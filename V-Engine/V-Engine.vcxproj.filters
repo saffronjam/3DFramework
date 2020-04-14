@@ -24,12 +24,21 @@
     <ClCompile Include="WindowsMessageMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VeException.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WindowsMessageMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VeWin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VeException.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
