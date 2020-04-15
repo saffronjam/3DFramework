@@ -2,6 +2,7 @@
 
 #include "VeWin.h"
 #include "VeException.h"
+#include "Keyboard.h"
 
 namespace ve
 {
@@ -41,7 +42,8 @@ public:
 	~Window();
 	Window(const Window &wnd) = delete;
 	Window &operator=(const Window &wnd) = delete;
-
+public:
+	Keyboard kbd;
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -55,4 +57,4 @@ private:
 }
 
 #define VEWND_EXCEPT(hr) Window::Exception(__LINE__,__FILE__,hr);
-#define VEWND_LAST_EXCEPT(hr) Window::Exception(__LINE__,__FILE__,GetLastError());
+#define VEWND_LAST_EXCEPT() Window::Exception(__LINE__,__FILE__,GetLastError());

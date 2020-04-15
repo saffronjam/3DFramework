@@ -1,4 +1,5 @@
 #include "Window.h"
+#include "resource.h"
 
 ve::Window::WindowClass ve::Window::WindowClass::m_wndClass;
 
@@ -12,12 +13,12 @@ ve::Window::WindowClass::WindowClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hIcon = nullptr;
+	wc.hIcon = static_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 256, 256, 0));
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	wc.hIconSm = nullptr;
+	wc.hIconSm = static_cast<HICON>(LoadImage(m_hInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, 0));
 	RegisterClassEx(&wc);
 }
 
@@ -31,14 +32,22 @@ ve::Window::Window(int width, int height, const char *name)
 	m_height(height)
 {
 	RECT wr = { 100, 100, 100 + width, 100 + height };
-	AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
 
+	if ( AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE) == 0 )
+	{
+		throw VEWND_LAST_EXCEPT();
+	}
 	m_hWnd = CreateWindow(
 		WindowClass::GetName(),
 		name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
 		nullptr, nullptr, WindowClass::GetInstance(), this
 	);
+	if ( m_hWnd == nullptr )
+	{
+		throw VEWND_LAST_EXCEPT();
+	}
+
 	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
 }
 
@@ -75,6 +84,24 @@ LRESULT ve::Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CLOSE:
 		PostQuitMessage(0);
 		return 0;
+	case WM_KILLFOCUS:
+		kbd.ClearState();
+		break;
+	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
+		if ( !(lParam & 0x40000000) || kbd.AutoRepeatIsOn() )
+		{
+			kbd.OnKeyPress(static_cast<uint8_t>(wParam));
+		}
+		break;
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+		kbd.OnKeyRelease(static_cast<uint8_t>(wParam));
+		break;
+	case WM_CHAR:
+		kbd.OnChar(static_cast<char>(wParam));
+		break;
+
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
 

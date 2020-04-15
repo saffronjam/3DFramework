@@ -9,12 +9,13 @@ int CALLBACK WinMain(
 {
 	try
 	{
-		ve::Window window(800, 300, "V-Engine");
+		ve::Window wnd(800, 300, "V-Engine");
 
 		MSG msg;
 		BOOL gResult;
 		while ( (gResult = GetMessage(&msg, nullptr, 0, 0)) > 0 )
 		{
+			wnd.kbd.Update();
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
