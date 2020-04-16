@@ -23,7 +23,7 @@ public:
 		Type m_type;
 		uint8_t m_code;
 	public:
-		Event(Type type = Type::Invalid, uint8_t code = 0u)
+		Event(Type type = Type::Invalid, uint8_t code = 0u) noexcept
 			:
 			m_type(type),
 			m_code(code)
@@ -32,8 +32,8 @@ public:
 	};
 public:
 	Keyboard() = default;
-	Keyboard(const Keyboard &kbd) = delete;
-	Keyboard &operator=(const Keyboard &kbd) = delete;
+	Keyboard(const Keyboard &) = delete;
+	Keyboard &operator=(const Keyboard &) = delete;
 
 	void Update();
 

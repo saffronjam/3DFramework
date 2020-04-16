@@ -47,7 +47,7 @@ void ve::Keyboard::ClearKey() noexcept
 
 std::optional<char> ve::Keyboard::ReadChar() noexcept
 {
-	if ( m_keyBuffer.size() > 0u )
+	if ( m_charBuffer.size() > 0u )
 	{
 		uint8_t c = m_charBuffer.front();
 		m_charBuffer.pop();
