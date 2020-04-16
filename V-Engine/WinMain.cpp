@@ -1,4 +1,4 @@
-#include "Window.h"
+#include "App.h"
 
 int CALLBACK WinMain(
 	_In_ HINSTANCE hInstance,
@@ -7,24 +7,10 @@ int CALLBACK WinMain(
 	_In_ int nCmdShow
 )
 {
+	App app;
 	try
 	{
-		ve::Window wnd(800, 300, "V-Engine");
-
-		MSG msg;
-		BOOL gResult;
-		while ( (gResult = GetMessage(&msg, nullptr, 0, 0)) > 0 )
-		{
-			wnd.kbd.Update();
-			wnd.mouse.Update();
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
-
-		if ( gResult == -1 )
-			return -1;
-
-		return (int)msg.wParam;
+		return app.Run();
 	}
 	catch ( const VeException &e )
 	{
