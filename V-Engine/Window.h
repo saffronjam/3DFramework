@@ -3,6 +3,7 @@
 #include "VeWin.h"
 #include "VeException.h"
 #include "Keyboard.h"
+#include "Mouse.h"
 
 namespace ve
 {
@@ -42,8 +43,11 @@ public:
 	~Window();
 	Window(const Window &wnd) = delete;
 	Window &operator=(const Window &wnd) = delete;
+
+	void SetTitle(const std::string &title) noexcept;
 public:
 	Keyboard kbd;
+	Mouse mouse;
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

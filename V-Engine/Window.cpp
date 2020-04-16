@@ -56,6 +56,14 @@ ve::Window::~Window()
 	DestroyWindow(m_hWnd);
 }
 
+void ve::Window::SetTitle(const std::string &title) noexcept
+{
+	if ( SetWindowText(m_hWnd, title.c_str()) == 0 )
+	{
+		throw VEWND_LAST_EXCEPT();
+	}
+}
+
 LRESULT ve::Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if ( msg == WM_NCCREATE )
@@ -87,6 +95,8 @@ LRESULT ve::Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_KILLFOCUS:
 		kbd.ClearState();
 		break;
+
+	/********************* KEYBOARD ***************************/
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
 		if ( !(lParam & 0x40000000) || kbd.AutoRepeatIsOn() )
@@ -101,10 +111,66 @@ LRESULT ve::Window::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	case WM_CHAR:
 		kbd.OnChar(static_cast<char>(wParam));
 		break;
-
+	/********************** MOUSE *****************************/
+	case WM_MOUSEMOVE:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		if ( pt.x >= 0 && pt.x < m_width && pt.y >= 0 && pt.y < m_height )
+		{
+			mouse.OnMove(pt.x, pt.y);
+			if ( !mouse.IsInWindow() )
+			{
+				SetCapture(hWnd);
+				mouse.OnEnter(pt.x, pt.y);
+			}
+		}
+		else
+		{
+			if ( mouse.LeftIsDown() || mouse.RightIsDown() )
+			{
+				mouse.OnMove(pt.x, pt.y);
+			}
+			else
+			{
+				ReleaseCapture();
+				mouse.OnLeave(pt.x, pt.y);
+			}
+		}
+		break;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		mouse.OnLeftPress(pt.x, pt.y);
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		mouse.OnRightPress(pt.x, pt.y);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		mouse.OnLeftRelease(pt.x, pt.y);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		mouse.OnRightRelease(pt.x, pt.y);
+		break;
+	}
+	case WM_MOUSEWHEEL:
+	{
+		const POINTS pt = MAKEPOINTS(lParam);
+		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
+		mouse.OnWheelDelta(pt.x, pt.y, delta);
+		break;
+	}
 	}
 	return DefWindowProc(hWnd, msg, wParam, lParam);
-
 }
 
 ve::Window::Exception::Exception(int line, const char *file, HRESULT hr) noexcept

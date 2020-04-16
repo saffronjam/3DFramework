@@ -16,6 +16,7 @@ int CALLBACK WinMain(
 		while ( (gResult = GetMessage(&msg, nullptr, 0, 0)) > 0 )
 		{
 			wnd.kbd.Update();
+			wnd.mouse.Update();
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
