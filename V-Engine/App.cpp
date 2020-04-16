@@ -8,24 +8,20 @@ App::App()
 
 int App::Run()
 {
-	MSG msg;
-	BOOL gResult;
-	while ( (gResult = GetMessage(&msg, nullptr, 0, 0)) > 0 )
+	while ( true )
 	{
 		m_wnd.kbd.Update();
 		m_wnd.mouse.Update();
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-
+		if ( const auto exitCode = ve::Window::ProcessMessages() )
+			return *exitCode;
 		DoFrame();
+
 	}
-
-	if ( gResult == -1 )
-		return -1;
-
-	return (int)msg.wParam;
 }
 
 void App::DoFrame()
 {
+	const float c = sin(m_clock.PeekDeltatime().asSeconds()) / 2.0f + 0.5;
+	m_wnd.gfx.ClearBuffer(c, c, 1.0f);
+	m_wnd.gfx.EndFrame();
 }

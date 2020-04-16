@@ -2,8 +2,10 @@
 
 #include "VeWin.h"
 #include "VeException.h"
+#include "Graphics.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include <optional>
 
 namespace ve
 {
@@ -44,10 +46,12 @@ public:
 	Window(const Window &wnd) = delete;
 	Window &operator=(const Window &wnd) = delete;
 
-	void SetTitle(const std::string &title) noexcept;
+	void SetTitle(const std::string &title);
+	static std::optional<int> ProcessMessages();
 public:
 	Keyboard kbd;
 	Mouse mouse;
+	Graphics gfx;
 private:
 	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);

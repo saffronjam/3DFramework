@@ -49,6 +49,8 @@ ve::Window::Window(int width, int height, const char *name)
 	}
 
 	ShowWindow(m_hWnd, SW_SHOWDEFAULT);
+
+	gfx.Init(m_hWnd);
 }
 
 ve::Window::~Window()
@@ -56,12 +58,28 @@ ve::Window::~Window()
 	DestroyWindow(m_hWnd);
 }
 
-void ve::Window::SetTitle(const std::string &title) noexcept
+void ve::Window::SetTitle(const std::string &title)
 {
 	if ( SetWindowText(m_hWnd, title.c_str()) == 0 )
 	{
 		throw VEWND_LAST_EXCEPT();
 	}
+}
+
+std::optional<int> ve::Window::ProcessMessages()
+{
+	MSG msg;
+	while ( PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE) )
+	{
+		if ( msg.message == WM_QUIT )
+		{
+			return static_cast<int>(msg.wParam);
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	return std::nullopt;
 }
 
 LRESULT ve::Window::HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

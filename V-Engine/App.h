@@ -1,6 +1,9 @@
 #pragma once
 
+#include <iomanip>
+
 #include "Window.h"
+#include "Clock.h"
 
 class App
 {
@@ -13,5 +16,7 @@ private:
 
 private:
 	ve::Window m_wnd;
+	ve::Clock m_clock;
+	ve::Time m_dt;
 };
 
