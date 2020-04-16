@@ -23,17 +23,9 @@ ve::DXGI_InfoManager::DXGI_InfoManager()
 	GFX_THROW_NOINFO(
 		DXGIGetDebugInterface_extract(
 			__uuidof( IDXGIInfoQueue ),
-			reinterpret_cast<void **>( &m_pDXGI_InfoQueue )
+			&m_pDXGI_InfoQueue
 		)
 	);
-}
-
-ve::DXGI_InfoManager::~DXGI_InfoManager()
-{
-	if ( m_pDXGI_InfoQueue != nullptr )
-	{
-		m_pDXGI_InfoQueue->Release();
-	}
 }
 
 void ve::DXGI_InfoManager::Set() noexcept

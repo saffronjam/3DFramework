@@ -3,21 +3,6 @@
 #include "dxerr.h"
 #include "GraphicsThrowMacros.h"
 
-ve::Graphics::~Graphics()
-{
-	if ( !m_initialized )
-		return;
-
-	if ( m_pContext != nullptr )
-		m_pContext->Release();
-	if ( m_pSwap != nullptr )
-		m_pSwap->Release();
-	if ( m_pDevice != nullptr )
-		m_pDevice->Release();
-	if ( m_pTarget != nullptr )
-		m_pTarget->Release();
-}
-
 void ve::Graphics::Init( HWND hWnd )
 {
 	if ( m_initialized )
@@ -64,17 +49,17 @@ void ve::Graphics::Init( HWND hWnd )
 		)
 	);
 
-	ID3D11Resource *pBackBuffer = nullptr;
+	Microsoft::WRL::ComPtr<ID3D11Resource> pBackBuffer;
 	GFX_THROW_INFO(
 		m_pSwap->GetBuffer(
 			0,
 			__uuidof( ID3D11Resource ),
-			reinterpret_cast<void **>( &pBackBuffer )
+			&pBackBuffer
 		)
 	);
 	GFX_THROW_INFO(
 		m_pDevice->CreateRenderTargetView(
-			pBackBuffer,
+			pBackBuffer.Get(),
 			nullptr,
 			&m_pTarget
 		)
@@ -106,7 +91,7 @@ void ve::Graphics::EndFrame()
 void ve::Graphics::ClearBuffer( float red, float green, float blue, float alpha ) noexcept
 {
 	const float color[] = { red, green, blue, 1.0f };
-	m_pContext->ClearRenderTargetView( m_pTarget, color );
+	m_pContext->ClearRenderTargetView( m_pTarget.Get(), color );
 }
 
 ve::Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs ) noexcept

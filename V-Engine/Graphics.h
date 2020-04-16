@@ -3,6 +3,7 @@
 #include "VeWin.h"
 #include <d3d11.h>
 #include <string>
+#include <wrl.h>
 
 #include "VeException.h"
 #include "DXGI_InfoManager.h"
@@ -51,9 +52,9 @@ public:
 	};
 public:
 	Graphics() = default;
+	~Graphics() = default;
 	Graphics( const Graphics & ) = delete;
 	Graphics &operator=( const Graphics & ) = delete;
-	~Graphics();
 
 	void Init( HWND hWnd );
 
@@ -65,9 +66,10 @@ private:
 #ifndef NDEBUG
 	DXGI_InfoManager m_infoManager;
 #endif
-	ID3D11Device *m_pDevice = nullptr;
-	IDXGISwapChain *m_pSwap = nullptr;
-	ID3D11DeviceContext *m_pContext = nullptr;
-	ID3D11RenderTargetView *m_pTarget = nullptr;
+
+	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwap;;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pTarget;;
 };
 }
