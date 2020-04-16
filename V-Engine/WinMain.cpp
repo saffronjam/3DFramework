@@ -7,22 +7,22 @@ int CALLBACK WinMain(
 	_In_ int nCmdShow
 )
 {
-	App app;
 	try
 	{
+		App app;
 		return app.Run();
 	}
 	catch ( const VeException &e )
 	{
-		MessageBox(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION);
+		MessageBox( nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION );
 	}
 	catch ( const std::exception &e )
 	{
-		MessageBox(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox( nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION );
 	}
 	catch ( ... )
 	{
-		MessageBox(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION);
+		MessageBox( nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION );
 	}
 	return -1;
 }
