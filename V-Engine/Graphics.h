@@ -4,15 +4,20 @@
 #include <d3d11.h>
 #include <string>
 #include <wrl.h>
+#include <d3dcompiler.h>
+#include <DirectXMath.h>
 
 #include "VeException.h"
 #include "DXGI_InfoManager.h"
 #include "GraphicsThrowMacros.h"
 
+namespace dx = DirectX;
+
 namespace ve
 {
 class Graphics
 {
+	friend class Bindable;
 public:
 	class Exception : public VeException
 	{
@@ -60,16 +65,21 @@ public:
 
 	void EndFrame();
 	void ClearBuffer( float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f ) noexcept;
+
+	void DrawIndexed( UINT count ) noexcept( !IS_DEBUG );
+	void SetProjection( DirectX::FXMMATRIX projection ) noexcept;
+	DirectX::XMMATRIX GetProjection() const noexcept;
 private:
 	bool m_initialized = false;
 private:
-#ifndef NDEBUG
-	DXGI_InfoManager m_infoManager;
-#endif
-
+	DirectX::XMMATRIX m_projection;
 	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwap;;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pTarget;;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
+#ifndef NDEBUG
+	DXGI_InfoManager m_infoManager;
+#endif
 };
 }

@@ -1,14 +1,14 @@
 #pragma once
 
-#include <iomanip>
-
 #include "Window.h"
 #include "Clock.h"
+#include "Box.h"
 
 class App
 {
 public:
 	App();
+	~App();
 
 	int Run();
 private:
@@ -17,6 +17,7 @@ private:
 private:
 	ve::Window m_wnd;
 	ve::Clock m_clock;
-	ve::Time m_dt;
+
+	std::vector<std::unique_ptr<ve::Box>> boxes;
 };
 
