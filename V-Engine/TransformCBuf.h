@@ -1,7 +1,8 @@
 #pragma once
 
-#include <DirectXMath.h>
+#pragma once
 
+#include "VeMath.h"
 #include "ConstantBuffer.h"
 #include "Drawable.h"
 
@@ -14,7 +15,7 @@ public:
 	void Bind( Graphics &gfx ) noexcept override;
 
 private:
-	VertexConstantBuffer<DirectX::XMMATRIX> m_vCBuf;
+	VSConstantBuffer<DirectX::XMMATRIX> m_vCBuf;
 	const Drawable &m_parent;
 };
 }

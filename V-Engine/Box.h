@@ -1,18 +1,18 @@
 #pragma once
 
-#include "Drawable.h"
-#include <random>
+#include "DrawableBase.h"
 
 namespace ve
 {
-class Box : public Drawable
+class Box : public DrawableBase<Box>
 {
 public:
 	Box( Graphics &gfx, std::mt19937 &rng,
 		 std::uniform_real_distribution<float> &adist,
 		 std::uniform_real_distribution<float> &ddist,
 		 std::uniform_real_distribution<float> &odist,
-		 std::uniform_real_distribution<float> &rdist
+		 std::uniform_real_distribution<float> &rdist,
+		 std::uniform_real_distribution<float> &bdist
 	);
 
 	void Update( const Time &dt ) noexcept override;
@@ -33,5 +33,7 @@ private:
 	float m_dtheta;
 	float m_dphi;
 	float m_dchi;
+
+	DirectX::XMFLOAT3X3 m_modelTransform;
 };
 }
