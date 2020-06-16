@@ -30,7 +30,7 @@ private:
 	class WindowClass
 	{
 	public:
-		E		static const char *GetName() { return m_wndClassName; }
+		static const char *GetName() { return m_wndClassName; }
 		static HINSTANCE GetInstance() { return m_wndClass.m_instanceHandle; }
 	private:
 		WindowClass() noexcept;
