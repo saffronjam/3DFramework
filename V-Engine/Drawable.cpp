@@ -12,6 +12,10 @@ void ve::Drawable::Draw( Graphics &gfx ) const noexcept( !IS_DEBUG )
 	{
 		bind->Bind( gfx );
 	}
+	for ( auto &staticBind : GetStaticBinds() )
+	{
+		staticBind->Bind( gfx );
+	}
 	gfx.DrawIndexed( m_pIndexBuffer->GetCount() );
 }
 
@@ -27,3 +31,4 @@ void ve::Drawable::AddIndexBuffer( std::unique_ptr<class IndexBuffer> ibuf ) noe
 	m_pIndexBuffer = ibuf.get();
 	m_binds.push_back( std::move( ibuf ) );
 }
+

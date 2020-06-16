@@ -58,7 +58,7 @@ protected:
 };
 
 template <typename C>
-class VertexConstantBuffer : public ConstantBuffer<C>
+class VSConstantBuffer : public ConstantBuffer<C>
 {
 	using ConstantBuffer<C>::m_pConstantBuffer;
 	using Bindable::GetContext;
@@ -71,7 +71,7 @@ public:
 };
 
 template <typename C>
-class PixelConstantBuffer : public ConstantBuffer<C>
+class PSConstantBuffer : public ConstantBuffer<C>
 {
 	using ConstantBuffer<C>::m_pConstantBuffer;
 	using Bindable::GetContext;

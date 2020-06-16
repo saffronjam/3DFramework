@@ -5,13 +5,12 @@
 #include <string>
 #include <wrl.h>
 #include <d3dcompiler.h>
-#include <DirectXMath.h>
 
+#include "VeMath.h"
 #include "VeException.h"
 #include "DXGI_InfoManager.h"
 #include "GraphicsThrowMacros.h"
 
-namespace dx = DirectX;
 
 namespace ve
 {
