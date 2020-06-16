@@ -3,7 +3,7 @@
 #include "BindableBase.h"
 #include "Sphere.h"
 
-ve::Melon::Melon( Graphics &gfx, std::mt19937 &rng, std::uniform_real_distribution<float> &adist, std::uniform_real_distribution<float> &ddist, std::uniform_real_distribution<float> &odist, std::uniform_real_distribution<float> &rdist, std::uniform_int_distribution<int> &longdist, std::uniform_int_distribution<int> &latdist )
+Melon::Melon( Graphics &gfx, std::mt19937 &rng, std::uniform_real_distribution<float> &adist, std::uniform_real_distribution<float> &ddist, std::uniform_real_distribution<float> &odist, std::uniform_real_distribution<float> &rdist, std::uniform_int_distribution<int> &longdist, std::uniform_int_distribution<int> &latdist )
 	:
 	r( rdist( rng ) ),
 	droll( ddist( rng ) ),
@@ -73,17 +73,17 @@ ve::Melon::Melon( Graphics &gfx, std::mt19937 &rng, std::uniform_real_distributi
 	AddBind( std::make_unique<TransformCBuf>( gfx, *this ) );
 }
 
-void ve::Melon::Update( const Time &dt ) noexcept
+void Melon::Update( const Time &dt ) noexcept
 {
-	roll += droll * dt.asSeconds();
-	pitch += dpitch * dt.asSeconds();
-	yaw += dyaw * dt.asSeconds();
-	theta += dtheta * dt.asSeconds();
-	phi += dphi * dt.asSeconds();
-	chi += dchi * dt.asSeconds();
+	roll += droll * dt.AsSeconds();
+	pitch += dpitch * dt.AsSeconds();
+	yaw += dyaw * dt.AsSeconds();
+	theta += dtheta * dt.AsSeconds();
+	phi += dphi * dt.AsSeconds();
+	chi += dchi * dt.AsSeconds();
 }
 
-DirectX::XMMATRIX ve::Melon::GetTransformXM() const noexcept
+DirectX::XMMATRIX Melon::GetTransformXM() const noexcept
 {
 	return
 		DirectX::XMMatrixRotationRollPitchYaw( pitch, yaw, roll ) *

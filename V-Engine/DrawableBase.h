@@ -5,8 +5,6 @@
 #include "Drawable.h"
 #include "IndexBuffer.h"
 
-namespace ve
-{
 template<class T>
 class DrawableBase : public Drawable
 {
@@ -51,4 +49,3 @@ private:
 
 template<class T>
 std::vector<std::unique_ptr<Bindable>> DrawableBase<T>::m_staticBinds;
-}

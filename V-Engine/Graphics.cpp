@@ -3,7 +3,7 @@
 #include "dxerr.h"
 #include "GraphicsThrowMacros.h"
 
-void ve::Graphics::Init( HWND hWnd )
+void Graphics::Init( HWND hWnd )
 {
 	if ( m_initialized )
 		return;
@@ -111,14 +111,14 @@ void ve::Graphics::Init( HWND hWnd )
 	m_initialized = true;
 }
 
-void ve::Graphics::EndFrame()
+void Graphics::EndFrame()
 {
 	HRESULT hr = {};
 #ifndef NDEBUG
 	m_infoManager.Set();
 #endif
 
-	if ( FAILED( m_pSwap->Present( 1u, 0u ) ) )
+	if ( FAILED( hr = m_pSwap->Present( 1u, 0u ) ) )
 	{
 		if ( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
@@ -131,29 +131,29 @@ void ve::Graphics::EndFrame()
 	}
 }
 
-void ve::Graphics::ClearBuffer( float red, float green, float blue, float alpha ) noexcept
+void Graphics::ClearBuffer( float red, float green, float blue, float alpha ) noexcept
 {
 	const float color[] = { red, green, blue, 1.0f };
 	m_pContext->ClearRenderTargetView( m_pTarget.Get(), color );
 	m_pContext->ClearDepthStencilView( m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u );
 }
 
-void ve::Graphics::DrawIndexed( UINT count ) noexcept( !IS_DEBUG )
+void Graphics::DrawIndexed( UINT count ) noexcept( !IS_DEBUG )
 {
 	GFX_THROW_INFO_ONLY( m_pContext->DrawIndexed( count, 0u, 0u ) );
 }
 
-void ve::Graphics::SetProjection( DirectX::FXMMATRIX projection ) noexcept
+void Graphics::SetProjection( DirectX::FXMMATRIX projection ) noexcept
 {
 	m_projection = projection;
 }
 
-DirectX::XMMATRIX ve::Graphics::GetProjection() const noexcept
+DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return m_projection;
 }
 
-ve::Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs ) noexcept
+Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs ) noexcept
 	:
 	Exception( line, file ),
 	hr( hr )
@@ -171,7 +171,7 @@ ve::Graphics::HRException::HRException( int line, const char *file, HRESULT hr, 
 	}
 }
 
-const char *ve::Graphics::HRException::what() const noexcept
+const char *Graphics::HRException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[Type] " << GetType() << std::endl
@@ -187,39 +187,39 @@ const char *ve::Graphics::HRException::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char *ve::Graphics::HRException::GetType() const noexcept
+const char *Graphics::HRException::GetType() const noexcept
 {
 	return "V-Engine Graphics Exception";
 }
 
-HRESULT ve::Graphics::HRException::GetErrorCode() const noexcept
+HRESULT Graphics::HRException::GetErrorCode() const noexcept
 {
 	return hr;
 }
 
-std::string ve::Graphics::HRException::GetErrorString() const noexcept
+std::string Graphics::HRException::GetErrorString() const noexcept
 {
 	return DXGetErrorString( hr );
 }
 
-std::string ve::Graphics::HRException::GetErrorDescription() const noexcept
+std::string Graphics::HRException::GetErrorDescription() const noexcept
 {
 	char buf[512];
 	DXGetErrorDescription( hr, buf, sizeof( buf ) );
 	return buf;
 }
 
-std::string ve::Graphics::HRException::GetErrorInfo() const noexcept
+std::string Graphics::HRException::GetErrorInfo() const noexcept
 {
 	return info;
 }
 
-const char *ve::Graphics::DeviceRemovedException::GetType() const noexcept
+const char *Graphics::DeviceRemovedException::GetType() const noexcept
 {
 	return "V-Engine Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
 }
 
-ve::Graphics::InfoException::InfoException( int line, const char *file, std::vector<std::string> infoMsgs ) noexcept
+Graphics::InfoException::InfoException( int line, const char *file, std::vector<std::string> infoMsgs ) noexcept
 	:
 	Exception( line, file )
 {
@@ -236,7 +236,7 @@ ve::Graphics::InfoException::InfoException( int line, const char *file, std::vec
 	}
 }
 
-const char *ve::Graphics::InfoException::what() const noexcept
+const char *Graphics::InfoException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[Type] " << GetType() << std::endl
@@ -246,12 +246,12 @@ const char *ve::Graphics::InfoException::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char *ve::Graphics::InfoException::GetType() const noexcept
+const char *Graphics::InfoException::GetType() const noexcept
 {
 	return "V-Engine Graphics Info Exception";
 }
 
-std::string ve::Graphics::InfoException::GetErrorInfo() const noexcept
+std::string Graphics::InfoException::GetErrorInfo() const noexcept
 {
 	return info;
 }

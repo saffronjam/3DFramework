@@ -4,8 +4,6 @@
 #include <bitset>
 #include <optional>
 
-namespace ve
-{
 class Keyboard
 {
 	friend class Window;
@@ -23,23 +21,23 @@ public:
 		Type m_type;
 		uint8_t m_code;
 	public:
-		Event(Type type = Type::Invalid, uint8_t code = 0u) noexcept
+		Event( Type type = Type::Invalid, uint8_t code = 0u ) noexcept
 			:
-			m_type(type),
-			m_code(code)
+			m_type( type ),
+			m_code( code )
 		{
 		}
 	};
 public:
 	Keyboard() = default;
-	Keyboard(const Keyboard &) = delete;
-	Keyboard &operator=(const Keyboard &) = delete;
+	Keyboard( const Keyboard & ) = delete;
+	Keyboard &operator=( const Keyboard & ) = delete;
 
 	void Update();
 
-	bool KeyIsDown(uint8_t keycode) const noexcept;
-	bool KeyIsPressed(uint8_t keycode) const noexcept;
-	bool KeyIsReleased(uint8_t keycode) const noexcept;
+	bool KeyIsDown( uint8_t keycode ) const noexcept;
+	bool KeyIsPressed( uint8_t keycode ) const noexcept;
+	bool KeyIsReleased( uint8_t keycode ) const noexcept;
 	std::optional<Event> ReadKey() noexcept;
 	bool KeyIsEmpty() const noexcept;
 	void ClearKey() noexcept;
@@ -55,12 +53,12 @@ public:
 	bool AutoRepeatIsOn() const noexcept;
 
 private:
-	void OnKeyPress(uint8_t keycode) noexcept;
-	void OnKeyRelease(uint8_t keycode) noexcept;
-	void OnChar(char character) noexcept;
+	void OnKeyPress( uint8_t keycode ) noexcept;
+	void OnKeyRelease( uint8_t keycode ) noexcept;
+	void OnChar( char character ) noexcept;
 	void ClearState() noexcept;
 	template <typename T>
-	static void TrimBuffer(std::queue<T> &buffer) noexcept;
+	static void TrimBuffer( std::queue<T> &buffer ) noexcept;
 private:
 	static constexpr uint32_t m_numKeys = 256u;
 	static constexpr uint32_t m_bufferSize = 16u;
@@ -70,5 +68,3 @@ private:
 	std::queue<Event> m_keyBuffer;
 	std::queue<char> m_charBuffer;
 };
-}
-

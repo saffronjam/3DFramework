@@ -4,8 +4,6 @@
 
 #include "VeMath.h"
 
-namespace ve
-{
 template <typename T>
 class IndexedTriangleList
 {
@@ -36,4 +34,3 @@ public:
 	std::vector<T> vertices;
 	std::vector<unsigned short> indices;
 };
-}

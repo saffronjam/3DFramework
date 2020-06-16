@@ -12,8 +12,6 @@
 #include "GraphicsThrowMacros.h"
 
 
-namespace ve
-{
 class Graphics
 {
 	friend class Bindable;
@@ -81,4 +79,3 @@ private:
 	DXGI_InfoManager m_infoManager;
 #endif
 };
-}

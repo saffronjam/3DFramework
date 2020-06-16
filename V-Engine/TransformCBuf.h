@@ -6,8 +6,6 @@
 #include "ConstantBuffer.h"
 #include "Drawable.h"
 
-namespace ve
-{
 class TransformCBuf : public Bindable
 {
 public:
@@ -18,5 +16,3 @@ private:
 	VSConstantBuffer<DirectX::XMMATRIX> m_vCBuf;
 	const Drawable &m_parent;
 };
-}
-

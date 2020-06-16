@@ -1,6 +1,6 @@
 #include "PixelShader.h"
 
-ve::PixelShader::PixelShader( Graphics &gfx, const std::wstring &path )
+PixelShader::PixelShader( Graphics &gfx, const std::wstring &path )
 {
 	INFOMAN( gfx );
 
@@ -16,7 +16,7 @@ ve::PixelShader::PixelShader( Graphics &gfx, const std::wstring &path )
 	);
 }
 
-void ve::PixelShader::Bind( Graphics &gfx ) noexcept
+void PixelShader::Bind( Graphics &gfx ) noexcept
 {
 	GetContext( gfx )->PSSetShader( m_pPixelShader.Get(), nullptr, 0u );
 }

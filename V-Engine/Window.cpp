@@ -1,9 +1,9 @@
 #include "Window.h"
 #include "resource.h"
 
-ve::Window::Win32Window ve::Window::Win32Window::m_win32Window;
+Window::Win32Window Window::Win32Window::m_win32Window;
 
-ve::Window::Win32Window::Win32Window() noexcept
+Window::Win32Window::Win32Window() noexcept
 	: m_instanceHandle( GetModuleHandle( nullptr ) )
 {
 	WNDCLASSEX wc = { 0 };
@@ -22,12 +22,12 @@ ve::Window::Win32Window::Win32Window() noexcept
 	RegisterClassEx( &wc );
 }
 
-ve::Window::Win32Window::~Win32Window()
+Window::Win32Window::~Win32Window()
 {
 	UnregisterClass( GetName(), GetInstance() );
 }
 
-ve::Window::Window( int width, int height, const char *name )
+Window::Window( int width, int height, const char *name )
 	: m_width( width ),
 	m_height( height )
 {
@@ -53,12 +53,12 @@ ve::Window::Window( int width, int height, const char *name )
 	gfx.Init( m_windowHandle );
 }
 
-ve::Window::~Window()
+Window::~Window()
 {
 	DestroyWindow( m_windowHandle );
 }
 
-void ve::Window::SetTitle( const std::string &title )
+void Window::SetTitle( const std::string &title )
 {
 	if ( SetWindowText( m_windowHandle, title.c_str() ) == 0 )
 	{
@@ -66,7 +66,7 @@ void ve::Window::SetTitle( const std::string &title )
 	}
 }
 
-std::optional<int> ve::Window::ProcessMessages()
+std::optional<int> Window::ProcessMessages()
 {
 	MSG msg;
 	while ( PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ) )
@@ -82,7 +82,7 @@ std::optional<int> ve::Window::ProcessMessages()
 	return std::nullopt;
 }
 
-LRESULT ve::Window::HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+LRESULT Window::HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
 	if ( msg == WM_NCCREATE )
 	{
@@ -97,13 +97,13 @@ LRESULT ve::Window::HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
 	return DefWindowProc( hWnd, msg, wParam, lParam );
 }
 
-LRESULT ve::Window::HandleMsgThunk( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
+LRESULT Window::HandleMsgThunk( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
 	Window *const wnd = reinterpret_cast<Window *>( GetWindowLongPtr( hWnd, GWLP_USERDATA ) );
 	return wnd->HandleMsg( hWnd, msg, wParam, lParam );
 }
 
-LRESULT ve::Window::HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept
+LRESULT Window::HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept
 {
 	switch ( msg )
 	{
@@ -193,14 +193,14 @@ LRESULT ve::Window::HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	return DefWindowProc( hWnd, msg, wParam, lParam );
 }
 
-ve::Window::Exception::Exception( int line, const char *file, HRESULT hr ) noexcept
+Window::Exception::Exception( int line, const char *file, HRESULT hr ) noexcept
 	:
 	VeException( line, file ),
 	m_hr( hr )
 {
 }
 
-const char *ve::Window::Exception::what() const noexcept
+const char *Window::Exception::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[Type] " << GetType() << std::endl
@@ -211,12 +211,12 @@ const char *ve::Window::Exception::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char *ve::Window::Exception::GetType() const noexcept
+const char *Window::Exception::GetType() const noexcept
 {
 	return "V-Engine Window Exception";
 }
 
-std::string ve::Window::Exception::TranslateErrorCode( HRESULT hr )
+std::string Window::Exception::TranslateErrorCode( HRESULT hr )
 {
 	char *pMsgBuf = nullptr;
 	const DWORD nMsgLen = FormatMessage(
@@ -235,12 +235,12 @@ std::string ve::Window::Exception::TranslateErrorCode( HRESULT hr )
 	return errorString;
 }
 
-HRESULT ve::Window::Exception::GetErrorCode() const noexcept
+HRESULT Window::Exception::GetErrorCode() const noexcept
 {
 	return m_hr;
 }
 
-std::string ve::Window::Exception::GetErrorString() const noexcept
+std::string Window::Exception::GetErrorString() const noexcept
 {
 	return TranslateErrorCode( m_hr );
 }

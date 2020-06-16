@@ -177,7 +177,6 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Pyramid.cpp" />
-    <ClCompile Include="Time.cpp" />
     <ClCompile Include="Topology.cpp" />
     <ClCompile Include="TransformCBuf.cpp" />
     <ClCompile Include="VeException.cpp" />

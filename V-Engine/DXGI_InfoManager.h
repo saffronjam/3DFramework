@@ -5,8 +5,6 @@
 #include <dxgidebug.h>
 #include <wrl.h>
 
-namespace ve
-{
 class DXGI_InfoManager
 {
 public:
@@ -20,4 +18,3 @@ private:
 	unsigned long long m_next = 0u;
 	Microsoft::WRL::ComPtr<IDXGIInfoQueue> m_pDXGI_InfoQueue;
 };
-}

@@ -2,8 +2,6 @@
 
 #include "Bindable.h"
 
-namespace ve
-{
 class Topology : public Bindable
 {
 public:
@@ -12,5 +10,4 @@ public:
 protected:
 	D3D11_PRIMITIVE_TOPOLOGY m_type;
 };
-}
 

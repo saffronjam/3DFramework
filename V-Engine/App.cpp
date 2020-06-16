@@ -11,27 +11,27 @@ App::App()
 	class Factory
 	{
 	public:
-		Factory( ve::Graphics &gfx )
+		Factory( Graphics &gfx )
 			:
 			gfx( gfx )
 		{
 		}
-		std::unique_ptr<ve::Drawable> operator()()
+		std::unique_ptr<Drawable> operator()()
 		{
 			switch ( typedist( rng ) )
 			{
 			case 0:
-				return std::make_unique<ve::Pyramid>(
+				return std::make_unique<Pyramid>(
 					gfx, rng, adist, ddist,
 					odist, rdist
 					);
 			case 1:
-				return std::make_unique<ve::Box>(
+				return std::make_unique<Box>(
 					gfx, rng, adist, ddist,
 					odist, rdist, bdist
 					);
 			case 2:
-				return std::make_unique<ve::Melon>(
+				return std::make_unique<Melon>(
 					gfx, rng, adist, ddist,
 					odist, rdist, longdist, latdist
 					);
@@ -41,11 +41,11 @@ App::App()
 			}
 		}
 	private:
-		ve::Graphics &gfx;
+		Graphics &gfx;
 		std::mt19937 rng{ std::random_device{}( ) };
-		std::uniform_real_distribution<float> adist{ 0.0f,ve::PI * 2.0f };
-		std::uniform_real_distribution<float> ddist{ 0.0f,ve::PI * 0.5f };
-		std::uniform_real_distribution<float> odist{ 0.0f,ve::PI * 0.08f };
+		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
+		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
+		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
 		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
 		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
 		std::uniform_int_distribution<int> latdist{ 5,20 };
@@ -71,7 +71,7 @@ int App::Run()
 	{
 		m_wnd.kbd.Update();
 		m_wnd.mouse.Update();
-		if ( const auto exitCode = ve::Window::ProcessMessages() )
+		if ( const auto exitCode = Window::ProcessMessages() )
 			return *exitCode;
 		DoFrame();
 
@@ -80,7 +80,7 @@ int App::Run()
 
 void App::DoFrame()
 {
-	ve::Time dt = m_clock.GetDeltatime();
+	Time dt = m_clock.GetDeltatime();
 
 	m_wnd.gfx.ClearBuffer( 0.07f, 0.0f, 0.12f );
 

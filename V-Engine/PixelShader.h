@@ -2,8 +2,6 @@
 
 #include "Bindable.h"
 
-namespace ve
-{
 class PixelShader : public Bindable
 {
 public:
@@ -12,5 +10,4 @@ public:
 protected:
 	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_pPixelShader;
 };
-}
 

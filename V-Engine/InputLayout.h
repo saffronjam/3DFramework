@@ -2,8 +2,6 @@
 
 #include "Bindable.h"
 
-namespace ve
-{
 class InputLayout : public Bindable
 {
 public:
@@ -14,5 +12,4 @@ public:
 protected:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_pInputLayout;
 };
-}
 

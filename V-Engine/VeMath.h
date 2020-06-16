@@ -5,8 +5,6 @@
 #include <DirectXMath.h>
 #endif
 
-namespace ve
-{
 constexpr float PI = 3.14159265f;
 constexpr double PI_D = 3.1415926535897932;
 
@@ -35,5 +33,4 @@ template<typename T>
 constexpr T to_rad( T deg )
 {
 	return deg * PI / (T)180.0;
-}
 }

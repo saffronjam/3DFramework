@@ -1,8 +1,6 @@
 #pragma once
 #include "DrawableBase.h"
 
-namespace ve
-{
 class Pyramid : public DrawableBase<Pyramid>
 {
 public:
@@ -30,4 +28,3 @@ private:
 	float dphi;
 	float dchi;
 };
-}

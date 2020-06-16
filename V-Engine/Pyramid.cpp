@@ -3,7 +3,7 @@
 #include "BindableBase.h"
 #include "Cone.h"
 
-ve::Pyramid::Pyramid( Graphics &gfx,
+Pyramid::Pyramid( Graphics &gfx,
 					  std::mt19937 &rng,
 					  std::uniform_real_distribution<float> &adist,
 					  std::uniform_real_distribution<float> &ddist,
@@ -72,17 +72,17 @@ ve::Pyramid::Pyramid( Graphics &gfx,
 	AddBind( std::make_unique<TransformCBuf>( gfx, *this ) );
 }
 
-void ve::Pyramid::Update( const Time &dt ) noexcept
+void Pyramid::Update( const Time &dt ) noexcept
 {
-	roll += droll * dt.asSeconds();
-	pitch += dpitch * dt.asSeconds();
-	yaw += dyaw * dt.asSeconds();
-	theta += dtheta * dt.asSeconds();
-	phi += dphi * dt.asSeconds();
-	chi += dchi * dt.asSeconds();
+	roll += droll * dt.AsSeconds();
+	pitch += dpitch * dt.AsSeconds();
+	yaw += dyaw * dt.AsSeconds();
+	theta += dtheta * dt.AsSeconds();
+	phi += dphi * dt.AsSeconds();
+	chi += dchi * dt.AsSeconds();
 }
 
-DirectX::XMMATRIX ve::Pyramid::GetTransformXM() const noexcept
+DirectX::XMMATRIX Pyramid::GetTransformXM() const noexcept
 {
 	return
 		DirectX::XMMatrixRotationRollPitchYaw( pitch, yaw, roll ) *

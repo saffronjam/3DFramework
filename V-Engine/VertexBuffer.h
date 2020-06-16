@@ -2,8 +2,6 @@
 
 #include "Bindable.h"
 
-namespace ve
-{
 class VertexBuffer : public Bindable
 {
 public:
@@ -33,4 +31,3 @@ protected:
 	UINT m_stride;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_pVertexBuffer;
 };
-}

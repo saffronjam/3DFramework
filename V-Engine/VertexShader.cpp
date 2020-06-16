@@ -1,6 +1,6 @@
 #include "VertexShader.h"
 
-ve::VertexShader::VertexShader( Graphics &gfx, const std::wstring &path )
+VertexShader::VertexShader( Graphics &gfx, const std::wstring &path )
 {
 	INFOMAN( gfx );
 
@@ -15,7 +15,7 @@ ve::VertexShader::VertexShader( Graphics &gfx, const std::wstring &path )
 	);
 }
 
-void ve::VertexShader::Bind( Graphics &gfx ) noexcept
+void VertexShader::Bind( Graphics &gfx ) noexcept
 {
 	GetContext( gfx )->VSSetShader( m_pVertexShader.Get(), nullptr, 0u );
 }

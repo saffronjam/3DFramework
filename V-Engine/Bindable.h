@@ -2,8 +2,6 @@
 
 #include "Graphics.h"
 
-namespace ve
-{
 class Bindable
 {
 public:
@@ -14,5 +12,3 @@ protected:
 	static ID3D11Device *GetDevice( Graphics &gfx ) noexcept;
 	static DXGI_InfoManager &GetInfoManager( Graphics &gfx ) noexcept( !IS_DEBUG );
 };
-}
-

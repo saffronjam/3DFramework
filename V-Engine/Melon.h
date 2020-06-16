@@ -2,8 +2,6 @@
 
 #include "DrawableBase.h"
 
-namespace ve
-{
 class Melon : public DrawableBase<Melon>
 {
 public:
@@ -34,5 +32,3 @@ private:
 	float dphi;
 	float dchi;
 };
-}
-

@@ -1,6 +1,6 @@
 #include "IndexBuffer.h"
 
-ve::IndexBuffer::IndexBuffer( Graphics &gfx, const std::vector<unsigned short> &indices )
+IndexBuffer::IndexBuffer( Graphics &gfx, const std::vector<unsigned short> &indices )
 	:
 	m_count( (UINT)indices.size() )
 {
@@ -19,7 +19,7 @@ ve::IndexBuffer::IndexBuffer( Graphics &gfx, const std::vector<unsigned short> &
 	GFX_THROW_INFO( GetDevice( gfx )->CreateBuffer( &ibd, &isd, &m_indexBuffer ) );
 }
 
-void ve::IndexBuffer::Bind( Graphics &gfx ) noexcept
+void IndexBuffer::Bind( Graphics &gfx ) noexcept
 {
 	GetContext( gfx )->IASetIndexBuffer( m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u );
 }

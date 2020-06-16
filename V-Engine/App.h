@@ -17,10 +17,10 @@ private:
 	void DoFrame();
 
 private:
-	ve::Window m_wnd;
-	ve::Clock m_clock;
+	Window m_wnd;
+	Clock m_clock;
 
-	std::vector<std::unique_ptr<ve::Drawable>> drawables;
+	std::vector<std::unique_ptr<Drawable>> drawables;
 	static constexpr int nDrawables = 180;
 };
 

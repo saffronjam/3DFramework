@@ -2,8 +2,6 @@
 
 #include "Bindable.h"
 
-namespace ve
-{
 class IndexBuffer : public Bindable
 {
 public:
@@ -14,5 +12,4 @@ protected:
 	UINT m_count;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer;
 };
-}
 

@@ -3,8 +3,6 @@
 #include "VeMath.h"
 #include "IndexedTriangleList.h"
 
-namespace ve
-{
 class Sphere
 {
 public:
@@ -95,5 +93,3 @@ public:
 		return { std::move( vertices ),std::move( indices ) };
 	}
 };
-}
-

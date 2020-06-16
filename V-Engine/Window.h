@@ -9,8 +9,6 @@
 #include "Mouse.h"
 #include "WindowThrowMacros.h"
 
-namespace ve
-{
 class Window
 {
 public:
@@ -64,4 +62,3 @@ private:
 	HWND m_windowHandle;
 
 };
-}

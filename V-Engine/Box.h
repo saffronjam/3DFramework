@@ -2,8 +2,6 @@
 
 #include "DrawableBase.h"
 
-namespace ve
-{
 class Box : public DrawableBase<Box>
 {
 public:
@@ -36,4 +34,3 @@ private:
 
 	DirectX::XMFLOAT3X3 m_modelTransform;
 };
-}

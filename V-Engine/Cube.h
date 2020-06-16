@@ -3,8 +3,6 @@
 #include "VeMath.h"
 #include "IndexedTriangleList.h"
 
-namespace ve
-{
 class Cube
 {
 public:
@@ -40,5 +38,3 @@ public:
 		};
 	}
 };
-}
-

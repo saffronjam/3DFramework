@@ -3,8 +3,6 @@
 #include "Bindable.h"
 #include "GraphicsThrowMacros.h"
 
-namespace ve
-{
 template <typename C>
 class ConstantBuffer : public Bindable
 {
@@ -82,5 +80,3 @@ public:
 		GetContext( gfx )->PSSetConstantBuffers( 0u, 1u, m_pConstantBuffer.GetAddressOf() );
 	}
 };
-}
-

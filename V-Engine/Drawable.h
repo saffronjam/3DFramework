@@ -4,8 +4,6 @@
 #include "Graphics.h"
 #include "Time.h"
 
-namespace ve
-{
 class Bindable;
 
 class Drawable
@@ -30,4 +28,3 @@ protected:
 	const class IndexBuffer *m_pIndexBuffer = nullptr;
 	std::vector<std::unique_ptr<Bindable>> m_binds;
 };
-}

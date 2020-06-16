@@ -3,8 +3,6 @@
 #include "VeMath.h"
 #include "IndexedTriangleList.h"
 
-namespace ve
-{
 class Prism
 {
 public:
@@ -77,5 +75,3 @@ public:
 		return { std::move( vertices ),std::move( indices ) };
 	}
 };
-}
-

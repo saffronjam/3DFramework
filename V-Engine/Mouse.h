@@ -3,8 +3,6 @@
 #include <queue>
 #include <optional>
 
-namespace ve
-{
 class Mouse
 {
 	friend class Window;
@@ -32,17 +30,17 @@ public:
 	public:
 		Event() noexcept
 			:
-			m_type(Type::Invalid),
-			m_state(std::make_pair(false, false)),
-			m_coords(std::make_pair(0, 0))
+			m_type( Type::Invalid ),
+			m_state( std::make_pair( false, false ) ),
+			m_coords( std::make_pair( 0, 0 ) )
 		{
 
 		}
-		Event(Type type, const Mouse &parent) noexcept
+		Event( Type type, const Mouse &parent ) noexcept
 			:
-			m_type(type),
-			m_state(parent.m_state),
-			m_coords(parent.m_coords)
+			m_type( type ),
+			m_state( parent.m_state ),
+			m_coords( parent.m_coords )
 		{
 		}
 		bool IsValid() const noexcept { return m_type != Type::Invalid; }
@@ -53,8 +51,8 @@ public:
 	};
 public:
 	Mouse() = default;
-	Mouse(const Mouse &) = delete;
-	Mouse &operator=(const Mouse &) = delete;
+	Mouse( const Mouse & ) = delete;
+	Mouse &operator=( const Mouse & ) = delete;
 
 	void Update();
 
@@ -72,16 +70,16 @@ public:
 	void Clear() noexcept;
 	bool IsInWindow() const noexcept { return m_inWindow; }
 private:
-	void OnMove(int x, int y) noexcept;
-	void OnLeave(int x, int y) noexcept;
-	void OnEnter(int x, int y) noexcept;
-	void OnLeftPress(int x, int y) noexcept;
-	void OnLeftRelease(int x, int y) noexcept;
-	void OnRightPress(int x, int y) noexcept;
-	void OnRightRelease(int x, int y) noexcept;
-	void OnWheelUp(int x, int y) noexcept;
-	void OnWheelDown(int x, int y) noexcept;
-	void OnWheelDelta(int x, int y, int delta) noexcept;
+	void OnMove( int x, int y ) noexcept;
+	void OnLeave( int x, int y ) noexcept;
+	void OnEnter( int x, int y ) noexcept;
+	void OnLeftPress( int x, int y ) noexcept;
+	void OnLeftRelease( int x, int y ) noexcept;
+	void OnRightPress( int x, int y ) noexcept;
+	void OnRightRelease( int x, int y ) noexcept;
+	void OnWheelUp( int x, int y ) noexcept;
+	void OnWheelDown( int x, int y ) noexcept;
+	void OnWheelDelta( int x, int y, int delta ) noexcept;
 	void TrimBuffer() noexcept;
 private:
 	static constexpr uint32_t m_bufferSize = 16u;
@@ -92,4 +90,3 @@ private:
 	std::queue<Event> m_buffer;
 	bool m_inWindow = false;
 };
-}

@@ -3,8 +3,6 @@
 #include "VeMath.h"
 #include "IndexedTriangleList.h"
 
-namespace ve
-{
 class Cone
 {
 public:
@@ -52,5 +50,3 @@ public:
 		return { std::move( vertices ),std::move( indices ) };
 	}
 };
-}
-

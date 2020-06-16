@@ -5,7 +5,7 @@
 #include "Window.h"
 #include "Graphics.h"
 
-ve::DXGI_InfoManager::DXGI_InfoManager()
+DXGI_InfoManager::DXGI_InfoManager()
 {
 	typedef HRESULT( WINAPI *DXGIGetDebugInterface )( REFIID, void ** );
 
@@ -28,12 +28,12 @@ ve::DXGI_InfoManager::DXGI_InfoManager()
 	);
 }
 
-void ve::DXGI_InfoManager::Set() noexcept
+void DXGI_InfoManager::Set() noexcept
 {
 	m_next = m_pDXGI_InfoQueue->GetNumStoredMessages( DXGI_DEBUG_ALL );
 }
 
-std::vector<std::string> ve::DXGI_InfoManager::GetMessages() const
+std::vector<std::string> DXGI_InfoManager::GetMessages() const
 {
 	std::vector<std::string> messages;
 	const auto end = m_pDXGI_InfoQueue->GetNumStoredMessages( DXGI_DEBUG_ALL );
