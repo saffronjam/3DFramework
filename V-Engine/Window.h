@@ -27,19 +27,19 @@ public:
 		HRESULT m_hr;
 	};
 private:
-	class WindowClass
+	class Win32Window
 	{
 	public:
 		static const char *GetName() { return m_wndClassName; }
-		static HINSTANCE GetInstance() { return m_wndClass.m_instanceHandle; }
+		static HINSTANCE GetInstance() { return m_win32Window.m_instanceHandle; }
 	private:
-		WindowClass() noexcept;
-		~WindowClass();
-		WindowClass( const WindowClass &wndClass ) = delete;
-		WindowClass &operator=( const WindowClass &wndClass ) = delete;
+		Win32Window() noexcept;
+		~Win32Window();
+		Win32Window( const Win32Window &win32Window ) = delete;
+		Win32Window &operator=( const Win32Window &win32Window ) = delete;
 	private:
 		static constexpr const char *m_wndClassName = "V-Engine Window";
-		static WindowClass m_wndClass;
+		static Win32Window m_win32Window;
 		HINSTANCE m_instanceHandle;
 	};
 public:

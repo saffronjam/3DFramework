@@ -1,9 +1,9 @@
 #include "Window.h"
 #include "resource.h"
 
-ve::Window::WindowClass ve::Window::WindowClass::m_wndClass;
+ve::Window::Win32Window ve::Window::Win32Window::m_win32Window;
 
-ve::Window::WindowClass::WindowClass() noexcept
+ve::Window::Win32Window::Win32Window() noexcept
 	: m_instanceHandle( GetModuleHandle( nullptr ) )
 {
 	WNDCLASSEX wc = { 0 };
@@ -22,7 +22,7 @@ ve::Window::WindowClass::WindowClass() noexcept
 	RegisterClassEx( &wc );
 }
 
-ve::Window::WindowClass::~WindowClass()
+ve::Window::Win32Window::~Win32Window()
 {
 	UnregisterClass( GetName(), GetInstance() );
 }
@@ -38,10 +38,10 @@ ve::Window::Window( int width, int height, const char *name )
 		throw VEWND_LAST_EXCEPT();
 	}
 	m_windowHandle = CreateWindow(
-		WindowClass::GetName(),
+		Win32Window::GetName(),
 		name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
-		nullptr, nullptr, WindowClass::GetInstance(), this
+		nullptr, nullptr, Win32Window::GetInstance(), this
 	);
 	if ( m_windowHandle == nullptr )
 	{
@@ -187,6 +187,8 @@ LRESULT ve::Window::HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 		mouse.OnWheelDelta( pt.x, pt.y, delta );
 		break;
 	}
+	default:
+		break;
 	}
 	return DefWindowProc( hWnd, msg, wParam, lParam );
 }
