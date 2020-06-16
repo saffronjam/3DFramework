@@ -30,8 +30,8 @@ private:
 	class WindowClass
 	{
 	public:
-		static auto GetName() { return m_wndClassName; }
-		static auto GetInstance() { return m_wndClass.m_hInstance; }
+		E		static const char *GetName() { return m_wndClassName; }
+		static HINSTANCE GetInstance() { return m_wndClass.m_instanceHandle; }
 	private:
 		WindowClass() noexcept;
 		~WindowClass();
@@ -40,7 +40,7 @@ private:
 	private:
 		static constexpr const char *m_wndClassName = "V-Engine Window";
 		static WindowClass m_wndClass;
-		HINSTANCE m_hInstance;
+		HINSTANCE m_instanceHandle;
 	};
 public:
 	Window( int width, int height, const char *name );
@@ -61,7 +61,7 @@ private:
 private:
 	int m_width;
 	int m_height;
-	HWND m_hWnd;
+	HWND m_windowHandle;
 
 };
 }

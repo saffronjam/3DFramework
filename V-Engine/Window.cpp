@@ -4,7 +4,7 @@
 ve::Window::WindowClass ve::Window::WindowClass::m_wndClass;
 
 ve::Window::WindowClass::WindowClass() noexcept
-	: m_hInstance( GetModuleHandle( nullptr ) )
+	: m_instanceHandle( GetModuleHandle( nullptr ) )
 {
 	WNDCLASSEX wc = { 0 };
 	wc.cbSize = sizeof( wc );
@@ -13,12 +13,12 @@ ve::Window::WindowClass::WindowClass() noexcept
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 	wc.hInstance = GetInstance();
-	wc.hIcon = static_cast<HICON>( LoadImage( m_hInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, 256, 256, 0 ) );
+	wc.hIcon = static_cast<HICON>( LoadImage( m_instanceHandle, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, 256, 256, 0 ) );
 	wc.hCursor = nullptr;
 	wc.hbrBackground = nullptr;
 	wc.lpszMenuName = nullptr;
 	wc.lpszClassName = GetName();
-	wc.hIconSm = static_cast<HICON>( LoadImage( m_hInstance, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, 32, 32, 0 ) );
+	wc.hIconSm = static_cast<HICON>( LoadImage( m_instanceHandle, MAKEINTRESOURCE( IDI_ICON1 ), IMAGE_ICON, 32, 32, 0 ) );
 	RegisterClassEx( &wc );
 }
 
@@ -37,30 +37,30 @@ ve::Window::Window( int width, int height, const char *name )
 	{
 		throw VEWND_LAST_EXCEPT();
 	}
-	m_hWnd = CreateWindow(
+	m_windowHandle = CreateWindow(
 		WindowClass::GetName(),
 		name, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
 		CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
 		nullptr, nullptr, WindowClass::GetInstance(), this
 	);
-	if ( m_hWnd == nullptr )
+	if ( m_windowHandle == nullptr )
 	{
 		throw VEWND_LAST_EXCEPT();
 	}
 
-	ShowWindow( m_hWnd, SW_SHOWDEFAULT );
+	ShowWindow( m_windowHandle, SW_SHOWDEFAULT );
 
-	gfx.Init( m_hWnd );
+	gfx.Init( m_windowHandle );
 }
 
 ve::Window::~Window()
 {
-	DestroyWindow( m_hWnd );
+	DestroyWindow( m_windowHandle );
 }
 
 void ve::Window::SetTitle( const std::string &title )
 {
-	if ( SetWindowText( m_hWnd, title.c_str() ) == 0 )
+	if ( SetWindowText( m_windowHandle, title.c_str() ) == 0 )
 	{
 		throw VEWND_LAST_EXCEPT();
 	}
@@ -217,7 +217,7 @@ const char *ve::Window::Exception::GetType() const noexcept
 std::string ve::Window::Exception::TranslateErrorCode( HRESULT hr )
 {
 	char *pMsgBuf = nullptr;
-	DWORD nMsgLen = FormatMessage(
+	const DWORD nMsgLen = FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |
 		FORMAT_MESSAGE_FROM_SYSTEM |
 		FORMAT_MESSAGE_IGNORE_INSERTS,
