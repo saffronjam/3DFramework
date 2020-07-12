@@ -4,11 +4,11 @@
 #include "Cone.h"
 
 Pyramid::Pyramid( Graphics &gfx,
-					  std::mt19937 &rng,
-					  std::uniform_real_distribution<float> &adist,
-					  std::uniform_real_distribution<float> &ddist,
-					  std::uniform_real_distribution<float> &odist,
-					  std::uniform_real_distribution<float> &rdist )
+				  std::mt19937 &rng,
+				  std::uniform_real_distribution<float> &adist,
+				  std::uniform_real_distribution<float> &ddist,
+				  std::uniform_real_distribution<float> &odist,
+				  std::uniform_real_distribution<float> &rdist )
 	:
 	r( rdist( rng ) ),
 	droll( ddist( rng ) ),
@@ -52,6 +52,7 @@ Pyramid::Pyramid( Graphics &gfx,
 		StaticBind( std::move( pvs ) );
 
 		StaticBind( std::make_unique<PixelShader>( gfx, L"ColorBlendPS.cso" ) );
+
 
 		AddStaticIndexBuffer( std::make_unique<IndexBuffer>( gfx, model.indices ) );
 

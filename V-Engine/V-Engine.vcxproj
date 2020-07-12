@@ -23,6 +23,7 @@
     <ProjectGuid>{9C67F66C-8E7C-4499-A18E-485C94378642}</ProjectGuid>
     <RootNamespace>VEngine</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>V-3DFramework</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -212,6 +213,7 @@
     <ClInclude Include="Prism.h" />
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="resource1.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Topology.h" />
@@ -224,9 +226,6 @@
     <ClInclude Include="Window.h" />
     <ClInclude Include="WindowsMessageMap.h" />
     <ClInclude Include="WindowThrowMacros.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="V-Engine.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="wndIcon.ico" />

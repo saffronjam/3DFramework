@@ -15,6 +15,35 @@
 class Graphics
 {
 	friend class Bindable;
+
+public:
+	Graphics() = default;
+	~Graphics() = default;
+	Graphics( const Graphics & ) = delete;
+	Graphics &operator=( const Graphics & ) = delete;
+
+	void Init( HWND hWnd );
+
+	void EndFrame();
+	void ClearBuffer( float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f ) noexcept;
+
+	void DrawIndexed( UINT count ) noexcept( !IS_DEBUG );
+	void SetProjection( DirectX::FXMMATRIX projection ) noexcept;
+	DirectX::XMMATRIX GetProjection() const noexcept;
+private:
+	bool m_initialized = false;
+
+private:
+	DirectX::XMMATRIX m_projection;
+	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;;
+	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwap;;
+	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;;
+	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pTarget;;
+	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
+#ifndef NDEBUG
+	DXGI_InfoManager m_infoManager;
+#endif
+
 public:
 	class Exception : public VeException
 	{
@@ -52,30 +81,4 @@ public:
 	private:
 		std::string reason;
 	};
-public:
-	Graphics() = default;
-	~Graphics() = default;
-	Graphics( const Graphics & ) = delete;
-	Graphics &operator=( const Graphics & ) = delete;
-
-	void Init( HWND hWnd );
-
-	void EndFrame();
-	void ClearBuffer( float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f ) noexcept;
-
-	void DrawIndexed( UINT count ) noexcept( !IS_DEBUG );
-	void SetProjection( DirectX::FXMMATRIX projection ) noexcept;
-	DirectX::XMMATRIX GetProjection() const noexcept;
-private:
-	bool m_initialized = false;
-private:
-	DirectX::XMMATRIX m_projection;
-	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwap;;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_pTarget;;
-	Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_pDSV;
-#ifndef NDEBUG
-	DXGI_InfoManager m_infoManager;
-#endif
 };

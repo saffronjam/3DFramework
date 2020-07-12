@@ -15,7 +15,7 @@ public:
 		const float longitudeAngle = 2.0f * PI / longDiv;
 
 		std::vector<V> vertices;
-		for ( int iLong = 0; iLong < longDiv; iLong++ )
+		for ( unsigned int iLong = 0; iLong < longDiv; iLong++ )
 		{
 			vertices.emplace_back();
 			auto vector3 = DirectX::XMVector3Transform(
