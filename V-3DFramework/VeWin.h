@@ -1,10 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0601
 #endif
 #include <sdkddkver.h>
 
+#ifndef DISABLE_WINWRAPPER
 #define WIN32_LEAN_AND_MEAN
 #define NOGDICAPMASKS
 #define NOSYSMETRICS
@@ -39,10 +40,10 @@
 #define NOIMAGE
 #define NOTAPE
 #define NOMINMAX
+#endif
 
 #ifndef STRICT
 #define STRICT
 #endif
 
 #include <Windows.h>
-
