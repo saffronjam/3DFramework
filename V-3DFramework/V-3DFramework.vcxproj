@@ -172,6 +172,7 @@
     <ClCompile Include="DrawableBase.cpp" />
     <ClCompile Include="dxerr.cpp" />
     <ClCompile Include="DXGI_InfoManager.cpp" />
+    <ClCompile Include="GDIPlusMgr.cpp" />
     <ClCompile Include="Graphics.cpp" />
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayout.cpp" />
@@ -180,7 +181,9 @@
     <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="Pyramid.cpp" />
+    <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Surface.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Topology.cpp" />
     <ClCompile Include="TransformCBuf.cpp" />
     <ClCompile Include="VeException.cpp" />
@@ -205,6 +208,7 @@
     <ClInclude Include="DrawableBase.h" />
     <ClInclude Include="dxerr.h" />
     <ClInclude Include="DXGI_InfoManager.h" />
+    <ClInclude Include="GDIPlusMgr.h" />
     <ClInclude Include="Graphics.h" />
     <ClInclude Include="GraphicsThrowMacros.h" />
     <ClInclude Include="IndexBuffer.h" />
@@ -219,8 +223,10 @@
     <ClInclude Include="Pyramid.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="Sampler.h" />
     <ClInclude Include="Sphere.h" />
     <ClInclude Include="Surface.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Topology.h" />
     <ClInclude Include="TransformCBuf.h" />

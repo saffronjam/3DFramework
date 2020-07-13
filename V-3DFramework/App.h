@@ -5,6 +5,8 @@
 #include "Window.h"
 #include "Clock.h"
 #include "Drawable.h"
+#include "GDIPlusMgr.h"
+#include "Surface.h"
 
 class App
 {
@@ -22,5 +24,7 @@ private:
 
 	std::vector<std::unique_ptr<Drawable>> drawables;
 	static constexpr int nDrawables = 180;
+
+	GDIPlusMgr m_gdiPlusMgr;
 };
 

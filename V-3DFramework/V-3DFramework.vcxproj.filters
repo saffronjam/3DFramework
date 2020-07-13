@@ -120,6 +120,15 @@
     <ClCompile Include="Surface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
+    <ClCompile Include="GDIPlusMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sampler.cpp">
+      <Filter>Source Files\Bindables</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Window.h">
@@ -244,6 +253,15 @@
     </ClInclude>
     <ClInclude Include="ConditionalNoexcept.h">
       <Filter>Header Files\Macros</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files\Bindables</Filter>
+    </ClInclude>
+    <ClInclude Include="GDIPlusMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Sampler.h">
+      <Filter>Header Files\Bindables</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

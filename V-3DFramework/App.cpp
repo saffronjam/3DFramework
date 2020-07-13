@@ -6,19 +6,19 @@
 
 App::App()
 	:
-	m_wnd( 800, 600, "V-Engine" )
+	m_wnd(800, 600, "V-Engine")
 {
 	class Factory
 	{
 	public:
-		Factory( Graphics &gfx )
+		Factory(Graphics& gfx)
 			:
-			gfx( gfx )
+			gfx(gfx)
 		{
 		}
 		std::unique_ptr<Drawable> operator()()
 		{
-			switch ( typedist( rng ) )
+			switch ( typedist(rng) )
 			{
 			case 0:
 				return std::make_unique<Pyramid>(
@@ -36,13 +36,13 @@ App::App()
 					odist, rdist, longdist, latdist
 					);
 			default:
-				assert( false && "bad drawable type in factory" );
+				assert(false && "bad drawable type in factory");
 				return {};
 			}
 		}
 	private:
-		Graphics &gfx;
-		std::mt19937 rng{ std::random_device{}( ) };
+		Graphics& gfx;
+		std::mt19937 rng{ std::random_device{}() };
 		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
@@ -54,11 +54,13 @@ App::App()
 	};
 
 
-	Factory f( m_wnd.gfx );
-	drawables.reserve( nDrawables );
-	std::generate_n( std::back_inserter( drawables ), nDrawables, f );
+	Factory f(m_wnd.gfx);
+	drawables.reserve(nDrawables);
+	std::generate_n(std::back_inserter(drawables), nDrawables, f);
 
-	m_wnd.gfx.SetProjection( DirectX::XMMatrixPerspectiveLH( 1.0f, 3.0f / 4.0f, 0.5f, 40.0f ) );
+	const auto s = Surface::FromFile("res/sample_trans.png");
+
+	m_wnd.gfx.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, 3.0f / 4.0f, 0.5f, 40.0f));
 }
 
 App::~App()
@@ -82,14 +84,14 @@ void App::DoFrame()
 {
 	Time dt = m_clock.GetDeltatime();
 
-	m_wnd.gfx.ClearBuffer( 0.07f, 0.0f, 0.12f );
+	m_wnd.gfx.ClearBuffer(0.07f, 0.0f, 0.12f);
 
 
 
-	for ( auto &drawable : drawables )
+	for ( auto& drawable : drawables )
 	{
-		drawable->Update( dt );
-		drawable->Draw( m_wnd.gfx );
+		drawable->Update(dt);
+		drawable->Draw(m_wnd.gfx);
 	}
 
 	m_wnd.gfx.EndFrame();
