@@ -12,12 +12,14 @@
 #include "GraphicsThrowMacros.h"
 
 
+class Bindable;
+
 class Graphics
 {
 	friend class Bindable;
 
 public:
-	Graphics() = default;
+	Graphics();
 	~Graphics() = default;
 	Graphics( const Graphics & ) = delete;
 	Graphics &operator=( const Graphics & ) = delete;
@@ -30,6 +32,9 @@ public:
 	void DrawIndexed( UINT count ) noexcept( !IS_DEBUG );
 	void SetProjection( DirectX::FXMMATRIX projection ) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
+
+	void Bind(class Bindable& bindable) noexcept;
+
 private:
 	bool m_initialized = false;
 

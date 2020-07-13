@@ -2,6 +2,12 @@
 
 #include "dxerr.h"
 #include "GraphicsThrowMacros.h"
+#include "Bindable.h"
+
+Graphics::Graphics()
+	: m_projection(DirectX::XMMatrixIdentity())
+{
+}
 
 void Graphics::Init( HWND hWnd )
 {
@@ -26,9 +32,9 @@ void Graphics::Init( HWND hWnd )
 	sd.Flags = 0;
 
 	UINT swapCreateFlags = 0u;
-#ifndef NDEBUG
-	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
+//#ifndef NDEBUG
+//	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
+//#endif
 
 	HRESULT hr = {};
 
@@ -151,6 +157,11 @@ void Graphics::SetProjection( DirectX::FXMMATRIX projection ) noexcept
 DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 {
 	return m_projection;
+}
+
+void Graphics::Bind(Bindable& bindable) noexcept
+{
+	bindable.BindTo(*this);
 }
 
 Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs ) noexcept

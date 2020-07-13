@@ -1,4 +1,4 @@
-#include "Drawable.h"
+﻿#include "Drawable.h"
 
 #include <cassert>
 #include <typeinfo>
@@ -6,29 +6,25 @@
 #include "Bindable.h"
 #include "IndexBuffer.h"
 
-void Drawable::Draw( Graphics &gfx ) const noexcept( !IS_DEBUG )
+void Drawable::Draw(Graphics& gfx) const noexcept(!IS_DEBUG)
 {
-	for ( auto &bind : m_binds )
+	for ( auto& bind : m_binds )
 	{
-		bind->Bind( gfx );
+		bind->BindTo(gfx);
 	}
-	for ( auto &staticBind : GetStaticBinds() )
+	for ( auto& staticBind : GetStaticBinds() )
 	{
-		staticBind->Bind( gfx );
+		staticBind->BindTo(gfx);
 	}
-	gfx.DrawIndexed( m_pIndexBuffer->GetCount() );
+	gfx.DrawIndexed(m_pIndexBuffer->GetCount());
 }
 
-void Drawable::AddBind( std::unique_ptr<Bindable> bind ) noexcept( !IS_DEBUG )
+void Drawable::AddBind(std::unique_ptr<Bindable> bind) noexcept(!IS_DEBUG)
 {
-	assert( "Use AddIndexBuffer to bind index buffer" && typeid( *bind ) != typeid( IndexBuffer ) );
-	m_binds.push_back( std::move( bind ) );
+	if ( const auto pDynCast = dynamic_cast<IndexBuffer*>(bind.get()) )
+	{
+		assert("Attempting to add index buffer a second time" && m_pIndexBuffer == nullptr);
+		m_pIndexBuffer = pDynCast;
+	}
+	m_binds.push_back(std::move(bind));
 }
-
-void Drawable::AddIndexBuffer( std::unique_ptr<class IndexBuffer> ibuf ) noexcept
-{
-	assert( "Attempting to add index buffer a second time" && m_pIndexBuffer == nullptr );
-	m_pIndexBuffer = ibuf.get();
-	m_binds.push_back( std::move( ibuf ) );
-}
-

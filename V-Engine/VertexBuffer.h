@@ -26,7 +26,7 @@ public:
 		GFX_THROW_INFO( GetDevice( gfx )->CreateBuffer( &bd, &sd, &m_pVertexBuffer ) );
 	}
 
-	void Bind( Graphics &gfx ) noexcept override;
+	void BindTo( Graphics &gfx ) noexcept override;
 protected:
 	UINT m_stride;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_pVertexBuffer;

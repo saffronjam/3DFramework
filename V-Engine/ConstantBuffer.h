@@ -62,7 +62,7 @@ class VSConstantBuffer : public ConstantBuffer<C>
 	using Bindable::GetContext;
 public:
 	using ConstantBuffer<C>::ConstantBuffer;
-	void Bind( Graphics &gfx ) noexcept override
+	void BindTo( Graphics &gfx ) noexcept override
 	{
 		GetContext( gfx )->VSSetConstantBuffers( 0u, 1u, m_pConstantBuffer.GetAddressOf() );
 	}
@@ -75,7 +75,7 @@ class PSConstantBuffer : public ConstantBuffer<C>
 	using Bindable::GetContext;
 public:
 	using ConstantBuffer<C>::ConstantBuffer;
-	void Bind( Graphics &gfx ) noexcept override
+	void BindTo( Graphics &gfx ) noexcept override
 	{
 		GetContext( gfx )->PSSetConstantBuffers( 0u, 1u, m_pConstantBuffer.GetAddressOf() );
 	}

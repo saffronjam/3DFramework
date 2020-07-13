@@ -19,7 +19,7 @@ IndexBuffer::IndexBuffer( Graphics &gfx, const std::vector<unsigned short> &indi
 	GFX_THROW_INFO( GetDevice( gfx )->CreateBuffer( &ibd, &isd, &m_indexBuffer ) );
 }
 
-void IndexBuffer::Bind( Graphics &gfx ) noexcept
+void IndexBuffer::BindTo( Graphics &gfx ) noexcept
 {
 	GetContext( gfx )->IASetIndexBuffer( m_indexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u );
 }

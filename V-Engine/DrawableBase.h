@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <random>
 
@@ -13,39 +13,35 @@ protected:
 	{
 		return !m_staticBinds.empty();
 	}
-	static void StaticBind( std::unique_ptr<Bindable> bind ) noexcept( !IS_DEBUG )
+	void AddStaticBind(std::unique_ptr<Bindable> bind) noexcept(!IS_DEBUG)
 	{
-		assert( "Use AddStaticIndexBuffer to bind index buffer" && typeid( *bind ) != typeid( IndexBuffer ) );
-		m_staticBinds.push_back( std::move( bind ) );
-	}
-	void AddStaticIndexBuffer( std::unique_ptr<IndexBuffer> ibuf ) noexcept( !IS_DEBUG )
-	{
-		assert( "Attempted to add index buffer two times" && m_pIndexBuffer == nullptr );
-		m_pIndexBuffer = ibuf.get();
-		m_staticBinds.push_back( std::move( ibuf ) );
-	}
-	void SetIndexFromStatic() noexcept( !IS_DEBUG )
-	{
-		assert( "Attempted to add index buffer two times" && m_pIndexBuffer == nullptr );
-		for ( const auto &bind : m_staticBinds )
+		if ( const auto pDynCast = dynamic_cast<IndexBuffer*>(bind.get()) )
 		{
-			if ( const auto pDynCast = dynamic_cast<IndexBuffer *>( bind.get() ) )
-			{
-				m_pIndexBuffer = pDynCast;
-				return;
-			}
+			assert("Attempted to add index buffer two times" && m_staticIndexBuffer == nullptr);
+			m_pIndexBuffer = pDynCast;
+			m_staticIndexBuffer = pDynCast;
 		}
-		assert( "Failed to find index buffer in static binds" && m_pIndexBuffer != nullptr );
+		m_staticBinds.push_back(std::move(bind));
+	}
+	void SetIndexFromStatic() noexcept(!IS_DEBUG)
+	{
+		assert("Attempted to add index buffer two times" && m_pIndexBuffer == nullptr);
+		assert("Attempted to add a nullptr static index buffer" && m_staticIndexBuffer != nullptr);
+		m_pIndexBuffer = m_staticIndexBuffer;
 	}
 
 private:
-	const std::vector<std::unique_ptr<Bindable>> &GetStaticBinds() const noexcept override
+	const std::vector<std::unique_ptr<Bindable>>& GetStaticBinds() const noexcept override
 	{
 		return m_staticBinds;
 	}
 private:
 	static std::vector<std::unique_ptr<Bindable>> m_staticBinds;
+	static IndexBuffer* m_staticIndexBuffer;
 };
 
 template<class T>
 std::vector<std::unique_ptr<Bindable>> DrawableBase<T>::m_staticBinds;
+
+template<class T>
+IndexBuffer* DrawableBase<T>::m_staticIndexBuffer = nullptr;

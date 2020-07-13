@@ -7,7 +7,7 @@ TransformCBuf::TransformCBuf( Graphics &gfx, const Drawable &parent )
 {
 }
 
-void TransformCBuf::Bind( Graphics &gfx ) noexcept
+void TransformCBuf::BindTo( Graphics &gfx ) noexcept
 {
 	m_vCBuf.Update(
 		gfx,
@@ -15,5 +15,5 @@ void TransformCBuf::Bind( Graphics &gfx ) noexcept
 			m_parent.GetTransformXM() * gfx.GetProjection()
 		)
 	);
-	m_vCBuf.Bind( gfx );
+	m_vCBuf.BindTo( gfx );
 }

@@ -10,7 +10,7 @@ class TransformCBuf : public Bindable
 {
 public:
 	TransformCBuf( Graphics &gfx, const Drawable &parent );
-	void Bind( Graphics &gfx ) noexcept override;
+	void BindTo( Graphics &gfx ) noexcept override;
 
 private:
 	VSConstantBuffer<DirectX::XMMATRIX> m_vCBuf;

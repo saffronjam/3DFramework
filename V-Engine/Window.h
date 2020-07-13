@@ -11,35 +11,9 @@
 
 class Window
 {
-public:
-	class Exception : public VeException
-	{
-	public:
-		Exception( int line, const char *file, HRESULT hr ) noexcept;
-		const char *what() const noexcept override;
-		virtual const char *GetType() const noexcept override;
-		static std::string TranslateErrorCode( HRESULT hr );
-		HRESULT GetErrorCode() const noexcept;
-		std::string GetErrorString() const noexcept;
-	private:
-		HRESULT m_hr;
-	};
 private:
-	class Win32Window
-	{
-	public:
-		static const char *GetName() { return m_wndClassName; }
-		static HINSTANCE GetInstance() { return m_win32Window.m_instanceHandle; }
-	private:
-		Win32Window() noexcept;
-		~Win32Window();
-		Win32Window( const Win32Window &win32Window ) = delete;
-		Win32Window &operator=( const Win32Window &win32Window ) = delete;
-	private:
-		static constexpr const char *m_wndClassName = "V-Engine Window";
-		static Win32Window m_win32Window;
-		HINSTANCE m_instanceHandle;
-	};
+	class Win32Window;
+
 public:
 	Window( int width, int height, const char *name );
 	~Window();
@@ -60,5 +34,35 @@ private:
 	int m_width;
 	int m_height;
 	HWND m_windowHandle;
+
+private:
+	class Win32Window
+	{
+	public:
+		static const char* GetName() { return m_wndClassName; }
+		static HINSTANCE GetInstance() { return m_win32Window.m_instanceHandle; }
+	private:
+		Win32Window() noexcept;
+		~Win32Window();
+		Win32Window(const Win32Window& win32Window) = delete;
+		Win32Window& operator=(const Win32Window& win32Window) = delete;
+	private:
+		static constexpr const char* m_wndClassName = "V-Engine Window";
+		static Win32Window m_win32Window;
+		HINSTANCE m_instanceHandle;
+	};
+public:
+	class Exception : public VeException
+	{
+	public:
+		Exception(int line, const char* file, HRESULT hr) noexcept;
+		const char* what() const noexcept override;
+		virtual const char* GetType() const noexcept override;
+		static std::string TranslateErrorCode(HRESULT hr);
+		HRESULT GetErrorCode() const noexcept;
+		std::string GetErrorString() const noexcept;
+	private:
+		HRESULT m_hr;
+	};
 
 };
