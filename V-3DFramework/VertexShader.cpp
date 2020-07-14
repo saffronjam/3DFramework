@@ -1,12 +1,12 @@
-#include "VertexShader.h"
+﻿#include "VertexShader.h"
 
-VertexShader::VertexShader( Graphics &gfx, const std::wstring &path )
+VertexShader::VertexShader(Graphics& gfx, const std::wstring& path)
 {
-	INFOMAN( gfx );
+	INFOMAN(gfx);
 
-	GFX_THROW_INFO( D3DReadFileToBlob( path.c_str(), &m_pBytecodeBlob ) );
+	GFX_THROW_INFO(D3DReadFileToBlob(path.c_str(), &m_pBytecodeBlob));
 	GFX_THROW_INFO(
-		GetDevice( gfx )->CreateVertexShader(
+		GetDevice(gfx)->CreateVertexShader(
 			m_pBytecodeBlob->GetBufferPointer(),
 			m_pBytecodeBlob->GetBufferSize(),
 			nullptr,
@@ -15,7 +15,7 @@ VertexShader::VertexShader( Graphics &gfx, const std::wstring &path )
 	);
 }
 
-void VertexShader::BindTo( Graphics &gfx ) noexcept
+void VertexShader::BindTo(Graphics& gfx) noexcept
 {
-	GetContext( gfx )->VSSetShader( m_pVertexShader.Get(), nullptr, 0u );
+	GetContext(gfx)->VSSetShader(m_pVertexShader.Get(), nullptr, 0u);
 }
