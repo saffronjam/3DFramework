@@ -10,16 +10,7 @@ Pyramid::Pyramid(Graphics& gfx,
 				 std::uniform_real_distribution<float>& odist,
 				 std::uniform_real_distribution<float>& rdist)
 	:
-	r(rdist(rng)),
-	droll(ddist(rng)),
-	dpitch(ddist(rng)),
-	dyaw(ddist(rng)),
-	dphi(odist(rng)),
-	dtheta(odist(rng)),
-	dchi(odist(rng)),
-	chi(adist(rng)),
-	theta(adist(rng)),
-	phi(adist(rng))
+	TestObject(gfx, rng, adist, ddist, odist, rdist)
 {
 	if ( !IsInitialized() )
 	{
@@ -71,23 +62,4 @@ Pyramid::Pyramid(Graphics& gfx,
 	}
 
 	AddBind(std::make_unique<TransformCBuf>(gfx, *this));
-}
-
-void Pyramid::Update(const Time& dt) noexcept
-{
-	roll += droll * dt.AsSeconds();
-	pitch += dpitch * dt.AsSeconds();
-	yaw += dyaw * dt.AsSeconds();
-	theta += dtheta * dt.AsSeconds();
-	phi += dphi * dt.AsSeconds();
-	chi += dchi * dt.AsSeconds();
-}
-
-DirectX::XMMATRIX Pyramid::GetTransformXM() const noexcept
-{
-	return
-		DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
-		DirectX::XMMatrixTranslation(r, 0.0f, 0.0f) *
-		DirectX::XMMatrixRotationRollPitchYaw(theta, phi, chi) *
-		DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f);
 }

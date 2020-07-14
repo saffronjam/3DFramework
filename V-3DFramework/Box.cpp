@@ -11,16 +11,7 @@ Box::Box(Graphics& gfx,
 		 std::uniform_real_distribution<float>& rdist,
 		 std::uniform_real_distribution<float>& bdist)
 	:
-	m_r(rdist(rng)),
-	m_theta(adist(rng)),
-	m_phi(adist(rng)),
-	m_chi(adist(rng)),
-	m_droll(ddist(rng)),
-	m_dpitch(ddist(rng)),
-	m_dyaw(ddist(rng)),
-	m_dtheta(odist(rng)),
-	m_dphi(odist(rng)),
-	m_dchi(odist(rng))
+	TestObject(gfx, rng, adist, ddist, odist, rdist)
 {
 
 	if ( !IsInitialized() )
@@ -88,22 +79,7 @@ Box::Box(Graphics& gfx,
 	);
 }
 
-void Box::Update(const Time& dt) noexcept
-{
-	m_roll += m_droll * (float)dt.AsSeconds();
-	m_pitch += m_dpitch * (float)dt.AsSeconds();
-	m_yaw += m_dyaw * (float)dt.AsSeconds();
-	m_theta += m_dtheta * (float)dt.AsSeconds();
-	m_phi += m_dphi * (float)dt.AsSeconds();
-	m_chi += m_dchi * (float)dt.AsSeconds();
-}
-
 DirectX::XMMATRIX Box::GetTransformXM() const noexcept
 {
-	return
-		DirectX::XMLoadFloat3x3(&m_modelTransform) *
-		DirectX::XMMatrixRotationRollPitchYaw(m_pitch, m_yaw, m_roll) *
-		DirectX::XMMatrixTranslation(m_r, 0.0f, 0.0f) *
-		DirectX::XMMatrixRotationRollPitchYaw(m_theta, m_phi, m_chi) *
-		DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f);
+	return DirectX::XMLoadFloat3x3(&m_modelTransform) * TestObject::GetTransformXM();
 }

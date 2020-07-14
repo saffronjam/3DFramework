@@ -3,18 +3,16 @@
 #include "BindableBase.h"
 #include "Sphere.h"
 
-Melon::Melon(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_int_distribution<int>& longdist, std::uniform_int_distribution<int>& latdist)
+Melon::Melon(Graphics& gfx,
+			 std::mt19937& rng,
+			 std::uniform_real_distribution<float>& adist,
+			 std::uniform_real_distribution<float>& ddist,
+			 std::uniform_real_distribution<float>& odist,
+			 std::uniform_real_distribution<float>& rdist,
+			 std::uniform_int_distribution<int>& longdist,
+			 std::uniform_int_distribution<int>& latdist)
 	:
-	r(rdist(rng)),
-	droll(ddist(rng)),
-	dpitch(ddist(rng)),
-	dyaw(ddist(rng)),
-	dphi(odist(rng)),
-	dtheta(odist(rng)),
-	dchi(odist(rng)),
-	chi(adist(rng)),
-	theta(adist(rng)),
-	phi(adist(rng))
+	TestObject(gfx, rng, adist, ddist, odist, rdist)
 {
 	if ( !IsInitialized() )
 	{
@@ -71,23 +69,4 @@ Melon::Melon(Graphics& gfx, std::mt19937& rng, std::uniform_real_distribution<fl
 	AddBind(std::make_unique<IndexBuffer>(gfx, model.indices));
 
 	AddBind(std::make_unique<TransformCBuf>(gfx, *this));
-}
-
-void Melon::Update(const Time& dt) noexcept
-{
-	roll += droll * dt.AsSeconds();
-	pitch += dpitch * dt.AsSeconds();
-	yaw += dyaw * dt.AsSeconds();
-	theta += dtheta * dt.AsSeconds();
-	phi += dphi * dt.AsSeconds();
-	chi += dchi * dt.AsSeconds();
-}
-
-DirectX::XMMATRIX Melon::GetTransformXM() const noexcept
-{
-	return
-		DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
-		DirectX::XMMatrixTranslation(r, 0.0f, 0.0f) *
-		DirectX::XMMatrixRotationRollPitchYaw(theta, phi, chi) *
-		DirectX::XMMatrixTranslation(0.0f, 0.0f, 20.0f);
 }
