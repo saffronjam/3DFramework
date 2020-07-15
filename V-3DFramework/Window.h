@@ -8,6 +8,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "WindowThrowMacros.h"
+#include "imgui/imgui_impl_win32.h"
 
 class Window
 {
@@ -15,21 +16,21 @@ private:
 	class Win32Window;
 
 public:
-	Window( int width, int height, const char *name );
+	Window(int width, int height, const char* name);
 	~Window();
-	Window( const Window &wnd ) = delete;
-	Window &operator=( const Window &wnd ) = delete;
+	Window(const Window& wnd) = delete;
+	Window& operator=(const Window& wnd) = delete;
 
-	void SetTitle( const std::string &title );
+	void SetTitle(const std::string& title);
 	static std::optional<int> ProcessMessages();
 public:
 	Keyboard kbd;
 	Mouse mouse;
 	Graphics gfx;
 private:
-	static LRESULT CALLBACK HandleMsgSetup( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
-	static LRESULT CALLBACK HandleMsgThunk( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
-	LRESULT HandleMsg( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam ) noexcept;
+	static LRESULT CALLBACK HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+	LRESULT HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 private:
 	int m_width;
 	int m_height;

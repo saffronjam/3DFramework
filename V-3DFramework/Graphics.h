@@ -21,25 +21,34 @@ class Graphics
 public:
 	Graphics();
 	~Graphics() = default;
-	Graphics( const Graphics & ) = delete;
-	Graphics &operator=( const Graphics & ) = delete;
+	Graphics(const Graphics&) = delete;
+	Graphics& operator=(const Graphics&) = delete;
 
-	void Init( HWND hWnd );
+	void Init(HWND hWnd);
 
+	void BeginFrame();
 	void EndFrame();
-	void ClearBuffer( float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f ) noexcept;
+	void ClearBuffer(float red = 0.0f, float green = 0.0f, float blue = 0.0f, float alpha = 1.0f) noexcept;
 
-	void DrawIndexed( UINT count ) noexcept( !IS_DEBUG );
-	void SetProjection( DirectX::FXMMATRIX projection ) noexcept;
+	void DrawIndexed(UINT count) noexcept(!IS_DEBUG);
+	void SetProjection(DirectX::FXMMATRIX projection) noexcept;
 	DirectX::XMMATRIX GetProjection() const noexcept;
 
+	void SetCamera(DirectX::FXMMATRIX m_camera) noexcept;
+	DirectX::XMMATRIX GetCamera() const noexcept;
+
 	void Bind(class Bindable& bindable) noexcept;
+
+	void EnableImgui() noexcept;
+	void DisableImgui() noexcept;
+	bool IsImguiEnabled() const noexcept;
 
 private:
 	bool m_initialized = false;
 
 private:
 	DirectX::XMMATRIX m_projection;
+	DirectX::XMMATRIX m_camera;
 	Microsoft::WRL::ComPtr<ID3D11Device> m_pDevice;;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_pSwap;;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_pContext;;
@@ -49,6 +58,8 @@ private:
 	DXGI_InfoManager m_infoManager;
 #endif
 
+	bool m_imguiEnabled;
+
 public:
 	class Exception : public VeException
 	{
@@ -57,9 +68,9 @@ public:
 	class InfoException : public Exception
 	{
 	public:
-		InfoException( int line, const char *file, std::vector<std::string> infoMsgs ) noexcept;
-		const char *what() const noexcept override;
-		const char *GetType() const noexcept override;
+		InfoException(int line, const char* file, std::vector<std::string> infoMsgs) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
 		std::string GetErrorInfo() const noexcept;
 	private:
 		std::string info;
@@ -67,9 +78,9 @@ public:
 	class HRException : public Exception
 	{
 	public:
-		HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs = {} ) noexcept;
-		const char *what() const noexcept override;
-		const char *GetType() const noexcept override;
+		HRException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMsgs = {}) noexcept;
+		const char* what() const noexcept override;
+		const char* GetType() const noexcept override;
 		HRESULT GetErrorCode() const noexcept;
 		std::string GetErrorString() const noexcept;
 		std::string GetErrorDescription() const noexcept;
@@ -82,7 +93,7 @@ public:
 	{
 		using HRException::HRException;
 	public:
-		const char *GetType() const noexcept override;
+		const char* GetType() const noexcept override;
 	private:
 		std::string reason;
 	};

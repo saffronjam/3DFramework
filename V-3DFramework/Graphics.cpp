@@ -3,13 +3,16 @@
 #include "dxerr.h"
 #include "GraphicsThrowMacros.h"
 #include "Bindable.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 
 Graphics::Graphics()
-	: m_projection(DirectX::XMMatrixIdentity())
+	: m_projection(DirectX::XMMatrixIdentity()),
+	m_imguiEnabled(true)
 {
 }
 
-void Graphics::Init( HWND hWnd )
+void Graphics::Init(HWND hWnd)
 {
 	if ( m_initialized )
 		return;
@@ -32,9 +35,9 @@ void Graphics::Init( HWND hWnd )
 	sd.Flags = 0;
 
 	UINT swapCreateFlags = 0u;
-//#ifndef NDEBUG
-//	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
-//#endif
+#ifndef NDEBUG
+	swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
 
 	HRESULT hr = {};
 
@@ -59,7 +62,7 @@ void Graphics::Init( HWND hWnd )
 	GFX_THROW_INFO(
 		m_pSwap->GetBuffer(
 			0,
-			__uuidof( ID3D11Resource ),
+			__uuidof(ID3D11Resource),
 			&pBackBuffer
 		)
 	);
@@ -76,9 +79,9 @@ void Graphics::Init( HWND hWnd )
 	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 	Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
-	GFX_THROW_INFO( m_pDevice->CreateDepthStencilState( &dsDesc, &pDSState ) );
+	GFX_THROW_INFO(m_pDevice->CreateDepthStencilState(&dsDesc, &pDSState));
 
-	m_pContext->OMSetDepthStencilState( pDSState.Get(), 1u );
+	m_pContext->OMSetDepthStencilState(pDSState.Get(), 1u);
 
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
 	D3D11_TEXTURE2D_DESC descDepth = {};
@@ -91,7 +94,7 @@ void Graphics::Init( HWND hWnd )
 	descDepth.SampleDesc.Quality = 0u;
 	descDepth.Usage = D3D11_USAGE_DEFAULT;
 	descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	GFX_THROW_INFO( m_pDevice->CreateTexture2D( &descDepth, nullptr, &pDepthStencil ) );
+	GFX_THROW_INFO(m_pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
 	descDSV.Format = DXGI_FORMAT_D32_FLOAT;
@@ -103,7 +106,7 @@ void Graphics::Init( HWND hWnd )
 		)
 	);
 
-	m_pContext->OMSetRenderTargets( 1u, m_pTarget.GetAddressOf(), m_pDSV.Get() );
+	m_pContext->OMSetRenderTargets(1u, m_pTarget.GetAddressOf(), m_pDSV.Get());
 
 	D3D11_VIEWPORT vp;
 	vp.Width = 800.0f;
@@ -112,44 +115,63 @@ void Graphics::Init( HWND hWnd )
 	vp.MaxDepth = 1.0f;
 	vp.TopLeftX = 0.0f;
 	vp.TopLeftY = 0.0f;
-	m_pContext->RSSetViewports( 1u, &vp );
+	m_pContext->RSSetViewports(1u, &vp);
+
+	// init imgui d3d impl
+	ImGui_ImplDX11_Init(m_pDevice.Get(), m_pContext.Get());
 
 	m_initialized = true;
 }
 
+void Graphics::BeginFrame()
+{
+	if ( m_imguiEnabled )
+	{
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+}
+
 void Graphics::EndFrame()
 {
+	if ( m_imguiEnabled )
+	{
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+	}
+
 	HRESULT hr = {};
 #ifndef NDEBUG
 	m_infoManager.Set();
 #endif
 
-	if ( FAILED( hr = m_pSwap->Present( 1u, 0u ) ) )
+	if ( FAILED(hr = m_pSwap->Present(1u, 0u)) )
 	{
 		if ( hr == DXGI_ERROR_DEVICE_REMOVED )
 		{
-			throw GFX_DEVICE_REMOVED_EXCEPT( m_pDevice->GetDeviceRemovedReason() );
+			throw GFX_DEVICE_REMOVED_EXCEPT(m_pDevice->GetDeviceRemovedReason());
 		}
 		else
 		{
-			throw GFX_EXCEPT( hr );
+			throw GFX_EXCEPT(hr);
 		}
 	}
 }
 
-void Graphics::ClearBuffer( float red, float green, float blue, float alpha ) noexcept
+void Graphics::ClearBuffer(float red, float green, float blue, float alpha) noexcept
 {
 	const float color[] = { red, green, blue, 1.0f };
-	m_pContext->ClearRenderTargetView( m_pTarget.Get(), color );
-	m_pContext->ClearDepthStencilView( m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u );
+	m_pContext->ClearRenderTargetView(m_pTarget.Get(), color);
+	m_pContext->ClearDepthStencilView(m_pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0u);
 }
 
-void Graphics::DrawIndexed( UINT count ) noexcept( !IS_DEBUG )
+void Graphics::DrawIndexed(UINT count) noexcept(!IS_DEBUG)
 {
-	GFX_THROW_INFO_ONLY( m_pContext->DrawIndexed( count, 0u, 0u ) );
+	GFX_THROW_INFO_ONLY(m_pContext->DrawIndexed(count, 0u, 0u));
 }
 
-void Graphics::SetProjection( DirectX::FXMMATRIX projection ) noexcept
+void Graphics::SetProjection(DirectX::FXMMATRIX projection) noexcept
 {
 	m_projection = projection;
 }
@@ -159,20 +181,45 @@ DirectX::XMMATRIX Graphics::GetProjection() const noexcept
 	return m_projection;
 }
 
+void Graphics::SetCamera(DirectX::FXMMATRIX camera) noexcept
+{
+	m_camera = camera;
+}
+
+DirectX::XMMATRIX Graphics::GetCamera() const noexcept
+{
+	return m_camera;
+}
+
 void Graphics::Bind(Bindable& bindable) noexcept
 {
 	bindable.BindTo(*this);
 }
 
-Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std::vector<std::string> infoMsgs ) noexcept
-	:
-	Exception( line, file ),
-	hr( hr )
+void Graphics::EnableImgui() noexcept
 {
-	for ( const auto &msg : infoMsgs )
+	m_imguiEnabled = true;
+}
+
+void Graphics::DisableImgui() noexcept
+{
+	m_imguiEnabled = false;
+}
+
+bool Graphics::IsImguiEnabled() const noexcept
+{
+	return m_imguiEnabled;
+}
+
+Graphics::HRException::HRException(int line, const char* file, HRESULT hr, std::vector<std::string> infoMsgs) noexcept
+	:
+	Exception(line, file),
+	hr(hr)
+{
+	for ( const auto& msg : infoMsgs )
 	{
 		info += msg;
-		info.push_back( '\n' );
+		info.push_back('\n');
 	}
 
 	//Remove final newline, if exists
@@ -182,7 +229,7 @@ Graphics::HRException::HRException( int line, const char *file, HRESULT hr, std:
 	}
 }
 
-const char *Graphics::HRException::what() const noexcept
+const char* Graphics::HRException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[Type] " << GetType() << std::endl
@@ -198,7 +245,7 @@ const char *Graphics::HRException::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char *Graphics::HRException::GetType() const noexcept
+const char* Graphics::HRException::GetType() const noexcept
 {
 	return "V-Engine Graphics Exception";
 }
@@ -210,13 +257,13 @@ HRESULT Graphics::HRException::GetErrorCode() const noexcept
 
 std::string Graphics::HRException::GetErrorString() const noexcept
 {
-	return DXGetErrorString( hr );
+	return DXGetErrorString(hr);
 }
 
 std::string Graphics::HRException::GetErrorDescription() const noexcept
 {
 	char buf[512];
-	DXGetErrorDescription( hr, buf, sizeof( buf ) );
+	DXGetErrorDescription(hr, buf, sizeof(buf));
 	return buf;
 }
 
@@ -225,19 +272,19 @@ std::string Graphics::HRException::GetErrorInfo() const noexcept
 	return info;
 }
 
-const char *Graphics::DeviceRemovedException::GetType() const noexcept
+const char* Graphics::DeviceRemovedException::GetType() const noexcept
 {
 	return "V-Engine Graphics Exception [Device Removed] (DXGI_ERROR_DEVICE_REMOVED)";
 }
 
-Graphics::InfoException::InfoException( int line, const char *file, std::vector<std::string> infoMsgs ) noexcept
+Graphics::InfoException::InfoException(int line, const char* file, std::vector<std::string> infoMsgs) noexcept
 	:
-	Exception( line, file )
+	Exception(line, file)
 {
-	for ( const auto &msg : infoMsgs )
+	for ( const auto& msg : infoMsgs )
 	{
 		info += msg;
-		info.push_back( '\n' );
+		info.push_back('\n');
 	}
 
 	//Remove final newline, if exists
@@ -247,7 +294,7 @@ Graphics::InfoException::InfoException( int line, const char *file, std::vector<
 	}
 }
 
-const char *Graphics::InfoException::what() const noexcept
+const char* Graphics::InfoException::what() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[Type] " << GetType() << std::endl
@@ -257,7 +304,7 @@ const char *Graphics::InfoException::what() const noexcept
 	return whatBuffer.c_str();
 }
 
-const char *Graphics::InfoException::GetType() const noexcept
+const char* Graphics::InfoException::GetType() const noexcept
 {
 	return "V-Engine Graphics Info Exception";
 }

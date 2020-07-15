@@ -1,7 +1,9 @@
 ﻿#include "Box.h"
 
 #include "BindableBase.h"
+#include "GraphicsThrowMacros.h"
 #include "Cube.h"
+#include "GuiMgr.h"
 
 Box::Box(Graphics& gfx,
 		 std::mt19937& rng,
@@ -9,61 +11,39 @@ Box::Box(Graphics& gfx,
 		 std::uniform_real_distribution<float>& ddist,
 		 std::uniform_real_distribution<float>& odist,
 		 std::uniform_real_distribution<float>& rdist,
-		 std::uniform_real_distribution<float>& bdist)
+		 std::uniform_real_distribution<float>& bdist,
+		 DirectX::XMFLOAT3 material)
 	:
 	TestObject(gfx, rng, adist, ddist, odist, rdist)
 {
+	namespace dx = DirectX;
 
 	if ( !IsInitialized() )
 	{
 		struct Vertex
 		{
-			DirectX::XMFLOAT3 pos;
+			dx::XMFLOAT3 pos;
+			dx::XMFLOAT3 n;
 		};
-		const auto model = Cube::Make<Vertex>();
-
+		auto model = Cube::MakeIndependent<Vertex>();
+		model.SetNormalsIndependentFlat();
 
 		AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
 
-		//Creates the vertex shader and extracts its bytecode
-		auto pVS = std::make_unique<VertexShader>(gfx, L"ColorIndexVS.cso");
-		auto pVSbc = pVS->GetBytecode();
-		AddStaticBind(std::move(pVS));
+		auto pvs = std::make_unique<VertexShader>(gfx, L"PhongVS.cso");
+		auto pvsbc = pvs->GetBytecode();
+		AddStaticBind(std::move(pvs));
 
-		AddStaticBind(std::make_unique<PixelShader>(gfx, L"ColorIndexPS.cso"));
+		AddStaticBind(std::make_unique<PixelShader>(gfx, L"PhongPS.cso"));
 
 		AddStaticBind(std::make_unique<IndexBuffer>(gfx, model.indices));
-
-		struct PSConstants
-		{
-			struct
-			{
-				float r;
-				float g;
-				float b;
-				float a;
-			} face_colors[8];
-		};
-		const PSConstants psc =
-		{
-			{
-				{ 1.0f,1.0f,1.0f },
-				{ 1.0f,0.0f,0.0f },
-				{ 0.0f,1.0f,0.0f },
-				{ 1.0f,1.0f,0.0f },
-				{ 0.0f,0.0f,1.0f },
-				{ 1.0f,0.0f,1.0f },
-				{ 0.0f,1.0f,1.0f },
-				{ 0.0f,0.0f,0.0f },
-			}
-		};
-		AddStaticBind(std::make_unique<PSConstantBuffer<PSConstants>>(gfx, psc));
 
 		const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
 		{
 			{ "Position",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
+			{ "Normal",0,DXGI_FORMAT_R32G32B32_FLOAT,0,12,D3D11_INPUT_PER_VERTEX_DATA,0 },
 		};
-		AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pVSbc));
+		AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
 
 		AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
 	}
@@ -73,13 +53,19 @@ Box::Box(Graphics& gfx,
 	}
 
 	AddBind(std::make_unique<TransformCBuf>(gfx, *this));
-	DirectX::XMStoreFloat3x3(
-		&m_modelTransform,
-		DirectX::XMMatrixScaling(1.0f, 1.0f, bdist(rng))
+
+	materialConstants.color = material;
+	AddBind(std::make_unique<PSConstantBuffer<PSMaterialConstant>>(gfx, materialConstants, 1u));
+
+	// model deformation transform (per instance, not stored as bind)
+	dx::XMStoreFloat3x3(
+		&mt,
+		dx::XMMatrixScaling(1.0f, 1.0f, bdist(rng))
 	);
 }
 
 DirectX::XMMATRIX Box::GetTransformXM() const noexcept
 {
-	return DirectX::XMLoadFloat3x3(&m_modelTransform) * TestObject::GetTransformXM();
+	namespace dx = DirectX;
+	return dx::XMLoadFloat3x3(&mt) * TestObject::GetTransformXM();
 }
