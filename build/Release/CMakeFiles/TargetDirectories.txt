@@ -1,3 +1,0 @@
-C:/Users/ownem/source/repos/SaffronEngine/build/Release/CMakeFiles/Client.dir
-C:/Users/ownem/source/repos/SaffronEngine/build/Release/CMakeFiles/edit_cache.dir
-C:/Users/ownem/source/repos/SaffronEngine/build/Release/CMakeFiles/rebuild_cache.dir
