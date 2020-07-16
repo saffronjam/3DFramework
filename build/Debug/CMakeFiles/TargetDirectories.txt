@@ -1,0 +1,3 @@
+C:/Users/ownem/source/repos/SaffronEngine/build/Debug/CMakeFiles/Client.dir
+C:/Users/ownem/source/repos/SaffronEngine/build/Debug/CMakeFiles/edit_cache.dir
+C:/Users/ownem/source/repos/SaffronEngine/build/Debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="SaffronEngine" targetName="Client" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_DIR="build/Debug" />
+      <configuration PROFILE_NAME="Release" CONFIG_NAME="Release" GENERATION_DIR="build/Release" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4acf824b-3aad-4d4c-9ee7-4c6b28d0f8f3" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitattributes" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework.sln" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/App.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/App.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Bindable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Bindable.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/BindableBase.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/BlendedPhongPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/BlendedPhongVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Box.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Box.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Camera.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Camera.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Clock.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Clock.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Color.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Color.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ColorBlendPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ColorBlendVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ColorIndexPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ColorIndexVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ConditionalNoexcept.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Cone.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ConstantBuffer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/ConstantBuffer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Cube.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DXGI_InfoManager.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DXGI_InfoManager.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DXGetErrorDescription.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DXGetErrorString.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DXTrace.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Drawable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Drawable.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DrawableBase.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/DrawableBase.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/GDIPlusMgr.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/GDIPlusMgr.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Graphics.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Graphics.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/GraphicsThrowMacros.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/GuiMgr.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/GuiMgr.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/IndexBuffer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/IndexBuffer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/IndexedPhongPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/IndexedTriangleList.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/InputLayout.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/InputLayout.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Keyboard.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Keyboard.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Melon.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Melon.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Model.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Model.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Mouse.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Mouse.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PhongPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PhongVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PixelShader.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PixelShader.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Plane.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PointLight.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/PointLight.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Prism.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Pyramid.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Pyramid.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Sampler.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Sampler.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SkinnedBox.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SkinnedBox.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SolidPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SolidSphere.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SolidSphere.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/SolidVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Sphere.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Surface.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Surface.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TestObject.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TestObject.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Texture.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Texture.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TexturePS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TextureVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TexturedPhongPS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TexturedPhongVS.hlsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Time.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Topology.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Topology.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TransformCBuf.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/TransformCBuf.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/V-3DFramework.vcxproj" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/V-3DFramework.vcxproj.filters" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VeException.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VeException.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VeMath.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VeWin.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Vertex.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VertexBuffer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VertexBuffer.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VertexShader.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/VertexShader.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/WinMain.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Window.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/Window.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/WindowThrowMacros.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/WindowsMessageMap.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/WindowsMessageMap.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/assimp-vc140-mt.dll" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/cpp.hint" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/dxerr.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/dxerr.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/imgui.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/arial.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/sample.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/sample_image.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/sample_music.wav" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/sample_sound.flac" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/res/sample_trans.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/resource.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/resource1.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/V-3DFramework/wndIcon.ico" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Compiler/poppack1.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Compiler/pstdint.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Compiler/pushpack1.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/DefaultIOStream.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/DefaultIOSystem.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/DefaultLogger.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Defines.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Exporter.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/IOStream.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/IOSystem.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Importer.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/LogStream.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/Logger.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/NullLogger.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/ProgressHandler.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/SceneCombiner.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/ai_assert.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/anim.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/camera.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/cexport.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/cfileio.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/cimport.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/color4.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/color4.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/config.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/defs.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/importerdesc.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/light.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/material.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/material.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/matrix3x3.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/matrix3x3.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/matrix4x4.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/matrix4x4.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/mesh.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/metadata.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/postprocess.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/quaternion.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/quaternion.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/scene.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/texture.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/types.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/vector2.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/vector2.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/vector3.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/vector3.inl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/include/assimp/version.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/assimp/lib/assimp-vc140-mt.lib" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imconfig.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_demo.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_draw.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_impl_dx11.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_impl_dx11.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_impl_win32.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_impl_win32.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_internal.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imgui_widgets.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imstb_rectpack.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imstb_textedit.h" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/deps/imgui/include/imgui/imstb_truetype.h" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1emcRMdtiva8kstUwBY1wP3IYYm" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Client" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="SaffronEngine" TARGET_NAME="Client" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="SaffronEngine" RUN_TARGET_NAME="Client">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1594930435390">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="414" y="175" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1594930435390" />
+    <state x="740" y="275" key="FileChooserDialogImpl" timestamp="1594930954271">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="740" y="275" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1594930954271" />
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom" timestamp="1594930846559">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1594930846559" />
+    <state width="1877" height="282" key="GridCell.Tab.0.center" timestamp="1594930846558">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1594930846558" />
+    <state width="1877" height="282" key="GridCell.Tab.0.left" timestamp="1594930846558">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1594930846558" />
+    <state width="1877" height="282" key="GridCell.Tab.0.right" timestamp="1594930846559">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state width="1877" height="282" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1594930846559" />
+    <state x="461" y="165" key="SettingsEditor" timestamp="1594931317201">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1594931317201" />
+  </component>
+</project>
