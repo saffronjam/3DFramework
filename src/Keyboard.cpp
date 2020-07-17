@@ -1,6 +1,11 @@
 #include "Keyboard.h"
 
-#include "Event.h"
+#include "Window.h"
+
+Keyboard::Keyboard(Window &window)
+{
+    window.AddEventHandler(Event::Type::Keyboard, this);
+}
 
 void Keyboard::Update() noexcept
 {
@@ -11,18 +16,18 @@ void Keyboard::Update() noexcept
 
 void Keyboard::HandleEvent(const Event &event)
 {
-    switch (static_cast<Keyboard::Action>(event.keyboard.action))
+    switch (event.keyboard.action)
     {
     case Keyboard::Press:
-        OnPress(static_cast<Keyboard::Key>(event.keyboard.key));
+        OnPress(event.keyboard.key);
         break;
     case Keyboard::Release:
-        OnRelease(static_cast<Keyboard::Key>(event.keyboard.key));
+        OnRelease(event.keyboard.key);
         break;
     case Keyboard::Repeat:
-        OnRepeat(static_cast<Keyboard::Key>(event.keyboard.key));
+        OnRepeat(event.keyboard.key);
         break;
-    default: // Keyboard::Action::Unknown not handled
+    default:
         break;
     }
 }

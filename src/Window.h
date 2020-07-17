@@ -1,11 +1,13 @@
 #pragma once
 
 #include <string>
+#include <deque>
 
 #include "IException.h"
 #include "Engine.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Event.h"
 
 class Window
 {
@@ -16,23 +18,26 @@ public:
     void BeginFrame(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
     void EndFrame();
 
+    void PollAllEvents();
+    void PushEvent(const Event &event);
+    void AddEventHandler(Event::Type type, IEventHandler *handler);
+
     [[nodiscard]] class GLFWwindow *GetCoreWindow() const noexcept;
 
     void SetTitle(std::string title);
 
 private:
-    static void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods);
-    static void MouseCallback(GLFWwindow *window, int button, int action, int mods);
+    std::string m_title;
+    int m_width, m_height;
+    class GLFWwindow *m_glfwWindow;
+
+    std::deque<Event> m_events;
+    std::multimap<Event::Type, IEventHandler *> m_handlers;
+
 
 public:
     Keyboard kbd;
     Mouse mouse;
-
-private:
-    class GLFWwindow *m_glfwWindow;
-
-    std::string m_title;
-    int m_width, m_height;
 
 public:
     class Exception : public IException

@@ -1,10 +1,9 @@
 #pragma once
 
-union Event;
+class Event;
 
 class IEventHandler
 {
 public:
-    virtual void HandleEvent(const Event& event) = 0;
+    virtual void HandleEvent(const Event &event) = 0;
 };
-

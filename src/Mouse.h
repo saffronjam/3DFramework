@@ -23,21 +23,21 @@ public:
         Num6 = 5,
         Num7 = 6,
         Num8 = 7,
-        LAST = Num8,
-        LEFT = Num1,
-        RIGHT = Num2,
-        MIDDLE = Num3
+        Last = Num8,
+        Left = Num1,
+        Right = Num2,
+        Middle = Num3
     };
     enum Action
     {
-        Press,
-        Release,
-        Repeat,
-        Unknown [[maybe_unused]]
+        Release = 0,
+        Press = 1
     };
     using Callback = std::function<void(Action action, Button key, const glm::vec2 &position)>;
 
 public:
+    explicit Mouse(class Window &window);
+
     void Update() noexcept;
     void HandleEvent(const Event &event) override;
 
@@ -47,7 +47,6 @@ public:
         {
         case Action::Press:
         case Action::Release:
-        case Action::Repeat:
             m_callbacks[action].push_back(callback);
             break;
         default:
@@ -56,6 +55,7 @@ public:
     }
 
     bool IsDown(Button button);
+    bool WasDown(Button button);
     bool IsPressed(Button button);
     bool IsReleased(Button button);
     bool IsAnyDown();

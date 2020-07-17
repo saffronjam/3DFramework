@@ -11,12 +11,11 @@ int main()
     while (!glfwWindowShouldClose(window.GetCoreWindow()))
     {
         window.BeginFrame();
+
         window.kbd.Update();
         window.mouse.Update();
-        if (window.kbd.IsReleased(Keyboard::E))
-            window.SetTitle("button down");
-        else
-            window.SetTitle("button up");
+        window.PollAllEvents();
+
         window.EndFrame();
     }
 }

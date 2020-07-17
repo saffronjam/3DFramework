@@ -3,29 +3,34 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
-struct KeyboardEvent
+class Event
 {
-    Keyboard::Action action;
-    Keyboard::Key key;
-};
+public:
+    enum class Type
+    {
+        Keyboard,
+        Mouse,
+        Unknown
+    };
 
-struct MouseEvent
-{
-    Mouse::Action action;
-    Mouse::Button button;
-};
+    struct KeyboardEvent
+    {
+        Keyboard::Action action;
+        Keyboard::Key key;
+    };
 
-enum class EventType
-{
-    Keyboard,
-    Mouse,
-    Unknown
-};
+    struct MouseEvent
+    {
+        Mouse::Action action;
+        Mouse::Button button;
+        glm::vec2 position;
+    };
 
-union Event
-{
-    EventType type = EventType::Unknown;
-    MouseEvent mouse;
-    KeyboardEvent keyboard;
+    Type type;
+    union
+    {
+        KeyboardEvent keyboard;
+        MouseEvent mouse;
+    };
 };
 
