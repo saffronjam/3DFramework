@@ -21,6 +21,7 @@ public:
     static void Uninitialize(Subsystem subsystem);
 
     static void BindErrorCallback(GLFWerrorfun callback);
+    static void BindDefaultErrorCallback();
     static void UnbindErrorCallback();
 };
 

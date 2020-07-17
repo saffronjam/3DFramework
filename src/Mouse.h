@@ -1,0 +1,71 @@
+#pragma once
+
+#include <map>
+#include <functional>
+#include <glm/vec2.hpp>
+
+#include "IEventHandler.h"
+
+enum class Button;
+
+class Mouse : public IEventHandler
+{
+    friend class Window;
+
+public:
+    enum Button
+    {
+        Num1 = 0,
+        Num2 = 1,
+        Num3 = 2,
+        Num4 = 3,
+        Num5 = 4,
+        Num6 = 5,
+        Num7 = 6,
+        Num8 = 7,
+        LAST = Num8,
+        LEFT = Num1,
+        RIGHT = Num2,
+        MIDDLE = Num3
+    };
+    enum Action
+    {
+        Press,
+        Release,
+        Repeat,
+        Unknown [[maybe_unused]]
+    };
+    using Callback = std::function<void(Action action, Button key, const glm::vec2 &position)>;
+
+public:
+    void Update() noexcept;
+    void HandleEvent(const Event &event) override;
+
+    void AddCallback(Action action, const Callback &callback) noexcept
+    {
+        switch (action)
+        {
+        case Action::Press:
+        case Action::Release:
+        case Action::Repeat:
+            m_callbacks[action].push_back(callback);
+            break;
+        default:
+            break;
+        }
+    }
+
+    bool IsDown(Button button);
+    bool IsPressed(Button button);
+    bool IsReleased(Button button);
+    bool IsAnyDown();
+
+private:
+    void OnPress(Button button) noexcept;
+    void OnRelease(Button button) noexcept;
+
+private:
+    std::map<Button, bool> m_buttonmap;
+    std::map<Button, bool> m_prevButtonmap;
+    std::map<Action, std::vector<Callback>> m_callbacks;
+};

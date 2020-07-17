@@ -41,6 +41,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_include_directories(Client PRIVATE
             deps/GLEW/include
             deps/GLFW/include
+            deps/glm/include
             )
     target_link_directories(Client PRIVATE
             deps/GLEW/lib

@@ -20,11 +20,47 @@ Window::Window(std::string title, int width, int height, bool activeContext)
     {
         glfwMakeContextCurrent(m_glfwWindow);
     }
+
+    glfwSetWindowUserPointer(m_glfwWindow, this);
+    glfwSetKeyCallback(m_glfwWindow, Window::KeyCallback);
+
+    Engine::BindDefaultErrorCallback();
 }
 
 Window::~Window()
 {
     glfwDestroyWindow(m_glfwWindow);
+}
+void Window::BeginFrame(float r, float g, float b, float a)
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void Window::EndFrame()
+{
+    glfwSwapBuffers(m_glfwWindow);
+    glfwPollEvents();
+}
+
+GLFWwindow *Window::GetCoreWindow() const noexcept
+{
+    return m_glfwWindow;
+}
+
+void Window::KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+
+}
+
+void Window::MouseCallback(GLFWwindow *window, int button, int action, int mods)
+{
+
+}
+
+void Window::SetTitle(std::string title)
+{
+    m_title = std::move(title);
+    glfwSetWindowTitle(m_glfwWindow, m_title.c_str());
 }
 
 Window::Exception::Exception(int line, const char *file, int errorCode, const char *errorString) noexcept
