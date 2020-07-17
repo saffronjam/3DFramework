@@ -7,11 +7,11 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  # Copy dlls
-else()
-  # FindPackage
-endif()
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    # Copy dlls
+else ()
+    # FindPackage
+endif ()
 
 file(COPY "res" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 
@@ -37,26 +37,26 @@ set_target_properties(Client PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"
         )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  target_include_directories(Client PRIVATE
-          deps/GLEW/include
-          deps/GLFW/include
-  )
-  target_link_directories(Client PRIVATE
-          deps/GLEW/lib
-          deps/GLFW/lib
-  )
-  target_link_libraries(Client PRIVATE
-          gdi32
-          glfw3
-          glew32s
-          opengl32
-  )
-else()
-  target_include_directories(Client PRIVATE
-  )
-  target_link_directories(Client PRIVATE
-  )
-  target_link_libraries(Client PRIVATE
-  )
-endif()
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    target_include_directories(Client PRIVATE
+            deps/GLEW/include
+            deps/GLFW/include
+            )
+    target_link_directories(Client PRIVATE
+            deps/GLEW/lib
+            deps/GLFW/lib
+            )
+    target_link_libraries(Client PRIVATE
+            gdi32
+            glfw3
+            glew32s
+            opengl32
+            )
+else ()
+    target_include_directories(Client PRIVATE
+            )
+    target_link_directories(Client PRIVATE
+            )
+    target_link_libraries(Client PRIVATE
+            )
+endif ()

@@ -1,8 +1,10 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Engine.h"
+#include "Window.h"
 
 int main()
 {
-    glewInit();
-    glfwInit();
+    Engine::Init(Engine::Graphics);
+    Window window("Saffron Engine", 100, 500);
+
+    while (true);
 }
