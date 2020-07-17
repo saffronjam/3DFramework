@@ -19,6 +19,7 @@ find_package(Threads REQUIRED)
 
 add_definitions(
         # Static or dynamic?
+        -DGLEW_STATIC
 )
 
 
@@ -38,10 +39,18 @@ set_target_properties(Client PROPERTIES
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   target_include_directories(Client PRIVATE
+          deps/GLEW/include
+          deps/GLFW/include
   )
   target_link_directories(Client PRIVATE
+          deps/GLEW/lib
+          deps/GLFW/lib
   )
   target_link_libraries(Client PRIVATE
+          gdi32
+          glfw3
+          glew32s
+          opengl32
   )
 else()
   target_include_directories(Client PRIVATE
