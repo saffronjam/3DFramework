@@ -4,7 +4,8 @@
 #include "GenericThrowMacros.h"
 
 IApp::IApp()
-        : m_wnd("Saffron Engine", 1024, 720)
+        : m_wnd("Saffron Engine", 1024, 720),
+          m_gfx(m_wnd)
 {
 }
 
@@ -21,14 +22,14 @@ void IApp::Run()
         m_wnd.kbd.Update();
         m_wnd.mouse.Update();
         m_wnd.PollAllEvents();
-        m_wnd.BeginFrame();
+        m_gfx.BeginFrame();
         try
         {
             OnUpdate();
             OnDraw();
         }
         LogOnly;
-        m_wnd.EndFrame();
+        m_gfx.EndFrame();
     }
 }
 

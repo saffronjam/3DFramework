@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Window.h"
+#include "Graphics.h"
 #include "IEventHandler.h"
 
 class IApp : public IEventHandler
@@ -24,6 +24,7 @@ protected:
 
 protected:
     Window m_wnd;
+    Graphics m_gfx;
 
 public:
     class Exception : public IException

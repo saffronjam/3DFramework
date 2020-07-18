@@ -15,9 +15,6 @@ public:
     Window(std::string title, int width, int height, bool activeContext = true);
     ~Window();
 
-    void BeginFrame(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
-    void EndFrame();
-
     bool ShouldClose();
     void Close();
 

@@ -32,16 +32,6 @@ Window::~Window()
 {
     glfwDestroyWindow(m_glfwWindow);
 }
-void Window::BeginFrame(float r, float g, float b, float a)
-{
-    glClear(GL_COLOR_BUFFER_BIT);
-}
-
-void Window::EndFrame()
-{
-    glfwSwapBuffers(m_glfwWindow);
-    glfwPollEvents();
-}
 
 bool Window::ShouldClose()
 {
