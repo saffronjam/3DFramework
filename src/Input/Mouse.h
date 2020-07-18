@@ -2,14 +2,14 @@
 
 #include <map>
 #include <functional>
+#include <optional>
+
 #include <glm/vec2.hpp>
 
 #include "IEventHandler.h"
 
 class Mouse : public IEventHandler
 {
-    friend class Window;
-
 public:
     enum Button
     {
@@ -24,12 +24,16 @@ public:
         Last = Num8,
         Left = Num1,
         Right = Num2,
-        Middle = Num3
+        Middle = Num3,
+        Undefined = 100
     };
     enum Action
     {
         Release = 0,
-        Press = 1
+        Press = 1,
+        Move = 2,
+        Enter = 3,
+        Leave = 4
     };
     using Callback = std::function<void(const struct MouseEvent &event)>;
 
@@ -39,31 +43,31 @@ public:
     void Update() noexcept;
     void HandleEvent(const Event &event) override;
 
-    void AddCallback(Action action, const Callback &callback) noexcept
-    {
-        switch (action)
-        {
-        case Action::Press:
-        case Action::Release:
-            m_callbacks[action].push_back(callback);
-            break;
-        default:
-            break;
-        }
-    }
+    void AddCallback(Action action, const Callback &callback);
 
-    bool IsDown(Button button);
-    bool WasDown(Button button);
-    bool IsPressed(Button button);
-    bool IsReleased(Button button);
-    bool IsAnyDown();
+    bool IsDown(Button button) const noexcept;
+    bool WasDown(Button button) const noexcept;
+    bool IsPressed(Button button) const noexcept;
+    bool IsReleased(Button button) const noexcept;
+    bool IsAnyDown() const noexcept;
+    bool IsInScreen() const noexcept;
+
+    [[nodiscard]] const glm::vec2 &GetPosition() const noexcept;
 
 private:
     void OnPress(const struct MouseEvent &event);
     void OnRelease(const struct MouseEvent &event);
+    void OnMove(const struct MouseEvent &event);
+    void OnEnter(const struct MouseEvent &event);
+    void OnLeave(const struct MouseEvent &event);
 
 private:
-    std::map<Button, bool> m_buttonmap;
-    std::map<Button, bool> m_prevButtonmap;
+    class Window& m_wnd;
+
+    mutable std::map<Button, bool> m_buttonmap;
+    mutable std::map<Button, bool> m_prevButtonmap;
     std::map<Action, std::vector<Callback>> m_callbacks;
+
+    mutable std::optional<glm::vec2> m_position;
+    bool m_isInScreen;
 };

@@ -30,6 +30,9 @@ public:
     void SetTitle(std::string title);
 
 private:
+    void SetupGLFWCallbacks();
+
+private:
     std::string m_title;
     int m_width, m_height;
 

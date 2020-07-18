@@ -1,8 +1,12 @@
 #include "Mouse.h"
 
+#include <GLFW/glfw3.h>
+
 #include "Window.h"
 
 Mouse::Mouse(Window &window)
+        : m_isInScreen(true),
+          m_wnd(window)
 {
     window.AddEventHandler(Event::Type::Mouse, this);
 }
@@ -16,42 +20,56 @@ void Mouse::HandleEvent(const Event &event)
 {
     switch (event.mouse.action)
     {
-    case Mouse::Press:
+    case Action::Press:
         OnPress(event.mouse);
         break;
-    case Mouse::Release:
+    case Action::Release:
         OnRelease(event.mouse);
+        break;
+    case Action::Move:
+        OnMove(event.mouse);
+        break;
+    case Action::Enter:
+        OnEnter(event.mouse);
+        break;
+    case Action::Leave:
+        OnLeave(event.mouse);
         break;
     default:
         break;
     }
 }
 
-bool Mouse::IsDown(Button button)
+void Mouse::AddCallback(Mouse::Action action, const Mouse::Callback &callback)
+{
+    m_callbacks[action].push_back(callback);
+}
+
+bool Mouse::IsDown(Button button) const noexcept
 {
     if (m_buttonmap.find(button) == m_buttonmap.end())
         m_buttonmap[button] = false;
     return m_buttonmap[button];
 }
 
-bool Mouse::WasDown(Button button)
+bool Mouse::WasDown(Button button) const noexcept
 {
     if (m_prevButtonmap.find(button) == m_prevButtonmap.end())
         m_prevButtonmap[button] = false;
     return m_prevButtonmap[button];
 }
 
-bool Mouse::IsPressed(Button button)
+bool Mouse::IsPressed(Button button) const noexcept
 {
     return IsDown(button) && !WasDown(button);
 }
 
-bool Mouse::IsReleased(Button button)
+bool Mouse::IsReleased(Button button) const noexcept
 {
     return !IsDown(button) && WasDown(button);
 }
 
-bool Mouse::IsAnyDown()
+bool Mouse::IsAnyDown() const noexcept
 {
     for (auto&[button, state] : m_buttonmap)
     {
@@ -59,6 +77,22 @@ bool Mouse::IsAnyDown()
             return true;
     }
     return false;
+}
+
+bool Mouse::IsInScreen() const noexcept
+{
+    return m_isInScreen;
+}
+
+const glm::vec2 &Mouse::GetPosition() const noexcept
+{
+    if (!m_position.has_value())
+    {
+        double x, y;
+        glfwGetCursorPos(m_wnd.GetCoreWindow(), &x, &y);
+        m_position = std::make_optional(glm::vec2(x, y));
+    }
+    return m_position.value();
 }
 
 void Mouse::OnPress(const MouseEvent &event)
@@ -74,4 +108,21 @@ void Mouse::OnRelease(const MouseEvent &event)
     for (auto &callback : m_callbacks[Action::Release])
         callback(event);
 }
+void Mouse::OnMove(const MouseEvent &event)
+{
+    m_position = event.position;
+    for (auto &callback : m_callbacks[Action::Move])
+        callback(event);
+}
 
+void Mouse::OnEnter(const struct MouseEvent &event)
+{
+    for (auto &callback : m_callbacks[Action::Enter])
+        callback(event);
+}
+
+void Mouse::OnLeave(const struct MouseEvent &event)
+{
+    for (auto &callback : m_callbacks[Action::Leave])
+        callback(event);
+}

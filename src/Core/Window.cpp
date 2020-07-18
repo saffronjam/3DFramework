@@ -24,27 +24,7 @@ Window::Window(std::string title, int width, int height, bool activeContext)
     {
         glfwMakeContextCurrent(m_glfwWindow);
     }
-
-    glfwSetWindowUserPointer(m_glfwWindow, this);
-    glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods)
-    {
-        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        Event event{};
-        event.type = Event::Type::Keyboard;
-        event.keyboard = {static_cast<Keyboard::Action>(action), static_cast<Keyboard::Key>(key)};
-        pWnd->PushEvent(event);
-    });
-    glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow *window, int button, int action, int mods)
-    {
-        double xpos, ypos;
-        glfwGetCursorPos(window, &xpos, &ypos);
-        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
-        Event event{};
-        event.type = Event::Type::Mouse;
-        event.mouse = {static_cast<Mouse::Action>(action), static_cast<Mouse::Button>(button), glm::vec2(xpos, ypos)};
-        pWnd->PushEvent(event);
-    });
-
+    SetupGLFWCallbacks();
     Engine::BindDefaultErrorCallback();
 }
 
@@ -118,6 +98,44 @@ void Window::SetTitle(std::string title)
 {
     m_title = std::move(title);
     glfwSetWindowTitle(m_glfwWindow, m_title.c_str());
+}
+
+void Window::SetupGLFWCallbacks()
+{
+    glfwSetWindowUserPointer(m_glfwWindow, this);
+    glfwSetKeyCallback(m_glfwWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods)
+    {
+        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        Event event{};
+        event.type = Event::Type::Keyboard;
+        event.keyboard = {static_cast<Keyboard::Action>(action), static_cast<Keyboard::Key>(key)};
+        pWnd->PushEvent(event);
+    });
+    glfwSetMouseButtonCallback(m_glfwWindow, [](GLFWwindow *window, int button, int action, int mods)
+    {
+        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        Event event{};
+        event.type = Event::Type::Mouse;
+        event.mouse = {static_cast<Mouse::Action>(action), static_cast<Mouse::Button>(button), pWnd->mouse.GetPosition()};
+        pWnd->PushEvent(event);
+    });
+    glfwSetCursorPosCallback(m_glfwWindow, [](GLFWwindow *window, double xpos, double ypos)
+    {
+        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        Event event{};
+        event.type = Event::Type::Mouse;
+        event.mouse = {Mouse::Action::Move, Mouse::Button::Undefined, glm::vec2(xpos, ypos)};
+        pWnd->PushEvent(event);
+    });
+    glfwSetCursorEnterCallback(m_glfwWindow, [](GLFWwindow *window, int enter)
+    {
+        auto pWnd = static_cast<Window *>(glfwGetWindowUserPointer(window));
+        auto action = enter ? Mouse::Action::Enter : Mouse::Action::Leave;
+        Event event{};
+        event.type = Event::Type::Mouse;
+        event.mouse = {action, Mouse::Button::Undefined, pWnd->mouse.GetPosition()};
+        pWnd->PushEvent(event);
+    });
 }
 
 Window::Exception::Exception(int

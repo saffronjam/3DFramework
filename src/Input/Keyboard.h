@@ -7,8 +7,6 @@
 
 class Keyboard : public IEventHandler
 {
-    friend class Window;
-
 public:
     enum Key
     {
@@ -161,12 +159,12 @@ public:
         }
     }
 
-    bool IsDown(Key key);
-    bool WasDown(Key key);
-    bool IsPressed(Key key);
-    bool IsReleased(Key key);
-    bool IsBeingRepeated(Key key);
-    bool IsAnyDown();
+    bool IsDown(Key key) const noexcept;;
+    bool WasDown(Key key) const noexcept;;
+    bool IsPressed(Key key) const noexcept;;
+    bool IsReleased(Key key) const noexcept;;
+    bool IsBeingRepeated(Key key) const noexcept;;
+    bool IsAnyDown() const noexcept;;
 
 private:
     void OnPress(const class KeyboardEvent &event);
@@ -174,8 +172,8 @@ private:
     void OnRepeat(const class KeyboardEvent &event);
 
 private:
-    std::map<Key, bool> m_keymap;
-    std::map<Key, bool> m_prevKeymap;
-    std::map<Key, bool> m_repeatKeymap;
+    mutable std::map<Key, bool> m_keymap;
+    mutable std::map<Key, bool> m_prevKeymap;
+    mutable std::map<Key, bool> m_repeatKeymap;
     std::map<Action, std::vector<Callback>> m_callbacks;
 };
