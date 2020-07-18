@@ -1,21 +1,14 @@
 #include "Engine.h"
-#include "Window.h"
-
-#include <GLFW/glfw3.h>
+#include "App.h"
+#include "GenericThrowMacros.h"
 
 int main()
 {
-    Engine::Initialize(Engine::Graphics);
-    Window window("Saffron Engine", 1024, 720);
-
-    while (!glfwWindowShouldClose(window.GetCoreWindow()))
+    try
     {
-        window.BeginFrame();
-
-        window.kbd.Update();
-        window.mouse.Update();
-        window.PollAllEvents();
-
-        window.EndFrame();
+        Engine::Initialize(Engine::Graphics);
+        App app;
+        app.Run();
     }
+    LogOnly;
 }

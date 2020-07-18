@@ -19,13 +19,13 @@ void Keyboard::HandleEvent(const Event &event)
     switch (event.keyboard.action)
     {
     case Keyboard::Press:
-        OnPress(event.keyboard.key);
+        OnPress(event.keyboard);
         break;
     case Keyboard::Release:
-        OnRelease(event.keyboard.key);
+        OnRelease(event.keyboard);
         break;
     case Keyboard::Repeat:
-        OnRepeat(event.keyboard.key);
+        OnRepeat(event.keyboard);
         break;
     default:
         break;
@@ -73,17 +73,23 @@ bool Keyboard::IsAnyDown()
     return false;
 }
 
-void Keyboard::OnPress(Key key) noexcept
+void Keyboard::OnPress(const KeyboardEvent &event)
 {
-    m_keymap[key] = true;
+    m_keymap[event.key] = true;
+    for (auto &callback : m_callbacks[Action::Press])
+        callback(event);
 }
 
-void Keyboard::OnRelease(Key key) noexcept
+void Keyboard::OnRelease(const KeyboardEvent &event)
 {
-    m_keymap[key] = false;
+    m_keymap[event.key] = false;
+    for (auto &callback : m_callbacks[Action::Release])
+        callback(event);
 }
 
-void Keyboard::OnRepeat(Key key) noexcept
+void Keyboard::OnRepeat(const KeyboardEvent &event)
 {
-    m_repeatKeymap[key] = true;
+    m_repeatKeymap[event.key] = true;
+    for (auto &callback : m_callbacks[Action::Repeat])
+        callback(event);
 }

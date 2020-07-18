@@ -29,7 +29,18 @@ set(ClientSRC "${ALL_SOURCES}")
 
 add_executable(Client "${ClientSRC}")
 
-target_include_directories(Client PRIVATE)
+target_include_directories(Client PRIVATE
+        src
+        src/Apps
+        src/Core
+        src/Etc
+        src/Input
+        src/Interfaces
+        src/Project
+        src/Res
+        src/Screens
+        src/ThrowMacros
+        )
 
 set_target_properties(Client PROPERTIES
         ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}"

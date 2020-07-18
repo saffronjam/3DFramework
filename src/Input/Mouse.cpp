@@ -17,10 +17,10 @@ void Mouse::HandleEvent(const Event &event)
     switch (event.mouse.action)
     {
     case Mouse::Press:
-        OnPress(event.mouse.button);
+        OnPress(event.mouse);
         break;
     case Mouse::Release:
-        OnRelease(event.mouse.button);
+        OnRelease(event.mouse);
         break;
     default:
         break;
@@ -61,13 +61,17 @@ bool Mouse::IsAnyDown()
     return false;
 }
 
-void Mouse::OnPress(Button button) noexcept
+void Mouse::OnPress(const MouseEvent &event)
 {
-    m_buttonmap[button] = true;
+    m_buttonmap[event.button] = true;
+    for (auto &callback : m_callbacks[Action::Press])
+        callback(event);
 }
 
-void Mouse::OnRelease(Button button) noexcept
+void Mouse::OnRelease(const MouseEvent &event)
 {
-    m_buttonmap[button] = false;
+    m_buttonmap[event.button] = false;
+    for (auto &callback : m_callbacks[Action::Release])
+        callback(event);
 }
 

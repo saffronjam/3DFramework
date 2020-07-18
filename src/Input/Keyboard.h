@@ -139,7 +139,7 @@ public:
         Press = 1,
         Repeat = 2
     };
-    using Callback = std::function<void(Action action, Key key)>;
+    using Callback = std::function<void(const class KeyboardEvent &event)>;
 
 public:
     explicit Keyboard(class Window &window);
@@ -169,9 +169,9 @@ public:
     bool IsAnyDown();
 
 private:
-    void OnPress(Key key) noexcept;
-    void OnRelease(Key key) noexcept;
-    void OnRepeat(Key key) noexcept;
+    void OnPress(const class KeyboardEvent &event);
+    void OnRelease(const class KeyboardEvent &event);
+    void OnRepeat(const class KeyboardEvent &event);
 
 private:
     std::map<Key, bool> m_keymap;

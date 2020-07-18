@@ -18,6 +18,9 @@ public:
     void BeginFrame(float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f);
     void EndFrame();
 
+    bool ShouldClose();
+    void Close();
+
     void PollAllEvents();
     void PushEvent(const Event &event);
     void AddEventHandler(Event::Type type, IEventHandler *handler);
@@ -29,11 +32,11 @@ public:
 private:
     std::string m_title;
     int m_width, m_height;
+
     class GLFWwindow *m_glfwWindow;
 
     std::deque<Event> m_events;
     std::multimap<Event::Type, IEventHandler *> m_handlers;
-
 
 public:
     Keyboard kbd;

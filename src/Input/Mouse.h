@@ -6,8 +6,6 @@
 
 #include "IEventHandler.h"
 
-enum class Button;
-
 class Mouse : public IEventHandler
 {
     friend class Window;
@@ -33,7 +31,7 @@ public:
         Release = 0,
         Press = 1
     };
-    using Callback = std::function<void(Action action, Button key, const glm::vec2 &position)>;
+    using Callback = std::function<void(const struct MouseEvent &event)>;
 
 public:
     explicit Mouse(class Window &window);
@@ -61,8 +59,8 @@ public:
     bool IsAnyDown();
 
 private:
-    void OnPress(Button button) noexcept;
-    void OnRelease(Button button) noexcept;
+    void OnPress(const struct MouseEvent &event);
+    void OnRelease(const struct MouseEvent &event);
 
 private:
     std::map<Button, bool> m_buttonmap;

@@ -2,21 +2,24 @@
 
 #include <GLFW/glfw3.h>
 
+#include "GenericThrowMacros.h"
+
 Window::Window(std::string title, int width, int height, bool activeContext)
         : m_title(std::move(title)),
           m_width(width),
           m_height(height),
-          m_glfwWindow(glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr)),
           kbd(*this),
           mouse(*this)
 {
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-
     Engine::BindErrorCallback([](int code, const char *desc)
                               {
                                   throw Window::Exception(__LINE__, __FILE__, code, desc);
                               });
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
+    m_glfwWindow = glfwCreateWindow(m_width, m_height, m_title.c_str(), nullptr, nullptr);
+
     if (activeContext)
     {
         glfwMakeContextCurrent(m_glfwWindow);
@@ -58,6 +61,16 @@ void Window::EndFrame()
 {
     glfwSwapBuffers(m_glfwWindow);
     glfwPollEvents();
+}
+
+bool Window::ShouldClose()
+{
+    return glfwWindowShouldClose(m_glfwWindow);
+}
+
+void Window::Close()
+{
+    glfwSetWindowShouldClose(m_glfwWindow, GLFW_TRUE);
 }
 
 void Window::PushEvent(const Event &event)

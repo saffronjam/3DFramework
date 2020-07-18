@@ -3,6 +3,19 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
+struct KeyboardEvent
+{
+    Keyboard::Action action;
+    Keyboard::Key key;
+};
+
+struct MouseEvent
+{
+    Mouse::Action action;
+    Mouse::Button button;
+    glm::vec2 position;
+};
+
 class Event
 {
 public:
@@ -10,20 +23,7 @@ public:
     {
         Keyboard,
         Mouse,
-        Unknown
-    };
-
-    struct KeyboardEvent
-    {
-        Keyboard::Action action;
-        Keyboard::Key key;
-    };
-
-    struct MouseEvent
-    {
-        Mouse::Action action;
-        Mouse::Button button;
-        glm::vec2 position;
+        Unknown [[maybe_unused]]
     };
 
     Type type;
