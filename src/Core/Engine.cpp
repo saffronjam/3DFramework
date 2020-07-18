@@ -8,7 +8,6 @@
 void Engine::Initialize(Engine::Subsystem subsystem)
 {
     BindDefaultErrorCallback();
-    glewInit();
     glfwInit();
 }
 

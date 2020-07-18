@@ -32,7 +32,9 @@ add_executable(Client "${ClientSRC}")
 target_include_directories(Client PRIVATE
         src
         src/Apps
+        src/Bindables
         src/Core
+        src/Drawables
         src/Etc
         src/Input
         src/Interfaces

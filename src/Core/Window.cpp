@@ -128,11 +128,7 @@ void Window::SetupGLFWCallbacks()
     });
 }
 
-Window::Exception::Exception(int
-                             line,
-                             const char *file,
-                             int errorCode,
-                             const char *errorString) noexcept
+Window::Exception::Exception(int line, const char *file, int errorCode, const char *errorString) noexcept
         : IException(line, file),
           errorCode(errorCode),
           errorString(errorString)
