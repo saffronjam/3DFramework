@@ -4,7 +4,7 @@
 
 #define THROW(ExceptionClass, msg, format...)          \
     {                                                  \
-        char buf[200];                                 \
+        char buf[200] = {0};                           \
         sprintf(buf, msg, format);                     \
         throw ExceptionClass(__LINE__, __FILE__, buf); \
     }

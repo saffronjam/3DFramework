@@ -1,5 +1,5 @@
-#include "FragmentShader.h"
+#include "Shaders/FragmentShader.h"
 #include "ShaderProgram.h"
 #include "VertexBuffer.h"
 #include "VertexLayout.h"
-#include "VertexShader.h"
+#include "Shaders/VertexShader.h"

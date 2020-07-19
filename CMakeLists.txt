@@ -13,7 +13,7 @@ else ()
     # FindPackage
 endif ()
 
-file(COPY "res" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+file(COPY "res/Shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 
 find_package(Threads REQUIRED)
 
@@ -36,11 +36,14 @@ target_include_directories(Client PRIVATE
         src/Core
         src/Drawables
         src/Etc
+        src/GL
         src/Input
         src/Interfaces
         src/Project
         src/Res
         src/Screens
+        src/Shaders
+        src/System
         src/ThrowMacros
         )
 

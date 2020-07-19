@@ -23,6 +23,6 @@ std::string IException::GetOriginString() const noexcept
 {
     std::ostringstream oss;
     oss << "[File] " << m_file << std::endl
-        << "[Line] " << m_line << std::endl;
+        << "[Line] " << m_line;
     return oss.str();
 }

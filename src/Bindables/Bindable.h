@@ -4,6 +4,7 @@
 
 #include "Graphics.h"
 #include "GenericThrowMacros.h"
+#include "GLCheck.h"
 
 class Bindable
 {
