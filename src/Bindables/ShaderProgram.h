@@ -8,12 +8,13 @@
 #include <glm/vec4.hpp>
 #include <glm/matrix.hpp>
 
+#include "NonCopyable.h"
 #include "Bindable.h"
 #include "VertexShader.h"
 //#include "GeometryShader.h"
 #include "FragmentShader.h"
 
-class ShaderProgram : public Bindable
+class ShaderProgram : public Bindable, NonCopyable
 {
     friend class Shader;
     struct UniformBinder;
@@ -22,8 +23,6 @@ public:
     ShaderProgram();
     ShaderProgram(const VertexShader &vert, const FragmentShader &frag);
     ~ShaderProgram();
-    ShaderProgram(const ShaderProgram& other) = delete;
-    ShaderProgram& operator()(const ShaderProgram& other) = delete;
     ShaderProgram(ShaderProgram&& other) noexcept;
 
     void BindTo(Graphics &gfx) override;

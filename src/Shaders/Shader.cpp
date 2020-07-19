@@ -20,6 +20,15 @@ Shader::~Shader()
     glCheck(glDeleteShader(m_shaderID));
 }
 
+Shader::Shader(Shader &&other) noexcept
+        : FileIO(std::move(other)),
+          m_type(other.m_type),
+          m_shaderID(other.m_shaderID),
+          m_name(std::move(other.m_name))
+{
+    other.m_shaderID = 0;
+}
+
 bool Shader::LoadFromFile(const std::string &path)
 {
     try

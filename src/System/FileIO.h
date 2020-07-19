@@ -5,6 +5,10 @@
 class FileIO
 {
 public:
+    FileIO() = default;
+    explicit FileIO(std::string preloadedData);
+    FileIO(FileIO&& other) noexcept;
+
     virtual bool LoadFromFile(const std::string &path);
 
 protected:

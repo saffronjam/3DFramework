@@ -7,8 +7,9 @@
 
 #include "Bindable.h"
 #include "FileIO.h"
+#include "NonCopyable.h"
 
-class Shader : public FileIO
+class Shader : public FileIO, NonCopyable
 {
 protected:
     enum Type
@@ -22,6 +23,7 @@ public:
     explicit Shader(Type shaderType);
     Shader(Type shaderType, const std::string &filepath);
     ~Shader();
+    Shader(Shader&& other) noexcept;
 
     bool LoadFromFile(const std::string &path) override;
 
