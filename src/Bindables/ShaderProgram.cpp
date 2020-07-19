@@ -6,7 +6,7 @@ struct ShaderProgram::UniformBinder
 {
     UniformBinder(ShaderProgram &program, const std::string &name)
             : savedProgram(0),
-              currentProgram(program.m_programID),
+              currentProgram(program.m_GLResourceID),
               location(-1)
     {
         if (currentProgram)
@@ -34,15 +34,13 @@ struct ShaderProgram::UniformBinder
 };
 
 ShaderProgram::ShaderProgram()
-        : m_programID(0)
 {
-    glCheck(m_programID = glCreateProgram());
+    glCheck(m_GLResourceID = glCreateProgram());
 }
 
 ShaderProgram::ShaderProgram(const VertexShader &vert, const FragmentShader &frag)
-        : m_programID(0)
 {
-    glCheck(m_programID = glCreateProgram());
+    glCheck(m_GLResourceID = glCreateProgram());
     Attach(vert);
     Attach(frag);
     Link();
@@ -50,26 +48,18 @@ ShaderProgram::ShaderProgram(const VertexShader &vert, const FragmentShader &fra
 
 ShaderProgram::~ShaderProgram()
 {
-    if (m_programID)
-        glCheck(glDeleteProgram(m_programID));
-}
-
-ShaderProgram::ShaderProgram(ShaderProgram &&other) noexcept
-        :
-        m_programID(other.m_programID),
-        m_uniforms(other.m_uniforms)
-{
-    other.m_programID = 0u;
+    if (m_GLResourceID != 0)
+        glCheck(glDeleteProgram(m_GLResourceID));
 }
 
 void ShaderProgram::BindTo(Graphics &gfx)
 {
-    glUseProgram(m_programID);
+    glUseProgram(m_GLResourceID);
 }
 
 void ShaderProgram::Attach(const Shader &shader) const
 {
-    glCheck(glAttachShader(m_programID, shader.GetShaderID()));
+    glCheck(glAttachShader(m_GLResourceID, shader.GetShaderID()));
 }
 
 void ShaderProgram::SetUniform(const std::string &name, float x)
@@ -165,18 +155,18 @@ void ShaderProgram::SetUniform(const std::string &name, const glm::mat4 &matrix)
 void ShaderProgram::Link() const
 {
     // Link the program
-    glCheck(glLinkProgram(m_programID));
+    glCheck(glLinkProgram(m_GLResourceID));
     // Check the link log
     GLint success;
-    glCheck(glGetProgramiv(m_programID, GL_LINK_STATUS, &success));
+    glCheck(glGetProgramiv(m_GLResourceID, GL_LINK_STATUS, &success));
     if (success == GL_FALSE)
     {
         GLint logLength;
-        glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &logLength);
+        glGetProgramiv(m_GLResourceID, GL_INFO_LOG_LENGTH, &logLength);
         char log[logLength];
         std::memset(log, 0, logLength * sizeof(char));
-        glCheck(glGetProgramInfoLog(m_programID, logLength, nullptr, log));
-        log_error("Failed to link shader program (ID:%u): %s", m_programID, log);
+        glCheck(glGetProgramInfoLog(m_GLResourceID, logLength, nullptr, log));
+        log_error("Failed to link shader program (ID:%u): %s", m_GLResourceID, log);
     }
 }
 
@@ -192,11 +182,11 @@ int ShaderProgram::GetUniformLocation(const std::string &name)
     else
     {
         // Not in cache, request the location from OpenGL
-        int location = glGetUniformLocation(m_programID, name.c_str());
+        int location = glGetUniformLocation(m_GLResourceID, name.c_str());
         m_uniforms.insert(std::make_pair(name, location));
 
         if (location == -1)
-        THROW(Bindable::Exception, "Uniform \"%s\" not found in shader program (ID: %u)", name.c_str(), m_programID);
+        THROW(Bindable::Exception, "Uniform \"%s\" not found in shader program (ID: %u)", name.c_str(), m_GLResourceID);
 
         return location;
     }

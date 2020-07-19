@@ -14,16 +14,16 @@
 //#include "GeometryShader.h"
 #include "FragmentShader.h"
 
-class ShaderProgram : public Bindable, NonCopyable
+class ShaderProgram : public Bindable
 {
     friend class Shader;
+
     struct UniformBinder;
     typedef std::map<std::string, int> UniformTable;
 public:
     ShaderProgram();
     ShaderProgram(const VertexShader &vert, const FragmentShader &frag);
-    ~ShaderProgram();
-    ShaderProgram(ShaderProgram&& other) noexcept;
+    ~ShaderProgram() override;
 
     void BindTo(Graphics &gfx) override;
 
@@ -51,6 +51,5 @@ private:
     void Link() const;
     int GetUniformLocation(const std::string &name);
 
-    GLuint m_programID;
     UniformTable m_uniforms;
 };

@@ -1,6 +1,12 @@
 #include "VertexBuffer.h"
 
+VertexBuffer::~VertexBuffer()
+{
+    if(m_GLResourceID != 0u)
+        glCheck(glDeleteBuffers(1, &m_GLResourceID));
+}
+
 void VertexBuffer::BindTo(Graphics &gfx)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glCheck(glBindBuffer(GL_ARRAY_BUFFER, m_GLResourceID));
 }

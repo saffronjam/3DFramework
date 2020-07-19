@@ -11,6 +11,10 @@ void App::OnExit()
 
 void App::OnUpdate()
 {
+    for(auto& drawable : m_drawables)
+    {
+        drawable->Update(m_wnd.mouse);
+    }
 }
 
 void App::OnDraw()

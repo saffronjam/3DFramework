@@ -16,14 +16,19 @@ TestTriangle::TestTriangle()
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
 
-    VertexShader vert2 = std::move(vert);
-    FragmentShader frag2 = std::move(frag);
+    auto unique_Shaderprogram = std::make_unique<ShaderProgram>(vert, frag);
+    m_shaderProgram = unique_Shaderprogram.get();
 
-    ShaderProgram shaderProgram(vert2, frag2);
-    shaderProgram.SetUniform("color", glm::vec3(0.5f, 0.5f, 0.9f));
-
-    AddBind(std::make_unique<ShaderProgram>(std::move(shaderProgram)));
+    AddBind(std::move(unique_Shaderprogram));
     AddBind(std::make_unique<VertexBuffer>(vertices));
     AddBind(std::make_unique<VertexLayout>());
 
+}
+
+void TestTriangle::Update(const Mouse &mouse)
+{
+    auto pos = mouse.GetPosition();
+    pos.x = pos.x / 1024.0f * 2.0f - 1.0f;
+    pos.y = -1.0f * (pos.y / 720.0f * 2.0f - 1.0f);
+    m_shaderProgram->SetUniform("color", glm::vec3(pos, 1.0f));
 }

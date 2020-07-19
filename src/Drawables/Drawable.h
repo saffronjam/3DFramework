@@ -9,6 +9,7 @@
 class Drawable
 {
 public:
+    virtual void Update(const Mouse &mouse);
     void Draw(Graphics &gfx);
 
 protected:

@@ -6,11 +6,9 @@ class VertexLayout : public Bindable
 {
 public:
     VertexLayout();
+    ~VertexLayout();
 
     void BindTo(Graphics &gfx) override;
-
-private:
-    unsigned int m_VAO;
 };
 
 

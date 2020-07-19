@@ -1,5 +1,10 @@
 #include "Drawable.h"
 
+void Drawable::Update(const Mouse &mouse)
+{
+    
+}
+
 void Drawable::Draw(Graphics &gfx)
 {
     for (auto &bindable : m_bindables)

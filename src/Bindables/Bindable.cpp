@@ -1,5 +1,16 @@
 #include "Bindable.h"
 
+Bindable::Bindable()
+        : m_GLResourceID(0u)
+{
+}
+
+Bindable::Bindable(Bindable &&bindable) noexcept
+        : m_GLResourceID(bindable.m_GLResourceID)
+{
+    bindable.m_GLResourceID = 0u;
+}
+
 Bindable::Exception::Exception(int line, const char *file, const char *errorString) noexcept
         : IException(line, file),
           errorString(errorString)
