@@ -6,8 +6,9 @@
 #include <glm/matrix.hpp>
 
 #include "Bindable.h"
+#include "FileIO.h"
 
-class Shader
+class Shader : public FileIO
 {
 protected:
     enum Type
@@ -18,14 +19,17 @@ protected:
     };
 
 public:
-    explicit Shader(Type shaderType, const char *shaderRaw);
+    explicit Shader(Type shaderType);
+    Shader(Type shaderType, const std::string &filepath);
     ~Shader();
 
-public:
+    bool LoadFromFile(const std::string &path) override;
+
     [[nodiscard]] const std::string &GetName() const noexcept;
     [[nodiscard]] unsigned int GetShaderID() const noexcept;
 
 private:
+    void ConfigureName() noexcept;
     static GLenum MapShaderType(Type type) noexcept;
 
 private:

@@ -1,6 +1,6 @@
 #include "FragmentShader.h"
 
-FragmentShader::FragmentShader(const char *shaderRaw)
-        : Shader(Type::Fragment, shaderRaw)
+FragmentShader::FragmentShader(const std::string& filepath)
+        : Shader(Type::Fragment, filepath)
 {
 }

@@ -1,6 +1,6 @@
 #include "VertexShader.h"
 
-VertexShader::VertexShader(const char *shaderRaw)
-        : Shader(Type::Vertex, shaderRaw)
+VertexShader::VertexShader(const std::string& filepath)
+        : Shader(Type::Vertex, filepath)
 {
 }
