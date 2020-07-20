@@ -1,16 +1,16 @@
 #pragma once
 
 #include <optional>
-#include "IndexedTriangleList.h"
 #include <array>
+
+#include "IndexedTriangleList.h"
 
 class Cube
 {
 public:
     static IndexedTriangleList Make(std::optional<Dvtx::VertexLayout> layout = {})
     {
-        using namespace Dvtx;
-        using Type = Dvtx::VertexLayout::ElementType;
+        using Type = Dvtx::ElementType;
 
         if (!layout)
         {
@@ -20,7 +20,7 @@ public:
 
         constexpr float side = 1.0f / 2.0f;
 
-        VertexBuffer vertices(std::move(*layout), 8u);
+        Dvtx::VertexBuffer vertices(std::move(*layout));
         vertices[0].Attr<Type::Position3D>() = {-side, -side, -side};
         vertices[1].Attr<Type::Position3D>() = {side, -side, -side};
         vertices[2].Attr<Type::Position3D>() = {-side, side, -side};
@@ -43,12 +43,11 @@ public:
     }
     static IndexedTriangleList MakeIndependent(Dvtx::VertexLayout layout)
     {
-        using namespace Dvtx;
-        using Type = Dvtx::VertexLayout::ElementType;
+        using Type = Dvtx::ElementType;
 
         constexpr float side = 1.0f / 2.0f;
 
-        VertexBuffer vertices(std::move(layout), 24u);
+        Dvtx::VertexBuffer vertices(std::move(layout));
         vertices[0].Attr<Type::Position3D>() = {-side, -side, -side};// 0 near side
         vertices[1].Attr<Type::Position3D>() = {side, -side, -side};// 1
         vertices[2].Attr<Type::Position3D>() = {-side, side, -side};// 2
@@ -87,10 +86,9 @@ public:
     }
     static IndexedTriangleList MakeIndependentTextured()
     {
-        using namespace Dvtx;
-        using Type = Dvtx::VertexLayout::ElementType;
+        using Type = Dvtx::ElementType;
 
-        auto itl = MakeIndependent(std::move(VertexLayout{}
+        auto itl = MakeIndependent(std::move(Dvtx::VertexLayout{}
                                                      .Append(Type::Position3D)
                                                      .Append(Type::Normal)
                                                      .Append(Type::Texture2D)

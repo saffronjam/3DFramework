@@ -12,7 +12,7 @@
 
 namespace Dvtx
 {
-    enum ElementType
+    enum class ElementType
     {
         Position2D,
         Position3D,
@@ -23,7 +23,7 @@ namespace Dvtx
         BGRAColor,
     };
 
-    struct VertexAttributes
+    struct VertexProperties
     {
         GLint size;
         GLenum type;
@@ -35,58 +35,58 @@ namespace Dvtx
     struct VertexMap;
 
     template<>
-    struct VertexMap<Position2D>
+    struct VertexMap<ElementType::Position2D>
     {
         using SysType = glm::vec2;
-        static constexpr VertexAttributes vertexAttributes = {2, GL_FLOAT, false, 2 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false, 2 * sizeof(float)};
         static constexpr const char *semantic = "Position";
         static constexpr const char *code = "P2";
     };
     template<>
-    struct VertexMap<Position3D>
+    struct VertexMap<ElementType::Position3D>
     {
         using SysType = glm::vec3;
-        static constexpr VertexAttributes vertexAttributes = {3, GL_FLOAT, false, 3 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
         static constexpr const char *semantic = "Position";
         static constexpr const char *code = "P3";
     };
     template<>
-    struct VertexMap<Texture2D>
+    struct VertexMap<ElementType::Texture2D>
     {
         using SysType = glm::vec2;
-        static constexpr VertexAttributes vertexAttributes = {2, GL_FLOAT, false, 2 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false, 2 * sizeof(float)};
         static constexpr const char *semantic = "Texcoord";
         static constexpr const char *code = "T2";
     };
     template<>
-    struct VertexMap<Normal>
+    struct VertexMap<ElementType::Normal>
     {
         using SysType = glm::vec3;
-        static constexpr VertexAttributes vertexAttributes = {3, GL_FLOAT, false, 3 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
         static constexpr const char *semantic = "Normal";
         static constexpr const char *code = "N";
     };
     template<>
-    struct VertexMap<Float3Color>
+    struct VertexMap<ElementType::Float3Color>
     {
         using SysType = glm::vec3;
-        static constexpr VertexAttributes vertexAttributes = {3, GL_FLOAT, false, 3 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
         static constexpr const char *semantic = "Color";
         static constexpr const char *code = "C3";
     };
     template<>
-    struct VertexMap<Float4Color>
+    struct VertexMap<ElementType::Float4Color>
     {
         using SysType = glm::vec4;
-        static constexpr VertexAttributes vertexAttributes = {4, GL_FLOAT, false, 4 * sizeof(float)};
+        static constexpr VertexProperties vertexProperties = {4, GL_FLOAT, false, 4 * sizeof(float)};
         static constexpr const char *semantic = "Color";
         static constexpr const char *code = "C4";
     };
     template<>
-    struct VertexMap<BGRAColor>
+    struct VertexMap<ElementType::BGRAColor>
     {
         using SysType = ::BGRAColor;
-        static constexpr VertexAttributes vertexAttributes = {3, GL_BYTE, true, 3 * sizeof(char)};
+        static constexpr VertexProperties vertexProperties = {3, GL_BYTE, true, 3 * sizeof(char)};
         static constexpr const char *semantic = "Color";
         static constexpr const char *code = "C8";
     };
@@ -103,7 +103,7 @@ namespace Dvtx
             [[nodiscard]] size_t Size() const noxnd;
             static constexpr size_t SizeOf(ElementType type) noxnd;
             [[nodiscard]] ElementType GetType() const noexcept;
-            [[nodiscard]] VertexAttributes GetVertexAttributes() const noxnd;
+            [[nodiscard]] VertexProperties GetVertexProperties() const noxnd;
             [[nodiscard]] const char *GetCode() const noexcept;
 
         private:
@@ -152,26 +152,26 @@ namespace Dvtx
             auto pAttribute = pData + element.GetOffset();
             switch (element.GetType())
             {
-            case VertexLayout::Position2D:
-                SetAttribute<VertexLayout::Position2D>(pAttribute, std::forward<T>(val));
+            case ElementType::Position2D:
+                SetAttribute<ElementType::Position2D>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::Position3D:
-                SetAttribute<VertexLayout::Position3D>(pAttribute, std::forward<T>(val));
+            case ElementType::Position3D:
+                SetAttribute<ElementType::Position3D>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::Texture2D:
-                SetAttribute<VertexLayout::Texture2D>(pAttribute, std::forward<T>(val));
+            case ElementType::Texture2D:
+                SetAttribute<ElementType::Texture2D>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::Normal:
-                SetAttribute<VertexLayout::Normal>(pAttribute, std::forward<T>(val));
+            case ElementType::Normal:
+                SetAttribute<ElementType::Normal>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::Float3Color:
-                SetAttribute<VertexLayout::Float3Color>(pAttribute, std::forward<T>(val));
+            case ElementType::Float3Color:
+                SetAttribute<ElementType::Float3Color>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::Float4Color:
-                SetAttribute<VertexLayout::Float4Color>(pAttribute, std::forward<T>(val));
+            case ElementType::Float4Color:
+                SetAttribute<ElementType::Float4Color>(pAttribute, std::forward<T>(val));
                 break;
-            case VertexLayout::BGRAColor:
-                SetAttribute<VertexLayout::BGRAColor>(pAttribute, std::forward<T>(val));
+            case ElementType::BGRAColor:
+                SetAttribute<ElementType::BGRAColor>(pAttribute, std::forward<T>(val));
                 break;
             default:
                 assert("Bad element type" && false);
@@ -188,10 +188,10 @@ namespace Dvtx
             SetAttributeByIndex(i + 1, std::forward<Rest>(rest)...);
         }
         // helper to reduce code duplication in SetAttributeByIndex
-        template<VertexLayout::ElementType DestLayoutType, typename SrcType>
+        template<ElementType DestLayoutType, typename SrcType>
         void SetAttribute(char *pAttribute, SrcType &&val) noxnd
         {
-            using Dest = typename VertexLayout::Map<DestLayoutType>::SysType;
+            using Dest = typename VertexMap<DestLayoutType>::SysType;
             if constexpr(std::is_assignable<Dest, SrcType>::value)
             {
                 *reinterpret_cast<Dest *>(pAttribute) = val;
@@ -210,7 +210,7 @@ namespace Dvtx
     {
     public:
         explicit ConstVertex(const Vertex &v) noxnd;
-        template<VertexLayout::ElementType Type>
+        template<ElementType Type>
         const auto &Attr() const noxnd
         {
             return const_cast<Vertex &>(vertex).Attr<Type>();
@@ -237,8 +237,8 @@ namespace Dvtx
         Vertex Back() noxnd;
         Vertex Front() noxnd;
         Vertex operator[](size_t i) noxnd;
-        ConstVertex Back() const noxnd;
-        ConstVertex Front() const noxnd;
+        [[nodiscard]] ConstVertex Back() const noxnd;
+        [[nodiscard]] ConstVertex Front() const noxnd;
         ConstVertex operator[](size_t i) const noxnd;
     private:
         std::vector<char> buffer;
