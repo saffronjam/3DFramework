@@ -1,12 +1,14 @@
 #include "VertexLayout.h"
 
-VertexLayout::VertexLayout()
+VertexLayout::VertexLayout(const VertexElementLayout &vertexElementLayout)
 {
     glCheck(glGenVertexArrays(1, &m_GLResourceID));
     glCheck(glBindVertexArray(m_GLResourceID));
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-
+    for (auto &elements : vertexElementLayout.GetElements())
+    {
+        m_vertexProperties.push_back(elements.GetVertexProperties());
+    }
 }
 
 VertexLayout::~VertexLayout()
@@ -17,6 +19,11 @@ VertexLayout::~VertexLayout()
 
 void VertexLayout::BindTo(Graphics &gfx)
 {
-    glCheck(glEnableVertexAttribArray(0));
-    glCheck(glBindVertexArray(m_GLResourceID));
+    for (size_t i = 0; i < m_vertexProperties.size(); i++)
+    {
+        auto &prop = m_vertexProperties[i];
+        glCheck(glEnableVertexAttribArray(i));
+        glVertexAttribPointer(i, prop.size, prop.type, prop.normalized, prop.stride, nullptr);
+        glCheck(glBindVertexArray(m_GLResourceID));
+    }
 }

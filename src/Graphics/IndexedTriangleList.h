@@ -2,17 +2,17 @@
 
 #include <vector>
 
-#include "Vertex.h"
+#include "VertexConfig.h"
 #include "SeMath.h"
 
 class IndexedTriangleList
 {
 public:
-    IndexedTriangleList(Dvtx::VertexBuffer verts_in, std::vector<unsigned short> indices_in);
+    IndexedTriangleList(RawVertexBuffer rawVertexBuffer, std::vector<unsigned int> indices);
     void Transform(const glm::mat4 &matrix);
     void SetNormalsIndependentFlat() noxnd;
 
 public:
-    Dvtx::VertexBuffer vertices;
-    std::vector<unsigned short> indices;
+    RawVertexBuffer rawVertexBuffer;
+    std::vector<unsigned int> indices;
 };

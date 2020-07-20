@@ -2,16 +2,14 @@
 
 TestTriangle::TestTriangle()
 {
-    struct Vertex
-    {
-        glm::vec3 pos;
-    };
+    VertexElementLayout vel;
+    vel.Append(ElementType::Position3D);
 
-    std::vector<Vertex> vertices = {
-            {{-0.5f, -0.5f, 0.0f}},
-            {{0.5f,  -0.5f, 0.0f}},
-            {{0.0f,  0.5f,  0.0f}}
-    };
+    RawVertexBuffer rvb(std::move(vel), 3);
+    rvb[0].Attr<ElementType::Position3D>() = {-0.5f, -0.5f, 0.0f};
+    rvb[1].Attr<ElementType::Position3D>() = {0.5f,  -0.5f, 0.0f};
+    rvb[2].Attr<ElementType::Position3D>() = {0.0f,  0.5f,  0.0f};
+
 
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
@@ -20,8 +18,8 @@ TestTriangle::TestTriangle()
     m_shaderProgram = unique_Shaderprogram.get();
 
     AddBind(std::move(unique_Shaderprogram));
-    AddBind(std::make_unique<VertexBuffer>(vertices));
-    AddBind(std::make_unique<VertexLayout>());
+    AddBind(std::make_unique<VertexBuffer>(rvb));
+    AddBind(std::make_unique<VertexLayout>(rvb.GetLayout()));
 
 }
 
