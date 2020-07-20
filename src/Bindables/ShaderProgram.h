@@ -23,7 +23,7 @@ class ShaderProgram : public Bindable
 public:
     ShaderProgram();
     ShaderProgram(const VertexShader &vert, const FragmentShader &frag);
-    ~ShaderProgram() override;
+    ~ShaderProgram();
 
     void BindTo(Graphics &gfx) override;
 
@@ -51,5 +51,8 @@ private:
     void Link() const;
     int GetUniformLocation(const std::string &name);
 
+private:
+    unsigned int m_shaderProgramID;
     UniformTable m_uniforms;
+
 };

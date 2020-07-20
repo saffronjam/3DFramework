@@ -20,7 +20,7 @@ public:
 
         constexpr float side = 1.0f / 2.0f;
 
-        RawVertexBuffer rvb(std::move(*layout));
+        RawVertexBuffer rvb(std::move(*layout), 8);
         rvb[0].Attr<Type::Position3D>() = {-side, -side, -side};
         rvb[1].Attr<Type::Position3D>() = {side, -side, -side};
         rvb[2].Attr<Type::Position3D>() = {-side, side, -side};
@@ -47,7 +47,7 @@ public:
 
         constexpr float side = 1.0f / 2.0f;
 
-        RawVertexBuffer rvb(layout);
+        RawVertexBuffer rvb(layout, 24);
         rvb[0].Attr<Type::Position3D>() = {-side, -side, -side};// 0 near side
         rvb[1].Attr<Type::Position3D>() = {side, -side, -side};// 1
         rvb[2].Attr<Type::Position3D>() = {-side, side, -side};// 2

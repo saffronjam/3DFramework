@@ -11,6 +11,7 @@ public:
     void EndFrame();
 
     void DrawArrays();
+    void DrawIndexed(const std::vector<unsigned int>& indicies);
 
 private:
     Window &m_wnd;

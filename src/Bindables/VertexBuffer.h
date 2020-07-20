@@ -9,9 +9,13 @@ class VertexBuffer : public Bindable
 {
 public:
     explicit VertexBuffer(const RawVertexBuffer &rawVertexBuffer);
-    ~VertexBuffer() override;
+    ~VertexBuffer();
 
     void BindTo(Graphics &gfx) override;
+
+private:
+    unsigned int m_vboID;
+    unsigned int m_vaoID;
 };
 
 

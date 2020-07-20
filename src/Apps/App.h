@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "IApp.h"
+#include "TestBox.h"
 #include "TestTriangle.h"
 
 class App : public IApp

@@ -11,11 +11,6 @@ Graphics::Graphics(Window &window)
     glewInit();
 }
 
-void Graphics::DrawArrays()
-{
-    glCheck(glDrawArrays(GL_TRIANGLES, 0, 3));
-}
-
 void Graphics::BeginFrame(float r, float g, float b, float a)
 {
     glCheck(glClearColor(r, g, b, a));
@@ -26,4 +21,14 @@ void Graphics::EndFrame()
 {
     glfwSwapBuffers(m_wnd.GetCoreWindow());
     glfwPollEvents();
+}
+
+void Graphics::DrawArrays()
+{
+    glCheck(glDrawArrays(GL_TRIANGLES, 0, 3));
+}
+
+void Graphics::DrawIndexed(const std::vector<unsigned int> &indicies)
+{
+    glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
 }

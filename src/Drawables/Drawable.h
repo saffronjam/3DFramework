@@ -17,6 +17,8 @@ protected:
 
 private:
     std::vector<std::unique_ptr<Bindable>> m_bindables;
+
+    std::optional<IndexBuffer *> m_indexBuffer;
 };
 
 

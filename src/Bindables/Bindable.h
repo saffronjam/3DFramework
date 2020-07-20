@@ -10,14 +10,7 @@
 class Bindable : public NonCopyable
 {
 public:
-    Bindable();
-    virtual ~Bindable() = default;
-    Bindable(Bindable &&bindable) noexcept;
-
     virtual void BindTo(Graphics &gfx) = 0;
-
-protected:
-    GLuint m_GLResourceID;
 
 public:
     class Exception : public IException

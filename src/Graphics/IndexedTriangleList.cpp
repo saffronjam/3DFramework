@@ -4,8 +4,8 @@ IndexedTriangleList::IndexedTriangleList(RawVertexBuffer rawVertexBuffer, std::v
         : rawVertexBuffer(std::move(rawVertexBuffer)),
           indices(std::move(indices))
 {
-    assert(rawVertexBuffer.Size() > 2);
-    assert(indices.size() % 3 == 0);
+    assert(this->rawVertexBuffer.Size() > 2);
+    assert(this->indices.size() % 3 == 0);
 }
 
 void IndexedTriangleList::Transform(const glm::mat4 &matrix)

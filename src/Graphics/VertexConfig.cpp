@@ -181,8 +181,6 @@ const VertexElementLayout &RawVertexBuffer::GetLayout() const noexcept
 
 size_t RawVertexBuffer::Size() const noxnd
 {
-    auto size1 = buffer.size();
-    auto size2 = vertexElementLayout.Size();
     return buffer.size() / vertexElementLayout.Size();
 }
 

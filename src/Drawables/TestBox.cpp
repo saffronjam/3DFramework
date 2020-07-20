@@ -13,10 +13,13 @@ TestBox::TestBox()
 
     AddBind(std::move(unique_Shaderprogram));
     AddBind(std::make_unique<VertexBuffer>(model.rawVertexBuffer));
-
+//    AddBind(std::make_unique<IndexBuffer>(model.indices));
 }
 
 void TestBox::Update(const Mouse &mouse)
 {
-    Drawable::Update(mouse);
+    auto pos = mouse.GetPosition();
+    pos.x = pos.x / 1024.0f * 2.0f - 1.0f;
+    pos.y = -1.0f * (pos.y / 720.0f * 2.0f - 1.0f);
+    m_shaderProgram->SetUniform("color", glm::vec3(pos, 1.0f));
 }
