@@ -2,7 +2,7 @@
 
 void App::OnInit()
 {
-    m_drawables.push_back(std::make_unique<TestTriangle>());
+    m_drawables.push_back(std::make_unique<TestBox>());
 }
 
 void App::OnExit()

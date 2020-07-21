@@ -6,7 +6,7 @@ IndexBuffer::IndexBuffer(std::vector<unsigned int> indices)
 {
     glCheck(glGenBuffers(1, &m_iboID));
     glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboID));
-    glCheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW));
+    glCheck(glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned int), m_indices.data(), GL_STATIC_DRAW));
 }
 
 IndexBuffer::~IndexBuffer()
@@ -17,7 +17,7 @@ IndexBuffer::~IndexBuffer()
 
 void IndexBuffer::BindTo(Graphics &gfx)
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboID);
+    glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_iboID));
 }
 const std::vector<unsigned int> &IndexBuffer::GetIndices() const noexcept
 {

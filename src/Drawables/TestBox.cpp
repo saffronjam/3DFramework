@@ -13,7 +13,7 @@ TestBox::TestBox()
 
     AddBind(std::move(unique_Shaderprogram));
     AddBind(std::make_unique<VertexBuffer>(model.rawVertexBuffer));
-//    AddBind(std::make_unique<IndexBuffer>(model.indices));
+    AddBind(std::make_unique<IndexBuffer>(model.indices));
 }
 
 void TestBox::Update(const Mouse &mouse)

@@ -30,5 +30,5 @@ void Graphics::DrawArrays()
 
 void Graphics::DrawIndexed(const std::vector<unsigned int> &indicies)
 {
-    glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr);
+    glCheck(glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr));
 }
