@@ -1,8 +1,7 @@
 #include "TestBox.h"
 
 TestBox::TestBox()
-        : m_shaderProgram(nullptr),
-          m_transform(1)
+        : m_shaderProgram(nullptr)
 {
     VertexElementLayout layout;
     layout.Append(ElementType::Position3D).Append(ElementType::Float3Color);
@@ -31,10 +30,5 @@ TestBox::TestBox()
 
 void TestBox::Update(const Mouse &mouse)
 {
-    m_shaderProgram->SetUniform("transform", m_transform);
-}
-
-void TestBox::Rotate(float yaw, float pitch, float roll)
-{
-    m_transform *= glm::yawPitchRoll(yaw, pitch, roll);
+    m_shaderProgram->SetUniform("transform", m_projection * m_translation * m_rotation);
 }
