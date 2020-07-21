@@ -16,30 +16,11 @@ void App::OnUpdate()
         drawable->Update(m_wnd.mouse);
     }
 
-    if (m_wnd.kbd.IsDown(Keyboard::Q))
-    {
-        m_drawables[0]->Rotate(0.01f, 0.0f, 0.0f);
-    }
-    if (m_wnd.kbd.IsDown(Keyboard::W))
-    {
-        m_drawables[0]->Rotate(-0.01f, 0.0f, 0.0f);
-    }
-    if (m_wnd.kbd.IsDown(Keyboard::A))
-    {
-        m_drawables[0]->Rotate(0.0f, 0.01f, 0.0f);
-    }
-    if (m_wnd.kbd.IsDown(Keyboard::S))
-    {
-        m_drawables[0]->Rotate(0.0f, -0.01f, 0.0f);
-    }
-    if (m_wnd.kbd.IsDown(Keyboard::Z))
-    {
-        m_drawables[0]->Rotate(0.0f, 0.0f, 0.01f);
-    }
-    if (m_wnd.kbd.IsDown(Keyboard::X))
-    {
-        m_drawables[0]->Rotate(0.0f, 0.0f, -0.01f);
-    }
+    float speed = 0.001f;
+    float yaw = (m_wnd.kbd.IsDown(Keyboard::Q) - m_wnd.kbd.IsDown(Keyboard::W)) * speed;
+    float pitch = (m_wnd.kbd.IsDown(Keyboard::A) - m_wnd.kbd.IsDown(Keyboard::S)) * speed;
+    float roll = (m_wnd.kbd.IsDown(Keyboard::Z) - m_wnd.kbd.IsDown(Keyboard::X)) * speed;
+    m_drawables[0]->Rotate(yaw, pitch, roll);
 }
 
 void App::OnDraw()

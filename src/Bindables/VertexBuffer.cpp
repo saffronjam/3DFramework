@@ -18,8 +18,10 @@ VertexBuffer::VertexBuffer(const RawVertexBuffer &rawVertexBuffer)
     const auto &elements = rawVertexBuffer.GetLayout().GetElements();
     for (size_t i = 0; i < elements.size(); i++)
     {
-        auto props = elements[i].GetVertexProperties();
-        glVertexAttribPointer(i, props.size, props.type, props.normalized, vertexSize, nullptr);
+        auto &element = elements[i];
+        auto props = element.GetVertexProperties();
+        auto offset = element.GetOffset();
+        glVertexAttribPointer(i, 3, GL_FLOAT, false, 24, (GLvoid *) (offset));
         glCheck(glEnableVertexAttribArray(i));
     }
 }

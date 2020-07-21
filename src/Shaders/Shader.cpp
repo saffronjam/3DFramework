@@ -35,7 +35,7 @@ bool Shader::LoadFromFile(const std::string &path)
     try
     {
         FileIO::LoadFromFile(path);
-        m_shaderID = glCreateShader(MapShaderType(m_type));
+        glCheck(m_shaderID = glCreateShader(MapShaderType(m_type)));
         auto pathRawString = m_fileContents.c_str();
         glCheck(glShaderSource(m_shaderID, 1, &pathRawString, nullptr));
         glCheck(glCompileShader(m_shaderID));

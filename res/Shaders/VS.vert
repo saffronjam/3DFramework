@@ -1,7 +1,7 @@
 #version 330 core
 
-in vec3 pos;
-in vec3 color;
+layout(location = 0) in vec3 pos;
+layout(location = 1) in vec3 color;
 
 out vec3 outColor;
 

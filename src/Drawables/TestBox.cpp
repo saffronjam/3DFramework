@@ -9,14 +9,14 @@ TestBox::TestBox()
 
     auto model = Cube::Make(layout);
     auto &rvb = model.rawVertexBuffer;
-    rvb[0].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[1].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[2].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[0].Attr<ElementType::Float3Color>() = {1.0f, 1.0f, 1.0f};
+    rvb[1].Attr<ElementType::Float3Color>() = {0.0f, 0.0f, 1.0f};
+    rvb[2].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 0.0f};
     rvb[3].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[4].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[5].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[6].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
-    rvb[7].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[4].Attr<ElementType::Float3Color>() = {1.0f, 0.0f, 0.0f};
+    rvb[5].Attr<ElementType::Float3Color>() = {1.0f, 0.0f, 1.0f};
+    rvb[6].Attr<ElementType::Float3Color>() = {1.0f, 1.0f, 0.0f};
+    rvb[7].Attr<ElementType::Float3Color>() = {1.0f, 1.0f, 1.0f};
 
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
