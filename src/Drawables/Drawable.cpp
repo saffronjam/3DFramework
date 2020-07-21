@@ -37,6 +37,16 @@ void Drawable::AddBind(std::unique_ptr<Bindable> bindable)
     m_bindables.push_back(std::move(bindable));
 }
 
+void Drawable::SetTranslation(const glm::vec3 &translate)
+{
+     m_translation = glm::translate(translate);
+}
+
+void Drawable::SetRotation(float yaw, float pitch, float roll)
+{
+    m_rotation = glm::yawPitchRoll(yaw, pitch, roll);
+}
+
 void Drawable::SetProjection(const glm::mat4 &projection)
 {
     m_projection = projection;

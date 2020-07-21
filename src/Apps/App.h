@@ -16,4 +16,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Drawable>> m_drawables;
+
+    glm::vec3 trans = {0.0f, 0.0f, 0.0f};
+    glm::vec3 rot = {0.0f, 0.0f, 0.0f};
 };

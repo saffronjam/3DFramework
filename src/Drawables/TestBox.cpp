@@ -30,5 +30,5 @@ TestBox::TestBox()
 
 void TestBox::Update(const Mouse &mouse)
 {
-    m_shaderProgram->SetUniform("transform", m_projection * m_translation * m_rotation);
+    m_shaderProgram->SetUniform("transform", m_projection * m_translation * glm::translate(glm::vec3{0.0f, 0.0f, -5.0f}) * m_rotation);
 }

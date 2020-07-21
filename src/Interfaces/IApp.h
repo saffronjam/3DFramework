@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "GuiMgr.h"
 #include "IEventHandler.h"
+#include "SeMath.h"
 
 class IApp : public IEventHandler
 {

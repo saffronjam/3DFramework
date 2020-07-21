@@ -17,6 +17,8 @@ public:
     virtual void Update(const Mouse &mouse);
     void Draw(Graphics &gfx);
 
+    void SetTranslation(const glm::vec3& translate);
+    void SetRotation(float yaw, float pitch, float roll);
     void SetProjection(const glm::mat4 &projection);
 
     void Translate(const glm::vec3& translate);
