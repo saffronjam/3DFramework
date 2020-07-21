@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "Graphics.h"
+#include "GuiMgr.h"
 #include "IEventHandler.h"
 
 class IApp : public IEventHandler

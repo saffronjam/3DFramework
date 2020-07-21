@@ -2,7 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-#include "GenericThrowMacros.h"
 #include "GLCheck.h"
 
 Window::Window(std::string title, int width, int height, bool activeContext)

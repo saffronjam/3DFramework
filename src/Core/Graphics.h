@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "GuiMgr.h"
 
 class Graphics
 {
@@ -11,10 +12,11 @@ public:
     void EndFrame();
 
     void DrawArrays();
-    void DrawIndexed(const std::vector<unsigned int>& indicies);
+    void DrawIndexed(const std::vector<unsigned int> &indicies);
 
 private:
     Window &m_wnd;
+    GuiMgr m_guiMgr;
 
 };
 

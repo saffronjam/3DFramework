@@ -38,6 +38,7 @@ target_include_directories(Client PRIVATE
         src/Etc
         src/GL
         src/Graphics
+        src/Gui
         src/Input
         src/Interfaces
         src/Primitives

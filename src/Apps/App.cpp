@@ -1,10 +1,12 @@
 #include "App.h"
 
+#include "imgui/imgui.h"
+
 void App::OnInit()
 {
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1024.0f / 720.0f, 0.1f, 100.0f);
     m_drawables.push_back(std::make_unique<TestBox>());
-    for(auto& drawable : m_drawables)
+    for (auto &drawable : m_drawables)
     {
         drawable->SetProjection(proj);
     }
@@ -32,6 +34,8 @@ void App::OnUpdate()
     float transY = (m_wnd.kbd.IsDown(Keyboard::G) - m_wnd.kbd.IsDown(Keyboard::H)) * transSpeed;
     float transZ = (m_wnd.kbd.IsDown(Keyboard::B) - m_wnd.kbd.IsDown(Keyboard::N)) * transSpeed;
     m_drawables[0]->Translate(glm::vec3(transX, transY, transZ));
+
+    ImGui::ShowDemoWindow();
 
 }
 
