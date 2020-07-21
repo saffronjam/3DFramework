@@ -1,9 +1,14 @@
 #version 330 core
 
-layout (location = 0) in vec3 aPos;
-uniform vec3 color;
+in vec3 pos;
+in vec3 color;
+
+out vec3 outColor;
+
+uniform mat4 transform;
 
 void main()
 {
-    gl_Position = vec4(aPos.x + color.r, aPos.y + color.g, aPos.z +  + color.b, 1.0);
+    outColor = color;
+    gl_Position = transform * vec4(pos.x, pos.y, pos.z, 1.0);
 }

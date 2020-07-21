@@ -92,7 +92,7 @@ public:
         layout.Append(Type::Position3D).Append(Type::Normal).Append(Type::Texture2D);
 
         auto itl = MakeIndependent(layout);
-        auto& rwb = itl.rawVertexBuffer;
+        auto &rwb = itl.rawVertexBuffer;
 
         rwb[0].Attr<Type::Texture2D>() = {0.0f, 0.0f};
         rwb[1].Attr<Type::Texture2D>() = {1.0f, 0.0f};

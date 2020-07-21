@@ -1,9 +1,22 @@
 #include "TestBox.h"
 
 TestBox::TestBox()
-        : m_shaderProgram(nullptr)
+        : m_shaderProgram(nullptr),
+          m_transform(1)
 {
-    auto model = Cube::Make();
+    VertexElementLayout layout;
+    layout.Append(ElementType::Position3D).Append(ElementType::Float3Color);
+
+    auto model = Cube::Make(layout);
+    auto &rvb = model.rawVertexBuffer;
+    rvb[0].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[1].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[2].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[3].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[4].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[5].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[6].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
+    rvb[7].Attr<ElementType::Float3Color>() = {0.0f, 1.0f, 1.0f};
 
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
@@ -18,8 +31,10 @@ TestBox::TestBox()
 
 void TestBox::Update(const Mouse &mouse)
 {
-    auto pos = mouse.GetPosition();
-    pos.x = pos.x / 1024.0f * 2.0f - 1.0f;
-    pos.y = -1.0f * (pos.y / 720.0f * 2.0f - 1.0f);
-    m_shaderProgram->SetUniform("color", glm::vec3(pos, 1.0f));
+    m_shaderProgram->SetUniform("transform", m_transform);
+}
+
+void TestBox::Rotate(float yaw, float pitch, float roll)
+{
+    m_transform *= glm::yawPitchRoll(yaw, pitch, roll);
 }

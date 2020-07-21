@@ -14,7 +14,7 @@ Graphics::Graphics(Window &window)
 void Graphics::BeginFrame(float r, float g, float b, float a)
 {
     glCheck(glClearColor(r, g, b, a));
-    glCheck(glClear(GL_COLOR_BUFFER_BIT));
+    glCheck(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 }
 
 void Graphics::EndFrame()

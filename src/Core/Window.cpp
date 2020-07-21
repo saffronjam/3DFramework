@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "GenericThrowMacros.h"
+#include "GLCheck.h"
 
 Window::Window(std::string title, int width, int height, bool activeContext)
         : m_title(std::move(title)),
@@ -26,6 +27,8 @@ Window::Window(std::string title, int width, int height, bool activeContext)
     }
     SetupGLFWCallbacks();
     Engine::BindDefaultErrorCallback();
+
+    glCheck(glEnable(GL_DEPTH_TEST));
 }
 
 Window::~Window()

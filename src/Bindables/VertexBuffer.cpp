@@ -14,9 +14,14 @@ VertexBuffer::VertexBuffer(const RawVertexBuffer &rawVertexBuffer)
     glCheck(glBufferData(GL_ARRAY_BUFFER, rawVertexBuffer.SizeBytes(), rawVertexBuffer.GetData(), GL_STATIC_DRAW));
 
     // Configure Vertex Attrib pointer which is stored in bound VAO
-    auto prop = rawVertexBuffer.GetLayout().GetElements().front().GetVertexProperties();
-    glCheck(glVertexAttribPointer(0, prop.size, prop.type, prop.normalized, prop.stride, nullptr));
-    glCheck(glEnableVertexAttribArray(0));
+    const size_t vertexSize = rawVertexBuffer.GetLayout().Size();
+    const auto &elements = rawVertexBuffer.GetLayout().GetElements();
+    for (size_t i = 0; i < elements.size(); i++)
+    {
+        auto props = elements[i].GetVertexProperties();
+        glVertexAttribPointer(i, props.size, props.type, props.normalized, vertexSize, nullptr);
+        glCheck(glEnableVertexAttribArray(i));
+    }
 }
 
 VertexBuffer::~VertexBuffer()

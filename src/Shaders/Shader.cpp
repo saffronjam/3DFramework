@@ -17,7 +17,8 @@ Shader::Shader(Type shaderType, const std::string &filepath)
 
 Shader::~Shader()
 {
-    glCheck(glDeleteShader(m_shaderID));
+    if (m_shaderID != 0u)
+        glCheck(glDeleteShader(m_shaderID));
 }
 
 Shader::Shader(Shader &&other) noexcept
