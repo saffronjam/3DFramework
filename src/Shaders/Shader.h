@@ -11,7 +11,7 @@
 
 class Shader : public FileIO, NonCopyable
 {
-protected:
+public:
     enum Type
     {
         Vertex,
@@ -23,19 +23,20 @@ public:
     explicit Shader(Type shaderType);
     Shader(Type shaderType, const std::string &filepath);
     ~Shader();
-    Shader(Shader&& other) noexcept;
+    Shader(Shader &&other) noexcept;
 
     bool LoadFromFile(const std::string &path) override;
 
-    [[nodiscard]] const std::string &GetName() const noexcept;
     [[nodiscard]] unsigned int GetShaderID() const noexcept;
+    [[nodiscard]] const std::string &GetName() const noexcept;
+    [[nodiscard]] const std::string &GetFilepath() const noexcept;
 
 private:
     void ConfigureName() noexcept;
-    static GLenum MapShaderType(Type type) noexcept;
 
 private:
     Type m_type;
     unsigned int m_shaderID;
     std::string m_name;
+    std::string m_filepath;
 };

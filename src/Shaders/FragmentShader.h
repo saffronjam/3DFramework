@@ -5,5 +5,5 @@
 class FragmentShader : public Shader
 {
 public:
-    explicit FragmentShader(const std::string& filepath);
+    explicit FragmentShader(const std::string &filepath);
 };

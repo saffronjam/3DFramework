@@ -33,9 +33,16 @@ void Graphics::EndFrame()
 void Graphics::DrawArrays()
 {
     glCheck(glDrawArrays(GL_TRIANGLES, 0, 3));
+    glCheck(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    glCheck(glBindVertexArray(0));
+    glCheck(glUseProgram(0));
 }
 
 void Graphics::DrawIndexed(const std::vector<unsigned int> &indicies)
 {
     glCheck(glDrawElements(GL_TRIANGLES, indicies.size(), GL_UNSIGNED_INT, nullptr));
+    glCheck(glBindBuffer(GL_ARRAY_BUFFER, 0));
+    glCheck(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0));
+    glCheck(glBindVertexArray(0));
+    glCheck(glUseProgram(0));
 }

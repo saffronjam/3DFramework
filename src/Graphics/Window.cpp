@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "GLCheck.h"
+#include "BindableCodex.h"
 
 Window::Window(std::string title, int width, int height, bool activeContext)
         : m_title(std::move(title)),
@@ -33,6 +34,7 @@ Window::Window(std::string title, int width, int height, bool activeContext)
 
 Window::~Window()
 {
+    Bind::Codex::Destroy();
     glfwDestroyWindow(m_glfwWindow);
 }
 

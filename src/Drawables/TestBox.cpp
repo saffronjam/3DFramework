@@ -22,9 +22,9 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
 
-    AddBind(std::make_shared<ShaderProgram>(vert, frag));
-    AddBind(std::make_shared<VertexBuffer>(model.rawVertexBuffer));
-    AddBind(std::make_shared<IndexBuffer>(model.indices));
+    AddBind(Bind::ShaderProgram::Resolve(vert, frag));
+    AddBind(Bind::VertexBuffer::Resolve("TestBox", rvb));
+    AddBind(Bind::IndexBuffer::Resolve("TestBox", model.indices));
 
     SetRotation(Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f));
 }

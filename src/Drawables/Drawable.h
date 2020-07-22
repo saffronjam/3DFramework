@@ -28,7 +28,7 @@ protected:
     void AddBind(std::shared_ptr<Bindable> bindable);
 
 protected:
-    std::optional<std::shared_ptr<ShaderProgram>> m_shaderProgram;
+    std::optional<std::shared_ptr<Bind::ShaderProgram>> m_shaderProgram;
 
     glm::mat4 m_baseTranslation;
     glm::mat4 m_translation;
@@ -36,7 +36,7 @@ protected:
     glm::mat4 m_projection;
 
 private:
-    std::optional<std::shared_ptr<IndexBuffer>> m_indexBuffer;
+    std::optional<std::shared_ptr<Bind::IndexBuffer>> m_indexBuffer;
     std::vector<std::shared_ptr<Bindable>> m_bindables;
 
 };

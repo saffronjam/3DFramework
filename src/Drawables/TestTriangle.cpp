@@ -19,9 +19,10 @@ TestTriangle::TestTriangle(const glm::mat4 &baseTranslation)
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
 
-    AddBind(std::make_shared<ShaderProgram>(vert, frag));
-    AddBind(std::make_shared<VertexBuffer>(rvb));
-    AddBind(std::make_shared<IndexBuffer>(indices));
+    AddBind(Bind::ShaderProgram::Resolve(vert, frag));
+    AddBind(Bind::VertexBuffer::Resolve("TestTriangle", rvb));
+    AddBind(Bind::IndexBuffer::Resolve("TestTriangle", indices));
+
 }
 
 void TestTriangle::Update(const Mouse &mouse)

@@ -31,13 +31,13 @@ void Drawable::Draw(Graphics &gfx)
 
 void Drawable::AddBind(std::shared_ptr<Bindable> bindable)
 {
-    if (dynamic_cast<IndexBuffer *>(bindable.get()))
+    if (dynamic_cast<Bind::IndexBuffer *>(bindable.get()))
     {
-        m_indexBuffer = std::make_optional(std::static_pointer_cast<IndexBuffer>(bindable));
+        m_indexBuffer = std::make_optional(std::static_pointer_cast<Bind::IndexBuffer>(bindable));
     }
-    if (dynamic_cast<ShaderProgram *>(bindable.get()))
+    if (dynamic_cast<Bind::ShaderProgram *>(bindable.get()))
     {
-        m_shaderProgram = std::make_optional(std::static_pointer_cast<ShaderProgram>(bindable));
+        m_shaderProgram = std::make_optional(std::static_pointer_cast<Bind::ShaderProgram>(bindable));
     }
     m_bindables.push_back(std::move(bindable));
 }

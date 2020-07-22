@@ -1,16 +1,18 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <memory>
+#include <string>
 
 #include "Graphics.h"
 #include "GenericThrowMacros.h"
 #include "GLCheck.h"
 #include "NonCopyable.h"
 
-class Bindable : public NonCopyable
+class Bindable
 {
 public:
     virtual void BindTo(Graphics &gfx) = 0;
+    [[nodiscard]] virtual std::string GetUID() const noexcept = 0;
 
 public:
     class Exception : public IException

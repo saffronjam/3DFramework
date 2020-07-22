@@ -1,5 +1,22 @@
 #include "Shader.h"
 
+#include <GL/glew.h>
+
+static GLenum MapShaderType(Shader::Type type) noexcept
+{
+    switch (type)
+    {
+    case Shader::Type::Vertex:
+        return GL_VERTEX_SHADER;
+    case Shader::Type::Geometry:
+        return GL_GEOMETRY_SHADER;
+    case Shader::Type::Fragment:
+        return GL_FRAGMENT_SHADER;
+    default:
+        return GL_INVALID_VALUE;
+    }
+}
+
 Shader::Shader(Shader::Type shaderType)
         : m_type(shaderType),
           m_shaderID(0u)
@@ -32,6 +49,7 @@ Shader::Shader(Shader &&other) noexcept
 
 bool Shader::LoadFromFile(const std::string &path)
 {
+    m_filepath = path;
     try
     {
         FileIO::LoadFromFile(path);
@@ -48,7 +66,7 @@ bool Shader::LoadFromFile(const std::string &path)
             glCheck(glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &logLength));
             char infoLog[logLength];
             glCheck(glGetShaderInfoLog(m_shaderID, logLength, nullptr, infoLog));
-            THROW(Bindable::Exception, "Failed to compile %s (ID: %u): %s", GetName().c_str(), m_shaderID, infoLog);
+            THROW(Bindable::Exception, "Failed to compile %s Path: %s (ID: %u): %s", GetName().c_str(), m_filepath.c_str(), m_shaderID, infoLog);
         }
     }
     catch (IException &e)
@@ -58,25 +76,6 @@ bool Shader::LoadFromFile(const std::string &path)
         return false;
     }
     return true;
-}
-
-GLenum Shader::MapShaderType(Shader::Type type) noexcept
-{
-    switch (type)
-    {
-    case Type::Vertex:
-        return GL_VERTEX_SHADER;
-    case Type::Geometry:
-        return GL_GEOMETRY_SHADER;
-    case Type::Fragment:
-        return GL_FRAGMENT_SHADER;
-    default:
-        return GL_INVALID_VALUE;
-    }
-}
-const std::string &Shader::GetName() const noexcept
-{
-    return m_name;
 }
 
 void Shader::ConfigureName() noexcept
@@ -101,5 +100,15 @@ void Shader::ConfigureName() noexcept
 unsigned int Shader::GetShaderID() const noexcept
 {
     return m_shaderID;
+}
+
+const std::string &Shader::GetName() const noexcept
+{
+    return m_name;
+}
+
+const std::string &Shader::GetFilepath() const noexcept
+{
+    return m_filepath;
 }
 

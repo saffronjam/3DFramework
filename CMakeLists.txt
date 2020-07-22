@@ -8,7 +8,7 @@ set(CMAKE_SOURCE_DIR "${PROJECT_SOURCE_DIR}/src")
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 # Compiler flags
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mwindows")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Copy dlls
