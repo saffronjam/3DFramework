@@ -76,38 +76,38 @@ namespace Bind
             constexpr size_t dataSize = sizeof(T);
             auto &uniformBindValue = m_uniforms[name];
             uniformBindValue.vecType = nParams + 1;
-            void *dataPointer = nullptr;
+            char *dataPointer = nullptr;
             if constexpr (std::is_same<T, float>::value)
             {
                 uniformBindValue.dataType = 0;
-                dataPointer = static_cast<void *>(&uniformBindValue.f);
+                dataPointer = reinterpret_cast<char *>(&uniformBindValue.f);
             }
             else if constexpr (std::is_same<T, int>::value)
             {
                 uniformBindValue.dataType = 1;
-                dataPointer = static_cast<void *>(&uniformBindValue.i);
+                dataPointer = reinterpret_cast<char *>(&uniformBindValue.i);
             }
             else
             {
                 uniformBindValue.dataType = 2;
-                dataPointer = static_cast<void *>(&uniformBindValue.b);
+                dataPointer = reinterpret_cast<char *>(&uniformBindValue.b);
             }
 
             memcpy(dataPointer, &data, dataSize);
             if constexpr (nParams > 0)
             {
                 float lVal = ParamsIndex<0>(std::forward<Params>(params)...);
-                memcpy(dataPointer, &lVal, dataSize);
+                memcpy(dataPointer + dataSize, &lVal, dataSize);
             }
             if constexpr (nParams > 1)
             {
                 float lVal = ParamsIndex<1>(std::forward<Params>(params)...);
-                memcpy(dataPointer, &lVal, dataSize);
+                memcpy(dataPointer + dataSize * 2, &lVal, dataSize);
             }
             if constexpr (nParams > 2)
             {
                 float lVal = ParamsIndex<2>(std::forward<Params>(params)...);
-                memcpy(dataPointer, &lVal, dataSize);
+                memcpy(dataPointer + dataSize * 3, &lVal, dataSize);
             }
         }
 
