@@ -26,7 +26,6 @@ struct VertexProperties
     GLint size;
     GLenum type;
     GLboolean normalized;
-    GLsizei stride;
 };
 
 template<ElementType>
@@ -36,7 +35,7 @@ template<>
 struct VertexMap<ElementType::Position2D>
 {
     using SysType = glm::vec2;
-    static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false, 2 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false};
     static constexpr const char *semantic = "Position";
     static constexpr const char *code = "P2";
 };
@@ -44,7 +43,7 @@ template<>
 struct VertexMap<ElementType::Position3D>
 {
     using SysType = glm::vec3;
-    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false};
     static constexpr const char *semantic = "Position";
     static constexpr const char *code = "P3";
 };
@@ -52,7 +51,7 @@ template<>
 struct VertexMap<ElementType::Texture2D>
 {
     using SysType = glm::vec2;
-    static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false, 2 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {2, GL_FLOAT, false};
     static constexpr const char *semantic = "Texcoord";
     static constexpr const char *code = "T2";
 };
@@ -60,7 +59,7 @@ template<>
 struct VertexMap<ElementType::Normal>
 {
     using SysType = glm::vec3;
-    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false};
     static constexpr const char *semantic = "Normal";
     static constexpr const char *code = "N";
 };
@@ -68,7 +67,7 @@ template<>
 struct VertexMap<ElementType::Float3Color>
 {
     using SysType = glm::vec3;
-    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false, 3 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {3, GL_FLOAT, false};
     static constexpr const char *semantic = "Color";
     static constexpr const char *code = "C3";
 };
@@ -76,7 +75,7 @@ template<>
 struct VertexMap<ElementType::Float4Color>
 {
     using SysType = glm::vec4;
-    static constexpr VertexProperties vertexProperties = {4, GL_FLOAT, false, 4 * sizeof(float)};
+    static constexpr VertexProperties vertexProperties = {4, GL_FLOAT, false};
     static constexpr const char *semantic = "Color";
     static constexpr const char *code = "C4";
 };
@@ -84,7 +83,7 @@ template<>
 struct VertexMap<ElementType::BGRAColor>
 {
     using SysType = ::BGRAColor;
-    static constexpr VertexProperties vertexProperties = {3, GL_BYTE, true, 3 * sizeof(char)};
+    static constexpr VertexProperties vertexProperties = {3, GL_BYTE, true};
     static constexpr const char *semantic = "Color";
     static constexpr const char *code = "C8";
 };
