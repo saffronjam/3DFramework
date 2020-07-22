@@ -48,189 +48,87 @@ namespace Bind
             switch (uniform.dataType)
             {
             case 0:
-                switch (uniform.dataSpec)
+                switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.f.v1);
+                    Set_(key, uniform.f.x);
                     break;
                 case 1:
-                    Set_(key, uniform.f.v2);
+                    Set_(key, uniform.f.x, uniform.f.y);
                     break;
                 case 2:
-                    Set_(key, uniform.f.v3);
+                    Set_(key, uniform.f.x, uniform.f.y, uniform.f.z);
                     break;
                 case 3:
-                    Set_(key, uniform.f.v4);
-                    break;
-                case 4:
-                    Set_(key, uniform.f.m3);
-                    break;
-                case 5:
-                    Set_(key, uniform.f.m4);
+                    Set_(key, uniform.f.x, uniform.f.y, uniform.f.z, uniform.f.w);
                     break;
                 }
                 break;
             case 1:
-                switch (uniform.dataSpec)
+                switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.i.v1);
+                    Set_(key, uniform.i.x);
                     break;
                 case 1:
-                    Set_(key, uniform.i.v2);
+                    Set_(key, uniform.i.x, uniform.i.y);
                     break;
                 case 2:
-                    Set_(key, uniform.i.v3);
+                    Set_(key, uniform.i.x, uniform.i.y, uniform.i.z);
                     break;
                 case 3:
-                    Set_(key, uniform.i.v4);
+                    Set_(key, uniform.i.x, uniform.i.y, uniform.i.z, uniform.i.w);
                     break;
                 }
                 break;
             case 2:
-                switch (uniform.dataSpec)
+                switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.b.v1);
+                    Set_(key, uniform.b.x);
                     break;
                 case 1:
-                    Set_(key, uniform.b.v2);
+                    Set_(key, uniform.b.x, uniform.b.y);
                     break;
                 case 2:
-                    Set_(key, uniform.b.v3);
+                    Set_(key, uniform.b.x, uniform.b.y, uniform.b.z);
                     break;
                 case 3:
-                    Set_(key, uniform.b.v4);
+                    Set_(key, uniform.b.x, uniform.b.y, uniform.b.z, uniform.b.w);
+                    break;
+                }
+            case 3:
+            {
+                switch (uniform.vecType)
+                {
+                case 0:
+                    Set_(key, uniform.m.m3);
+                    break;
+                case 1:
+                    Set_(key, uniform.m.m4);
                     break;
                 }
                 break;
             }
+            }
         }
-    }
-
-    void UniformBinder::Set(const std::string &name, float x)
-    {
-        UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 0;
-        val.f.v1 = x;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::vec2 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 1;
-        val.f.v2 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::vec3 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 2;
-        val.f.v3 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::vec4 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 3;
-        val.f.v4 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, int x)
-    {
-        UniformBindValue val;
-        val.dataType = 1;
-        val.dataSpec = 0;
-        val.i.v1 = x;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::ivec2 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 1;
-        val.dataSpec = 1;
-        val.i.v2 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::ivec3 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 1;
-        val.dataSpec = 2;
-        val.i.v3 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::ivec4 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 1;
-        val.dataSpec = 3;
-        val.i.v4 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, bool x)
-    {
-        UniformBindValue val;
-        val.dataType = 2;
-        val.dataSpec = 0;
-        val.b.v1 = x;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::bvec2 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 2;
-        val.dataSpec = 1;
-        val.b.v2 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::bvec3 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 2;
-        val.dataSpec = 2;
-        val.b.v3 = vector;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::bvec4 &vector)
-    {
-        UniformBindValue val;
-        val.dataType = 2;
-        val.dataSpec = 3;
-        val.b.v4 = vector;
-        m_uniforms[name] = val;
     }
 
     void UniformBinder::Set(const std::string &name, const glm::mat3 &matrix)
     {
         UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 4;
-        val.f.m3 = matrix;
+        val.dataType = 3;
+        val.vecType = 0;
+        val.m.m3 = matrix;
         m_uniforms[name] = val;
     }
 
     void UniformBinder::Set(const std::string &name, const glm::mat4 &matrix)
     {
         UniformBindValue val;
-        val.dataType = 0;
-        val.dataSpec = 5;
-        val.f.m4 = matrix;
+        val.dataType = 3;
+        val.vecType = 1;
+        val.m.m4 = matrix;
         m_uniforms[name] = val;
     }
 
@@ -241,25 +139,25 @@ namespace Bind
             glCheck(glUniform1f(bindHelper.location, x));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::vec2 &v)
+    void UniformBinder::Set_(const std::string &name, float x, float y)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform2f(bindHelper.location, v.x, v.y));
+            glCheck(glUniform2f(bindHelper.location, x, y));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::vec3 &v)
+    void UniformBinder::Set_(const std::string &name, float x, float y, float z)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform3f(bindHelper.location, v.x, v.y, v.z));
+            glCheck(glUniform3f(bindHelper.location, x, y, z));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::vec4 &v)
+    void UniformBinder::Set_(const std::string &name, float x, float y, float z, float w)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform4f(bindHelper.location, v.x, v.y, v.z, v.w));
+            glCheck(glUniform4f(bindHelper.location, x, y, z, w));
     }
 
     void UniformBinder::Set_(const std::string &name, int x)
@@ -269,45 +167,45 @@ namespace Bind
             glCheck(glUniform1i(bindHelper.location, x));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::ivec2 &v)
+    void UniformBinder::Set_(const std::string &name, int x, int y)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform2i(bindHelper.location, v.x, v.y));
+            glCheck(glUniform2i(bindHelper.location, x, y));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::ivec3 &v)
+    void UniformBinder::Set_(const std::string &name, int x, int y, int z)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform3i(bindHelper.location, v.x, v.y, v.z));
+            glCheck(glUniform3i(bindHelper.location, x, y, z));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::ivec4 &v)
+    void UniformBinder::Set_(const std::string &name, int x, int y, int z, int w)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
-            glCheck(glUniform4i(bindHelper.location, v.x, v.y, v.z, v.w));
+            glCheck(glUniform4i(bindHelper.location, x, y, z, w));
     }
 
     void UniformBinder::Set_(const std::string &name, bool x)
     {
-        Set(name, static_cast<int>(x));
+        Set_(name, static_cast<int>(x));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::bvec2 &v)
+    void UniformBinder::Set_(const std::string &name, bool x, bool y)
     {
-        Set(name, glm::ivec2(v));
+        Set_(name, static_cast<int>(x), static_cast<int>(y));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::bvec3 &v)
+    void UniformBinder::Set_(const std::string &name, bool x, bool y, bool z)
     {
-        Set(name, glm::ivec3(v));
+        Set_(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::bvec4 &v)
+    void UniformBinder::Set_(const std::string &name, bool x, bool y, bool z, bool w)
     {
-        Set(name, glm::ivec4(v));
+        Set_(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z), static_cast<int>(w));
     }
 
     void UniformBinder::Set_(const std::string &name, const glm::mat3 &matrix)
@@ -333,7 +231,7 @@ namespace Bind
     {
         return GenerateUID(m_shaderProgram);
     }
-    
+
     int UniformBinder::GetUniformLocation(const std::string &name) const
     {
         // Check the cache
@@ -355,4 +253,5 @@ namespace Bind
             return location;
         }
     }
+
 }
