@@ -28,7 +28,7 @@ protected:
     void AddBind(std::shared_ptr<Bindable> bindable);
 
 protected:
-    std::optional<std::shared_ptr<Bind::ShaderProgram>> m_shaderProgram;
+    std::optional<std::shared_ptr<Bind::UniformBinder>> m_uniformBinder;
 
     glm::mat4 m_baseTranslation;
     glm::mat4 m_translation;

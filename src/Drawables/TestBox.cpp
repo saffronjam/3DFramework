@@ -22,7 +22,9 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
 
-    AddBind(Bind::ShaderProgram::Resolve(vert, frag));
+    auto shaderProgram = Bind::ShaderProgram::Resolve(vert, frag);
+    AddBind(shaderProgram);
+    AddBind(Bind::UniformBinder::Resolve(shaderProgram));
     AddBind(Bind::VertexBuffer::Resolve("TestBox", rvb));
     AddBind(Bind::IndexBuffer::Resolve("TestBox", model.indices));
 
@@ -31,5 +33,5 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
 
 void TestBox::Update(const Mouse &mouse)
 {
-    m_shaderProgram.value()->SetUniform("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
+    m_uniformBinder.value()->Set("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
 }

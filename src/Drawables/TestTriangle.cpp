@@ -27,5 +27,5 @@ TestTriangle::TestTriangle(const glm::mat4 &baseTranslation)
 
 void TestTriangle::Update(const Mouse &mouse)
 {
-    m_shaderProgram.value()->SetUniform("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
+    m_uniformBinder.value()->Set("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
 }

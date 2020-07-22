@@ -35,9 +35,9 @@ void Drawable::AddBind(std::shared_ptr<Bindable> bindable)
     {
         m_indexBuffer = std::make_optional(std::static_pointer_cast<Bind::IndexBuffer>(bindable));
     }
-    if (dynamic_cast<Bind::ShaderProgram *>(bindable.get()))
+    if (dynamic_cast<Bind::UniformBinder *>(bindable.get()))
     {
-        m_shaderProgram = std::make_optional(std::static_pointer_cast<Bind::ShaderProgram>(bindable));
+        m_uniformBinder = std::make_optional(std::static_pointer_cast<Bind::UniformBinder>(bindable));
     }
     m_bindables.push_back(std::move(bindable));
 }
