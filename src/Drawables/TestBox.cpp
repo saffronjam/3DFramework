@@ -1,7 +1,9 @@
 #include "TestBox.h"
 
-TestBox::TestBox()
-        : m_shaderProgram(nullptr)
+#include "Random.h"
+
+TestBox::TestBox(const glm::mat4 &baseTranslation)
+        : Drawable(baseTranslation)
 {
     VertexElementLayout layout;
     layout.Append(ElementType::Position3D).Append(ElementType::Float3Color);
@@ -20,15 +22,14 @@ TestBox::TestBox()
     VertexShader vert("Shaders/VS.vert");
     FragmentShader frag("Shaders/FS.frag");
 
-    auto unique_Shaderprogram = std::make_unique<ShaderProgram>(vert, frag);
-    m_shaderProgram = unique_Shaderprogram.get();
+    AddBind(std::make_shared<ShaderProgram>(vert, frag));
+    AddBind(std::make_shared<VertexBuffer>(model.rawVertexBuffer));
+    AddBind(std::make_shared<IndexBuffer>(model.indices));
 
-    AddBind(std::move(unique_Shaderprogram));
-    AddBind(std::make_unique<VertexBuffer>(model.rawVertexBuffer));
-    AddBind(std::make_unique<IndexBuffer>(model.indices));
+    SetRotation(Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f));
 }
 
 void TestBox::Update(const Mouse &mouse)
 {
-    m_shaderProgram->SetUniform("transform", m_projection * m_translation * glm::translate(glm::vec3{0.0f, 0.0f, -5.0f}) * m_rotation);
+    m_shaderProgram.value()->SetUniform("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
 }

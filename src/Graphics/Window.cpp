@@ -28,6 +28,7 @@ Window::Window(std::string title, int width, int height, bool activeContext)
     Engine::BindDefaultErrorCallback();
 
     glCheck(glEnable(GL_DEPTH_TEST));
+    glCheck(glEnable(GL_CULL_FACE));
 }
 
 Window::~Window()

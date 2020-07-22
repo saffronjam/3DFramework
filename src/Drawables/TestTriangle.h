@@ -5,12 +5,9 @@
 class TestTriangle : public Drawable
 {
 public:
-    TestTriangle();
+    TestTriangle(const glm::mat4 &baseTranslation);
 
     void Update(const Mouse &mouse) override;
-
-private:
-    ShaderProgram* m_shaderProgram;
 };
 
 

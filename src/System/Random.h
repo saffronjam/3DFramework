@@ -3,14 +3,16 @@
 #include <utility>
 #include <random>
 
+#include "SeMath.h"
+
 class Random
 {
 public:
     Random(int const &lower = 0, int const &upper = 10)
-        : m_lower(lower),
-          m_upper(upper){};
+            : m_lower(lower),
+              m_upper(upper) {};
 
-    int Gen() { return (double)((rand() % ((int)m_upper - (int)m_lower)) + (int)m_lower); }
+    int Gen() { return (double) ((rand() % ((int) m_upper - (int) m_lower)) + (int) m_lower); }
 
     void SetLowerBound(int lowerBound_IN) { m_lower = lowerBound_IN; };
     void SetUpperBound(int upperBound_IN) { m_upper = upperBound_IN; };
@@ -23,11 +25,12 @@ public:
         return static_cast<int>(dis(e));
     }
 
-    static float Float(float low = 0.0f, float high = 1.0f)
+    template<typename T = float>
+    static T Real(T low = (T)0, T high = (T)1)
     {
         static std::random_device rd;
         static std::mt19937 e(rd());
-        std::uniform_real_distribution<float> dis(low, high);
+        std::uniform_real_distribution<T> dis(low, high);
         return dis(e);
     }
 
@@ -42,18 +45,19 @@ public:
 //        return sf::Color(r, g, b, a);
 //    }
 
-//    template <typename T>
-//    static sf::Vector2<T> Vec2(const sf::Vector2<T> &low, const sf::Vector2<T> &high)
-//    {
-//        return Random::Vec2(low.x, low.y, high.x, high.y);
-//    }
-//    template <typename T>
-//    static sf::Vector2<T> Vec2(T lowX, T lowY, T highX, T highY)
-//    {
-//        float x = Random::Float(lowX, highX);
-//        float y = Random::Float(lowY, highY);
-//        return sf::Vector2<T>((T)x, (T)y);
-//    }
+    template<typename T>
+    static glm::vec<3, T> Vec3(const glm::vec<3,T> &low, const glm::vec<3,T> &high)
+    {
+        return Random::Vec3(low.x, low.y, low.z, high.x, high.y, high.z);
+    }
+    template<typename T>
+    static glm::vec<3, T> Vec3(T lowX, T lowY, T lowZ, T highX, T highY, T highZ)
+    {
+        float x = Random::Real<T>(lowX, highX);
+        float y = Random::Real<T>(lowY, highY);
+        float z = Random::Real<T>(lowZ, highZ);
+        return {x,y,z};
+    }
 
 private:
     int m_lower;

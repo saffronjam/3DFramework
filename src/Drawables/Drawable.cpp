@@ -1,7 +1,8 @@
 #include "Drawable.h"
 
-Drawable::Drawable()
-        : m_translation(glm::translate(glm::vec3(0.0f, 0.0f, -5.0f))),
+Drawable::Drawable(const glm::mat4 &baseTranslation)
+        : m_baseTranslation(baseTranslation),
+          m_translation(1),
           m_rotation(1),
           m_projection(1)
 {
@@ -28,18 +29,22 @@ void Drawable::Draw(Graphics &gfx)
     }
 }
 
-void Drawable::AddBind(std::unique_ptr<Bindable> bindable)
+void Drawable::AddBind(std::shared_ptr<Bindable> bindable)
 {
     if (dynamic_cast<IndexBuffer *>(bindable.get()))
     {
-        m_indexBuffer = dynamic_cast<IndexBuffer * >(bindable.get());
+        m_indexBuffer = std::make_optional(std::static_pointer_cast<IndexBuffer>(bindable));
+    }
+    if (dynamic_cast<ShaderProgram *>(bindable.get()))
+    {
+        m_shaderProgram = std::make_optional(std::static_pointer_cast<ShaderProgram>(bindable));
     }
     m_bindables.push_back(std::move(bindable));
 }
 
 void Drawable::SetTranslation(const glm::vec3 &translate)
 {
-     m_translation = glm::translate(translate);
+    m_translation = glm::translate(translate);
 }
 
 void Drawable::SetRotation(float yaw, float pitch, float roll)

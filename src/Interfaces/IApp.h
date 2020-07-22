@@ -6,6 +6,7 @@
 #include "GuiMgr.h"
 #include "IEventHandler.h"
 #include "SeMath.h"
+#include "Random.h"
 
 class IApp : public IEventHandler
 {

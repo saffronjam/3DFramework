@@ -6,10 +6,7 @@
 class TestBox : public Drawable
 {
 public:
-    TestBox();
+    TestBox(const glm::mat4 &baseTranslation);
 
     void Update(const Mouse &mouse) override;
-
-private:
-    ShaderProgram *m_shaderProgram;
 };
