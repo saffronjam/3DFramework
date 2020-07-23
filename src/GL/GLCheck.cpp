@@ -4,6 +4,8 @@
 
 #include <GL/glew.h>
 
+#include "Log.h"
+
 void SaffronGL::CheckError(const char *file, unsigned int line, const char *expression)
 {
     // Get the last error
@@ -69,8 +71,8 @@ void SaffronGL::CheckError(const char *file, unsigned int line, const char *expr
         default:
             break;
         }
-
-        throw SaffronGL::Exception(static_cast<int>(line), fileString.substr(fileString.find_last_of("\\/") + 1).c_str(), expression, std::string(error + " " + description).c_str());
+        LogWarningUser("GLCheck caught a bad operation: \"%s\"\n\t[Problem]: %s\n\t[File]: %s:%u\n", expression, std::string(error + " " + description).c_str(), fileString.substr(fileString.find_last_of("\\/") + 1).c_str(), line);
+        //throw SaffronGL::Exception(static_cast<int>(line), fileString.substr(fileString.find_last_of("\\/") + 1).c_str(), expression, std::string(error + " " + description).c_str());
 
     }
 }

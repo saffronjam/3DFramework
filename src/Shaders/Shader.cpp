@@ -66,7 +66,7 @@ bool Shader::LoadFromFile(const std::string &path)
         char infoLog[logLength];
         glCheck(glGetShaderInfoLog(m_shaderID, logLength, nullptr, infoLog));
 
-        LogErrorUser("Failed to compile %s Path: %s (ID: %u): %s", GetName().c_str(), m_filepath.c_str(), m_shaderID, infoLog);
+        LogErrorUser("Failed to compile %s. Path: \"%s\" (ID: %u): %s", GetName().c_str(), m_filepath.c_str(), m_shaderID, infoLog);
         CleanUp();
     }
     return static_cast<bool>(m_shaderID);

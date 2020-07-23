@@ -17,6 +17,7 @@ else ()
 endif ()
 
 file(COPY "res/Shaders" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
+file(COPY "res/Images" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 
 find_package(Threads REQUIRED)
 
@@ -63,6 +64,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
             deps/GLEW/include
             deps/GLFW/include
             deps/glm/include
+            deps/stb_image/include
             )
     target_link_directories(Client PRIVATE
             deps/GLEW/lib

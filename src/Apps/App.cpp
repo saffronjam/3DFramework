@@ -2,8 +2,12 @@
 
 #include "imgui/imgui.h"
 
+#include "Surface.h"
+
 void App::OnInit()
 {
+    Surface surf = Surface::FromFile("Images/sample.png");
+
     glm::mat4 proj = glm::perspective(glm::radians(45.0f), 1024.0f / 720.0f, 0.1f, 100.0f);
 
     const int nDrawables = 25;

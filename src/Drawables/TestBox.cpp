@@ -27,6 +27,7 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
     AddBind(Bind::UniformBinder::Resolve(shaderProgram));
     AddBind(Bind::VertexBuffer::Resolve("TestBox", rvb));
     AddBind(Bind::IndexBuffer::Resolve("TestBox", model.indices));
+    AddBind(Bind::Texture::Resolve("Images/sample.png"));
 
     SetRotation(Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f), Random::Real(0.0f, PI<> * 2.0f));
 }
@@ -34,5 +35,4 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
 void TestBox::Update(const Mouse &mouse)
 {
     m_uniformBinder.value()->SetMatrix("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
-    m_uniformBinder.value()->SetVector("color", glm::vec3{0.5f, 0.5f, 0.5f});
 }
