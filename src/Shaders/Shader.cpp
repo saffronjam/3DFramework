@@ -34,8 +34,7 @@ Shader::Shader(Type shaderType, const std::string &filepath)
 
 Shader::~Shader()
 {
-    if (m_shaderID != 0u)
-        glCheck(glDeleteShader(m_shaderID));
+    CleanUp();
 }
 
 Shader::Shader(Shader &&other) noexcept
@@ -49,33 +48,43 @@ Shader::Shader(Shader &&other) noexcept
 
 bool Shader::LoadFromFile(const std::string &path)
 {
-    m_filepath = path;
-    try
-    {
-        FileIO::LoadFromFile(path);
-        glCheck(m_shaderID = glCreateShader(MapShaderType(m_type)));
-        auto pathRawString = m_fileContents.c_str();
-        glCheck(glShaderSource(m_shaderID, 1, &pathRawString, nullptr));
-        glCheck(glCompileShader(m_shaderID));
+    CleanUp();
 
-        GLint compiledOK;
-        glCheck(glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &compiledOK));
-        if (compiledOK == GL_FALSE)
-        {
-            GLint logLength;
-            glCheck(glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &logLength));
-            char infoLog[logLength];
-            glCheck(glGetShaderInfoLog(m_shaderID, logLength, nullptr, infoLog));
-            THROW(Bindable::Exception, "Failed to compile %s Path: %s (ID: %u): %s", GetName().c_str(), m_filepath.c_str(), m_shaderID, infoLog);
-        }
-    }
-    catch (IException &e)
+    m_filepath = path;
+    FileIO::LoadFromFile(path);
+    glCheck(m_shaderID = glCreateShader(MapShaderType(m_type)));
+    auto pathRawString = m_fileContents.c_str();
+    glCheck(glShaderSource(m_shaderID, 1, &pathRawString, nullptr));
+    glCheck(glCompileShader(m_shaderID));
+
+    GLint compiledOK;
+    glCheck(glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &compiledOK));
+    if (compiledOK == GL_FALSE)
     {
-        LogWarningUser("\n%s", e.what());
-        glCheck(glDeleteShader(m_shaderID));
-        return false;
+        GLint logLength;
+        glCheck(glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &logLength));
+        char infoLog[logLength];
+        glCheck(glGetShaderInfoLog(m_shaderID, logLength, nullptr, infoLog));
+
+        LogErrorUser("Failed to compile %s Path: %s (ID: %u): %s", GetName().c_str(), m_filepath.c_str(), m_shaderID, infoLog);
+        CleanUp();
     }
-    return true;
+    return static_cast<bool>(m_shaderID);
+}
+
+unsigned int Shader::GetShaderID() const noexcept
+{
+    return m_shaderID;
+}
+
+const std::string &Shader::GetName() const noexcept
+{
+    return m_name;
+}
+
+const std::string &Shader::GetFilepath() const noexcept
+{
+    return m_filepath;
 }
 
 void Shader::ConfigureName() noexcept
@@ -97,18 +106,11 @@ void Shader::ConfigureName() noexcept
     }
 }
 
-unsigned int Shader::GetShaderID() const noexcept
+void Shader::CleanUp()
 {
-    return m_shaderID;
+    if (m_shaderID != 0u)
+    {
+        glCheck(glDeleteShader(m_shaderID));
+        m_shaderID = 0u;
+    }
 }
-
-const std::string &Shader::GetName() const noexcept
-{
-    return m_name;
-}
-
-const std::string &Shader::GetFilepath() const noexcept
-{
-    return m_filepath;
-}
-

@@ -1,8 +1,10 @@
 #include "VertexBuffer.h"
 
+#include <GL/glew.h>
+
 namespace Bind
 {
-    VertexBuffer::VertexBuffer(std::string tag, RawVertexBuffer &rawVertexBuffer)
+    VertexBuffer::VertexBuffer(std::string tag, const RawVertexBuffer &rawVertexBuffer)
             : m_tag(std::move(tag)),
               m_vboID(0u),
               m_vaoID(0u)
@@ -43,7 +45,7 @@ namespace Bind
         glCheck(glBindVertexArray(m_vaoID));
     }
 
-    VertexBuffer::Ptr VertexBuffer::Resolve(const std::string &tag, RawVertexBuffer &rawVertexBuffer)
+    VertexBuffer::Ptr VertexBuffer::Resolve(const std::string &tag, const RawVertexBuffer &rawVertexBuffer)
     {
         return Codex::Resolve<VertexBuffer>(tag, rawVertexBuffer);
     }

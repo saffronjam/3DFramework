@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <GL/glew.h>
+
 // VertexElementLayout
 VertexElementLayout &VertexElementLayout::Append(ElementType type) noxnd
 {

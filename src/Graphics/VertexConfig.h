@@ -3,12 +3,13 @@
 #include <vector>
 #include <type_traits>
 
-#include <GL/glew.h>
-
 #include "SeMath.h"
 #include "Graphics.h"
 #include "Color.h"
 #include "Config.h"
+
+#define GL_FLOAT 5126
+#define GL_BYTE 5120
 
 enum class ElementType
 {
@@ -23,14 +24,13 @@ enum class ElementType
 
 struct VertexProperties
 {
-    GLint size;
-    GLenum type;
-    GLboolean normalized;
+    int size;
+    int type;
+    bool normalized;
 };
 
 template<ElementType>
 struct VertexMap;
-
 template<>
 struct VertexMap<ElementType::Position2D>
 {
@@ -230,3 +230,7 @@ private:
     std::vector<char> buffer;
     VertexElementLayout vertexElementLayout;
 };
+
+
+#undef GL_FLOAT
+#undef GL_BYTE

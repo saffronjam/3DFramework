@@ -38,9 +38,9 @@ void Log::Custom(Log::Level level, const char *file, int line, const char *fmt, 
         char buf[16];
         buf[strftime(buf, sizeof(buf), "%H:%M:%S", time)] = '\0';
 #ifdef LOG_USE_COLOR
-        fprintf(stderr, "%s %s%-5s\x1b[0m \x1b[90m%s:%d:\x1b[0m ", buf, level_colors[static_cast<int>(level)], level_names[static_cast<int>(level)], file, line);
+        fprintf(stderr, "%s %s[%s]\x1b[0m \x1b[90m%s:%d:\x1b[0m ", buf, level_colors[static_cast<int>(level)], level_names[static_cast<int>(level)], file, line);
 #else
-        fprintf(stderr, "%s %-5s %s:%d: ", buf, level_names[static_cast<int>(level)], file, line);
+        fprintf(stderr, "%s [%s] %s:%d: ", buf, level_names[static_cast<int>(level)], file, line);
 #endif
         va_start(args, fmt);
         vfprintf(stderr, fmt, args);
@@ -76,9 +76,9 @@ void Log::CustomUser(Log::Level level, const char *file, int line, const char *f
         char buf[16];
         buf[strftime(buf, sizeof(buf), "%H:%M:%S", time)] = '\0';
 #ifdef LOG_USE_COLOR
-        fprintf(stderr, "%s %s%-5s\x1b[0m \x1b:\x1b[0m ", buf, level_colors[static_cast<int>(level)], level_names[static_cast<int>(level)]);
+        fprintf(stderr, "%s %s[%s]\x1b[0m \x1b:\x1b[0m ", buf, level_colors[static_cast<int>(level)], level_names[static_cast<int>(level)]);
 #else
-        fprintf(stderr, "%s %s: ", buf, level_names[static_cast<int>(level)]);
+        fprintf(stderr, "%s [%s]: ", buf, level_names[static_cast<int>(level)]);
 #endif
         va_start(args, fmt);
         vfprintf(stderr, fmt, args);
@@ -116,7 +116,7 @@ void Log::ToFile(Log::Level level, tm *time, const char *file, int line, const c
         va_list args;
         char buf[32];
         buf[strftime(buf, sizeof(buf), "%Y-%m-%d %H:%M:%S", time)] = '\0';
-        fprintf(m_filePointer, "%s %-5s: ", buf, level_names[static_cast<int>(level)]);
+        fprintf(m_filePointer, "%s [%s]: ", buf, level_names[static_cast<int>(level)]);
         va_start(args, fmt);
         vfprintf(m_filePointer, fmt, args);
         va_end(args);

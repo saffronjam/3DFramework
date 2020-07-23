@@ -14,11 +14,11 @@ namespace Bind
         using Ptr = std::shared_ptr<VertexBuffer>;
 
     public:
-        VertexBuffer(std::string tag, RawVertexBuffer &rawVertexBuffer);
+        VertexBuffer(std::string tag, const RawVertexBuffer &rawVertexBuffer);
         ~VertexBuffer();
 
         void BindTo(Graphics &gfx) override;
-        static VertexBuffer::Ptr Resolve(const std::string &tag, RawVertexBuffer &rawVertexBuffer);
+        static VertexBuffer::Ptr Resolve(const std::string &tag,const RawVertexBuffer &rawVertexBuffer);
 
         template<typename... Ignore>
         [[nodiscard]] static std::string GenerateUID(const std::string &tag, Ignore &&...ignore);

@@ -33,6 +33,7 @@ public:
 
 private:
     void ConfigureName() noexcept;
+    void CleanUp();
 
 private:
     Type m_type;

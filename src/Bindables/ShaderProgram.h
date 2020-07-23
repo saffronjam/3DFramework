@@ -3,11 +3,7 @@
 #include <map>
 #include <string>
 
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
-#include <glm/matrix.hpp>
-
+#include "SeMath.h"
 #include "Bindable.h"
 #include "BindableCodex.h"
 #include "VertexShader.h"
@@ -38,7 +34,8 @@ namespace Bind
 
     private:
         void Attach(const Shader &shader) const;
-        void Link() const;
+        bool Link();
+        void CleanUp();
 
 
     private:

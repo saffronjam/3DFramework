@@ -5,7 +5,6 @@
 
 namespace Bind
 {
-
     ShaderProgram::ShaderProgram(VertexShader &vert, FragmentShader &frag)
             : m_vertexShader(std::move(vert)),
               m_fragmentShader(std::move(frag)),
@@ -19,8 +18,7 @@ namespace Bind
 
     ShaderProgram::~ShaderProgram()
     {
-        if (m_shaderProgramID != 0)
-            glCheck(glDeleteProgram(m_shaderProgramID));
+        CleanUp();
     }
 
     unsigned int ShaderProgram::GetProgramID() const noexcept
@@ -30,7 +28,8 @@ namespace Bind
 
     void ShaderProgram::BindTo(Graphics &gfx)
     {
-        glCheck(glUseProgram(m_shaderProgramID));
+        if (m_shaderProgramID != 0)
+            glCheck(glUseProgram(m_shaderProgramID));
     }
 
     ShaderProgram::Ptr ShaderProgram::Resolve(VertexShader &vert, FragmentShader &frag)
@@ -48,7 +47,7 @@ namespace Bind
         glCheck(glAttachShader(m_shaderProgramID, shader.GetShaderID()));
     }
 
-    void ShaderProgram::Link() const
+    bool ShaderProgram::Link()
     {
         // Link the program
         glCheck(glLinkProgram(m_shaderProgramID));
@@ -63,6 +62,17 @@ namespace Bind
             std::memset(log, 0, logLength * sizeof(char));
             glCheck(glGetProgramInfoLog(m_shaderProgramID, logLength, nullptr, log));
             LogWarningUser("Failed to link shader program (ID:%u): %s", m_shaderProgramID, log);
+            CleanUp();
+        }
+        return static_cast<bool>(m_shaderProgramID);
+    }
+
+    void ShaderProgram::CleanUp()
+    {
+        if (m_shaderProgramID != 0)
+        {
+            glCheck(glDeleteProgram(m_shaderProgramID));
+            m_shaderProgramID = 0;
         }
     }
 }
