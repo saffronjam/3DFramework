@@ -3,9 +3,7 @@
 #include <vector>
 #include <memory>
 
-#include <glm/gtx/transform.hpp>
-#include <glm/gtx/euler_angles.hpp>
-
+#include "SeMath.h"
 #include "Bindable.h"
 #include "AllBindables.h"
 
@@ -20,6 +18,7 @@ public:
     void SetTranslation(const glm::vec3 &translate);
     void SetRotation(float yaw, float pitch, float roll);
     void SetProjection(const glm::mat4 &projection);
+    void SetExtraColor(const glm::vec3& color);
 
     void Translate(const glm::vec3 &translate);
     void Rotate(float yaw, float pitch, float roll);
@@ -34,6 +33,7 @@ protected:
     glm::mat4 m_translation;
     glm::mat4 m_rotation;
     glm::mat4 m_projection;
+    glm::vec3 m_extraColor;
 
 private:
     std::optional<std::shared_ptr<Bind::IndexBuffer>> m_indexBuffer;

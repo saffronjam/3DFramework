@@ -1,5 +1,8 @@
 #include "Drawable.h"
 
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
+
 Drawable::Drawable(const glm::mat4 &baseTranslation)
         : m_baseTranslation(baseTranslation),
           m_translation(1),
@@ -55,6 +58,11 @@ void Drawable::SetRotation(float yaw, float pitch, float roll)
 void Drawable::SetProjection(const glm::mat4 &projection)
 {
     m_projection = projection;
+}
+
+void Drawable::SetExtraColor(const glm::vec3 &color)
+{
+    m_extraColor = color;
 }
 
 void Drawable::Translate(const glm::vec3 &translate)

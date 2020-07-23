@@ -10,16 +10,16 @@ namespace Bind
             : m_filepath(surface.GetFilepath()),
               m_textureID(0u)
     {
-        glGenTextures(1, &m_textureID);
-        glBindTexture(GL_TEXTURE_2D, m_textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, surface.GetWidth(), surface.GetHeight(), 0, GL_RGB32F, GL_FLOAT, surface.GetBufferPtr());
-        glGenerateMipmap(GL_TEXTURE_2D);
+        glCheck(glGenTextures(1, &m_textureID));
+        glCheck (glBindTexture(GL_TEXTURE_2D, m_textureID));
+        glCheck (glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, surface.GetWidth(), surface.GetHeight(), 0, GL_RGBA, GL_FLOAT, surface.GetBufferPtr()));
+        glCheck (glGenerateMipmap(GL_TEXTURE_2D));
 
         // Set the texture wrapping/filtering options (on the currently bound texture object)
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glCheck (glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+        glCheck(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+        glCheck (glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+        glCheck (glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
     }
 
     Texture::Texture(const std::string &filepath)
@@ -29,7 +29,7 @@ namespace Bind
 
     void Texture::BindTo(Graphics &gfx)
     {
-        glBindTexture(GL_TEXTURE_2D, m_textureID);
+        glCheck(glBindTexture(GL_TEXTURE_2D, m_textureID));
     }
 
     Texture::Ptr Texture::Resolve(const Surface &surface)

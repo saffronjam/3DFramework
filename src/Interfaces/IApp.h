@@ -5,6 +5,7 @@
 #include "Graphics.h"
 #include "GuiMgr.h"
 #include "IEventHandler.h"
+#include "Timer.h"
 #include "SeMath.h"
 #include "Random.h"
 
@@ -28,6 +29,9 @@ protected:
 protected:
     Window m_wnd;
     Graphics m_gfx;
+    Timer m_timer;
+
+    float dt;
 
 public:
     class Exception : public IException

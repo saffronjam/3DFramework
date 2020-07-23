@@ -17,6 +17,10 @@ public:
 private:
     std::vector<std::unique_ptr<Drawable>> m_drawables;
 
+    float m_windowTitleUpdateTimer = 0.0f;
+
+    int nDrawables = 25;
     glm::vec3 trans = {0.0f, 0.0f, 0.0f};
     glm::vec3 rot = {0.0f, 0.0f, 0.0f};
+    glm::vec3 color = {0.0f, 0.0f, 0.0f};
 };
