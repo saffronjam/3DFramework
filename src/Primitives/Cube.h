@@ -89,35 +89,60 @@ public:
         using Type = ElementType;
 
         VertexElementLayout layout;
-        layout.Append(Type::Position3D).Append(Type::Normal).Append(Type::Texture2D);
+        layout.Append(Type::Position3D).Append(Type::Normal).Append(Type::Texture2D).Append(Type::Normal);
 
         auto itl = MakeIndependent(layout);
-        auto &rwb = itl.rawVertexBuffer;
+        auto &rvb = itl.rawVertexBuffer;
 
-        rwb[0].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[1].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[2].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[3].Attr<Type::Texture2D>() = {1.0f, 1.0f};
-        rwb[4].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[5].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[6].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[7].Attr<Type::Texture2D>() = {1.0f, 1.0f};
-        rwb[8].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[9].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[10].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[11].Attr<Type::Texture2D>() = {1.0f, 1.0f};
-        rwb[12].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[13].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[14].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[15].Attr<Type::Texture2D>() = {1.0f, 1.0f};
-        rwb[16].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[17].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[18].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[19].Attr<Type::Texture2D>() = {1.0f, 1.0f};
-        rwb[20].Attr<Type::Texture2D>() = {0.0f, 0.0f};
-        rwb[21].Attr<Type::Texture2D>() = {1.0f, 0.0f};
-        rwb[22].Attr<Type::Texture2D>() = {0.0f, 1.0f};
-        rwb[23].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[0].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[1].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[2].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[3].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[4].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[5].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[6].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[7].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[8].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[9].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[10].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[11].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[12].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[13].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[14].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[15].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[16].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[17].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[18].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[19].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+        rvb[20].Attr<Type::Texture2D>() = {0.0f, 0.0f};
+        rvb[21].Attr<Type::Texture2D>() = {1.0f, 0.0f};
+        rvb[22].Attr<Type::Texture2D>() = {0.0f, 1.0f};
+        rvb[23].Attr<Type::Texture2D>() = {1.0f, 1.0f};
+
+        rvb[0].Attr<Type::Normal>() = {0.0f, 0.0f, -1.0f};// 0 near side
+        rvb[1].Attr<Type::Normal>() = {0.0f, 0.0f, -1.0f};// 1
+        rvb[2].Attr<Type::Normal>() = {0.0f, 0.0f, -1.0f};// 2
+        rvb[3].Attr<Type::Normal>() = {0.0f, 0.0f, -1.0f};// 3
+        rvb[4].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 4 far side
+        rvb[5].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 5
+        rvb[6].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 6
+        rvb[7].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 7
+        rvb[8].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 8 left side
+        rvb[9].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 9
+        rvb[10].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 10
+        rvb[11].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 11
+        rvb[12].Attr<Type::Normal>() = {1.0f, 0.0f, 0.0f};// 12 right side
+        rvb[13].Attr<Type::Normal>() = {1.0f, 0.0f, 0.0f};// 13
+        rvb[14].Attr<Type::Normal>() = {1.0f, 0.0f, 0.0f};// 14
+        rvb[15].Attr<Type::Normal>() = {1.0f, 0.0f, 0.0f};// 15
+        rvb[16].Attr<Type::Normal>() = {0.0f, -1.0f, 0.0f};// 16 bottom side
+        rvb[17].Attr<Type::Normal>() = {0.0f, -1.0f, 0.0f};// 17
+        rvb[18].Attr<Type::Normal>() = {0.0f, -1.0f, 0.0f};// 18
+        rvb[19].Attr<Type::Normal>() = {0.0f, -1.0f, 0.0f};// 19
+        rvb[20].Attr<Type::Normal>() = {0.0f, 1.0f, 0.0f};// 20 top side
+        rvb[21].Attr<Type::Normal>() = {0.0f, 1.0f, 0.0f};// 21
+        rvb[22].Attr<Type::Normal>() = {0.0f, 1.0f, 0.0f};// 22
+        rvb[23].Attr<Type::Normal>() = {0.0f, 1.0f, 0.0f};// 23
 
         return itl;
     }

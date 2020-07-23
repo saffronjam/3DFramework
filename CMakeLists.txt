@@ -12,6 +12,8 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # Copy dlls
+    file(GLOB SHARED_BINARIES "deps/*/bin/*.dll")
+    file(COPY ${SHARED_BINARIES} DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")
 else ()
     # FindPackage
 endif ()
@@ -61,20 +63,26 @@ set_target_properties(Client PROPERTIES
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     target_include_directories(Client PRIVATE
+            deps/assimp/include
             deps/GLEW/include
             deps/GLFW/include
             deps/glm/include
             deps/stb_image/include
             )
     target_link_directories(Client PRIVATE
+            deps/assimp/lib
             deps/GLEW/lib
             deps/GLFW/lib
             )
     target_link_libraries(Client PRIVATE
+            assimp
+            IrrXML
             gdi32
             glfw3
             glew32s
             opengl32
+            log
+
             )
 else ()
     target_include_directories(Client PRIVATE
