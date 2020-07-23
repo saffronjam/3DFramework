@@ -38,6 +38,13 @@ enum
 #define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
 #define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
 
+#define log_trace_user(...) log_log_user(LOG_TRACE, __VA_ARGS__)
+#define log_debug_user(...) log_log_user(LOG_DEBUG, __VA_ARGS__)
+#define log_info_user(...) log_log_user(LOG_INFO, __VA_ARGS__)
+#define log_warn_user(...) log_log_user(LOG_WARN, __VA_ARGS__)
+#define log_error_user(...) log_log_user(LOG_ERROR, __VA_ARGS__)
+#define log_fatal_user(...) log_log_user(LOG_FATAL, __VA_ARGS__)
+
 void log_set_udata(void *udata);
 void log_set_lock(log_LockFn fn);
 void log_set_fp(FILE *fp);
@@ -45,5 +52,6 @@ void log_set_level(int level);
 void log_set_quiet(int enable);
 
 void log_log(int level, const char *file, int line, const char *fmt, ...);
+void log_log_user(int level, const char *fmt, ...);
 
 #endif
