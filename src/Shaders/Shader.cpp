@@ -71,7 +71,7 @@ bool Shader::LoadFromFile(const std::string &path)
     }
     catch (IException &e)
     {
-        log_warn("\n%s", e.what());
+        LogWarningUser("\n%s", e.what());
         glCheck(glDeleteShader(m_shaderID));
         return false;
     }

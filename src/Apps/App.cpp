@@ -25,16 +25,6 @@ void App::OnExit()
 
 void App::OnUpdate()
 {
-    for (auto &drawable : m_drawables)
-    {
-        drawable->Update(m_wnd.mouse);
-    }
-    ImGui::Begin("Box controls");
-    ImGui::SliderFloat3("Rotation", &rot.x, 0, 2 * PI<>, "%.2f");
-    ImGui::SliderFloat3("Translation", &trans.x, -5.0f, 5.0f, "%.2f");
-    ImGui::End();
-    m_drawables[0]->SetRotation(rot.x, rot.y, rot.z);
-    m_drawables[0]->SetTranslation(trans);
     const float rotIntensity = 0.01f;
     for (auto &drawable : m_drawables)
     {
@@ -43,7 +33,17 @@ void App::OnUpdate()
         float roll = Random::Real(0.0f, rotIntensity);
         drawable->Rotate(yaw, pitch, roll);
     }
+    ImGui::Begin("Box controls");
+    ImGui::SliderFloat3("Rotation", &rot.x, 0, 2 * PI<>, "%.2f");
+    ImGui::SliderFloat3("Translation", &trans.x, -5.0f, 5.0f, "%.2f");
+    ImGui::End();
+    m_drawables[0]->SetRotation(rot.x, rot.y, rot.z);
+    m_drawables[0]->SetTranslation(trans);
 
+    for (auto &drawable : m_drawables)
+    {
+        drawable->Update(m_wnd.mouse);
+    }
 }
 
 void App::OnDraw()

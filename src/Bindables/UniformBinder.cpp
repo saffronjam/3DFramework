@@ -51,16 +51,16 @@ namespace Bind
                 switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.f.x);
+                    BindUniform(key, uniform.f.x);
                     break;
                 case 1:
-                    Set_(key, uniform.f.x, uniform.f.y);
+                    BindUniform(key, uniform.f.x, uniform.f.y);
                     break;
                 case 2:
-                    Set_(key, uniform.f.x, uniform.f.y, uniform.f.z);
+                    BindUniform(key, uniform.f.x, uniform.f.y, uniform.f.z);
                     break;
                 case 3:
-                    Set_(key, uniform.f.x, uniform.f.y, uniform.f.z, uniform.f.w);
+                    BindUniform(key, uniform.f.x, uniform.f.y, uniform.f.z, uniform.f.w);
                     break;
                 }
                 break;
@@ -68,16 +68,16 @@ namespace Bind
                 switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.i.x);
+                    BindUniform(key, uniform.i.x);
                     break;
                 case 1:
-                    Set_(key, uniform.i.x, uniform.i.y);
+                    BindUniform(key, uniform.i.x, uniform.i.y);
                     break;
                 case 2:
-                    Set_(key, uniform.i.x, uniform.i.y, uniform.i.z);
+                    BindUniform(key, uniform.i.x, uniform.i.y, uniform.i.z);
                     break;
                 case 3:
-                    Set_(key, uniform.i.x, uniform.i.y, uniform.i.z, uniform.i.w);
+                    BindUniform(key, uniform.i.x, uniform.i.y, uniform.i.z, uniform.i.w);
                     break;
                 }
                 break;
@@ -85,16 +85,16 @@ namespace Bind
                 switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.b.x);
+                    BindUniform(key, uniform.b.x);
                     break;
                 case 1:
-                    Set_(key, uniform.b.x, uniform.b.y);
+                    BindUniform(key, uniform.b.x, uniform.b.y);
                     break;
                 case 2:
-                    Set_(key, uniform.b.x, uniform.b.y, uniform.b.z);
+                    BindUniform(key, uniform.b.x, uniform.b.y, uniform.b.z);
                     break;
                 case 3:
-                    Set_(key, uniform.b.x, uniform.b.y, uniform.b.z, uniform.b.w);
+                    BindUniform(key, uniform.b.x, uniform.b.y, uniform.b.z, uniform.b.w);
                     break;
                 }
             case 3:
@@ -102,10 +102,10 @@ namespace Bind
                 switch (uniform.vecType)
                 {
                 case 0:
-                    Set_(key, uniform.m.m3);
+                    BindUniform(key, uniform.m.m3);
                     break;
                 case 1:
-                    Set_(key, uniform.m.m4);
+                    BindUniform(key, uniform.m.m4);
                     break;
                 }
                 break;
@@ -114,108 +114,90 @@ namespace Bind
         }
     }
 
-    void UniformBinder::Set(const std::string &name, const glm::mat3 &matrix)
-    {
-        UniformBindValue val;
-        val.dataType = 3;
-        val.vecType = 0;
-        val.m.m3 = matrix;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set(const std::string &name, const glm::mat4 &matrix)
-    {
-        UniformBindValue val;
-        val.dataType = 3;
-        val.vecType = 1;
-        val.m.m4 = matrix;
-        m_uniforms[name] = val;
-    }
-
-    void UniformBinder::Set_(const std::string &name, float x)
+    void UniformBinder::BindUniform(const std::string &name, float x)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform1f(bindHelper.location, x));
     }
 
-    void UniformBinder::Set_(const std::string &name, float x, float y)
+    void UniformBinder::BindUniform(const std::string &name, float x, float y)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform2f(bindHelper.location, x, y));
     }
 
-    void UniformBinder::Set_(const std::string &name, float x, float y, float z)
+    void UniformBinder::BindUniform(const std::string &name, float x, float y, float z)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform3f(bindHelper.location, x, y, z));
     }
 
-    void UniformBinder::Set_(const std::string &name, float x, float y, float z, float w)
+    void UniformBinder::BindUniform(const std::string &name, float x, float y, float z, float w)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform4f(bindHelper.location, x, y, z, w));
     }
 
-    void UniformBinder::Set_(const std::string &name, int x)
+    void UniformBinder::BindUniform(const std::string &name, int x)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform1i(bindHelper.location, x));
     }
 
-    void UniformBinder::Set_(const std::string &name, int x, int y)
+    void UniformBinder::BindUniform(const std::string &name, int x, int y)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform2i(bindHelper.location, x, y));
     }
 
-    void UniformBinder::Set_(const std::string &name, int x, int y, int z)
+    void UniformBinder::BindUniform(const std::string &name, int x, int y, int z)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform3i(bindHelper.location, x, y, z));
     }
 
-    void UniformBinder::Set_(const std::string &name, int x, int y, int z, int w)
+    void UniformBinder::BindUniform(const std::string &name, int x, int y, int z, int w)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniform4i(bindHelper.location, x, y, z, w));
     }
 
-    void UniformBinder::Set_(const std::string &name, bool x)
+    void UniformBinder::BindUniform(const std::string &name, bool x)
     {
-        Set_(name, static_cast<int>(x));
+        BindUniform(name, static_cast<int>(x));
     }
 
-    void UniformBinder::Set_(const std::string &name, bool x, bool y)
+    void UniformBinder::BindUniform(const std::string &name, bool x, bool y)
     {
-        Set_(name, static_cast<int>(x), static_cast<int>(y));
+        BindUniform(name, static_cast<int>(x), static_cast<int>(y));
     }
 
-    void UniformBinder::Set_(const std::string &name, bool x, bool y, bool z)
+    void UniformBinder::BindUniform(const std::string &name, bool x, bool y, bool z)
     {
-        Set_(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
+        BindUniform(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
     }
 
-    void UniformBinder::Set_(const std::string &name, bool x, bool y, bool z, bool w)
+    void UniformBinder::BindUniform(const std::string &name, bool x, bool y, bool z, bool w)
     {
-        Set_(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z), static_cast<int>(w));
+        BindUniform(name, static_cast<int>(x), static_cast<int>(y), static_cast<int>(z), static_cast<int>(w));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::mat3 &matrix)
+    void UniformBinder::BindUniform(const std::string &name, const glm::mat3 &matrix)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
             glCheck(glUniformMatrix3fv(bindHelper.location, 1, GL_FALSE, glm::value_ptr(matrix)));
     }
 
-    void UniformBinder::Set_(const std::string &name, const glm::mat4 &matrix)
+    void UniformBinder::BindUniform(const std::string &name, const glm::mat4 &matrix)
     {
         UniformBindHelper bindHelper(*this, *m_shaderProgram, name);
         if (bindHelper.location != -1)
@@ -248,10 +230,9 @@ namespace Bind
             m_uniformLocationCache.insert(std::make_pair(name, location));
 
             if (location == -1)
-            THROW(Bindable::Exception, "Uniform \"%s\" not found in shader program (ID: %u)", name.c_str(), m_shaderProgram->GetProgramID());
+                LogWarningUser("Uniform \"%s\" not found in shader program (ID: %u)", name.c_str(), m_shaderProgram->GetProgramID());
 
             return location;
         }
     }
-
 }

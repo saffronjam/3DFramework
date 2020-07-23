@@ -12,26 +12,26 @@ namespace Bind
     {
         struct UniformBindValue
         {
-            int location = 0;
             int dataType = 0;
             int vecType = 0;
             union
             {
                 struct
                 {
-                    float x,y,z,w;
+                    float x, y, z, w;
                 } f;
                 struct
                 {
-                    int x,y,z,w;
+                    int x, y, z, w;
                 } i;
                 struct
                 {
-                    bool x,y,z,w;
+                    bool x, y, z, w;
                 } b;
                 struct
                 {
-                    union{
+                    union
+                    {
                         glm::mat3 m3;
                         glm::mat4 m4;
                     };
@@ -55,12 +55,11 @@ namespace Bind
         [[nodiscard]] std::string GetUID() const noexcept override;
 
         template<typename T>
-        void Set(const std::string &name, const T &val);
-        template<size_t size, typename T>
-        void Set(const std::string &name, const glm::vec<size, T> &vector);
-
-        void Set(const std::string &name, const glm::mat3 &matrix);
-        void Set(const std::string &name, const glm::mat4 &matrix);
+        void SetValue(const std::string &name, const T &val);
+        template<int size, typename T>
+        void SetVector(const std::string &name, const glm::vec<size, T> &vector);
+        template<int size>
+        void SetMatrix(const std::string &name, const glm::mat<size, size, float> &matrix);
 
     private:
         template<size_t N, typename... Args>
@@ -75,7 +74,7 @@ namespace Bind
             constexpr size_t nParams = sizeof...(Params);
             constexpr size_t dataSize = sizeof(T);
             auto &uniformBindValue = m_uniforms[name];
-            uniformBindValue.vecType = nParams + 1;
+            uniformBindValue.vecType = nParams;
             char *dataPointer = nullptr;
             if constexpr (std::is_same<T, float>::value)
             {
@@ -111,23 +110,23 @@ namespace Bind
             }
         }
 
-        void Set_(const std::string &name, float x);
-        void Set_(const std::string &name, float x, float y);
-        void Set_(const std::string &name, float x, float y, float z);
-        void Set_(const std::string &name, float x, float y, float z, float w);
+        void BindUniform(const std::string &name, float x);
+        void BindUniform(const std::string &name, float x, float y);
+        void BindUniform(const std::string &name, float x, float y, float z);
+        void BindUniform(const std::string &name, float x, float y, float z, float w);
 
-        void Set_(const std::string &name, int x);
-        void Set_(const std::string &name, int x, int y);
-        void Set_(const std::string &name, int x, int y, int z);
-        void Set_(const std::string &name, int x, int y, int z, int w);
+        void BindUniform(const std::string &name, int x);
+        void BindUniform(const std::string &name, int x, int y);
+        void BindUniform(const std::string &name, int x, int y, int z);
+        void BindUniform(const std::string &name, int x, int y, int z, int w);
 
-        void Set_(const std::string &name, bool x);
-        void Set_(const std::string &name, bool x, bool y);
-        void Set_(const std::string &name, bool x, bool y, bool z);
-        void Set_(const std::string &name, bool x, bool y, bool z, bool w);
+        void BindUniform(const std::string &name, bool x);
+        void BindUniform(const std::string &name, bool x, bool y);
+        void BindUniform(const std::string &name, bool x, bool y, bool z);
+        void BindUniform(const std::string &name, bool x, bool y, bool z, bool w);
 
-        void Set_(const std::string &name, const glm::mat3 &matrix);
-        void Set_(const std::string &name, const glm::mat4 &matrix);
+        void BindUniform(const std::string &name, const glm::mat3 &matrix);
+        void BindUniform(const std::string &name, const glm::mat4 &matrix);
 
         int GetUniformLocation(const std::string &name) const;
 
@@ -138,15 +137,16 @@ namespace Bind
     };
 
     template<typename T>
-    void UniformBinder::Set(const std::string &name, const T &val)
+    void UniformBinder::SetValue(const std::string &name, const T &val)
     {
+        static_assert("Value must be one-dimensional" && static_cast<int>(val));
         CopyData(name, val);
     }
 
-    template<size_t size, typename T>
-    void UniformBinder::Set(const std::string &name, const glm::vec<size, T> &vector)
+    template<int size, typename T>
+    void UniformBinder::SetVector(const std::string &name, const glm::vec<size, T> &vector)
     {
-        static_assert(size == 2 || size == 3 || size == 4);
+        static_assert("Size must be standard" && size == 2 || size == 3 || size == 4);
         if constexpr(size == 2)
         {
             CopyData(name, vector.x, vector.y);
@@ -160,6 +160,26 @@ namespace Bind
             CopyData(name, vector.x, vector.y, vector.z, vector.w);
         }
 
+    }
+
+    template<int size>
+    void UniformBinder::SetMatrix(const std::string &name, const glm::mat<size, size, float> &matrix)
+    {
+        static_assert("Matrix must be 3x3 or 4x4" && size == 3 || size == 4);
+        UniformBindValue val;
+        val.dataType = 3;
+        val.vecType = size - 3;
+        if constexpr(size == 3)
+        {
+            val.m.m3 = matrix;
+        }
+        else if constexpr(size == 4)
+        {
+            val.m.m4 = matrix;
+        }
+
+
+        m_uniforms[name] = val;
     }
 
     template<typename... Ignore>

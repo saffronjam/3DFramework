@@ -1,57 +1,53 @@
-/**
- * Copyright (c) 2017 rxi
- *
- * This library is free software; you can redistribute it and/or modify it
- * under the terms of the MIT license. See `log.c` for details.
- */
+#pragma once
 
-/*
+#include <cstdio>
 
-IMPORTED FROM https://github.com/rxi/log.c
+#include "NormalLock.h"
 
-*/
+#define LogTrace(...) Log::Custom(Log::Level::Trace, __FILE__, __LINE__, __VA_ARGS__)
+#define LogDebug(...) Log::Custom(Log::Level::Debug, __FILE__, __LINE__, __VA_ARGS__)
+#define LogInfo(...) Log::Custom(Log::Level::Info, __FILE__, __LINE__, __VA_ARGS__)
+#define LogWarning(...) Log::Custom(Log::Level::Warning, __FILE__, __LINE__, __VA_ARGS__)
+#define LogError(...) Log::Custom(Log::Level::Error, __FILE__, __LINE__, __VA_ARGS__)
+#define LogFatal(...) Log::Custom(Log::Level::Fatal, __FILE__, __LINE__, __VA_ARGS__)
 
-#ifndef LOG_H
-#define LOG_H
+#define LogTraceUser(...) Log::CustomUser(Log::Level::Trace, __FILE__, __LINE__, __VA_ARGS__)
+#define LogDebugUser(...) lLog::CustomUser(Log::Level::Debug, __FILE__, __LINE__, __VA_ARGS__)
+#define LogInfoUser(...) Log::CustomUser(Log::Level::Info, __FILE__, __LINE__, __VA_ARGS__)
+#define LogWarningUser(...) Log::CustomUser(Log::Level::Warning, __FILE__, __LINE__, __VA_ARGS__)
+#define LogErrorUser(...) Log::CustomUser(Log::Level::Error, __FILE__, __LINE__, __VA_ARGS__)
+#define LogFatalUser(...) Log::CustomUser(Log::Level::Fatal, __FILE__, __LINE__, __VA_ARGS__)
 
-#include <stdio.h>
-#include <stdarg.h>
-
-#define LOG_VERSION "0.1.0"
-
-typedef void (*log_LockFn)(void *udata, int lock);
-
-enum
+class Log
 {
-    LOG_TRACE,
-    LOG_DEBUG,
-    LOG_INFO,
-    LOG_WARN,
-    LOG_ERROR,
-    LOG_FATAL
+public:
+    enum class Level
+    {
+        Trace,
+        Debug,
+        Info,
+        Warning,
+        Error,
+        Fatal
+    };
+
+public:
+    static void Custom(Log::Level level, const char *file, int line, const char *fmt, ...);
+    static void CustomUser(Log::Level level, const char *file, int line, const char *fmt, ...
+    );
+
+    static void SetFilePointer(FILE *filePointer);
+    static void SetLevel(Log::Level level);
+    static void SetQuiet(bool enable);
+
+private:
+    static void ToFile(Log::Level level, struct tm *time, const char *file, int line, const char *fmt, ...);
+    static struct tm *GetLocalTime();
+
+private:
+    static NormalLock m_lock;
+    static FILE *m_filePointer;
+    static Log
+    ::Level m_level;
+    static bool m_isQuiet;
 };
-
-#define log_trace(...) log_log(LOG_TRACE, __FILE__, __LINE__, __VA_ARGS__)
-#define log_debug(...) log_log(LOG_DEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define log_info(...) log_log(LOG_INFO, __FILE__, __LINE__, __VA_ARGS__)
-#define log_warn(...) log_log(LOG_WARN, __FILE__, __LINE__, __VA_ARGS__)
-#define log_error(...) log_log(LOG_ERROR, __FILE__, __LINE__, __VA_ARGS__)
-#define log_fatal(...) log_log(LOG_FATAL, __FILE__, __LINE__, __VA_ARGS__)
-
-#define log_trace_user(...) log_log_user(LOG_TRACE, __VA_ARGS__)
-#define log_debug_user(...) log_log_user(LOG_DEBUG, __VA_ARGS__)
-#define log_info_user(...) log_log_user(LOG_INFO, __VA_ARGS__)
-#define log_warn_user(...) log_log_user(LOG_WARN, __VA_ARGS__)
-#define log_error_user(...) log_log_user(LOG_ERROR, __VA_ARGS__)
-#define log_fatal_user(...) log_log_user(LOG_FATAL, __VA_ARGS__)
-
-void log_set_udata(void *udata);
-void log_set_lock(log_LockFn fn);
-void log_set_fp(FILE *fp);
-void log_set_level(int level);
-void log_set_quiet(int enable);
-
-void log_log(int level, const char *file, int line, const char *fmt, ...);
-void log_log_user(int level, const char *fmt, ...);
-
-#endif

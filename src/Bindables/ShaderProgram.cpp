@@ -62,7 +62,7 @@ namespace Bind
             char log[logLength];
             std::memset(log, 0, logLength * sizeof(char));
             glCheck(glGetProgramInfoLog(m_shaderProgramID, logLength, nullptr, log));
-            log_error("Failed to link shader program (ID:%u): %s", m_shaderProgramID, log);
+            LogWarningUser("Failed to link shader program (ID:%u): %s", m_shaderProgramID, log);
         }
     }
 }
