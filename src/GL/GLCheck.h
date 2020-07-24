@@ -17,7 +17,7 @@
 class SaffronGL
 {
 public:
-    static void CheckError(const char *file, unsigned int line, const char *expression) noexcept(!SAFFRON_DEBUG_ACTIVE);
+    static void CheckError(const char *file, unsigned int line, const char *expression) noxnd;
 
     class Exception : public IException
     {

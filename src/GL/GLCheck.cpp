@@ -6,7 +6,7 @@
 
 #include "Log.h"
 
-void SaffronGL::CheckError(const char *file, unsigned int line, const char *expression)
+void SaffronGL::CheckError(const char *file, unsigned int line, const char *expression) noxnd
 {
     // Get the last error
     GLenum errorCode = glGetError();

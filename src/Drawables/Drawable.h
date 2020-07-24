@@ -15,13 +15,14 @@ public:
     virtual void Update(const Mouse &mouse);
     void Draw(Graphics &gfx);
 
-    void SetTranslation(const glm::vec3 &translate);
-    void SetRotation(float yaw, float pitch, float roll);
-    void SetProjection(const glm::mat4 &projection);
-    void SetExtraColor(const glm::vec3& color);
+    void SetView(const glm::mat4 &view) noexcept;
+    void SetTranslation(const glm::vec3 &translate) noexcept;
+    void SetRotation(float yaw, float pitch, float roll) noexcept;
+    void SetProjection(const glm::mat4 &projection) noexcept;
+    void SetExtraColor(const glm::vec3 &color) noexcept;
 
-    void Translate(const glm::vec3 &translate);
-    void Rotate(float yaw, float pitch, float roll);
+    void Translate(const glm::vec3 &translate) noexcept;
+    void Rotate(float yaw, float pitch, float roll) noexcept;
 
 protected:
     void AddBind(std::shared_ptr<Bindable> bindable);
@@ -33,6 +34,7 @@ protected:
     glm::mat4 m_translation;
     glm::mat4 m_rotation;
     glm::mat4 m_projection;
+    glm::mat4 m_view;
     glm::vec3 m_extraColor;
 
 private:

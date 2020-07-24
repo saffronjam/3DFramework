@@ -6,7 +6,8 @@
 
 Mouse::Mouse(Window &window)
         : m_isInScreen(true),
-          m_wnd(window)
+          m_wnd(window),
+          m_moveDelta(0.0f, 0.0f)
 {
     window.AddEventHandler(Event::Type::Mouse, this);
 }
@@ -14,6 +15,7 @@ Mouse::Mouse(Window &window)
 void Mouse::Update() noexcept
 {
     m_prevButtonmap = m_buttonmap;
+    m_moveDelta = glm::vec2{0.0f, 0.0f};
 }
 
 void Mouse::HandleEvent(const Event &event)
@@ -86,13 +88,12 @@ bool Mouse::IsInScreen() const noexcept
 
 const glm::vec2 &Mouse::GetPosition() const noexcept
 {
-    if (!m_position.has_value())
-    {
-        double x, y;
-        glfwGetCursorPos(m_wnd.GetCoreWindow(), &x, &y);
-        m_position = std::make_optional(glm::vec2(x, y));
-    }
-    return m_position.value();
+    return m_position;
+}
+
+const glm::vec2 &Mouse::GetDelta() const noexcept
+{
+    return m_moveDelta;
 }
 
 void Mouse::OnPress(const MouseEvent &event)
@@ -110,6 +111,7 @@ void Mouse::OnRelease(const MouseEvent &event)
 }
 void Mouse::OnMove(const MouseEvent &event)
 {
+    m_moveDelta = m_position - event.position;
     m_position = event.position;
     for (auto &callback : m_callbacks[Action::Move])
         callback(event);
@@ -126,3 +128,4 @@ void Mouse::OnLeave(const struct MouseEvent &event)
     for (auto &callback : m_callbacks[Action::Leave])
         callback(event);
 }
+

@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "IApp.h"
+#include "Camera.h"
 #include "TestBox.h"
 #include "TestTriangle.h"
 
@@ -23,4 +24,6 @@ private:
     glm::vec3 trans = {0.0f, 0.0f, 0.0f};
     glm::vec3 rot = {0.0f, 0.0f, 0.0f};
     glm::vec3 color = {0.0f, 0.0f, 0.0f};
+
+    Camera m_camera;
 };

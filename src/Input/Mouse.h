@@ -4,9 +4,8 @@
 #include <functional>
 #include <optional>
 
-#include <glm/vec2.hpp>
-
 #include "IEventHandler.h"
+#include "SeMath.h"
 
 class Mouse : public IEventHandler
 {
@@ -53,6 +52,7 @@ public:
     bool IsInScreen() const noexcept;
 
     [[nodiscard]] const glm::vec2 &GetPosition() const noexcept;
+    [[nodiscard]] const glm::vec2 &GetDelta() const noexcept;
 
 private:
     void OnPress(const struct MouseEvent &event);
@@ -62,12 +62,14 @@ private:
     void OnLeave(const struct MouseEvent &event);
 
 private:
-    class Window& m_wnd;
+    class Window &m_wnd;
 
     mutable std::map<Button, bool> m_buttonmap;
     mutable std::map<Button, bool> m_prevButtonmap;
     std::map<Action, std::vector<Callback>> m_callbacks;
 
-    mutable std::optional<glm::vec2> m_position;
+    glm::vec2 m_position;
+    glm::vec2 m_moveDelta;
+
     bool m_isInScreen;
 };

@@ -9,7 +9,7 @@ void App::OnInit()
     const int nDrawables = 500;
     for (int i = 0; i < nDrawables; i++)
     {
-        auto randomVec = Random::Vec3(glm::vec3{-10.0f, -10.0f, -45.0f}, glm::vec3{10.0f, 10.0f, -15.0f});
+        auto randomVec = Random::Vec3(glm::vec3{-10.0f, -10.0f, -10.0f}, glm::vec3{10.0f, 10.0f, 10.0f});
         glm::mat4 transform = glm::translate(randomVec);
         m_drawables.push_back(std::make_unique<TestBox>(transform));
     }
@@ -17,6 +17,7 @@ void App::OnInit()
     {
         drawable->SetProjection(proj);
     }
+
 }
 
 void App::OnExit()
@@ -25,10 +26,18 @@ void App::OnExit()
 
 void App::OnUpdate()
 {
+    m_camera.Update(dt, m_wnd.mouse, m_wnd.kbd);
+
     m_windowTitleUpdateTimer += dt;
     if (m_windowTitleUpdateTimer > 0.5f)
     {
         std::ostringstream windowTitle;
+#ifdef SAFFRON_DEBUG
+        const char* buildType = "Debug";
+#else
+        const char *buildType = "Release";
+#endif
+        windowTitle << "[ " << buildType << " ]  ";
         windowTitle << "FPS: " << 1.0f / dt;
         m_wnd.SetTitle(windowTitle.str());
         m_windowTitleUpdateTimer = 0.0f;
@@ -37,10 +46,7 @@ void App::OnUpdate()
     const float rotIntensity = 0.01f;
     for (auto &drawable : m_drawables)
     {
-        float yaw = Random::Real(0.0f, rotIntensity);
-        float pitch = Random::Real(0.0f, rotIntensity);
-        float roll = Random::Real(0.0f, rotIntensity);
-        drawable->Rotate(yaw, pitch, roll);
+        drawable->Rotate(dt, dt * 1.5f, dt * 0.5f);
     }
     ImGui::Begin("Box controls");
     ImGui::SliderFloat3("Rotation", &rot.x, 0, 2 * PI<>, "%.2f");
@@ -53,6 +59,7 @@ void App::OnUpdate()
 
     for (size_t i = 0; i < nDrawables; i++)
     {
+        m_drawables[i]->SetView(m_camera.GetMatrix());
         m_drawables[i]->SetExtraColor(color);
         m_drawables[i]->Update(m_wnd.mouse);
     }

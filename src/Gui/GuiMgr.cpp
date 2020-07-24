@@ -21,6 +21,9 @@ GuiMgr::GuiMgr(Window &window)
 
 GuiMgr::~GuiMgr()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+
     ImGui::DestroyContext();
 }
 

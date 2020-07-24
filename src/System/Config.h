@@ -7,5 +7,5 @@
 #define SAFFRON_DEBUG_ACTIVE false
 #endif
 
-#define noxnd noexcept(!SAFFRON_DEBUG_ACTIVE)
+#define noxnd noexcept(SAFFRON_DEBUG_ACTIVE)
 

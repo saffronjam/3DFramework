@@ -23,6 +23,8 @@ TestBox::TestBox(const glm::mat4 &baseTranslation)
 
 void TestBox::Update(const Mouse &mouse)
 {
-    m_uniformBinder.value()->SetMatrix("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
+    m_uniformBinder.value()->SetMatrix("model", m_baseTranslation * m_translation * m_rotation);
+    m_uniformBinder.value()->SetMatrix("view", m_view);
+    m_uniformBinder.value()->SetMatrix("projection", m_projection);
     m_uniformBinder.value()->SetVector("extraColor", m_extraColor);
 }

@@ -20,6 +20,7 @@ void IApp::Run()
     while (!m_wnd.ShouldClose())
     {
         dt = m_timer.Mark();
+        Timer::UpdateGlobalTimer(dt);
         m_wnd.kbd.Update();
         m_wnd.mouse.Update();
         m_wnd.PollAllEvents();

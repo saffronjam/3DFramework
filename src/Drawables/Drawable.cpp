@@ -45,32 +45,37 @@ void Drawable::AddBind(std::shared_ptr<Bindable> bindable)
     m_bindables.push_back(std::move(bindable));
 }
 
-void Drawable::SetTranslation(const glm::vec3 &translate)
+void Drawable::SetView(const glm::mat4 &view) noexcept
+{
+    m_view = view;
+}
+
+void Drawable::SetTranslation(const glm::vec3 &translate) noexcept
 {
     m_translation = glm::translate(translate);
 }
 
-void Drawable::SetRotation(float yaw, float pitch, float roll)
+void Drawable::SetRotation(float yaw, float pitch, float roll) noexcept
 {
     m_rotation = glm::yawPitchRoll(yaw, pitch, roll);
 }
 
-void Drawable::SetProjection(const glm::mat4 &projection)
+void Drawable::SetProjection(const glm::mat4 &projection) noexcept
 {
     m_projection = projection;
 }
 
-void Drawable::SetExtraColor(const glm::vec3 &color)
+void Drawable::SetExtraColor(const glm::vec3 &color) noexcept
 {
     m_extraColor = color;
 }
 
-void Drawable::Translate(const glm::vec3 &translate)
+void Drawable::Translate(const glm::vec3 &translate) noexcept
 {
     m_translation *= glm::translate(translate);
 }
 
-void Drawable::Rotate(float yaw, float pitch, float roll)
+void Drawable::Rotate(float yaw, float pitch, float roll) noexcept
 {
     m_rotation *= glm::yawPitchRoll(yaw, pitch, roll);
 }

@@ -2,6 +2,7 @@
 
 #include <GLFW/glfw3.h>
 
+#include "imgui/imgui.h"
 #include "GLCheck.h"
 #include "BindableCodex.h"
 
@@ -30,6 +31,14 @@ Window::Window(std::string title, int width, int height, bool activeContext)
 
     glCheck(glEnable(GL_DEPTH_TEST));
     glCheck(glEnable(GL_CULL_FACE));
+
+    double x, y;
+    glfwGetCursorPos(GetCoreWindow(), &x, &y);
+    Event ev{};
+    ev.mouse.action = Mouse::Action::Move;
+    ev.mouse.button = Mouse::Button::Undefined;
+    ev.mouse.position = glm::vec2(x, y);
+    PushEvent(ev);
 }
 
 Window::~Window()
