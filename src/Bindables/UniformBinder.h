@@ -139,7 +139,6 @@ namespace Bind
     template<typename T>
     void UniformBinder::SetValue(const std::string &name, const T &val)
     {
-        static_assert("Value must be one-dimensional" && static_cast<int>(val));
         CopyData(name, val);
     }
 

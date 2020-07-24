@@ -89,7 +89,7 @@ public:
         using Type = ElementType;
 
         VertexElementLayout layout;
-        layout.Append(Type::Position3D).Append(Type::Normal).Append(Type::Texture2D).Append(Type::Normal);
+        layout.Append(Type::Position3D).Append(Type::Float3Color).Append(Type::Texture2D).Append(Type::Normal);
 
         auto itl = MakeIndependent(layout);
         auto &rvb = itl.rawVertexBuffer;
@@ -127,7 +127,7 @@ public:
         rvb[5].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 5
         rvb[6].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 6
         rvb[7].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 7
-        rvb[8].Attr<Type::Normal>() = {0.0f, 0.0f, 1.0f}; // 8 left side
+        rvb[8].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f}; // 8 left side
         rvb[9].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 9
         rvb[10].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 10
         rvb[11].Attr<Type::Normal>() = {-1.0f, 0.0f, 0.0f};// 11

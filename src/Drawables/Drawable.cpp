@@ -11,7 +11,7 @@ Drawable::Drawable(const glm::mat4 &baseTranslation)
 {
 }
 
-void Drawable::Update(const Mouse &mouse)
+void Drawable::Update(const Mouse &mouse, const Camera &camera)
 {
 
 }
@@ -65,9 +65,9 @@ void Drawable::SetProjection(const glm::mat4 &projection) noexcept
     m_projection = projection;
 }
 
-void Drawable::SetExtraColor(const glm::vec3 &color) noexcept
+void Drawable::SetExtraValues(const glm::vec3 &values) noexcept
 {
-    m_extraColor = color;
+    m_extraValues = values;
 }
 
 void Drawable::Translate(const glm::vec3 &translate) noexcept

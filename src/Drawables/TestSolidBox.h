@@ -1,13 +1,12 @@
 #pragma once
 
 #include "Drawable.h"
+#include "Cube.h"
 
-class TestTriangle : public Drawable
+class TestSolidBox : public Drawable
 {
 public:
-    TestTriangle(const glm::mat4 &baseTranslation);
+    TestSolidBox(const glm::mat4 &baseTranslation);
 
     void Update(const Mouse &mouse, const Camera &camera) override;
 };
-
-

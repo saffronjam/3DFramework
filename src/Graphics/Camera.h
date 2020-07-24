@@ -23,13 +23,9 @@ public:
 
     void Update(float dt, Mouse &mouse, Keyboard &kbd);
 
+    [[nodiscard]] const glm::vec3 &GetPosition() const noexcept;
+    [[nodiscard]] const glm::vec3 &GetForward() const noexcept;
     [[nodiscard]] const glm::mat4 &GetMatrix() const noexcept;
-
-    // processes input received from a mouse scroll-wheel event. Only requires input on the vertical wheel-axis
-//    void ProcessMouseScroll(float yoffset)
-//    {
-
-//    }
 
 private:
     // Calculates the front vector from the Camera's (updated) Euler Angles

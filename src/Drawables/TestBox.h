@@ -8,5 +8,5 @@ class TestBox : public Drawable
 public:
     TestBox(const glm::mat4 &baseTranslation);
 
-    void Update(const Mouse &mouse) override;
+    void Update(const Mouse &mouse, const Camera &camera) override;
 };

@@ -25,7 +25,7 @@ TestTriangle::TestTriangle(const glm::mat4 &baseTranslation)
 
 }
 
-void TestTriangle::Update(const Mouse &mouse)
+void TestTriangle::Update(const Mouse &mouse, const Camera &camera)
 {
     m_uniformBinder.value()->SetMatrix("transform", m_projection * m_translation * m_baseTranslation * m_rotation);
 }

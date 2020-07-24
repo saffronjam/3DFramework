@@ -21,7 +21,7 @@ Camera::Camera(glm::vec3 position)
 void Camera::Update(float dt, Mouse &mouse, Keyboard &kbd)
 {
     // Handle position
-    m_movementSpeed= kbd.IsDown(Keyboard::LeftShift) ?  8.0f : 2.5f;
+    m_movementSpeed = kbd.IsDown(Keyboard::LeftShift) ? 8.0f : 2.5f;
 
     float velocity = m_movementSpeed * dt;
     if (kbd.IsDown(Keyboard::W))
@@ -50,6 +50,17 @@ void Camera::Update(float dt, Mouse &mouse, Keyboard &kbd)
     UpdateCameraVectors();
     m_matrix = glm::lookAt(m_position, m_position + m_forward, m_up);
 }
+
+const glm::vec3 &Camera::GetPosition() const noexcept
+{
+    return m_position;
+}
+
+const glm::vec3 &Camera::GetForward() const noexcept
+{
+    return m_forward;
+}
+
 
 const glm::mat4 &Camera::GetMatrix() const noexcept
 {
