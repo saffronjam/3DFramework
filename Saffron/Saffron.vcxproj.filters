@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Saffron">
+      <UniqueIdentifier>{B45A95E2-203A-147E-2952-9F5495B07ADF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\Core">
+      <UniqueIdentifier>{8C4F575F-78B2-E603-2138-1FBA0D7AB286}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\Event">
+      <UniqueIdentifier>{0513694A-71D3-E480-3A0E-2EFEA68D295D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\GL">
+      <UniqueIdentifier>{969F3288-8257-74D5-EB5E-4D31D7350FC6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\Graphics">
+      <UniqueIdentifier>{746D9C43-6066-BB95-8998-A01A75F09AA1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\Input">
+      <UniqueIdentifier>{B341AD4A-1F02-2981-E83C-72FE54BC6D5D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Saffron\System">
+      <UniqueIdentifier>{48BB71B8-3489-65BE-1D1D-D6E4098A4123}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Src\Saffron.h" />
+    <ClInclude Include="Src\Saffron\Config.h">
+      <Filter>Saffron</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Core\Application.h">
+      <Filter>Saffron\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Core\Engine.h">
+      <Filter>Saffron\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\EntryPoint.h">
+      <Filter>Saffron</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\ApplicationEvent.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\Event.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\EventHandler.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\KeyboardEvent.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\MouseEvent.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Event\WindowEvent.h">
+      <Filter>Saffron\Event</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\GL\GLCheck.h">
+      <Filter>Saffron\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Graphics\Layer.h">
+      <Filter>Saffron\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Graphics\LayerStack.h">
+      <Filter>Saffron\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Graphics\Window.h">
+      <Filter>Saffron\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Input\KeyCodes.h">
+      <Filter>Saffron\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Input\Keyboard.h">
+      <Filter>Saffron\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Input\Mouse.h">
+      <Filter>Saffron\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\Input\MouseCodes.h">
+      <Filter>Saffron\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\SaffronPCH.h">
+      <Filter>Saffron</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\Log.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\Macros.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\NormalLock.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\Random.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\ScopedLock.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\SeMath.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\Time.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Src\Saffron\System\Timer.h">
+      <Filter>Saffron\System</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Src\Saffron\Core\Application.cpp">
+      <Filter>Saffron\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Core\Engine.cpp">
+      <Filter>Saffron\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Event\Event.cpp">
+      <Filter>Saffron\Event</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\GL\GLCheck.cpp">
+      <Filter>Saffron\GL</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Graphics\Layer.cpp">
+      <Filter>Saffron\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Graphics\LayerStack.cpp">
+      <Filter>Saffron\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Graphics\Window.cpp">
+      <Filter>Saffron\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Input\Keyboard.cpp">
+      <Filter>Saffron\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\Input\Mouse.cpp">
+      <Filter>Saffron\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\SaffronPCH.cpp">
+      <Filter>Saffron</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\Log.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\NormalLock.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\ScopedLock.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\SeMath.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\Time.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+    <ClCompile Include="Src\Saffron\System\Timer.cpp">
+      <Filter>Saffron\System</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
+  </ItemGroup>
+</Project>

@@ -26,6 +26,6 @@
 
 # Folders
 .idea/
-build/
-cmake-build-debug/
-cmake-build-release/
+.vs/
+Bin/
+Bin-Int/
