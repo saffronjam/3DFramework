@@ -1,4 +1,4 @@
-
+﻿
 #include <Glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -90,15 +90,12 @@ Window::~Window()
 	glfwDestroyWindow(m_nativeWindowHandle);
 }
 
-inline void Window::BeginFrame()
+void Window::OnUpdate()
 {
+	glfwPollEvents();
+	glfwSwapBuffers(GetCoreWindow());
 	glCheck(glClearColor(1, 0, 1, 1));
 	glCheck(glClear(GL_COLOR_BUFFER_BIT));
-}
-
-inline void Window::EndFrame()
-{
-	glfwSwapBuffers(GetCoreWindow());
 }
 
 bool Window::ShouldClose()
@@ -116,7 +113,7 @@ void Window::RequestFocus()
 	glfwRequestWindowAttention(GetCoreWindow());
 }
 
-void Window::PollAllEvents()
+void Window::HandleBufferedEvents()
 {
 	glfwPollEvents();
 	for ( auto &event : m_events )

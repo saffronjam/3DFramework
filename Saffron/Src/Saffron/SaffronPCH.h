@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 #include <functional>
@@ -11,3 +11,5 @@
 #include <vector>
 #include <map>
 #include <set>
+
+#include <cstdio>

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/Config.h"
 #include "Saffron/SaffronPCH.h"
@@ -13,11 +13,13 @@ namespace Saffron
 class SAFFRON_API Window : public EventHandler
 {
 public:
+	using Ptr = std::shared_ptr<Window>;
+
+public:
 	Window(std::string title, int width, int height, bool activeContext = true);
 	virtual ~Window();
 
-	void BeginFrame();;
-	void EndFrame();
+	void OnUpdate();
 
 	bool ShouldClose();
 	void RequestClose();
@@ -25,7 +27,7 @@ public:
 
 	template<typename T, typename...Params>
 	void PushEvent(Params &&...params);
-	void PollAllEvents();
+	void HandleBufferedEvents();
 	void AddEventHandler(EventHandler *handler);
 	void OnEvent(const Event::Ptr pEvent) override;
 
@@ -75,4 +77,3 @@ void Window::PushEvent(Params &&...params)
 }
 
 }
-
