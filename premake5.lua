@@ -112,12 +112,14 @@ project "Sandbox"
 	{
 		"Saffron/Src",
 		"Saffron/Vendors/spdlog/include",
-		"Saffron/Vendors/glm/include"
+		"Saffron/Vendors/glm/include",
+		"%{includeDirs.ImGui}"
 	}
 
 	links
 	{
-		"Saffron"
+		"Saffron",
+		"ImGui"
 	}
 
 	disablewarnings

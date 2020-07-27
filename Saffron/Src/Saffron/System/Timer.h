@@ -4,9 +4,9 @@
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/System/Time.h"
 
-namespace Saffron
+namespace Se
 {
-class Timer
+class SAFFRON_API Timer
 {
 public:
 	Timer() noexcept;

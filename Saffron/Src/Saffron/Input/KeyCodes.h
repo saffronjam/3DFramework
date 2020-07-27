@@ -2,7 +2,7 @@
 
 #include "Saffron/SaffronPCH.h"
 
-namespace Saffron
+namespace Se
 {
 enum class KeyCode
 {
@@ -137,128 +137,128 @@ inline std::ostream &operator<<(std::ostream &os, KeyCode keyCode)
 }
 
 
-#define SE_KEY_SPACE           ::Saffron::Key::Space
-#define SE_KEY_APOSTROPHE      ::Saffron::Key::Apostrophe    /* ' */
-#define SE_KEY_COMMA           ::Saffron::Key::Comma         /* , */
-#define SE_KEY_MINUS           ::Saffron::Key::Minus         /* - */
-#define SE_KEY_PERIOD          ::Saffron::Key::Period        /* . */
-#define SE_KEY_SLASH           ::Saffron::Key::Slash         /* / */
-#define SE_KEY_0               ::Saffron::Key::D0
-#define SE_KEY_1               ::Saffron::Key::D1
-#define SE_KEY_2               ::Saffron::Key::D2
-#define SE_KEY_3               ::Saffron::Key::D3
-#define SE_KEY_4               ::Saffron::Key::D4
-#define SE_KEY_5               ::Saffron::Key::D5
-#define SE_KEY_6               ::Saffron::Key::D6
-#define SE_KEY_7               ::Saffron::Key::D7
-#define SE_KEY_8               ::Saffron::Key::D8
-#define SE_KEY_9               ::Saffron::Key::D9
-#define SE_KEY_SEMICOLON       ::Saffron::Key::Semicolon     /* ; */
-#define SE_KEY_EQUAL           ::Saffron::Key::Equal         /* = */
-#define SE_KEY_A               ::Saffron::Key::A
-#define SE_KEY_B               ::Saffron::Key::B
-#define SE_KEY_C               ::Saffron::Key::C
-#define SE_KEY_D               ::Saffron::Key::D
-#define SE_KEY_E               ::Saffron::Key::E
-#define SE_KEY_F               ::Saffron::Key::F
-#define SE_KEY_G               ::Saffron::Key::G
-#define SE_KEY_H               ::Saffron::Key::H
-#define SE_KEY_I               ::Saffron::Key::I
-#define SE_KEY_J               ::Saffron::Key::J
-#define SE_KEY_K               ::Saffron::Key::K
-#define SE_KEY_L               ::Saffron::Key::L
-#define SE_KEY_M               ::Saffron::Key::M
-#define SE_KEY_N               ::Saffron::Key::N
-#define SE_KEY_O               ::Saffron::Key::O
-#define SE_KEY_P               ::Saffron::Key::P
-#define SE_KEY_Q               ::Saffron::Key::Q
-#define SE_KEY_R               ::Saffron::Key::R
-#define SE_KEY_S               ::Saffron::Key::S
-#define SE_KEY_T               ::Saffron::Key::T
-#define SE_KEY_U               ::Saffron::Key::U
-#define SE_KEY_V               ::Saffron::Key::V
-#define SE_KEY_W               ::Saffron::Key::W
-#define SE_KEY_X               ::Saffron::Key::X
-#define SE_KEY_Y               ::Saffron::Key::Y
-#define SE_KEY_Z               ::Saffron::Key::Z
-#define SE_KEY_LEFT_BRACKET    ::Saffron::Key::LeftBracket   /* [ */
-#define SE_KEY_BACKSLASH       ::Saffron::Key::Backslash     /* \ */
-#define SE_KEY_RIGHT_BRACKET   ::Saffron::Key::RightBracket  /* ] */
-#define SE_KEY_GRAVE_ACCENT    ::Saffron::Key::GraveAccent   /* ` */
-#define SE_KEY_WORLD_1         ::Saffron::Key::World1        /* non-US #1 */
-#define SE_KEY_WORLD_2         ::Saffron::Key::World2        /* non-US #2 */
+#define SE_KEY_SPACE           ::Se::Key::Space
+#define SE_KEY_APOSTROPHE      ::Se::Key::Apostrophe    /* ' */
+#define SE_KEY_COMMA           ::Se::Key::Comma         /* , */
+#define SE_KEY_MINUS           ::Se::Key::Minus         /* - */
+#define SE_KEY_PERIOD          ::Se::Key::Period        /* . */
+#define SE_KEY_SLASH           ::Se::Key::Slash         /* / */
+#define SE_KEY_0               ::Se::Key::D0
+#define SE_KEY_1               ::Se::Key::D1
+#define SE_KEY_2               ::Se::Key::D2
+#define SE_KEY_3               ::Se::Key::D3
+#define SE_KEY_4               ::Se::Key::D4
+#define SE_KEY_5               ::Se::Key::D5
+#define SE_KEY_6               ::Se::Key::D6
+#define SE_KEY_7               ::Se::Key::D7
+#define SE_KEY_8               ::Se::Key::D8
+#define SE_KEY_9               ::Se::Key::D9
+#define SE_KEY_SEMICOLON       ::Se::Key::Semicolon     /* ; */
+#define SE_KEY_EQUAL           ::Se::Key::Equal         /* = */
+#define SE_KEY_A               ::Se::Key::A
+#define SE_KEY_B               ::Se::Key::B
+#define SE_KEY_C               ::Se::Key::C
+#define SE_KEY_D               ::Se::Key::D
+#define SE_KEY_E               ::Se::Key::E
+#define SE_KEY_F               ::Se::Key::F
+#define SE_KEY_G               ::Se::Key::G
+#define SE_KEY_H               ::Se::Key::H
+#define SE_KEY_I               ::Se::Key::I
+#define SE_KEY_J               ::Se::Key::J
+#define SE_KEY_K               ::Se::Key::K
+#define SE_KEY_L               ::Se::Key::L
+#define SE_KEY_M               ::Se::Key::M
+#define SE_KEY_N               ::Se::Key::N
+#define SE_KEY_O               ::Se::Key::O
+#define SE_KEY_P               ::Se::Key::P
+#define SE_KEY_Q               ::Se::Key::Q
+#define SE_KEY_R               ::Se::Key::R
+#define SE_KEY_S               ::Se::Key::S
+#define SE_KEY_T               ::Se::Key::T
+#define SE_KEY_U               ::Se::Key::U
+#define SE_KEY_V               ::Se::Key::V
+#define SE_KEY_W               ::Se::Key::W
+#define SE_KEY_X               ::Se::Key::X
+#define SE_KEY_Y               ::Se::Key::Y
+#define SE_KEY_Z               ::Se::Key::Z
+#define SE_KEY_LEFT_BRACKET    ::Se::Key::LeftBracket   /* [ */
+#define SE_KEY_BACKSLASH       ::Se::Key::Backslash     /* \ */
+#define SE_KEY_RIGHT_BRACKET   ::Se::Key::RightBracket  /* ] */
+#define SE_KEY_GRAVE_ACCENT    ::Se::Key::GraveAccent   /* ` */
+#define SE_KEY_WORLD_1         ::Se::Key::World1        /* non-US #1 */
+#define SE_KEY_WORLD_2         ::Se::Key::World2        /* non-US #2 */
 
 /* Function keys */
-#define SE_KEY_ESCAPE          ::Saffron::Key::Escape
-#define SE_KEY_ENTER           ::Saffron::Key::Enter
-#define SE_KEY_TAB             ::Saffron::Key::Tab
-#define SE_KEY_BACKSPACE       ::Saffron::Key::Backspace
-#define SE_KEY_INSERT          ::Saffron::Key::Insert
-#define SE_KEY_DELETE          ::Saffron::Key::Delete
-#define SE_KEY_RIGHT           ::Saffron::Key::Right
-#define SE_KEY_LEFT            ::Saffron::Key::Left
-#define SE_KEY_DOWN            ::Saffron::Key::Down
-#define SE_KEY_UP              ::Saffron::Key::Up
-#define SE_KEY_PAGE_UP         ::Saffron::Key::PageUp
-#define SE_KEY_PAGE_DOWN       ::Saffron::Key::PageDown
-#define SE_KEY_HOME            ::Saffron::Key::Home
-#define SE_KEY_END             ::Saffron::Key::End
-#define SE_KEY_CAPS_LOCK       ::Saffron::Key::CapsLock
-#define SE_KEY_SCROLL_LOCK     ::Saffron::Key::ScrollLock
-#define SE_KEY_NUM_LOCK        ::Saffron::Key::NumLock
-#define SE_KEY_PRINT_SCREEN    ::Saffron::Key::PrintScreen
-#define SE_KEY_PAUSE           ::Saffron::Key::Pause
-#define SE_KEY_F1              ::Saffron::Key::F1
-#define SE_KEY_F2              ::Saffron::Key::F2
-#define SE_KEY_F3              ::Saffron::Key::F3
-#define SE_KEY_F4              ::Saffron::Key::F4
-#define SE_KEY_F5              ::Saffron::Key::F5
-#define SE_KEY_F6              ::Saffron::Key::F6
-#define SE_KEY_F7              ::Saffron::Key::F7
-#define SE_KEY_F8              ::Saffron::Key::F8
-#define SE_KEY_F9              ::Saffron::Key::F9
-#define SE_KEY_F10             ::Saffron::Key::F10
-#define SE_KEY_F11             ::Saffron::Key::F11
-#define SE_KEY_F12             ::Saffron::Key::F12
-#define SE_KEY_F13             ::Saffron::Key::F13
-#define SE_KEY_F14             ::Saffron::Key::F14
-#define SE_KEY_F15             ::Saffron::Key::F15
-#define SE_KEY_F16             ::Saffron::Key::F16
-#define SE_KEY_F17             ::Saffron::Key::F17
-#define SE_KEY_F18             ::Saffron::Key::F18
-#define SE_KEY_F19             ::Saffron::Key::F19
-#define SE_KEY_F20             ::Saffron::Key::F20
-#define SE_KEY_F21             ::Saffron::Key::F21
-#define SE_KEY_F22             ::Saffron::Key::F22
-#define SE_KEY_F23             ::Saffron::Key::F23
-#define SE_KEY_F24             ::Saffron::Key::F24
-#define SE_KEY_F25             ::Saffron::Key::F25
+#define SE_KEY_ESCAPE          ::Se::Key::Escape
+#define SE_KEY_ENTER           ::Se::Key::Enter
+#define SE_KEY_TAB             ::Se::Key::Tab
+#define SE_KEY_BACKSPACE       ::Se::Key::Backspace
+#define SE_KEY_INSERT          ::Se::Key::Insert
+#define SE_KEY_DELETE          ::Se::Key::Delete
+#define SE_KEY_RIGHT           ::Se::Key::Right
+#define SE_KEY_LEFT            ::Se::Key::Left
+#define SE_KEY_DOWN            ::Se::Key::Down
+#define SE_KEY_UP              ::Se::Key::Up
+#define SE_KEY_PAGE_UP         ::Se::Key::PageUp
+#define SE_KEY_PAGE_DOWN       ::Se::Key::PageDown
+#define SE_KEY_HOME            ::Se::Key::Home
+#define SE_KEY_END             ::Se::Key::End
+#define SE_KEY_CAPS_LOCK       ::Se::Key::CapsLock
+#define SE_KEY_SCROLL_LOCK     ::Se::Key::ScrollLock
+#define SE_KEY_NUM_LOCK        ::Se::Key::NumLock
+#define SE_KEY_PRINT_SCREEN    ::Se::Key::PrintScreen
+#define SE_KEY_PAUSE           ::Se::Key::Pause
+#define SE_KEY_F1              ::Se::Key::F1
+#define SE_KEY_F2              ::Se::Key::F2
+#define SE_KEY_F3              ::Se::Key::F3
+#define SE_KEY_F4              ::Se::Key::F4
+#define SE_KEY_F5              ::Se::Key::F5
+#define SE_KEY_F6              ::Se::Key::F6
+#define SE_KEY_F7              ::Se::Key::F7
+#define SE_KEY_F8              ::Se::Key::F8
+#define SE_KEY_F9              ::Se::Key::F9
+#define SE_KEY_F10             ::Se::Key::F10
+#define SE_KEY_F11             ::Se::Key::F11
+#define SE_KEY_F12             ::Se::Key::F12
+#define SE_KEY_F13             ::Se::Key::F13
+#define SE_KEY_F14             ::Se::Key::F14
+#define SE_KEY_F15             ::Se::Key::F15
+#define SE_KEY_F16             ::Se::Key::F16
+#define SE_KEY_F17             ::Se::Key::F17
+#define SE_KEY_F18             ::Se::Key::F18
+#define SE_KEY_F19             ::Se::Key::F19
+#define SE_KEY_F20             ::Se::Key::F20
+#define SE_KEY_F21             ::Se::Key::F21
+#define SE_KEY_F22             ::Se::Key::F22
+#define SE_KEY_F23             ::Se::Key::F23
+#define SE_KEY_F24             ::Se::Key::F24
+#define SE_KEY_F25             ::Se::Key::F25
 
 /* Keypad */
-#define SE_KEY_KP_0            ::Saffron::Key::KP0
-#define SE_KEY_KP_1            ::Saffron::Key::KP1
-#define SE_KEY_KP_2            ::Saffron::Key::KP2
-#define SE_KEY_KP_3            ::Saffron::Key::KP3
-#define SE_KEY_KP_4            ::Saffron::Key::KP4
-#define SE_KEY_KP_5            ::Saffron::Key::KP5
-#define SE_KEY_KP_6            ::Saffron::Key::KP6
-#define SE_KEY_KP_7            ::Saffron::Key::KP7
-#define SE_KEY_KP_8            ::Saffron::Key::KP8
-#define SE_KEY_KP_9            ::Saffron::Key::KP9
-#define SE_KEY_KP_DECIMAL      ::Saffron::Key::KPDecimal
-#define SE_KEY_KP_DIVIDE       ::Saffron::Key::KPDivide
-#define SE_KEY_KP_MULTIPLY     ::Saffron::Key::KPMultiply
-#define SE_KEY_KP_SUBTRACT     ::Saffron::Key::KPSubtract
-#define SE_KEY_KP_ADD          ::Saffron::Key::KPAdd
-#define SE_KEY_KP_ENTER        ::Saffron::Key::KPEnter
-#define SE_KEY_KP_EQUAL        ::Saffron::Key::KPEqual
+#define SE_KEY_KP_0            ::Se::Key::KP0
+#define SE_KEY_KP_1            ::Se::Key::KP1
+#define SE_KEY_KP_2            ::Se::Key::KP2
+#define SE_KEY_KP_3            ::Se::Key::KP3
+#define SE_KEY_KP_4            ::Se::Key::KP4
+#define SE_KEY_KP_5            ::Se::Key::KP5
+#define SE_KEY_KP_6            ::Se::Key::KP6
+#define SE_KEY_KP_7            ::Se::Key::KP7
+#define SE_KEY_KP_8            ::Se::Key::KP8
+#define SE_KEY_KP_9            ::Se::Key::KP9
+#define SE_KEY_KP_DECIMAL      ::Se::Key::KPDecimal
+#define SE_KEY_KP_DIVIDE       ::Se::Key::KPDivide
+#define SE_KEY_KP_MULTIPLY     ::Se::Key::KPMultiply
+#define SE_KEY_KP_SUBTRACT     ::Se::Key::KPSubtract
+#define SE_KEY_KP_ADD          ::Se::Key::KPAdd
+#define SE_KEY_KP_ENTER        ::Se::Key::KPEnter
+#define SE_KEY_KP_EQUAL        ::Se::Key::KPEqual
 
-#define SE_KEY_LEFT_SHIFT      ::Saffron::Key::LeftShift
-#define SE_KEY_LEFT_CONTROL    ::Saffron::Key::LeftControl
-#define SE_KEY_LEFT_ALT        ::Saffron::Key::LeftAlt
-#define SE_KEY_LEFT_SUPER      ::Saffron::Key::LeftSuper
-#define SE_KEY_RIGHT_SHIFT     ::Saffron::Key::RightShift
-#define SE_KEY_RIGHT_CONTROL   ::Saffron::Key::RightControl
-#define SE_KEY_RIGHT_ALT       ::Saffron::Key::RightAlt
-#define SE_KEY_RIGHT_SUPER     ::Saffron::Key::RightSuper
-#define SE_KEY_MENU            ::Saffron::Key::Menu
+#define SE_KEY_LEFT_SHIFT      ::Se::Key::LeftShift
+#define SE_KEY_LEFT_CONTROL    ::Se::Key::LeftControl
+#define SE_KEY_LEFT_ALT        ::Se::Key::LeftAlt
+#define SE_KEY_LEFT_SUPER      ::Se::Key::LeftSuper
+#define SE_KEY_RIGHT_SHIFT     ::Se::Key::RightShift
+#define SE_KEY_RIGHT_CONTROL   ::Se::Key::RightControl
+#define SE_KEY_RIGHT_ALT       ::Se::Key::RightAlt
+#define SE_KEY_RIGHT_SUPER     ::Se::Key::RightSuper
+#define SE_KEY_MENU            ::Se::Key::Menu

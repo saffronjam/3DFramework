@@ -2,7 +2,7 @@
 
 #include <mutex>
 
-namespace Saffron
+namespace Se
 {
 class ScopedLock
 {

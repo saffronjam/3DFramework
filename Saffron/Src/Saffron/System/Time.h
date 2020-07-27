@@ -1,8 +1,10 @@
 #pragma once
 
-namespace Saffron
+#include "Saffron/Config.h"
+
+namespace Se
 {
-class Time
+class SAFFRON_API Time
 {
 public:
 	Time(float time);
@@ -11,8 +13,8 @@ public:
 	Time &operator+=(const Time &rhs);
 	float operator()() const;
 
-	float Sec();
-	float MS();
+	float sec() const;
+	float ms() const;
 
 private:
 	float m_Time;

@@ -1,7 +1,9 @@
+#include "Saffron/SaffronPCH.h"
+
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Graphics/Window.h"
 
-namespace Saffron
+namespace Se
 {
 
 Keyboard::Keyboard(Window &window)
@@ -14,16 +16,16 @@ Keyboard::Keyboard(Window &window)
 void Keyboard::Update() noexcept
 {
 	m_prevKeymap = m_keymap;
-	for ( auto &[key, state] : m_repeatKeymap )
-		state = false;
+	for ( auto &[key, value] : m_repeatKeymap )
+		value = false;
 }
 
-void Keyboard::OnEvent(const Event::Ptr pEvent)
+void Keyboard::OnEvent(const Event::Ptr &pEvent)
 {
 	const EventDispatcher dispatcher(pEvent);
-	dispatcher.Try<KeyboardPressEvent>(EVENT_FN(Keyboard::OnPress));
-	dispatcher.Try<KeyboardReleaseEvent>(EVENT_FN(Keyboard::OnRelease));
-	dispatcher.Try<KeyboardRepeatEvent>(EVENT_FN(Keyboard::OnRepeat));
+	dispatcher.Try<KeyboardPressEvent>(SE_EVENT_FN(Keyboard::OnPress));
+	dispatcher.Try<KeyboardReleaseEvent>(SE_EVENT_FN(Keyboard::OnRelease));
+	dispatcher.Try<KeyboardRepeatEvent>(SE_EVENT_FN(Keyboard::OnRepeat));
 }
 
 bool Keyboard::IsDown(Key key) const noexcept
@@ -67,17 +69,17 @@ bool Keyboard::IsAnyDown() const noexcept
 	return false;
 }
 
-void Keyboard::OnPress(const KeyboardPressEvent::Ptr event)
+void Keyboard::OnPress(const KeyboardPressEvent::Ptr &event)
 {
 	m_keymap[event->GetKey()] = true;
 }
 
-void Keyboard::OnRelease(const KeyboardReleaseEvent::Ptr event)
+void Keyboard::OnRelease(const KeyboardReleaseEvent::Ptr &event)
 {
 	m_keymap[event->GetKey()] = false;
 }
 
-void Keyboard::OnRepeat(const KeyboardRepeatEvent::Ptr event)
+void Keyboard::OnRepeat(const KeyboardRepeatEvent::Ptr &event)
 {
 	m_repeatKeymap[event->GetKey()] = true;
 }

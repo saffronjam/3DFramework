@@ -5,7 +5,7 @@
 
 typedef void(*GLFWerrorfun) (int, const char *);
 
-namespace Saffron
+namespace Se
 {
 class SAFFRON_API Engine
 {

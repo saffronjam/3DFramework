@@ -2,8 +2,9 @@
 
 #include "Saffron/Config.h"
 #include "Saffron/Graphics/Layer.h"
+#include "Saffron/Gui/Gui.h"
 
-namespace Saffron
+namespace Se
 {
 
 class Window;
@@ -14,7 +15,7 @@ public:
 	LAYER_TYPE(ImGui);
 
 public:
-	explicit ImGuiLayer(Window &window);
+	explicit ImGuiLayer(const Window::Ptr &pWindow);
 
 	void Begin();
 	void End();
@@ -22,7 +23,7 @@ public:
 	void OnAttach() override;
 	void OnDetach() override;
 
-	void OnEvent(const Event::Ptr pEvent) override;
+	void OnEvent(const Event::Ptr &pEvent) override;
 
 };
 }

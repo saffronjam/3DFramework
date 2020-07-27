@@ -3,43 +3,41 @@
 #include "Saffron/Config.h"
 #include "Saffron/Event/Event.h"
 #include "Saffron/Event/EventHandler.h"
+#include "Saffron/Graphics/Window.h"
 #include "Saffron/System/Time.h"
 
-namespace Saffron
+namespace Se
 {
-class Window;
-
 class SAFFRON_API Layer : public EventHandler
 {
 public:
 	using Ptr = std::shared_ptr<Layer>;
 
 public:
-	Layer(Window &window, std::string name = "Default");
+	Layer(const Window::Ptr &pWindow, std::string name = "Default");
 	virtual ~Layer() = default;
 
 	template<typename LayerType, typename ... Params>
-	static auto Create(Params &&...params);
+	static auto Create(class Window &window, Params &&...params);
 
 	virtual void OnAttach() {}
 	virtual void OnDetach() {}
 	virtual void OnUpdate(Time ts) {}
 	virtual void OnImGuiRender() {}
 
-	void OnEvent(const Event::Ptr pEvent) override {}
+	void OnEvent(const Event::Ptr &pEvent) override {}
 
 	const std::string &GetName() const { return m_DebugName; }
 protected:
-	Window &m_window;
+	Window::Ptr m_pWindow;
 	std::string m_DebugName;
 };
 
 template<typename LayerType, typename ...Params>
-auto Layer::Create(Params && ...params)
+auto Layer::Create(class Window &window, Params && ...params)
 {
-	return std::make_shared<LayerType>(std::forward(params...));
+	return std::make_shared<LayerType>(window, std::forward<Params>(params)...);
 }
-
 
 #define LAYER_TYPE(x) using Ptr = std::shared_ptr<x##Layer>;
 

@@ -1,7 +1,8 @@
+#include "Saffron/SaffronPCH.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Graphics/Window.h"
 
-namespace Saffron
+namespace Se
 {
 
 Mouse::Mouse(Window &window)
@@ -20,16 +21,14 @@ void Mouse::Update() noexcept
 	m_moveDelta = glm::vec2{ 0.0f, 0.0f };
 }
 
-#include <functional>
-
-void Mouse::OnEvent(const Event::Ptr pEvent)
+void Mouse::OnEvent(const Event::Ptr &pEvent)
 {
 	const EventDispatcher dispathcher(pEvent);
-	dispathcher.Try<MousePressEvent>(EVENT_FN(Mouse::OnPress));
-	dispathcher.Try<MouseReleaseEvent>(EVENT_FN(Mouse::OnRelease));
-	dispathcher.Try<MouseMoveEvent>(EVENT_FN(Mouse::OnMove));
-	dispathcher.Try<MouseEnterEvent>(EVENT_FN(Mouse::OnEnter));
-	dispathcher.Try<MouseLeaveEvent>(EVENT_FN(Mouse::OnLeave));
+	dispathcher.Try<MousePressEvent>(SE_EVENT_FN(Mouse::OnPress));
+	dispathcher.Try<MouseReleaseEvent>(SE_EVENT_FN(Mouse::OnRelease));
+	dispathcher.Try<MouseMoveEvent>(SE_EVENT_FN(Mouse::OnMove));
+	dispathcher.Try<MouseEnterEvent>(SE_EVENT_FN(Mouse::OnEnter));
+	dispathcher.Try<MouseLeaveEvent>(SE_EVENT_FN(Mouse::OnLeave));
 }
 
 bool Mouse::IsDown(Button button) const noexcept
@@ -81,29 +80,29 @@ const glm::vec2 &Mouse::GetDelta() const noexcept
 	return m_moveDelta;
 }
 
-void Mouse::OnPress(const MousePressEvent::Ptr event)
+void Mouse::OnPress(const MousePressEvent::Ptr &event)
 {
 	m_buttonmap[event->GetButton()] = true;
 }
 
-void Mouse::OnRelease(const MouseReleaseEvent::Ptr event)
+void Mouse::OnRelease(const MouseReleaseEvent::Ptr &event)
 {
 	m_buttonmap[event->GetButton()] = false;
 }
 
-void Mouse::OnMove(const MouseMoveEvent::Ptr event)
+void Mouse::OnMove(const MouseMoveEvent::Ptr &event)
 {
 	m_moveDelta = m_position - event->GetPosition();
 	m_position = event->GetPosition();
 }
 
-void Mouse::OnEnter(const MouseEnterEvent::Ptr event)
+void Mouse::OnEnter(const MouseEnterEvent::Ptr &event)
 {
 	m_moveDelta = m_position - event->GetPosition();
 	m_position = event->GetPosition();
 }
 
-void Mouse::OnLeave(const MouseLeaveEvent::Ptr event)
+void Mouse::OnLeave(const MouseLeaveEvent::Ptr &event)
 {
 	m_moveDelta = m_position - event->GetPosition();
 	m_position = event->GetPosition();

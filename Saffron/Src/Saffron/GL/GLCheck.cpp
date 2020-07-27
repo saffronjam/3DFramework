@@ -1,11 +1,11 @@
-#include "GLCheck.h"
-
+#include "Saffron/SaffronPCH.h"
+#include "Saffron/GL/GLCheck.h"
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/System/Log.h"
 
 #include <glad/glad.h>
 
-namespace Saffron
+namespace Se
 {
 void SaffronGL::CheckError(const char *file, unsigned int line, const char *expression)
 {

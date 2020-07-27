@@ -5,14 +5,14 @@
 
 #ifdef SE_PLATFORM_WINDOWS
 
-extern Saffron::Application::Ptr Saffron::CreateApplication();
+extern Se::Application::Ptr Se::CreateApplication();
 
 int main()
 {
-	Saffron::Engine::Initialize(Saffron::Engine::Subsystem::Graphics);
-	Saffron::Log::Init();
+	Se::Engine::Initialize(Se::Engine::Subsystem::Graphics);
+	Se::Log::Init();
 
-	auto app = Saffron::CreateApplication();
+	auto app = Se::CreateApplication();
 	app->Run();
 }
 

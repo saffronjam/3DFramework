@@ -1,18 +1,26 @@
 #include <Saffron.h>
+#include <Saffron/EntryPoint.h>
 
-class SandboxApp : public Saffron::Application
+#include "SandboxLayer.h"
+
+class SandboxApp : public Se::Application
 {
 public:
 	SandboxApp()
+		: m_layer(Se::CreateRef<SandboxLayer>(GetWindow()))
 	{
+		PushLayer(m_layer);
 	}
 
 	~SandboxApp()
 	{
 	}
+
+private:
+	SandboxLayer::Ptr m_layer;
 };
 
-Saffron::Application::Ptr Saffron::CreateApplication()
+Se::Application::Ptr Se::CreateApplication()
 {
-	return std::make_shared<Saffron::Application>();
+	return std::make_shared<SandboxApp>();
 }

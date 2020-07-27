@@ -4,7 +4,7 @@
 #include "Saffron/Config.h"
 #include "Saffron/System/Macros.h"
 
-namespace Saffron
+namespace Se
 {
 
 class Event
@@ -62,7 +62,7 @@ inline std::ostream &operator<<(std::ostream &os, const Event &e)
 class EventDispatcher
 {
 public:
-	explicit EventDispatcher(const Event::Ptr pEvent) : m_pEvent(pEvent) {}
+	explicit EventDispatcher(const Event::Ptr &pEvent) : m_pEvent(pEvent) {}
 
 	template<typename EventType, typename Fn>
 	void Try(const Fn &func) const
@@ -72,7 +72,7 @@ public:
 	}
 
 private:
-	const Event::Ptr m_pEvent;
+	const Event::Ptr &m_pEvent;
 };
 
 }

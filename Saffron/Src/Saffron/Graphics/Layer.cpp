@@ -1,15 +1,15 @@
-﻿#include "Saffron/Graphics/Layer.h"
-#include "Saffron/Graphics/Window.h"
+﻿#include "Saffron/SaffronPCH.h"
+#include "Saffron/Graphics/Layer.h"
 
-namespace Saffron
+namespace Se
 {
 
-Layer::Layer(Window &window, std::string name)
+Layer::Layer(const Window::Ptr &pWindow, std::string name)
 	:
-	m_window(window),
+	m_pWindow(pWindow),
 	m_DebugName(std::move(name))
 {
-	m_window.AddEventHandler(this);
+	m_pWindow->AddEventHandler(this);
 }
 
 }

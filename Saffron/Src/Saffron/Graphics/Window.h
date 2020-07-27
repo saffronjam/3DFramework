@@ -8,7 +8,7 @@
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/System/Log.h"
 
-namespace Saffron
+namespace Se
 {
 class SAFFRON_API Window : public EventHandler
 {
@@ -29,7 +29,7 @@ public:
 	void PushEvent(Params &&...params);
 	void HandleBufferedEvents();
 	void AddEventHandler(EventHandler *handler);
-	void OnEvent(const Event::Ptr pEvent) override;
+	void OnEvent(const Event::Ptr &pEvent) override;
 
 	struct GLFWwindow *GetCoreWindow() const;
 	const glm::vec2 &GetPosition() const;
@@ -44,11 +44,11 @@ public:
 private:
 	void SetupGLFWCallbacks();
 
-	void OnResize(const WindowResizeEvent::Ptr event);
-	void OnMove(const WindowMoveEvent::Ptr event);
-	void OnGainFocus(const WindowGainFocusEvent::Ptr event);
-	void OnLostFocus(const WindowLostFocusEvent::Ptr event);
-	void OnClose(const WindowCloseEvent::Ptr event);
+	void OnResize(const WindowResizeEvent::Ptr &event);
+	void OnMove(const WindowMoveEvent::Ptr &event);
+	void OnGainFocus(const WindowGainFocusEvent::Ptr &event);
+	void OnLostFocus(const WindowLostFocusEvent::Ptr &event);
+	void OnClose(const WindowCloseEvent::Ptr &event);
 
 private:
 	std::string m_title;

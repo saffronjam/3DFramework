@@ -4,7 +4,7 @@
 
 #ifdef SE_DEBUG
 
-#define glCheck(expr) do { expr; Saffron::SaffronGL::CheckError(__FILE__, __LINE__, #expr); } while (false)
+#define glCheck(expr) do { expr; Se::SaffronGL::CheckError(__FILE__, __LINE__, #expr); } while (false)
 
 #else
 
@@ -12,7 +12,7 @@
 
 #endif
 
-namespace Saffron
+namespace Se
 {
 class SaffronGL
 {

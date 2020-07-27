@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Saffron/Event/Event.h"
-#include "Saffron/System/SeMath.h"
+#include "Saffron/System/SaffronMath.h"
 
-namespace Saffron
+namespace Se
 {
 class WindowResizeEvent : public Event
 {

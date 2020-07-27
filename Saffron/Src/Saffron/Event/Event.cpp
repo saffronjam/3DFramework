@@ -1,6 +1,7 @@
+#include "Saffron/SaffronPCH.h"
 #include "Saffron/Event/Event.h"
 
-namespace Saffron
+namespace Se
 {
 
 Event::Type Event::GetType() const

@@ -4,9 +4,9 @@
 #include "Saffron/Config.h"
 #include "Saffron/Event/MouseEvent.h"
 #include "Saffron/Event/EventHandler.h"
-#include "Saffron/System/SeMath.h"
+#include "Saffron/System/SaffronMath.h"
 
-namespace Saffron
+namespace Se
 {
 class SAFFRON_API Mouse : public EventHandler
 {
@@ -18,7 +18,7 @@ public:
 	virtual ~Mouse() = default;
 
 	void Update() noexcept;
-	void OnEvent(const Event::Ptr pEvent) override;
+	void OnEvent(const Event::Ptr &pEvent) override;
 
 	bool IsDown(Button button) const noexcept;
 	bool WasDown(Button button) const noexcept;
@@ -31,11 +31,11 @@ public:
 	const glm::vec2 &GetDelta() const noexcept;
 
 private:
-	void OnPress(const MousePressEvent::Ptr event);
-	void OnRelease(const MouseReleaseEvent::Ptr event);
-	void OnMove(const MouseMoveEvent::Ptr event);
-	void OnEnter(const MouseEnterEvent::Ptr event);
-	void OnLeave(const MouseLeaveEvent::Ptr event);
+	void OnPress(const MousePressEvent::Ptr &event);
+	void OnRelease(const MouseReleaseEvent::Ptr &event);
+	void OnMove(const MouseMoveEvent::Ptr &event);
+	void OnEnter(const MouseEnterEvent::Ptr &event);
+	void OnLeave(const MouseLeaveEvent::Ptr &event);
 
 private:
 	class Window &m_wnd;

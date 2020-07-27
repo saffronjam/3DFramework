@@ -5,7 +5,7 @@
 #include "Saffron/Event/KeyboardEvent.h"
 #include "Saffron/Event/EventHandler.h"
 
-namespace Saffron
+namespace Se
 {
 class SAFFRON_API Keyboard : public EventHandler
 {
@@ -17,7 +17,7 @@ public:
 	virtual ~Keyboard() = default;
 
 	void Update() noexcept;
-	void OnEvent(const Event::Ptr pEvent) override;
+	void OnEvent(const Event::Ptr &pEvent) override;
 
 	bool IsDown(Key key) const noexcept;;
 	bool WasDown(Key key) const noexcept;;
@@ -27,9 +27,9 @@ public:
 	bool IsAnyDown() const noexcept;;
 
 private:
-	void OnPress(const KeyboardPressEvent::Ptr event);
-	void OnRelease(const KeyboardReleaseEvent::Ptr event);
-	void OnRepeat(const KeyboardRepeatEvent::Ptr event);
+	void OnPress(const KeyboardPressEvent::Ptr &event);
+	void OnRelease(const KeyboardReleaseEvent::Ptr &event);
+	void OnRepeat(const KeyboardRepeatEvent::Ptr &event);
 
 private:
 	class Window &m_wnd;

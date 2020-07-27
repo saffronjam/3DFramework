@@ -1,6 +1,7 @@
+#include "Saffron/SaffronPCH.h"
 #include "Saffron/System/Time.h"
 
-namespace Saffron
+namespace Se
 {
 
 Time::Time(float time)
@@ -10,7 +11,8 @@ Time::Time(float time)
 
 Time &Time::operator+(const Time &rhs)
 {
-	return Time(m_Time + rhs.m_Time);
+	m_Time += rhs.m_Time;
+	return *this;
 }
 
 Time &Time::operator+=(const Time &rhs)
@@ -23,12 +25,12 @@ float Time::operator()() const
 	return m_Time;
 }
 
-float Time::Sec()
+float Time::sec() const
 {
 	return m_Time;
 }
 
-float Time::MS()
+float Time::ms() const
 {
 	return m_Time * 1000.0f;
 }

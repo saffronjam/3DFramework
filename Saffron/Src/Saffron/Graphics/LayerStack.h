@@ -2,7 +2,7 @@
 
 #include "Saffron/Graphics/Layer.h"
 
-namespace Saffron
+namespace Se
 {
 class LayerStack
 {

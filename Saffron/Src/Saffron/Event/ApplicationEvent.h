@@ -2,7 +2,7 @@
 
 #include "Saffron/Event/Event.h"
 
-namespace Saffron
+namespace Se
 {
 class ApplicationEvent : public Event
 {

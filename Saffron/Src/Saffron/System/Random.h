@@ -5,7 +5,7 @@
 
 #include "SeMath.h"
 
-namespace Saffron
+namespace Se
 {
 class Random
 {

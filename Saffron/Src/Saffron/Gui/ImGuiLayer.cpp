@@ -1,20 +1,19 @@
 ﻿#include "Saffron/SaffronPCH.h"
+
+#include <GLFW/glfw3.h>
+
+#include "Saffron/SaffronPCH.h"
 #include "Saffron/Gui/ImGuiLayer.h"
 #include "Saffron/Core/Application.h"
 #include "Saffron/Gui/ImGuiOpenGLRenderer.h"
+#include "Saffron/Gui/ImGuiGLFWImpl.h"
 #include "Saffron/System/Log.h"
 
-#include <examples/imgui_impl_glfw.h>
-#include <examples/imgui_impl_opengl3.h>
-// TMP
-#include <examples/imgui_impl_glfw.h>
-#include <GLFW/glfw3.h>
-
-namespace Saffron
+namespace Se
 {
 
-ImGuiLayer::ImGuiLayer(Window &window)
-	: Layer(window, "ImGui")
+ImGuiLayer::ImGuiLayer(const Window::Ptr &pWindow)
+	: Layer(pWindow, "ImGui")
 {
 }
 
@@ -27,21 +26,9 @@ void ImGuiLayer::Begin()
 
 void ImGuiLayer::End()
 {
-	auto &io = ImGui::GetIO();
-	auto &app = Application::Get();
-	io.DisplaySize = ImVec2((float)app.GetWindow()->GetWidth(), (float)app.GetWindow()->GetHeight());
-
 	// Rendering
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	if ( io.ConfigFlags )// & ImGuiConfigFlags_ViewportsEnable )
-	{
-		GLFWwindow *backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
 }
 
 void ImGuiLayer::OnAttach()
@@ -55,7 +42,7 @@ void ImGuiLayer::OnAttach()
 	}
 
 	auto &io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
+	//io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	//io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
@@ -71,10 +58,9 @@ void ImGuiLayer::OnAttach()
 	}
 
 	auto &app = Application::Get();
-	auto *window = static_cast<GLFWwindow *>(app.GetWindow()->GetCoreWindow());
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(app.GetWindow()->GetCoreWindow(), true);
 	ImGui_ImplOpenGL3_Init("#version 410");
 
 }
@@ -86,7 +72,7 @@ void ImGuiLayer::OnDetach()
 	ImGui::DestroyContext();
 }
 
-void ImGuiLayer::OnEvent(const Event::Ptr pEvent)
+void ImGuiLayer::OnEvent(const Event::Ptr &pEvent)
 {
 }
 

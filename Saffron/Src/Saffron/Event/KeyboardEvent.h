@@ -3,7 +3,7 @@
 #include "Saffron/Event/Event.h"
 #include "Saffron/Input/KeyCodes.h"
 
-namespace Saffron
+namespace Se
 {
 class KeyboardPressEvent : public Event
 {

@@ -1,6 +1,7 @@
-#include "NormalLock.h"
+#include "Saffron/SaffronPCH.h"
+#include "Saffron/System/NormalLock.h"
 
-namespace Saffron
+namespace Se
 {
 void NormalLock::Lock()
 {

@@ -1,4 +1,5 @@
-﻿
+﻿#include "Saffron/SaffronPCH.h"
+
 #include <Glad/glad.h>
 #include <GLFW/glfw3.h>
 
@@ -10,11 +11,9 @@
 #include "Saffron/GL/GLCheck.h"
 #include "Saffron/System/ScopedLock.h"
 
-
-//#include "imgui/imgui.h"
 //#include "BindableCodex.h"
 
-namespace Saffron
+namespace Se
 {
 
 bool Window::m_sInitialized = false;
@@ -131,14 +130,14 @@ void Window::AddEventHandler(EventHandler *handler)
 	m_handlers.emplace(handler);
 }
 
-void Window::OnEvent(const Event::Ptr event)
+void Window::OnEvent(const Event::Ptr &event)
 {
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<WindowResizeEvent>(EVENT_FN(Window::OnResize));
-	dispatcher.Try<WindowMoveEvent>(EVENT_FN(Window::OnMove));
-	dispatcher.Try<WindowGainFocusEvent>(EVENT_FN(Window::OnGainFocus));
-	dispatcher.Try<WindowLostFocusEvent>(EVENT_FN(Window::OnLostFocus));
-	dispatcher.Try<WindowCloseEvent>(EVENT_FN(Window::OnClose));
+	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Window::OnResize));
+	dispatcher.Try<WindowMoveEvent>(SE_EVENT_FN(Window::OnMove));
+	dispatcher.Try<WindowGainFocusEvent>(SE_EVENT_FN(Window::OnGainFocus));
+	dispatcher.Try<WindowLostFocusEvent>(SE_EVENT_FN(Window::OnLostFocus));
+	dispatcher.Try<WindowCloseEvent>(SE_EVENT_FN(Window::OnClose));
 }
 
 GLFWwindow *Window::GetCoreWindow() const
@@ -236,26 +235,26 @@ void Window::SetupGLFWCallbacks()
 							   });
 }
 
-void Window::OnResize(const WindowResizeEvent::Ptr event)
+void Window::OnResize(const WindowResizeEvent::Ptr &event)
 {
 	m_width = event->GetWidth();
 	m_height = event->GetHeight();
 }
 
-void Window::OnMove(const WindowMoveEvent::Ptr event)
+void Window::OnMove(const WindowMoveEvent::Ptr &event)
 {
 	m_position = event->GetPosition();
 }
 
-void Window::OnGainFocus(const WindowGainFocusEvent::Ptr event)
+void Window::OnGainFocus(const WindowGainFocusEvent::Ptr &event)
 {
 }
 
-void Window::OnLostFocus(const WindowLostFocusEvent::Ptr event)
+void Window::OnLostFocus(const WindowLostFocusEvent::Ptr &event)
 {
 }
 
-void Window::OnClose(const WindowCloseEvent::Ptr event)
+void Window::OnClose(const WindowCloseEvent::Ptr &event)
 {
 }
 

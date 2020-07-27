@@ -1,6 +1,7 @@
-#include "Timer.h"
+#include "Saffron/SaffronPCH.h"
+#include "Saffron/System/Timer.h"
 
-namespace Saffron
+namespace Se
 {
 
 using namespace std::chrono;

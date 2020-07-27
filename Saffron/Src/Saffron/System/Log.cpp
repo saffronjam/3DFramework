@@ -1,9 +1,11 @@
-﻿#include "Saffron/System/Log.h"
+﻿#include "Saffron/SaffronPCH.h"
+#include "Saffron/System/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Saffron
+namespace Se
 {
+
 std::shared_ptr<spdlog::logger> Log::m_sCoreLogger;
 std::shared_ptr<spdlog::logger> Log::m_sClientLogger;
 

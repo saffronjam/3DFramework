@@ -1,6 +1,7 @@
+#include "Saffron/SaffronPCH.h"
 #include "LayerStack.h"
 
-namespace Saffron
+namespace Se
 {
 
 LayerStack::~LayerStack()

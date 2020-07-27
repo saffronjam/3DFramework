@@ -68,11 +68,12 @@
 //  ES 3.0    300       "#version 300 es"   = WebGL 2.0
 //----------------------------------------
 
+#include "Saffron/SaffronPCH.h"
+
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "Saffron/SaffronPCH.h"
 #include "Saffron/Gui/ImGuiOpenGLRenderer.h"
 #include <glad/glad.h>
 

@@ -2,9 +2,9 @@
 
 #include "Saffron/Event/Event.h"
 #include "Saffron/Input/MouseCodes.h"
-#include "Saffron/System/SeMath.h"
+#include "Saffron/System/SaffronMath.h"
 
-namespace Saffron
+namespace Se
 {
 class MousePressEvent : public Event
 {
