@@ -45,6 +45,7 @@ RelWithDebInfo
 
 # Executables
 *.exe
+!Vendors/*/Bin/*.exe
 *.out
 *.app
 
@@ -52,4 +53,5 @@ RelWithDebInfo
 .idea/
 .vs/
 Bin/
+!Vendors/*/Bin/
 Bin-Int/
