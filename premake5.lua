@@ -1,5 +1,6 @@
 workspace "Saffron"
 	architecture "x64"
+	startproject "Sandbox"
 
 	configurations
 	{
@@ -17,9 +18,9 @@ includeDirs["GLFW"] = "Saffron/Vendors/GLFW/include"
 includeDirs["Glad"] = "Saffron/Vendors/Glad/include"
 includeDirs["ImGui"] = "Saffron/Vendors/ImGui"
 
-include "Saffron/Vendors/GLFW"
-include "Saffron/Vendors/Glad"
-include "Saffron/Vendors/ImGui"
+include "Saffron/Vendors/.Premake/GLFW"
+include "Saffron/Vendors/.Premake/Glad"
+include "Saffron/Vendors/.Premake/ImGui"
 
 project "Saffron"
 	location "Saffron"
