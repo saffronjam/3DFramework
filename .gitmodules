@@ -4,6 +4,6 @@
 [submodule "Saffron/Vendors/GLFW"]
 	path = Saffron/Vendors/GLFW
 	url = https://github.com/glfw/glfw
-[submodule "Saffron/Vendors/imgui"]
+[submodule "Saffron/Vendors/ImGui"]
 	path = Saffron/Vendors/imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/ocornut/ImGui
