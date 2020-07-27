@@ -1,9 +1,10 @@
 [submodule "Saffron/Vendors/spdlog"]
 	path = Saffron/Vendors/spdlog
-	url = https://github.com/gabime/spdlog
+	url = https://github.com/gabime/spdlog.git
+	branch = v1.x
 [submodule "Saffron/Vendors/ImGui"]
 	path = Saffron/Vendors/ImGui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/ocornut/imgui.git
 [submodule "Saffron/Vendors/GLFW"]
 	path = Saffron/Vendors/GLFW
-	url = https://github.com/glfw/glfw
+	url = https://github.com/glfw/glfw.git

@@ -1,4 +1,4 @@
-#include "Saffron/System/Log.h"
+﻿#include "Saffron/System/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 
