@@ -28,7 +28,7 @@ public:
 	void OnEvent(const Event &event) override;
 
 	const Ref<Window> &GetWindow() const;
-	Ref<ImGuiLayer> GetImGuiLayer() const;
+	const Ref<ImGuiLayer> &GetImGuiLayer() const;
 
 	static Application &Get() { return *m_sInstance; }
 
@@ -36,16 +36,19 @@ private:
 	void OnWindowClose(const WindowCloseEvent &event);
 	void OnWindowResize(const WindowResizeEvent &event);
 
+protected:
+	Ref<Window> m_pWindow;
+	Keyboard m_Keyboard;
+	Mouse m_Mouse;
+	Time dt;
+
 private:
 	bool m_Running = true;
 	bool m_Minimized = false;
 	Timer m_AppTimer;
 
-	Ref<Window> m_pWindow;
 	Ref<ImGuiLayer> m_pImGuiLayer;
 	LayerStack m_LayerStack;
-	Keyboard m_Keyboard;
-	Mouse m_Mouse;
 
 	static Application *m_sInstance;
 };

@@ -10,9 +10,9 @@ Application *Application::m_sInstance = nullptr;
 Application::Application()
 	:
 	m_pWindow(Se::Window::Create(Se::WindowProps())),
-	m_pImGuiLayer(CreateRef<ImGuiLayer>(m_pWindow)),
 	m_Keyboard(*m_pWindow),
-	m_Mouse(*m_pWindow)
+	m_Mouse(*m_pWindow),
+	m_pImGuiLayer(CreateRef<ImGuiLayer>(m_pWindow))
 {
 	m_pWindow->AddEventHandler(this);
 
@@ -27,7 +27,7 @@ void Application::Run()
 {
 	while ( m_Running )
 	{
-		const auto dt = m_AppTimer.Mark();
+		dt = m_AppTimer.Mark();
 
 		m_pWindow->HandleBufferedEvents();
 		m_Keyboard.Update();
@@ -35,15 +35,14 @@ void Application::Run()
 
 		if ( !m_Minimized )
 		{
+			// Normal updates and rendering
+			for ( auto &layer : m_LayerStack )
+				layer->OnUpdate(dt);
+
+			// ImGui rendering
 			m_pImGuiLayer->Begin();
-			{
-				for ( auto &layer : m_LayerStack )
-					layer->OnUpdate(dt);
-			}
-			{
-				for ( auto &layer : m_LayerStack )
-					layer->OnImGuiRender();
-			}
+			for ( auto &layer : m_LayerStack )
+				layer->OnImGuiRender();
 			m_pImGuiLayer->End();
 		}
 
@@ -79,7 +78,7 @@ const Ref<Window> &Application::GetWindow() const
 	return m_pWindow;
 }
 
-Ref<ImGuiLayer> Application::GetImGuiLayer() const
+const Ref<ImGuiLayer> &Application::GetImGuiLayer() const
 {
 	return m_pImGuiLayer;
 }

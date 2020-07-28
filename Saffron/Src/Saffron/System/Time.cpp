@@ -4,8 +4,8 @@
 namespace Se
 {
 
-Time::Time(float time)
-	: m_Time(time)
+Time::Time(float seconds)
+	: m_Time(seconds)
 {
 }
 
@@ -18,6 +18,12 @@ Time &Time::operator+(const Time &rhs)
 Time &Time::operator+=(const Time &rhs)
 {
 	return *this = *this + rhs;
+}
+
+Time &Time::operator+=(float seconds)
+{
+	m_Time += seconds;
+	return *this;
 }
 
 float Time::operator()() const

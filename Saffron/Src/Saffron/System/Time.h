@@ -7,10 +7,11 @@ namespace Se
 class Time
 {
 public:
-	Time(float time);
+	Time(float seconds = 0.0f);
 
 	Time &operator+(const Time &rhs);
 	Time &operator+=(const Time &rhs);
+	Time &operator+=(float seconds);
 	float operator()() const;
 
 	float sec() const;
