@@ -8,7 +8,7 @@
 
 namespace Se
 {
-class SAFFRON_API Mouse : public EventHandler
+class Mouse : public EventHandler
 {
 public:
 	using Button = ButtonCode;

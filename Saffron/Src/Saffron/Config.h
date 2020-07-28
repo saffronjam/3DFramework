@@ -1,16 +1,21 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 
-#ifdef SE_PLATFORM_WINDOWS
-
-#ifdef SE_BUILD_DLL
-#define SAFFRON_API __declspec(dllexport)
+// Platform detection using predefined macros
+#ifdef _WIN32
+	/* Windows x64/x86 */
+#ifdef _WIN64
+	/* Windows x64  */
+#define SE_PLATFORM_WINDOWS
 #else
-#define SAFFRON_API __declspec(dllimport)
+	/* Windows x86 */
+#error "x86 Builds are not supported!"
+#endif
 #endif
 
-#else
+
+#ifndef SE_PLATFORM_WINDOWS
 #error Saffron only support Windows!
 #endif
 

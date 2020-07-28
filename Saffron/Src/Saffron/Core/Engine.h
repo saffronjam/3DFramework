@@ -7,7 +7,7 @@ typedef void(*GLFWerrorfun) (int, const char *);
 
 namespace Se
 {
-class SAFFRON_API Engine
+class Engine
 {
 public:
 	Engine() = delete;

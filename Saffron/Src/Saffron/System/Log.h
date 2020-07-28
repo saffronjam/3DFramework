@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <memory>
 
@@ -9,7 +9,7 @@
 namespace Se
 {
 
-class SAFFRON_API Log
+class Log
 {
 public:
 	using Ptr = ::std::shared_ptr<spdlog::logger>;
@@ -44,4 +44,3 @@ private:
 #define SE_ERROR(...)      ::Se::Log::GetClientLogger()->error(__VA_ARGS__)
 
 }
-

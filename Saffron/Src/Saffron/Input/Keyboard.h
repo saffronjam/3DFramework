@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
@@ -7,7 +7,7 @@
 
 namespace Se
 {
-class SAFFRON_API Keyboard : public EventHandler
+class Keyboard : public EventHandler
 {
 public:
 	using Key = KeyCode;

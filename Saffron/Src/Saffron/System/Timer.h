@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class SAFFRON_API Timer
+class Timer
 {
 public:
 	Timer() noexcept;

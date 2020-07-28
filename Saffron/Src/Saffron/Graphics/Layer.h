@@ -8,7 +8,7 @@
 
 namespace Se
 {
-class SAFFRON_API Layer : public EventHandler
+class Layer : public EventHandler
 {
 public:
 	using Ptr = std::shared_ptr<Layer>;

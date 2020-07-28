@@ -7,8 +7,8 @@ project "ImGui"
 	outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 	srcDirectory = "../%{prj.name}/"
 	
-	targetdir ("bin/" .. outputDirectory .. "/%{prj.name}")
-	objdir ("bin-int/" .. outputDirectory .. "/%{prj.name}")
+	targetdir ("../%{prj.name}/Bin/" .. outputDirectory .. "/%{prj.name}")
+	objdir ("../%{prj.name}/Bin-Int/" .. outputDirectory .. "/%{prj.name}")
 	
 	files
 	{

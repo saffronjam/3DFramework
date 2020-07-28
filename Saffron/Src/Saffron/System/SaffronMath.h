@@ -7,7 +7,7 @@
 
 #include "Saffron/Config.h"
 
-class SAFFRON_API Math
+class Math
 {
 public:
 	float PI = 3.141592653589793238462643383279f;

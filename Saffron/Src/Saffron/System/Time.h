@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class SAFFRON_API Time
+class Time
 {
 public:
 	Time(float time);

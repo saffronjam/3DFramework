@@ -9,7 +9,7 @@ namespace Se
 
 class Window;
 
-class SAFFRON_API ImGuiLayer : public Layer
+class ImGuiLayer : public Layer
 {
 public:
 	LAYER_TYPE(ImGui);

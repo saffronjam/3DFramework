@@ -10,7 +10,7 @@
 
 namespace Se
 {
-class SAFFRON_API Window : public EventHandler
+class Window : public EventHandler
 {
 public:
 	using Ptr = std::shared_ptr<Window>;
