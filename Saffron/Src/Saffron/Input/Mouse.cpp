@@ -15,15 +15,15 @@ Mouse::Mouse(Window &window)
 	window.AddEventHandler(this);
 }
 
-void Mouse::Update() noexcept
+void Mouse::Update()
 {
 	m_prevButtonmap = m_buttonmap;
 	m_moveDelta = glm::vec2{ 0.0f, 0.0f };
 }
 
-void Mouse::OnEvent(const Event::Ptr &pEvent)
+void Mouse::OnEvent(const Event &event)
 {
-	const EventDispatcher dispathcher(pEvent);
+	const EventDispatcher dispathcher(event);
 	dispathcher.Try<MousePressEvent>(SE_EVENT_FN(Mouse::OnPress));
 	dispathcher.Try<MouseReleaseEvent>(SE_EVENT_FN(Mouse::OnRelease));
 	dispathcher.Try<MouseMoveEvent>(SE_EVENT_FN(Mouse::OnMove));
@@ -31,31 +31,31 @@ void Mouse::OnEvent(const Event::Ptr &pEvent)
 	dispathcher.Try<MouseLeaveEvent>(SE_EVENT_FN(Mouse::OnLeave));
 }
 
-bool Mouse::IsDown(Button button) const noexcept
+bool Mouse::IsDown(Button button) const
 {
 	if ( m_buttonmap.find(button) == m_buttonmap.end() )
 		m_buttonmap[button] = false;
 	return m_buttonmap[button];
 }
 
-bool Mouse::WasDown(Button button) const noexcept
+bool Mouse::WasDown(Button button) const
 {
 	if ( m_prevButtonmap.find(button) == m_prevButtonmap.end() )
 		m_prevButtonmap[button] = false;
 	return m_prevButtonmap[button];
 }
 
-bool Mouse::IsPressed(Button button) const noexcept
+bool Mouse::IsPressed(Button button) const
 {
 	return IsDown(button) && !WasDown(button);
 }
 
-bool Mouse::IsReleased(Button button) const noexcept
+bool Mouse::IsReleased(Button button) const
 {
 	return !IsDown(button) && WasDown(button);
 }
 
-bool Mouse::IsAnyDown() const noexcept
+bool Mouse::IsAnyDown() const
 {
 	for ( auto &[button, state] : m_buttonmap )
 	{
@@ -65,47 +65,43 @@ bool Mouse::IsAnyDown() const noexcept
 	return false;
 }
 
-bool Mouse::IsInScreen() const noexcept
+bool Mouse::IsInScreen() const
 {
 	return m_isInScreen;
 }
 
-const glm::vec2 &Mouse::GetPosition() const noexcept
+const glm::vec2 &Mouse::GetPosition() const
 {
 	return m_position;
 }
 
-const glm::vec2 &Mouse::GetDelta() const noexcept
+const glm::vec2 &Mouse::GetDelta() const
 {
 	return m_moveDelta;
 }
 
-void Mouse::OnPress(const MousePressEvent::Ptr &event)
+void Mouse::OnPress(const MousePressEvent &event)
 {
-	m_buttonmap[event->GetButton()] = true;
+	m_buttonmap[event.GetButton()] = true;
 }
 
-void Mouse::OnRelease(const MouseReleaseEvent::Ptr &event)
+void Mouse::OnRelease(const MouseReleaseEvent &event)
 {
-	m_buttonmap[event->GetButton()] = false;
+	m_buttonmap[event.GetButton()] = false;
 }
 
-void Mouse::OnMove(const MouseMoveEvent::Ptr &event)
+void Mouse::OnMove(const MouseMoveEvent &event)
 {
-	m_moveDelta = m_position - event->GetPosition();
-	m_position = event->GetPosition();
+	m_moveDelta = m_position - event.GetPosition();
+	m_position = event.GetPosition();
 }
 
-void Mouse::OnEnter(const MouseEnterEvent::Ptr &event)
+void Mouse::OnEnter(const MouseEnterEvent &event)
 {
-	m_moveDelta = m_position - event->GetPosition();
-	m_position = event->GetPosition();
 }
 
-void Mouse::OnLeave(const MouseLeaveEvent::Ptr &event)
+void Mouse::OnLeave(const MouseLeaveEvent &event)
 {
-	m_moveDelta = m_position - event->GetPosition();
-	m_position = event->GetPosition();
 }
 
 }

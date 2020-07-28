@@ -1,72 +1,70 @@
 ﻿#pragma once
 
-#include "Saffron/Config.h"
 #include "Saffron/SaffronPCH.h"
-#include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Config.h"
 #include "Saffron/Event/EventHandler.h"
-#include "Saffron/Input/Keyboard.h"
-#include "Saffron/Input/Mouse.h"
+#include "Saffron/System/SaffronMath.h"
+
+// TEMPORARY
 #include "Saffron/System/Log.h"
 
 namespace Se
 {
+struct WindowProps
+{
+	std::string Title;
+	unsigned int Width;
+	unsigned int Height;
+	glm::vec2 Position;
+
+	explicit WindowProps(const std::string &title = "Saffron Engine",
+						 unsigned int width = 1280,
+						 unsigned int height = 720,
+						 const glm::vec2 position = { 100.0f, 100.0f })
+		: Title(title), Width(width), Height(height), Position(position)
+	{
+	}
+};
+
+// Interface representing a desktop system based Window
 class Window : public EventHandler
 {
 public:
-	using Ptr = std::shared_ptr<Window>;
+	Window();
+	virtual ~Window() = default;
 
-public:
-	Window(std::string title, int width, int height, bool activeContext = true);
-	virtual ~Window();
+	virtual void OnUpdate() = 0;
+	void OnEvent(const Event &event) override {};
 
-	void OnUpdate();
-
-	bool ShouldClose();
-	void RequestClose();
-	void RequestFocus();
+	virtual void Close() = 0;
+	virtual	void Focus() = 0;
 
 	template<typename T, typename...Params>
 	void PushEvent(Params &&...params);
-	void HandleBufferedEvents();
 	void AddEventHandler(EventHandler *handler);
-	void OnEvent(const Event::Ptr &pEvent) override;
+	void HandleBufferedEvents();
 
-	struct GLFWwindow *GetCoreWindow() const;
-	const glm::vec2 &GetPosition() const;
-	int GetWidth() const;
-	int GetHeight() const;
+	virtual uint32_t GetWidth() const;
+	virtual uint32_t GetHeight() const;
+	virtual const glm::vec2 &GetPosition() const;
+	virtual void *GetNativeWindow() const = 0;
 
-	bool HasFocus() const;
+	// Window attributes
+	virtual void SetTitle(std::string title) = 0;
+	virtual void SetVSync(bool enabled) = 0;
+	virtual bool IsVSync() const = 0;
 
-	void SetTitle(std::string title);
-	void SetVSync(bool enabled);
+
+	static Ref<Window> Create(const WindowProps &props = WindowProps());
+
+protected:
+	std::string m_Title;
+	glm::vec2 m_Position;
+	unsigned int m_Width, m_Height;
 
 private:
-	void SetupGLFWCallbacks();
-
-	void OnResize(const WindowResizeEvent::Ptr &event);
-	void OnMove(const WindowMoveEvent::Ptr &event);
-	void OnGainFocus(const WindowGainFocusEvent::Ptr &event);
-	void OnLostFocus(const WindowLostFocusEvent::Ptr &event);
-	void OnClose(const WindowCloseEvent::Ptr &event);
-
-private:
-	std::string m_title;
-	int m_width, m_height;
-	glm::vec2 m_position;
-	bool m_hasFocus;
-
-	struct GLFWwindow *m_nativeWindowHandle;
-
-	std::vector<Event::Ptr> m_events;
+	std::vector<Ref<Event>> m_events;
 	std::set<EventHandler *> m_handlers;
-
-	static bool m_sInitialized;
-	static bool m_sAnyActiveContext;
-
-public:
-	Keyboard kbd;
-	Mouse mouse;
 };
 
 template<typename T, typename...Params>
@@ -76,4 +74,6 @@ void Window::PushEvent(Params &&...params)
 	SE_INFO("{0}", m_events.back()->ToString());
 }
 
-}
+};
+
+

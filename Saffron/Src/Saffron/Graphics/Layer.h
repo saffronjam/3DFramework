@@ -11,10 +11,7 @@ namespace Se
 class Layer : public EventHandler
 {
 public:
-	using Ptr = std::shared_ptr<Layer>;
-
-public:
-	Layer(const Window::Ptr &pWindow, std::string name = "Default");
+	Layer(const Ref<Window> &pWindow, std::string name = "Default");
 	virtual ~Layer() = default;
 
 	template<typename LayerType, typename ... Params>
@@ -25,11 +22,11 @@ public:
 	virtual void OnUpdate(Time ts) {}
 	virtual void OnImGuiRender() {}
 
-	void OnEvent(const Event::Ptr &pEvent) override {}
+	void OnEvent(const Event &event) override {}
 
 	const std::string &GetName() const { return m_DebugName; }
 protected:
-	Window::Ptr m_pWindow;
+	Ref<Window> m_pWindow;
 	std::string m_DebugName;
 };
 
@@ -38,7 +35,5 @@ auto Layer::Create(class Window &window, Params && ...params)
 {
 	return std::make_shared<LayerType>(window, std::forward<Params>(params)...);
 }
-
-#define LAYER_TYPE(x) using Ptr = std::shared_ptr<x##Layer>;
 
 }

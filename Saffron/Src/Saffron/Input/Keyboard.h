@@ -16,20 +16,20 @@ public:
 	explicit Keyboard(class Window &window);
 	virtual ~Keyboard() = default;
 
-	void Update() noexcept;
-	void OnEvent(const Event::Ptr &pEvent) override;
+	void Update();
+	void OnEvent(const Event &event) override;
 
-	bool IsDown(Key key) const noexcept;;
-	bool WasDown(Key key) const noexcept;;
-	bool IsPressed(Key key) const noexcept;;
-	bool IsReleased(Key key) const noexcept;;
-	bool IsBeingRepeated(Key key) const noexcept;;
-	bool IsAnyDown() const noexcept;;
+	bool IsDown(Key key) const;
+	bool WasDown(Key key) const;
+	bool IsPressed(Key key) const;
+	bool IsReleased(Key key) const;
+	bool IsBeingRepeated(Key key) const;
+	bool IsAnyDown() const;
 
 private:
-	void OnPress(const KeyboardPressEvent::Ptr &event);
-	void OnRelease(const KeyboardReleaseEvent::Ptr &event);
-	void OnRepeat(const KeyboardRepeatEvent::Ptr &event);
+	void OnPress(const KeyboardPressEvent &event);
+	void OnRelease(const KeyboardReleaseEvent &event);
+	void OnRepeat(const KeyboardRepeatEvent &event);
 
 private:
 	class Window &m_wnd;

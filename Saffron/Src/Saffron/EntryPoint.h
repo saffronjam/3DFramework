@@ -5,7 +5,7 @@
 
 #ifdef SE_PLATFORM_WINDOWS
 
-extern Se::Application::Ptr Se::CreateApplication();
+extern Se::Ref<Se::Application> Se::CreateApplication();
 
 int main()
 {

@@ -9,13 +9,13 @@ namespace Se
 class Timer
 {
 public:
-	Timer() noexcept;
+	Timer() ;
 
 	static void UpdateGlobalTimer(float dt);
 
-	Time Mark() noexcept;
-	[[nodiscard]] Time Peek() const noexcept;
-	static Time PeekGlobal() noexcept;
+	Time Mark() ;
+	[[nodiscard]] Time Peek() const ;
+	static Time PeekGlobal() ;
 private:
 	std::chrono::steady_clock::time_point m_last;
 	static Time m_globalTimer;

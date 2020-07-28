@@ -4,7 +4,7 @@
 namespace Se
 {
 
-Layer::Layer(const Window::Ptr &pWindow, std::string name)
+Layer::Layer(const Ref<Window> &pWindow, std::string name)
 	:
 	m_pWindow(pWindow),
 	m_DebugName(std::move(name))

@@ -76,18 +76,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseEnterEvent(const glm::vec2 &position) : m_Position(position) {}
-
-	const glm::vec2 &GetPosition() const { return m_Position; }
-	std::string ToString() const override
-	{
-		std::ostringstream oss;
-		oss << GetName() << " Position: " << m_Position.x << ", " << m_Position.y;
-		return oss.str();
-	}
-
-private:
-	glm::vec2 m_Position;
+	std::string ToString() const override { return GetName(); }
 };
 
 class MouseLeaveEvent : public Event
@@ -97,18 +86,8 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseLeaveEvent(const glm::vec2 &position) : m_Position(position) {}
+	std::string ToString() const override { return GetName(); }
 
-	const glm::vec2 &GetPosition() const { return m_Position; }
-	std::string ToString() const override
-	{
-		std::ostringstream oss;
-		oss << GetName() << " Position: " << m_Position.x << ", " << m_Position.y;
-		return oss.str();
-	}
-
-private:
-	glm::vec2 m_Position;
 };
 
 }

@@ -8,7 +8,7 @@ using namespace std::chrono;
 
 Time Timer::m_globalTimer(0.0f);
 
-Timer::Timer() noexcept
+Timer::Timer() 
 	: m_last(steady_clock::now())
 {
 }
@@ -18,7 +18,7 @@ void Timer::UpdateGlobalTimer(float dt)
 	m_globalTimer += dt;
 }
 
-Time Timer::Mark() noexcept
+Time Timer::Mark() 
 {
 	const auto old = m_last;
 	m_last = steady_clock::now();
@@ -26,12 +26,12 @@ Time Timer::Mark() noexcept
 	return frameTime.count();
 }
 
-Time Timer::Peek() const noexcept
+Time Timer::Peek() const 
 {
 	return duration<float>(steady_clock::now() - m_last).count();
 }
 
-Time Timer::PeekGlobal() noexcept
+Time Timer::PeekGlobal() 
 {
 	return m_globalTimer;
 }

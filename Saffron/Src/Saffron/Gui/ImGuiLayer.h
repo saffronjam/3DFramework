@@ -12,10 +12,7 @@ class Window;
 class ImGuiLayer : public Layer
 {
 public:
-	LAYER_TYPE(ImGui);
-
-public:
-	explicit ImGuiLayer(const Window::Ptr &pWindow);
+	explicit ImGuiLayer(const Ref<Window> &pWindow);
 
 	void Begin();
 	void End();

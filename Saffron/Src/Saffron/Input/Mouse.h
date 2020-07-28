@@ -17,25 +17,25 @@ public:
 	explicit Mouse(class Window &window);
 	virtual ~Mouse() = default;
 
-	void Update() noexcept;
-	void OnEvent(const Event::Ptr &pEvent) override;
+	void Update();
+	void OnEvent(const Event &event) override;
 
-	bool IsDown(Button button) const noexcept;
-	bool WasDown(Button button) const noexcept;
-	bool IsPressed(Button button) const noexcept;
-	bool IsReleased(Button button) const noexcept;
-	bool IsAnyDown() const noexcept;
-	bool IsInScreen() const noexcept;
+	bool IsDown(Button button) const;
+	bool WasDown(Button button) const;
+	bool IsPressed(Button button) const;
+	bool IsReleased(Button button) const;
+	bool IsAnyDown() const;
+	bool IsInScreen() const;
 
-	const glm::vec2 &GetPosition() const noexcept;
-	const glm::vec2 &GetDelta() const noexcept;
+	const glm::vec2 &GetPosition() const;
+	const glm::vec2 &GetDelta() const;
 
 private:
-	void OnPress(const MousePressEvent::Ptr &event);
-	void OnRelease(const MouseReleaseEvent::Ptr &event);
-	void OnMove(const MouseMoveEvent::Ptr &event);
-	void OnEnter(const MouseEnterEvent::Ptr &event);
-	void OnLeave(const MouseLeaveEvent::Ptr &event);
+	void OnPress(const MousePressEvent &event);
+	void OnRelease(const MouseReleaseEvent &event);
+	void OnMove(const MouseMoveEvent &event);
+	void OnEnter(const MouseEnterEvent &event);
+	void OnLeave(const MouseLeaveEvent &event);
 
 private:
 	class Window &m_wnd;

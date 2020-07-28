@@ -13,8 +13,6 @@ public:
 	enum class Type;
 	enum Category : unsigned int;
 
-	using Ptr = std::shared_ptr<Event>;
-
 public:
 	Event() = default;
 	virtual ~Event() = default;
@@ -51,8 +49,7 @@ inline std::ostream &operator<<(std::ostream &os, const Event &e)
 	return os << e.ToString();
 }
 
-#define EVENT_CLASS_TYPE(type)  using Ptr = std::shared_ptr<type##Event>;\
-								static constexpr Event::Type GetStaticType() { return Event::Type::type; }\
+#define EVENT_CLASS_TYPE(type)	static constexpr Event::Type GetStaticType() { return Event::Type::type; }\
 								virtual Event::Type GetType() const override { return GetStaticType(); }\
 								virtual const char* GetName() const override { return #type; }\
 
@@ -62,17 +59,17 @@ inline std::ostream &operator<<(std::ostream &os, const Event &e)
 class EventDispatcher
 {
 public:
-	explicit EventDispatcher(const Event::Ptr &pEvent) : m_pEvent(pEvent) {}
+	explicit EventDispatcher(const Event &event) : m_Event(event) {}
 
 	template<typename EventType, typename Fn>
 	void Try(const Fn &func) const
 	{
-		if ( typeid(*m_pEvent) == typeid(EventType) )
-			func(std::static_pointer_cast<EventType>(m_pEvent));
+		if ( typeid(m_Event) == typeid(EventType) )
+			func(static_cast<const EventType &>(m_Event));
 	}
 
 private:
-	const Event::Ptr &m_pEvent;
+	const Event &m_Event;
 };
 
 }

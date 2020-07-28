@@ -10,7 +10,7 @@ public:
 	void Lock();
 	void Unlock();
 
-	bool TryLock()noexcept;
+	bool TryLock();
 
 private:
 	std::mutex m_mutex;

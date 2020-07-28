@@ -13,7 +13,7 @@ void NormalLock::Unlock()
 	m_mutex.unlock();
 }
 
-bool NormalLock::TryLock() noexcept
+bool NormalLock::TryLock() 
 {
 	return m_mutex.try_lock();
 }

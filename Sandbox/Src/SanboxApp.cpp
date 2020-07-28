@@ -17,10 +17,10 @@ public:
 	}
 
 private:
-	SandboxLayer::Ptr m_layer;
+	Se::Ref<SandboxLayer> m_layer;
 };
 
-Se::Application::Ptr Se::CreateApplication()
+Se::Ref<Se::Application> Se::CreateApplication()
 {
 	return Se::CreateRef<SandboxApp>();
 }

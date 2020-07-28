@@ -9,8 +9,10 @@ Application *Application::m_sInstance = nullptr;
 
 Application::Application()
 	:
-	m_pWindow(CreateRef<Window>("Saffron Engine", 800, 600)),
-	m_pImGuiLayer(CreateRef<ImGuiLayer>(m_pWindow))
+	m_pWindow(Se::Window::Create(Se::WindowProps())),
+	m_pImGuiLayer(CreateRef<ImGuiLayer>(m_pWindow)),
+	m_Keyboard(*m_pWindow),
+	m_Mouse(*m_pWindow)
 {
 	m_pWindow->AddEventHandler(this);
 
@@ -28,8 +30,8 @@ void Application::Run()
 		const auto dt = m_AppTimer.Mark();
 
 		m_pWindow->HandleBufferedEvents();
-		m_pWindow->kbd.Update();
-		m_pWindow->mouse.Update();
+		m_Keyboard.Update();
+		m_Mouse.Update();
 
 		if ( !m_Minimized )
 		{
@@ -53,43 +55,43 @@ void Application::Close()
 {
 }
 
-void Application::PushLayer(const Layer::Ptr &layer)
+void Application::PushLayer(const Ref<Layer> &layer)
 {
 	m_LayerStack.PushLayer(layer);
 	layer->OnAttach();
 }
 
-void Application::PushOverlay(const Layer::Ptr &layer)
+void Application::PushOverlay(const Ref<Layer> &layer)
 {
 	m_LayerStack.PushOverlay(layer);
 	layer->OnAttach();
 }
 
-void Application::OnEvent(const Event::Ptr &pEvent)
+void Application::OnEvent(const Event &event)
 {
-	const EventDispatcher dispatcher(pEvent);
+	const EventDispatcher dispatcher(event);
 	dispatcher.Try<WindowCloseEvent>(SE_EVENT_FN(Application::OnWindowClose));
 	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Application::OnWindowResize));
 }
 
-const Window::Ptr &Application::GetWindow() const
+const Ref<Window> &Application::GetWindow() const
 {
 	return m_pWindow;
 }
 
-ImGuiLayer::Ptr Application::GetImGuiLayer() const
+Ref<ImGuiLayer> Application::GetImGuiLayer() const
 {
 	return m_pImGuiLayer;
 }
 
-void Application::OnWindowClose(const WindowCloseEvent::Ptr &pEvent)
+void Application::OnWindowClose(const WindowCloseEvent &event)
 {
 	m_Running = false;
 }
 
-void Application::OnWindowResize(const WindowResizeEvent::Ptr &pEvent)
+void Application::OnWindowResize(const WindowResizeEvent &event)
 {
-	if ( pEvent->GetWidth() == 0 || pEvent->GetHeight() == 0 )
+	if ( event.GetWidth() == 0 || event.GetHeight() == 0 )
 	{
 		m_Minimized = true;
 	}

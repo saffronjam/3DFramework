@@ -11,7 +11,7 @@
 namespace Se
 {
 
-ImGuiLayer::ImGuiLayer(const Window::Ptr &pWindow)
+ImGuiLayer::ImGuiLayer(const Ref<Window> &pWindow)
 	: Layer(pWindow, "ImGui")
 {
 }
@@ -71,7 +71,7 @@ void ImGuiLayer::OnAttach()
 	auto &app = Application::Get();
 
 	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(app.GetWindow()->GetCoreWindow(), true);
+	ImGui_ImplGlfw_InitForOpenGL(static_cast<GLFWwindow *>(app.GetWindow()->GetNativeWindow()), true);
 	ImGui_ImplOpenGL3_Init("#version 410");
 
 }

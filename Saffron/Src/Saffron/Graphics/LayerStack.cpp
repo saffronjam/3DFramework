@@ -12,18 +12,18 @@ LayerStack::~LayerStack()
 	}
 }
 
-void LayerStack::PushLayer(Layer::Ptr layer)
+void LayerStack::PushLayer(Ref<Layer> layer)
 {
 	m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 	m_LayerInsertIndex++;
 }
 
-void LayerStack::PushOverlay(Layer::Ptr overlay)
+void LayerStack::PushOverlay(Ref<Layer> overlay)
 {
 	m_Layers.emplace_back(overlay);
 }
 
-void LayerStack::PopLayer(Layer::Ptr layer)
+void LayerStack::PopLayer(Ref<Layer> layer)
 {
 	auto it = std::find(m_Layers.begin(), m_Layers.begin() + m_LayerInsertIndex, layer);
 	if ( it != m_Layers.begin() + m_LayerInsertIndex )
@@ -34,7 +34,7 @@ void LayerStack::PopLayer(Layer::Ptr layer)
 	}
 }
 
-void LayerStack::PopOverlay(Layer::Ptr overlay)
+void LayerStack::PopOverlay(Ref<Layer> overlay)
 {
 	auto it = std::find(m_Layers.begin() + m_LayerInsertIndex, m_Layers.end(), overlay);
 	if ( it != m_Layers.end() )
@@ -44,20 +44,20 @@ void LayerStack::PopOverlay(Layer::Ptr overlay)
 	}
 }
 
-std::vector<Layer::Ptr>::iterator LayerStack::begin() { return m_Layers.begin(); }
+std::vector<Ref<Layer>>::iterator LayerStack::begin() { return m_Layers.begin(); }
 
-std::vector<Layer::Ptr>::iterator LayerStack::end() { return m_Layers.end(); }
+std::vector<Ref<Layer>>::iterator LayerStack::end() { return m_Layers.end(); }
 
-std::vector<Layer::Ptr>::reverse_iterator LayerStack::rbegin() { return m_Layers.rbegin(); }
+std::vector<Ref<Layer>>::reverse_iterator LayerStack::rbegin() { return m_Layers.rbegin(); }
 
-std::vector<Layer::Ptr>::reverse_iterator LayerStack::rend() { return m_Layers.rend(); }
+std::vector<Ref<Layer>>::reverse_iterator LayerStack::rend() { return m_Layers.rend(); }
 
-std::vector<Layer::Ptr>::const_iterator LayerStack::begin() const { return m_Layers.begin(); }
+std::vector<Ref<Layer>>::const_iterator LayerStack::begin() const { return m_Layers.begin(); }
 
-std::vector<Layer::Ptr>::const_iterator LayerStack::end() const { return m_Layers.end(); }
+std::vector<Ref<Layer>>::const_iterator LayerStack::end() const { return m_Layers.end(); }
 
-std::vector<Layer::Ptr>::const_reverse_iterator LayerStack::rbegin() const { return m_Layers.rbegin(); }
+std::vector<Ref<Layer>>::const_reverse_iterator LayerStack::rbegin() const { return m_Layers.rbegin(); }
 
-std::vector<Layer::Ptr>::const_reverse_iterator LayerStack::rend() const { return m_Layers.rend(); }
+std::vector<Ref<Layer>>::const_reverse_iterator LayerStack::rend() const { return m_Layers.rend(); }
 
 }
