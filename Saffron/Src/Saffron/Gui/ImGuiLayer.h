@@ -23,7 +23,5 @@ public:
 	void OnAttach() override;
 	void OnDetach() override;
 
-	void OnEvent(const Event::Ptr &pEvent) override;
-
 };
 }

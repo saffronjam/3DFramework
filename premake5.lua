@@ -38,7 +38,7 @@ project "Saffron"
 	kind "StaticLib"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "On"
 
 	targetdir(binDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
 	objdir(intDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
@@ -92,17 +92,17 @@ project "Saffron"
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
 		runtime "Debug"
-		symbols "on"
+		symbols "On"
 
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		runtime "Release"
-		optimize "on"
+		optimize "On"
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		runtime "Release"
-		optimize "on"
+		optimize "On"
 
 
 
@@ -111,7 +111,7 @@ project "Sandbox"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
-	staticruntime "on"
+	staticruntime "On"
 
 	targetdir(binDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
 	objdir(intDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
@@ -147,14 +147,14 @@ project "Sandbox"
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
 		runtime "Debug"
-		symbols "on"
+		symbols "On"
 
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		runtime "Release"
-		optimize "on"
+		optimize "On"
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		runtime "Release"
-		optimize "on"
+		optimize "On"

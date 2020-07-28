@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <Saffron.h>
 
@@ -19,4 +19,3 @@ public:
 
 
 };
-

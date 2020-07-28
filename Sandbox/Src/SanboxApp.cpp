@@ -1,4 +1,4 @@
-#include <Saffron.h>
+﻿#include <Saffron.h>
 #include <Saffron/EntryPoint.h>
 
 #include "SandboxLayer.h"
@@ -22,5 +22,5 @@ private:
 
 Se::Application::Ptr Se::CreateApplication()
 {
-	return std::make_shared<SandboxApp>();
+	return Se::CreateRef<SandboxApp>();
 }

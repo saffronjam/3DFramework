@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // For use by Saffron applications
 

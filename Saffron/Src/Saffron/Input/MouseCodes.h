@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/SaffronPCH.h"
 
@@ -28,15 +28,15 @@ inline std::ostream &operator<<(std::ostream &os, ButtonCode buttonCode)
 }
 }
 
-#define SE_MOUSE_BUTTON_0      ::Se::MouseCode::Button0
-#define SE_MOUSE_BUTTON_1      ::Se::MouseCode::Button1
-#define SE_MOUSE_BUTTON_2      ::Se::MouseCode::Button2
-#define SE_MOUSE_BUTTON_3      ::Se::MouseCode::Button3
-#define SE_MOUSE_BUTTON_4      ::Se::MouseCode::Button4
-#define SE_MOUSE_BUTTON_5      ::Se::MouseCode::Button5
-#define SE_MOUSE_BUTTON_6      ::Se::MouseCode::Button6
-#define SE_MOUSE_BUTTON_7      ::Se::MouseCode::Button7
-#define SE_MOUSE_BUTTON_LAST   ::Se::MouseCode::ButtonLast
-#define SE_MOUSE_BUTTON_LEFT   ::Se::MouseCode::ButtonLeft
-#define SE_MOUSE_BUTTON_RIGHT  ::Se::MouseCode::ButtonRight
-#define SE_MOUSE_BUTTON_MIDDLE ::Se::MouseCode::ButtonMiddle
+#define SE_MOUSE_BUTTON_0      ::Se::ButtonCode::Button0
+#define SE_MOUSE_BUTTON_1      ::Se::ButtonCode::Button1
+#define SE_MOUSE_BUTTON_2      ::Se::ButtonCode::Button2
+#define SE_MOUSE_BUTTON_3      ::Se::ButtonCode::Button3
+#define SE_MOUSE_BUTTON_4      ::Se::ButtonCode::Button4
+#define SE_MOUSE_BUTTON_5      ::Se::ButtonCode::Button5
+#define SE_MOUSE_BUTTON_6      ::Se::ButtonCode::Button6
+#define SE_MOUSE_BUTTON_7      ::Se::ButtonCode::Button7
+#define SE_MOUSE_BUTTON_LAST   ::Se::ButtonCode::ButtonLast
+#define SE_MOUSE_BUTTON_LEFT   ::Se::ButtonCode::ButtonLeft
+#define SE_MOUSE_BUTTON_RIGHT  ::Se::ButtonCode::ButtonRight
+#define SE_MOUSE_BUTTON_MIDDLE ::Se::ButtonCode::ButtonMiddle
