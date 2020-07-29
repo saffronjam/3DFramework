@@ -21,6 +21,6 @@ void SandboxLayer::OnImGuiRender()
 {
 }
 
-void SandboxLayer::OnEvent(const Se::Event &pEvent)
+void SandboxLayer::OnEvent(const Se::Event &event)
 {
 }

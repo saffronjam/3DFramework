@@ -12,7 +12,7 @@ public:
 	void OnUpdate(Se::Time ts) override;
 	void OnImGuiRender() override;
 
-	void OnEvent(const Se::Event &pEvent) override;
+	void OnEvent(const Se::Event &event) override;
 
 
 };

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/Event/WindowEvent.h"

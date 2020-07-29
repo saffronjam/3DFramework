@@ -1,6 +1,6 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 
-#include <Glad/glad.h>
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "Platform/Windows/WindowsWindow.h"
@@ -8,6 +8,7 @@
 #include "Saffron/Event/MouseEvent.h"
 #include "Saffron/GL/GLCheck.h"
 #include "Saffron/System/ScopedLock.h"
+#include "Platform/OpenGL/OpenGLContext.h"
 
 namespace Se
 {
@@ -43,7 +44,6 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	m_NativeWindow = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
-	glfwMakeContextCurrent(m_NativeWindow);
 	SetupGLFWCallbacks();
 
 	// Initialize Glad
