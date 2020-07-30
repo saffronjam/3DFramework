@@ -1,10 +1,8 @@
 ﻿#pragma once
 
-#include <memory>
-
 #include <spdlog/spdlog.h>
 
-#include "Saffron/Config.h"
+#include "Saffron/SaffronPCH.h"
 
 namespace Se
 {

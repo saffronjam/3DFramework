@@ -1,9 +1,7 @@
 #pragma once
 
-#include <utility>
-#include <random>
-
-#include "SeMath.h"
+#include "Saffron/SaffronPCH.h"
+#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {
@@ -16,7 +14,7 @@ public:
 	{
 	};
 
-	int Gen() { return (double)((rand() % ((int)m_upper - (int)m_lower)) + (int)m_lower); }
+	int Gen() { return static_cast<double>((rand() % (static_cast<int>(m_upper) - static_cast<int>(m_lower))) + static_cast<int>(m_lower)); }
 
 	void SetLowerBound(int lowerBound_IN) { m_lower = lowerBound_IN; };
 	void SetUpperBound(int upperBound_IN) { m_upper = upperBound_IN; };
@@ -25,12 +23,12 @@ public:
 	{
 		static std::random_device rd;
 		static std::mt19937 e(rd());
-		std::uniform_real_distribution<float> dis(static_cast<float>(low), static_cast<float>(high));
+		const std::uniform_real_distribution<float> dis(static_cast<float>(low), static_cast<float>(high));
 		return static_cast<int>(dis(e));
 	}
 
 	template<typename T = float>
-	static T Real(T low = (T)0, T high = (T)1)
+	static T Real(T low = static_cast<T>(0), T high = static_cast<T>(1))
 	{
 		static std::random_device rd;
 		static std::mt19937 e(rd());

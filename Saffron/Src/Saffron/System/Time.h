@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Saffron/Config.h"
-
 namespace Se
 {
 class Time

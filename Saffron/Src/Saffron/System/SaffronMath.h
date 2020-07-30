@@ -7,6 +7,8 @@
 
 #include "Saffron/Config.h"
 
+namespace Se
+{
 class Math
 {
 public:
@@ -16,3 +18,4 @@ public:
 	float E = 2.71828182845904523536f;
 	double E_D = static_cast<double>(E);
 };
+}
