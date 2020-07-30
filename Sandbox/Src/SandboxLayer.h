@@ -5,7 +5,7 @@
 class SandboxLayer : public Se::Layer
 {
 public:
-	SandboxLayer(const Se::Ref<Se::Window> &pWindow);
+	SandboxLayer();
 
 	void OnAttach() override;
 	void OnDetach() override;

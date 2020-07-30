@@ -1,7 +1,7 @@
 ﻿#include "SandboxLayer.h"
 
-SandboxLayer::SandboxLayer(const Se::Ref<Se::Window> &pWindow)
-	: Layer(pWindow, "Sandbox")
+SandboxLayer::SandboxLayer()
+	: Layer("Sandbox")
 {
 }
 

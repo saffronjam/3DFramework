@@ -27,7 +27,6 @@ public:
 	void SetVSync(bool enabled) override;
 	bool IsVSync() const override;
 
-
 private:
 	void OnResize(const WindowResizeEvent &event);
 	void OnMove(const WindowMoveEvent &event);

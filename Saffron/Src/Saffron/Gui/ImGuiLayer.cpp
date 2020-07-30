@@ -11,8 +11,8 @@
 namespace Se
 {
 
-ImGuiLayer::ImGuiLayer(const Ref<Window> &pWindow)
-	: Layer(pWindow, "ImGui")
+ImGuiLayer::ImGuiLayer()
+	: Layer("ImGui")
 {
 }
 

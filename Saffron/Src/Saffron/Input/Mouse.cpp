@@ -1,21 +1,19 @@
 #include "Saffron/SaffronPCH.h"
+
 #include "Saffron/Input/Mouse.h"
-#include "Saffron/Graphics/Window.h"
 
 namespace Se
 {
 
-Mouse::Mouse(Window &window)
+Mouse::Mouse()
 	:
-	m_wnd(window),
 	m_position(0.0f, 0.0f),
 	m_moveDelta(0.0f, 0.0f),
 	m_isInScreen(true)
 {
-	window.AddEventHandler(this);
 }
 
-void Mouse::Update()
+void Mouse::OnUpdate()
 {
 	m_prevButtonmap = m_buttonmap;
 	m_moveDelta = glm::vec2{ 0.0f, 0.0f };

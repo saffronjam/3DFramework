@@ -9,7 +9,7 @@ public:
 	SandboxApp()
 		:
 		Application(),
-		m_layer(Se::CreateRef<SandboxLayer>(GetWindow()))
+		m_layer(Se::CreateRef<SandboxLayer>())
 	{
 		PushLayer(m_layer);
 	}

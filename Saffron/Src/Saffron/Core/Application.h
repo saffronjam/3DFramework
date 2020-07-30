@@ -2,7 +2,6 @@
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
-#include "Saffron/Event/EventHandler.h"
 #include "Saffron/Event/WindowEvent.h"
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/Gui/ImGuiLayer.h"
@@ -13,7 +12,7 @@
 
 namespace Se
 {
-class Application : public EventHandler
+class Application
 {
 public:
 	Application();
@@ -25,7 +24,7 @@ public:
 	void PushLayer(const Ref<Layer> &layer);
 	void PushOverlay(const Ref<Layer> &layer);
 
-	void OnEvent(const Event &event) override;
+	void OnEvent(const Event &event);
 
 	const Ref<Window> &GetWindow() const;
 	const Ref<ImGuiLayer> &GetImGuiLayer() const;

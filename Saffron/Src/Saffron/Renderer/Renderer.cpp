@@ -7,11 +7,6 @@ namespace Se
 
 Scope<Renderer::SceneData> Renderer::m_sSceneData = CreateScope<SceneData>();
 
-Renderer::Renderer(Window &window)
-{
-	window.AddEventHandler(this);
-}
-
 void Renderer::Init()
 {
 	//SE_PROFILE_FUNCTION();
@@ -28,7 +23,7 @@ void Renderer::Shutdown()
 void Renderer::OnEvent(const Event &event)
 {
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Renderer::OnWindowResize));
+	dispatcher.Try<WindowResizeEvent>(&OnWindowResize);
 }
 
 //void Renderer::BeginScene(OrthographicCamera &camera)
@@ -59,4 +54,5 @@ void Renderer::OnWindowResize(const WindowResizeEvent &event)
 {
 	RenderCommand::SetViewport(0, 0, event.GetWidth(), event.GetHeight());
 }
+
 }

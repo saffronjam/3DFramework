@@ -6,12 +6,14 @@
 #include <mutex>
 #include <random>
 #include <fstream>
+#include <optional>
 
 #include <atomic>
 #include <string>
 #include <sstream>
 #include <array>
 #include <vector>
+#include <deque>
 #include <map>
 #include <set>
 

@@ -12,11 +12,9 @@ Application *Application::m_sInstance = nullptr;
 Application::Application()
 	:
 	m_pWindow(Se::Window::Create(Se::WindowProps())),
-	m_Keyboard(*m_pWindow),
-	m_Mouse(*m_pWindow),
-	m_pImGuiLayer(CreateRef<ImGuiLayer>(m_pWindow))
+	m_pImGuiLayer(CreateRef<ImGuiLayer>())
 {
-	m_pWindow->AddEventHandler(this);
+	m_pWindow->SetEventCallback(SE_EVENT_FN(Application::OnEvent));
 
 	SE_ASSERT(!m_sInstance, "Application already exist");
 	m_sInstance = this;
@@ -34,13 +32,15 @@ Application::~Application()
 
 void Application::Run()
 {
+	glm::vec4 color = { 0.0f, 0.0f, 0.0f, 0.0f };
+
 	while ( m_Running )
 	{
 		dt = m_AppTimer.Mark();
 
+		m_Keyboard.OnUpdate();
+		m_Mouse.OnUpdate();
 		m_pWindow->HandleBufferedEvents();
-		m_Keyboard.Update();
-		m_Mouse.Update();
 
 		if ( !m_Minimized )
 		{
@@ -48,7 +48,15 @@ void Application::Run()
 			mousePos.x /= m_pWindow->GetWidth();
 			mousePos.y /= m_pWindow->GetHeight();
 
-			RenderCommand::SetClearColor(glm::vec4(mousePos.x, mousePos.y, 0.0f, 1.0f));
+			color.r = mousePos.x;
+			color.g = mousePos.y;
+
+			if ( m_Keyboard.IsPressed(SE_KEY_UP) )
+				color.b += 0.1f;
+			if ( m_Keyboard.IsPressed(SE_KEY_DOWN) )
+				color.b -= 0.1f;
+
+			RenderCommand::SetClearColor(color);
 			RenderCommand::Clear();
 
 			// Normal updates and rendering
@@ -61,7 +69,6 @@ void Application::Run()
 				layer->OnImGuiRender();
 			m_pImGuiLayer->End();
 		}
-
 		m_pWindow->OnUpdate();
 	}
 }
@@ -84,9 +91,30 @@ void Application::PushOverlay(const Ref<Layer> &layer)
 
 void Application::OnEvent(const Event &event)
 {
+	// TODO: Optimize this if event is handled?
+
+	// Application events
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<WindowCloseEvent>(SE_EVENT_FN(Application::OnWindowClose));
 	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Application::OnWindowResize));
+
+	// Window events
+	m_pWindow->OnEvent(event);
+
+	// Keyboard events
+	m_Keyboard.OnEvent(event);
+
+	// Mouse events
+	m_Mouse.OnEvent(event);
+
+	// Renderer events
+	Renderer::OnEvent(event);
+
+	// Layer events
+	for ( const auto &layer : m_LayerStack )
+	{
+		layer->OnEvent(event);
+	}
 }
 
 const Ref<Window> &Application::GetWindow() const

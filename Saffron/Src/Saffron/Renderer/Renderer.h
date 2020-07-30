@@ -1,8 +1,6 @@
 ﻿#pragma once
 
-#include "Saffron/Event/EventHandler.h"
 #include "Saffron/Event/WindowEvent.h"
-#include "Saffron/Graphics/Window.h"
 #include "Saffron/Renderer/RenderCommand.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/Shader.h"
@@ -10,16 +8,15 @@
 
 namespace Se
 {
-class Renderer : public EventHandler
+class Renderer
 {
 public:
-	explicit Renderer(Window &window);
 	virtual ~Renderer() = default;
 
 	static void Init();
 	static void Shutdown();
 
-	void OnEvent(const Event &event) override;
+	static void OnEvent(const Event &event);
 
 	//static void BeginScene(OrthographicCamera &camera);
 	static void EndScene();
@@ -29,7 +26,7 @@ public:
 	static RendererAPI::API GetAPI();
 
 private:
-	void OnWindowResize(const WindowResizeEvent &event);
+	static void OnWindowResize(const WindowResizeEvent &event);
 
 private:
 	struct SceneData

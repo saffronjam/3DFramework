@@ -2,7 +2,7 @@
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
-#include "Saffron/Event/EventHandler.h"
+#include "Saffron/Event/WindowEvent.h" 
 #include "Saffron/System/SaffronMath.h"
 
 // TEMPORARY
@@ -27,25 +27,28 @@ struct WindowProps
 };
 
 // Interface representing a desktop system based Window
-class Window : public EventHandler
+class Window
 {
+public:
+	using EventCallback = std::function<void(const Event &)>;
+
 public:
 	Window();
 	virtual ~Window() = default;
 
 	virtual void OnUpdate() = 0;
-	void OnEvent(const Event &event) override {};
+	virtual void OnEvent(const Event &event) {}
 
 	virtual void Close() = 0;
 	virtual	void Focus() = 0;
 
 	template<typename T, typename...Params>
 	void PushEvent(Params &&...params);
-	void AddEventHandler(EventHandler *handler);
 	void HandleBufferedEvents();
+	void SetEventCallback(const EventCallback &callback);
 
-	virtual uint32_t GetWidth() const;
-	virtual uint32_t GetHeight() const;
+	virtual Uint32 GetWidth() const;
+	virtual Uint32 GetHeight() const;
 	virtual const glm::vec2 &GetPosition() const;
 	virtual void *GetNativeWindow() const = 0;
 
@@ -54,24 +57,23 @@ public:
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
 
-
 	static Ref<Window> Create(const WindowProps &props = WindowProps());
 
 protected:
 	std::string m_Title;
 	glm::vec2 m_Position;
-	unsigned int m_Width, m_Height;
+	Uint32 m_Width, m_Height;
 
 private:
-	std::vector<Ref<Event>> m_events;
-	std::set<EventHandler *> m_handlers;
+	std::vector<Ref<Event>> m_Events;
+	std::optional<EventCallback> m_EventCallback;
 };
 
 template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
-	m_events.emplace_back(std::make_shared<T>(std::forward<Params>(params)...));
-	SE_INFO("{0}", m_events.back()->ToString());
+	m_Events.emplace_back(std::make_shared<T>(std::forward<Params>(params)...));
+	SE_INFO("{0}", m_Events.back()->ToString());
 }
 
 };

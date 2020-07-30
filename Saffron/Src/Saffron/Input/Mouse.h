@@ -3,22 +3,21 @@
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
 #include "Saffron/Event/MouseEvent.h"
-#include "Saffron/Event/EventHandler.h"
 #include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {
-class Mouse : public EventHandler
+class Mouse
 {
 public:
 	using Button = ButtonCode;
 
 public:
-	explicit Mouse(class Window &window);
+	Mouse();
 	virtual ~Mouse() = default;
 
-	void Update();
-	void OnEvent(const Event &event) override;
+	void OnUpdate();
+	void OnEvent(const Event &event);
 
 	bool IsDown(Button button) const;
 	bool WasDown(Button button) const;
@@ -38,8 +37,6 @@ private:
 	void OnLeave(const MouseLeaveEvent &event);
 
 private:
-	class Window &m_wnd;
-
 	mutable std::map<Button, bool> m_buttonmap;
 	mutable std::map<Button, bool> m_prevButtonmap;
 

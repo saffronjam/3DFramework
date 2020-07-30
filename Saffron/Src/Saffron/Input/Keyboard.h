@@ -3,21 +3,20 @@
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
 #include "Saffron/Event/KeyboardEvent.h"
-#include "Saffron/Event/EventHandler.h"
 
 namespace Se
 {
-class Keyboard : public EventHandler
+class Keyboard
 {
 public:
 	using Key = KeyCode;
 
 public:
-	explicit Keyboard(class Window &window);
+	Keyboard() = default;
 	virtual ~Keyboard() = default;
 
-	void Update();
-	void OnEvent(const Event &event) override;
+	void OnUpdate();
+	void OnEvent(const Event &event);
 
 	bool IsDown(Key key) const;
 	bool WasDown(Key key) const;
@@ -32,8 +31,6 @@ private:
 	void OnRepeat(const KeyboardRepeatEvent &event);
 
 private:
-	class Window &m_wnd;
-
 	mutable std::map<Key, bool> m_keymap;
 	mutable std::map<Key, bool> m_prevKeymap;
 	mutable std::map<Key, bool> m_repeatKeymap;

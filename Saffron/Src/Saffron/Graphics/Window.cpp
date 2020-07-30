@@ -14,29 +14,29 @@ Window::Window()
 {
 }
 
-void Window::AddEventHandler(EventHandler *handler)
-{
-	m_handlers.emplace(handler);
-}
-
 void Window::HandleBufferedEvents()
 {
-	for ( auto &event : m_events )
+	if ( m_EventCallback.has_value() )
 	{
-		for ( const auto &handler : m_handlers )
+		for ( const auto &event : m_Events )
 		{
-			handler->OnEvent(*event);
+			(*m_EventCallback)(*event);
 		}
 	}
-	m_events.clear();
+	m_Events.clear();
 }
 
-uint32_t Window::GetWidth() const
+void Window::SetEventCallback(const EventCallback &callback)
+{
+	m_EventCallback = callback;
+}
+
+Uint32 Window::GetWidth() const
 {
 	return m_Width;
 }
 
-uint32_t Window::GetHeight() const
+Uint32 Window::GetHeight() const
 {
 	return m_Height;
 }

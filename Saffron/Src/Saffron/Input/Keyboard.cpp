@@ -1,18 +1,11 @@
 ﻿#include "Saffron/SaffronPCH.h"
+
 #include "Saffron/Input/Keyboard.h"
-#include "Saffron/Graphics/Window.h"
 
 namespace Se
 {
 
-Keyboard::Keyboard(Window &window)
-	:
-	m_wnd(window)
-{
-	window.AddEventHandler(this);
-}
-
-void Keyboard::Update()
+void Keyboard::OnUpdate()
 {
 	m_prevKeymap = m_keymap;
 	for ( auto &[key, value] : m_repeatKeymap )
@@ -34,7 +27,7 @@ bool Keyboard::IsDown(Key key) const
 	return m_keymap[key];
 }
 
-bool Keyboard::WasDown(Keyboard::Key key) const
+bool Keyboard::WasDown(Key key) const
 {
 	if ( m_prevKeymap.find(key) == m_prevKeymap.end() )
 		m_prevKeymap[key] = false;

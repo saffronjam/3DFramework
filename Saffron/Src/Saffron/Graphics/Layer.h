@@ -2,16 +2,15 @@
 
 #include "Saffron/Config.h"
 #include "Saffron/Event/Event.h"
-#include "Saffron/Event/EventHandler.h"
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/System/Time.h"
 
 namespace Se
 {
-class Layer : public EventHandler
+class Layer
 {
 public:
-	Layer(const Ref<Window> &pWindow, std::string name = "Default");
+	Layer(std::string name = "Default");
 	virtual ~Layer() = default;
 
 	template<typename LayerType, typename ... Params>
@@ -22,11 +21,10 @@ public:
 	virtual void OnUpdate(Time ts) {}
 	virtual void OnImGuiRender() {}
 
-	void OnEvent(const Event &event) override {}
+	virtual void OnEvent(const Event &event) {}
 
 	const std::string &GetName() const { return m_DebugName; }
 protected:
-	Ref<Window> m_pWindow;
 	std::string m_DebugName;
 };
 
