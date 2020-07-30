@@ -5,6 +5,7 @@
 #include <chrono>
 #include <mutex>
 #include <random>
+#include <fstream>
 
 #include <atomic>
 #include <string>

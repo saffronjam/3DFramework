@@ -17,7 +17,7 @@ class Application : public EventHandler
 {
 public:
 	Application();
-	virtual ~Application() = default;
+	virtual ~Application();
 
 	void Run();
 	void Close();

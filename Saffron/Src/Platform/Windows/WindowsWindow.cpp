@@ -70,8 +70,6 @@ void WindowsWindow::OnUpdate()
 {
 	glfwPollEvents();
 	m_Context->SwapBuffers();
-	glCheck(glClearColor(1, 0, 1, 1));
-	glCheck(glClear(GL_COLOR_BUFFER_BIT));
 }
 
 void WindowsWindow::OnEvent(const Event &event)

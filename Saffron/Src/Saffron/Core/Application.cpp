@@ -1,5 +1,7 @@
 ﻿#include "Saffron/SaffronPCH.h"
+
 #include "Saffron/Core/Application.h"
+#include "Saffron/Renderer/Renderer.h"
 #include "Saffron/System/Log.h"
 
 namespace Se
@@ -19,7 +21,14 @@ Application::Application()
 	SE_ASSERT(!m_sInstance, "Application already exist");
 	m_sInstance = this;
 
+	Renderer::Init();
+
 	PushLayer(m_pImGuiLayer);
+}
+
+Application::~Application()
+{
+	Renderer::Shutdown();
 }
 
 
@@ -35,6 +44,13 @@ void Application::Run()
 
 		if ( !m_Minimized )
 		{
+			auto mousePos = m_Mouse.GetPosition();
+			mousePos.x /= m_pWindow->GetWidth();
+			mousePos.y /= m_pWindow->GetHeight();
+
+			RenderCommand::SetClearColor(glm::vec4(mousePos.x, mousePos.y, 0.0f, 1.0f));
+			RenderCommand::Clear();
+
 			// Normal updates and rendering
 			for ( auto &layer : m_LayerStack )
 				layer->OnUpdate(dt);
