@@ -2,6 +2,7 @@
 
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Renderer/GraphicsContext.h"
 
 struct GLFWwindow;
 
@@ -38,8 +39,8 @@ private:
 
 private:
 	GLFWwindow *m_NativeWindow;
-	//Scope<GraphicsContext> m_Context;
-	static bool m_sInitialized;
+	Scope<GraphicsContext> m_Context;
+	static bool m_sGLFWInitialized;
 	bool m_VSync;
 };
 }

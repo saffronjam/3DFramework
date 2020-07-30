@@ -13,16 +13,13 @@
 namespace Se
 {
 
-bool WindowsWindow::m_sInitialized = false;
+bool WindowsWindow::m_sGLFWInitialized = false;
 
 WindowsWindow::WindowsWindow(const WindowProps &props)
 	:
 	m_NativeWindow(nullptr),
 	m_VSync(false)
 {
-	static const auto *failMessage = "Failed to initialize {0}";
-	static const auto *successMessage = "Successfully initialized {0}";
-
 	m_Title = props.Title;
 	m_Width = props.Width;
 	m_Height = props.Height;
@@ -32,34 +29,22 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 	ScopedLock lock(mutex);
 
 	// Initialize GLFW
-	if ( !m_sInitialized )
+	if ( !m_sGLFWInitialized )
 	{
 		const auto success = glfwInit();
-		SE_CORE_ASSERT(success, failMessage, "GLFW");
-		if ( success )
-		{
-			SE_CORE_INFO(successMessage, "GLFW");
-		}
+		SE_CORE_ASSERT(success, "Failed to initialize GLFW");
+		m_sGLFWInitialized = true;
 	}
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
 	m_NativeWindow = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
 	SetupGLFWCallbacks();
 
-	// Initialize Glad
-	if ( !m_sInitialized )
-	{
-		const auto success = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-		SE_CORE_ASSERT(success, failMessage, "Glad");
-		if ( success )
-		{
-			SE_CORE_INFO(successMessage, "Glad");
-		}
-	}
+	m_Context = GraphicsContext::Create(m_NativeWindow);
+
 	glCheck(glEnable(GL_DEPTH_TEST));
 	glCheck(glEnable(GL_CULL_FACE));
 
-	m_sInitialized = true;
 
 	SE_CORE_INFO("Creating Window \"{0}\" ({1:d}x{2:d})", m_Title, m_Width, m_Height);
 
@@ -84,7 +69,7 @@ WindowsWindow::~WindowsWindow()
 void WindowsWindow::OnUpdate()
 {
 	glfwPollEvents();
-	glfwSwapBuffers(m_NativeWindow);
+	m_Context->SwapBuffers();
 	glCheck(glClearColor(1, 0, 1, 1));
 	glCheck(glClear(GL_COLOR_BUFFER_BIT));
 }
@@ -102,7 +87,6 @@ void WindowsWindow::OnEvent(const Event &event)
 void WindowsWindow::Close()
 {
 	glfwSetWindowShouldClose(m_NativeWindow, GLFW_TRUE);
-
 }
 
 void WindowsWindow::Focus()
