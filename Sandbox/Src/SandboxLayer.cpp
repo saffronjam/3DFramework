@@ -5,7 +5,7 @@ SandboxLayer::SandboxLayer(const Se::Keyboard &keyboard, const Se::Mouse &mouse)
 	Layer("Sandbox"),
 	m_Keyboard(keyboard),
 	m_Mouse(mouse),
-	m_CameraController(16.0f / 9.0f, true)
+	m_CameraController(16.0f / 9.0f)
 {
 	m_VertexArray = Se::VertexArray::Create();
 

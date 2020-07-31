@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Saffron/Renderer/Camera2D.h"
+#include "Saffron/Renderer/Camera3D.h"
 #include "Saffron/System/Time.h"
 
 #include "Saffron/Input/Keyboard.h"
@@ -11,16 +11,16 @@
 
 namespace Se
 {
-class CameraController2D
+class CameraController3D
 {
 public:
-	explicit CameraController2D(float aspectRatio, bool rotationEnabled = false);
+	explicit CameraController3D(float aspectRatio);
 
 	void OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts);
 	void OnEvent(const Event &event);
 
-	Camera2D &GetCamera();
-	const Camera2D &GetCamera() const;
+	Camera3D &GetCamera();
+	const Camera3D &GetCamera() const;
 
 	float GetZoomLevel() const;
 	void SetZoomLevel(float level);
@@ -31,11 +31,10 @@ private:
 
 private:
 	float m_AspectRatio, m_ZoomLevel;
-	bool m_RotationEnabled;
 
 	glm::vec3 m_CameraPosition;
-	float m_CameraRotation;
+	float m_CameraYaw, m_CameraPitch;
 	float m_CameraTranslationSpeed, m_CameraRotationSpeed;
-	Camera2D m_Camera;
+	Camera3D m_Camera;
 };
 }

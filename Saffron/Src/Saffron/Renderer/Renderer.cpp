@@ -31,6 +31,11 @@ void Renderer::BeginScene(Camera2D &camera)
 	m_sSceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 }
 
+void Renderer::BeginScene(Camera3D &camera)
+{
+	m_sSceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+}
+
 void Renderer::EndScene()
 {
 }

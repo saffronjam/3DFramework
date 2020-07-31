@@ -1,33 +1,24 @@
 ﻿#pragma once
 
+#include "Saffron/Renderer/Camera.h"
 #include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {
-class Camera2D
+class Camera2D : public Camera
 {
 public:
-	Camera2D(float left, float right, float bottom, float top);
+	Camera2D(const glm::vec3 &position, float left, float right, float bottom, float top);
+	virtual ~Camera2D() = default;
 
 	void SetProjection(float left, float right, float bottom, float top);
 
-	const glm::vec3 &GetPosition() const { return m_Position; }
-	void SetPosition(const glm::vec3 &position) { m_Position = position; RecalculateViewMatrix(); }
+	float GetRotation() const;
+	void SetRotation(float rotation);
 
-	float GetRotation() const { return m_Rotation; }
-	void SetRotation(float rotation) { m_Rotation = rotation; RecalculateViewMatrix(); }
+	void RecalculateViewMatrix() override;
 
-	const glm::mat4 &GetProjectionMatrix() const { return m_ProjectionMatrix; }
-	const glm::mat4 &GetViewMatrix() const { return m_ViewMatrix; }
-	const glm::mat4 &GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 private:
-	void RecalculateViewMatrix();
-private:
-	glm::mat4 m_ProjectionMatrix;
-	glm::mat4 m_ViewMatrix;
-	glm::mat4 m_ViewProjectionMatrix;
-
-	glm::vec3 m_Position = { 0.0f, 0.0f, 0.0f };
-	float m_Rotation = 0.0f;
+	float m_Rotation;
 };
 }

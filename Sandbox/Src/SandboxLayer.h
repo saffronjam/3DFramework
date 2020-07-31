@@ -25,6 +25,6 @@ private:
 	Se::Ref<Se::Shader> m_FlatColorShader;
 	Se::Ref<Se::VertexArray> m_SquareVA;
 
-	Se::CameraController2D m_CameraController;
+	Se::CameraController3D m_CameraController;
 	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 };

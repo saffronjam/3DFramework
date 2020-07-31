@@ -5,13 +5,13 @@
 namespace Se
 {
 
-Camera2D::Camera2D(float left, float right, float bottom, float top)
+Camera2D::Camera2D(const glm::vec3 &position, float left, float right, float bottom, float top)
 	:
-	m_ProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)),
-	m_ViewMatrix(1.0f),
-	m_ViewProjectionMatrix(m_ProjectionMatrix *m_ViewMatrix)
+	Camera(position, glm::ortho(left, right, bottom, top, -1.0f, 1.0f)),
+	m_Rotation(0.0f)
 {
 	//SE_PROFILE_FUNCTION();
+	Camera2D::RecalculateViewMatrix();
 }
 
 void Camera2D::SetProjection(float left, float right, float bottom, float top)
@@ -20,6 +20,17 @@ void Camera2D::SetProjection(float left, float right, float bottom, float top)
 
 	m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
 	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+}
+
+float Camera2D::GetRotation() const
+{
+	return m_Rotation;
+}
+
+void Camera2D::SetRotation(float rotation)
+{
+	m_Rotation = rotation;
+	RecalculateViewMatrix();
 }
 
 void Camera2D::RecalculateViewMatrix()

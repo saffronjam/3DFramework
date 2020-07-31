@@ -14,7 +14,7 @@ CameraController2D::CameraController2D(float aspectRatio, bool rotationEnabled)
 	m_CameraRotation(0.0f),
 	m_CameraTranslationSpeed(5.0f),
 	m_CameraRotationSpeed(180.0f),
-	m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio *m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel)
+	m_Camera(m_CameraPosition, -m_AspectRatio * m_ZoomLevel, m_AspectRatio *m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel)
 {
 }
 
@@ -59,7 +59,6 @@ void CameraController2D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, 
 		{
 			m_CameraRotation -= 360.0f;
 		}
-
 		m_Camera.SetRotation(m_CameraRotation);
 	}
 
@@ -75,6 +74,26 @@ void CameraController2D::OnEvent(const Event &event)
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<MouseScrollEvent>(SE_EVENT_FN(CameraController2D::OnMouseScroll));
 	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(CameraController2D::OnWindowResize));
+}
+
+Camera2D &CameraController2D::GetCamera()
+{
+	return m_Camera;
+}
+
+const Camera2D &CameraController2D::GetCamera() const
+{
+	return m_Camera;
+}
+
+float CameraController2D::GetZoomLevel() const
+{
+	return m_ZoomLevel;
+}
+
+void CameraController2D::SetZoomLevel(float level)
+{
+	m_ZoomLevel = level;
 }
 
 void CameraController2D::OnWindowResize(const WindowResizeEvent &event)
