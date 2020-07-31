@@ -27,13 +27,15 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 
 }
 
+
 OpenGLVertexArray::OpenGLVertexArray()
 	:
 	m_RendererID(0u)
 {
 	//SE_PROFILE_FUNCTION();
 
-	glCreateVertexArrays(1, &m_RendererID);
+
+	//glCreateVertexArrays(1, &m_RendererID);
 }
 
 OpenGLVertexArray::~OpenGLVertexArray()

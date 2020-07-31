@@ -2,7 +2,6 @@
 
 #include <glad/glad.h>
 
-#include "Saffron/System/Log.h"
 #include "Platform/OpenGL/OpenGLRendererAPI.h"
 
 namespace Se

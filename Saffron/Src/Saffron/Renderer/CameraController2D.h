@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Saffron/Renderer/OrthographicCamera.h"
+#include "Saffron/Renderer/Camera2D.h"
 #include "Saffron/System/Time.h"
 
 #include "Saffron/Input/Keyboard.h"
@@ -11,34 +11,33 @@
 
 namespace Se
 {
-class OrthographicCameraController
+class CameraController2D
 {
 public:
-	OrthographicCameraController(float aspectRatio, bool rotation = false);
+	CameraController2D(float aspectRatio, bool rotationEnabled = false);
 
 	void OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts);
 	void OnEvent(const Event &event);
 
-
-	OrthographicCamera &GetCamera() { return m_Camera; }
-	const OrthographicCamera &GetCamera() const { return m_Camera; }
+	Camera2D &GetCamera() { return m_Camera; }
+	const Camera2D &GetCamera() const { return m_Camera; }
 
 	float GetZoomLevel() const { return m_ZoomLevel; }
 	void SetZoomLevel(float level) { m_ZoomLevel = level; }
 
 private:
 	void OnWindowResize(const WindowResizeEvent &event);
-	bool OnMouseScroll(const MouseScrollEvent &event);
+	void OnMouseScroll(const MouseScrollEvent &event);
 
 private:
 	float m_AspectRatio;
 	float m_ZoomLevel;
 
-	bool m_Rotation;
+	bool m_RotationEnabled;
 
 	glm::vec3 m_CameraPosition;
 	float m_CameraRotation;
 	float m_CameraTranslationSpeed, m_CameraRotationSpeed;
-	OrthographicCamera m_Camera;
+	Camera2D m_Camera;
 };
 }

@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Event/WindowEvent.h"
-#include "Saffron/Renderer/OrthographicCamera.h"
+#include "Saffron/Renderer/Camera2D.h"
 #include "Saffron/Renderer/RenderCommand.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/Shader.h"
@@ -19,7 +19,7 @@ public:
 
 	static void OnEvent(const Event &event);
 
-	static void BeginScene(OrthographicCamera &camera);
+	static void BeginScene(Camera2D &camera);
 	static void EndScene();
 
 	static void Submit(const Ref<Shader> &shader, const Ref<VertexArray> &vertexArray, const glm::mat4 &transform = glm::mat4(1.0f));

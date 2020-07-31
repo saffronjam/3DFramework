@@ -5,21 +5,18 @@
 #include "Saffron/Event/WindowEvent.h" 
 #include "Saffron/System/SaffronMath.h"
 
-// TEMPORARY
-#include "Saffron/System/Log.h"
-
 namespace Se
 {
 struct WindowProps
 {
 	std::string Title;
-	unsigned int Width;
-	unsigned int Height;
+	Uint32 Width;
+	Uint32 Height;
 	glm::vec2 Position;
 
 	explicit WindowProps(const std::string &title = "Saffron Engine",
-						 unsigned int width = 1280,
-						 unsigned int height = 720,
+						 Uint32 width = 1280,
+						 Uint32 height = 720,
 						 const glm::vec2 position = { 100.0f, 100.0f })
 		: Title(title), Width(width), Height(height), Position(position)
 	{
@@ -73,9 +70,7 @@ template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
 	m_Events.emplace_back(std::make_shared<T>(std::forward<Params>(params)...));
-	SE_INFO("{0}", m_Events.back()->ToString());
+	//SE_INFO("{0}", m_Events.back()->ToString());
 }
 
 };
-
-

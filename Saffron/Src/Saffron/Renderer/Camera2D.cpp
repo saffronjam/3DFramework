@@ -1,11 +1,11 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
-#include "Saffron/Renderer/OrthographicCamera.h"
+#include "Saffron/Renderer/Camera2D.h"
 
 namespace Se
 {
 
-OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top)
+Camera2D::Camera2D(float left, float right, float bottom, float top)
 	:
 	m_ProjectionMatrix(glm::ortho(left, right, bottom, top, -1.0f, 1.0f)),
 	m_ViewMatrix(1.0f),
@@ -14,7 +14,7 @@ OrthographicCamera::OrthographicCamera(float left, float right, float bottom, fl
 	//SE_PROFILE_FUNCTION();
 }
 
-void OrthographicCamera::SetProjection(float left, float right, float bottom, float top)
+void Camera2D::SetProjection(float left, float right, float bottom, float top)
 {
 	//SE_PROFILE_FUNCTION();
 
@@ -22,7 +22,7 @@ void OrthographicCamera::SetProjection(float left, float right, float bottom, fl
 	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 }
 
-void OrthographicCamera::RecalculateViewMatrix()
+void Camera2D::RecalculateViewMatrix()
 {
 	//SE_PROFILE_FUNCTION();
 

@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Saffron/SaffronPCH.h"
+#include "Saffron/Config.h"
 
 namespace Se
 {
@@ -10,22 +10,14 @@ namespace Se
 class Log
 {
 public:
-	using Ptr = ::std::shared_ptr<spdlog::logger>;
-public:
 	static void Init();
 
-	inline static Ptr &GetCoreLogger()
-	{
-		return m_sCoreLogger;
-	}
-	inline static Ptr &GetClientLogger()
-	{
-		return m_sClientLogger;
-	}
+	static Ref<spdlog::logger> &GetCoreLogger();
+	static Ref<spdlog::logger> &GetClientLogger();
 
 private:
-	static Ptr m_sCoreLogger;
-	static Ptr m_sClientLogger;
+	static Ref<spdlog::logger> m_sCoreLogger;
+	static Ref<spdlog::logger> m_sClientLogger;
 
 };
 

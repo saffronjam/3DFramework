@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Saffron/Config.h"
 #include "Saffron/Renderer/GraphicsContext.h"
 
 struct GLFWwindow;

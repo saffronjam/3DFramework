@@ -2,11 +2,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Saffron/SaffronPCH.h"
 #include "Saffron/Gui/ImGuiLayer.h"
 #include "Saffron/Core/Application.h"
 #include "Saffron/Gui/ImGuiImpl.h"
-#include "Saffron/System/Log.h"
 
 namespace Se
 {

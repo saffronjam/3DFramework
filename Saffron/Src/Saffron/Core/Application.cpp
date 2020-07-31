@@ -2,7 +2,6 @@
 
 #include "Saffron/Core/Application.h"
 #include "Saffron/Renderer/Renderer.h"
-#include "Saffron/System/Log.h"
 
 namespace Se
 {

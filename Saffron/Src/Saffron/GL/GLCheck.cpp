@@ -1,9 +1,8 @@
-#include "Saffron/SaffronPCH.h"
-#include "Saffron/GL/GLCheck.h"
-#include "Saffron/SaffronPCH.h"
-#include "Saffron/System/Log.h"
+﻿#include "Saffron/SaffronPCH.h"
 
 #include <glad/glad.h>
+
+#include "Saffron/GL/GLCheck.h"
 
 namespace Se
 {

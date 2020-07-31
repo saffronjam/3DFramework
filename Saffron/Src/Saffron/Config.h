@@ -20,6 +20,7 @@
 #endif
 
 #ifdef SE_DEBUG
+#define SE_ENABLE_ASSERTS
 #if defined(SE_PLATFORM_WINDOWS)
 #define SE_DEBUGBREAK() __debugbreak()
 #elif defined(SE_PLATFORM_LINUX)

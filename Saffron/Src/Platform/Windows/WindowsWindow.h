@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Saffron/Config.h"
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/Event/WindowEvent.h"
 #include "Saffron/Renderer/GraphicsContext.h"
@@ -39,7 +40,7 @@ private:
 private:
 	GLFWwindow *m_NativeWindow;
 	Scope<GraphicsContext> m_Context;
-	static bool m_sGLFWInitialized;
+	static Uint16 m_sGLFWWindowCount;
 	bool m_VSync;
 };
 }

@@ -13,8 +13,9 @@
 #include "Saffron/Graphics/Window.h"
 
 // Renderer include
-#include "Saffron/Renderer/OrthographicCamera.h"
-#include "Saffron/Renderer/OrthographicCameraController.h"
+#include "Saffron/Renderer/Camera2D.h"
+#include "Saffron/Renderer/CameraController2D.h"
+#include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/RenderCommand.h"
 #include "Saffron/Renderer/Buffer.h"
 #include "Saffron/Renderer/Shader.h"

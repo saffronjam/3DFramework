@@ -24,7 +24,7 @@ public:
 	void PushLayer(const Ref<Layer> &layer);
 	void PushOverlay(const Ref<Layer> &layer);
 
-	void OnEvent(const Event &event);
+	virtual void OnEvent(const Event &event);
 
 	const Ref<Window> &GetWindow() const;
 	const Ref<ImGuiLayer> &GetImGuiLayer() const;

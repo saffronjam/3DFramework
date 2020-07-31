@@ -18,3 +18,5 @@
 #include <set>
 
 #include <cstdio>
+
+#include "Saffron/System/Log.h"

@@ -26,7 +26,7 @@ void Renderer::OnEvent(const Event &event)
 	dispatcher.Try<WindowResizeEvent>(&OnWindowResize);
 }
 
-void Renderer::BeginScene(OrthographicCamera &camera)
+void Renderer::BeginScene(Camera2D &camera)
 {
 	m_sSceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
 }

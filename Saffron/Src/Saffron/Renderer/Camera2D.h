@@ -4,10 +4,10 @@
 
 namespace Se
 {
-class OrthographicCamera
+class Camera2D
 {
 public:
-	OrthographicCamera(float left, float right, float bottom, float top);
+	Camera2D(float left, float right, float bottom, float top);
 
 	void SetProjection(float left, float right, float bottom, float top);
 

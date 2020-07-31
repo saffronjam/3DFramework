@@ -16,8 +16,8 @@ Scope<RendererAPI> RendererAPI::Create()
 {
 	switch ( m_sAPI )
 	{
-	case RendererAPI::API::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::API::OpenGL:	return CreateScope<OpenGLRendererAPI>();
+	case API::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+	case API::OpenGL:	return CreateScope<OpenGLRendererAPI>();
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 	}
 }

@@ -1,8 +1,7 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 
 #include <glad/glad.h>
 
-#include "Saffron/System/Log.h"
 #include "Saffron/System/SaffronMath.h"
 #include "Platform/OpenGL/OpenGLShader.h"
 
@@ -129,7 +128,7 @@ std::unordered_map<Uint32, std::string> OpenGLShader::PreProcess(const std::stri
 	{
 		//End of shader type declaration line
 		const size_t fileEnd = source.find_first_of("\r\n", pos);
-		SE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+		SE_CORE_ASSERT(fileEnd != std::string::npos, "Syntax error");
 
 		//Start of shader type name (after "#type " keyword)
 		const size_t begin = pos + typeTokenLength + 1;

@@ -1,19 +1,25 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Platform/Windows/WindowsWindow.h"
+#include "Saffron/Renderer/Renderer.h"
+#include "Saffron/System/ScopedLock.h"
+
 #include "Saffron/Event/KeyboardEvent.h"
 #include "Saffron/Event/MouseEvent.h"
-#include "Saffron/GL/GLCheck.h"
-#include "Saffron/System/ScopedLock.h"
+
 #include "Platform/OpenGL/OpenGLContext.h"
+#include "Platform/Windows/WindowsWindow.h"
 
 namespace Se
 {
 
-bool WindowsWindow::m_sGLFWInitialized = false;
+Uint16 WindowsWindow::m_sGLFWWindowCount = 0u;
+
+static void GLFWErrorCallback(int error, const char *description)
+{
+	SE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+}
 
 WindowsWindow::WindowsWindow(const WindowProps &props)
 	:
@@ -29,25 +35,26 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 	ScopedLock lock(mutex);
 
 	// Initialize GLFW
-	if ( !m_sGLFWInitialized )
+	if ( m_sGLFWWindowCount == 0 )
 	{
-		const auto success = glfwInit();
+		const int success = glfwInit();
 		SE_CORE_ASSERT(success, "Failed to initialize GLFW");
-		m_sGLFWInitialized = true;
+		glfwSetErrorCallback(GLFWErrorCallback);
 	}
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 4);
-	m_NativeWindow = glfwCreateWindow(m_Width, m_Height, m_Title.c_str(), nullptr, nullptr);
-	SetupGLFWCallbacks();
+
+#ifdef SE_DEBUG
+	if ( Renderer::GetAPI() == RendererAPI::API::OpenGL )
+		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+#endif
+
+	m_NativeWindow = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Title.c_str(), nullptr, nullptr);
+	++m_sGLFWWindowCount;
 
 	m_Context = GraphicsContext::Create(m_NativeWindow);
 
-	glCheck(glEnable(GL_DEPTH_TEST));
-	glCheck(glEnable(GL_CULL_FACE));
-
-
 	SE_CORE_INFO("Creating Window \"{0}\" ({1:d}x{2:d})", m_Title, m_Width, m_Height);
 
+	SetupGLFWCallbacks();
 	// Initialization events
 	{
 		double x, y;
@@ -164,7 +171,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetScrollCallback(m_NativeWindow, [](GLFWwindow *window, double xoffset, double yoffset)
 						  {
 							  auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-							  pWnd->PushEvent<MouseScrollEvent>(xoffset, yoffset);
+							  pWnd->PushEvent<MouseScrollEvent>(static_cast<float>(xoffset), static_cast<float>(yoffset));
 						  });
 	glfwSetCursorPosCallback(m_NativeWindow, [](GLFWwindow *window, double xpos, double ypos)
 							 {

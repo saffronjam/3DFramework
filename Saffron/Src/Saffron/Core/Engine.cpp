@@ -1,9 +1,8 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 
 #include <GLFW/glfw3.h>
 
 #include "Saffron/Core/Engine.h"
-#include "Saffron/System/Log.h"
 
 namespace Se
 {
