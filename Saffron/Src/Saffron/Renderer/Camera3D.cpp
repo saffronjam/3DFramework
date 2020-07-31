@@ -13,11 +13,15 @@ Camera3D::Camera3D(const glm::vec3 &position, float fov, float aspect, float nea
 	m_Yaw(-90.0f),
 	m_Pitch(0.0f)
 {
+	//SE_PROFILE_FUNCTION();
+
 	Camera3D::RecalculateViewMatrix();
 }
 
 void Camera3D::SetProjection(float fov, float aspect, float nearClip, float farClip)
 {
+	//SE_PROFILE_FUNCTION();
+
 	m_ProjectionMatrix = glm::perspective(fov, aspect, nearClip, farClip);
 	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
 }
@@ -45,19 +49,23 @@ const glm::vec3 &Camera3D::GetRight() const
 void Camera3D::SetYaw(float yaw)
 {
 	m_Yaw = yaw;
+	RecalculateViewMatrix();
 }
 
 void Camera3D::SetPitch(float pitch)
 {
 	m_Pitch = pitch;
+	RecalculateViewMatrix();
 }
 
 void Camera3D::RecalculateViewMatrix()
 {
-	glm::vec4 front;
-	front.x = cos(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
-	front.y = sin(glm::radians(m_Pitch));
-	front.z = sin(glm::radians(m_Yaw)) * cos(glm::radians(m_Pitch));
+	//SE_PROFILE_FUNCTION();
+
+	glm::vec3 front;
+	front.x = std::cos(glm::radians(m_Yaw)) * std::cos(glm::radians(m_Pitch));
+	front.y = std::sin(glm::radians(m_Pitch));
+	front.z = std::sin(glm::radians(m_Yaw)) * std::cos(glm::radians(m_Pitch));
 	m_Forward = glm::normalize(front);
 
 	m_Right = glm::normalize(glm::cross(m_Forward, m_WorldUp));

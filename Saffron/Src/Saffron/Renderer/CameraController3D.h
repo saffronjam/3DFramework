@@ -34,7 +34,7 @@ private:
 
 	glm::vec3 m_CameraPosition;
 	float m_CameraYaw, m_CameraPitch;
-	float m_CameraTranslationSpeed, m_CameraRotationSpeed;
+	float m_CameraTranslationSpeed, m_MouseSensitivity;
 	Camera3D m_Camera;
 };
 }

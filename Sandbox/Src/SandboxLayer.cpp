@@ -5,7 +5,8 @@ SandboxLayer::SandboxLayer(const Se::Keyboard &keyboard, const Se::Mouse &mouse)
 	Layer("Sandbox"),
 	m_Keyboard(keyboard),
 	m_Mouse(mouse),
-	m_CameraController(16.0f / 9.0f)
+	m_CameraController2D(16.0f / 9.0f, true),
+	m_CameraController3D(16.0f / 9.0f)
 {
 	m_VertexArray = Se::VertexArray::Create();
 
@@ -121,13 +122,24 @@ void SandboxLayer::OnDetach()
 void SandboxLayer::OnUpdate(Se::Time ts)
 {
 	// Update
-	m_CameraController.OnUpdate(m_Keyboard, m_Mouse, ts);
+	if ( m_Keyboard.IsPressed(SE_KEY_2) )
+		m_PerspectiveOn = false;
+	else if ( m_Keyboard.IsPressed(SE_KEY_3) )
+		m_PerspectiveOn = true;
+
+	if ( m_PerspectiveOn )
+		m_CameraController3D.OnUpdate(m_Keyboard, m_Mouse, ts);
+	else
+		m_CameraController2D.OnUpdate(m_Keyboard, m_Mouse, ts);
 
 	// Render
 	Se::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1 });
 	Se::RenderCommand::Clear();
 
-	Se::Renderer::BeginScene(m_CameraController.GetCamera());
+	if ( m_PerspectiveOn )
+		Se::Renderer::BeginScene(m_CameraController3D.GetCamera());
+	else
+		Se::Renderer::BeginScene(m_CameraController2D.GetCamera());
 
 	const glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
 
@@ -156,5 +168,8 @@ void SandboxLayer::OnImGuiRender()
 
 void SandboxLayer::OnEvent(const Se::Event &event)
 {
-	m_CameraController.OnEvent(event);
+	if ( m_PerspectiveOn )
+		m_CameraController3D.OnEvent(event);
+	else
+		m_CameraController2D.OnEvent(event);
 }

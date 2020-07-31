@@ -9,10 +9,16 @@ CameraController3D::CameraController3D(float aspectRatio)
 	:
 	m_AspectRatio(aspectRatio),
 	m_ZoomLevel(1.0f),
-	m_CameraTranslationSpeed(5.0f),
-	m_CameraRotationSpeed(180.0f),
-	m_Camera(glm::vec3(0.0f, 0.0f, 0.0f), 45.0f, m_AspectRatio, 0.0f, 1000.0f)
+	m_CameraPosition(0.0f, 0.0f, -0.0f),
+	m_CameraYaw(-90.0f),
+	m_CameraPitch(0.0f),
+	m_CameraTranslationSpeed(3.0f),
+	m_MouseSensitivity(0.13f),
+	m_Camera(m_CameraPosition, 45.0f, m_AspectRatio, 100.0f, 0.1f)
 {
+	m_Camera.SetPosition(m_CameraPosition);
+	m_Camera.SetYaw(m_CameraYaw);
+	m_Camera.SetPitch(m_CameraPitch);
 }
 
 void CameraController3D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts)
@@ -20,7 +26,7 @@ void CameraController3D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, 
 	//SE_PROFILE_FUNCTION();
 
 	const float multiplier = keyboard.IsDown(SE_KEY_LEFT_SHIFT) ? 2.5f : 1.0f;
-	const float velocity = m_CameraTranslationSpeed * multiplier;
+	const float velocity = m_CameraTranslationSpeed * multiplier * ts.sec();
 	if ( keyboard.IsDown(SE_KEY_W) )
 		m_CameraPosition += m_Camera.GetForward() * velocity;
 	if ( keyboard.IsDown(SE_KEY_S) )
@@ -32,12 +38,11 @@ void CameraController3D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, 
 
 	m_Camera.SetPosition(m_CameraPosition);
 
-	SE_INFO("position {0},{1},{2}", m_CameraPosition.x, m_CameraPosition.y, m_CameraPosition.z);
-
 	// Handle yaw and pitch
 	if ( mouse.IsAnyDown() )
 	{
-		const glm::vec2 mouseDelta = mouse.GetDelta() * m_CameraRotationSpeed;
+		const glm::vec2 mouseDelta = mouse.GetDelta() * m_MouseSensitivity;
+
 		m_CameraYaw -= mouseDelta.x;
 		m_CameraPitch += mouseDelta.y;
 		m_CameraPitch = std::clamp(m_CameraPitch, -89.0f, 89.0f);
