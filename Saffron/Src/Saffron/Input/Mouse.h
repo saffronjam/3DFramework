@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
@@ -28,21 +28,25 @@ public:
 
 	const glm::vec2 &GetPosition() const;
 	const glm::vec2 &GetDelta() const;
+	float GetHScroll() const;
+	float GetVScroll() const;
 
 private:
 	void OnPress(const MousePressEvent &event);
 	void OnRelease(const MouseReleaseEvent &event);
+	void OnScroll(const MouseScrollEvent &event);
 	void OnMove(const MouseMoveEvent &event);
 	void OnEnter(const MouseEnterEvent &event);
 	void OnLeave(const MouseLeaveEvent &event);
 
 private:
-	mutable std::map<Button, bool> m_buttonmap;
-	mutable std::map<Button, bool> m_prevButtonmap;
+	mutable std::map<Button, bool> m_ButtonMap;
+	mutable std::map<Button, bool> m_PrevButtonMap;
 
-	glm::vec2 m_position;
-	glm::vec2 m_moveDelta;
+	glm::vec2 m_Position;
+	glm::vec2 m_MoveDelta;
+	glm::vec2 m_Scroll;
 
-	bool m_isInScreen;
+	bool m_IsInScreen;
 };
 }

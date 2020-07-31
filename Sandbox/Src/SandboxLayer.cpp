@@ -1,7 +1,9 @@
 ﻿#include "SandboxLayer.h"
 
 SandboxLayer::SandboxLayer()
-	: Layer("Sandbox")
+	:
+	Layer("Sandbox"),
+	m_CameraController(16.0f / 9.0f, true)
 {
 }
 

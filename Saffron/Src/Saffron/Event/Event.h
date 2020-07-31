@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
@@ -31,7 +31,7 @@ public:
 		Application,
 		WindowResize, WindowMove, WindowGainFocus, WindowLostFocus, WindowClose,
 		KeyboardPress, KeyboardRelease, KeyboardRepeat,
-		MousePress, MouseRelease, MouseMove, MouseEnter, MouseLeave
+		MousePress, MouseRelease, MouseScroll, MouseMove, MouseEnter, MouseLeave
 	};
 	enum Category : unsigned int
 	{

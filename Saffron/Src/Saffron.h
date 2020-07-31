@@ -12,6 +12,14 @@
 #include "Saffron/Graphics/Layer.h"
 #include "Saffron/Graphics/Window.h"
 
+// Renderer include
+#include "Saffron/Renderer/OrthographicCamera.h"
+#include "Saffron/Renderer/OrthographicCameraController.h"
+#include "Saffron/Renderer/RenderCommand.h"
+#include "Saffron/Renderer/Buffer.h"
+#include "Saffron/Renderer/Shader.h"
+#include "Saffron/Renderer/VertexArray.h"
+
 // System include
 #include "Saffron/System/Log.h"
 #include "Saffron/System/SaffronMath.h"

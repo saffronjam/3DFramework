@@ -139,6 +139,8 @@ void WindowsWindow::OnClose(const WindowCloseEvent &event)
 void WindowsWindow::SetupGLFWCallbacks()
 {
 	glfwSetWindowUserPointer(m_NativeWindow, this);
+
+	// ----- Keyboard events -----
 	glfwSetKeyCallback(m_NativeWindow, [](GLFWwindow *window, int key, int scancode, int action, int mods)
 					   {
 						   auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
@@ -149,6 +151,8 @@ void WindowsWindow::SetupGLFWCallbacks()
 						   else if ( action == GLFW_REPEAT )
 							   pWnd->PushEvent<KeyboardRepeatEvent>(static_cast<KeyCode>(key));
 					   });
+
+	// ----- Mouse events -----
 	glfwSetMouseButtonCallback(m_NativeWindow, [](GLFWwindow *window, int button, int action, int mods)
 							   {
 								   auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
@@ -157,6 +161,11 @@ void WindowsWindow::SetupGLFWCallbacks()
 								   else if ( action == GLFW_RELEASE )
 									   pWnd->PushEvent<MouseReleaseEvent>(static_cast<ButtonCode>(button));
 							   });
+	glfwSetScrollCallback(m_NativeWindow, [](GLFWwindow *window, double xoffset, double yoffset)
+						  {
+							  auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
+							  pWnd->PushEvent<MouseScrollEvent>(xoffset, yoffset);
+						  });
 	glfwSetCursorPosCallback(m_NativeWindow, [](GLFWwindow *window, double xpos, double ypos)
 							 {
 								 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
@@ -170,6 +179,8 @@ void WindowsWindow::SetupGLFWCallbacks()
 								   else
 									   pWnd->PushEvent<MouseLeaveEvent>();
 							   });
+
+	// ----- Window events -----
 	glfwSetWindowSizeCallback(m_NativeWindow, [](GLFWwindow *window, int width, int height)
 							  {
 								  auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));

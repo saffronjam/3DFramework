@@ -26,10 +26,10 @@ void Renderer::OnEvent(const Event &event)
 	dispatcher.Try<WindowResizeEvent>(&OnWindowResize);
 }
 
-//void Renderer::BeginScene(OrthographicCamera &camera)
-//{
-//	s_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
-//}
+void Renderer::BeginScene(OrthographicCamera &camera)
+{
+	m_sSceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();
+}
 
 void Renderer::EndScene()
 {

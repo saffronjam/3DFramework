@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "Saffron/Event/Event.h"
 #include "Saffron/Input/MouseCodes.h"
@@ -46,6 +46,29 @@ public:
 
 private:
 	ButtonCode m_Button;
+};
+
+class MouseScrollEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(MouseScroll);
+	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput)
+
+public:
+	MouseScrollEvent(float xOffset, float yOffset) : m_OffsetX(xOffset), m_OffsetY(yOffset) {}
+
+	float GetOffsetX() const { return m_OffsetX; }
+	float GetOffsetY() const { return m_OffsetY; }
+
+	std::string ToString() const override
+	{
+		std::stringstream ss;
+		ss << GetName() << " Offsets: " << GetOffsetX() << ", " << GetOffsetY();
+		return ss.str();
+	}
+
+private:
+	float m_OffsetX, m_OffsetY;
 };
 
 class MouseMoveEvent : public Event

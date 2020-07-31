@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 
 #include <glad/glad.h>
 
@@ -19,13 +19,12 @@ void OpenGLMessageCallback(
 {
 	switch ( severity )
 	{
-	case GL_DEBUG_SEVERITY_HIGH:         SE_CORE_CRITICAL(message); return;
-	case GL_DEBUG_SEVERITY_MEDIUM:       SE_CORE_ERROR(message); return;
-	case GL_DEBUG_SEVERITY_LOW:          SE_CORE_WARN(message); return;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: SE_CORE_TRACE(message); return;
+	case GL_DEBUG_SEVERITY_HIGH:			SE_CORE_CRITICAL(message); return;
+	case GL_DEBUG_SEVERITY_MEDIUM:			SE_CORE_ERROR(message); return;
+	case GL_DEBUG_SEVERITY_LOW:				SE_CORE_WARN(message); return;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:	SE_CORE_TRACE(message); return;
+	default:								SE_CORE_ASSERT(false, "Unknown severity level!");
 	}
-
-	SE_CORE_ASSERT(false, "Unknown severity level!");
 }
 
 void OpenGLRendererAPI::Init()
@@ -37,7 +36,7 @@ void OpenGLRendererAPI::Init()
 	glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 	glDebugMessageCallback(OpenGLMessageCallback, nullptr);
 
-	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, NULL, GL_FALSE);
+	glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
 #endif
 
 	glEnable(GL_BLEND);
@@ -46,7 +45,7 @@ void OpenGLRendererAPI::Init()
 	glEnable(GL_DEPTH_TEST);
 }
 
-void OpenGLRendererAPI::SetViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height)
+void OpenGLRendererAPI::SetViewport(Uint32 x, Uint32 y, Uint32 width, Uint32 height)
 {
 	glViewport(x, y, width, height);
 }
@@ -61,7 +60,7 @@ void OpenGLRendererAPI::Clear()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray> &vertexArray, uint32_t indexCount)
+void OpenGLRendererAPI::DrawIndexed(const Ref<VertexArray> &vertexArray, Uint32 indexCount)
 {
 	const Uint32 count = indexCount ? indexCount : vertexArray->GetIndexBuffer()->GetCount();
 	glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
