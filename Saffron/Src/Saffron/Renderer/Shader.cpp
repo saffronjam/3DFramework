@@ -15,13 +15,13 @@ void ShaderLibrary::Add(const std::string &name, const Ref<Shader> &shader)
 
 void ShaderLibrary::Add(const Ref<Shader> &shader)
 {
-	auto &name = shader->GetName();
+	const auto &name = shader->GetName();
 	Add(name, shader);
 }
 
 Ref<Shader> ShaderLibrary::Load(const std::string &filepath)
 {
-	auto shader = Shader::Create(filepath);
+	const auto shader = Shader::Create(filepath);
 	Add(shader);
 	return shader;
 }

@@ -19,15 +19,13 @@ private:
 	const Se::Mouse &m_Mouse;
 
 	Se::ShaderLibrary m_ShaderLibrary;
-	Se::Ref<Se::Shader> m_Shader;
-	Se::Ref<Se::VertexArray> m_VertexArray;
 
-	Se::Ref<Se::Shader> m_FlatColorShader;
 	Se::Ref<Se::VertexArray> m_SquareVA;
+
+	Se::Ref<Se::Texture2D> m_Texture;
 
 	Se::CameraController2D m_CameraController2D;
 	Se::CameraController3D m_CameraController3D;
-	glm::vec3 m_SquareColor = { 0.2f, 0.3f, 0.8f };
 
 	bool m_PerspectiveOn = false;
 };

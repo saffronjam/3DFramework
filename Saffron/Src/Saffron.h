@@ -21,6 +21,7 @@
 #include "Saffron/Renderer/RenderCommand.h"
 #include "Saffron/Renderer/Buffer.h"
 #include "Saffron/Renderer/Shader.h"
+#include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/VertexArray.h"
 
 // System include

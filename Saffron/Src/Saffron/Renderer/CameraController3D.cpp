@@ -9,7 +9,7 @@ CameraController3D::CameraController3D(float aspectRatio)
 	:
 	m_AspectRatio(aspectRatio),
 	m_ZoomLevel(1.0f),
-	m_CameraPosition(0.0f, 0.0f, -0.0f),
+	m_CameraPosition(0.0f, 0.0f, 3.0f),
 	m_CameraYaw(-90.0f),
 	m_CameraPitch(0.0f),
 	m_CameraTranslationSpeed(3.0f),
