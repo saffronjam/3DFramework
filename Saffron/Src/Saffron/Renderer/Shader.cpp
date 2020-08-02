@@ -50,10 +50,8 @@ Ref<Shader> Shader::Create(const std::string &filepath)
 	{
 	case RendererAPI::API::None:    SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
+	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 	}
-
-	SE_CORE_ASSERT(false, "Unknown RendererAPI!");
-	return nullptr;
 }
 
 Ref<Shader> Shader::Create(const std::string &name, const std::string &vertexSrc, const std::string &fragmentSrc)
@@ -62,9 +60,7 @@ Ref<Shader> Shader::Create(const std::string &name, const std::string &vertexSrc
 	{
 	case RendererAPI::API::None:    SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
+	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 	}
-
-	SE_CORE_ASSERT(false, "Unknown RendererAPI!");
-	return nullptr;
 }
 }
