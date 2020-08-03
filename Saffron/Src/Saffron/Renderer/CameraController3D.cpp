@@ -85,7 +85,7 @@ void CameraController3D::OnWindowResize(const WindowResizeEvent &event)
 	//SE_PROFILE_FUNCTION();
 
 	m_AspectRatio = static_cast<float>(event.GetWidth()) / static_cast<float>(event.GetHeight());
-	m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, 0.1f, 100.0f);
+	m_Camera.SetProjection(45.0f, m_AspectRatio, 100.0f, 0.1f);
 }
 
 void CameraController3D::OnMouseScroll(const MouseScrollEvent &event)
@@ -94,7 +94,7 @@ void CameraController3D::OnMouseScroll(const MouseScrollEvent &event)
 
 	m_ZoomLevel -= event.GetOffsetY() * 0.25f;
 	m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-	m_Camera.SetProjection(45.0f, m_AspectRatio, 0.1f, 100.0f);
+	m_Camera.SetProjection(45.0f, m_AspectRatio, 100.0f, 0.1f);
 }
 
 }
