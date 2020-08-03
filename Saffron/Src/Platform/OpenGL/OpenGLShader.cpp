@@ -1,5 +1,6 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
+#include <filesystem>
 #include <glad/glad.h>
 
 #include "Saffron/System/SaffronMath.h"
@@ -50,6 +51,7 @@ struct OpenGLShader::UniformBindHelper
 	Int32 location;
 };
 
+
 OpenGLShader::OpenGLShader(const std::string &filepath)
 {
 	//SE_PROFILE_FUNCTION();
@@ -58,12 +60,8 @@ OpenGLShader::OpenGLShader(const std::string &filepath)
 	const auto shaderSources = PreProcess(source);
 	Compile(shaderSources);
 
-	// Extract name from filepath
-	auto lastSlash = filepath.find_last_of("/\\");
-	lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
-	const auto lastDot = filepath.rfind('.');
-	const auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
-	m_Name = filepath.substr(lastSlash, count);
+	const std::filesystem::path fsPath = filepath;
+	m_Name = fsPath.stem().string();
 }
 
 OpenGLShader::OpenGLShader(const std::string &name, const std::string &vertexSrc, const std::string &fragmentSrc)
