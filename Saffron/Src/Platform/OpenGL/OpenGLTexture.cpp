@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 
 #include <glad/glad.h>
 #include <stb_image.h>
@@ -56,7 +56,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path)
 	m_InternalFormat = internalFormat;
 	m_DataFormat = dataFormat;
 
-	SE_CORE_ASSERT(internalFormat & dataFormat, "Format not supported!");
+	SE_CORE_ASSERT(internalFormat && dataFormat, "Format not supported!");
 
 	glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 	glTextureStorage2D(m_RendererID, 1, internalFormat, m_Width, m_Height);
