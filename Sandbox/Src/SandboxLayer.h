@@ -5,7 +5,7 @@
 class SandboxLayer : public Se::Layer
 {
 public:
-	SandboxLayer(const Se::Keyboard &keyboard, const Se::Mouse &mouse);
+	SandboxLayer(Se::Window &window, const Se::Keyboard &keyboard, const Se::Mouse &mouse);
 
 	void OnAttach() override;
 	void OnDetach() override;
@@ -15,6 +15,7 @@ public:
 	void OnEvent(const Se::Event &event) override;
 
 private:
+	Se::Window &m_Window;
 	const Se::Keyboard &m_Keyboard;
 	const Se::Mouse &m_Mouse;
 

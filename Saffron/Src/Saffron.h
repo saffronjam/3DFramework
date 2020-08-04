@@ -18,6 +18,7 @@
 #include "Saffron/Renderer/CameraController2D.h"
 #include "Saffron/Renderer/CameraController3D.h"
 #include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RenderCommand.h"
 #include "Saffron/Renderer/Buffer.h"
 #include "Saffron/Renderer/Shader.h"

@@ -1,6 +1,7 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
 #include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Renderer/Renderer2D.h"
 
 namespace Se
 {
@@ -12,12 +13,12 @@ void Renderer::Init()
 	//SE_PROFILE_FUNCTION();
 
 	RenderCommand::Init();
-	//Renderer2D::Init();
+	Renderer2D::Init();
 }
 
 void Renderer::Shutdown()
 {
-	//Renderer2D::Shutdown();
+	Renderer2D::Shutdown();
 }
 
 void Renderer::OnEvent(const Event &event)

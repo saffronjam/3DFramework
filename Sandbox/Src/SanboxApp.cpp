@@ -9,7 +9,7 @@ public:
 	SandboxApp()
 		:
 		Application(),
-		m_layer(Se::CreateRef<SandboxLayer>(m_Keyboard, m_Mouse))
+		m_layer(Se::CreateRef<SandboxLayer>(*m_pWindow, m_Keyboard, m_Mouse))
 	{
 		PushLayer(m_layer);
 	}

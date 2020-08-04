@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include <string>
 
-#include <Saffron/Config.h>}
+#include <Saffron/Config.h>
 
 namespace Se
 {
