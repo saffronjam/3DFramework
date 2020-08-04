@@ -28,7 +28,7 @@ void OpenGLMessageCallback(
 
 void OpenGLRendererAPI::Init()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 #ifdef SE_DEBUG
 	glEnable(GL_DEBUG_OUTPUT);

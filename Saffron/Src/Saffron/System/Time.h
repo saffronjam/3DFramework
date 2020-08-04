@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace Se
 {
@@ -14,6 +14,7 @@ public:
 
 	float sec() const;
 	float ms() const;
+	float us() const;
 
 private:
 	float m_Time;

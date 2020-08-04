@@ -9,10 +9,13 @@ namespace Se
 Application *Application::m_sInstance = nullptr;
 
 Application::Application()
-	:
-	m_pWindow(Se::Window::Create(Se::WindowProps())),
-	m_pImGuiLayer(CreateRef<ImGuiLayer>())
 {
+	SE_PROFILE_FUNCTION();
+
+	m_pWindow = Window::Create(WindowProps());
+	m_pImGuiLayer = CreateRef<ImGuiLayer>();
+
+
 	m_pWindow->SetEventCallback(SE_EVENT_FN(Application::OnEvent));
 
 	SE_ASSERT(!m_sInstance, "Application already exist");
@@ -25,48 +28,51 @@ Application::Application()
 
 Application::~Application()
 {
+	SE_PROFILE_FUNCTION();
+
 	Renderer::Shutdown();
 }
 
 
 void Application::Run()
 {
+	SE_PROFILE_FUNCTION();
+
 	glm::vec4 color = { 0.0f, 0.0f, 0.0f, 0.0f };
 
 	while ( m_Running )
 	{
+		SE_PROFILE_SCOPE("Run Loop");
+
 		dt = m_AppTimer.Mark();
 
-		m_Keyboard.OnUpdate();
-		m_Mouse.OnUpdate();
-		m_pWindow->HandleBufferedEvents();
+		{
+			SE_PROFILE_SCOPE("Components OnUpdate");
+
+			m_Keyboard.OnUpdate();
+			m_Mouse.OnUpdate();
+			m_pWindow->HandleBufferedEvents();
+		}
 
 		if ( !m_Minimized )
 		{
-			auto mousePos = m_Mouse.GetPosition();
-			mousePos.x /= m_pWindow->GetWidth();
-			mousePos.y /= m_pWindow->GetHeight();
-
-			color.r = mousePos.x;
-			color.g = mousePos.y;
-
-			if ( m_Keyboard.IsPressed(SE_KEY_UP) )
-				color.b += 0.1f;
-			if ( m_Keyboard.IsPressed(SE_KEY_DOWN) )
-				color.b -= 0.1f;
-
-			RenderCommand::SetClearColor(color);
-			RenderCommand::Clear();
-
 			// Normal updates and rendering
-			for ( auto &layer : m_LayerStack )
-				layer->OnUpdate(dt);
+			{
+				SE_PROFILE_SCOPE("LayerStack OnUpdate");
+
+				for ( auto &layer : m_LayerStack )
+					layer->OnUpdate(dt);
+			}
 
 			// ImGui rendering
-			m_pImGuiLayer->Begin();
-			for ( auto &layer : m_LayerStack )
-				layer->OnImGuiRender();
-			m_pImGuiLayer->End();
+			{
+				SE_PROFILE_SCOPE("LayerStack OnImGuiRender");
+
+				m_pImGuiLayer->Begin();
+				for ( auto &layer : m_LayerStack )
+					layer->OnImGuiRender();
+				m_pImGuiLayer->End();
+			}
 		}
 		m_pWindow->OnUpdate();
 	}
@@ -78,18 +84,24 @@ void Application::Close()
 
 void Application::PushLayer(const Ref<Layer> &layer)
 {
+	SE_PROFILE_FUNCTION();
+
 	m_LayerStack.PushLayer(layer);
 	layer->OnAttach();
 }
 
 void Application::PushOverlay(const Ref<Layer> &layer)
 {
+	SE_PROFILE_FUNCTION();
+
 	m_LayerStack.PushOverlay(layer);
 	layer->OnAttach();
 }
 
 void Application::OnEvent(const Event &event)
 {
+	SE_PROFILE_FUNCTION();
+
 	// TODO: Optimize this if event is handled?
 
 	// Application events
@@ -133,6 +145,8 @@ void Application::OnWindowClose(const WindowCloseEvent &event)
 
 void Application::OnWindowResize(const WindowResizeEvent &event)
 {
+	SE_PROFILE_FUNCTION();
+
 	if ( event.GetWidth() == 0 || event.GetHeight() == 0 )
 	{
 		m_Minimized = true;

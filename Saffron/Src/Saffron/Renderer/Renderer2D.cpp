@@ -46,7 +46,7 @@ static Renderer2DData m_sData;
 
 void Renderer2D::Init()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	m_sData.QuadVertexArray = VertexArray::Create();
 
@@ -105,14 +105,14 @@ void Renderer2D::Init()
 
 void Renderer2D::Shutdown()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	delete[] m_sData.QuadVertexBufferBase;
 }
 
 void Renderer2D::BeginScene(const Camera &camera)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const glm::mat4 viewProj = camera.GetViewProjectionMatrix();
 
@@ -127,7 +127,7 @@ void Renderer2D::BeginScene(const Camera &camera)
 
 void Renderer2D::EndScene()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const Uint32 dataSize = static_cast<Uint32>(reinterpret_cast<uint8_t *>(m_sData.QuadVertexBufferPtr) - reinterpret_cast<uint8_t *>(m_sData.QuadVertexBufferBase));
 	m_sData.QuadVertexBuffer->SetData(m_sData.QuadVertexBufferBase, dataSize);
@@ -165,7 +165,7 @@ void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, cons
 
 void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 		* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -180,7 +180,7 @@ void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, cons
 
 void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 		* glm::scale(glm::mat4(1.0f), { size.x, size.y, 1.0f });
@@ -190,7 +190,7 @@ void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, cons
 
 void Renderer2D::DrawQuad(const glm::mat4 &transform, const glm::vec4 &color)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	constexpr size_t quadVertexCount = 4;
 	const float textureIndex = 0.0f; // White Texture
@@ -217,7 +217,7 @@ void Renderer2D::DrawQuad(const glm::mat4 &transform, const glm::vec4 &color)
 
 void Renderer2D::DrawQuad(const glm::mat4 &transform, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	constexpr size_t quadVertexCount = 4;
 	constexpr glm::vec2 textureCoords[] = { { 0.0f, 0.0f }, { 1.0f, 0.0f }, { 1.0f, 1.0f }, { 0.0f, 1.0f } };
@@ -267,7 +267,7 @@ void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &siz
 
 void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation, const glm::vec4 &color)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })
@@ -283,7 +283,7 @@ void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &siz
 
 void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation, const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const glm::mat4 transform = glm::translate(glm::mat4(1.0f), position)
 		* glm::rotate(glm::mat4(1.0f), glm::radians(rotation), { 0.0f, 0.0f, 1.0f })

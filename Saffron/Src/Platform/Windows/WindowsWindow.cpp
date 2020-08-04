@@ -26,6 +26,8 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 	m_NativeWindow(nullptr),
 	m_VSync(false)
 {
+	SE_PROFILE_FUNCTION();
+
 	m_Title = props.Title;
 	m_Width = props.Width;
 	m_Height = props.Height;
@@ -37,18 +39,24 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 	// Initialize GLFW
 	if ( m_sGLFWWindowCount == 0 )
 	{
+		SE_PROFILE_SCOPE("glfwInit");
+
 		const int success = glfwInit();
 		SE_CORE_ASSERT(success, "Failed to initialize GLFW");
 		glfwSetErrorCallback(GLFWErrorCallback);
 	}
 
+	{
+		SE_PROFILE_SCOPE("glfwCreateWindow");
+
 #ifdef SE_DEBUG
-	if ( Renderer::GetAPI() == RendererAPI::API::OpenGL )
-		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		if ( Renderer::GetAPI() == RendererAPI::API::OpenGL )
+			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 
-	m_NativeWindow = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Title.c_str(), nullptr, nullptr);
-	++m_sGLFWWindowCount;
+		m_NativeWindow = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), m_Title.c_str(), nullptr, nullptr);
+		++m_sGLFWWindowCount;
+	}
 
 	m_Context = GraphicsContext::Create(m_NativeWindow);
 
@@ -70,17 +78,23 @@ WindowsWindow::WindowsWindow(const WindowProps &props)
 
 WindowsWindow::~WindowsWindow()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwDestroyWindow(static_cast<GLFWwindow *>(WindowsWindow::GetNativeWindow()));
 }
 
 void WindowsWindow::OnUpdate()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwPollEvents();
 	m_Context->SwapBuffers();
 }
 
 void WindowsWindow::OnEvent(const Event &event)
 {
+	SE_PROFILE_FUNCTION();
+
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(WindowsWindow::OnResize));
 	dispatcher.Try<WindowMoveEvent>(SE_EVENT_FN(WindowsWindow::OnMove));
@@ -91,11 +105,15 @@ void WindowsWindow::OnEvent(const Event &event)
 
 void WindowsWindow::Close()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwSetWindowShouldClose(m_NativeWindow, GLFW_TRUE);
 }
 
 void WindowsWindow::Focus()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwRequestWindowAttention(m_NativeWindow);
 }
 
@@ -106,12 +124,16 @@ void *WindowsWindow::GetNativeWindow() const
 
 void WindowsWindow::SetTitle(std::string title)
 {
+	SE_PROFILE_FUNCTION();
+
 	m_Title = std::move(title);
 	glfwSetWindowTitle(m_NativeWindow, m_Title.c_str());
 }
 
 void WindowsWindow::SetVSync(bool enabled)
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwSwapInterval(static_cast<int>(m_VSync = enabled));
 }
 
@@ -145,6 +167,8 @@ void WindowsWindow::OnClose(const WindowCloseEvent &event)
 
 void WindowsWindow::SetupGLFWCallbacks()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwSetWindowUserPointer(m_NativeWindow, this);
 
 	// ----- Keyboard events -----

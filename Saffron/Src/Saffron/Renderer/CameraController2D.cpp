@@ -20,7 +20,7 @@ CameraController2D::CameraController2D(float aspectRatio, bool rotationEnabled)
 
 void CameraController2D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	if ( keyboard.IsDown(SE_KEY_A) )
 	{
@@ -69,7 +69,7 @@ void CameraController2D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, 
 
 void CameraController2D::OnEvent(const Event &event)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<MouseScrollEvent>(SE_EVENT_FN(CameraController2D::OnMouseScroll));
@@ -104,7 +104,7 @@ void CameraController2D::OnWindowResize(const WindowResizeEvent &event)
 
 void CameraController2D::OnMouseScroll(const MouseScrollEvent &event)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	m_ZoomLevel -= event.GetOffsetY() * 0.25f;
 	m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);

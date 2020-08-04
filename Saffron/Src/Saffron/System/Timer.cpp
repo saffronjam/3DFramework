@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 #include "Saffron/System/Timer.h"
 
 namespace Se
@@ -6,34 +6,38 @@ namespace Se
 
 using namespace std::chrono;
 
-Time Timer::m_globalTimer(0.0f);
-
-Timer::Timer()
-	: m_last(steady_clock::now())
+Timer::Timer(const char *name)
+	:
+	m_Name(name),
+	m_LastTimePoint(steady_clock::now()),
+	m_InitialTimePoint(steady_clock::now())
 {
-}
-
-void Timer::UpdateGlobalTimer(float dt)
-{
-	m_globalTimer += dt;
 }
 
 Time Timer::Mark()
 {
-	const auto old = m_last;
-	m_last = steady_clock::now();
-	const duration<float> frameTime = m_last - old;
-	return Time(frameTime.count());
+	const auto old = m_LastTimePoint;
+	m_LastTimePoint = steady_clock::now();
+	return Time(duration<float>(m_LastTimePoint - old).count());
 }
 
 Time Timer::Peek() const
 {
-	return Time(duration<float>(steady_clock::now() - m_last).count());
+	return Time(duration<float>(steady_clock::now() - m_LastTimePoint).count());
 }
 
-Time Timer::PeekGlobal()
+Time Timer::PeekTotal() const
 {
-	return m_globalTimer;
+	return Time(duration<float>(steady_clock::now() - m_InitialTimePoint).count());
 }
 
+Timer::TimePoint Timer::GetStart() const
+{
+	return m_LastTimePoint;
+}
+
+Timer::TimePoint Timer::GetInitialStart() const
+{
+	return m_InitialTimePoint;
+}
 }

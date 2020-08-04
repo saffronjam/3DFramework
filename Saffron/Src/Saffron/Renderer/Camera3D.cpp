@@ -13,14 +13,14 @@ Camera3D::Camera3D(const glm::vec3 &position, float fov, float aspect, float nea
 	m_Yaw(-90.0f),
 	m_Pitch(0.0f)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	Camera3D::RecalculateViewMatrix();
 }
 
 void Camera3D::SetProjection(float fov, float aspect, float nearClip, float farClip)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	m_ProjectionMatrix = glm::perspective(fov, aspect, nearClip, farClip);
 	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
@@ -60,7 +60,7 @@ void Camera3D::SetPitch(float pitch)
 
 void Camera3D::RecalculateViewMatrix()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	glm::vec3 front;
 	front.x = std::cos(glm::radians(m_Yaw)) * std::cos(glm::radians(m_Pitch));

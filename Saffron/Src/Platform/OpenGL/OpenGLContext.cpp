@@ -11,6 +11,8 @@ namespace Se
 OpenGLContext::OpenGLContext(GLFWwindow *windowHandle)
 	: m_WindowHandle(windowHandle)
 {
+	SE_PROFILE_FUNCTION();
+
 	SE_CORE_ASSERT(windowHandle, "Window handle is null");
 	glfwMakeContextCurrent(m_WindowHandle);
 	const auto success = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
@@ -37,6 +39,8 @@ OpenGLContext::OpenGLContext(GLFWwindow *windowHandle)
 
 void OpenGLContext::SwapBuffers()
 {
+	SE_PROFILE_FUNCTION();
+
 	glfwSwapBuffers(m_WindowHandle);
 }
 

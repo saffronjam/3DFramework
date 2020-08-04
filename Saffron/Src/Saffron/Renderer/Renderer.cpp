@@ -10,7 +10,7 @@ Scope<Renderer::SceneData> Renderer::m_sSceneData = CreateScope<SceneData>();
 
 void Renderer::Init()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	RenderCommand::Init();
 	Renderer2D::Init();

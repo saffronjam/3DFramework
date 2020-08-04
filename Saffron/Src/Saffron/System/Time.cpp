@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+﻿#include "Saffron/SaffronPCH.h"
 #include "Saffron/System/Time.h"
 
 namespace Se
@@ -41,4 +41,8 @@ float Time::ms() const
 	return m_Time * 1000.0f;
 }
 
+float Time::us() const
+{
+	return m_Time * 1000000.0f;
+}
 }

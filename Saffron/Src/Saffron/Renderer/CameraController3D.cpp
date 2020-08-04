@@ -23,7 +23,7 @@ CameraController3D::CameraController3D(float aspectRatio)
 
 void CameraController3D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const float multiplier = keyboard.IsDown(SE_KEY_LEFT_SHIFT) ? 2.5f : 1.0f;
 	const float velocity = m_CameraTranslationSpeed * multiplier * ts.sec();
@@ -53,7 +53,7 @@ void CameraController3D::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, 
 
 void CameraController3D::OnEvent(const Event &event)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<MouseScrollEvent>(SE_EVENT_FN(CameraController3D::OnMouseScroll));
@@ -82,7 +82,7 @@ void CameraController3D::SetZoomLevel(float level)
 
 void CameraController3D::OnWindowResize(const WindowResizeEvent &event)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	m_AspectRatio = static_cast<float>(event.GetWidth()) / static_cast<float>(event.GetHeight());
 	m_Camera.SetProjection(45.0f, m_AspectRatio, 100.0f, 0.1f);
@@ -90,7 +90,7 @@ void CameraController3D::OnWindowResize(const WindowResizeEvent &event)
 
 void CameraController3D::OnMouseScroll(const MouseScrollEvent &event)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	m_ZoomLevel -= event.GetOffsetY() * 0.25f;
 	m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);

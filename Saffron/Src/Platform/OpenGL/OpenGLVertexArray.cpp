@@ -32,7 +32,7 @@ OpenGLVertexArray::OpenGLVertexArray()
 	:
 	m_RendererID(0u)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 
 	//glCreateVertexArrays(1, &m_RendererID);
@@ -40,28 +40,28 @@ OpenGLVertexArray::OpenGLVertexArray()
 
 OpenGLVertexArray::~OpenGLVertexArray()
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	glDeleteVertexArrays(1, &m_RendererID);
 }
 
 void OpenGLVertexArray::Bind() const
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	glBindVertexArray(m_RendererID);
 }
 
 void OpenGLVertexArray::Unbind() const
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	glBindVertexArray(0);
 }
 
 void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	SE_CORE_ASSERT(vertexBuffer->GetLayout().GetElements().size(), "Vertex Buffer has no layout!");
 
@@ -121,7 +121,7 @@ void OpenGLVertexArray::AddVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 
 void OpenGLVertexArray::SetIndexBuffer(const Ref<IndexBuffer> &indexBuffer)
 {
-	//SE_PROFILE_FUNCTION();
+	SE_PROFILE_FUNCTION();
 
 	glBindVertexArray(m_RendererID);
 	indexBuffer->Bind();

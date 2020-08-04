@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
-#include "Saffron/Config.h"
-#include "Saffron/SaffronPCH.h"
+#include <chrono>
+
 #include "Saffron/System/Time.h"
 
 namespace Se
@@ -9,17 +9,21 @@ namespace Se
 class Timer
 {
 public:
-	Timer() ;
+	using TimePoint = std::chrono::steady_clock::time_point;
 
-	static void UpdateGlobalTimer(float dt);
+public:
+	explicit Timer(const char *name = "Unnamed");
 
-	Time Mark() ;
-	[[nodiscard]] Time Peek() const ;
-	static Time PeekGlobal() ;
-private:
-	std::chrono::steady_clock::time_point m_last;
-	static Time m_globalTimer;
+	Time Mark();
+	Time Peek() const;
+	Time PeekTotal() const;
+
+	TimePoint GetStart() const;
+	TimePoint GetInitialStart() const;
+
+protected:
+	const char *m_Name;
+	TimePoint m_LastTimePoint;
+	TimePoint m_InitialTimePoint;
 };
 }
-
-
