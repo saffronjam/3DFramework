@@ -12,3 +12,6 @@
 	path = Saffron/Vendors/GLFW
 	url = https://github.com/glfw/glfw.git
 	ignore = dirty 
+[submodule "Saffron/Vendors/glm"]
+	path = Saffron/Vendors/glm
+	url = https://github.com/g-truc/glm.git

@@ -15,9 +15,6 @@ _ReSharper*
 .vs
 CMakeSettings.json
 Win32
-x64
-Debug
-Release
 MinSizeRel
 RelWithDebInfo
 *.opensdf
