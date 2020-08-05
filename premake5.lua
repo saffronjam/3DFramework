@@ -27,10 +27,11 @@ includeDirs["ImGui"] = "Saffron/Vendors/ImGui"
 includeDirs["glm"] = "Saffron/Vendors/glm/include"
 includeDirs["stb_image"] = "Saffron/Vendors/stb_image"
 
-group "Dependencies"
+group "Vendors"
 	include "Saffron/Vendors/.Premake/GLFW"
 	include "Saffron/Vendors/.Premake/Glad"
 	include "Saffron/Vendors/.Premake/ImGui"
+	include "Saffron/Vendors/.Premake/glm"
 group ""
 
 project "Saffron"

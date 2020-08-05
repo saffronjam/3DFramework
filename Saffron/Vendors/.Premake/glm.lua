@@ -11,14 +11,14 @@ project "glm"
 	targetdir ("../%{prj.name}/Bin/" .. outputDirectory .. "/%{prj.name}")
 	objdir ("../%{prj.name}/Bin-Int/" .. outputDirectory .. "/%{prj.name}")
 	
-    files
-    {
-        srcDirectory .. "glm/**.hpp",
-    }
+	files
+	{
+		srcDirectory .. "include/glm/**.hpp"
+	}
 
     includedirs
     {
-        srcDirectory
+        srcDirectory .. "include"
     }
     
     filter "system:windows"
