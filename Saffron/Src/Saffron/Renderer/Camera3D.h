@@ -8,10 +8,8 @@ namespace Se
 class Camera3D : public Camera
 {
 public:
-	Camera3D(const glm::vec3 &position, float fov, float aspect, float nearClip, float farClip);
+	Camera3D(const glm::vec3 &position, const glm::mat4 &projection);
 	virtual ~Camera3D() = default;
-
-	void SetProjection(float fov, float aspect, float nearClip, float farClip);
 
 	float GetYaw() const;
 	float GetPitch() const;
@@ -21,7 +19,7 @@ public:
 	void SetYaw(float yaw);
 	void SetPitch(float pitch);
 
-	void RecalculateViewMatrix() override;
+	void CalculateViewMatrix() override;
 
 private:
 	glm::vec3 m_Forward, m_Up, m_Right, m_WorldUp;

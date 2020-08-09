@@ -2,7 +2,7 @@
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
-#include "Saffron/Event/KeyboardEvent.h"
+#include "Saffron/Core/Event/KeyboardEvent.h"
 
 namespace Se
 {

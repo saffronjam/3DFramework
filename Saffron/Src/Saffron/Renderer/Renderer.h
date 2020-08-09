@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Core/Event/WindowEvent.h"
 #include "Saffron/Renderer/Camera2D.h"
 #include "Saffron/Renderer/Camera3D.h"
 #include "Saffron/Renderer/RenderCommand.h"

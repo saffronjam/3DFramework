@@ -7,7 +7,7 @@ SandboxLayer::SandboxLayer(Se::Window &window, const Se::Keyboard &keyboard, con
 	m_Keyboard(keyboard),
 	m_Mouse(mouse),
 	m_CameraController2D(16.0f / 9.0f, true),
-	m_CameraController3D(16.0f / 9.0f)
+	m_CameraControllerEditor(16.0f / 9.0f)
 {
 	m_Texture = Se::Texture2D::Create("Assets/Textures/sample_image.png");
 }
@@ -24,12 +24,12 @@ void SandboxLayer::OnUpdate(Se::Time ts)
 {
 	// Update
 	if ( m_Keyboard.IsPressed(SE_KEY_2) )
-		m_PerspectiveOn = false;
+		m_EditorModeOn = false;
 	else if ( m_Keyboard.IsPressed(SE_KEY_3) )
-		m_PerspectiveOn = true;
+		m_EditorModeOn = true;
 
-	if ( m_PerspectiveOn )
-		m_CameraController3D.OnUpdate(m_Keyboard, m_Mouse, ts);
+	if ( m_EditorModeOn )
+		m_CameraControllerEditor.OnUpdate(m_Keyboard, m_Mouse, ts);
 	else
 		m_CameraController2D.OnUpdate(m_Keyboard, m_Mouse, ts);
 
@@ -37,8 +37,8 @@ void SandboxLayer::OnUpdate(Se::Time ts)
 	Se::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 	Se::RenderCommand::Clear();
 
-	if ( m_PerspectiveOn )
-		Se::Renderer2D::BeginScene(m_CameraController3D.GetCamera());
+	if ( m_EditorModeOn )
+		Se::Renderer2D::BeginScene(m_CameraControllerEditor.GetCamera());
 	else
 		Se::Renderer2D::BeginScene(m_CameraController2D.GetCamera());
 
@@ -58,8 +58,8 @@ void SandboxLayer::OnImGuiRender()
 
 void SandboxLayer::OnEvent(const Se::Event &event)
 {
-	if ( m_PerspectiveOn )
-		m_CameraController3D.OnEvent(event);
+	if ( m_EditorModeOn )
+		m_CameraControllerEditor.OnEvent(event);
 	else
 		m_CameraController2D.OnEvent(event);
 }

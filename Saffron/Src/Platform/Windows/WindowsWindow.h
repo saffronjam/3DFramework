@@ -2,7 +2,7 @@
 
 #include "Saffron/Config.h"
 #include "Saffron/Graphics/Window.h"
-#include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Core/Event/WindowEvent.h"
 #include "Saffron/Renderer/GraphicsContext.h"
 
 struct GLFWwindow;

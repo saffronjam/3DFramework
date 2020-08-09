@@ -26,7 +26,7 @@ private:
 	Se::Ref<Se::Texture2D> m_Texture;
 
 	Se::CameraController2D m_CameraController2D;
-	Se::CameraController3D m_CameraController3D;
+	Se::CameraControllerEditor m_CameraControllerEditor;
 
-	bool m_PerspectiveOn = false;
+	bool m_EditorModeOn = false;
 };

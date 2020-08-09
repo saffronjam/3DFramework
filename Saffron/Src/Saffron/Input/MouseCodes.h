@@ -28,15 +28,15 @@ inline std::ostream &operator<<(std::ostream &os, ButtonCode buttonCode)
 }
 }
 
-#define SE_MOUSE_BUTTON_0      ::Se::ButtonCode::Button0
-#define SE_MOUSE_BUTTON_1      ::Se::ButtonCode::Button1
-#define SE_MOUSE_BUTTON_2      ::Se::ButtonCode::Button2
-#define SE_MOUSE_BUTTON_3      ::Se::ButtonCode::Button3
-#define SE_MOUSE_BUTTON_4      ::Se::ButtonCode::Button4
-#define SE_MOUSE_BUTTON_5      ::Se::ButtonCode::Button5
-#define SE_MOUSE_BUTTON_6      ::Se::ButtonCode::Button6
-#define SE_MOUSE_BUTTON_7      ::Se::ButtonCode::Button7
-#define SE_MOUSE_BUTTON_LAST   ::Se::ButtonCode::ButtonLast
-#define SE_MOUSE_BUTTON_LEFT   ::Se::ButtonCode::ButtonLeft
-#define SE_MOUSE_BUTTON_RIGHT  ::Se::ButtonCode::ButtonRight
-#define SE_MOUSE_BUTTON_MIDDLE ::Se::ButtonCode::ButtonMiddle
+#define SE_BUTTON_0      ::Se::ButtonCode::0
+#define SE_BUTTON_1      ::Se::ButtonCode::1
+#define SE_BUTTON_2      ::Se::ButtonCode::2
+#define SE_BUTTON_3      ::Se::ButtonCode::3
+#define SE_BUTTON_4      ::Se::ButtonCode::4
+#define SE_BUTTON_5      ::Se::ButtonCode::5
+#define SE_BUTTON_6      ::Se::ButtonCode::6
+#define SE_BUTTON_7      ::Se::ButtonCode::7
+#define SE_BUTTON_LAST   ::Se::ButtonCode::Last
+#define SE_BUTTON_LEFT   ::Se::ButtonCode::Left
+#define SE_BUTTON_RIGHT  ::Se::ButtonCode::Right
+#define SE_BUTTON_MIDDLE ::Se::ButtonCode::Middle

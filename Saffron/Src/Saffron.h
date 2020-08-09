@@ -6,6 +6,9 @@
 #include "Saffron/Config.h"
 #include "Saffron/Core/Application.h"
 
+// Editor includes
+#include "Saffron/Editor/CameraControllerEditor.h"
+
 // Graphics include
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/ImGuiLayer.h"

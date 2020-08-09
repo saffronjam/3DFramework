@@ -2,8 +2,8 @@
 
 #include <GLFW/glfw3.h>
 
-#include "Saffron/Gui/ImGuiLayer.h"
 #include "Saffron/Core/Application.h"
+#include "Saffron/Gui/ImGuiLayer.h"
 #include "Saffron/Gui/ImGuiImpl.h"
 
 namespace Se
@@ -21,6 +21,7 @@ void ImGuiLayer::Begin()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
 }
 
 void ImGuiLayer::End()
@@ -53,13 +54,16 @@ void ImGuiLayer::OnAttach()
 	auto *context = ImGui::CreateContext();
 	if ( !context )
 	{
-		SE_CORE_ASSERT(context, "Failed to create ImGui renderer");
+		SE_CORE_ASSERT(context, "Failed to create ImGui context");
 	}
 
 	auto &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;       // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
+
+	auto *pFont = io.Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto.ttf", 18.0f);
+	io.FontDefault = io.Fonts->Fonts.back();
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
@@ -71,6 +75,7 @@ void ImGuiLayer::OnAttach()
 		style.WindowRounding = 0.0f;
 		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
 	}
+	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, style.Colors[ImGuiCol_WindowBg].w);
 
 	auto &app = Application::Get();
 

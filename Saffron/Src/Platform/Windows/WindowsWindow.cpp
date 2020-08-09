@@ -5,8 +5,8 @@
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/System/ScopedLock.h"
 
-#include "Saffron/Event/KeyboardEvent.h"
-#include "Saffron/Event/MouseEvent.h"
+#include "Saffron/Core/Event/KeyboardEvent.h"
+#include "Saffron/Core/Event/MouseEvent.h"
 
 #include "Platform/OpenGL/OpenGLContext.h"
 #include "Platform/Windows/WindowsWindow.h"

@@ -2,7 +2,7 @@
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
-#include "Saffron/Event/WindowEvent.h" 
+#include "Saffron/Core/Event/WindowEvent.h" 
 #include "Saffron/System/SaffronMath.h"
 
 namespace Se

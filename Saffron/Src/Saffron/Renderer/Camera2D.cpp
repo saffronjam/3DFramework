@@ -11,15 +11,14 @@ Camera2D::Camera2D(const glm::vec3 &position, float left, float right, float bot
 	m_Rotation(0.0f)
 {
 	SE_PROFILE_FUNCTION();
-	Camera2D::RecalculateViewMatrix();
+	Camera2D::CalculateViewMatrix();
 }
 
 void Camera2D::SetProjection(float left, float right, float bottom, float top)
 {
 	SE_PROFILE_FUNCTION();
 
-	m_ProjectionMatrix = glm::ortho(left, right, bottom, top, -1.0f, 1.0f);
-	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+	Camera::SetProjection(glm::ortho(left, right, bottom, top, -1.0f, 1.0f));
 }
 
 float Camera2D::GetRotation() const
@@ -30,10 +29,10 @@ float Camera2D::GetRotation() const
 void Camera2D::SetRotation(float rotation)
 {
 	m_Rotation = rotation;
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
-void Camera2D::RecalculateViewMatrix()
+void Camera2D::CalculateViewMatrix()
 {
 	SE_PROFILE_FUNCTION();
 

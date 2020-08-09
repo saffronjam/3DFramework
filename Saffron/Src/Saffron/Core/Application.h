@@ -2,7 +2,7 @@
 
 #include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
-#include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Core/Event/WindowEvent.h"
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/Gui/ImGuiLayer.h"
 #include "Saffron/Graphics/LayerStack.h"

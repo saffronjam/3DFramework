@@ -6,8 +6,8 @@
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 
-#include "Saffron/Event/MouseEvent.h"
-#include "Saffron/Event/WindowEvent.h"
+#include "Saffron/Core/Event/MouseEvent.h"
+#include "Saffron/Core/Event/WindowEvent.h"
 
 namespace Se
 {

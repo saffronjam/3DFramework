@@ -16,7 +16,7 @@ public:
 	float GetRotation() const;
 	void SetRotation(float rotation);
 
-	void RecalculateViewMatrix() override;
+	void CalculateViewMatrix() override;
 
 private:
 	float m_Rotation;

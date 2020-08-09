@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Config.h"
-#include "Saffron/Event/Event.h"
+#include "Saffron/Core/Event/Event.h"
 #include "Saffron/Graphics/Window.h"
 #include "Saffron/System/Time.h"
 

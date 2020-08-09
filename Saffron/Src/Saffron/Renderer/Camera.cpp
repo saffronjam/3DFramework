@@ -33,10 +33,25 @@ const glm::mat4 &Camera::GetViewProjectionMatrix() const
 	return m_ViewProjectionMatrix;
 }
 
+float Camera::GetExposure() const
+{
+	return m_Exposure;
+}
+
+float &Camera::GetExposure()
+{
+	return m_Exposure;
+}
+
 void Camera::SetPosition(const glm::vec3 &position)
 {
 	m_Position = position;
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
+void Camera::SetProjection(const glm::mat4 &projection)
+{
+	m_ProjectionMatrix = projection;
+	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+}
 }

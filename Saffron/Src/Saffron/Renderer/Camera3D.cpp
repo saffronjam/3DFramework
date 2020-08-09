@@ -4,8 +4,9 @@
 
 namespace Se
 {
-Camera3D::Camera3D(const glm::vec3 &position, float fov, float aspect, float nearClip, float farClip)
-	: Camera(position, glm::perspective(fov, aspect, nearClip, farClip)),
+Camera3D::Camera3D(const glm::vec3 &position, const glm::mat4 &projection)
+	:
+	Camera(position, projection),
 	m_Forward(0.0f, 0.0f, 0.0f),
 	m_Up(0.0f, 1.0f, 0.0f),
 	m_Right(1.0f, 0.0f, 0.0f),
@@ -15,15 +16,7 @@ Camera3D::Camera3D(const glm::vec3 &position, float fov, float aspect, float nea
 {
 	SE_PROFILE_FUNCTION();
 
-	Camera3D::RecalculateViewMatrix();
-}
-
-void Camera3D::SetProjection(float fov, float aspect, float nearClip, float farClip)
-{
-	SE_PROFILE_FUNCTION();
-
-	m_ProjectionMatrix = glm::perspective(fov, aspect, nearClip, farClip);
-	m_ViewProjectionMatrix = m_ProjectionMatrix * m_ViewMatrix;
+	Camera3D::CalculateViewMatrix();
 }
 
 float Camera3D::GetYaw() const
@@ -49,16 +42,16 @@ const glm::vec3 &Camera3D::GetRight() const
 void Camera3D::SetYaw(float yaw)
 {
 	m_Yaw = yaw;
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
 void Camera3D::SetPitch(float pitch)
 {
 	m_Pitch = pitch;
-	RecalculateViewMatrix();
+	CalculateViewMatrix();
 }
 
-void Camera3D::RecalculateViewMatrix()
+void Camera3D::CalculateViewMatrix()
 {
 	SE_PROFILE_FUNCTION();
 
