@@ -7,6 +7,7 @@
 #include <fstream>
 #include <optional>
 #include <iomanip>
+#include <filesystem>
 
 #include <atomic>
 #include <string>

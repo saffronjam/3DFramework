@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "Saffron/SaffronPCH.h"
-#include "Saffron/Config.h"
+#include <string>
+
 #include "Saffron/System/Macros.h"
 
 namespace Se
 {
 
-class Event
+class Event : public RefCounted
 {
 public:
 	enum class Type;

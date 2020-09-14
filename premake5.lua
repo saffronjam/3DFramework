@@ -20,8 +20,12 @@ intDirectory = "Bin-Int"
 
 -- Include directories relative to root folder (solution directory)
 includeDirs = {}
+includeDirs["assimp"] = "Saffron/Vendors/assimp/include"
+includeDirs["Box2D"] = "Saffron/Vendors/Box2D/include"
+includeDirs["entt"] = "Saffron/Vendors/entt/include"
 includeDirs["GLFW"] = "Saffron/Vendors/GLFW/include"
 includeDirs["Glad"] = "Saffron/Vendors/Glad/include"
+includeDirs["mono"] = "Saffron/Vendors/mono/include"
 includeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
 includeDirs["ImGui"] = "Saffron/Vendors/ImGui"
 includeDirs["glm"] = "Saffron/Vendors/glm/include"
@@ -66,8 +70,12 @@ project "Saffron"
 	includedirs
 	{
 		"%{prj.name}/Src",
+		"%{includeDirs.assimp}",
+		"%{includeDirs.Box2D}",
+		"%{includeDirs.entt}",
 		"%{includeDirs.GLFW}",
 		"%{includeDirs.Glad}",
+		"%{includeDirs.mono}",
 		"%{includeDirs.spdlog}",
 		"%{includeDirs.ImGui}",
 		"%{includeDirs.glm}",

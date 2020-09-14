@@ -1,66 +1,70 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
-#include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Shader.h"
-#include "Platform/OpenGL/OpenGLShader.h"
+#include "Saffron/Platform/OpenGL/OpenGLShader.h"
 
 namespace Se
 {
-
-void ShaderLibrary::Add(const std::string &name, const Ref<Shader> &shader)
+Ref<Shader> Shader::Create(const std::string &filepath)
 {
-	SE_CORE_ASSERT(!Exists(name), "Shader already exists!");
-	m_Shaders[name] = shader;
+	Ref<Shader> result = nullptr;
+
+	switch ( RendererAPI::CurrentAPI() )
+	{
+	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath);
+	}
+
+	if ( result )
+		s_AllShaders.push_back(result);
+	else
+		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
+
+	return result;
+}
+
+Ref<Shader> Shader::CreateFromString(const std::string &source)
+{
+	Ref<Shader> result = nullptr;
+
+	switch ( RendererAPI::CurrentAPI() )
+	{
+	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+	case RendererAPI::Type::OpenGL: result = OpenGLShader::CreateFromString(source);
+	}
+
+	if ( result )
+		s_AllShaders.push_back(result);
+	else
+		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
+
+	return result;
 }
 
 void ShaderLibrary::Add(const Ref<Shader> &shader)
 {
 	const auto &name = shader->GetName();
-	Add(name, shader);
+	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+	m_Shaders[name] = shader;
 }
 
-Ref<Shader> ShaderLibrary::Load(const std::string &filepath)
+void ShaderLibrary::Load(const std::string &path)
 {
-	const auto shader = Shader::Create(filepath);
-	Add(shader);
-	return shader;
+	const auto shader = Ref<Shader>(Shader::Create(path));
+	const auto &name = shader->GetName();
+	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+	m_Shaders[name] = shader;
 }
 
-Ref<Shader> ShaderLibrary::Load(const std::string &name, const std::string &filepath)
+void ShaderLibrary::Load(const std::string &name, const std::string &path)
 {
-	auto shader = Shader::Create(filepath);
-	Add(name, shader);
-	return shader;
+	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
+	m_Shaders[name] = Ref<Shader>(Shader::Create(path));
 }
 
-Ref<Shader> ShaderLibrary::Get(const std::string &name)
+const Ref<Shader> &ShaderLibrary::Get(const std::string &name) const
 {
-	SE_CORE_ASSERT(Exists(name), "Shader not found!");
-	return m_Shaders[name];
-}
-
-bool ShaderLibrary::Exists(const std::string &name) const
-{
-	return m_Shaders.find(name) != m_Shaders.end();
-}
-
-Ref<Shader> Shader::Create(const std::string &filepath)
-{
-	switch ( Renderer::GetAPI() )
-	{
-	case RendererAPI::API::None:    SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(filepath);
-	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
-	}
-}
-
-Ref<Shader> Shader::Create(const std::string &name, const std::string &vertexSrc, const std::string &fragmentSrc)
-{
-	switch ( Renderer::GetAPI() )
-	{
-	case RendererAPI::API::None:    SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::API::OpenGL:  return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
-	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
-	}
+	SE_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end());
+	return m_Shaders.at(name);
 }
 }

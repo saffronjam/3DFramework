@@ -4,13 +4,17 @@
 
 
 #ifdef SE_PLATFORM_WINDOWS
-#include "Platform/Windows/WindowsWindow.h"
+#include "Saffron/Platform/Windows/WindowsWindow.h"
 #endif
 
 namespace Se
 {
-Window::Window()
-	: m_Width(0), m_Height(0), m_Position(0.0f, 0.0f)
+Window::Window(const Properties &properties)
+	:
+	m_Title(properties.Title),
+	m_Position(properties.Position),
+	m_Width(properties.Width),
+	m_Height(properties.Height)
 {
 }
 
@@ -46,10 +50,11 @@ const glm::vec2 &Window::GetPosition() const
 	return m_Position;
 }
 
-Ref<Window> Window::Create(const WindowProps &props)
+Ref<Window> Window::Create(const Properties &properties)
 {
+	// TODO: Use RendererAPI::CurrentAPI()
 #ifdef SE_PLATFORM_WINDOWS
-	return CreateScope<WindowsWindow>(props);
+	return Ref<WindowsWindow>::Create(properties);
 #else
 	SE_CORE_ASSERT(false, "Unknown platform!");
 	return nullptr;

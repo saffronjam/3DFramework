@@ -5,34 +5,43 @@
 
 namespace Se
 {
+
+template<typename T>
 class Random
 {
 public:
-	Random(int const &lower = 0, int const &upper = 10)
-		: m_lower(lower),
-		m_upper(upper)
+	explicit Random(T lower = static_cast<T>(0), T upper = static_cast<T>(100))
+		:
+		m_Lower(lower),
+		m_Upper(upper)
 	{
 	};
 
-	int Gen() { return static_cast<double>((rand() % (static_cast<int>(m_upper) - static_cast<int>(m_lower))) + static_cast<int>(m_lower)); }
-
-	void SetLowerBound(int lowerBound_IN) { m_lower = lowerBound_IN; };
-	void SetUpperBound(int upperBound_IN) { m_upper = upperBound_IN; };
-
-	static int Integer(int low = 0, int high = 100)
+	T Generate()
 	{
-		static std::random_device rd;
-		static std::mt19937 e(rd());
-		const std::uniform_real_distribution<float> dis(static_cast<float>(low), static_cast<float>(high));
-		return static_cast<int>(dis(e));
+		return static_cast<T>(m_sUniformDistribution(m_sEngine));
+	}
+
+	void SetLower(T lower) { m_Lower = lower; };
+	void SetUpper(T upper) { m_Upper = upper; };
+
+	static int Integer(int lower = 0, int upper = 100)
+	{
+		// TODO: Remove
+		/*static std::random_device sRandomDevice;
+		static std::mt19937 sEngine(sRandomDevice());
+		const std::uniform_real_distribution<int> sUniformDistribution(lower, upper);
+		return static_cast<int>(sUniformDistribution(sEngine));*/
+
+		return Real<int>(lower, upper);
 	}
 
 	template<typename T = float>
-	static T Real(T low = static_cast<T>(0), T high = static_cast<T>(1))
+	static T Real(T lower = static_cast<T>(0), T upper = static_cast<T>(1))
 	{
 		static std::random_device rd;
 		static std::mt19937 e(rd());
-		std::uniform_real_distribution<T> dis(low, high);
+		std::uniform_real_distribution<T> dis(lower, upper);
 		return dis(e);
 	}
 
@@ -62,7 +71,11 @@ public:
 	}
 
 private:
-	int m_lower;
-	int m_upper;
+	T m_Lower;
+	T m_Upper;
+
+	static std::random_device m_sRandomDevice;
+	static std::mt19937 m_sEngine;
+	static std::uniform_int_distribution<T> m_sUniformDistribution;
 };
 }

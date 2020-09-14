@@ -10,23 +10,23 @@ public:
 	LayerStack() = default;
 	~LayerStack();
 
-	void PushLayer(Ref<Layer> layer);
-	void PushOverlay(Ref<Layer> overlay);
-	void PopLayer(Ref<Layer> layer);
-	void PopOverlay(Ref<Layer> overlay);
+	void PushLayer(Layer *layer);
+	void PushOverlay(Layer *overlay);
+	void PopLayer(Layer *layer);
+	void PopOverlay(Layer *overlay);
 
-	std::vector<Ref<Layer>>::iterator begin();
-	std::vector<Ref<Layer>>::iterator end();
-	std::vector<Ref<Layer>>::reverse_iterator rbegin();
-	std::vector<Ref<Layer>>::reverse_iterator rend();
+	std::vector<Layer *>::iterator begin();
+	std::vector<Layer *>::iterator end();
+	std::vector<Layer *>::reverse_iterator rbegin();
+	std::vector<Layer *>::reverse_iterator rend();
 
-	std::vector<Ref<Layer>>::const_iterator begin() const;
-	std::vector<Ref<Layer>>::const_iterator end()	const;
-	std::vector<Ref<Layer>>::const_reverse_iterator rbegin() const;
-	std::vector<Ref<Layer>>::const_reverse_iterator rend() const;
+	std::vector<Layer *>::const_iterator begin() const;
+	std::vector<Layer *>::const_iterator end()	const;
+	std::vector<Layer *>::const_reverse_iterator rbegin() const;
+	std::vector<Layer *>::const_reverse_iterator rend() const;
 
 private:
-	std::vector<Ref<Layer>> m_Layers;
+	std::vector<Layer *> m_Layers;
 	unsigned int m_LayerInsertIndex = 0;
 };
 }

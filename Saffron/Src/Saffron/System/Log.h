@@ -12,12 +12,12 @@ class Log
 public:
 	static void Init();
 
-	static Ref<spdlog::logger> &GetCoreLogger();
-	static Ref<spdlog::logger> &GetClientLogger();
+	static std::shared_ptr<spdlog::logger> &GetCoreLogger();
+	static std::shared_ptr<spdlog::logger> &GetClientLogger();
 
 private:
-	static Ref<spdlog::logger> m_sCoreLogger;
-	static Ref<spdlog::logger> m_sClientLogger;
+	static std::shared_ptr<spdlog::logger> m_sCoreLogger;
+	static std::shared_ptr<spdlog::logger> m_sClientLogger;
 
 };
 

@@ -7,30 +7,31 @@
 
 namespace Se
 {
-struct WindowProps
-{
-	std::string Title;
-	Uint32 Width;
-	Uint32 Height;
-	glm::vec2 Position;
-
-	explicit WindowProps(const std::string &title = "Saffron Engine",
-						 Uint32 width = 1280,
-						 Uint32 height = 720,
-						 const glm::vec2 position = { 100.0f, 100.0f })
-		: Title(title), Width(width), Height(height), Position(position)
-	{
-	}
-};
-
 // Interface representing a desktop system based Window
-class Window
+class Window : public RefCounted
 {
 public:
 	using EventCallback = std::function<void(const Event &)>;
 
 public:
-	Window();
+	struct Properties
+	{
+		std::string Title;
+		Uint32 Width;
+		Uint32 Height;
+		glm::vec2 Position;
+
+		explicit Properties(const std::string &title = "Saffron Engine",
+							Uint32 width = 1280,
+							Uint32 height = 720,
+							const glm::vec2 position = { 100.0f, 100.0f })
+			: Title(title), Width(width), Height(height), Position(position)
+		{
+		}
+	};
+
+public:
+	Window(const Properties &properties);
 	virtual ~Window() = default;
 
 	virtual void OnUpdate() = 0;
@@ -54,7 +55,7 @@ public:
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
 
-	static Ref<Window> Create(const WindowProps &props = WindowProps());
+	static Ref<Window> Create(const Properties &properties = Properties());
 
 protected:
 	std::string m_Title;
@@ -69,7 +70,7 @@ private:
 template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
-	m_Events.emplace_back(std::make_shared<T>(std::forward<Params>(params)...));
+	m_Events.emplace_back(Ref<T>::Create(std::forward<Params>(params)...));
 	//SE_INFO("{0}", m_Events.back()->ToString());
 }
 

@@ -10,6 +10,8 @@ public:
 	Time &operator+(const Time &rhs);
 	Time &operator+=(const Time &rhs);
 	Time &operator+=(float seconds);
+	Time &operator*(float multiplier);
+	Time &operator*=(float multiplier);
 	float operator()() const;
 
 	float sec() const;

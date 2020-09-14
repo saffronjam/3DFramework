@@ -1,34 +1,51 @@
 ﻿#pragma once
 
 #include "Saffron/Config.h"
-#include "Saffron/Renderer/VertexArray.h"
-#include "Saffron/System/SaffronMath.h"
+#include "Saffron/Renderer/PrimitiveType.h"
 
 namespace Se
 {
+using RendererID = Uint32;
+
 class RendererAPI
 {
 public:
-	enum class API
+	enum class Type
 	{
 		None = 0, OpenGL = 1
+	};
+
+	struct Capabilities
+	{
+		std::string Vendor;
+		std::string Renderer;
+		std::string Version;
+
+		int MaxSamples = 0;
+		float MaxAnisotropy = 0.0f;
+		int MaxTextureUnits = 0;
 	};
 
 public:
 	virtual ~RendererAPI() = default;
 
-	virtual void Init() = 0;
+	static void Init();
+	static void Shutdown();
 
-	virtual void SetViewport(Uint32 x, Uint32 y, Uint32 width, Uint32 height) = 0;
-	virtual void SetClearColor(const glm::vec4 &color) = 0;
-	virtual void Clear() = 0;
+	static void Clear(float r, float g, float b, float a);
+	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
-	virtual void DrawIndexed(const Ref<VertexArray> &vertexArray, Uint32 indexCount = 0) = 0;
+	static Capabilities &GetCapabilities() { return m_sCapabilities; }
+	static void SetLineThickness(float thickness);
+	static void SetClearColor(float r, float g, float b, float a);
 
-	static API GetAPI();
-	static Scope<RendererAPI> Create();
+	static Type CurrentAPI() { return m_sCurrentAPI; }
 
 private:
-	static API m_sAPI;
+	static void LoadRequiredAssets();
+
+private:
+	static Type m_sCurrentAPI;
+	static Capabilities m_sCapabilities;
 };
 }

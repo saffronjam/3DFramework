@@ -1,42 +1,66 @@
 ﻿#pragma once
 
-#include "Saffron/Core/Event/WindowEvent.h"
-#include "Saffron/Renderer/Camera2D.h"
-#include "Saffron/Renderer/Camera3D.h"
-#include "Saffron/Renderer/RenderCommand.h"
-#include "Saffron/Renderer/RendererAPI.h"
-#include "Saffron/Renderer/Shader.h"
-#include "Saffron/System/SaffronMath.h"
+#include "Saffron/Renderer/Material.h"
+#include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Renderer/PrimitiveType.h"
+#include "Saffron/Renderer/RenderCommandQueue.h"
+#include "Saffron/Renderer/RenderPass.h"
 
 namespace Se
 {
+class ShaderLibrary;
+
 class Renderer
 {
 public:
-	virtual ~Renderer() = default;
-
 	static void Init();
 	static void Shutdown();
 
-	static void OnEvent(const Event &event);
+	// Commands
+	static void Clear();
+	static void Clear(float r, float g, float b, float a = 1.0f);
+	static void SetClearColor(float r, float g, float b, float a);
 
-	static void BeginScene(Camera2D &camera);
-	static void BeginScene(Camera3D &camera);
-	static void EndScene();
+	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
-	static void Submit(const Ref<Shader> &shader, const Ref<VertexArray> &vertexArray, const glm::mat4 &transform = glm::mat4(1.0f));
+	// For OpenGL
+	static void ClearMagenta();
+	static Ref<ShaderLibrary> GetShaderLibrary();
+	static void SetLineThickness(float thickness);
 
-	static RendererAPI::API GetAPI();
+	template<typename FuncT>
+	static void Submit(FuncT &&func);
+	static void WaitAndRender();
 
+	// ~Actual~ Renderer here... TODO: remove confusion later
+	static void BeginRenderPass(Ref<RenderPass> renderPass, bool clear = true);
+	static void EndRenderPass();
+
+	static void SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
+	static void SubmitFullscreenQuad(Ref<MaterialInstance> material);
+	static void SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial = nullptr);
+
+	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	static void DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 private:
-	static void OnWindowResize(const WindowResizeEvent &event);
+	static RenderCommandQueue &GetRenderCommandQueue();
 
-private:
-	struct SceneData
-	{
-		glm::mat4 ViewProjectionMatrix;
-	};
-
-	static Scope<SceneData> m_sSceneData;
 };
+
+template <typename FuncT>
+void Renderer::Submit(FuncT &&func)
+{
+	auto renderCmd = [](void *ptr)
+	{
+		auto pFunc = *static_cast<FuncT *>(ptr);
+		pFunc();
+
+		// NOTE: Instead of destroying we could try and enforce all items to be trivially destructible
+		// however some items like uniforms which contain std::strings still exist for now
+		// static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
+		pFunc.~FuncT();
+	};
+	auto storageBuffer = GetRenderCommandQueue().Allocate(renderCmd, sizeof(func));
+	new(storageBuffer) FuncT(std::forward<FuncT>(func));
+}
 }

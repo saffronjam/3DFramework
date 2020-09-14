@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-#include "Saffron/SaffronPCH.h"
 #include "Saffron/Config.h"
 #include "Saffron/Core/Event/WindowEvent.h"
 #include "Saffron/Graphics/Window.h"
@@ -14,29 +13,43 @@ namespace Se
 {
 class Application
 {
+	struct Properties
+	{
+		std::string Name;
+		Uint32 WindowWidth, WindowHeight;
+	};
+
 public:
-	Application();
+	explicit Application(const Properties &properties = { "Saffron Engine", 1280, 720 });
 	virtual ~Application();
 
 	void Run();
 	void Close();
 
-	void PushLayer(const Ref<Layer> &layer);
-	void PushOverlay(const Ref<Layer> &layer);
+	void PushLayer(Layer *layer);
+	void PushOverlay(Layer *layer);
+	void RenderImGui();
 
+	virtual void OnInit() {}
+	virtual void OnShutdown() {}
+	virtual void OnUpdate(Time ts) {}
 	virtual void OnEvent(const Event &event);
 
 	const Ref<Window> &GetWindow() const;
-	const Ref<ImGuiLayer> &GetImGuiLayer() const;
-
 	static Application &Get() { return *m_sInstance; }
+
+	static const char *GetConfigurationName();
+	static const char *GetPlatformName();
+
+	std::string OpenFile(const char *filter = "All\0*.*\0") const;
+	std::string SaveFile(const char *filter = "All\0*.*\0") const;
 
 private:
 	void OnWindowClose(const WindowCloseEvent &event);
 	void OnWindowResize(const WindowResizeEvent &event);
 
 protected:
-	Ref<Window> m_pWindow;
+	Ref<Window> m_Window;
 	Keyboard m_Keyboard;
 	Mouse m_Mouse;
 	Time dt;
@@ -46,7 +59,8 @@ private:
 	bool m_Minimized = false;
 	Timer m_AppTimer;
 
-	Ref<ImGuiLayer> m_pImGuiLayer;
+	// TODO: Make this a ref instead of raw pointer
+	ImGuiLayer *m_ImGuiLayer;
 	LayerStack m_LayerStack;
 
 	static Application *m_sInstance;

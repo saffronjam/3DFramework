@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sstream>
+
 #include "Saffron/Core/Event/Event.h"
 #include "Saffron/System/SaffronMath.h"
 

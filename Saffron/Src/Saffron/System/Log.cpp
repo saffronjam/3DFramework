@@ -1,13 +1,13 @@
 ﻿#include "Saffron/SaffronPCH.h"
-#include "Saffron/System/Log.h"
 
 #include <spdlog/sinks/stdout_color_sinks.h>
 
+#include "Saffron/System/Log.h"
+
 namespace Se
 {
-
-Ref<spdlog::logger> Log::m_sCoreLogger;
-Ref<spdlog::logger> Log::m_sClientLogger;
+std::shared_ptr<spdlog::logger> Log::m_sCoreLogger;
+std::shared_ptr<spdlog::logger> Log::m_sClientLogger;
 
 void Log::Init()
 {
@@ -18,12 +18,12 @@ void Log::Init()
 	m_sClientLogger->set_level(spdlog::level::trace);
 }
 
-Ref<spdlog::logger> &Log::GetCoreLogger()
+std::shared_ptr<spdlog::logger> &Log::GetCoreLogger()
 {
 	return m_sCoreLogger;
 }
 
-Ref<spdlog::logger> &Log::GetClientLogger()
+std::shared_ptr<spdlog::logger> &Log::GetClientLogger()
 {
 	return m_sClientLogger;
 }

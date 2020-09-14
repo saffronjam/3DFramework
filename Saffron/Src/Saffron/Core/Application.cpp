@@ -1,101 +1,170 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
+#define GLFW_EXPOSE_NATIVE_WIN32
+#include <Windows.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <GLFW/glfw3native.h>
+
 #include "Saffron/Core/Application.h"
+#include "Saffron/Renderer/Framebuffer.h"
 #include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Script/ScriptEngine.h"
+
 
 namespace Se
 {
 
 Application *Application::m_sInstance = nullptr;
 
-Application::Application()
+Application::Application(const Properties &properties)
 {
-	SE_PROFILE_FUNCTION();
-
-	m_pWindow = Window::Create(WindowProps());
-	m_pImGuiLayer = CreateRef<ImGuiLayer>();
-
-
-	m_pWindow->SetEventCallback(SE_EVENT_FN(Application::OnEvent));
-
 	SE_ASSERT(!m_sInstance, "Application already exist");
 	m_sInstance = this;
 
-	Renderer::Init();
+	m_Window = Window::Create();
 
-	PushLayer(m_pImGuiLayer);
+	m_Window->SetEventCallback(SE_EVENT_FN(Application::OnEvent));
+	m_Window->SetVSync(true);
+
+	m_ImGuiLayer = new ImGuiLayer;
+	PushLayer(m_ImGuiLayer);
+
+	ScriptEngine::Init("assets/scripts/ExampleApp.dll");
+	Renderer::Init();
+	Renderer::WaitAndRender();
+
+	dt = m_AppTimer.Mark();
 }
 
 Application::~Application()
 {
-	SE_PROFILE_FUNCTION();
-
-	Renderer::Shutdown();
+	ScriptEngine::Shutdown();
+	delete m_ImGuiLayer;
 }
 
 
 void Application::Run()
 {
-	SE_PROFILE_FUNCTION();
-
-	glm::vec4 color = { 0.0f, 0.0f, 0.0f, 0.0f };
-
+	OnInit();
 	while ( m_Running )
 	{
-		SE_PROFILE_SCOPE("Run Loop");
-
-		dt = m_AppTimer.Mark();
-
-		{
-			SE_PROFILE_SCOPE("Components OnUpdate");
-
-			m_Keyboard.OnUpdate();
-			m_Mouse.OnUpdate();
-			m_pWindow->HandleBufferedEvents();
-		}
-
 		if ( !m_Minimized )
 		{
-			// Normal updates and rendering
-			{
-				SE_PROFILE_SCOPE("LayerStack OnUpdate");
+			for ( auto *layer : m_LayerStack )
+				layer->OnUpdate(dt);
 
-				for ( auto &layer : m_LayerStack )
-					layer->OnUpdate(dt);
-			}
+			// Render ImGui on render thread
+			Application *app = this;
+			Renderer::Submit([app]() { app->RenderImGui(); });
 
-			// ImGui rendering
-			{
-				SE_PROFILE_SCOPE("LayerStack OnImGuiRender");
-
-				m_pImGuiLayer->Begin();
-				for ( auto &layer : m_LayerStack )
-					layer->OnImGuiRender();
-				m_pImGuiLayer->End();
-			}
+			Renderer::WaitAndRender();
 		}
-		m_pWindow->OnUpdate();
+		m_Window->OnUpdate();
+
+		dt = m_AppTimer.Mark();
 	}
+	OnShutdown();
 }
 
 void Application::Close()
 {
 }
 
-void Application::PushLayer(const Ref<Layer> &layer)
+void Application::PushLayer(Layer *layer)
 {
-	SE_PROFILE_FUNCTION();
-
 	m_LayerStack.PushLayer(layer);
 	layer->OnAttach();
 }
 
-void Application::PushOverlay(const Ref<Layer> &layer)
+void Application::PushOverlay(Layer *layer)
 {
-	SE_PROFILE_FUNCTION();
-
 	m_LayerStack.PushOverlay(layer);
 	layer->OnAttach();
+}
+
+void Application::RenderImGui()
+{
+	m_ImGuiLayer->Begin();
+
+	ImGui::Begin("Renderer");
+	auto &caps = RendererAPI::GetCapabilities();
+	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
+	ImGui::Text("Renderer: %s", caps.Renderer.c_str());
+	ImGui::Text("Version: %s", caps.Version.c_str());
+	ImGui::Text("Frame Time: %.2fms\n", dt.ms());
+	ImGui::End();
+
+	for ( Layer *layer : m_LayerStack )
+		layer->OnImGuiRender();
+
+	m_ImGuiLayer->End();
+}
+
+const char *Application::GetConfigurationName()
+{
+#if defined(SE_DEBUG)
+	return "Debug";
+#elif defined(SE_RELEASE)
+	return "Release";
+#elif defined(SE_DIST)
+	return "Dist";
+#else
+#error Undefined configuration?
+#endif
+}
+
+const char *Application::GetPlatformName()
+{
+#if defined(SE_PLATFORM_WINDOWS)
+	return "Windows x64";
+#else
+#error Undefined platform?
+#endif
+}
+
+std::string Application::OpenFile(const char *filter) const
+{
+	OPENFILENAMEA ofn;       // common dialog box structure
+	CHAR szFile[260] = { 0 };       // if using TCHAR macros
+
+	// Initialize OPENFILENAME
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+	if ( GetOpenFileNameA(&ofn) == TRUE )
+	{
+		return ofn.lpstrFile;
+	}
+	return std::string();
+}
+
+std::string Application::SaveFile(const char *filter) const
+{
+	OPENFILENAMEA ofn;       // common dialog box structure
+	CHAR szFile[260] = { 0 };       // if using TCHAR macros
+
+	// Initialize OPENFILENAME
+	ZeroMemory(&ofn, sizeof(OPENFILENAME));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
+	ofn.lpstrFile = szFile;
+	ofn.nMaxFile = sizeof(szFile);
+	ofn.lpstrFilter = filter;
+	ofn.nFilterIndex = 1;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+
+	if ( GetSaveFileNameA(&ofn) == TRUE )
+	{
+		return ofn.lpstrFile;
+	}
+	return std::string();
 }
 
 void Application::OnEvent(const Event &event)
@@ -110,7 +179,7 @@ void Application::OnEvent(const Event &event)
 	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Application::OnWindowResize));
 
 	// Window events
-	m_pWindow->OnEvent(event);
+	m_Window->OnEvent(event);
 
 	// Keyboard events
 	m_Keyboard.OnEvent(event);
@@ -118,11 +187,8 @@ void Application::OnEvent(const Event &event)
 	// Mouse events
 	m_Mouse.OnEvent(event);
 
-	// Renderer events
-	Renderer::OnEvent(event);
-
 	// Layer events
-	for ( const auto &layer : m_LayerStack )
+	for ( auto &layer : m_LayerStack )
 	{
 		layer->OnEvent(event);
 	}
@@ -130,12 +196,7 @@ void Application::OnEvent(const Event &event)
 
 const Ref<Window> &Application::GetWindow() const
 {
-	return m_pWindow;
-}
-
-const Ref<ImGuiLayer> &Application::GetImGuiLayer() const
-{
-	return m_pImGuiLayer;
+	return m_Window;
 }
 
 void Application::OnWindowClose(const WindowCloseEvent &event)
@@ -145,13 +206,17 @@ void Application::OnWindowClose(const WindowCloseEvent &event)
 
 void Application::OnWindowResize(const WindowResizeEvent &event)
 {
-	SE_PROFILE_FUNCTION();
-
-	if ( event.GetWidth() == 0 || event.GetHeight() == 0 )
+	const int width = event.GetWidth(), height = event.GetHeight();
+	if ( width == 0 || height == 0 )
 	{
 		m_Minimized = true;
+		return;
 	}
 	m_Minimized = false;
+	Renderer::Submit([=]() { glViewport(0, 0, width, height); });
+	auto &fbs = FramebufferPool::GetGlobal()->GetAll();
+	for ( auto &fb : fbs )
+		fb->Resize(width, height);
 }
 
 }

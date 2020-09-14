@@ -6,16 +6,14 @@
 class SandboxApp : public Se::Application
 {
 public:
-	SandboxApp()
-		:
-		Application(),
-		m_layer(Se::CreateRef<SandboxLayer>(*m_pWindow, m_Keyboard, m_Mouse))
+	SandboxApp(const Se::Application::Properties &props)
+		: Application(props)
 	{
-		PushLayer(m_layer);
 	}
 
-	~SandboxApp()
+	virtual void OnInit() override
 	{
+		PushLayer(new Hazel::EditorLayer());
 	}
 
 private:
