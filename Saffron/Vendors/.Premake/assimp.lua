@@ -1,4 +1,4 @@
-project "Glad"
+project "assimp"
     kind "StaticLib"
     language "C"
     staticruntime "on"
