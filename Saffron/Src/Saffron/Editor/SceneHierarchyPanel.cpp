@@ -441,7 +441,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 		name = entity.GetComponent<TagComponent>().Tag.c_str();
 
 	const ImGuiTreeNodeFlags node_flags = (entity == m_SelectionContext ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity)), node_flags, name);
+	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(&entity), node_flags, name);
 	if ( ImGui::IsItemClicked() )
 	{
 		m_SelectionContext = entity;

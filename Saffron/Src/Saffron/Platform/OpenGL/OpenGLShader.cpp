@@ -89,7 +89,7 @@ std::string GetBlock(const char *str, const char **outPosition)
 
 	if ( outPosition )
 		*outPosition = end;
-	const Int32 length = end - str + 1;
+	const auto length = static_cast<Int32>(end - str + 1);
 	return std::string(str, length);
 }
 
@@ -101,7 +101,7 @@ std::string GetStatement(const char *str, const char **outPosition)
 
 	if ( outPosition )
 		*outPosition = end;
-	const Int32 length = end - str + 1;
+	const auto length = static_cast<Int32>(end - str + 1);
 	return std::string(str, length);
 }
 
