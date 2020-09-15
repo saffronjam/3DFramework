@@ -19,24 +19,34 @@ binDirectory = "Bin"
 intDirectory = "Bin-Int"
 
 -- Include directories relative to root folder (solution directory)
-includeDirs = {}
-includeDirs["assimp"] = "Saffron/Vendors/assimp/include"
-includeDirs["Box2D"] = "Saffron/Vendors/Box2D/include"
-includeDirs["entt"] = "Saffron/Vendors/entt/include"
-includeDirs["GLFW"] = "Saffron/Vendors/GLFW/include"
-includeDirs["Glad"] = "Saffron/Vendors/Glad/include"
-includeDirs["mono"] = "Saffron/Vendors/mono/include"
-includeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
-includeDirs["ImGui"] = "Saffron/Vendors/ImGui"
-includeDirs["glm"] = "Saffron/Vendors/glm/include"
-includeDirs["stb_image"] = "Saffron/Vendors/stb_image"
-includeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
+IncludeDirs = {}
+IncludeDirs["assimp"] = "Saffron/Vendors/assimp/include"
+IncludeDirs["Box2D"] = "Saffron/Vendors/Box2D/include"
+IncludeDirs["entt"] = "Saffron/Vendors/entt/include"
+IncludeDirs["Glad"] = "Saffron/Vendors/Glad/include"
+IncludeDirs["GLFW"] = "Saffron/Vendors/GLFW/include"
+IncludeDirs["glm"] = "Saffron/Vendors/glm/include"
+IncludeDirs["ImGui"] = "Saffron/Vendors/ImGui"
+IncludeDirs["mono"] = "Saffron/Vendors/mono/include"
+IncludeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
+IncludeDirs["stb"] = "Saffron/Vendors/stb"
+IncludeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
+
+-- Library directories relative to root folder (solution directory)
+LibraryDirs = {}
+LibraryDirs["mono"] = "Saffron/Vendors/mono/lib/Debug/mono-2.0-sgen.lib"
 
 group "Vendors"
-	include "Saffron/Vendors/.Premake/GLFW"
+	include "Saffron/Vendors/.Premake/assimp"
+	include "Saffron/Vendors/.Premake/Box2D"
+	include "Saffron/Vendors/.Premake/entt"
 	include "Saffron/Vendors/.Premake/Glad"
-	include "Saffron/Vendors/.Premake/ImGui"
+	include "Saffron/Vendors/.Premake/GLFW"
 	include "Saffron/Vendors/.Premake/glm"
+	include "Saffron/Vendors/.Premake/ImGui"
+	include "Saffron/Vendors/.Premake/mono"
+	include "Saffron/Vendors/.Premake/stb"
+	include "Saffron/Vendors/.Premake/yaml-cpp"
 group ""
 
 project "Saffron"
@@ -52,44 +62,31 @@ project "Saffron"
 	pchheader "Saffron/SaffronPCH.h"
 	pchsource "Saffron/Src/Saffron/SaffronPCH.cpp"
 
-	files
-	{
-		"%{prj.name}/Src/**.h",
-		"%{prj.name}/Src/**.cpp",
-		"%{prj.name}/Vendors/stb_image/**.h",
-		"%{prj.name}/Vendors/stb_image/**.cpp",
-		"%{prj.name}/Vendors/glm/glm/include/**.hpp",
-		"%{prj.name}/Vendors/glm/glm/include/**.inl",
-	}
-
-	defines
-	{
-		"_CRT_SECURE_NO_WARNINGS",
-		"GLFW_INCLUDE_NONE"
-	}
 
 	includedirs
 	{
 		"%{prj.name}/Src",
-		"%{includeDirs.assimp}",
-		"%{includeDirs.Box2D}",
-		"%{includeDirs.entt}",
-		"%{includeDirs.GLFW}",
-		"%{includeDirs.Glad}",
-		"%{includeDirs.mono}",
-		"%{includeDirs.spdlog}",
-		"%{includeDirs.ImGui}",
-		"%{includeDirs.glm}",
-		"%{includeDirs.stb_image}",
-		"%{includeDirs.yamlcpp}"
+		"%{IncludeDirs.assimp}",
+		"%{IncludeDirs.Box2D}",
+		"%{IncludeDirs.entt}",
+		"%{IncludeDirs.GLFW}",
+		"%{IncludeDirs.Glad}",
+		"%{IncludeDirs.mono}",
+		"%{IncludeDirs.spdlog}",
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.glm}",
+		"%{IncludeDirs.stb_image}",
+		"%{IncludeDirs.yamlcpp}"
 	}
 
 	links
 	{
-		"ImGui",
+		"Box2D",
+		"Glad",
         "GLFW",
-		"GLAD",
-        "opengl32.lib"
+		"ImGui",
+		"opengl32.lib",
+		"${LibraryDirs.mono}"
 	}
 
 	disablewarnings
@@ -136,10 +133,10 @@ project "Sandbox"
 	includedirs
 	{
 		"Saffron/Src",
-		"%{includeDirs.spdlog}",
-		"%{includeDirs.ImGui}",
-		"%{includeDirs.glm}",
-		"%{includeDirs.entt}"
+		"%{IncludeDirs.spdlog}",
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.glm}",
+		"%{IncludeDirs.entt}"
 	}
 
 	links
