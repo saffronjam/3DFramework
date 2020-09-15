@@ -1,6 +1,6 @@
 project "entt"
     kind "StaticLib"
-    language "C"
+    language "C++"
     staticruntime "on"
 
 	location "../%{prj.name}"

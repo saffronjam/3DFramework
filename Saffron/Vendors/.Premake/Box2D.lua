@@ -1,6 +1,6 @@
 project "Box2D"
     kind "StaticLib"
-    language "C"
+    language "C++"
     staticruntime "on"
 
 	location "../%{prj.name}"
@@ -14,12 +14,14 @@ project "Box2D"
     files
     {
 		srcDirectory .. "include/box2d/**.h",
+		srcDirectory .. "src/**.h",
 		srcDirectory .. "src/**.cpp"
     }
 
     includedirs
     {
-        srcDirectory .. "include"
+        srcDirectory .. "include",
+        srcDirectory .. "src"
     }
     
     filter "system:windows"

@@ -1,7 +1,7 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
 #include <glad/glad.h>
-#include <stb_image.h>
+#include <stb/stb_image.h>
 
 #include "Saffron/Platform/OpenGL/OpenGLTexture.h"
 #include "Saffron/Renderer/Renderer.h"

@@ -29,7 +29,7 @@ IncludeDirs["glm"] = "Saffron/Vendors/glm/include"
 IncludeDirs["ImGui"] = "Saffron/Vendors/ImGui"
 IncludeDirs["mono"] = "Saffron/Vendors/mono/include"
 IncludeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
-IncludeDirs["stb"] = "Saffron/Vendors/stb"
+IncludeDirs["stb"] = "Saffron/Vendors/stb/include"
 IncludeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
 
 -- Library directories relative to root folder (solution directory)
@@ -62,6 +62,11 @@ project "Saffron"
 	pchheader "Saffron/SaffronPCH.h"
 	pchsource "Saffron/Src/Saffron/SaffronPCH.cpp"
 
+	files
+	{
+		"%{prj.name}/Src/**.h",
+		"%{prj.name}/Src/**.cpp"
+	}
 
 	includedirs
 	{
@@ -75,7 +80,7 @@ project "Saffron"
 		"%{IncludeDirs.spdlog}",
 		"%{IncludeDirs.ImGui}",
 		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.stb_image}",
+		"%{IncludeDirs.stb}",
 		"%{IncludeDirs.yamlcpp}"
 	}
 

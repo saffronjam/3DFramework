@@ -106,8 +106,8 @@ class ContactListener : public b2ContactListener
 public:
 	void BeginContact(b2Contact *contact) override
 	{
-		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
+		Entity &a = *reinterpret_cast<Entity *>(&contact->GetFixtureA()->GetBody()->GetUserData());
+		Entity &b = *reinterpret_cast<Entity *>(&contact->GetFixtureB()->GetBody()->GetUserData());
 
 		// TODO: improve these if checks
 		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )
@@ -120,8 +120,8 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact *contact) override
 	{
-		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
+		Entity &a = *reinterpret_cast<Entity *>(&contact->GetFixtureA()->GetBody()->GetUserData());
+		Entity &b = *reinterpret_cast<Entity *>(&contact->GetFixtureB()->GetBody()->GetUserData());
 
 		// TODO: improve these if checks
 		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )

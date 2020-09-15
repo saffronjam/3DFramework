@@ -13,8 +13,7 @@ project "stb"
 	
     files
     {
-        srcDirectory .. "include/%{prj.name}/stb_image.h",
-        srcDirectory .. "src/%{prj.name}/stb_image.cpp"
+        srcDirectory .. "include/%{prj.name}/stb_image.h"
     }
 
     includedirs
