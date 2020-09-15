@@ -1,26 +1,29 @@
 ﻿#include <Saffron.h>
 #include <Saffron/EntryPoint.h>
 
-#include "SandboxLayer.h"
+#include "EditorLayer.h"
 
-class SandboxApp : public Se::Application
+namespace Se
+{
+class SandboxApp : public Application
 {
 public:
-	SandboxApp(const Se::Application::Properties &props)
+	SandboxApp(const Properties &props = { "Sandbox App", 1024, 720 })
 		: Application(props)
 	{
 	}
 
-	virtual void OnInit() override
+	void OnInit() override
 	{
-		PushLayer(new Hazel::EditorLayer());
+		PushLayer(new EditorLayer(m_Keyboard, m_Mouse));
 	}
 
 private:
-	Se::Ref<SandboxLayer> m_layer;
+	Ref<EditorLayer> m_layer;
 };
 
-Se::Ref<Se::Application> Se::CreateApplication()
+Ref<Application> CreateApplication()
 {
-	return Se::CreateRef<SandboxApp>();
+	return Ref<SandboxApp>::Create();
+}
 }

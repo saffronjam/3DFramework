@@ -17,11 +17,11 @@ public:
 
 	struct Specification
 	{
-		uint32_t Width = 1280;
-		uint32_t Height = 720;
+		Uint32 Width = 1280;
+		Uint32 Height = 720;
 		glm::vec4 ClearColor;
 		Format Format;
-		uint32_t Samples = 1; // multisampling
+		Uint32 Samples = 1; // multisampling
 
 		// SwapChainTarget = screen buffer (i.e. no framebuffer)
 		bool SwapChainTarget = false;
@@ -32,9 +32,9 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	virtual void Resize(uint32_t width, uint32_t height, bool forceRecreate = false) = 0;
+	virtual void Resize(Uint32 width, Uint32 height, bool forceRecreate = false) = 0;
 
-	virtual void BindTexture(uint32_t slot = 0) const = 0;
+	virtual void BindTexture(Uint32 slot = 0) const = 0;
 
 	virtual RendererID GetRendererID() const = 0;
 	virtual RendererID GetColorAttachmentRendererID() const = 0;

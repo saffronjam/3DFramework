@@ -64,7 +64,7 @@ private:
 	Buffer m_PSUniformStorageBuffer;
 	std::vector<Ref<Texture>> m_Textures;
 
-	uint32_t m_MaterialFlags;
+	Uint32 m_MaterialFlags;
 };
 
 
@@ -85,7 +85,7 @@ public:
 
 	const std::string &GetName() const { return m_Name; }
 	Ref<Shader> GetShader() { return m_Material->m_Shader; }
-	uint32_t GetFlags() const { return m_Material->m_MaterialFlags; }
+	Uint32 GetFlags() const { return m_Material->m_MaterialFlags; }
 	bool GetFlag(Material::Flag flag) const { return static_cast<Uint32>(flag) & m_Material->m_MaterialFlags; }
 	template<typename T>
 	T &Get(const std::string &name);

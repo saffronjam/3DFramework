@@ -68,8 +68,8 @@ void Renderer::Init()
 	sData.m_FullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
 
 	sData.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
-	uint32_t indices[6] = { 0, 1, 2, 2, 3, 0, };
-	sData.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32_t));
+	Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+	sData.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
 
 	Renderer2D::Init();
 }
@@ -206,7 +206,7 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 			else
 				glDisable(GL_DEPTH_TEST);
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(uint32_t) * submesh.BaseIndex), submesh.BaseVertex);
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });
 	}
 }
@@ -229,13 +229,13 @@ void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm:
 		transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
 	};
 
-	for ( uint32_t i = 0; i < 4; i++ )
+	for ( Uint32 i = 0; i < 4; i++ )
 		Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
 
-	for ( uint32_t i = 0; i < 4; i++ )
+	for ( Uint32 i = 0; i < 4; i++ )
 		Renderer2D::DrawLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
 
-	for ( uint32_t i = 0; i < 4; i++ )
+	for ( Uint32 i = 0; i < 4; i++ )
 		Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 

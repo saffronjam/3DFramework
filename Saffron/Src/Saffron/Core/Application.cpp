@@ -194,6 +194,11 @@ void Application::OnEvent(const Event &event)
 	}
 }
 
+Ref<Window> &Application::GetWindow()
+{
+	return m_Window;
+}
+
 const Ref<Window> &Application::GetWindow() const
 {
 	return m_Window;

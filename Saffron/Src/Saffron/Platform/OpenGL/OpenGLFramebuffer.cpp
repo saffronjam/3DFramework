@@ -19,7 +19,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer()
 	Renderer::Submit([this]() {glDeleteFramebuffers(1, &m_RendererID); });
 }
 
-void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool forceRecreate)
+void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 {
 	if ( !forceRecreate && (m_Specification.Width == width && m_Specification.Height == height) )
 		return;
@@ -120,7 +120,7 @@ void OpenGLFramebuffer::Unbind() const
 	Renderer::Submit([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); });
 }
 
-void OpenGLFramebuffer::BindTexture(uint32_t slot) const
+void OpenGLFramebuffer::BindTexture(Uint32 slot) const
 {
 	Renderer::Submit([=]() { glBindTextureUnit(slot, m_ColorAttachment); });
 }

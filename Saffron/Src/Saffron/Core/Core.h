@@ -6,7 +6,7 @@ namespace Se
 class Core
 {
 public:
-	void Initialize();
-	void Shutdown();
+	static void Initialize();
+	static void Shutdown();
 };
 }

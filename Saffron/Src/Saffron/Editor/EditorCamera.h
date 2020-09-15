@@ -40,7 +40,7 @@ public:
 	float GetYaw() const { return m_Yaw; }
 
 	void SetDistance(float distance) { m_Distance = distance; }
-	void SetViewportSize(uint32_t width, uint32_t height) { m_ViewportWidth = width; m_ViewportHeight = height; }
+	void SetViewportSize(Uint32 width, Uint32 height) { m_ViewportWidth = width; m_ViewportHeight = height; }
 
 private:
 	void UpdateCameraView();
@@ -69,6 +69,6 @@ private:
 
 	float m_Exposure = 0.8f;
 
-	uint32_t m_ViewportWidth = 1280, m_ViewportHeight = 720;
+	Uint32 m_ViewportWidth = 1280, m_ViewportHeight = 720;
 };
 }

@@ -14,7 +14,7 @@ namespace Se
 #define UNIFORM_LOGGING 0
 
 #if UNIFORM_LOGGING
-#define SE_LOG_UNIFORM(...) HZ_CORE_WARN(__VA_ARGS__)
+#define SE_LOG_UNIFORM(...) SE_CORE_WARN(__VA_ARGS__)
 #else
 #define SE_LOG_UNIFORM(...)
 #endif
@@ -886,13 +886,13 @@ void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration *uniform, 
 
 void OpenGLShader::UploadUniformInt(const std::string &name, Int32 value)
 {
-	const int32_t location = GetUniformLocation(name);
+	const Int32 location = GetUniformLocation(name);
 	glUniform1i(location, value);
 }
 
 void OpenGLShader::UploadUniformIntArray(const std::string &name, Int32 *values, Uint32 count)
 {
-	const int32_t location = GetUniformLocation(name);
+	const Int32 location = GetUniformLocation(name);
 	glUniform1iv(location, count, values);
 }
 

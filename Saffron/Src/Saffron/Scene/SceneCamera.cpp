@@ -20,7 +20,7 @@ void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 	m_OrthographicFar = farClip;
 }
 
-void SceneCamera::SetViewportSize(uint32_t width, uint32_t height)
+void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
 {
 	switch ( m_ProjectionType )
 	{

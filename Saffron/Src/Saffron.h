@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <Saffron/Config.h>
+
 #include <Saffron/Core/Application.h>
 #include <Saffron/Core/Math/AABB.h>
 #include <Saffron/Core/Math/Ray.h>
@@ -7,6 +9,8 @@
 #include <Saffron/System/Log.h>
 #include <Saffron/System/Time.h>
 #include <Saffron/System/Timer.h>
+
+#include <Saffron/Editor/SceneHierarchyPanel.h>
 
 #include <Saffron/Core/Event/Event.h>
 #include <Saffron/Core/Event/ApplicationEvent.h>
@@ -20,6 +24,7 @@
 
 // --- SaffronRenderer API ------------------------------
 #include <Saffron/Renderer/Renderer.h>
+#include <Saffron/Renderer/Renderer2D.h>
 #include <Saffron/Renderer/SceneRenderer.h>
 #include <Saffron/Renderer/RenderPass.h>
 #include <Saffron/Renderer/Framebuffer.h>
@@ -38,3 +43,6 @@
 #include <Saffron/Scene/SceneCamera.h>
 #include <Saffron/Scene/SceneSerializer.h>
 #include <Saffron/Scene/Components.h>
+
+// -------Saffron Scene ---------------------------------------
+#include <Saffron/Script/ScriptEngine.h>

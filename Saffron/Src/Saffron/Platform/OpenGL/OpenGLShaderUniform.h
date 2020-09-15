@@ -63,7 +63,7 @@ private:
 	ShaderDomain m_Domain;
 
 	Type m_Type;
-	mutable int32_t m_Location{};
+	mutable Int32 m_Location{};
 
 public:
 	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, std::string name, Uint32 count = 1);

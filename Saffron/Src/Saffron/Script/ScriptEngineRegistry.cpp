@@ -20,7 +20,7 @@ extern MonoImage *s_CoreAssemblyImage;
 	{\
 		MonoType* type = mono_reflection_type_from_name("Saffron." #Type, s_CoreAssemblyImage);\
 		if (type) {\
-			uint32_t id = mono_type_get_type(type);\
+			Uint32 id = mono_type_get_type(type);\
 			s_HasComponentFuncs[type] = [](Entity& entity) { return entity.HasComponent<Type>(); };\
 			s_CreateComponentFuncs[type] = [](Entity& entity) { entity.AddComponent<Type>(); };\
 		} else {\

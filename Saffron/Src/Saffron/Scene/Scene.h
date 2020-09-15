@@ -44,7 +44,7 @@ public:
 	void OnUpdate(Time ts);
 	void OnRenderRuntime(Time ts);
 	void OnRenderEditor(Time ts, const EditorCamera &editorCamera);
-	void OnEvent(Event &e);
+	void OnEvent(const Event &event);
 
 	// Runtime
 	void OnRuntimeStart();
@@ -71,7 +71,7 @@ public:
 	static Ref<Scene> GetScene(UUID uuid);
 	float GetPhysics2DGravity() const;
 
-	void SetViewportSize(uint32_t width, uint32_t height);
+	void SetViewportSize(Uint32 width, Uint32 height);
 	void SetEnvironment(const Environment &environment);
 	const Environment &GetEnvironment() const { return m_Environment; }
 	void SetSkybox(const Ref<TextureCube> &skybox);
@@ -85,7 +85,7 @@ private:
 	entt::registry m_Registry;
 
 	std::string m_DebugName;
-	uint32_t m_ViewportWidth = 0, m_ViewportHeight = 0;
+	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	EntityMap m_EntityIDMap;
 

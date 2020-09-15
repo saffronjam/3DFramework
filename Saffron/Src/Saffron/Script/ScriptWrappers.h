@@ -34,9 +34,9 @@ void Saffron_RigidBody2DComponent_SetLinearVelocity(uint64_t entityID, glm::vec2
 
 // Renderer
 // Texture2D
-void *Saffron_Texture2D_Constructor(uint32_t width, uint32_t height);
+void *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
 void Saffron_Texture2D_Destructor(Ref<Texture2D> *_this);
-void Saffron_Texture2D_SetData(Ref<Texture2D> *_this, MonoArray *inData, int32_t count);
+void Saffron_Texture2D_SetData(Ref<Texture2D> *_this, MonoArray *inData, Int32 count);
 
 // Material
 void Saffron_Material_Destructor(Ref<Material> *_this);

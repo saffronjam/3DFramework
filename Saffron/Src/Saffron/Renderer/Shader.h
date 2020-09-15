@@ -151,9 +151,8 @@ public:
 	static Ref<Shader> Create(const std::string &filepath);
 	static Ref<Shader> CreateFromString(const std::string &source);
 
-private:
 	// TODO: Create Asset manager and remove this
-	static std::vector<Ref<Shader>> s_AllShaders;
+	static std::vector<Ref<Shader>> m_sAllShaders;
 };
 
 class ShaderLibrary : public RefCounted

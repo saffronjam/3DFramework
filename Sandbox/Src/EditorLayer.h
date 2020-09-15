@@ -12,17 +12,17 @@ public:
 		None = 0, ColorProperty = 1, DragProperty = 2, SliderProperty = 4
 	};
 public:
-	EditorLayer();
-	virtual ~EditorLayer();
+	EditorLayer(const Keyboard &keyboard, const Mouse &mouse);
+	virtual ~EditorLayer() = default;
 
 	void OnAttach() override;
 	void OnDetach() override;
 	void OnUpdate(Time ts) override;
 
 	void OnImGuiRender() override;
-	void OnEvent(const Event &e) override;
-	bool OnKeyPressEvent(KeyboardPressEvent &e);
-	bool OnMouseButtonPress(MousePressEvent &e);
+	void OnEvent(const Event &event) override;
+	void OnKeyPressEvent(const KeyboardPressEvent &event);
+	void OnMouseButtonPress(const MousePressEvent &event);
 
 	// ImGui UI helpers
 	bool Property(const std::string &name, bool &value);
@@ -41,7 +41,7 @@ public:
 	void SaveScene();
 	void SaveSceneAs();
 private:
-	std::pair<float, float> GetMouseViewportSpace();
+	glm::vec2 GetMouseViewportSpace();
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my);
 
 	struct SelectedSubmesh
@@ -62,6 +62,11 @@ private:
 
 	float GetSnapValue();
 private:
+	//TEMPOARY
+	// TODO: Remove Keyboard and Mouse abstraction
+	const Keyboard &keyboard;
+	const Mouse &mouse;
+
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;

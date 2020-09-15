@@ -189,7 +189,7 @@ private:
 	std::vector<Ref<Texture2D>> m_NormalMaps;
 	std::vector<Ref<MaterialInstance>> m_Materials;
 
-	std::unordered_map<uint32_t, std::vector<Triangle>> m_TriangleCache;
+	std::unordered_map<Uint32, std::vector<Triangle>> m_TriangleCache;
 
 	// Animation
 	bool m_IsAnimated = false;

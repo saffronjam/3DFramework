@@ -137,8 +137,8 @@ void SceneRenderer::SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &t
 
 std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
 {
-	const uint32_t cubemapSize = 2048;
-	const uint32_t irradianceMapSize = 32;
+	const Uint32 cubemapSize = 2048;
+	const Uint32 irradianceMapSize = 32;
 
 	Ref<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 	if ( !equirectangularConversionShader )

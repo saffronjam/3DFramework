@@ -11,7 +11,7 @@ public:
 public:
 	void SetPerspective(float verticalFOV, float nearClip = 0.01f, float farClip = 10000.0f);
 	void SetOrthographic(float size, float nearClip = -1.0f, float farClip = 1.0f);
-	void SetViewportSize(uint32_t width, uint32_t height);
+	void SetViewportSize(Uint32 width, Uint32 height);
 
 	void SetPerspectiveVerticalFOV(float verticalFov) { m_PerspectiveFOV = glm::radians(verticalFov); }
 	float GetPerspectiveVerticalFOV() const { return glm::degrees(m_PerspectiveFOV); }

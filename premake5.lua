@@ -30,6 +30,7 @@ includeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
 includeDirs["ImGui"] = "Saffron/Vendors/ImGui"
 includeDirs["glm"] = "Saffron/Vendors/glm/include"
 includeDirs["stb_image"] = "Saffron/Vendors/stb_image"
+includeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
 
 group "Vendors"
 	include "Saffron/Vendors/.Premake/GLFW"
@@ -79,7 +80,8 @@ project "Saffron"
 		"%{includeDirs.spdlog}",
 		"%{includeDirs.ImGui}",
 		"%{includeDirs.glm}",
-		"%{includeDirs.stb_image}"
+		"%{includeDirs.stb_image}",
+		"%{includeDirs.yamlcpp}"
 	}
 
 	links
@@ -136,7 +138,8 @@ project "Sandbox"
 		"Saffron/Src",
 		"%{includeDirs.spdlog}",
 		"%{includeDirs.ImGui}",
-		"%{includeDirs.glm}"
+		"%{includeDirs.glm}",
+		"%{includeDirs.entt}"
 	}
 
 	links

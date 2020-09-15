@@ -96,7 +96,7 @@ void OpenGLPipeline::Invalidate()
 						 // TODO: Check whatever this is doing...
 #if 0
 						 const auto &layout = instance->m_Specification.Layout;
-						 uint32_t attribIndex = 0;
+						 Uint32 attribIndex = 0;
 						 for ( const auto &element : layout )
 						 {
 							 const auto glBaseType = ShaderDataTypeToOpenGLBaseType(element.Type);

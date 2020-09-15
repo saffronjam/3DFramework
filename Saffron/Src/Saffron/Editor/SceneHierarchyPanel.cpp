@@ -100,7 +100,7 @@ static void DrawComponent(const std::string &name, Entity entity, UIFunction uiF
 		bool removeComponent = false;
 
 		auto &component = entity.GetComponent<T>();
-		const bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<uint32_t>(entity) | typeid(T).hash_code()), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, name.c_str());
+		const bool open = ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(T).hash_code()), ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, name.c_str());
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));

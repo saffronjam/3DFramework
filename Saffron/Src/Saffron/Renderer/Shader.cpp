@@ -16,7 +16,7 @@ Ref<Shader> Shader::Create(const std::string &filepath)
 	}
 
 	if ( result )
-		s_AllShaders.push_back(result);
+		m_sAllShaders.push_back(result);
 	else
 		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
 
@@ -34,7 +34,7 @@ Ref<Shader> Shader::CreateFromString(const std::string &source)
 	}
 
 	if ( result )
-		s_AllShaders.push_back(result);
+		m_sAllShaders.push_back(result);
 	else
 		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
 

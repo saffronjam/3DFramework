@@ -11,8 +11,9 @@
 
 namespace Se
 {
-class Application
+class Application : public RefCounted
 {
+public:
 	struct Properties
 	{
 		std::string Name;
@@ -35,6 +36,7 @@ public:
 	virtual void OnUpdate(Time ts) {}
 	virtual void OnEvent(const Event &event);
 
+	Ref<Window> &GetWindow();
 	const Ref<Window> &GetWindow() const;
 	static Application &Get() { return *m_sInstance; }
 

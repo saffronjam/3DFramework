@@ -229,8 +229,8 @@ void Scene::OnUpdate(Time ts)
 	// Box2D physics
 	const auto sceneView = m_Registry.view<Box2DWorldComponent>();
 	auto &box2DWorld = m_Registry.get<Box2DWorldComponent>(sceneView.front()).World;
-	const int32_t velocityIterations = 6;
-	const int32_t positionIterations = 2;
+	const Int32 velocityIterations = 6;
+	const Int32 positionIterations = 2;
 	box2DWorld->Step(ts.sec(), velocityIterations, positionIterations);
 
 	{
@@ -350,7 +350,7 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 #endif
 }
 
-void Scene::OnEvent(Event &e)
+void Scene::OnEvent(const Event &event)
 {
 }
 
@@ -375,7 +375,7 @@ void Scene::OnRuntimeStart()
 	{
 		auto view = m_Registry.view<RigidBody2DComponent>();
 		m_PhysicsBodyEntityBuffer = new Entity[view.size()];
-		uint32_t physicsBodyEntityBufferIndex = 0;
+		Uint32 physicsBodyEntityBufferIndex = 0;
 		for ( auto entity : view )
 		{
 			Entity e = { entity, this };
@@ -597,7 +597,7 @@ float Scene::GetPhysics2DGravity() const
 	return m_Registry.get<Box2DWorldComponent>(m_SceneEntity).World->GetGravity().y;
 }
 
-void Scene::SetViewportSize(uint32_t width, uint32_t height)
+void Scene::SetViewportSize(Uint32 width, Uint32 height)
 {
 	m_ViewportWidth = width;
 	m_ViewportHeight = height;

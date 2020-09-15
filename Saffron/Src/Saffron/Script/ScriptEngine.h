@@ -38,7 +38,7 @@ struct EntityInstance
 {
 	EntityScriptClass *ScriptClass = nullptr;
 
-	uint32_t Handle = 0;
+	Uint32 Handle = 0;
 	Scene *SceneInstance = nullptr;
 
 	MonoObject *GetInstance() const;

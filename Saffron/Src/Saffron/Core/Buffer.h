@@ -52,13 +52,13 @@ Buffer Buffer::Copy(T *data, Uint32 size)
 template <typename T>
 T &Buffer::Read(Uint32 offset)
 {
-	return *static_cast<T *>(m_Data[offset]);
+	return *reinterpret_cast<T *>(m_Data[offset]);
 }
 
 template <typename T>
 T *Buffer::As()
 {
-	return static_cast<T *>(m_Data);
+	return reinterpret_cast<T *>(m_Data);
 }
 
 }
