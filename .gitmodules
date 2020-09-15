@@ -24,17 +24,13 @@
 	path = Saffron/Vendors/Box2D
 	url = https://github.com/erincatto/box2d.git
 	ignore = dirty 
-[submodule "Saffron/Vendors/entt"]
-	path = Saffron/Vendors/entt
-	url = https://github.com/saffronjam/entt.git
-	ignore = dirty 
 [submodule "Saffron/Vendors/Glad"]
 	path = Saffron/Vendors/Glad
 	url = https://github.com/saffronjam/Glad.git
 	ignore = dirty 
 [submodule "Saffron/Vendors/mono"]
 	path = Saffron/Vendors/mono
-	url = https://github.com/mono/mono.git
+	url = https://github.com/saffronjam/mono.git
 	ignore = dirty 
 [submodule "Saffron/Vendors/stb"]
 	path = Saffron/Vendors/stb
@@ -43,4 +39,8 @@
 [submodule "Saffron/Vendors/yaml-cpp"]
 	path = Saffron/Vendors/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+	ignore = dirty 
+[submodule "Saffron/Vendors/entt"]
+	path = Saffron/Vendors/entt
+	url = https://github.com/saffronjam/entt.git
 	ignore = dirty 
