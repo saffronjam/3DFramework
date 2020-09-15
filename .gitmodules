@@ -27,6 +27,7 @@
 [submodule "Saffron/Vendors/entt"]
 	path = Saffron/Vendors/entt
 	url = https://github.com/saffronjam/entt.git
+	ignore = dirty 
 [submodule "Saffron/Vendors/Glad"]
 	path = Saffron/Vendors/Glad
 	url = https://github.com/saffronjam/Glad.git
@@ -37,7 +38,7 @@
 	ignore = dirty 
 [submodule "Saffron/Vendors/stb"]
 	path = Saffron/Vendors/stb
-	url = https://github.com/nothings/stb.git
+	url = https://github.com/saffronjam/stb.git
 	ignore = dirty 
 [submodule "Saffron/Vendors/yaml-cpp"]
 	path = Saffron/Vendors/yaml-cpp
