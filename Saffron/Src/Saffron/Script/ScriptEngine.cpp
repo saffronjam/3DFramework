@@ -1,11 +1,11 @@
 #include "Saffron/SaffronPCH.h"
 
+#include <utility>
+
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
-
-#include <utility>
 
 #include "Saffron/Scene/Entity.h"
 #include "Saffron/Gui/Gui.h"
@@ -127,6 +127,10 @@ struct EntityScriptClass
 ///////////////////////////////////////////////////////////////////////////
 /// Mono functions / Setup procedures
 ///////////////////////////////////////////////////////////////////////////
+
+	//TODO: Add correct #include instead of this
+#define FILE_READ_ACCESS          ( 0x0001 )    // file & pipe
+#define FILE_WRITE_ACCESS         ( 0x0002 )    // file & pipe
 
 static std::unordered_map<std::string, EntityScriptClass> sEntityClassMap;
 

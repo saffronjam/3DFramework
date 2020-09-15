@@ -1,6 +1,7 @@
 ﻿#include "Saffron/SaffronPCH.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
+#include <Commdlg.h>
 #include <Windows.h>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
