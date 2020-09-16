@@ -18,7 +18,7 @@
 	ignore = dirty 
 [submodule "Saffron/Vendors/assimp"]
 	path = Saffron/Vendors/assimp
-	url = https://github.com/assimp/assimp.git
+	url = https://github.com/saffronjam/assimp.git
 	ignore = dirty 
 [submodule "Saffron/Vendors/Box2D"]
 	path = Saffron/Vendors/Box2D

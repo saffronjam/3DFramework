@@ -101,6 +101,7 @@ project "Saffron"
 	
 	filter "system:windows"
 		systemversion "latest"
+		defines "GLFW_INCLUDE_NONE"
 
 	filter "configurations:Debug"
 		defines "SE_DEBUG"

@@ -13,8 +13,8 @@ project "assimp"
 	
     files
     {
-        srcDirectory .. "include/%{prj.name}/**.h",
-        srcDirectory .. "include/%{prj.name}/**.hpp",
+        srcDirectory .. "include/assimp/**.h",
+        srcDirectory .. "include/assimp/**.hpp",
     }
 
     includedirs
