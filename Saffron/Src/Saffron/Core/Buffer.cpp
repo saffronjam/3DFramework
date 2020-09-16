@@ -36,13 +36,13 @@ void Buffer::ZeroInitialize()
 
 void Buffer::Write(void *data, Uint32 size, Uint32 offset) const
 {
-	SE_CORE_ASSERT(offset + size < m_Size, "Buffer overflow");
+	SE_CORE_ASSERT(offset + size <= m_Size, "Buffer overflow");
 	memcpy(m_Data + offset, data, size);
 }
 
 void Buffer::Write(const void *data, Uint32 size, Uint32 offset) const
 {
-	SE_CORE_ASSERT(offset + size < m_Size, "Buffer overflow");
+	SE_CORE_ASSERT(offset + size <= m_Size, "Buffer overflow");
 	memcpy(m_Data + offset, data, size);
 }
 

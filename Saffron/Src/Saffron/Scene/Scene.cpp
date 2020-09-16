@@ -1,6 +1,6 @@
 #include "Saffron/SaffronPCH.h"
 
-#include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 
 #include <utility>
 
@@ -9,6 +9,13 @@
 #include "Saffron/Scene/Entity.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Script/ScriptEngine.h"
+
+
+// TODO: Make this function work
+void b2Body::SetUserData(void *data)
+{
+	SE_ASSERT(false, "DO NOT USE THIS FUNCTION");
+}
 
 namespace Se
 {
@@ -207,7 +214,7 @@ Scene::~Scene()
 
 void Scene::Init()
 {
-	const auto skyboxShader = Shader::Create("assets/shaders/Skybox.glsl");
+	const auto skyboxShader = Shader::Create("Assets/shaders/Skybox.glsl");
 	m_SkyboxMaterial = MaterialInstance::Create(Material::Create(skyboxShader));
 	m_SkyboxMaterial->SetFlag(Material::Flag::DepthTest, false);
 }

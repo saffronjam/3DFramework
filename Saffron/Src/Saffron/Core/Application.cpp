@@ -31,7 +31,7 @@ Application::Application(const Properties &properties)
 	m_ImGuiLayer = new ImGuiLayer;
 	PushLayer(m_ImGuiLayer);
 
-	ScriptEngine::Init("assets/scripts/ExampleApp.dll");
+	ScriptEngine::Init("Assets/scripts/ExampleApp.dll");
 	Renderer::Init();
 	Renderer::WaitAndRender();
 

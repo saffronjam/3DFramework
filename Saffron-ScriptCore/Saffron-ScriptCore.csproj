@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{9F9CCE97-8B80-8FED-F4E0-8940E0E3796F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Saffron-ScriptCore</RootNamespace>
+    <AssemblyName>Saffron-ScriptCore</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\Debug-windows-x86_64\Saffron-ScriptCore\</OutputPath>
+    <BaseIntermediateOutputPath>..\Bin-Int\Debug-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\Release-windows-x86_64\Saffron-ScriptCore\</OutputPath>
+    <BaseIntermediateOutputPath>..\Bin-Int\Release-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\Bin\Dist-windows-x86_64\Saffron-ScriptCore\</OutputPath>
+    <BaseIntermediateOutputPath>..\Bin-Int\Dist-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
+    <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
+    <DefineConstants></DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Src\Saffron\Entity.cs" />
+    <Compile Include="Src\Saffron\Input.cs" />
+    <Compile Include="Src\Saffron\KeyCodes.cs" />
+    <Compile Include="Src\Saffron\Math\Matrix4.cs" />
+    <Compile Include="Src\Saffron\Math\Noise.cs" />
+    <Compile Include="Src\Saffron\Math\Vector2.cs" />
+    <Compile Include="Src\Saffron\Math\Vector3.cs" />
+    <Compile Include="Src\Saffron\Math\Vector4.cs" />
+    <Compile Include="Src\Saffron\Renderer\Color.cs" />
+    <Compile Include="Src\Saffron\Renderer\Material.cs" />
+    <Compile Include="Src\Saffron\Renderer\Mesh.cs" />
+    <Compile Include="Src\Saffron\Renderer\MeshFactory.cs" />
+    <Compile Include="Src\Saffron\Renderer\Texture2D.cs" />
+    <Compile Include="Src\Saffron\Scene\Component.cs" />
+    <Compile Include="Src\Saffron\SpriteRenderer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

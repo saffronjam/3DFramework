@@ -287,7 +287,7 @@ void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *_this, MonoStrin
 void *Saffron_MeshFactory_CreatePlane(float width, float height)
 {
 	// TODO: Implement properly with MeshFactory class!
-	return new Ref<Mesh>(new Mesh("assets/models/Plane1m.obj"));
+	return new Ref<Mesh>(new Mesh("Assets/models/Plane1m.obj"));
 }
 }
 }

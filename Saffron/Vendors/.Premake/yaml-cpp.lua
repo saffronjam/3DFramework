@@ -13,12 +13,16 @@ project "yaml-cpp"
 	
     files
     {
-        srcDirectory .. "include/%{prj.name}/**.h"
+        srcDirectory .. "include/yaml-cpp/**.h",
+        srcDirectory .. "include/yaml-cpp/**.cpp",
+        srcDirectory .. "src/**.h",
+        srcDirectory .. "src/**.cpp"
     }
 
     includedirs
     {
-        srcDirectory .. "include"
+        srcDirectory .. "include",
+        srcDirectory .. "src"
     }
     
     filter "system:windows"

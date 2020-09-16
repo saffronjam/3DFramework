@@ -5,6 +5,9 @@
 
 namespace Se
 {
+
+std::vector<Ref<Shader>> Shader::m_sAllShaders;
+
 Ref<Shader> Shader::Create(const std::string &filepath)
 {
 	Ref<Shader> result = nullptr;
@@ -12,13 +15,11 @@ Ref<Shader> Shader::Create(const std::string &filepath)
 	switch ( RendererAPI::CurrentAPI() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath);
+	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath); break;
+	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
-	if ( result )
-		m_sAllShaders.push_back(result);
-	else
-		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
+	m_sAllShaders.push_back(result);
 
 	return result;
 }
@@ -30,13 +31,11 @@ Ref<Shader> Shader::CreateFromString(const std::string &source)
 	switch ( RendererAPI::CurrentAPI() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = OpenGLShader::CreateFromString(source);
+	case RendererAPI::Type::OpenGL: result = OpenGLShader::CreateFromString(source); break;
+	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
-	if ( result )
-		m_sAllShaders.push_back(result);
-	else
-		SE_CORE_ASSERT(false, "Unknown RendererAPI!");
+	m_sAllShaders.push_back(result);
 
 	return result;
 }

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "Saffron/System/Macros.h"
+#include "Saffron/Config.h"
 
 namespace Se
 {

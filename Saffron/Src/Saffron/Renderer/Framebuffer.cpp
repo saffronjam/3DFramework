@@ -16,13 +16,12 @@ Ref<Framebuffer> Framebuffer::Create(const Specification &spec)
 
 	switch ( RendererAPI::CurrentAPI() )
 	{
-	case RendererAPI::Type::None:		return nullptr;
-	case RendererAPI::Type::OpenGL:		result = Ref<OpenGLFramebuffer>::Create(spec);
-	default:							SE_CORE_ASSERT(false, "Unknown RendererAPI"); result = nullptr;
+	case RendererAPI::Type::None:		SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
+	case RendererAPI::Type::OpenGL:		result = Ref<OpenGLFramebuffer>::Create(spec); break;
+	default:							SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;;
 	}
 
-	if ( !result )
-		FramebufferPool::GetGlobal()->Add(result);
+	FramebufferPool::GetGlobal()->Add(result);
 
 	return result;
 }

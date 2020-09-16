@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Saffron/SaffronPCH.h"
+#include <random>
+
 #include "Saffron/System/SaffronMath.h"
 
 namespace Se
@@ -19,7 +20,7 @@ public:
 
 	T Generate()
 	{
-		return static_cast<T>(m_sUniformDistribution(m_sEngine));
+		return static_cast<T>(GetUniformDistribution()(GetEngine()));
 	}
 
 	void SetLower(T lower) { m_Lower = lower; };
@@ -36,12 +37,12 @@ public:
 		return Real<int>(lower, upper);
 	}
 
-	template<typename T = float>
-	static T Real(T lower = static_cast<T>(0), T upper = static_cast<T>(1))
+	template<typename U = float>
+	static U Real(U lower = static_cast<U>(0), U upper = static_cast<U>(1))
 	{
 		static std::random_device rd;
 		static std::mt19937 e(rd());
-		std::uniform_real_distribution<T> dis(lower, upper);
+		std::uniform_real_distribution<U> dis(lower, upper);
 		return dis(e);
 	}
 
@@ -56,26 +57,40 @@ public:
 	//        return sf::Color(r, g, b, a);
 	//    }
 
-	template<typename T>
-	static glm::vec<3, T> Vec3(const glm::vec<3, T> &low, const glm::vec<3, T> &high)
+	template<typename U>
+	static glm::vec<3, U> Vec3(const glm::vec<3, U> &low, const glm::vec<3, U> &high)
 	{
 		return Random::Vec3(low.x, low.y, low.z, high.x, high.y, high.z);
 	}
-	template<typename T>
-	static glm::vec<3, T> Vec3(T lowX, T lowY, T lowZ, T highX, T highY, T highZ)
+	template<typename U>
+	static glm::vec<3, U> Vec3(U lowX, U lowY, U lowZ, U highX, U highY, U highZ)
 	{
-		float x = Random::Real<T>(lowX, highX);
-		float y = Random::Real<T>(lowY, highY);
-		float z = Random::Real<T>(lowZ, highZ);
+		float x = Random::Real<U>(lowX, highX);
+		float y = Random::Real<U>(lowY, highY);
+		float z = Random::Real<U>(lowZ, highZ);
 		return { x,y,z };
+	}
+private:
+	auto &GetUniformDistribution() const
+	{
+		static std::uniform_int_distribution<T> sUniformDistribution;
+		return sUniformDistribution;
+	}
+
+	auto &GetDevice() const
+	{
+		static std::random_device sRandomDevice;
+		return sRandomDevice;
+	}
+
+	auto &GetEngine() const
+	{
+		static std::mt19937 sEngine(GetDevice()());
+		return sEngine;
 	}
 
 private:
 	T m_Lower;
 	T m_Upper;
-
-	static std::random_device m_sRandomDevice;
-	static std::mt19937 m_sEngine;
-	static std::uniform_int_distribution<T> m_sUniformDistribution;
 };
 }

@@ -43,7 +43,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 	m_Count(count),
 	m_Size(SizeOfUniformType(type) *m_Count),
 	m_Domain(domain),
-	m_Type(Type::Struct)
+	m_Type(type)
 
 {
 }

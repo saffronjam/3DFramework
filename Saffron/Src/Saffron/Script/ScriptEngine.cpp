@@ -36,7 +36,7 @@ static Uint32 GetFieldSize(FieldType type)
 	}
 }
 
-static FieldType GetHazelFieldType(MonoType *monoType)
+static FieldType GetSaffronFieldType(MonoType *monoType)
 {
 	const int type = mono_type_get_type(monoType);
 	switch ( type )
@@ -48,9 +48,9 @@ static FieldType GetHazelFieldType(MonoType *monoType)
 	case MONO_TYPE_VALUETYPE:
 	{
 		char *name = mono_type_get_name(monoType);
-		if ( strcmp(name, "Hazel.Vector2") == 0 )	return FieldType::Vec2;
-		if ( strcmp(name, "Hazel.Vector3") == 0 )	return FieldType::Vec3;
-		if ( strcmp(name, "Hazel.Vector4") == 0 )	return FieldType::Vec4;
+		if ( strcmp(name, "Saffron.Vector2") == 0 )	return FieldType::Vec2;
+		if ( strcmp(name, "Saffron.Vector3") == 0 )	return FieldType::Vec3;
+		if ( strcmp(name, "Saffron.Vector4") == 0 )	return FieldType::Vec4;
 	}
 	default:					return FieldType::None;
 	}
@@ -118,8 +118,8 @@ struct EntityScriptClass
 		OnUpdateMethod = GetMethod(image, FullName + ":OnUpdate(single)");
 
 		// Physics (Entity class)
-		OnCollision2DBeginMethod = GetMethod(sCoreAssemblyImage, "Hazel.Entity:OnCollision2DBegin(single)");
-		OnCollision2DEndMethod = GetMethod(sCoreAssemblyImage, "Hazel.Entity:OnCollision2DEnd(single)");
+		OnCollision2DBeginMethod = GetMethod(sCoreAssemblyImage, "Saffron.Entity:OnCollision2DBegin(single)");
+		OnCollision2DEndMethod = GetMethod(sCoreAssemblyImage, "Saffron.Entity:OnCollision2DEnd(single)");
 	}
 };
 
@@ -187,9 +187,9 @@ static void InitMono()
 {
 	mono_set_assemblies_path("mono/lib");
 	// mono_jit_set_trace_options("--verbose");
-	auto *domain = mono_jit_init("Hazel");
+	auto *domain = mono_jit_init("Saffron");
 
-	char *name = static_cast<char *>("HazelRuntime");
+	char *name = static_cast<char *>("SaffronRuntime");
 	sMonoDomain = mono_domain_create_appdomain(name, nullptr);
 }
 
@@ -420,12 +420,12 @@ void ScriptEngine::LoadSaffronRuntimeAssembly(const std::string &path)
 	bool cleanup = false;
 	if ( sMonoDomain )
 	{
-		domain = mono_domain_create_appdomain("Hazel Runtime", nullptr);
+		domain = mono_domain_create_appdomain("Saffron Runtime", nullptr);
 		mono_domain_set(domain, false);
 		cleanup = true;
 	}
 
-	sCoreAssembly = LoadAssembly("assets/scripts/Saffron-ScriptCore.dll");
+	sCoreAssembly = LoadAssembly("Assets/Scripts/Saffron-ScriptCore.dll");
 	sCoreAssemblyImage = GetAssemblyImage(sCoreAssembly);
 
 	auto *appAssembly = LoadAssembly(path);
@@ -631,7 +631,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 				continue;
 
 			MonoType *fieldType = mono_field_get_type(iter);
-			const FieldType hazelFieldType = GetHazelFieldType(fieldType);
+			const FieldType hazelFieldType = GetSaffronFieldType(fieldType);
 
 			// TODO: Attributes
 			MonoCustomAttrInfo *attr = mono_custom_attrs_from_field(scriptClass.Class, iter);

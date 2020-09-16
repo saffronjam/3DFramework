@@ -48,4 +48,7 @@ private:
 	static Type m_sCurrentAPI;
 	static Capabilities m_sCapabilities;
 };
+
+//RendererAPI::Capabilities RendererAPI::m_sCapabilities = {};
+
 }

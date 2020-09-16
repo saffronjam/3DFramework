@@ -68,6 +68,6 @@ private:
 	static Application *m_sInstance;
 };
 
-Ref<Application> CreateApplication();
+Application *CreateApplication();
 
 }

@@ -1,6 +1,7 @@
 #include "Saffron/SaffronPCH.h"
 
 #include "Saffron/Renderer/VertexBuffer.h"
+#include "Saffron/Platform/OpenGL/OpenGLVertexBuffer.h"
 
 namespace Se
 {
@@ -85,4 +86,29 @@ void VertexBuffer::Layout::CalculateOffsetsAndStride()
 		m_Stride += element.Size;
 	}
 }
+
+Ref<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
+{
+	switch ( RendererAPI::CurrentAPI() )
+	{
+	case RendererAPI::Type::None:    return nullptr;
+	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(data, size, usage);
+	default:
+		SE_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+}
+
+Ref<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
+{
+	switch ( RendererAPI::CurrentAPI() )
+	{
+	case RendererAPI::Type::None:    return nullptr;
+	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(size, usage);
+	default:
+		SE_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+}
+
 }

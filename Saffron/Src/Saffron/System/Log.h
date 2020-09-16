@@ -2,8 +2,6 @@
 
 #include <spdlog/spdlog.h>
 
-#include "Saffron/Config.h"
-
 namespace Se
 {
 

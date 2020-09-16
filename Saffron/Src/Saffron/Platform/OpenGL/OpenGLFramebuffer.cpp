@@ -44,7 +44,7 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 							 glCreateTextures(GL_TEXTURE_2D_MULTISAMPLE, 1, &m_ColorAttachment);
 							 glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_ColorAttachment);
 
-							 // TODO: Create Hazel texture object based on format here
+							 // TODO: Create Saffron texture object based on format here
 							 if ( m_Specification.Format == Format::RGBA16F )
 							 {
 								 glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_Specification.Samples, GL_RGBA16F, m_Specification.Width, m_Specification.Height, GL_FALSE);
@@ -62,7 +62,7 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 							 glCreateTextures(GL_TEXTURE_2D, 1, &m_ColorAttachment);
 							 glBindTexture(GL_TEXTURE_2D, m_ColorAttachment);
 
-							 // TODO: Create Hazel texture object based on format here
+							 // TODO: Create Saffron texture object based on format here
 							 if ( m_Specification.Format == Format::RGBA16F )
 							 {
 								 glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, m_Specification.Width, m_Specification.Height, 0, GL_RGBA, GL_FLOAT, nullptr);

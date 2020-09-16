@@ -30,8 +30,8 @@ void Renderer::Init()
 	sData.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
 	Submit([]() { RendererAPI::Init(); });
 
-	GetShaderLibrary()->Load("assets/shaders/HazelPBR_Static.glsl");
-	GetShaderLibrary()->Load("assets/shaders/HazelPBR_Anim.glsl");
+	GetShaderLibrary()->Load("Assets/shaders/SaffronPBR_Static.glsl");
+	GetShaderLibrary()->Load("Assets/shaders/SaffronPBR_Anim.glsl");
 
 	SceneRenderer::Init();
 

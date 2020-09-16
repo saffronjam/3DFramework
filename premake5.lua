@@ -1,6 +1,6 @@
 workspace "Saffron"
 	architecture "x64"
-	startproject "Sandbox"
+	targetdir "build"
 
 	configurations
 	{
@@ -14,9 +14,11 @@ workspace "Saffron"
 		"MultiProcessorCompile"
 	}
 
-outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-binDirectory = "Bin"
-intDirectory = "Bin-Int"
+	startproject "Sandbox"
+	
+OutputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+BinDirectory = "Bin"
+IntDirectory = "Bin-Int"
 
 -- Include directories relative to root folder (solution directory)
 IncludeDirs = {}
@@ -34,7 +36,9 @@ IncludeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
 
 -- Library directories relative to root folder (solution directory)
 LibraryDirs = {}
-LibraryDirs["mono"] = "Saffron/Vendors/mono/lib/Debug/mono-2.0-sgen.lib"
+LibraryDirs["mono"] = "Vendors/mono/lib/Debug/mono-2.0-sgen.lib"
+LibraryDirs["assimp_deb"] = "Vendors/assimp/lib/Debug/assimp-vc141-mtd.lib"
+LibraryDirs["assimp_rel"] = "Vendors/assimp/lib/Release/assimp-vc141-mt.lib"
 
 group "Vendors"
 	include "Saffron/Vendors/.Premake/assimp"
@@ -49,6 +53,18 @@ group "Vendors"
 	include "Saffron/Vendors/.Premake/yaml-cpp"
 group ""
 
+
+-- --------------------------------------
+-- Core
+-- --------------------------------------
+
+group "Core"
+
+
+-- --------------------------------------
+-- Saffron
+-- --------------------------------------
+
 project "Saffron"
 	location "Saffron"
 	kind "StaticLib"
@@ -56,8 +72,8 @@ project "Saffron"
 	cppdialect "C++17"
 	staticruntime "On"
 
-	targetdir(binDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
-	objdir(intDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
+	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
 	
 	pchheader "Saffron/SaffronPCH.h"
 	pchsource "Saffron/Src/Saffron/SaffronPCH.cpp"
@@ -91,7 +107,8 @@ project "Saffron"
         "GLFW",
 		"ImGui",
 		"opengl32.lib",
-		"${LibraryDirs.mono}"
+		"%{LibraryDirs.mono}",
+		"yaml-cpp"
 	}
 
 	disablewarnings
@@ -105,71 +122,201 @@ project "Saffron"
 
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
-		runtime "Debug"
 		symbols "On"
-
+		
+		links
+		{
+			"%{LibraryDirs.assimp_deb}"
+		}
+		
 	filter "configurations:Release"
 		defines "SE_RELEASE"
-		runtime "Release"
 		optimize "On"
-
+		
+		links
+		{
+			"%{LibraryDirs.assimp_rel}"
+		}
+		
 	filter "configurations:Dist"
 		defines "SE_DIST"
-		runtime "Release"
 		optimize "On"
+		
+		links
+		{
+			"%{LibraryDirs.assimp_rel}"
+		}
+group ""
 
 
 
-project "Sandbox"
-	location "Sandbox"
+-- --------------------------------------
+-- TOOLS
+-- --------------------------------------
+
+group "Tools"
+
+
+-- --------------------------------------
+-- SaffronBun
+-- --------------------------------------
+
+project "SaffronBun"
+	location "SaffronBun"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "On"
 
-	targetdir(binDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
-	objdir(intDirectory .. "/" .. outputDirectory .. "/%{prj.name}")
+	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
 
+	links
+	{
+		"Saffron"
+	}
+	
 	files
 	{
-		"%{prj.name}/Src/**.h",
-		"%{prj.name}/Src/**.cpp"
+		"%{prj.name}/Src/**.h", 
+		"%{prj.name}/Src/**.c", 
+		"%{prj.name}/Src/**.hpp", 
+		"%{prj.name}/Src/**.cpp" 
 	}
 
 	includedirs
 	{
+		"%{prj.name}/Src", 
 		"Saffron/Src",
-		"%{IncludeDirs.spdlog}",
-		"%{IncludeDirs.ImGui}",
+		"Saffron/Vendors",
+		"%{IncludeDirs.entt}",
 		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.entt}"
+		"%{IncludeDirs.ImGui}",
+		"%{IncludeDirs.spdlog}"
 	}
-
-	links
+	
+	postbuildcommands 
 	{
-		"Saffron",
-		"ImGui"
-	}
-
-	disablewarnings
-	{
-		"4251"
+		'{COPY} "../SaffronBun/Assets" "%{cfg.targetdir}/Assets"'
 	}
 
 	filter "system:windows"
 		systemversion "latest"
 
+		defines 
+		{ 
+			"SE_PLATFORM_WINDOWS"
+		}
+		
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
-		runtime "Debug"
 		symbols "On"
+		
+		links
+		{
+			"Saffron/%{LibraryDirs.assimp_deb}"
+		}
+
+		postbuildcommands 
+		{
+			'{COPY} "../Saffron/Vendors/assimp/bin/Debug/assimp-vc141-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "../Saffron/Vendors/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+		}
 
 	filter "configurations:Release"
 		defines "SE_RELEASE"
-		runtime "Release"
 		optimize "On"
+		
+		links
+		{
+			"Saffron/%{LibraryDirs.assimp_rel}"
+		}
+		
+		postbuildcommands 
+		{
+			'{COPY} "../Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "../Saffron/Vendors/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+		}
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
-		runtime "Release"
 		optimize "On"
+		
+		links
+		{
+			"Saffron/%{LibraryDirs.assimp_rel}"
+		}
+		
+		postbuildcommands 
+		{
+			'{COPY} "../Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.dll" "%{cfg.targetdir}"',
+			'{COPY} "../Saffron/Vendors/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+		}
+group ""
+
+
+-- --------------------------------------
+-- Sandbox
+-- --------------------------------------
+
+group "Sandbox"
+-- workspace "Sandbox"
+	-- architecture "x64"
+	-- targetdir "build"
+	
+	-- configurations 
+	-- { 
+		-- "Debug", 
+		-- "Release",
+		-- "Dist"
+	-- }
+
+
+-- --------------------------------------
+-- Saffron ScriptCore
+-- --------------------------------------
+
+project "Saffron-ScriptCore"
+	location "Saffron-ScriptCore"
+	kind "SharedLib"
+	language "C#"
+
+	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+
+	files 
+	{
+		"%{prj.name}/Src/**.cs", 
+	}
+	
+	filter "configurations:Debug"
+		symbols "On"
+
+
+-- --------------------------------------
+-- ExampleApp
+-- --------------------------------------
+
+project "ExampleApp"
+	location "ExampleApp"
+	kind "SharedLib"
+	language "C#"
+
+	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+
+	files 
+	{
+		"%{prj.name}/Src/**.cs", 
+	}
+
+	links
+	{
+		"Saffron-ScriptCore"
+	}
+	
+	filter "configurations:Debug"
+		symbols "On"
+group ""
+
+

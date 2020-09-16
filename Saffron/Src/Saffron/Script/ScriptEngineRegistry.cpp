@@ -1,7 +1,6 @@
 #include "Saffron/SaffronPCH.h"
 
 #include <mono/jit/jit.h>
-#include <mono/metadata/assembly.h>
 
 #include "Saffron/Scene/Components.h"
 #include "Saffron/Scene/Entity.h"
@@ -14,11 +13,11 @@ namespace Se
 std::unordered_map<MonoType *, std::function<bool(Entity &)>> s_HasComponentFuncs;
 std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentFuncs;
 
-extern MonoImage *s_CoreAssemblyImage;
+extern MonoImage *sCoreAssemblyImage;
 
 #define Component_RegisterType(Type) \
 	{\
-		MonoType* type = mono_reflection_type_from_name("Saffron." #Type, s_CoreAssemblyImage);\
+		MonoType* type = mono_reflection_type_from_name("Saffron." #Type, sCoreAssemblyImage);\
 		if (type) {\
 			Uint32 id = mono_type_get_type(type);\
 			s_HasComponentFuncs[type] = [](Entity& entity) { return entity.HasComponent<Type>(); };\

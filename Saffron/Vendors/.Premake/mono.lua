@@ -1,15 +1,10 @@
 project "mono"
-    kind "StaticLib"
-    language "C"
-    staticruntime "on"
+    kind "None"
 
 	location "../%{prj.name}"
+	objdir ("../%{prj.name}/Unused/")
 	
-	outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 	srcDirectory = "../%{prj.name}/"
-	
-	targetdir ("../%{prj.name}/Bin/" .. outputDirectory .. "/%{prj.name}")
-	objdir ("../%{prj.name}/Bin-Int/" .. outputDirectory .. "/%{prj.name}")
 	
     files
     {
@@ -20,14 +15,3 @@ project "mono"
     {
         srcDirectory .. "include"
     }
-    
-    filter "system:windows"
-        systemversion "latest"
-
-    filter "configurations:Debug"
-        runtime "Debug"
-        symbols "on"
-
-    filter "configurations:Release"
-        runtime "Release"
-        optimize "on"
