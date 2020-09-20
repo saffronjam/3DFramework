@@ -43,3 +43,7 @@
 	path = Saffron/Vendors/entt
 	url = https://github.com/saffronjam/entt.git
 	ignore = dirty
+[submodule "Saffron/Vendors/FastNoise"]
+	path = Saffron/Vendors/FastNoise
+	url = https://github.com/saffronjam/FastNoise.git
+	ignore = dirty
