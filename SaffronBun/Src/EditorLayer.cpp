@@ -143,7 +143,7 @@ void EditorLayer::OnSceneStop()
 
 void EditorLayer::UpdateWindowTitle(const std::string &sceneName)
 {
-	const std::string title = sceneName + " - Hazelnut - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
+	const std::string title = sceneName + " - SaffronBun - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
 	Application::Get().GetWindow().SetTitle(title);
 }
 
