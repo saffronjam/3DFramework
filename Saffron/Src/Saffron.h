@@ -20,7 +20,7 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 
-// --- Hazel Render API ------------------------------
+// --- SaffronRender API ------------------------------
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/SceneRenderer.h"
 #include "Saffron/Renderer/RenderPass.h"

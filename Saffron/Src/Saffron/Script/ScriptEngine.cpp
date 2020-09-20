@@ -133,7 +133,7 @@ MonoAssembly *LoadAssemblyFromFile(const char *filepath)
 		return nullptr;
 	}
 
-	const HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	const HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if ( file == INVALID_HANDLE_VALUE )
 	{
 		return nullptr;
@@ -255,7 +255,7 @@ static void PrintClassMethods(MonoClass *monoClass)
 {
 	MonoMethod *iter;
 	void *ptr = nullptr;
-	while ( (iter = mono_class_get_methods(monoClass, &ptr)) != NULL )
+	while ( (iter = mono_class_get_methods(monoClass, &ptr)) != nullptr )
 	{
 		printf("--------------------------------\n");
 		const char *name = mono_method_get_name(iter);
@@ -621,7 +621,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 				continue;
 
 			MonoType *fieldType = mono_field_get_type(iter);
-			const FieldType hazelFieldType = GetSaffronFieldType(fieldType);
+			const FieldType saffronFieldType = GetSaffronFieldType(fieldType);
 
 			// TODO: Attributes
 			MonoCustomAttrInfo *attr = mono_custom_attrs_from_field(scriptClass.Class, iter);
@@ -632,7 +632,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 			}
 			else
 			{
-				PublicField field = { name, hazelFieldType };
+				PublicField field = { name, saffronFieldType };
 				field.m_EntityInstance = &entityInstance;
 				field.m_MonoClassField = iter;
 				fieldMap.emplace(name, std::move(field));
@@ -660,9 +660,9 @@ void ScriptEngine::InstantiateEntityClass(Entity entity)
 	SE_CORE_ASSERT(entityInstance.ScriptClass);
 	entityInstance.Handle = Instantiate(*entityInstance.ScriptClass);
 
-	MonoProperty *entityIDPropery = mono_class_get_property_from_name(entityInstance.ScriptClass->Class, "ID");
-	mono_property_get_get_method(entityIDPropery);
-	MonoMethod *entityIDSetMethod = mono_property_get_set_method(entityIDPropery);
+	MonoProperty *entityIDProperty = mono_class_get_property_from_name(entityInstance.ScriptClass->Class, "ID");
+	mono_property_get_get_method(entityIDProperty);
+	MonoMethod *entityIDSetMethod = mono_property_get_set_method(entityIDProperty);
 	void *param[] = { &id };
 	CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
 

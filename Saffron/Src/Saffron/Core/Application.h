@@ -21,7 +21,7 @@ public:
 	};
 
 public:
-	Application(const Properties &properties = { "Hazel Engine", 1280, 720 });
+	Application(const Properties &properties = { "Saffron Engine", 1280, 720 });
 	virtual ~Application();
 
 	void Run();

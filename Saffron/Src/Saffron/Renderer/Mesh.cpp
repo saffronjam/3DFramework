@@ -148,7 +148,7 @@ Mesh::Mesh(const std::string &filename)
 	m_Scene = scene;
 
 	m_IsAnimated = scene->mAnimations != nullptr;
-	m_MeshShader = m_IsAnimated ? Renderer::GetShaderLibrary()->Get("HazelPBR_Anim") : Renderer::GetShaderLibrary()->Get("HazelPBR_Static");
+	m_MeshShader = m_IsAnimated ? Renderer::GetShaderLibrary()->Get("SaffronPBR_Anim") : Renderer::GetShaderLibrary()->Get("SaffronPBR_Static");
 	m_BaseMaterial = Ref<Material>::Create(m_MeshShader);
 	// m_MaterialInstance = Ref<MaterialInstance>::Create(m_BaseMaterial);
 	m_InverseTransform = glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
@@ -317,7 +317,7 @@ Mesh::Mesh(const std::string &filename)
 			bool hasAlbedoMap = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
 			if ( hasAlbedoMap )
 			{
-				// TODO: Temp - this should be handled by Hazel's filesystem
+				// TODO: Temp - this should be handled by Saffron's filesystem
 				std::filesystem::path path = filename;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
@@ -347,7 +347,7 @@ Mesh::Mesh(const std::string &filename)
 			mi->Set("u_NormalTexToggle", 0.0f);
 			if ( aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS )
 			{
-				// TODO: Temp - this should be handled by Hazel's filesystem
+				// TODO: Temp - this should be handled by Saffron's filesystem
 				std::filesystem::path path = filename;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
@@ -374,7 +374,7 @@ Mesh::Mesh(const std::string &filename)
 			// mi->Set("u_RoughnessTexToggle", 0.0f);
 			if ( aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS )
 			{
-				// TODO: Temp - this should be handled by Hazel's filesystem
+				// TODO: Temp - this should be handled by Saffron's filesystem
 				std::filesystem::path path = filename;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
@@ -401,7 +401,7 @@ Mesh::Mesh(const std::string &filename)
 			// Metalness map (or is it??)
 			if ( aiMaterial->Get("$raw.ReflectionFactor|file", aiPTI_String, 0, aiTexPath) == AI_SUCCESS )
 			{
-				// TODO: Temp - this should be handled by Hazel's filesystem
+				// TODO: Temp - this should be handled by Saffron's filesystem
 				std::filesystem::path path = filename;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
@@ -493,7 +493,7 @@ Mesh::Mesh(const std::string &filename)
 					{
 						metalnessTextureFound = true;
 
-						// TODO: Temp - this should be handled by Hazel's filesystem
+						// TODO: Temp - this should be handled by Saffron's filesystem
 						std::filesystem::path path = filename;
 						auto parentPath = path.parent_path();
 						parentPath /= str;
