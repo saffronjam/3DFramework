@@ -1,7 +1,6 @@
-#include "Saffron/SaffronPCH.h"
-#include "OpenGLShaderUniform.h"
+#include "SaffronPCH.h"
 
-#include <utility>
+#include "Saffron/Platform/OpenGL/OpenGLShaderUniform.h"
 
 namespace Se
 {
@@ -41,7 +40,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 	m_Struct(nullptr),
 	m_Name(std::move(name)),
 	m_Count(count),
-	m_Size(SizeOfUniformType(type) *m_Count),
+	m_Size(SizeOfUniformType(type) * count),
 	m_Domain(domain),
 	m_Type(type)
 
@@ -54,8 +53,9 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 	m_Struct(uniformStruct),
 	m_Name(std::move(name)),
 	m_Count(count),
-	m_Size(m_Struct->GetSize() *m_Count),
-	m_Domain(domain), m_Type(Type::Struct)
+	m_Size(m_Struct->GetSize() * count),
+	m_Domain(domain), 
+	m_Type(Type::Struct)
 {
 }
 

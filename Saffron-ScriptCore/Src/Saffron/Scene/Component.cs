@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     public abstract class Component
     {
@@ -84,7 +84,7 @@ namespace Saffron
 
     public class CameraComponent : Component
     {
-        // TODO
+       // TODO
     }
 
     public class ScriptComponent : Component

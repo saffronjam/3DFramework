@@ -1,5 +1,6 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Scene/SceneCamera.h"
 
 namespace Se

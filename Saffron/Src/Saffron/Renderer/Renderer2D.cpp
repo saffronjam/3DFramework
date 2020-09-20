@@ -1,11 +1,11 @@
-﻿#include "Saffron/SaffronPCH.h"
+﻿#include "SaffronPCH.h"
 
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/IndexBuffer.h"
 #include "Saffron/Renderer/Pipeline.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/Shader.h"
-#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {
@@ -122,7 +122,7 @@ void Renderer2D::Init()
 	sData.WhiteTexture->GetWriteableBuffer().Write(&whiteTextureData, sizeof(Uint32));
 	sData.WhiteTexture->Unlock();
 
-	sData.TextureShader = Shader::Create("Assets/shaders/Renderer2D.glsl");
+	sData.TextureShader = Shader::Create("Assets/Shaders/Renderer2D.glsl");
 
 	// Set all texture slots to 0
 	sData.TextureSlots[0] = sData.WhiteTexture;
@@ -134,7 +134,7 @@ void Renderer2D::Init()
 
 	// Lines
 	{
-		sData.LineShader = Shader::Create("Assets/shaders/Renderer2D_Line.glsl");
+		sData.LineShader = Shader::Create("Assets/Shaders/Renderer2D_Line.glsl");
 
 		Pipeline::Specification pipelineSpecification;
 		pipelineSpecification.Layout = {

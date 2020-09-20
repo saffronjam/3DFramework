@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/Framebuffer.h"
 #include "Saffron/Platform/OpenGL/OpenGLFramebuffer.h"
@@ -14,7 +14,7 @@ Ref<Framebuffer> Framebuffer::Create(const Specification &spec)
 {
 	Ref<Framebuffer> result = nullptr;
 
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:		SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	case RendererAPI::Type::OpenGL:		result = Ref<OpenGLFramebuffer>::Create(spec); break;

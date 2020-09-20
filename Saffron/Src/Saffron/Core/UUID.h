@@ -1,6 +1,8 @@
 #pragma once
 
-#include "Saffron/Config.h"
+#include <xhash>
+
+#include "Saffron/System/TypeDefs.h"
 
 namespace Se
 {
@@ -23,8 +25,8 @@ private:
 };
 }
 
-namespace std {
-
+namespace std
+{
 template <>
 struct hash<Se::UUID>
 {

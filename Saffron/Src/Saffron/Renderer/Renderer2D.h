@@ -5,7 +5,6 @@
 
 namespace Se
 {
-
 class Renderer2D
 {
 public:

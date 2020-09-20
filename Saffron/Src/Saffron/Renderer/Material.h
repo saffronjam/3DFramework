@@ -2,14 +2,13 @@
 
 #include <unordered_set>
 
-#include "Saffron/Config.h"
-#include "Saffron/Core/Ref.h"
+#include "Saffron/Base.h"
 #include "Saffron/Renderer/Shader.h"
 #include "Saffron/Renderer/Texture.h"
-#include "Saffron/System/Macros.h"
 
 namespace Se
 {
+
 ////////////////////////////////////////////////////////////////
 /// Material
 ////////////////////////////////////////////////////////////////
@@ -26,7 +25,7 @@ public:
 	};
 
 public:
-	explicit Material(const Ref<Shader> &shader);
+	Material(const Ref<Shader> &shader);
 	virtual ~Material() = default;
 
 	void Bind();
@@ -38,12 +37,11 @@ public:
 	Ref<T> GetResource(const std::string &name);
 
 	void SetFlag(Flag flag) { m_MaterialFlags |= static_cast<Uint32>(flag); }
-	template<typename T>
+	template <typename T>
 	void Set(const std::string &name, const T &value);
 	void Set(const std::string &name, const Ref<Texture> &texture);
 	void Set(const std::string &name, const Ref<Texture2D> &texture);
 	void Set(const std::string &name, const Ref<TextureCube> &texture);
-
 
 	static Ref<Material> Create(const Ref<Shader> &shader);
 
@@ -55,7 +53,6 @@ private:
 	ShaderUniformDeclaration *FindUniformDeclaration(const std::string &name);
 	ShaderResourceDeclaration *FindResourceDeclaration(const std::string &name);
 	Buffer &GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclaration);
-
 private:
 	Ref<Shader> m_Shader;
 	std::unordered_set<MaterialInstance *> m_MaterialInstances;
@@ -66,6 +63,39 @@ private:
 
 	Uint32 m_MaterialFlags;
 };
+
+template <typename T>
+T &Material::Get(const std::string &name)
+{
+	auto decl = FindUniformDeclaration(name);
+	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	auto &buffer = GetUniformBufferTarget(decl);
+	return buffer.Read<T>(decl->GetOffset());
+}
+
+template <typename T>
+Ref<T> Material::GetResource(const std::string &name)
+{
+	auto decl = FindResourceDeclaration(name);
+	Uint32 slot = decl->GetRegister();
+	SE_CORE_ASSERT(slot < m_Textures.size(), "Texture slot is invalid!");
+	return m_Textures[slot];
+}
+
+template <typename T>
+void Material::Set(const std::string &name, const T &value)
+{
+	auto decl = FindUniformDeclaration(name);
+	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	auto &buffer = GetUniformBufferTarget(decl);
+	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
+
+	for ( auto mi : m_MaterialInstances )
+		mi->OnMaterialValueUpdated(decl);
+}
+
+
+
 
 
 
@@ -123,42 +153,6 @@ private:
 
 
 
-////////////////////////////////////////////////////////////////
-/// Material
-////////////////////////////////////////////////////////////////
-
-template <typename T>
-T &Material::Get(const std::string &name)
-{
-	auto *decl = FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
-	auto &buffer = GetUniformBufferTarget(decl);
-	return buffer.Read<T>(decl->GetOffset());
-}
-
-template <typename T>
-Ref<T> Material::GetResource(const std::string &name)
-{
-	const auto *decl = FindResourceDeclaration(name);
-	const Uint32 slot = decl->GetRegister();
-	SE_CORE_ASSERT(slot < m_Textures.size(), "Texture slot is invalid!");
-	return m_Textures[slot];
-}
-
-template <typename T>
-void Material::Set(const std::string &name, const T &value)
-{
-	const auto decl = FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
-	auto &buffer = GetUniformBufferTarget(decl);
-	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
-
-	for ( auto mi : m_MaterialInstances )
-		mi->OnMaterialValueUpdated(decl);
-}
-
-
-
 
 ////////////////////////////////////////////////////////////////
 /// Material Instance
@@ -212,18 +206,4 @@ void MaterialInstance::Set(const std::string &name, const T &value)
 
 	m_OverriddenValues.insert(name);
 }
-
-inline void Material::Set(const std::string &name, const Ref<Texture> &texture)
-{
-	const auto *decl = FindResourceDeclaration(name);
-	const Uint32 slot = decl->GetRegister();
-	if ( m_Textures.size() <= slot )
-		m_Textures.resize(static_cast<size_t>(slot) + 1);
-	m_Textures[slot] = texture;
 }
-
-
-
-
-}
-

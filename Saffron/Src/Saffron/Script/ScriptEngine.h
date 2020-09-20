@@ -1,17 +1,18 @@
 #pragma once
 
-#include <Saffron/Scene/Scene.h>
-#include <Saffron/System/Time.h>
-
 #include <string>
+
+#include "Saffron/Base.h"
+#include "Saffron/Core/Time.h"
+#include "Saffron/Scene/Scene.h"
 
 extern "C" {
 	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoClassField MonoClassField;
 }
 
-namespace Se
-{
+namespace Se {
+
 
 ///////////////////////////////////////////////////////////////////////////
 /// Forwards Declarations
@@ -57,7 +58,7 @@ struct PublicField
 
 	PublicField(std::string name, FieldType type);
 	PublicField(const PublicField &) = delete;
-	PublicField(PublicField &&other) noexcept;
+	PublicField(PublicField &&other);
 	~PublicField();
 
 	void CopyStoredValueToRuntime() const;
@@ -75,17 +76,15 @@ struct PublicField
 	void SetStoredValueRaw(void *src) const;
 
 private:
-	EntityInstance *m_EntityInstance;
-	MonoClassField *m_MonoClassField;
+	EntityInstance *m_EntityInstance{};
+	MonoClassField *m_MonoClassField{};
+	Uint8 *m_StoredValueBuffer = nullptr;
 
-	uint8_t *m_StoredValueBuffer = nullptr;
-	uint8_t *AllocateBuffer(FieldType type);
-
-	void GetStoredValue_Internal(void *outValue) const;
-	void GetRuntimeValue_Internal(void *outValue) const;
-
+	Uint8 *AllocateBuffer(FieldType type);
 	void SetStoredValue_Internal(void *value) const;
+	void GetStoredValue_Internal(void *outValue) const;
 	void SetRuntimeValue_Internal(void *value) const;
+	void GetRuntimeValue_Internal(void *outValue) const;
 
 	friend class ScriptEngine;
 };
@@ -163,12 +162,6 @@ T PublicField::GetStoredValue() const
 }
 
 template <typename T>
-void PublicField::SetStoredValue(T value) const
-{
-	SetStoredValue_Internal(&value);
-}
-
-template <typename T>
 T PublicField::GetRuntimeValue() const
 {
 	T value;
@@ -177,12 +170,14 @@ T PublicField::GetRuntimeValue() const
 }
 
 template <typename T>
+void PublicField::SetStoredValue(T value) const
+{
+	SetStoredValue_Internal(&value);
+}
+template <typename T>
 void PublicField::SetRuntimeValue(T value) const
 {
 	SetRuntimeValue_Internal(&value);
 }
 
-
-
 }
-

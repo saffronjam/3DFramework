@@ -1,9 +1,23 @@
 #pragma once
 
-#include <Saffron.h>
+#include "Saffron.h"
 
-namespace Se
-{
+#include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Editor/EditorCamera.h"
+#include "imgui/imgui_internal.h"
+
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/quaternion.hpp>
+
+#include <string>
+
+#include "Saffron/Editor/SceneHierarchyPanel.h"
+
+namespace Se {
+
 class EditorLayer : public Layer
 {
 public:
@@ -12,61 +26,56 @@ public:
 		None = 0, ColorProperty = 1, DragProperty = 2, SliderProperty = 4
 	};
 public:
-	EditorLayer(const Keyboard &keyboard, const Mouse &mouse);
-	virtual ~EditorLayer() = default;
+	EditorLayer();
+	virtual ~EditorLayer();
 
-	void OnAttach() override;
-	void OnDetach() override;
-	void OnUpdate(Time ts) override;
+	virtual void OnAttach() override;
+	virtual void OnDetach() override;
+	virtual void OnUpdate(Time ts) override;
 
-	void OnImGuiRender() override;
-	void OnEvent(const Event &event) override;
-	void OnKeyPressEvent(const KeyboardPressEvent &event);
-	void OnMouseButtonPress(const MousePressEvent &event);
+	virtual void OnImGuiRender() override;
+	virtual void OnEvent(const Event &event) override;
+	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
+	bool OnMouseButtonPressed(const MousePressEvent &event);
 
 	// ImGui UI helpers
 	bool Property(const std::string &name, bool &value);
-	bool Property(const std::string &name, float &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	bool Property(const std::string &name, glm::vec2 &value, PropertyFlag flags);
-	bool Property(const std::string &name, glm::vec2 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	bool Property(const std::string &name, glm::vec3 &value, PropertyFlag flags);
-	bool Property(const std::string &name, glm::vec3 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	bool Property(const std::string &name, glm::vec4 &value, PropertyFlag flags);
-	bool Property(const std::string &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
+	bool Property(const std::string &name, float &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None) const;
+	bool Property(const std::string &name, glm::vec2 &value, PropertyFlag flags) const;
+	bool Property(const std::string &name, glm::vec2 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None) const;
+	bool Property(const std::string &name, glm::vec3 &value, PropertyFlag flags) const;
+	bool Property(const std::string &name, glm::vec3 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None) const;
+	bool Property(const std::string &name, glm::vec4 &value, PropertyFlag flags) const;
+	bool Property(const std::string &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None) const;
 
 	void ShowBoundingBoxes(bool show, bool onTop = false);
 	void SelectEntity(Entity entity);
 
 	void OpenScene();
-	void SaveScene();
+	void SaveScene() const;
 	void SaveSceneAs();
 private:
-	glm::vec2 GetMouseViewportSpace();
-	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my);
+	glm::vec2 GetMouseViewportSpace() const;
+	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
 
 	struct SelectedSubmesh
 	{
-		Entity Entity;
+		Se::Entity Entity;
 		Submesh *Mesh = nullptr;
 		float Distance = 0.0f;
 	};
 
 	void OnSelected(const SelectedSubmesh &selectionContext);
 	void OnEntityDeleted(Entity e);
-	Ray CastMouseRay();
+	Ray CastMouseRay() const;
 
 	void OnScenePlay();
 	void OnSceneStop();
 
 	void UpdateWindowTitle(const std::string &sceneName);
 
-	float GetSnapValue();
+	float GetSnapValue() const;
 private:
-	//TEMPOARY
-	// TODO: Remove Keyboard and Mouse abstraction
-	const Keyboard &keyboard;
-	const Mouse &mouse;
-
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
@@ -158,5 +167,5 @@ private:
 	glm::mat4 *m_RelativeTransform = nullptr;
 	glm::mat4 *m_CurrentlySelectedTransform = nullptr;
 };
-}
 
+}

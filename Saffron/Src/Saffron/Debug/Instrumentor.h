@@ -1,10 +1,9 @@
 ﻿#pragma once
 
-#include "Saffron/System/Timer.h"
+#include "Saffron/Core/Timer.h"
 
 namespace Se
 {
-
 struct ProfileResult
 {
 	std::string Name;
@@ -60,8 +59,8 @@ private:
 	bool m_Stopped;
 };
 
-namespace InstrumentorUtils {
-
+namespace InstrumentorUtils
+{
 template <size_t N>
 struct ChangeResult
 {

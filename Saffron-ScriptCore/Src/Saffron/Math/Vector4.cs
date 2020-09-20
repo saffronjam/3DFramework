@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct Vector4
@@ -17,7 +17,7 @@ namespace Saffron
 
         public Vector4(float scalar)
         {
-            X = Y = Z = W = scalar;
+            X = Y = Z = W =scalar;
         }
 
         public Vector4(float x, float y, float z, float w)
@@ -28,17 +28,17 @@ namespace Saffron
             W = w;
         }
 
-        public static Vector4 operator +(Vector4 left, Vector4 right)
+        public static Vector4 operator+(Vector4 left, Vector4 right)
         {
             return new Vector4(left.X + right.X, left.Y + right.Y, left.Z + right.Z, left.W + right.W);
         }
 
-        public static Vector4 operator -(Vector4 left, Vector4 right)
+        public static Vector4 operator-(Vector4 left, Vector4 right)
         {
             return new Vector4(left.X - right.X, left.Y - right.Y, left.Z - right.Z, left.W - right.W);
         }
 
-        public static Vector4 operator *(Vector4 left, Vector4 right)
+        public static Vector4 operator*(Vector4 left, Vector4 right)
         {
             return new Vector4(left.X * right.X, left.Y * right.Y, left.Z * right.Z, left.W * right.W);
         }
@@ -53,7 +53,7 @@ namespace Saffron
             return new Vector4(scalar * right.X, scalar * right.Y, scalar * right.Z, scalar * right.W);
         }
 
-        public static Vector4 operator /(Vector4 left, Vector4 right)
+        public static Vector4 operator/(Vector4 left, Vector4 right)
         {
             return new Vector4(left.X / right.X, left.Y / right.Y, left.Z / right.Z, left.W / right.W);
         }

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     public class Mesh
     {
@@ -25,7 +25,7 @@ namespace Saffron
         }
 
         public Material BaseMaterial
-        {
+        { 
             get
             {
                 return new Material(GetMaterial_Native(m_UnmanagedInstance));

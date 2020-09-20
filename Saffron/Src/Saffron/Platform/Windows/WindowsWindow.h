@@ -1,7 +1,7 @@
-﻿#pragma once
+#pragma once
 
-#include "Saffron/Graphics/Window.h"
-#include "Saffron/Core/Event/WindowEvent.h"
+#include "Saffron/Core/Window.h"
+#include "Saffron/Core/Events/WindowEvent.h"
 
 struct GLFWwindow;
 struct GLFWcursor;
@@ -26,13 +26,14 @@ public:
 	void SetTitle(std::string title) override;
 	void SetVSync(bool enabled) override;
 	bool IsVSync() const override;
+	bool IsMinimized() const override;
 
 private:
-	void OnResize(const WindowResizeEvent &event);
-	void OnMove(const WindowMoveEvent &event);
-	void OnGainFocus(const WindowGainFocusEvent &event);
-	void OnLostFocus(const WindowLostFocusEvent &event);
-	void OnClose(const WindowCloseEvent &event);
+	bool OnResize(const WindowResizeEvent &event);
+	bool OnMove(const WindowMoveEvent &event);
+	bool OnGainFocus(const WindowGainFocusEvent &event);
+	bool OnLostFocus(const WindowLostFocusEvent &event);
+	bool OnClose(const WindowCloseEvent &event);
 
 	void SetupGLFWCallbacks();
 
@@ -41,5 +42,6 @@ private:
 	GLFWcursor *m_ImGuiMouseCursors[9] = { nullptr };
 
 	bool m_VSync;
+	Time ts = Time::Zero();
 };
 }

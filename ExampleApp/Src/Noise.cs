@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using Saffron;
+using Se;
 
 namespace Example
 {
@@ -24,7 +24,7 @@ namespace Example
 					 float sampleX = x / scale;
 					 float sampleY = y / scale;
 
-					 float perlinValue = Saffron.Noise.PerlinNoise(sampleX, sampleY);
+					 float perlinValue = Se.Noise.PerlinNoise(sampleX, sampleY);
 					 noiseMap[x, y] = perlinValue;
 				 }
 			 }
@@ -77,7 +77,7 @@ namespace Example
                         float sampleX = (x - halfWidth) / scale * frequency + octaveOffsets[i].X;
                         float sampleY = (y - halfHeight) / scale * frequency + octaveOffsets[i].Y;
 
-                        float perlinValue = Saffron.Noise.PerlinNoise(sampleX, sampleY);// * 2 - 1; // 0->1  // -1 -> 1      
+                        float perlinValue = Se.Noise.PerlinNoise(sampleX, sampleY);// * 2 - 1; // 0->1  // -1 -> 1      
                         noiseHeight += perlinValue * amplitude;
 
                         amplitude *= persistance;

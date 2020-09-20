@@ -1,4 +1,4 @@
-﻿#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/Camera.h"
 

@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/Pipeline.h"
 #include "Saffron/Platform/OpenGL/OpenGLPipeline.h"
@@ -7,7 +7,7 @@ namespace Se
 {
 Ref<Pipeline> Pipeline::Create(const Specification &spec)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
 	case RendererAPI::Type::OpenGL:  return Ref<OpenGLPipeline>::Create(spec);

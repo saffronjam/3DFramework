@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Editor/EditorCamera.h"
 
@@ -23,28 +23,30 @@ void EditorCamera::Focus()
 {
 }
 
-void EditorCamera::OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts)
+void EditorCamera::OnUpdate(Time ts)
 {
-	if ( keyboard.IsPressed(SE_KEY_LEFT_ALT) )
+	if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
 	{
-		const glm::vec2 delta = (mouse.GetPosition() - m_InitialMousePosition) * 0.003f;
-		m_InitialMousePosition = mouse.GetPosition();
+		const glm::vec2 &mouse{ Input::GetMouseX(), Input::GetMouseY() };
+		const glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
+		m_InitialMousePosition = mouse;
 
-		if ( mouse.IsPressed(SE_BUTTON_MIDDLE) )
-			OnMousePan(delta);
-		else if ( mouse.IsPressed(SE_BUTTON_LEFT) )
-			OnMouseRotate(delta);
-		else if ( mouse.IsPressed(SE_BUTTON_RIGHT) )
-			OnMouseZoom(delta.y);
+		if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
+			MousePan(delta);
+		else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
+			MouseRotate(delta);
+		else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
+			MouseZoom(delta.y);
 	}
 
 	UpdateCameraView();
 }
 
-void EditorCamera::OnEvent(const Event &event)
+bool EditorCamera::OnEvent(const Event &event)
 {
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<MouseScrollEvent>(SE_EVENT_FN(EditorCamera::OnMouseScroll));
+	dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+	return false;
 }
 
 glm::vec3 EditorCamera::GetUpDirection() const
@@ -77,28 +79,29 @@ void EditorCamera::UpdateCameraView()
 	m_ViewMatrix = glm::inverse(m_ViewMatrix);
 }
 
-void EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
+bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 {
 	const float delta = event.GetOffsetY() * 0.1f;
-	OnMouseZoom(delta);
+	MouseZoom(delta);
 	UpdateCameraView();
+	return false;
 }
 
-void EditorCamera::OnMousePan(const glm::vec2 &delta)
+void EditorCamera::MousePan(const glm::vec2 &delta)
 {
 	const auto &speed = GetPanSpeed();
 	m_FocalPoint += -GetRightDirection() * delta.x * speed.x * m_Distance;
 	m_FocalPoint += GetUpDirection() * delta.y * speed.y * m_Distance;
 }
 
-void EditorCamera::OnMouseRotate(const glm::vec2 &delta)
+void EditorCamera::MouseRotate(const glm::vec2 &delta)
 {
 	const float yawSign = GetUpDirection().y < 0 ? -1.0f : 1.0f;
 	m_Yaw += yawSign * delta.x * GetRotationSpeed();
 	m_Pitch += delta.y * GetRotationSpeed();
 }
 
-void EditorCamera::OnMouseZoom(float delta)
+void EditorCamera::MouseZoom(float delta)
 {
 	m_Distance -= delta * GetZoomSpeed();
 	if ( m_Distance < 1.0f )
@@ -108,7 +111,7 @@ void EditorCamera::OnMouseZoom(float delta)
 	}
 }
 
-glm::vec3 EditorCamera::CalculatePosition()
+glm::vec3 EditorCamera::CalculatePosition() const
 {
 	return m_FocalPoint - GetForwardDirection() * m_Distance;
 }

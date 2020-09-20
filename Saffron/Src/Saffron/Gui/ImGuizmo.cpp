@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 // Undef from Windows.h
 #undef min
@@ -32,6 +32,8 @@
 #endif
 #include "imgui_internal.h"
 #include "ImGuizmo.h"
+
+#include "Saffron/Input/Input.h"
 
 // includes patches for multiview from
 // https://github.com/CedricGuillemet/ImGuizmo/issues/15
@@ -230,7 +232,7 @@ public:
 	void TransformVector(const vec_t &v, const matrix_t &matrix) { (*this) = v; this->TransformVector(matrix); }
 	void TransformPoint(const vec_t &v, const matrix_t &matrix) { (*this) = v; this->TransformPoint(matrix); }
 
-	float &operator [] (size_t index) { return ((float *)&x)[index]; }
+	float &operator [] (size_t index) { return static_cast<float *>(&x)[index]; }
 	const float &operator [] (size_t index) const { return ((float *)&x)[index]; }
 };
 
@@ -286,7 +288,7 @@ public:
 	};
 
 	matrix_t(const matrix_t &other) { memcpy(&m16[0], &other.m16[0], sizeof(float) * 16); }
-	matrix_t() {}
+	matrix_t() = default;
 
 	operator float *() { return m16; }
 	operator const float *() const { return m16; }
@@ -920,20 +922,20 @@ static void ComputeColors(ImU32 *colors, int type, OPERATION operation)
 			colors[0] = (type == MOVE_SCREEN) ? selectionColor : 0xFFFFFFFF;
 			for ( int i = 0; i < 3; i++ )
 			{
-				colors[i + 1] = (type == (int)(MOVE_X + i)) ? selectionColor : directionColor[i];
-				colors[i + 4] = (type == (int)(MOVE_YZ + i)) ? selectionColor : planeColor[i];
+				colors[i + 1] = (type == static_cast<int>(MOVE_X + i)) ? selectionColor : directionColor[i];
+				colors[i + 4] = (type == static_cast<int>(MOVE_YZ + i)) ? selectionColor : planeColor[i];
 				colors[i + 4] = (type == MOVE_SCREEN) ? selectionColor : colors[i + 4];
 			}
 			break;
 		case ROTATE:
 			colors[0] = (type == ROTATE_SCREEN) ? selectionColor : 0xFFFFFFFF;
 			for ( int i = 0; i < 3; i++ )
-				colors[i + 1] = (type == (int)(ROTATE_X + i)) ? selectionColor : directionColor[i];
+				colors[i + 1] = (type == static_cast<int>(ROTATE_X + i)) ? selectionColor : directionColor[i];
 			break;
 		case SCALE:
 			colors[0] = (type == SCALE_XYZ) ? selectionColor : 0xFFFFFFFF;
 			for ( int i = 0; i < 3; i++ )
-				colors[i + 1] = (type == (int)(SCALE_X + i)) ? selectionColor : directionColor[i];
+				colors[i + 1] = (type == static_cast<int>(SCALE_X + i)) ? selectionColor : directionColor[i];
 			break;
 		case BOUNDS:
 			break;
@@ -1042,7 +1044,7 @@ static void DrawRotationGizmo(int type)
 	if ( gContext.mIsOrthographic )
 	{
 		matrix_t viewInverse;
-		viewInverse.Inverse(*(matrix_t *)&gContext.mViewMat);
+		viewInverse.Inverse(*static_cast<matrix_t *>(&gContext.mViewMat));
 		cameraToModelNormalized = viewInverse.v.dir;
 	}
 	else
@@ -1064,7 +1066,7 @@ static void DrawRotationGizmo(int type)
 
 		for ( unsigned int i = 0; i < halfCircleSegmentCount; i++ )
 		{
-			float ng = angleStart + ZPI * ((float)i / (float)halfCircleSegmentCount);
+			float ng = angleStart + ZPI * (static_cast<float>(i) / static_cast<float>(halfCircleSegmentCount));
 			vec_t axisPos = makeVect(cosf(ng), sinf(ng), 0.f);
 			vec_t pos = makeVect(axisPos[axis], axisPos[(axis + 1) % 3], axisPos[(axis + 2) % 3]) * gContext.mScreenFactor;
 			circlePos[i] = worldToPos(pos, gContext.mMVP);
@@ -1085,7 +1087,7 @@ static void DrawRotationGizmo(int type)
 		circlePos[0] = worldToPos(gContext.mModel.v.position, gContext.mViewProjection);
 		for ( unsigned int i = 1; i < halfCircleSegmentCount; i++ )
 		{
-			float ng = gContext.mRotationAngle * ((float)(i - 1) / (float)(halfCircleSegmentCount - 1));
+			float ng = gContext.mRotationAngle * (static_cast<float>(i - 1) / static_cast<float>(halfCircleSegmentCount - 1));
 			matrix_t rotateVectorMatrix;
 			rotateVectorMatrix.RotationAxis(gContext.mTranslationPlan, ng);
 			vec_t pos;
@@ -1108,8 +1110,8 @@ static void DrawHatchedAxis(const vec_t &axis)
 {
 	for ( int j = 1; j < 10; j++ )
 	{
-		ImVec2 baseSSpace2 = worldToPos(axis * 0.05f * (float)(j * 2) * gContext.mScreenFactor, gContext.mMVP);
-		ImVec2 worldDirSSpace2 = worldToPos(axis * 0.05f * (float)(j * 2 + 1) * gContext.mScreenFactor, gContext.mMVP);
+		ImVec2 baseSSpace2 = worldToPos(axis * 0.05f * static_cast<float>(j * 2) * gContext.mScreenFactor, gContext.mMVP);
+		ImVec2 worldDirSSpace2 = worldToPos(axis * 0.05f * static_cast<float>(j * 2 + 1) * gContext.mScreenFactor, gContext.mMVP);
 		gContext.mDrawList->AddLine(baseSSpace2, worldDirSSpace2, 0x80000000, 6.f);
 	}
 }
@@ -1265,7 +1267,7 @@ static void DrawTranslationGizmo(int type)
 static bool CanActivate()
 {
 	// Check for modifiers
-	if ( ImGui::GetIO().KeyAlt || ImGui::GetIO().KeyShift || ImGui::GetIO().KeyCtrl )
+	if ( Se::Input::IsKeyPressed(SE_KEY_LEFT_ALT) || Se::Input::IsKeyPressed(SE_KEY_LEFT_SHIFT) || Se::Input::IsKeyPressed(SE_KEY_LEFT_CONTROL) )
 		return false;
 
 	if ( ImGui::IsMouseClicked(0) && !ImGui::IsAnyItemHovered() && !ImGui::IsAnyItemActive() )
@@ -1369,13 +1371,13 @@ static void HandleAndDrawLocalBounds(float *bounds, matrix_t *matrix, float *sna
 				continue;
 			}
 			float boundDistance = sqrtf(ImLengthSqr(worldBound1 - worldBound2));
-			int stepCount = (int)(boundDistance / 10.f);
+			int stepCount = static_cast<int>(boundDistance / 10.f);
 			stepCount = min(stepCount, 1000);
-			float stepLength = 1.f / (float)stepCount;
+			float stepLength = 1.f / static_cast<float>(stepCount);
 			for ( int j = 0; j < stepCount; j++ )
 			{
-				float t1 = (float)j * stepLength;
-				float t2 = (float)j * stepLength + stepLength * 0.5f;
+				float t1 = static_cast<float>(j) * stepLength;
+				float t2 = static_cast<float>(j) * stepLength + stepLength * 0.5f;
 				ImVec2 worldBoundSS1 = ImLerp(worldBound1, worldBound2, ImVec2(t1, t1));
 				ImVec2 worldBoundSS2 = ImLerp(worldBound1, worldBound2, ImVec2(t2, t2));
 				//drawList->AddLine(worldBoundSS1, worldBoundSS2, 0x000000 + anchorAlpha, 3.f);
@@ -2188,7 +2190,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 			const vec_t origin = directionUnary[normalIndex] - dx - dy;
 			for ( int iPanel = 0; iPanel < 9; iPanel++ )
 			{
-				vec_t boxCoord = boxOrigin + indexVectorX * float(iPanel % 3) + indexVectorY * float(iPanel / 3) + makeVect(1.f, 1.f, 1.f);
+				vec_t boxCoord = boxOrigin + indexVectorX * static_cast<float>(iPanel % 3) + indexVectorY * static_cast<float>(iPanel / 3) + makeVect(1.f, 1.f, 1.f);
 				const ImVec2 p = panelPosition[iPanel] * 2.f;
 				const ImVec2 s = panelSize[iPanel] * 2.f;
 				ImVec2 faceCoordsScreen[4];
@@ -2204,7 +2206,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 
 				const ImVec2 panelCorners[2] = { panelPosition[iPanel], panelPosition[iPanel] + panelSize[iPanel] };
 				bool insidePanel = localx > panelCorners[0].x && localx < panelCorners[1].x &&localy > panelCorners[0].y && localy < panelCorners[1].y;
-				int boxCoordInt = int(boxCoord.x * 9.f + boxCoord.y * 3.f + boxCoord.z);
+				int boxCoordInt = static_cast<int>(boxCoord.x * 9.f + boxCoord.y * 3.f + boxCoord.z);
 				assert(boxCoordInt < 27);
 				boxes[boxCoordInt] |= insidePanel && (!isDraging);
 

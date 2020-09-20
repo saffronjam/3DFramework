@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/VertexBuffer.h"
 #include "Saffron/Platform/OpenGL/OpenGLVertexBuffer.h"
@@ -89,7 +89,7 @@ void VertexBuffer::Layout::CalculateOffsetsAndStride()
 
 Ref<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
 	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(data, size, usage);
@@ -101,7 +101,7 @@ Ref<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
 
 Ref<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
 	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(size, usage);

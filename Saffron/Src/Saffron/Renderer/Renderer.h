@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/Mesh.h"
@@ -14,19 +14,19 @@ class Renderer
 {
 public:
 	static void Init();
-	static void Shutdown();
+
+	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
 	// Commands
 	static void Clear();
 	static void Clear(float r, float g, float b, float a = 1.0f);
 	static void SetClearColor(float r, float g, float b, float a);
-
-	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
-
+	static void SetLineThickness(float thickness);
 	// For OpenGL
 	static void ClearMagenta();
+
+
 	static Ref<ShaderLibrary> GetShaderLibrary();
-	static void SetLineThickness(float thickness);
 
 	template<typename FuncT>
 	static void Submit(FuncT &&func);
@@ -42,9 +42,9 @@ public:
 
 	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 	static void DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
-
 };
 
 template <typename FuncT>

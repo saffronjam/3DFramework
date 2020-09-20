@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 #include "Saffron/Renderer/ShaderUniform.h"
 
 namespace Se

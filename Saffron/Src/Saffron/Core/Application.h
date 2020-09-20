@@ -1,17 +1,17 @@
-﻿#pragma once
+#pragma once
 
-#include "Saffron/Config.h"
-#include "Saffron/Core/Event/WindowEvent.h"
-#include "Saffron/Graphics/Window.h"
-#include "Saffron/Gui/ImGuiLayer.h"
-#include "Saffron/Graphics/LayerStack.h"
-#include "Saffron/Input/Keyboard.h"
-#include "Saffron/Input/Mouse.h"
-#include "Saffron/System/Timer.h"
+#include "Saffron/Base.h"
+#include "Saffron/Core/Events/WindowEvent.h"
+#include "Saffron/Core/LayerStack.h"
+#include "Saffron/Core/Timer.h"
+#include "Saffron/Core/Window.h"
+#include "Saffron/Gui/GuiLayer.h"
 
-namespace Se
-{
-class Application : public RefCounted
+namespace Se {
+
+
+
+class Application
 {
 public:
 	struct Properties
@@ -21,53 +21,45 @@ public:
 	};
 
 public:
-	explicit Application(const Properties &properties = { "Saffron Engine", 1280, 720 });
+	Application(const Properties &properties = { "Hazel Engine", 1280, 720 });
 	virtual ~Application();
 
 	void Run();
-	void Close();
-
-	void PushLayer(Layer *layer);
-	void PushOverlay(Layer *layer);
-	void RenderImGui();
 
 	virtual void OnInit() {}
 	virtual void OnShutdown() {}
 	virtual void OnUpdate(Time ts) {}
 	virtual void OnEvent(const Event &event);
 
-	Ref<Window> &GetWindow();
-	const Ref<Window> &GetWindow() const;
-	static Application &Get() { return *m_sInstance; }
-
-	static const char *GetConfigurationName();
-	static const char *GetPlatformName();
+	void PushLayer(Layer *layer);
+	void PushOverlay(Layer *layer);
+	void RenderGui();
 
 	std::string OpenFile(const char *filter = "All\0*.*\0") const;
 	std::string SaveFile(const char *filter = "All\0*.*\0") const;
 
-private:
-	void OnWindowClose(const WindowCloseEvent &event);
-	void OnWindowResize(const WindowResizeEvent &event);
+	Window &GetWindow() { return *m_Window; }
+	static Application &Get() { return *s_Instance; }
+	float GetTime() const; // TODO: This should be in "Platform"
 
-protected:
+	static const char *GetConfigurationName();
+	static const char *GetPlatformName();
+
+private:
+	bool OnWindowClose(const WindowCloseEvent &event);
+
+private:
 	Ref<Window> m_Window;
-	Keyboard m_Keyboard;
-	Mouse m_Mouse;
-	Time dt;
-
-private:
-	bool m_Running = true;
-	bool m_Minimized = false;
-	Timer m_AppTimer;
-
-	// TODO: Make this a ref instead of raw pointer
-	ImGuiLayer *m_ImGuiLayer;
+	bool m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
+	GuiLayer *m_GuiLayer;
 
-	static Application *m_sInstance;
+	Time ts;
+
+	static Application *s_Instance;
 };
 
+// Implemented by CLIENT
 Application *CreateApplication();
 
 }

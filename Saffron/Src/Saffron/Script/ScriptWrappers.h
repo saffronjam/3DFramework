@@ -4,7 +4,6 @@
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Script/ScriptEngine.h"
-#include "Saffron/System/SaffronMath.h"
 
 extern "C" {
 	typedef struct _MonoString MonoString;
@@ -14,9 +13,10 @@ extern "C" {
 
 namespace Se
 {
-namespace Script {
+namespace Script
+{
 // Input
-bool Saffron_Input_IsKeyPressed(const Keyboard &keyboard, KeyCode key);
+bool Saffron_Input_IsKeyPressed(KeyCode key);
 
 // Entity
 void Saffron_Entity_GetTransform(uint64_t entityID, glm::mat4 *outTransform);

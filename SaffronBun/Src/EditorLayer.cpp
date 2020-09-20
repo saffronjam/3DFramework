@@ -1,9 +1,16 @@
-#include <Saffron/SaffronPCH.h>
-
 #include "EditorLayer.h"
 
-namespace Se
-{
+#include <filesystem>
+
+#include "Saffron/Gui/Gui.h"
+#include "Saffron/Input/Input.h"
+#include "Saffron/Renderer/Renderer2D.h"
+#include "Saffron/Script/ScriptEngine.h"
+#include "Saffron/System/Macros.h"
+
+
+namespace Se {
+
 static void ImGuiShowHelpMarker(const char *desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -27,19 +34,12 @@ static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(con
 	return { translation, orientation, scale };
 }
 
+EditorLayer::EditorLayer()
+	: m_SceneType(SceneType::Model), m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f))
+{
+}
 
-EditorLayer::EditorLayer(const Keyboard &keyboard, const Mouse &mouse)
-	:
-	keyboard(keyboard),
-	mouse(mouse),
-	m_EditorCamera(glm::perspectiveFov(
-		glm::radians(45.0f),
-		1280.0f,
-		720.0f,
-		0.1f,
-		10000.0f
-	)),
-	m_SceneType(SceneType::Model), m_ViewportBounds{}
+EditorLayer::~EditorLayer()
 {
 }
 
@@ -94,8 +94,8 @@ void EditorLayer::OnAttach()
 
 
 	// Editor
-	m_CheckerboardTex = Texture2D::Create("Assets/editor/Checkerboard.tga");
-	m_PlayButtonTex = Texture2D::Create("Assets/editor/PlayButton.png");
+	m_CheckerboardTex = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+	m_PlayButtonTex = Texture2D::Create("Assets/Editor/PlayButton.png");
 
 	m_EditorScene = Ref<Scene>::Create();
 	UpdateWindowTitle("Untitled Scene");
@@ -105,11 +105,57 @@ void EditorLayer::OnAttach()
 	m_SceneHierarchyPanel->SetEntityDeletedCallback(std::bind(&EditorLayer::OnEntityDeleted, this, std::placeholders::_1));
 
 	SceneSerializer serializer(m_EditorScene);
-	serializer.Deserialize("Assets/scenes/levels/Physics2D-Game.hsc");
+	serializer.Deserialize("Assets/Scenes/Levels/Physics2D-Game.hsc");
 }
 
 void EditorLayer::OnDetach()
 {
+}
+
+void EditorLayer::OnScenePlay()
+{
+	m_SelectionContext.clear();
+
+	m_SceneState = SceneState::Play;
+
+	if ( m_ReloadScriptOnPlay )
+		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
+
+	m_RuntimeScene = Ref<Scene>::Create();
+	m_EditorScene->CopyTo(m_RuntimeScene);
+
+	m_RuntimeScene->OnRuntimeStart();
+	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
+}
+
+void EditorLayer::OnSceneStop()
+{
+	m_RuntimeScene->OnRuntimeStop();
+	m_SceneState = SceneState::Edit;
+
+	// Unload runtime scene
+	m_RuntimeScene = nullptr;
+
+	m_SelectionContext.clear();
+	ScriptEngine::SetSceneContext(m_EditorScene);
+	m_SceneHierarchyPanel->SetContext(m_EditorScene);
+}
+
+void EditorLayer::UpdateWindowTitle(const std::string &sceneName)
+{
+	const std::string title = sceneName + " - Hazelnut - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
+	Application::Get().GetWindow().SetTitle(title);
+}
+
+float EditorLayer::GetSnapValue() const
+{
+	switch ( m_GizmoType )
+	{
+	case  ImGuizmo::OPERATION::TRANSLATE: return 0.5f;
+	case  ImGuizmo::OPERATION::ROTATE: return 45.0f;
+	case  ImGuizmo::OPERATION::SCALE: return 0.5f;
+	}
+	return 0.0f;
 }
 
 void EditorLayer::OnUpdate(Time ts)
@@ -119,7 +165,7 @@ void EditorLayer::OnUpdate(Time ts)
 	case SceneState::Edit:
 	{
 		//if (m_ViewportPanelFocused)
-		m_EditorCamera.OnUpdate(keyboard, mouse, ts);
+		m_EditorCamera.OnUpdate(ts);
 
 		m_EditorScene->OnRenderEditor(ts, m_EditorCamera);
 
@@ -173,7 +219,7 @@ void EditorLayer::OnUpdate(Time ts)
 	case SceneState::Play:
 	{
 		if ( m_ViewportPanelFocused )
-			m_EditorCamera.OnUpdate(keyboard, mouse, ts);
+			m_EditorCamera.OnUpdate(ts);
 
 		m_RuntimeScene->OnUpdate(ts);
 		m_RuntimeScene->OnRenderRuntime(ts);
@@ -182,13 +228,184 @@ void EditorLayer::OnUpdate(Time ts)
 	case SceneState::Pause:
 	{
 		if ( m_ViewportPanelFocused )
-			m_EditorCamera.OnUpdate(keyboard, mouse, ts);
+			m_EditorCamera.OnUpdate(ts);
 
 		m_RuntimeScene->OnRenderRuntime(ts);
 		break;
 	}
-	default:
-		break;
+	}
+}
+
+bool EditorLayer::Property(const std::string &name, bool &value)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	const bool result = ImGui::Checkbox(id.c_str(), &value);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return result;
+}
+
+bool EditorLayer::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags) const
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed = false;
+	if ( flags == PropertyFlag::SliderProperty )
+		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
+	else
+		changed = ImGui::DragFloat(id.c_str(), &value, 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec2 &value, EditorLayer::PropertyFlag flags) const
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec2 &value, float min, float max, PropertyFlag flags) const
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed = false;
+	if ( flags == PropertyFlag::SliderProperty )
+		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec3 &value, EditorLayer::PropertyFlag flags) const
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min, float max, EditorLayer::PropertyFlag flags) const
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed = false;
+	if ( (int)flags & (int)PropertyFlag::ColorProperty )
+		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if ( flags == PropertyFlag::SliderProperty )
+		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat3(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec4 &value, EditorLayer::PropertyFlag flags) const
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool EditorLayer::Property(const std::string &name, glm::vec4 &value, float min, float max, EditorLayer::PropertyFlag flags) const
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed = false;
+	if ( (int)flags & (int)PropertyFlag::ColorProperty )
+		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if ( flags == PropertyFlag::SliderProperty )
+		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+void EditorLayer::ShowBoundingBoxes(bool show, bool onTop)
+{
+	SceneRenderer::GetOptions().ShowBoundingBoxes = show && !onTop;
+	m_DrawOnTopBoundingBoxes = show && onTop;
+}
+
+void EditorLayer::SelectEntity(Entity entity)
+{
+	SelectedSubmesh selection;
+	if ( entity.HasComponent<MeshComponent>() )
+	{
+		selection.Mesh = &entity.GetComponent<MeshComponent>().Mesh->GetSubmeshes()[0];
+	}
+	selection.Entity = entity;
+	m_SelectionContext.clear();
+	m_SelectionContext.push_back(selection);
+
+	m_EditorScene->SetSelectedEntity(entity);
+}
+
+void EditorLayer::OpenScene()
+{
+	auto &app = Application::Get();
+	const std::string filepath = app.OpenFile("Hazel Scene (*.hsc)\0*.hsc\0");
+	if ( !filepath.empty() )
+	{
+		const Ref<Scene> newScene = Ref<Scene>::Create();
+		SceneSerializer serializer(newScene);
+		serializer.Deserialize(filepath);
+		m_EditorScene = newScene;
+		const std::filesystem::path path = filepath;
+		UpdateWindowTitle(path.filename().string());
+		m_SceneHierarchyPanel->SetContext(m_EditorScene);
+		ScriptEngine::SetSceneContext(m_EditorScene);
+
+		m_EditorScene->SetSelectedEntity({});
+		m_SelectionContext.clear();
+
+		m_SceneFilePath = filepath;
+	}
+}
+
+void EditorLayer::SaveScene() const
+{
+	SceneSerializer serializer(m_EditorScene);
+	serializer.Serialize(m_SceneFilePath);
+}
+
+void EditorLayer::SaveSceneAs()
+{
+	auto &app = Application::Get();
+	const std::string filepath = app.SaveFile("Hazel Scene (*.hsc)\0*.hsc\0");
+	if ( !filepath.empty() )
+	{
+		SceneSerializer serializer(m_EditorScene);
+		serializer.Serialize(filepath);
+
+		const std::filesystem::path path = filepath;
+		UpdateWindowTitle(path.filename().string());
+		m_SceneFilePath = filepath;
 	}
 }
 
@@ -343,20 +560,20 @@ void EditorLayer::OnImGuiRender()
 	ImGui::Begin("Toolbar");
 	if ( m_SceneState == SceneState::Edit )
 	{
-		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(0.9f, 0.9f, 0.9f, 1.0f)) )
+		if ( ImGui::ImageButton((ImTextureID)(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(0.9f, 0.9f, 0.9f, 1.0f)) )
 		{
 			OnScenePlay();
 		}
 	}
 	else if ( m_SceneState == SceneState::Play )
 	{
-		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(1.0f, 1.0f, 1.0f, 0.2f)) )
+		if ( ImGui::ImageButton((ImTextureID)(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(1.0f, 1.0f, 1.0f, 0.2f)) )
 		{
 			OnSceneStop();
 		}
 	}
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(1.0f, 1.0f, 1.0f, 0.6f)) )
+	if ( ImGui::ImageButton((ImTextureID)(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(1.0f, 1.0f, 1.0f, 0.6f)) )
 	{
 		SE_CORE_INFO("PLAY!");
 	}
@@ -376,13 +593,13 @@ void EditorLayer::OnImGuiRender()
 
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
-	SceneRenderer::SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	m_EditorScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+	SceneRenderer::SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	m_EditorScene->SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 	if ( m_RuntimeScene )
-		m_RuntimeScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+		m_RuntimeScene->SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
 	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 10000.0f));
-	m_EditorCamera.SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID()), viewportSize, { 0, 1 }, { 1, 0 });
+	m_EditorCamera.SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	ImGui::Image((void *)SceneRenderer::GetFinalColorBufferRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
 
 	static int counter = 0;
 	auto windowSize = ImGui::GetWindowSize();
@@ -400,13 +617,13 @@ void EditorLayer::OnImGuiRender()
 	{
 		auto &selection = m_SelectionContext[0];
 
-		auto rw = static_cast<float>(ImGui::GetWindowWidth());
-		auto rh = static_cast<float>(ImGui::GetWindowHeight());
+		float rw = (float)ImGui::GetWindowWidth();
+		float rh = (float)ImGui::GetWindowHeight();
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, rw, rh);
 
-		bool snap = keyboard.IsPressed(SE_KEY_LEFT_CONTROL);
+		bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
 
 		auto &entityTransform = selection.Entity.Transform();
 		float snapValue = GetSnapValue();
@@ -415,7 +632,7 @@ void EditorLayer::OnImGuiRender()
 		{
 			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
 								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+								 (ImGuizmo::OPERATION)m_GizmoType,
 								 ImGuizmo::LOCAL,
 								 glm::value_ptr(entityTransform),
 								 nullptr,
@@ -426,7 +643,7 @@ void EditorLayer::OnImGuiRender()
 			glm::mat4 transformBase = entityTransform * selection.Mesh->Transform;
 			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
 								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+								 (ImGuizmo::OPERATION)m_GizmoType,
 								 ImGuizmo::LOCAL,
 								 glm::value_ptr(transformBase),
 								 nullptr,
@@ -464,7 +681,7 @@ void EditorLayer::OnImGuiRender()
 		if ( ImGui::BeginMenu("Script") )
 		{
 			if ( ImGui::MenuItem("Reload C# Assembly") )
-				ScriptEngine::ReloadAssembly("Assets/scripts/ExampleApp.dll");
+				ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 
 			ImGui::MenuItem("Reload assembly on play", nullptr, &m_ReloadScriptOnPlay);
 			ImGui::EndMenu();
@@ -485,14 +702,14 @@ void EditorLayer::OnImGuiRender()
 			Ref<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
 			if ( mesh )
 			{
-				auto materials = mesh->GetMaterials();
+				auto &materials = mesh->GetMaterials();
 				static uint32_t selectedMaterialIndex = 0;
 				for ( uint32_t i = 0; i < materials.size(); i++ )
 				{
 					auto &materialInstance = materials[i];
 
 					ImGuiTreeNodeFlags node_flags = (selectedMaterialIndex == i ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_Leaf;
-					bool opened = ImGui::TreeNodeEx(static_cast<void *>(&materialInstance), node_flags, materialInstance->GetName().c_str());
+					bool opened = ImGui::TreeNodeEx((void *)(&materialInstance), node_flags, materialInstance->GetName().c_str());
 					if ( ImGui::IsItemClicked() )
 					{
 						selectedMaterialIndex = i;
@@ -519,7 +736,7 @@ void EditorLayer::OnImGuiRender()
 							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
 							Ref<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
-							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(albedoMap ? (void *)albedoMap->GetRendererID() : (void *)m_CheckerboardTex->GetRendererID(), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -529,7 +746,7 @@ void EditorLayer::OnImGuiRender()
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 									ImGui::TextUnformatted(albedoMap->GetPath().c_str());
 									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(albedoMap->GetRendererID()), ImVec2(384, 384));
+									ImGui::Image((void *)albedoMap->GetRendererID(), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
@@ -537,7 +754,7 @@ void EditorLayer::OnImGuiRender()
 									std::string filename = Application::Get().OpenFile("");
 									if ( filename != "" )
 									{
-										albedoMap = Texture2D::Create(filename, true/*m_AlbedoInput.sRGB*/);
+										albedoMap = Texture2D::Create(filename, true/*m_AlbedoInput.SRGB*/);
 										materialInstance->Set("u_AlbedoTexture", albedoMap);
 									}
 								}
@@ -547,10 +764,10 @@ void EditorLayer::OnImGuiRender()
 							if ( ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap) )
 								materialInstance->Set<float>("u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
 
-							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.sRGB))
+							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.SRGB))
 							{
 								if (m_AlbedoInput.TextureMap)
-									m_AlbedoInput.TextureMap = Texture2D::Create(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.sRGB);
+									m_AlbedoInput.TextureMap = Texture2D::Create(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.SRGB);
 							}*/
 							ImGui::EndGroup();
 							ImGui::SameLine();
@@ -564,7 +781,7 @@ void EditorLayer::OnImGuiRender()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
 							Ref<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
-							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(normalMap ? (void *)normalMap->GetRendererID() : (void *)m_CheckerboardTex->GetRendererID(), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -574,7 +791,7 @@ void EditorLayer::OnImGuiRender()
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 									ImGui::TextUnformatted(normalMap->GetPath().c_str());
 									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(normalMap->GetRendererID()), ImVec2(384, 384));
+									ImGui::Image((void *)normalMap->GetRendererID(), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
@@ -600,7 +817,7 @@ void EditorLayer::OnImGuiRender()
 							float &metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
 							Ref<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
-							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(metalnessMap ? (void *)metalnessMap->GetRendererID() : (void *)m_CheckerboardTex->GetRendererID(), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -610,7 +827,7 @@ void EditorLayer::OnImGuiRender()
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 									ImGui::TextUnformatted(metalnessMap->GetPath().c_str());
 									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(metalnessMap->GetRendererID()), ImVec2(384, 384));
+									ImGui::Image((void *)metalnessMap->GetRendererID(), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
@@ -638,7 +855,7 @@ void EditorLayer::OnImGuiRender()
 							float &roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
 							Ref<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
-							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(roughnessMap ? (void *)roughnessMap->GetRendererID() : (void *)m_CheckerboardTex->GetRendererID(), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -648,7 +865,7 @@ void EditorLayer::OnImGuiRender()
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
 									ImGui::TextUnformatted(roughnessMap->GetPath().c_str());
 									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(roughnessMap->GetRendererID()), ImVec2(384, 384));
+									ImGui::Image((void *)roughnessMap->GetRendererID(), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
@@ -695,17 +912,17 @@ void EditorLayer::OnEvent(const Event &event)
 	}
 
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<KeyboardPressEvent>(SE_EVENT_FN(EditorLayer::OnKeyPressEvent));
-	dispatcher.Try<MousePressEvent>(SE_EVENT_FN(EditorLayer::OnMouseButtonPress));
+	dispatcher.Try<KeyboardPressEvent>(SE_BIND_EVENT_FN(EditorLayer::OnKeyboardPressEvent));
+	dispatcher.Try<MousePressEvent>(SE_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 }
 
-void EditorLayer::OnKeyPressEvent(const KeyboardPressEvent &event)
+bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 {
 	if ( m_ViewportPanelFocused )
 	{
 		switch ( event.GetKey() )
 		{
-		case KeyCode::Q:
+		case KeyCode::A:
 			m_GizmoType = -1;
 			break;
 		case KeyCode::W:
@@ -727,12 +944,10 @@ void EditorLayer::OnKeyPressEvent(const KeyboardPressEvent &event)
 				m_SceneHierarchyPanel->SetSelected({});
 			}
 			break;
-		default:
-			break;
 		}
 	}
 
-	if ( keyboard.IsPressed(SE_KEY_LEFT_CONTROL) )
+	if ( Input::IsKeyPressed(SE_KEY_LEFT_CONTROL) )
 	{
 		switch ( event.GetKey() )
 		{
@@ -758,45 +973,42 @@ void EditorLayer::OnKeyPressEvent(const KeyboardPressEvent &event)
 		case KeyCode::S:
 			SaveScene();
 			break;
-		default:
-			break;
 		}
 
-		if ( keyboard.IsPressed(SE_KEY_LEFT_SHIFT) )
+		if ( Input::IsKeyPressed(SE_KEY_LEFT_SHIFT) )
 		{
 			switch ( event.GetKey() )
 			{
 			case KeyCode::S:
 				SaveSceneAs();
 				break;
-			default:
-				break;
 			}
 		}
 	}
+
+	return false;
 }
 
-void EditorLayer::OnMouseButtonPress(const MousePressEvent &event)
+bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
-	if ( event.GetButton() == SE_BUTTON_LEFT && !keyboard.IsPressed(KeyCode::LeftAlt) && !ImGuizmo::IsOver() && m_SceneState != SceneState::Play )
+	if ( event.GetButton() == SE_BUTTON_LEFT && !Input::IsKeyPressed(SE_KEY_LEFT_ALT) && !ImGuizmo::IsOver() && m_SceneState != SceneState::Play )
 	{
-		const auto &mousePos = GetMouseViewportSpace();
-		if ( mousePos.x > -1.0f && mousePos.y < 1.0f && mousePos.y > -1.0f && mousePos.y < 1.0f )
+		const auto MousePosition = GetMouseViewportSpace();
+		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 		{
-			auto [origin, direction] = CastRay(mousePos.x, mousePos.y);
+			auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);
 
 			m_SelectionContext.clear();
 			m_EditorScene->SetSelectedEntity({});
 			auto meshEntities = m_EditorScene->GetAllEntitiesWith<MeshComponent>();
-			for ( auto meshEntity : meshEntities )
+			for ( auto e : meshEntities )
 			{
-				Entity entity = { meshEntity, m_EditorScene.Raw() };
+				Entity entity = { e, m_EditorScene.Raw() };
 				auto mesh = entity.GetComponent<MeshComponent>().Mesh;
 				if ( !mesh )
 					continue;
 
 				auto &submeshes = mesh->GetSubmeshes();
-				float lastT = std::numeric_limits<float>::max();
 				for ( uint32_t i = 0; i < submeshes.size(); i++ )
 				{
 					auto &submesh = submeshes[i];
@@ -828,193 +1040,21 @@ void EditorLayer::OnMouseButtonPress(const MousePressEvent &event)
 
 		}
 	}
+	return false;
 }
 
-bool EditorLayer::Property(const std::string &name, bool &value)
+glm::vec2 EditorLayer::GetMouseViewportSpace() const
 {
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	const bool result = ImGui::Checkbox(id.c_str(), &value);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return result;
-}
-
-bool EditorLayer::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags)
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
-	else
-		changed = ImGui::DragFloat(id.c_str(), &value, 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec2 &value, PropertyFlag flags)
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec2 &value, float min, float max, PropertyFlag flags)
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, PropertyFlag flags)
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min, float max, PropertyFlag flags)
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
-		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat3(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec4 &value, PropertyFlag flags)
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec4 &value, float min, float max, PropertyFlag flags)
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
-		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-void EditorLayer::ShowBoundingBoxes(bool show, bool onTop)
-{
-	SceneRenderer::GetOptions().ShowBoundingBoxes = show && !onTop;
-	m_DrawOnTopBoundingBoxes = show && onTop;
-}
-
-void EditorLayer::SelectEntity(Entity entity)
-{
-	SelectedSubmesh selection;
-	if ( entity.HasComponent<MeshComponent>() )
-	{
-		selection.Mesh = &entity.GetComponent<MeshComponent>().Mesh->GetSubmeshes()[0];
-	}
-	selection.Entity = entity;
-	m_SelectionContext.clear();
-	m_SelectionContext.push_back(selection);
-
-	m_EditorScene->SetSelectedEntity(entity);
-}
-
-void EditorLayer::OpenScene()
-{
-	auto &app = Application::Get();
-	const std::string filepath = app.OpenFile("Saffron Scene (*.hsc)\0*.hsc\0");
-	if ( !filepath.empty() )
-	{
-		const Ref<Scene> newScene = Ref<Scene>::Create();
-		SceneSerializer serializer(newScene);
-		serializer.Deserialize(filepath);
-		m_EditorScene = newScene;
-		const std::filesystem::path path = filepath;
-		UpdateWindowTitle(path.filename().string());
-		m_SceneHierarchyPanel->SetContext(m_EditorScene);
-		ScriptEngine::SetSceneContext(m_EditorScene);
-
-		m_EditorScene->SetSelectedEntity({});
-		m_SelectionContext.clear();
-
-		m_SceneFilePath = filepath;
-	}
-}
-
-void EditorLayer::SaveScene()
-{
-	SceneSerializer serializer(m_EditorScene);
-	serializer.Serialize(m_SceneFilePath);
-}
-
-void EditorLayer::SaveSceneAs()
-{
-	auto &app = Application::Get();
-	const std::string filepath = app.SaveFile("Saffron Scene (*.hsc)\0*.hsc\0");
-	if ( !filepath.empty() )
-	{
-		SceneSerializer serializer(m_EditorScene);
-		serializer.Serialize(filepath);
-
-		const std::filesystem::path path = filepath;
-		UpdateWindowTitle(path.filename().string());
-		m_SceneFilePath = filepath;
-	}
-}
-
-glm::vec2 EditorLayer::GetMouseViewportSpace()
-{
-	auto mousePosition = ImGui::GetMousePos();
-	mousePosition.x -= m_ViewportBounds[0].x;
-	mousePosition.y -= m_ViewportBounds[0].y;
+	auto [x, y] = ImGui::GetMousePos();
+	x -= m_ViewportBounds[0].x;
+	y -= m_ViewportBounds[0].y;
 	const auto viewportWidth = m_ViewportBounds[1].x - m_ViewportBounds[0].x;
 	const auto viewportHeight = m_ViewportBounds[1].y - m_ViewportBounds[0].y;
 
-	return { (mousePosition.x / viewportWidth) * 2.0f - 1.0f, ((mousePosition.y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
+	return { (x / viewportWidth) * 2.0f - 1.0f, ((y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
 }
 
-std::pair<glm::vec3, glm::vec3> EditorLayer::CastRay(float mx, float my)
+std::pair<glm::vec3, glm::vec3> EditorLayer::CastRay(float mx, float my) const
 {
 	const glm::vec4 mouseClipPos = { mx, my, -1.0f, 1.0f };
 
@@ -1043,60 +1083,15 @@ void EditorLayer::OnEntityDeleted(Entity e)
 	}
 }
 
-Ray EditorLayer::CastMouseRay()
+Ray EditorLayer::CastMouseRay() const
 {
-	const auto mousePosition = GetMouseViewportSpace();
-	if ( mousePosition.x > -1.0f && mousePosition.x < 1.0f && mousePosition.y > -1.0f && mousePosition.y < 1.0f )
+	const auto MousePosition = GetMouseViewportSpace();
+	if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 	{
-		auto [origin, direction] = CastRay(mousePosition.x, mousePosition.y);
+		auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);
 		return Ray(origin, direction);
 	}
 	return Ray::Zero();
 }
 
-void EditorLayer::OnScenePlay()
-{
-	m_SelectionContext.clear();
-
-	m_SceneState = SceneState::Play;
-
-	if ( m_ReloadScriptOnPlay )
-		ScriptEngine::ReloadAssembly("Assets/scripts/ExampleApp.dll");
-
-	m_RuntimeScene = Ref<Scene>::Create();
-	m_EditorScene->CopyTo(m_RuntimeScene);
-
-	m_RuntimeScene->OnRuntimeStart();
-	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
-}
-
-void EditorLayer::OnSceneStop()
-{
-	m_RuntimeScene->OnRuntimeStop();
-	m_SceneState = SceneState::Edit;
-
-	// Unload runtime scene
-	m_RuntimeScene = nullptr;
-
-	m_SelectionContext.clear();
-	ScriptEngine::SetSceneContext(m_EditorScene);
-	m_SceneHierarchyPanel->SetContext(m_EditorScene);
-}
-
-void EditorLayer::UpdateWindowTitle(const std::string &sceneName)
-{
-	const std::string title = sceneName + " - ExampleApp - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
-	Application::Get().GetWindow()->SetTitle(title);
-}
-
-float EditorLayer::GetSnapValue()
-{
-	switch ( m_GizmoType )
-	{
-	case  ImGuizmo::OPERATION::TRANSLATE: return 0.5f;
-	case  ImGuizmo::OPERATION::ROTATE: return 45.0f;
-	case  ImGuizmo::OPERATION::SCALE: return 0.5f;
-	}
-	return 0.0f;
-}
 }

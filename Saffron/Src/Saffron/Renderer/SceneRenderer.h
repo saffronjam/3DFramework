@@ -5,7 +5,6 @@
 #include "Saffron/Renderer/RenderPass.h"
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Scene/Scene.h"
-#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {

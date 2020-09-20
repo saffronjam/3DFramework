@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/RenderCommandQueue.h"
 
@@ -9,7 +9,7 @@ constexpr auto CommandQueueSize = 10 * 1024 * 1024;
 
 RenderCommandQueue::RenderCommandQueue()
 	: m_CommandBuffer(new Uint8[CommandQueueSize]),
-	m_CommandBufferPtr(m_CommandBuffer)
+	m_CommandBufferPtr(m_CommandBuffer), m_CommandCount(0)
 {
 	memset(m_CommandBuffer, 0, CommandQueueSize);
 }

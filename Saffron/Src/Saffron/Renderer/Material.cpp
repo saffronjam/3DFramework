@@ -1,13 +1,12 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
+#include "Material.h"
 
-#include "Saffron/Renderer/Material.h"
+namespace Se {
 
-namespace Se
-{
+//////////////////////////////////////////////////////////////////////////////////
+// Material
+//////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////
-/// Material
-////////////////////////////////////////////////////////////////
 
 Material::Material(const Ref<Shader> &shader)
 	: m_Shader(shader)
@@ -21,6 +20,24 @@ Material::Material(const Ref<Shader> &shader)
 
 void Material::Bind()
 {
+	m_Shader->Bind();
+
+	if ( m_VSUniformStorageBuffer )
+		m_Shader->SetVSMaterialUniformBuffer(m_VSUniformStorageBuffer);
+
+	if ( m_PSUniformStorageBuffer )
+		m_Shader->SetPSMaterialUniformBuffer(m_PSUniformStorageBuffer);
+
+	BindTextures();
+}
+
+void Material::Set(const std::string &name, const Ref<Texture> &texture)
+{
+	ShaderResourceDeclaration *decl = FindResourceDeclaration(name);
+	const Uint32 slot = decl->GetRegister();
+	if ( m_Textures.size() <= slot )
+		m_Textures.resize(static_cast<size_t>(slot) + 1);
+	m_Textures[slot] = texture;
 }
 
 void Material::Set(const std::string &name, const Ref<Texture2D> &texture)
@@ -67,15 +84,12 @@ void Material::OnShaderReloaded()
 
 void Material::BindTextures()
 {
-	m_Shader->Bind();
-
-	if ( m_VSUniformStorageBuffer )
-		m_Shader->SetVSMaterialUniformBuffer(m_VSUniformStorageBuffer);
-
-	if ( m_PSUniformStorageBuffer )
-		m_Shader->SetPSMaterialUniformBuffer(m_PSUniformStorageBuffer);
-
-	BindTextures();
+	for ( size_t i = 0; i < m_Textures.size(); i++ )
+	{
+		auto &texture = m_Textures[i];
+		if ( texture )
+			texture->Bind(i);
+	}
 }
 
 ShaderUniformDeclaration *Material::FindUniformDeclaration(const std::string &name)

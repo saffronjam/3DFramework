@@ -1,8 +1,6 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <glad/glad.h>
-
-#include <utility>
 
 #include "Saffron/Platform/OpenGL/OpenGLPipeline.h"
 #include "Saffron/Renderer/Renderer.h"

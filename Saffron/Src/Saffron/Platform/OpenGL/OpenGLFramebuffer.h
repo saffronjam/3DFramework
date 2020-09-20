@@ -17,9 +17,9 @@ public:
 
 	void BindTexture(Uint32 slot = 0) const override;
 
-	virtual RendererID GetRendererID() const { return m_RendererID; }
-	virtual RendererID GetColorAttachmentRendererID() const { return m_ColorAttachment; }
-	virtual RendererID GetDepthAttachmentRendererID() const { return m_DepthAttachment; }
+	RendererID GetRendererID() const override { return m_RendererID; }
+	RendererID GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+	RendererID GetDepthAttachmentRendererID() const override { return m_DepthAttachment; }
 
 	const Specification &GetSpecification() const override { return m_Specification; }
 private:

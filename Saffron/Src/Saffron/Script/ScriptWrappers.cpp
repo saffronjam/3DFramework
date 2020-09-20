@@ -1,6 +1,6 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
-#include <Box2D/Box2D.h>
+#include <box2d/box2d.h>
 #include <mono/jit/jit.h>
 
 #include "Saffron/Scene/Entity.h"
@@ -32,9 +32,9 @@ enum class ComponentID
 // Input
 ////////////////////////////////////////////////////////////////
 
-bool Saffron_Input_IsKeyPressed(const Keyboard &keyboard, KeyCode key)
+bool Saffron_Input_IsKeyPressed(KeyCode key)
 {
-	return keyboard.IsPressed(key);
+	return Input::IsKeyPressed(key);
 }
 
 

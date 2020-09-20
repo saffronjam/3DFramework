@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 
 namespace Se
 {
@@ -13,6 +13,7 @@ public:
 	template<typename T>
 	static Buffer Copy(T *data, Uint32 size);
 	static Buffer Copy(const Buffer &buffer);
+	static Buffer Encapsulate(Uint8 *data);
 
 	void Allocate(Uint32 size);
 	void ZeroInitialize();
@@ -22,6 +23,9 @@ public:
 
 	void Write(void *data, Uint32 size, Uint32 offset = 0) const;
 	void Write(const void *data, Uint32 size, Uint32 offset) const;
+
+	void Destroy();
+	void Reset();
 
 	operator bool() const;
 	Uint8 &operator[](int index);
@@ -54,7 +58,7 @@ Buffer Buffer::Copy(T *data, Uint32 size)
 template <typename T>
 T &Buffer::Read(Uint32 offset)
 {
-	return *reinterpret_cast<T *>(m_Data[offset]);
+	return *reinterpret_cast<T *>(m_Data + offset);
 }
 
 template <typename T>

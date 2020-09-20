@@ -1,7 +1,7 @@
 #pragma once
 
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/RendererAPI.h"
-#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {

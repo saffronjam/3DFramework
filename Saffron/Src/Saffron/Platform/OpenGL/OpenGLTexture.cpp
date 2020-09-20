@@ -1,4 +1,4 @@
-﻿#include "Saffron/SaffronPCH.h"
+﻿#include "SaffronPCH.h"
 
 #include <glad/glad.h>
 #define STB_IMAGE_IMPLEMENTATION
@@ -59,25 +59,22 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
 	: m_FilePath(path)
 {
 	int width, height, channels;
-	Uint8 *stbiResult;
 	if ( stbi_is_hdr(path.c_str()) )
 	{
 		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", path, sRGB);
-		stbiResult = reinterpret_cast<Uint8 *>(stbi_loadf(path.c_str(), &width, &height, &channels, 0));
-		m_ImageData = Buffer::Copy(stbiResult, width * height);
+
+		m_ImageData = Buffer::Encapsulate((Uint8 *)stbi_loadf(path.c_str(), &width, &height, &channels, 0));
+		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_IsHDR = true;
 		m_Format = Format::Float16;
 	}
 	else
 	{
 		SE_CORE_INFO("Loading texture {0}, sRGB={1}", path, sRGB);
-		stbiResult = stbi_load(path.c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha);
-		m_ImageData = Buffer::Copy(stbiResult, width * height);
+		m_ImageData = Buffer::Encapsulate(stbi_load(path.c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_Format = Format::RGBA;
 	}
-	if ( stbiResult )
-		stbi_image_free(stbiResult);
 
 	if ( !m_ImageData.Data() )
 		return;
@@ -94,7 +91,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
 						 if ( sRGB )
 						 {
 							 glCreateTextures(GL_TEXTURE_2D, 1, &instance->m_RendererID);
-							 const int levels = CalculateMipMapCount(instance->m_Width, instance->m_Height);
+							 const int levels = Texture::CalculateMipMapCount(instance->m_Width, instance->m_Height);
 							 glTextureStorage2D(instance->m_RendererID, levels, GL_SRGB8, instance->m_Width, instance->m_Height);
 							 glTextureParameteri(instance->m_RendererID, GL_TEXTURE_MIN_FILTER, levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
 							 glTextureParameteri(instance->m_RendererID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -121,6 +118,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
 
 							 glBindTexture(GL_TEXTURE_2D, 0);
 						 }
+						 stbi_image_free(instance->m_ImageData.Data());
 					 });
 }
 

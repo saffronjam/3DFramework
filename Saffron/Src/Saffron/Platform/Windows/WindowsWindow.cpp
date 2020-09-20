@@ -1,10 +1,10 @@
-﻿#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
-#include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-#include "Saffron/Core/Event/KeyboardEvent.h"
-#include "Saffron/Core/Event/MouseEvent.h"
+#include "Saffron/Core/Events/KeyboardEvent.h"
+#include "Saffron/Core/Events/MouseEvent.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
 #include "Saffron/Renderer/Renderer.h"
@@ -42,7 +42,7 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	// Create GLFW Window
 	{
 #ifdef SE_DEBUG
-		if ( RendererAPI::CurrentAPI() == RendererAPI::Type::OpenGL )
+		if ( RendererAPI::Current() == RendererAPI::Type::OpenGL )
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		m_NativeWindow = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height),
@@ -93,6 +93,13 @@ WindowsWindow::~WindowsWindow()
 void WindowsWindow::OnUpdate()
 {
 	glfwPollEvents();
+	glfwSwapBuffers(m_NativeWindow);
+
+	const ImGuiMouseCursor ImGuiCursor = ImGui::GetMouseCursor();
+	glfwSetCursor(m_NativeWindow, m_ImGuiMouseCursors[ImGuiCursor] ? m_ImGuiMouseCursors[ImGuiCursor] : m_ImGuiMouseCursors[ImGuiMouseCursor_Arrow]);
+	glfwSetInputMode(m_NativeWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+
+	ts = Timer::GlobalPeek();
 }
 
 void WindowsWindow::OnEvent(const Event &event)
@@ -100,11 +107,11 @@ void WindowsWindow::OnEvent(const Event &event)
 	SE_PROFILE_FUNCTION();
 
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(WindowsWindow::OnResize));
-	dispatcher.Try<WindowMoveEvent>(SE_EVENT_FN(WindowsWindow::OnMove));
-	dispatcher.Try<WindowGainFocusEvent>(SE_EVENT_FN(WindowsWindow::OnGainFocus));
-	dispatcher.Try<WindowLostFocusEvent>(SE_EVENT_FN(WindowsWindow::OnLostFocus));
-	dispatcher.Try<WindowCloseEvent>(SE_EVENT_FN(WindowsWindow::OnClose));
+	dispatcher.Try<WindowResizeEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnResize));
+	dispatcher.Try<WindowMoveEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnMove));
+	dispatcher.Try<WindowGainFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnGainFocus));
+	dispatcher.Try<WindowLostFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnLostFocus));
+	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
 }
 
 void WindowsWindow::Close()
@@ -146,27 +153,44 @@ bool WindowsWindow::IsVSync() const
 	return m_VSync;
 }
 
-void WindowsWindow::OnResize(const WindowResizeEvent &event)
+bool WindowsWindow::IsMinimized() const
+{
+	return m_Width == 0 || m_Height == 0;
+}
+
+bool WindowsWindow::OnResize(const WindowResizeEvent &event)
 {
 	m_Width = event.GetWidth();
 	m_Height = event.GetHeight();
+
+	auto *instance = this;
+	Renderer::Submit([=]() { glViewport(0, 0, instance->m_Width, instance->m_Height); });
+	auto &fbs = FramebufferPool::GetGlobal()->GetAll();
+	for ( auto &fb : fbs )
+		fb->Resize(instance->m_Width, instance->m_Height);
+
+	return false;
 }
 
-void WindowsWindow::OnMove(const WindowMoveEvent &event)
+bool WindowsWindow::OnMove(const WindowMoveEvent &event)
 {
 	m_Position = event.GetPosition();
+	return false;
 }
 
-void WindowsWindow::OnGainFocus(const WindowGainFocusEvent &event)
+bool WindowsWindow::OnGainFocus(const WindowGainFocusEvent &event)
 {
+	return false;
 }
 
-void WindowsWindow::OnLostFocus(const WindowLostFocusEvent &event)
+bool WindowsWindow::OnLostFocus(const WindowLostFocusEvent &event)
 {
+	return false;
 }
 
-void WindowsWindow::OnClose(const WindowCloseEvent &event)
+bool WindowsWindow::OnClose(const WindowCloseEvent &event)
 {
+	return false;
 }
 
 void WindowsWindow::SetupGLFWCallbacks()

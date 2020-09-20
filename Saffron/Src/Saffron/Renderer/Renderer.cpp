@@ -1,4 +1,4 @@
-﻿#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <glad/glad.h>
 
@@ -12,6 +12,7 @@ namespace Se
 {
 
 RendererAPI::Type RendererAPI::m_sCurrentAPI = Type::OpenGL;
+
 struct RendererData
 {
 	Ref<RenderPass> m_ActiveRenderPass;
@@ -23,30 +24,27 @@ struct RendererData
 	Ref<Pipeline> m_FullscreenQuadPipeline;
 };
 
-static RendererData sData;
+static RendererData s_Data;
 
 void Renderer::Init()
 {
-	sData.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
-	Submit([]() { RendererAPI::Init(); });
+	s_Data.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
+	Renderer::Submit([]() { RendererAPI::Init(); });
 
-	GetShaderLibrary()->Load("Assets/shaders/SaffronPBR_Static.glsl");
-	GetShaderLibrary()->Load("Assets/shaders/SaffronPBR_Anim.glsl");
+	GetShaderLibrary()->Load("Assets/Shaders/HazelPBR_Static.glsl");
+	GetShaderLibrary()->Load("Assets/Shaders/HazelPBR_Anim.glsl");
 
 	SceneRenderer::Init();
 
 	// Create fullscreen quad
-	const float x = -1;
-	const float y = -1;
-	const float width = 2;
-	const float height = 2;
+	const float x = -1, y = -1, width = 2, height = 2;
 	struct QuadVertex
 	{
 		glm::vec3 Position;
 		glm::vec2 TexCoord;
 	};
 
-	auto *data = new QuadVertex[4];
+	QuadVertex *data = new QuadVertex[4];
 
 	data[0].Position = glm::vec3(x, y, 0.1f);
 	data[0].TexCoord = glm::vec2(0, 0);
@@ -65,17 +63,18 @@ void Renderer::Init()
 		{ ShaderDataType::Float3, "a_Position" },
 		{ ShaderDataType::Float2, "a_TexCoord" }
 	};
-	sData.m_FullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
+	s_Data.m_FullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
 
-	sData.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+	s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
 	Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
-	sData.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+	s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
 
 	Renderer2D::Init();
 }
 
-void Renderer::Shutdown()
+void Renderer::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
 {
+	Submit([=]() { RendererAPI::DrawIndexed(count, type, depthTest); });
 }
 
 void Renderer::Clear()
@@ -92,8 +91,9 @@ void Renderer::SetClearColor(float r, float g, float b, float a)
 {
 }
 
-void Renderer::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
+void Renderer::SetLineThickness(float thickness)
 {
+	Submit([=]() { RendererAPI::SetLineThickness(thickness); });
 }
 
 void Renderer::ClearMagenta()
@@ -103,17 +103,12 @@ void Renderer::ClearMagenta()
 
 Ref<ShaderLibrary> Renderer::GetShaderLibrary()
 {
-	return sData.m_ShaderLibrary;
-}
-
-void Renderer::SetLineThickness(float thickness)
-{
-	Submit([=]() { RendererAPI::SetLineThickness(thickness); });
+	return s_Data.m_ShaderLibrary;
 }
 
 void Renderer::WaitAndRender()
 {
-	sData.m_CommandQueue.Execute();
+	s_Data.m_CommandQueue.Execute();
 }
 
 void Renderer::BeginRenderPass(Ref<RenderPass> renderPass, bool clear)
@@ -121,23 +116,21 @@ void Renderer::BeginRenderPass(Ref<RenderPass> renderPass, bool clear)
 	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
 
 	// TODO: Convert all of this into a render command buffer
-	sData.m_ActiveRenderPass = renderPass;
+	s_Data.m_ActiveRenderPass = renderPass;
 
 	renderPass->GetSpecification().TargetFramebuffer->Bind();
 	if ( clear )
 	{
 		const glm::vec4 &clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
-		Renderer::Submit([=]() {
-			RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
-						 });
+		Submit([=]() { RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a); });
 	}
 }
 
 void Renderer::EndRenderPass()
 {
-	SE_CORE_ASSERT(sData.m_ActiveRenderPass, "No active render pass! Have you called Renderer::EndRenderPass twice?");
-	sData.m_ActiveRenderPass->GetSpecification().TargetFramebuffer->Unbind();
-	sData.m_ActiveRenderPass = nullptr;
+	SE_CORE_ASSERT(s_Data.m_ActiveRenderPass, "No active render pass! Have you called Renderer::EndRenderPass twice?");
+	s_Data.m_ActiveRenderPass->GetSpecification().TargetFramebuffer->Unbind();
+	s_Data.m_ActiveRenderPass = nullptr;
 }
 
 void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform)
@@ -152,10 +145,10 @@ void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &trans
 		shader->SetMat4("u_Transform", transform);
 	}
 
-	sData.m_FullscreenQuadVertexBuffer->Bind();
-	sData.m_FullscreenQuadPipeline->Bind();
-	sData.m_FullscreenQuadIndexBuffer->Bind();
-	Renderer::DrawIndexed(6, PrimitiveType::Triangles, depthTest);
+	s_Data.m_FullscreenQuadVertexBuffer->Bind();
+	s_Data.m_FullscreenQuadPipeline->Bind();
+	s_Data.m_FullscreenQuadIndexBuffer->Bind();
+	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
 void Renderer::SubmitFullscreenQuad(Ref<MaterialInstance> material)
@@ -167,10 +160,10 @@ void Renderer::SubmitFullscreenQuad(Ref<MaterialInstance> material)
 		depthTest = material->GetFlag(Material::Flag::DepthTest);
 	}
 
-	sData.m_FullscreenQuadVertexBuffer->Bind();
-	sData.m_FullscreenQuadPipeline->Bind();
-	sData.m_FullscreenQuadIndexBuffer->Bind();
-	Renderer::DrawIndexed(6, PrimitiveType::Triangles, depthTest);
+	s_Data.m_FullscreenQuadVertexBuffer->Bind();
+	s_Data.m_FullscreenQuadPipeline->Bind();
+	s_Data.m_FullscreenQuadIndexBuffer->Bind();
+	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
 void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial)
@@ -182,7 +175,7 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 	mesh->m_Pipeline->Bind();
 	mesh->m_IndexBuffer->Bind();
 
-	auto materials = mesh->GetMaterials();
+	auto &materials = mesh->GetMaterials();
 	for ( Submesh &submesh : mesh->m_Submeshes )
 	{
 		// Material
@@ -200,21 +193,31 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 		}
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
 
-		Submit([submesh, material]() {
+		Renderer::Submit([submesh, material]() {
 			if ( material->GetFlag(Material::Flag::DepthTest) )
 				glEnable(GL_DEPTH_TEST);
 			else
 				glDisable(GL_DEPTH_TEST);
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
-			   });
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
+						 });
 	}
 }
 
-void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
+void Renderer::DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
 {
-	[[maybe_unused]] glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
-	[[maybe_unused]] glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
+	for ( Submesh &submesh : mesh->m_Submeshes )
+	{
+		auto &aabb = submesh.BoundingBox;
+		auto aabbTransform = transform * submesh.Transform;
+		DrawAABB(aabb, aabbTransform);
+	}
+}
+
+void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color /*= glm::vec4(1.0f)*/)
+{
+	glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
+	glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
 
 	glm::vec4 corners[8] =
 	{
@@ -239,19 +242,9 @@ void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm:
 		Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 
-void Renderer::DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
-{
-	for ( Submesh &submesh : mesh->m_Submeshes )
-	{
-		auto &aabb = submesh.BoundingBox;
-		auto aabbTransform = transform * submesh.Transform;
-		DrawAABB(aabb, aabbTransform);
-	}
-
-}
-
 RenderCommandQueue &Renderer::GetRenderCommandQueue()
 {
-	return sData.m_CommandQueue;
+	return s_Data.m_CommandQueue;
 }
+
 }

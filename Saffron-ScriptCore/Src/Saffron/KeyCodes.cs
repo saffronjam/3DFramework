@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     public enum KeyCode
     {

@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Platform/OpenGL/OpenGLIndexBuffer.h"
 #include "Saffron/Renderer/IndexBuffer.h"
@@ -8,7 +8,7 @@ namespace Se
 
 Ref<IndexBuffer> IndexBuffer::Create(Uint32 size)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL:	return Ref<OpenGLIndexBuffer>::Create(size);
@@ -18,7 +18,7 @@ Ref<IndexBuffer> IndexBuffer::Create(Uint32 size)
 
 Ref<IndexBuffer> IndexBuffer::Create(void *data, Uint32 size)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL:	return Ref<OpenGLIndexBuffer>::Create(data, size);
@@ -29,7 +29,7 @@ Ref<IndexBuffer> IndexBuffer::Create(void *data, Uint32 size)
 
 Ref<IndexBuffer> IndexBuffer::Create(const Buffer &buffer)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL:	return Ref<OpenGLIndexBuffer>::Create(buffer);

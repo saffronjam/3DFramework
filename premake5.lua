@@ -1,10 +1,21 @@
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+-- --------- Saffron Engine Project Generator ---------
+-- ----------------------------------------------------
+-- ----------------------------------------------------
+
+
+-- --------------------------------------
+-- Saffron Workspace
+-- --------------------------------------
+
 workspace "Saffron"
 	architecture "x64"
 	targetdir "build"
-
-	configurations
-	{
-		"Debug",
+	
+	configurations 
+	{ 
+		"Debug", 
 		"Release",
 		"Dist"
 	}
@@ -14,36 +25,35 @@ workspace "Saffron"
 		"MultiProcessorCompile"
 	}
 
-	startproject "Sandbox"
+	startproject "SaffronBun"
 	
-OutputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-BinDirectory = "Bin"
-IntDirectory = "Bin-Int"
+outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 -- Include directories relative to root folder (solution directory)
-IncludeDirs = {}
-IncludeDirs["assimp"] = "Saffron/Vendors/assimp/include"
-IncludeDirs["Box2D"] = "Saffron/Vendors/Box2D/include"
-IncludeDirs["entt"] = "Saffron/Vendors/entt/include"
-IncludeDirs["Glad"] = "Saffron/Vendors/Glad/include"
-IncludeDirs["GLFW"] = "Saffron/Vendors/GLFW/include"
-IncludeDirs["glm"] = "Saffron/Vendors/glm/include"
-IncludeDirs["ImGui"] = "Saffron/Vendors/ImGui"
-IncludeDirs["mono"] = "Saffron/Vendors/mono/include"
-IncludeDirs["spdlog"] = "Saffron/Vendors/spdlog/include"
-IncludeDirs["stb"] = "Saffron/Vendors/stb/include"
-IncludeDirs["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
+IncludeDir = {}
+IncludeDir["assimp"] = "Saffron/Vendors/assimp/include"
+IncludeDir["Box2D"] = "Saffron/Vendors/Box2D/include"
+IncludeDir["entt"] = "Saffron/Vendors/entt/include"
+IncludeDir["FastNoise"] = "Saffron/Vendors/FastNoise/include"
+IncludeDir["Glad"] = "Saffron/Vendors/Glad/include"
+IncludeDir["GLFW"] = "Saffron/Vendors/GLFW/include"
+IncludeDir["glm"] = "Saffron/Vendors/glm/include"
+IncludeDir["ImGui"] = "Saffron/Vendors/ImGui"
+IncludeDir["mono"] = "Saffron/Vendors/mono/include"
+IncludeDir["spdlog"] = "Saffron/Vendors/spdlog/include"
+IncludeDir["stb"] = "Saffron/Vendors/stb/include"
+IncludeDir["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
 
--- Library directories relative to root folder (solution directory)
-LibraryDirs = {}
-LibraryDirs["mono"] = "Vendors/mono/lib/Debug/mono-2.0-sgen.lib"
-LibraryDirs["assimp_deb"] = "Vendors/assimp/lib/Debug/assimp-vc141-mtd.lib"
-LibraryDirs["assimp_rel"] = "Vendors/assimp/lib/Release/assimp-vc141-mt.lib"
+LibraryDir = {}
+LibraryDir["mono"] = "Vendors/mono/lib/Debug/mono-2.0-sgen.lib"
+LibraryDir["assimp_deb"] = "Vendors/assimp/lib/Debug/assimp-vc141-mtd.lib"
+LibraryDir["assimp_rel"] = "Vendors/assimp/lib/Release/assimp-vc141-mt.lib"
 
-group "Vendors"
+group "Dependencies"
 	include "Saffron/Vendors/.Premake/assimp"
 	include "Saffron/Vendors/.Premake/Box2D"
 	include "Saffron/Vendors/.Premake/entt"
+	include "Saffron/Vendors/.Premake/FastNoise"
 	include "Saffron/Vendors/.Premake/Glad"
 	include "Saffron/Vendors/.Premake/GLFW"
 	include "Saffron/Vendors/.Premake/glm"
@@ -72,86 +82,92 @@ project "Saffron"
 	cppdialect "C++17"
 	staticruntime "On"
 
-	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-	
-	pchheader "Saffron/SaffronPCH.h"
-	pchsource "Saffron/Src/Saffron/SaffronPCH.cpp"
+	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
-	files
-	{
-		"%{prj.name}/Src/**.h",
+	pchheader "SaffronPCH.h"
+	pchsource "Saffron/Src/SaffronPCH.cpp"
+
+	files 
+	{ 
+		"%{prj.name}/Src/**.h", 
+		"%{prj.name}/Src/**.c", 
+		"%{prj.name}/Src/**.hpp", 
 		"%{prj.name}/Src/**.cpp"
 	}
 
 	includedirs
 	{
 		"%{prj.name}/Src",
-		"%{IncludeDirs.assimp}",
-		"%{IncludeDirs.Box2D}",
-		"%{IncludeDirs.entt}",
-		"%{IncludeDirs.GLFW}",
-		"%{IncludeDirs.Glad}",
-		"%{IncludeDirs.mono}",
-		"%{IncludeDirs.spdlog}",
-		"%{IncludeDirs.ImGui}",
-		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.stb}",
-		"%{IncludeDirs.yamlcpp}"
+		"%{IncludeDir.assimp}",
+		"%{IncludeDir.Box2D}",
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.FastNoise}",
+		"%{IncludeDir.GLFW}",
+		"%{IncludeDir.Glad}",
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.spdlog}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.stb}",
+		"%{IncludeDir.yamlcpp}"
 	}
-
-	links
-	{
+	
+	links 
+	{ 
 		"Box2D",
 		"Glad",
         "GLFW",
+		"FastNoise",
 		"ImGui",
 		"opengl32.lib",
-		"%{LibraryDirs.mono}",
-		"yaml-cpp"
+		"yaml-cpp",
+		"%{LibraryDir.mono}"
 	}
 
-	disablewarnings
-	{
-		"4251"
-	}
-	
 	filter "system:windows"
 		systemversion "latest"
-		defines "GLFW_INCLUDE_NONE"
+		
+		defines 
+		{ 
+			"SE_PLATFORM_WINDOWS",
+			"SE_BUILD_DLL"
+		}
 
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
 		symbols "On"
-		
-		links
-		{
-			"%{LibraryDirs.assimp_deb}"
-		}
-		
+			
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		optimize "On"
-		
-		links
-		{
-			"%{LibraryDirs.assimp_rel}"
-		}
-		
+
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		optimize "On"
-		
-		links
-		{
-			"%{LibraryDirs.assimp_rel}"
-		}
-group ""
-
 
 
 -- --------------------------------------
--- TOOLS
+-- Saffron ScriptCore
+-- --------------------------------------
+
+project "Saffron-ScriptCore"
+	location "Saffron-ScriptCore"
+	kind "SharedLib"
+	language "C#"
+
+	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
+
+	files 
+	{
+		"%{prj.name}/Src/**.cs", 
+	}
+group ""
+
+
+-- --------------------------------------
+-- Tools
 -- --------------------------------------
 
 group "Tools"
@@ -167,54 +183,55 @@ project "SaffronBun"
 	language "C++"
 	cppdialect "C++17"
 	staticruntime "On"
+	
+	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
-	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-
-	links
-	{
+	links 
+	{ 
 		"Saffron"
 	}
 	
-	files
-	{
+	files 
+	{ 
 		"%{prj.name}/Src/**.h", 
 		"%{prj.name}/Src/**.c", 
 		"%{prj.name}/Src/**.hpp", 
 		"%{prj.name}/Src/**.cpp" 
 	}
-
-	includedirs
+	
+	includedirs 
 	{
-		"%{prj.name}/Src", 
+		"%{prj.name}/Src",
 		"Saffron/Src",
 		"Saffron/Vendors",
-		"%{IncludeDirs.entt}",
-		"%{IncludeDirs.glm}",
-		"%{IncludeDirs.ImGui}",
-		"%{IncludeDirs.spdlog}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.FastNoise}",
+		"%{IncludeDir.glm}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.spdlog}"
 	}
-	
+
 	postbuildcommands 
 	{
 		'{COPY} "../SaffronBun/Assets" "%{cfg.targetdir}/Assets"'
 	}
-
+	
 	filter "system:windows"
 		systemversion "latest"
-
+				
 		defines 
 		{ 
 			"SE_PLATFORM_WINDOWS"
 		}
-		
+	
 	filter "configurations:Debug"
 		defines "SE_DEBUG"
 		symbols "On"
-		
+
 		links
 		{
-			"Saffron/%{LibraryDirs.assimp_deb}"
+			"Saffron/%{LibraryDir.assimp_deb}"
 		}
 
 		postbuildcommands 
@@ -222,58 +239,57 @@ project "SaffronBun"
 			'{COPY} "../Saffron/Vendors/assimp/bin/Debug/assimp-vc141-mtd.dll" "%{cfg.targetdir}"',
 			'{COPY} "../Saffron/Vendors/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
 		}
-
+				
 	filter "configurations:Release"
 		defines "SE_RELEASE"
 		optimize "On"
-		
+
 		links
 		{
-			"Saffron/%{LibraryDirs.assimp_rel}"
+			"Saffron/%{LibraryDir.assimp_rel}"
 		}
-		
+
 		postbuildcommands 
 		{
 			'{COPY} "../Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.dll" "%{cfg.targetdir}"',
-			'{COPY} "../Saffron/Vendors/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+			'{COPY} "../Saffron/Vendors/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
 		}
 
 	filter "configurations:Dist"
 		defines "SE_DIST"
 		optimize "On"
-		
+
 		links
 		{
-			"Saffron/%{LibraryDirs.assimp_rel}"
+			"Saffron/%{LibraryDir.assimp_rel}"
 		}
-		
+
 		postbuildcommands 
 		{
-			'{COPY} "../Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.dll" "%{cfg.targetdir}"',
-			'{COPY} "../Saffron/Vendors/mono/bin/Release/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
+			'{COPY} "../Saffron/Vendors/assimp/bin/Release/assimp-vc141-mtd.dll" "%{cfg.targetdir}"',
+			'{COPY} "../Saffron/Vendors/mono/bin/Debug/mono-2.0-sgen.dll" "%{cfg.targetdir}"'
 		}
 group ""
 
 
 -- --------------------------------------
--- Sandbox
+-- Sandbox Workspace
 -- --------------------------------------
 
-group "Sandbox"
--- workspace "Sandbox"
-	-- architecture "x64"
-	-- targetdir "build"
+workspace "Sandbox"
+	architecture "x64"
+	targetdir "build"
 	
-	-- configurations 
-	-- { 
-		-- "Debug", 
-		-- "Release",
-		-- "Dist"
-	-- }
+	configurations 
+	{ 
+		"Debug", 
+		"Release",
+		"Dist"
+	}
 
 
 -- --------------------------------------
--- Saffron ScriptCore
+-- Saffron-ScriptCore
 -- --------------------------------------
 
 project "Saffron-ScriptCore"
@@ -281,16 +297,13 @@ project "Saffron-ScriptCore"
 	kind "SharedLib"
 	language "C#"
 
-	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
 	files 
 	{
 		"%{prj.name}/Src/**.cs", 
 	}
-	
-	filter "configurations:Debug"
-		symbols "On"
 
 
 -- --------------------------------------
@@ -302,8 +315,8 @@ project "ExampleApp"
 	kind "SharedLib"
 	language "C#"
 
-	targetdir(BinDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
-	objdir(IntDirectory .. "/" .. OutputDirectory .. "/%{prj.name}")
+	targetdir ("SaffronBun/Assets/Scripts")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
 	files 
 	{
@@ -314,9 +327,72 @@ project "ExampleApp"
 	{
 		"Saffron-ScriptCore"
 	}
+
+		
+--[[project "Sandbox"
+	location "Sandbox"
+	kind "ConsoleApp"
+	language "C++"
+	cppdialect "C++17"
+	staticruntime "On"
+	
+	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
+
+	links 
+	{ 
+		"Saffron"
+	}
+	
+	files 
+	{ 
+		"%{prj.name}/Src/**.h", 
+		"%{prj.name}/Src/**.c", 
+		"%{prj.name}/Src/**.hpp", 
+		"%{prj.name}/Src/**.cpp" 
+	}
+	
+	includedirs 
+	{
+		"%{prj.name}/Src",
+		"Saffron/Src",
+		"Saffron/Vendors",
+		"%{IncludeDir.glm}"
+	}
+	
+	filter "system:windows"
+		systemversion "latest"
+				
+		defines 
+		{ 
+			"SE_PLATFORM_WINDOWS"
+		}
 	
 	filter "configurations:Debug"
+		defines "SE_DEBUG"
 		symbols "On"
+
+		links
+		{
+			"Saffron/Vendors/assimp/bin/Debug/assimp-vc141-mtd.lib"
+		}
+				
+	filter "configurations:Release"
+		defines "SE_RELEASE"
+		optimize "On"
+
+		links
+		{
+			"Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.lib"
+		}
+
+	filter "configurations:Dist"
+		defines "SE_DIST"
+		optimize "On"
+
+		links
+		{
+			"Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.lib"
+		}
+--]]
 group ""
-
-

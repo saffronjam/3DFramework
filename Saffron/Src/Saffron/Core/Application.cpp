@@ -1,75 +1,44 @@
-﻿#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
 #include <Commdlg.h>
 #include <Windows.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
 #include "Saffron/Core/Application.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Framebuffer.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
+namespace Se {
 
-namespace Se
-{
-
-Application *Application::m_sInstance = nullptr;
+Application *Application::s_Instance = nullptr;
 
 Application::Application(const Properties &properties)
 {
-	SE_ASSERT(!m_sInstance, "Application already exist");
-	m_sInstance = this;
+	SE_ASSERT(!s_Instance, "Application already exist");
+	s_Instance = this;
 
-	m_Window = Window::Create();
-
-	m_Window->SetEventCallback(SE_EVENT_FN(Application::OnEvent));
+	m_Window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
+	m_Window->SetEventCallback(SE_BIND_EVENT_FN(OnEvent));
 	m_Window->SetVSync(true);
 
-	m_ImGuiLayer = new ImGuiLayer;
-	PushLayer(m_ImGuiLayer);
+	m_GuiLayer = new GuiLayer("ImGui");
+	PushOverlay(m_GuiLayer);
 
-	ScriptEngine::Init("Assets/scripts/ExampleApp.dll");
+	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
+
 	Renderer::Init();
 	Renderer::WaitAndRender();
 
-	dt = m_AppTimer.Mark();
+	ts = Timer::GlobalMark();
 }
 
 Application::~Application()
 {
 	ScriptEngine::Shutdown();
-	delete m_ImGuiLayer;
-}
-
-
-void Application::Run()
-{
-	OnInit();
-	while ( m_Running )
-	{
-		if ( !m_Minimized )
-		{
-			for ( auto *layer : m_LayerStack )
-				layer->OnUpdate(dt);
-
-			// Render ImGui on render thread
-			Application *app = this;
-			Renderer::Submit([app]() { app->RenderImGui(); });
-
-			Renderer::WaitAndRender();
-		}
-		m_Window->OnUpdate();
-
-		dt = m_AppTimer.Mark();
-	}
-	OnShutdown();
-}
-
-void Application::Close()
-{
 }
 
 void Application::PushLayer(Layer *layer)
@@ -84,44 +53,67 @@ void Application::PushOverlay(Layer *layer)
 	layer->OnAttach();
 }
 
-void Application::RenderImGui()
+void Application::RenderGui()
 {
-	m_ImGuiLayer->Begin();
+	m_GuiLayer->Begin();
 
 	ImGui::Begin("Renderer");
 	auto &caps = RendererAPI::GetCapabilities();
 	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
 	ImGui::Text("Renderer: %s", caps.Renderer.c_str());
 	ImGui::Text("Version: %s", caps.Version.c_str());
-	ImGui::Text("Frame Time: %.2fms\n", dt.ms());
+	ImGui::Text("Frame Time: %.2fms\n", ts.ms());
 	ImGui::End();
 
 	for ( Layer *layer : m_LayerStack )
 		layer->OnImGuiRender();
 
-	m_ImGuiLayer->End();
+	m_GuiLayer->End();
 }
 
-const char *Application::GetConfigurationName()
+void Application::Run()
 {
-#if defined(SE_DEBUG)
-	return "Debug";
-#elif defined(SE_RELEASE)
-	return "Release";
-#elif defined(SE_DIST)
-	return "Dist";
-#else
-#error Undefined configuration?
-#endif
+	OnInit();
+	while ( m_Running )
+	{
+		m_Window->HandleBufferedEvents();
+		if ( !m_Minimized )
+		{
+			for ( Layer *layer : m_LayerStack )
+				layer->OnUpdate(ts);
+
+			// Render ImGui on render thread
+			Application *app = this;
+			Renderer::Submit([app]() { app->RenderGui(); });
+
+			Renderer::WaitAndRender();
+		}
+		m_Window->OnUpdate();
+
+		ts = Timer::GlobalMark();
+	}
+	OnShutdown();
 }
 
-const char *Application::GetPlatformName()
+void Application::OnEvent(const Event &event)
 {
-#if defined(SE_PLATFORM_WINDOWS)
-	return "Windows x64";
-#else
-#error Undefined platform?
-#endif
+	const EventDispatcher dispatcher(event);
+	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(OnWindowClose));
+
+	m_Window->OnEvent(event);
+
+	for ( auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
+	{
+		if ( event.Handled )
+			break;
+		(*--it)->OnEvent(event);
+	}
+}
+
+bool Application::OnWindowClose(const WindowCloseEvent &event)
+{
+	m_Running = false;
+	return true;
 }
 
 std::string Application::OpenFile(const char *filter) const
@@ -168,61 +160,31 @@ std::string Application::SaveFile(const char *filter) const
 	return std::string();
 }
 
-void Application::OnEvent(const Event &event)
+float Application::GetTime() const
 {
-	SE_PROFILE_FUNCTION();
-
-	// TODO: Optimize this if event is handled?
-
-	// Application events
-	const EventDispatcher dispatcher(event);
-	dispatcher.Try<WindowCloseEvent>(SE_EVENT_FN(Application::OnWindowClose));
-	dispatcher.Try<WindowResizeEvent>(SE_EVENT_FN(Application::OnWindowResize));
-
-	// Window events
-	m_Window->OnEvent(event);
-
-	// Keyboard events
-	m_Keyboard.OnEvent(event);
-
-	// Mouse events
-	m_Mouse.OnEvent(event);
-
-	// Layer events
-	for ( auto &layer : m_LayerStack )
-	{
-		layer->OnEvent(event);
-	}
+	return static_cast<float>(glfwGetTime());
 }
 
-Ref<Window> &Application::GetWindow()
+const char *Application::GetConfigurationName()
 {
-	return m_Window;
+#if defined(SE_DEBUG)
+	return "Debug";
+#elif defined(SE_RELEASE)
+	return "Release";
+#elif defined(SE_DIST)
+	return "Dist";
+#else
+#error Undefined configuration?
+#endif
 }
 
-const Ref<Window> &Application::GetWindow() const
+const char *Application::GetPlatformName()
 {
-	return m_Window;
-}
-
-void Application::OnWindowClose(const WindowCloseEvent &event)
-{
-	m_Running = false;
-}
-
-void Application::OnWindowResize(const WindowResizeEvent &event)
-{
-	const int width = event.GetWidth(), height = event.GetHeight();
-	if ( width == 0 || height == 0 )
-	{
-		m_Minimized = true;
-		return;
-	}
-	m_Minimized = false;
-	Renderer::Submit([=]() { glViewport(0, 0, width, height); });
-	auto &fbs = FramebufferPool::GetGlobal()->GetAll();
-	for ( auto &fb : fbs )
-		fb->Resize(width, height);
+#if defined(SE_PLATFORM_WINDOWS)
+	return "Windows x64";
+#else
+#error Undefined platform?
+#endif
 }
 
 }

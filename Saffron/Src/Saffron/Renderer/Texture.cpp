@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <string>
 
@@ -30,7 +30,7 @@ Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
 
 Ref<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wrap wrap)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL:	return Ref<OpenGLTexture2D>::Create(format, width, height, wrap);
@@ -40,7 +40,7 @@ Ref<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wra
 
 Ref<Texture2D> Texture2D::Create(const std::string &path, bool sRGB)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL:	return Ref<OpenGLTexture2D>::Create(path, sRGB);
@@ -50,7 +50,7 @@ Ref<Texture2D> Texture2D::Create(const std::string &path, bool sRGB)
 
 Ref<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL: return Ref<OpenGLTextureCube>::Create(format, width, height);
@@ -60,7 +60,7 @@ Ref<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
 
 Ref<TextureCube> TextureCube::Create(const std::string &path)
 {
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL: return Ref<OpenGLTextureCube>::Create(path);

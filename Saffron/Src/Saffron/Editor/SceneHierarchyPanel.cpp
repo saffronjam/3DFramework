@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <assimp/scene.h>
 
@@ -6,7 +6,7 @@
 #include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
-#include "Saffron/System/SaffronMath.h"
+#include "Saffron/Core/Math/SaffronMath.h"
 
 
 namespace Se

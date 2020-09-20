@@ -1,14 +1,11 @@
 #pragma once
 
+#include "Saffron/Core/Events/MouseEvent.h"
+#include "Saffron/Core/Events/WindowEvent.h"
+#include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Core/Time.h"
+#include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Camera.h"
-#include "Saffron/System/Time.h"
-
-#include "Saffron/Input/Keyboard.h"
-#include "Saffron/Input/Mouse.h"
-
-#include "Saffron/Core/Event/MouseEvent.h"
-#include "Saffron/Core/Event/WindowEvent.h"
-#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {
@@ -19,8 +16,8 @@ public:
 	explicit EditorCamera(const glm::mat4 &projectionMatrix);
 
 	void Focus();
-	void OnUpdate(const Keyboard &keyboard, const Mouse &mouse, Time ts);
-	void OnEvent(const Event &event);
+	void OnUpdate(Time ts);
+	bool OnEvent(const Event &event);
 
 	float GetDistance() const { return m_Distance; }
 
@@ -45,12 +42,13 @@ public:
 private:
 	void UpdateCameraView();
 
-	void OnMouseScroll(const MouseScrollEvent &event);
-	void OnMousePan(const glm::vec2 &delta);
-	void OnMouseRotate(const glm::vec2 &delta);
-	void OnMouseZoom(float delta);
+	bool OnMouseScroll(const MouseScrollEvent &event);
 
-	glm::vec3 CalculatePosition();
+	void MousePan(const glm::vec2 &delta);
+	void MouseRotate(const glm::vec2 &delta);
+	void MouseZoom(float delta);
+
+	glm::vec3 CalculatePosition() const;
 
 	glm::vec2 GetPanSpeed() const;
 	float GetRotationSpeed() const;

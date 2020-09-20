@@ -3,9 +3,9 @@
 #include <string>
 #include <unordered_map>
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
-#include "Saffron/System/SaffronMath.h"
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/ShaderUniform.h"
 

@@ -6,14 +6,14 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct Matrix4
     {
-        [FieldOffset(0)] public float D00;
-        [FieldOffset(4)] public float D10;
-        [FieldOffset(8)] public float D20;
+        [FieldOffset( 0)] public float D00;
+        [FieldOffset( 4)] public float D10;
+        [FieldOffset( 8)] public float D20;
         [FieldOffset(12)] public float D30;
         [FieldOffset(16)] public float D01;
         [FieldOffset(20)] public float D11;
@@ -37,7 +37,7 @@ namespace Saffron
         }
 
         public Vector3 Translation
-        {
+        { 
             get { return new Vector3(D03, D13, D23); }
             set { D03 = value.X; D13 = value.Y; D23 = value.Z; }
         }

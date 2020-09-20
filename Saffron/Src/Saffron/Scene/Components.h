@@ -3,7 +3,6 @@
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/SceneCamera.h"
-#include "Saffron/System/SaffronMath.h"
 
 namespace Se
 {

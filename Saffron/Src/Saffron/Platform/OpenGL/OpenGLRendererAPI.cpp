@@ -1,4 +1,4 @@
-﻿#include "Saffron/SaffronPCH.h"
+﻿#include "SaffronPCH.h"
 
 #include <glad/glad.h>
 
@@ -18,10 +18,10 @@ void OpenGLMessageCallback(
 {
 	switch ( severity )
 	{
-	case GL_DEBUG_SEVERITY_HIGH:			SE_CORE_CRITICAL("[OpenGL Debug HIGH] {0}", message); return;
-	case GL_DEBUG_SEVERITY_MEDIUM:			SE_CORE_ERROR("[OpenGL Debug MEDIUM] {0}", message); return;
-	case GL_DEBUG_SEVERITY_LOW:				SE_CORE_WARN("[OpenGL Debug LOW] {0}", message); return;
-	case GL_DEBUG_SEVERITY_NOTIFICATION:	SE_CORE_TRACE("[OpenGL Debug NOTIFICATION] {0}", message); return;
+	case GL_DEBUG_SEVERITY_HIGH:			SE_CORE_ERROR("[OpenGL Debug HIGH] {0}", message); return;
+	case GL_DEBUG_SEVERITY_MEDIUM:			SE_CORE_WARN("[OpenGL Debug MEDIUM] {0}", message); return;
+	case GL_DEBUG_SEVERITY_LOW:				SE_CORE_TRACE("[OpenGL Debug LOW] {0}", message); return;
+	case GL_DEBUG_SEVERITY_NOTIFICATION:	SE_CORE_INFO("[OpenGL Debug NOTIFICATION] {0}", message); return;
 	default:								SE_CORE_ASSERT(false, "Unknown severity level!");
 	}
 }

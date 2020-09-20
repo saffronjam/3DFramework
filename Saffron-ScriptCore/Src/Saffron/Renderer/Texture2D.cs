@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Saffron
+namespace Se
 {
     public class Texture2D
     {
@@ -34,6 +34,6 @@ namespace Saffron
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void SetData_Native(IntPtr unmanagedInstance, Vector4[] data, int size);
 
-
+        
     }
 }

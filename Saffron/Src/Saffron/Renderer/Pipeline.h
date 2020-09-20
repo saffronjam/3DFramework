@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Saffron/Core/Ref.h"
-
+#include "Saffron/Base.h"
 #include "Saffron/Renderer/VertexBuffer.h"
 #include "Saffron/Renderer/Shader.h"
 

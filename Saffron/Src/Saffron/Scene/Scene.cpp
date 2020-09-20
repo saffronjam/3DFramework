@@ -1,8 +1,6 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <box2d/box2d.h>
-
-#include <utility>
 
 #include "Saffron/Renderer/SceneRenderer.h"
 #include "Saffron/Scene/Components.h"
@@ -10,12 +8,6 @@
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
-
-// TODO: Make this function work
-void b2Body::SetUserData(void *data)
-{
-	SE_ASSERT(false, "DO NOT USE THIS FUNCTION");
-}
 
 namespace Se
 {
@@ -113,8 +105,8 @@ class ContactListener : public b2ContactListener
 public:
 	void BeginContact(b2Contact *contact) override
 	{
-		Entity &a = *reinterpret_cast<Entity *>(&contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *reinterpret_cast<Entity *>(&contact->GetFixtureB()->GetBody()->GetUserData());
+		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
+		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
 
 		// TODO: improve these if checks
 		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )
@@ -127,8 +119,8 @@ public:
 	/// Called when two fixtures cease to touch.
 	void EndContact(b2Contact *contact) override
 	{
-		Entity &a = *reinterpret_cast<Entity *>(&contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *reinterpret_cast<Entity *>(&contact->GetFixtureB()->GetBody()->GetUserData());
+		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
+		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
 
 		// TODO: improve these if checks
 		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )

@@ -1,7 +1,7 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include "Saffron/Core/UUID.h"
-#include "Saffron/System/Random.h"
+#include "Saffron/Core/Math/Random.h"
 
 namespace Se
 {

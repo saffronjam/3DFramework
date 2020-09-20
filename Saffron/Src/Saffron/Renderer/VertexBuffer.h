@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
 #include "Saffron/Renderer/RendererAPI.h"
 

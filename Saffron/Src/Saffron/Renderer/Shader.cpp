@@ -1,4 +1,4 @@
-﻿#include "Saffron/SaffronPCH.h"
+﻿#include "SaffronPCH.h"
 
 #include "Saffron/Renderer/Shader.h"
 #include "Saffron/Platform/OpenGL/OpenGLShader.h"
@@ -12,7 +12,7 @@ Ref<Shader> Shader::Create(const std::string &filepath)
 {
 	Ref<Shader> result = nullptr;
 
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath); break;
@@ -28,7 +28,7 @@ Ref<Shader> Shader::CreateFromString(const std::string &source)
 {
 	Ref<Shader> result = nullptr;
 
-	switch ( RendererAPI::CurrentAPI() )
+	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	case RendererAPI::Type::OpenGL: result = OpenGLShader::CreateFromString(source); break;

@@ -1,13 +1,13 @@
 #pragma once
 
+#include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Core/Time.h"
 #include "Saffron/Core/Math/AABB.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/IndexBuffer.h"
 #include "Saffron/Renderer/Pipeline.h"
 #include "Saffron/Renderer/Shader.h"
 #include "Saffron/Renderer/VertexBuffer.h"
-#include "Saffron/System/SaffronMath.h"
-#include "Saffron/System/Time.h"
 
 struct aiNode;
 struct aiAnimation;
@@ -18,7 +18,6 @@ namespace Assimp
 {
 class Importer;
 }
-
 
 namespace Se
 {
@@ -43,11 +42,11 @@ struct Vertex
 
 struct AnimatedVertex
 {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec3 Tangent;
-	glm::vec3 Binormal;
-	glm::vec2 TexCoord;
+	glm::vec3 Position{};
+	glm::vec3 Normal{};
+	glm::vec3 Tangent{};
+	glm::vec3 Binormal{};
+	glm::vec2 TexCoord{};
 
 	Uint32 IDs[4] = { 0, 0,0, 0 };
 	float Weights[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -69,6 +68,11 @@ struct Index
 
 static_assert(sizeof(Index) == 3 * sizeof(Uint32));
 
+
+////////////////////////////////////////////////////////////////////////
+/// Bone Info
+////////////////////////////////////////////////////////////////////////
+
 struct BoneInfo
 {
 	glm::mat4 BoneOffset;
@@ -85,15 +89,10 @@ struct VertexBoneData
 	Uint32 IDs[4]{};
 	float Weights[4]{};
 
-	VertexBoneData();;
+	VertexBoneData();
 
 	void AddBoneData(Uint32 BoneID, float Weight);
 };
-
-
-////////////////////////////////////////////////////////////////////////
-/// Triangle
-////////////////////////////////////////////////////////////////////////
 
 struct Triangle
 {
@@ -105,36 +104,25 @@ struct Triangle
 	}
 };
 
-
-////////////////////////////////////////////////////////////////////////
-/// Submesh
-////////////////////////////////////////////////////////////////////////
-
 class Submesh
 {
 public:
-	Uint32 BaseVertex;
-	Uint32 BaseIndex;
-	Uint32 MaterialIndex;
-	Uint32 IndexCount;
+	Uint32 BaseVertex{};
+	Uint32 BaseIndex{};
+	Uint32 MaterialIndex{};
+	Uint32 IndexCount{};
 
-	glm::mat4 Transform;
+	glm::mat4 Transform{};
 	AABB BoundingBox;
 
 	std::string NodeName, MeshName;
 };
 
-
-
-////////////////////////////////////////////////////////////////////////
-/// Mesh
-////////////////////////////////////////////////////////////////////////
-
 class Mesh : public RefCounted
 {
 public:
 	Mesh(const std::string &filename);
-	~Mesh() = default;
+	~Mesh();
 
 	void OnUpdate(Time ts);
 	void DumpVertexBuffer();
@@ -142,9 +130,9 @@ public:
 	std::vector<Submesh> &GetSubmeshes() { return m_Submeshes; }
 	const std::vector<Submesh> &GetSubmeshes() const { return m_Submeshes; }
 
-	Ref<Shader> GetMeshShader() { return m_MeshShader; }
-	Ref<Material> GetMaterial() { return m_BaseMaterial; }
-	std::vector<Ref<MaterialInstance>> GetMaterials() { return m_Materials; }
+	Ref<Shader> GetMeshShader() const { return m_MeshShader; }
+	Ref<Material> GetMaterial() const { return m_BaseMaterial; }
+	std::vector<Ref<MaterialInstance>> GetMaterials() const { return m_Materials; }
 	const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
 	const std::string &GetFilePath() const { return m_FilePath; }
 
@@ -204,4 +192,3 @@ private:
 	friend class SceneHierarchyPanel;
 };
 }
-

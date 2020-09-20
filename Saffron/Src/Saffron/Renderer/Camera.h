@@ -1,6 +1,6 @@
-﻿#pragma once
+#pragma once
 
-#include "Saffron/System/SaffronMath.h"
+#include "Saffron/Core/Math/SaffronMath.h"
 
 namespace Se
 {

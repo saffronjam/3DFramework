@@ -1,4 +1,4 @@
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <glad/glad.h>
 
@@ -80,18 +80,18 @@ void SceneRenderer::Init()
 	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
 	sData.CompositePass = RenderPass::Create(compRenderPassSpec);
 
-	sData.CompositeShader = Shader::Create("Assets/shaders/SceneComposite.glsl");
-	sData.BRDFLUT = Texture2D::Create("Assets/textures/BRDF_LUT.tga");
+	sData.CompositeShader = Shader::Create("Assets/Shaders/SceneComposite.glsl");
+	sData.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
 
 	// Grid
-	const auto gridShader = Shader::Create("Assets/shaders/Grid.glsl");
+	const auto gridShader = Shader::Create("Assets/Shaders/Grid.glsl");
 	sData.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
 	const float gridScale = 16.025, gridSize = 0.025f;
 	sData.GridMaterial->Set("u_Scale", gridScale);
 	sData.GridMaterial->Set("u_Res", gridSize);
 
 	// Outline
-	const auto outlineShader = Shader::Create("Assets/shaders/Outline.glsl");
+	const auto outlineShader = Shader::Create("Assets/Shaders/Outline.glsl");
 	sData.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
 	sData.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
 }
@@ -142,7 +142,7 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 
 	Ref<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 	if ( !equirectangularConversionShader )
-		equirectangularConversionShader = Shader::Create("Assets/shaders/EquirectangularToCubeMap.glsl");
+		equirectangularConversionShader = Shader::Create("Assets/Shaders/EquirectangularToCubeMap.glsl");
 	Ref<Texture2D> envEquirect = Texture2D::Create(filepath);
 	SE_CORE_ASSERT(envEquirect->GetFormat() == Texture::Format::Float16, "Texture is not HDR!");
 
@@ -157,7 +157,7 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 
 
 	if ( !envFilteringShader )
-		envFilteringShader = Shader::Create("Assets/shaders/EnvironmentMipFilter.glsl");
+		envFilteringShader = Shader::Create("Assets/Shaders/EnvironmentMipFilter.glsl");
 
 	Ref<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 
@@ -183,7 +183,7 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 					 });
 
 	if ( !envIrradianceShader )
-		envIrradianceShader = Shader::Create("Assets/shaders/EnvironmentIrradiance.glsl");
+		envIrradianceShader = Shader::Create("Assets/Shaders/EnvironmentIrradiance.glsl");
 
 	Ref<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
 	envIrradianceShader->Bind();

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 #include "Saffron/Renderer/PrimitiveType.h"
 
 namespace Se
@@ -39,7 +39,7 @@ public:
 	static void SetLineThickness(float thickness);
 	static void SetClearColor(float r, float g, float b, float a);
 
-	static Type CurrentAPI() { return m_sCurrentAPI; }
+	static Type Current() { return m_sCurrentAPI; }
 
 private:
 	static void LoadRequiredAssets();
