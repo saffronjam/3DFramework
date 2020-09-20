@@ -1,8 +1,8 @@
 #pragma once
 
-#include <mutex>
+#include "SaffronPCH.h"
 
-namespace Saffron
+namespace Se
 {
 class NormalLock
 {
@@ -10,7 +10,7 @@ public:
 	void Lock();
 	void Unlock();
 
-	bool TryLock()noexcept;
+	bool TryLock();
 
 private:
 	std::mutex m_mutex;

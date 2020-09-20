@@ -1,6 +1,7 @@
-#include "NormalLock.h"
+#include "SaffronPCH.h"
+#include "Saffron/System/NormalLock.h"
 
-namespace Saffron
+namespace Se
 {
 void NormalLock::Lock()
 {
@@ -12,7 +13,7 @@ void NormalLock::Unlock()
 	m_mutex.unlock();
 }
 
-bool NormalLock::TryLock() noexcept
+bool NormalLock::TryLock() 
 {
 	return m_mutex.try_lock();
 }

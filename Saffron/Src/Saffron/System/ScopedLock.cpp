@@ -1,6 +1,7 @@
-#include "ScopedLock.h"
+#include "SaffronPCH.h"
+#include "Saffron/System/ScopedLock.h"
 
-namespace Saffron
+namespace Se
 {
 ScopedLock::ScopedLock(std::mutex &mutex)
 	: m_mutex(mutex)

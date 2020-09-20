@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 
-#include "Saffron/SaffronPCH.h"
+#include "SaffronPCH.h"
 
-namespace Saffron
+namespace Se
 {
 enum class ButtonCode
 {
@@ -28,15 +28,15 @@ inline std::ostream &operator<<(std::ostream &os, ButtonCode buttonCode)
 }
 }
 
-#define SE_MOUSE_BUTTON_0      ::Saffron::MouseCode::Button0
-#define SE_MOUSE_BUTTON_1      ::Saffron::MouseCode::Button1
-#define SE_MOUSE_BUTTON_2      ::Saffron::MouseCode::Button2
-#define SE_MOUSE_BUTTON_3      ::Saffron::MouseCode::Button3
-#define SE_MOUSE_BUTTON_4      ::Saffron::MouseCode::Button4
-#define SE_MOUSE_BUTTON_5      ::Saffron::MouseCode::Button5
-#define SE_MOUSE_BUTTON_6      ::Saffron::MouseCode::Button6
-#define SE_MOUSE_BUTTON_7      ::Saffron::MouseCode::Button7
-#define SE_MOUSE_BUTTON_LAST   ::Saffron::MouseCode::ButtonLast
-#define SE_MOUSE_BUTTON_LEFT   ::Saffron::MouseCode::ButtonLeft
-#define SE_MOUSE_BUTTON_RIGHT  ::Saffron::MouseCode::ButtonRight
-#define SE_MOUSE_BUTTON_MIDDLE ::Saffron::MouseCode::ButtonMiddle
+#define SE_BUTTON_0      ::Se::ButtonCode::0
+#define SE_BUTTON_1      ::Se::ButtonCode::1
+#define SE_BUTTON_2      ::Se::ButtonCode::2
+#define SE_BUTTON_3      ::Se::ButtonCode::3
+#define SE_BUTTON_4      ::Se::ButtonCode::4
+#define SE_BUTTON_5      ::Se::ButtonCode::5
+#define SE_BUTTON_6      ::Se::ButtonCode::6
+#define SE_BUTTON_7      ::Se::ButtonCode::7
+#define SE_BUTTON_LAST   ::Se::ButtonCode::Last
+#define SE_BUTTON_LEFT   ::Se::ButtonCode::Left
+#define SE_BUTTON_RIGHT  ::Se::ButtonCode::Right
+#define SE_BUTTON_MIDDLE ::Se::ButtonCode::Middle
