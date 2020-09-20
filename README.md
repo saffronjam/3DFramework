@@ -1,2 +1,1 @@
-# Hazel-dev
-Hazel Engine private development repository.
+# Saffron Engine
