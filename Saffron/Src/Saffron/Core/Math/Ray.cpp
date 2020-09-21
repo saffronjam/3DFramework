@@ -22,12 +22,12 @@ bool Ray::IntersectsAABB(const AABB &aabb, float &t) const
 	// r.org is origin of ray
 	const glm::vec3 &lb = aabb.Min;
 	const glm::vec3 &rt = aabb.Max;
-	float t1 = (lb.x - Origin.x) * dirfrac.x;
-	float t2 = (rt.x - Origin.x) * dirfrac.x;
-	float t3 = (lb.y - Origin.y) * dirfrac.y;
-	float t4 = (rt.y - Origin.y) * dirfrac.y;
-	float t5 = (lb.z - Origin.z) * dirfrac.z;
-	float t6 = (rt.z - Origin.z) * dirfrac.z;
+	const float t1 = (lb.x - Origin.x) * dirfrac.x;
+	const float t2 = (rt.x - Origin.x) * dirfrac.x;
+	const float t3 = (lb.y - Origin.y) * dirfrac.y;
+	const float t4 = (rt.y - Origin.y) * dirfrac.y;
+	const float t5 = (lb.z - Origin.z) * dirfrac.z;
+	const float t6 = (rt.z - Origin.z) * dirfrac.z;
 
 	const auto tmin = glm::max<float>(glm::max<float>(glm::min<float>(t1, t2), glm::min<float>(t3, t4)),
 									  glm::min<float>(t5, t6));
@@ -54,16 +54,16 @@ bool Ray::IntersectsAABB(const AABB &aabb, float &t) const
 
 bool Ray::IntersectsTriangle(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C, float &t) const
 {
-	glm::vec3 E1 = B - A;
-	glm::vec3 E2 = C - A;
-	glm::vec3 N = cross(E1, E2);
-	float det = -glm::dot(Direction, N);
-	float invdet = 1.0 / det;
-	glm::vec3 AO = Origin - A;
-	glm::vec3 DAO = glm::cross(AO, Direction);
-	float u = glm::dot(E2, DAO) * invdet;
-	float v = -glm::dot(E1, DAO) * invdet;
+	const glm::vec3 E1 = B - A;
+	const glm::vec3 E2 = C - A;
+	const glm::vec3 N = cross(E1, E2);
+	const float det = -glm::dot(Direction, N);
+	const float invdet = 1.0f / det;
+	const glm::vec3 AO = Origin - A;
+	const glm::vec3 DAO = glm::cross(AO, Direction);
+	const float u = glm::dot(E2, DAO) * invdet;
+	const float v = -glm::dot(E1, DAO) * invdet;
 	t = glm::dot(AO, N) * invdet;
-	return (det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0);
+	return (det >= 1e-6f && t >= 0.0f && u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f);
 }
 }

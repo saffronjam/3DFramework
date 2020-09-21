@@ -61,7 +61,7 @@ private:
 	Buffer m_PSUniformStorageBuffer;
 	std::vector<Ref<Texture>> m_Textures;
 
-	Uint32 m_MaterialFlags;
+	Uint32 m_MaterialFlags{};
 };
 
 template <typename T>

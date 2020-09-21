@@ -20,7 +20,7 @@ public:
 	};
 public:
 	EditorLayer();
-	virtual ~EditorLayer();
+	virtual ~EditorLayer() = default;
 
 	void OnAttach() override;
 	void OnDetach() override;

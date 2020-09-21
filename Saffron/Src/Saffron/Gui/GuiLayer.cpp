@@ -6,20 +6,40 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Gui/GuiLayer.h"
 #include "Saffron/Gui/ImGuiImpl.h"
-#include "Saffron/Renderer/Renderer.h"
 
-namespace Se {
-
-GuiLayer::GuiLayer()
-= default;
+namespace Se
+{
 
 GuiLayer::GuiLayer(const std::string &name)
 {
-
 }
 
-GuiLayer::~GuiLayer()
-= default;
+void GuiLayer::Begin()
+{
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGuizmo::BeginFrame();
+}
+
+void GuiLayer::End()
+{
+	ImGuiIO &io = ImGui::GetIO();
+	Application &app = Application::Get();
+	io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow().GetWidth()), static_cast<float>(app.GetWindow().GetHeight()));
+
+	// Rendering
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+	{
+		GLFWwindow *backup_current_context = glfwGetCurrentContext();
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+		glfwMakeContextCurrent(backup_current_context);
+	}
+}
 
 void GuiLayer::OnAttach()
 {
@@ -34,7 +54,7 @@ void GuiLayer::OnAttach()
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-	ImFont *pFont = io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
+	[[maybe_unused]] ImFont *pFont = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\segoeui.ttf)", 18.0f);
 	io.FontDefault = io.Fonts->Fonts.back();
 
 	// Setup Dear ImGui style
@@ -51,7 +71,7 @@ void GuiLayer::OnAttach()
 	style.Colors[ImGuiCol_WindowBg] = ImVec4(0.15f, 0.15f, 0.15f, style.Colors[ImGuiCol_WindowBg].w);
 
 	Application &app = Application::Get();
-	GLFWwindow *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
+	auto *window = static_cast<GLFWwindow *>(app.GetWindow().GetNativeWindow());
 
 	// Setup Platform/Renderer bindings
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
@@ -63,33 +83,6 @@ void GuiLayer::OnDetach()
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
-}
-
-void GuiLayer::Begin()
-{
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-	ImGuizmo::BeginFrame();
-}
-
-void GuiLayer::End()
-{
-	ImGuiIO &io = ImGui::GetIO();
-	Application &app = Application::Get();
-	io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
-
-	// Rendering
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	if ( io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
-	{
-		GLFWwindow *backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
 }
 
 void GuiLayer::OnImGuiRender()

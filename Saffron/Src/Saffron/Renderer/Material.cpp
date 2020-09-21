@@ -11,7 +11,7 @@ namespace Se {
 Material::Material(const Ref<Shader> &shader)
 	: m_Shader(shader)
 {
-	m_Shader->AddShaderReloadedCallback(std::bind(&Material::OnShaderReloaded, this));
+	m_Shader->AddShaderReloadedCallback([this] { OnShaderReloaded(); });
 	AllocateStorage();
 
 	m_MaterialFlags |= static_cast<Uint32>(Flag::DepthTest);
@@ -84,11 +84,12 @@ void Material::OnShaderReloaded()
 
 void Material::BindTextures()
 {
-	for ( size_t i = 0; i < m_Textures.size(); i++ )
+	Uint32 TextureIndex = 0;
+	for ( auto &texture : m_Textures )
 	{
-		auto &texture = m_Textures[i];
 		if ( texture )
-			texture->Bind(i);
+			texture->Bind(TextureIndex);
+		TextureIndex++;
 	}
 }
 
@@ -170,11 +171,13 @@ void MaterialInstance::Bind()
 		m_Material->m_Shader->SetPSMaterialUniformBuffer(m_PSUniformStorageBuffer);
 
 	m_Material->BindTextures();
-	for ( size_t i = 0; i < m_Textures.size(); i++ )
+
+	Uint32 TextureIndex = 0;
+	for ( auto &texture : m_Textures )
 	{
-		const auto &texture = m_Textures[i];
 		if ( texture )
-			texture->Bind(i);
+			texture->Bind(TextureIndex);
+		TextureIndex++;
 	}
 }
 

@@ -8,9 +8,9 @@ namespace Se {
 class GuiLayer : public Layer
 {
 public:
-	GuiLayer();
-	GuiLayer(const std::string &name);
-	virtual ~GuiLayer();
+	GuiLayer() = default;
+	explicit GuiLayer(const std::string &name);
+	virtual ~GuiLayer() = default;
 
 	void Begin();
 	void End();
@@ -18,8 +18,6 @@ public:
 	void OnAttach() override;
 	void OnDetach() override;
 	void OnImGuiRender() override;
-private:
-	float m_Time = 0.0f;
 };
 
 }
