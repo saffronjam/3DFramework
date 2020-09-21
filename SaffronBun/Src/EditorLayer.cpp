@@ -9,8 +9,8 @@
 #include "Saffron/System/Macros.h"
 
 
-namespace Se {
-
+namespace Se
+{
 static void ImGuiShowHelpMarker(const char *desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -151,11 +151,11 @@ float EditorLayer::GetSnapValue() const
 {
 	switch ( m_GizmoType )
 	{
-	case  ImGuizmo::OPERATION::TRANSLATE: return 0.5f;
-	case  ImGuizmo::OPERATION::ROTATE: return 45.0f;
-	case  ImGuizmo::OPERATION::SCALE: return 0.5f;
+	case  ImGuizmo::OPERATION::TRANSLATE:	return 0.5f;
+	case  ImGuizmo::OPERATION::ROTATE:		return 45.0f;
+	case  ImGuizmo::OPERATION::SCALE:		return 0.5f;
+	default:								return 0.0f;
 	}
-	return 0.0f;
 }
 
 void EditorLayer::OnUpdate(Time ts)
@@ -307,7 +307,7 @@ bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min,
 
 	const std::string id = "##" + name;
 	bool changed = false;
-	if ( (int)flags & (int)PropertyFlag::ColorProperty )
+	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
 		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
 	else if ( flags == PropertyFlag::SliderProperty )
 		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
@@ -333,7 +333,7 @@ bool EditorLayer::Property(const std::string &name, glm::vec4 &value, float min,
 
 	const std::string id = "##" + name;
 	bool changed = false;
-	if ( (int)flags & (int)PropertyFlag::ColorProperty )
+	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
 		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
 	else if ( flags == PropertyFlag::SliderProperty )
 		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
@@ -593,12 +593,12 @@ void EditorLayer::OnImGuiRender()
 
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
-	SceneRenderer::SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
-	m_EditorScene->SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	SceneRenderer::SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
+	m_EditorScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	if ( m_RuntimeScene )
-		m_RuntimeScene->SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+		m_RuntimeScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 10000.0f));
-	m_EditorCamera.SetViewportSize((uint32_t)viewportSize.x, (uint32_t)viewportSize.y);
+	m_EditorCamera.SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	ImGui::Image((void *)SceneRenderer::GetFinalColorBufferRendererID(), viewportSize, { 0, 1 }, { 1, 0 });
 
 	static int counter = 0;
@@ -617,8 +617,8 @@ void EditorLayer::OnImGuiRender()
 	{
 		auto &selection = m_SelectionContext[0];
 
-		float rw = (float)ImGui::GetWindowWidth();
-		float rh = (float)ImGui::GetWindowHeight();
+		float rw = static_cast<float>(ImGui::GetWindowWidth());
+		float rh = static_cast<float>(ImGui::GetWindowHeight());
 		ImGuizmo::SetOrthographic(false);
 		ImGuizmo::SetDrawlist();
 		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, rw, rh);
@@ -632,7 +632,7 @@ void EditorLayer::OnImGuiRender()
 		{
 			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
 								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 (ImGuizmo::OPERATION)m_GizmoType,
+								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
 								 ImGuizmo::LOCAL,
 								 glm::value_ptr(entityTransform),
 								 nullptr,
@@ -643,7 +643,7 @@ void EditorLayer::OnImGuiRender()
 			glm::mat4 transformBase = entityTransform * selection.Mesh->Transform;
 			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
 								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 (ImGuizmo::OPERATION)m_GizmoType,
+								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
 								 ImGuizmo::LOCAL,
 								 glm::value_ptr(transformBase),
 								 nullptr,
@@ -709,7 +709,7 @@ void EditorLayer::OnImGuiRender()
 					auto &materialInstance = materials[i];
 
 					ImGuiTreeNodeFlags node_flags = (selectedMaterialIndex == i ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_Leaf;
-					bool opened = ImGui::TreeNodeEx((void *)(&materialInstance), node_flags, materialInstance->GetName().c_str());
+					bool opened = ImGui::TreeNodeEx(static_cast<void *>(&materialInstance), node_flags, materialInstance->GetName().c_str());
 					if ( ImGui::IsItemClicked() )
 					{
 						selectedMaterialIndex = i;

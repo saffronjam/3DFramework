@@ -2,21 +2,14 @@
 
 #include "Saffron.h"
 
-#include "Saffron/Gui/GuiLayer.h"
-#include "Saffron/Editor/EditorCamera.h"
-#include "imgui/imgui_internal.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
 #include <string>
 
+#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Editor/SceneHierarchyPanel.h"
+#include "Saffron/Gui/GuiLayer.h"
 
-namespace Se {
+namespace Se
+{
 
 class EditorLayer : public Layer
 {
@@ -29,12 +22,12 @@ public:
 	EditorLayer();
 	virtual ~EditorLayer();
 
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-	virtual void OnUpdate(Time ts) override;
+	void OnAttach() override;
+	void OnDetach() override;
+	void OnUpdate(Time ts) override;
 
-	virtual void OnImGuiRender() override;
-	virtual void OnEvent(const Event &event) override;
+	void OnImGuiRender() override;
+	void OnEvent(const Event &event) override;
 	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
 	bool OnMouseButtonPressed(const MousePressEvent &event);
 
@@ -60,7 +53,7 @@ private:
 
 	struct SelectedSubmesh
 	{
-		Se::Entity Entity;
+		Entity Entity;
 		Submesh *Mesh = nullptr;
 		float Distance = 0.0f;
 	};
