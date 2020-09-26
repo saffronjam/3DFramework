@@ -25,6 +25,7 @@ public:
 	virtual ~Application();
 
 	void Run();
+	void Exit();
 
 	virtual void OnInit() {}
 	virtual void OnShutdown() {}
@@ -35,8 +36,8 @@ public:
 	void PushOverlay(Layer *layer);
 	void RenderGui();
 
-	std::string OpenFile(const char *filter = "All\0*.*\0") const;
-	std::string SaveFile(const char *filter = "All\0*.*\0") const;
+	std::filesystem::path OpenFile(const char *filter = "All\0*.*\0") const;
+	std::filesystem::path SaveFile(const char *filter = "All\0*.*\0") const;
 
 	Window &GetWindow() { return *m_Window; }
 	static Application &Get() { return *s_Instance; }

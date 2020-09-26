@@ -19,6 +19,8 @@ public:
 	void OnUpdate(Time ts);
 	bool OnEvent(const Event &event);
 
+	void Reset();
+
 	float GetDistance() const { return m_Distance; }
 
 	const glm::mat4 &GetViewMatrix() const { return m_ViewMatrix; }

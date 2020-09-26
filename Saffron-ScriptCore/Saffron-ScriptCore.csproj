@@ -20,7 +20,8 @@
     <OutputPath>..\Bin\Debug-windows-x86_64\Saffron-ScriptCore\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Debug-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,7 +32,8 @@
     <OutputPath>..\Bin\Release-windows-x86_64\Saffron-ScriptCore\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Release-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -42,7 +44,8 @@
     <OutputPath>..\Bin\Dist-windows-x86_64\Saffron-ScriptCore\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Dist-windows-x86_64\Saffron-ScriptCore\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -63,7 +66,6 @@
     <Compile Include="Src\Saffron\Renderer\MeshFactory.cs" />
     <Compile Include="Src\Saffron\Renderer\Texture2D.cs" />
     <Compile Include="Src\Saffron\Scene\Component.cs" />
-    <Compile Include="Src\Saffron\SpriteRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

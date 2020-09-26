@@ -177,8 +177,8 @@ Environment Environment::Load(const std::string &filepath)
 /// Scene
 ///////////////////////////////////////////////////////////////////////////
 
-Scene::Scene(std::string debugName)
-	: m_DebugName(std::move(debugName))
+Scene::Scene(std::string name)
+	: m_Name(std::move(name))
 {
 	m_Registry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
 	m_Registry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
@@ -255,8 +255,8 @@ void Scene::OnUpdate(Time ts)
 void Scene::OnRenderRuntime(Time ts)
 {
 	/////////////////////////////////////////////////////////////////////
-		// RENDER 3D SCENE
-		/////////////////////////////////////////////////////////////////////
+	// RENDER 3D SCENE
+	/////////////////////////////////////////////////////////////////////
 	Entity cameraEntity = GetMainCameraEntity();
 	if ( !cameraEntity )
 		return;
@@ -596,6 +596,16 @@ float Scene::GetPhysics2DGravity() const
 	return m_Registry.get<Box2DWorldComponent>(m_SceneEntity).World->GetGravity().y;
 }
 
+void Scene::SetName(std::string name)
+{
+	m_Name = std::move(name);
+}
+
+void Scene::SetLight(const Light &light)
+{
+	m_Light = light;
+}
+
 void Scene::SetViewportSize(Uint32 width, Uint32 height)
 {
 	m_ViewportWidth = width;
@@ -619,4 +629,5 @@ void Scene::SetPhysics2DGravity(float gravity)
 	m_Registry.get<Box2DWorldComponent>(m_SceneEntity).World->SetGravity({ 0.0f, gravity });
 
 }
+
 }

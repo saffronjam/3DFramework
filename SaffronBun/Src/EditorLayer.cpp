@@ -37,7 +37,7 @@ static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(con
 EditorLayer::EditorLayer()
 	:
 	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)),
-	m_SceneType(SceneType::Model), m_ViewportBounds{}
+	m_SceneType(Scene::Type::Model), m_ViewportBounds{}
 {
 }
 
@@ -88,33 +88,39 @@ void EditorLayer::OnAttach()
 	colors[ImGuiCol_NavHighlight] = ImVec4(0.60f, 0.6f, 0.6f, 1.0f);
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.0f, 1.0f, 1.0f, 0.7f);
 
-	using namespace glm;
-
-
 	// Editor
 	m_CheckerboardTex = Texture2D::Create("Assets/Editor/Checkerboard.tga");
 	m_PlayButtonTex = Texture2D::Create("Assets/Editor/PlayButton.png");
 
-	m_EditorScene = Ref<Scene>::Create();
-	UpdateWindowTitle("Untitled Scene");
-	ScriptEngine::SetSceneContext(m_EditorScene);
 	m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_EditorScene);
 	m_SceneHierarchyPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
 	m_SceneHierarchyPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
 
-	SceneSerializer serializer(m_EditorScene);
-	serializer.Deserialize("Assets/Scenes/Levels/Physics2D-Game.hsc");
+	LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc");
+
+	ScriptEngine::SetSceneContext(m_EditorScene);
 }
 
 void EditorLayer::OnDetach()
 {
 }
 
+void EditorLayer::OnSceneChange()
+{
+	if ( m_SceneState == Scene::State::Play )
+	{
+		OnSceneStop();
+	}
+	m_EditorCamera.Reset();
+	m_EditorScene->SetSelectedEntity({});
+	m_SelectionContext.clear();
+}
+
 void EditorLayer::OnScenePlay()
 {
 	m_SelectionContext.clear();
 
-	m_SceneState = SceneState::Play;
+	m_SceneState = Scene::State::Play;
 
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
@@ -129,7 +135,7 @@ void EditorLayer::OnScenePlay()
 void EditorLayer::OnSceneStop()
 {
 	m_RuntimeScene->OnRuntimeStop();
-	m_SceneState = SceneState::Edit;
+	m_SceneState = Scene::State::Edit;
 
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
@@ -160,7 +166,7 @@ void EditorLayer::OnUpdate(Time ts)
 {
 	switch ( m_SceneState )
 	{
-	case SceneState::Edit:
+	case Scene::State::Edit:
 	{
 		//if (m_ViewportPanelFocused)
 		m_EditorCamera.OnUpdate(ts);
@@ -214,7 +220,7 @@ void EditorLayer::OnUpdate(Time ts)
 
 		break;
 	}
-	case SceneState::Play:
+	case Scene::State::Play:
 	{
 		if ( m_ViewportPanelFocused )
 			m_EditorCamera.OnUpdate(ts);
@@ -223,7 +229,7 @@ void EditorLayer::OnUpdate(Time ts)
 		m_RuntimeScene->OnRenderRuntime(ts);
 		break;
 	}
-	case SceneState::Pause:
+	case Scene::State::Pause:
 	{
 		if ( m_ViewportPanelFocused )
 			m_EditorCamera.OnUpdate(ts);
@@ -364,18 +370,78 @@ void EditorLayer::SelectEntity(Entity entity)
 	m_EditorScene->SetSelectedEntity(entity);
 }
 
-void EditorLayer::OpenScene()
+void EditorLayer::NewScenePrompt()
 {
 	auto &app = Application::Get();
-	const std::string filepath = app.OpenFile("Hazel Scene (*.hsc)\0*.hsc\0");
+	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+
 	if ( !filepath.empty() )
+	{
+		std::string sceneName = filepath.stem().string();
+		Ref<Scene> newScene = Ref<Scene>::Create(sceneName);
+
+		// Default construct environment and light
+		// TODO: Prompt user with templates instead?
+		newScene->SetEnvironment(Environment::Load("Assets/Env/birchwood_4k.hdr"));
+		const Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
+		newScene->SetLight(light);
+
+		m_EditorScene = newScene;
+		UpdateWindowTitle(sceneName);
+		m_SceneHierarchyPanel->SetContext(m_EditorScene);
+		ScriptEngine::SetSceneContext(m_EditorScene);
+
+		m_SceneFilePath = filepath;
+
+		SaveActiveScene();
+		OnSceneChange();
+	}
+}
+
+void EditorLayer::OpenScenePrompt()
+{
+	auto &app = Application::Get();
+	const std::filesystem::path filepath = app.OpenFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	if ( !filepath.empty() )
+	{
+		LoadNewScene(filepath.string());
+	}
+}
+
+void EditorLayer::SaveSceneAsPrompt()
+{
+	auto &app = Application::Get();
+	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	if ( !filepath.empty() )
+	{
+		m_SceneFilePath = filepath;
+		SaveActiveScene();
+		UpdateWindowTitle(m_EditorScene->GetName());
+
+	}
+}
+
+void EditorLayer::SaveActiveScene() const
+{
+	SceneSerializer serializer(m_EditorScene);
+	serializer.Serialize(m_SceneFilePath.string());
+}
+
+void EditorLayer::LoadNewScene(const std::string &filepath)
+{
+	if ( filepath != m_SceneFilePath.string() )
 	{
 		const Ref<Scene> newScene = Ref<Scene>::Create();
 		SceneSerializer serializer(newScene);
-		serializer.Deserialize(filepath);
+		if ( !serializer.Deserialize(filepath) )
+		{
+			SE_WARN("Failed to load scene! Filepath: {0}", filepath);
+			return;
+		}
+
 		m_EditorScene = newScene;
-		const std::filesystem::path path = filepath;
-		UpdateWindowTitle(path.filename().string());
+
+		UpdateWindowTitle(m_EditorScene->GetName());
 		m_SceneHierarchyPanel->SetContext(m_EditorScene);
 		ScriptEngine::SetSceneContext(m_EditorScene);
 
@@ -383,27 +449,13 @@ void EditorLayer::OpenScene()
 		m_SelectionContext.clear();
 
 		m_SceneFilePath = filepath;
+
+		SaveActiveScene();
+		OnSceneChange();
 	}
-}
-
-void EditorLayer::SaveScene() const
-{
-	SceneSerializer serializer(m_EditorScene);
-	serializer.Serialize(m_SceneFilePath);
-}
-
-void EditorLayer::SaveSceneAs()
-{
-	auto &app = Application::Get();
-	const std::string filepath = app.SaveFile("Hazel Scene (*.hsc)\0*.hsc\0");
-	if ( !filepath.empty() )
+	else
 	{
-		SceneSerializer serializer(m_EditorScene);
-		serializer.Serialize(filepath);
-
-		const std::filesystem::path path = filepath;
-		UpdateWindowTitle(path.filename().string());
-		m_SceneFilePath = filepath;
+		SE_INFO("Tried to load a scene that was already active");
 	}
 }
 
@@ -455,9 +507,9 @@ void EditorLayer::OnImGuiRender()
 
 	if ( ImGui::Button("Load Environment Map") )
 	{
-		std::string filename = Application::Get().OpenFile("*.hdr");
-		if ( !filename.empty() )
-			m_EditorScene->SetEnvironment(Environment::Load(filename));
+		std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
+		if ( !filepath.empty() )
+			m_EditorScene->SetEnvironment(Environment::Load(filepath.string()));
 	}
 
 	ImGui::SliderFloat("Skybox LOD", &m_EditorScene->GetSkyboxLod(), 0.0f, 11.0f);
@@ -475,7 +527,7 @@ void EditorLayer::OnImGuiRender()
 	Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, PropertyFlag::SliderProperty);
 
-	if ( m_SceneState == SceneState::Edit )
+	if ( m_SceneState == Scene::State::Edit )
 	{
 		float physics2DGravity = m_EditorScene->GetPhysics2DGravity();
 		if ( Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, PropertyFlag::DragProperty) )
@@ -483,7 +535,7 @@ void EditorLayer::OnImGuiRender()
 			m_EditorScene->SetPhysics2DGravity(physics2DGravity);
 		}
 	}
-	else if ( m_SceneState == SceneState::Play )
+	else if ( m_SceneState == Scene::State::Play )
 	{
 		float physics2DGravity = m_RuntimeScene->GetPhysics2DGravity();
 		if ( Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, PropertyFlag::DragProperty) )
@@ -556,14 +608,14 @@ void EditorLayer::OnImGuiRender()
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 0.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 	ImGui::Begin("Toolbar");
-	if ( m_SceneState == SceneState::Edit )
+	if ( m_SceneState == Scene::State::Edit )
 	{
 		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(0.9f, 0.9f, 0.9f, 1.0f)) )
 		{
 			OnScenePlay();
 		}
 	}
-	else if ( m_SceneState == SceneState::Play )
+	else if ( m_SceneState == Scene::State::Play )
 	{
 		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(1.0f, 1.0f, 1.0f, 0.2f)) )
 		{
@@ -658,20 +710,21 @@ void EditorLayer::OnImGuiRender()
 		if ( ImGui::BeginMenu("File") )
 		{
 			if ( ImGui::MenuItem("New Scene", "Ctrl-N") )
-			{
-				// TODO:
-			}
+				NewScenePrompt();
 			if ( ImGui::MenuItem("Open Scene...", "Ctrl+O") )
-				OpenScene();
+				OpenScenePrompt();
 			ImGui::Separator();
 			if ( ImGui::MenuItem("Save Scene", "Ctrl+S") )
-				SaveScene();
+				SaveActiveScene();
 			if ( ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S") )
-				SaveSceneAs();
+				SaveSceneAsPrompt();
 
 			ImGui::Separator();
 			if ( ImGui::MenuItem("Exit") )
+			{
 				p_open = false;
+				Application::Get().Exit();
+			}
 			ImGui::EndMenu();
 		}
 
@@ -748,10 +801,10 @@ void EditorLayer::OnImGuiRender()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									std::string filename = Application::Get().OpenFile("");
-									if ( !filename.empty() )
+									std::filesystem::path filepath = Application::Get().OpenFile("");
+									if ( !filepath.empty() )
 									{
-										albedoMap = Texture2D::Create(filename, true/*m_AlbedoInput.sRGB*/);
+										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
 										materialInstance->Set("u_AlbedoTexture", albedoMap);
 									}
 								}
@@ -793,10 +846,10 @@ void EditorLayer::OnImGuiRender()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									std::string filename = Application::Get().OpenFile("");
-									if ( !filename.empty() )
+									std::filesystem::path filepath = Application::Get().OpenFile("");
+									if ( !filepath.empty() )
 									{
-										normalMap = Texture2D::Create(filename);
+										normalMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_NormalTexture", normalMap);
 									}
 								}
@@ -829,10 +882,10 @@ void EditorLayer::OnImGuiRender()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									std::string filename = Application::Get().OpenFile("");
-									if ( !filename.empty() )
+									std::filesystem::path filepath = Application::Get().OpenFile("");
+									if ( !filepath.empty() )
 									{
-										metalnessMap = Texture2D::Create(filename);
+										metalnessMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_MetalnessTexture", metalnessMap);
 									}
 								}
@@ -867,10 +920,10 @@ void EditorLayer::OnImGuiRender()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									std::string filename = Application::Get().OpenFile("");
-									if ( !filename.empty() )
+									std::filesystem::path filepath = Application::Get().OpenFile("");
+									if ( !filepath.empty() )
 									{
-										roughnessMap = Texture2D::Create(filename);
+										roughnessMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_RoughnessTexture", roughnessMap);
 									}
 								}
@@ -896,14 +949,14 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::OnEvent(const Event &event)
 {
-	if ( m_SceneState == SceneState::Edit )
+	if ( m_SceneState == Scene::State::Edit )
 	{
 		if ( m_ViewportPanelMouseOver )
 			m_EditorCamera.OnEvent(event);
 
 		m_EditorScene->OnEvent(event);
 	}
-	else if ( m_SceneState == SceneState::Play )
+	else if ( m_SceneState == Scene::State::Play )
 	{
 		m_RuntimeScene->OnEvent(event);
 	}
@@ -911,6 +964,7 @@ void EditorLayer::OnEvent(const Event &event)
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<KeyboardPressEvent>(SE_BIND_EVENT_FN(EditorLayer::OnKeyboardPressEvent));
 	dispatcher.Try<MousePressEvent>(SE_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
+	dispatcher.Try<WindowDropFilesEvent>(SE_BIND_EVENT_FN(EditorLayer::OnWindowDropFiles));
 }
 
 bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
@@ -967,10 +1021,10 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 			SceneRenderer::GetOptions().ShowGrid = !SceneRenderer::GetOptions().ShowGrid;
 			break;
 		case KeyCode::O:
-			OpenScene();
+			OpenScenePrompt();
 			break;
 		case KeyCode::S:
-			SaveScene();
+			SaveActiveScene();
 			break;
 		default:
 			break;
@@ -981,7 +1035,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 			switch ( event.GetKey() )
 			{
 			case KeyCode::S:
-				SaveSceneAs();
+				SaveSceneAsPrompt();
 				break;
 			default:
 				break;
@@ -994,7 +1048,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 
 bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
-	if ( event.GetButton() == SE_BUTTON_LEFT && !Input::IsKeyPressed(SE_KEY_LEFT_ALT) && !ImGuizmo::IsOver() && m_SceneState != SceneState::Play )
+	if ( event.GetButton() == SE_BUTTON_LEFT && !Input::IsKeyPressed(SE_KEY_LEFT_ALT) && !ImGuizmo::IsOver() && m_SceneState != Scene::State::Play )
 	{
 		const auto MousePosition = GetMouseViewportSpace();
 		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
@@ -1041,6 +1095,30 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 			if ( !m_SelectionContext.empty() )
 				OnSelected(m_SelectionContext[0]);
 
+		}
+	}
+	return false;
+}
+
+bool EditorLayer::OnWindowDropFiles(const WindowDropFilesEvent &event)
+{
+	const auto &paths = event.GetPaths();
+
+	// If user dropped a scene in window
+	if ( m_SceneState == Scene::State::Edit && paths.size() == 1 )
+	{
+		const auto &scenePath = paths.front();
+		if ( scenePath.extension() == ".ssc" )
+		{
+			if ( scenePath != m_SceneFilePath )
+			{
+				SaveActiveScene();
+				LoadNewScene(scenePath.string());
+			}
+			else
+			{
+				SE_INFO("Tried to load a scene that was already active");
+			}
 		}
 	}
 	return false;

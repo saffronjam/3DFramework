@@ -627,9 +627,9 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 									 ImGui::NextColumn();
 									 if ( ImGui::Button("...##openmesh") )
 									 {
-										 std::string file = Application::Get().OpenFile();
-										 if ( !file.empty() )
-											 mc.Mesh = Ref<Mesh>::Create(file);
+										 const std::filesystem::path filepath = Application::Get().OpenFile();
+										 if ( !filepath.empty() )
+											 mc.Mesh = Ref<Mesh>::Create(filepath.string());
 									 }
 								 });
 

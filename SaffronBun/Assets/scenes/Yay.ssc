@@ -1,0 +1,9 @@
+Scene: Yay
+Environment:
+  AssetPath: Assets/Env/birchwood_4k.hdr
+  Light:
+    Direction: [-0.5, -0.5, 1]
+    Radiance: [1, 1, 1]
+    Multiplier: 1
+Entities:
+  []

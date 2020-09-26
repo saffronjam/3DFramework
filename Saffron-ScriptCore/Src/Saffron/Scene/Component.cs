@@ -84,7 +84,7 @@ namespace Se
 
     public class CameraComponent : Component
     {
-       // TODO
+        // TODO
     }
 
     public class ScriptComponent : Component

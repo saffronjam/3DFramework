@@ -7,16 +7,7 @@ namespace Se
 EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
 	: Camera(projectionMatrix)
 {
-	m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
-	m_FocalPoint = glm::vec3(0.0f);
-
-	glm::vec3 position = { -5, 5, 5 };
-	m_Distance = glm::distance(position, m_FocalPoint);
-
-	m_Yaw = 3.0f * Math::PI / 4.0f;
-	m_Pitch = Math::PI / 4.0f;
-
-	UpdateCameraView();
+	Reset();
 }
 
 void EditorCamera::Focus()
@@ -47,6 +38,20 @@ bool EditorCamera::OnEvent(const Event &event)
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
 	return false;
+}
+
+void EditorCamera::Reset()
+{
+	m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
+	m_FocalPoint = glm::vec3(0.0f);
+
+	glm::vec3 position = { -5, 5, 5 };
+	m_Distance = glm::distance(position, m_FocalPoint);
+
+	m_Yaw = 3.0f * Math::PI / 4.0f;
+	m_Pitch = Math::PI / 4.0f;
+
+	UpdateCameraView();
 }
 
 glm::vec3 EditorCamera::GetUpDirection() const

@@ -13,7 +13,7 @@
 namespace Se
 {
 
-static bool sGLFWInitialized = false;
+static bool s_GLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char *description)
 {
@@ -31,12 +31,12 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	ScopedLock lock(mutex);
 
 	// Initialize GLFW
-	if ( !sGLFWInitialized )
+	if ( !s_GLFWInitialized )
 	{
 		const int success = glfwInit();
 		SE_CORE_ASSERT(success, "Failed to initialize GLFW");
 		glfwSetErrorCallback(GLFWErrorCallback);
-		sGLFWInitialized = true;
+		s_GLFWInitialized = true;
 	}
 
 	// Create GLFW Window
@@ -263,5 +263,15 @@ void WindowsWindow::SetupGLFWCallbacks()
 								   auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
 								   pWnd->PushEvent<WindowCloseEvent>();
 							   });
+	glfwSetDropCallback(m_NativeWindow, [](GLFWwindow *window, int count, const char **paths)
+						{
+							auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
+							std::vector<std::filesystem::path> filepaths(count);
+							for ( int i = 0; i < count; i++ )
+							{
+								filepaths[i] = paths[i];
+							}
+							pWnd->PushEvent<WindowDropFilesEvent>(filepaths);
+						});
 }
 }

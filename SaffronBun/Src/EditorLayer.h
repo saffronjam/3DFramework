@@ -30,6 +30,7 @@ public:
 	void OnEvent(const Event &event) override;
 	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
 	bool OnMouseButtonPressed(const MousePressEvent &event);
+	bool OnWindowDropFiles(const WindowDropFilesEvent &event);
 
 	// ImGui UI helpers
 	bool Property(const std::string &name, bool &value);
@@ -44,9 +45,12 @@ public:
 	void ShowBoundingBoxes(bool show, bool onTop = false);
 	void SelectEntity(Entity entity);
 
-	void OpenScene();
-	void SaveScene() const;
-	void SaveSceneAs();
+	void NewScenePrompt();
+	void OpenScenePrompt();
+	void SaveSceneAsPrompt();
+
+	void SaveActiveScene() const;
+	void LoadNewScene(const std::string &filepath);
 private:
 	glm::vec2 GetMouseViewportSpace() const;
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
@@ -62,6 +66,7 @@ private:
 	void OnEntityDeleted(Entity e);
 	Ray CastMouseRay() const;
 
+	void OnSceneChange();
 	void OnScenePlay();
 	void OnSceneStop();
 
@@ -72,7 +77,7 @@ private:
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
-	std::string m_SceneFilePath;
+	std::filesystem::path m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorCamera m_EditorCamera;
@@ -121,11 +126,6 @@ private:
 
 	float m_EnvMapRotation = 0.0f;
 
-	enum class SceneType : uint32_t
-	{
-		Spheres = 0, Model = 1
-	};
-	SceneType m_SceneType;
 
 	// Editor resources
 	Ref<Texture2D> m_CheckerboardTex;
@@ -144,11 +144,8 @@ private:
 	bool m_ViewportPanelMouseOver = false;
 	bool m_ViewportPanelFocused = false;
 
-	enum class SceneState
-	{
-		Edit = 0, Play = 1, Pause = 2
-	};
-	SceneState m_SceneState = SceneState::Edit;
+	Scene::Type m_SceneType;
+	Scene::State m_SceneState = Scene::State::Edit;
 
 	enum class SelectionMode
 	{

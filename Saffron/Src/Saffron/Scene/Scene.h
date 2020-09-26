@@ -36,7 +36,18 @@ using EntityMap = std::unordered_map<UUID, Entity>;
 class Scene : public RefCounted
 {
 public:
-	Scene(std::string debugName = "Scene");
+	enum class Type : Uint32
+	{
+		Spheres = 0, Model = 1
+	};
+
+	enum class State
+	{
+		Edit = 0, Play = 1, Pause = 2
+	};
+
+public:
+	Scene(std::string name = "Scene");
 	~Scene();
 
 	void Init();
@@ -63,6 +74,7 @@ public:
 
 	void CopyTo(Ref<Scene> &target);
 
+	const std::string &GetName() const { return m_Name; }
 	Light &GetLight() { return m_Light; }
 	const Light &GetLight() const { return m_Light; }
 	Entity GetMainCameraEntity();
@@ -71,6 +83,8 @@ public:
 	static Ref<Scene> GetScene(UUID uuid);
 	float GetPhysics2DGravity() const;
 
+	void SetName(std::string name);
+	void SetLight(const Light &light);
 	void SetViewportSize(Uint32 width, Uint32 height);
 	void SetEnvironment(const Environment &environment);
 	const Environment &GetEnvironment() const { return m_Environment; }
@@ -84,7 +98,7 @@ private:
 	entt::entity m_SceneEntity;
 	entt::registry m_Registry;
 
-	std::string m_DebugName;
+	std::string m_Name;
 	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	EntityMap m_EntityIDMap;
@@ -96,7 +110,7 @@ private:
 	Ref<TextureCube> m_SkyboxTexture;
 	Ref<MaterialInstance> m_SkyboxMaterial;
 
-	entt::entity m_SelectedEntity;
+	entt::entity m_SelectedEntity{};
 
 	Entity *m_PhysicsBodyEntityBuffer = nullptr;
 
