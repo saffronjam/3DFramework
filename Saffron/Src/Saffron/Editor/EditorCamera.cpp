@@ -10,10 +10,6 @@ EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
 	Reset();
 }
 
-void EditorCamera::Focus()
-{
-}
-
 void EditorCamera::OnUpdate(Time ts)
 {
 
@@ -97,7 +93,7 @@ void EditorCamera::Reset()
 	m_Rotation = glm::vec3(90.0f, 0.0f, 0.0f);
 	m_FocalPoint = glm::vec3(0.0f);
 
-	glm::vec3 position = { -5, 5, 5 };
+	const glm::vec3 position = { -5, 5, 5 };
 	m_Distance = glm::distance(position, m_FocalPoint);
 
 	m_Yaw = 3.0f * Math::PI / 4.0f;
@@ -106,35 +102,7 @@ void EditorCamera::Reset()
 	UpdateCameraView();
 }
 
-glm::vec3 EditorCamera::GetUpDirection() const
-{
-	return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
-}
 
-glm::vec3 EditorCamera::GetRightDirection() const
-{
-	return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
-}
-
-glm::vec3 EditorCamera::GetForwardDirection() const
-{
-	return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
-}
-
-glm::quat EditorCamera::GetOrientation() const
-{
-	return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
-}
-
-void EditorCamera::UpdateCameraView()
-{
-	m_Position = CalculatePosition();
-
-	const glm::quat orientation = GetOrientation();
-	m_Rotation = glm::eulerAngles(orientation) * (180.0f / Math::PI);
-	m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
-	m_ViewMatrix = glm::inverse(m_ViewMatrix);
-}
 
 bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 {
@@ -166,11 +134,6 @@ void EditorCamera::MouseZoom(float delta)
 		m_FocalPoint += GetForwardDirection();
 		m_Distance = 1.0f;
 	}
-}
-
-glm::vec3 EditorCamera::CalculatePosition() const
-{
-	return m_FocalPoint - GetForwardDirection() * m_Distance;
 }
 
 glm::vec2 EditorCamera::GetPanSpeed() const

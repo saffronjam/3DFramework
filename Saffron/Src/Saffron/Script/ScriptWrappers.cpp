@@ -42,7 +42,7 @@ bool Saffron_Input_IsKeyPressed(KeyCode key)
 // Entity //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-void Saffron_Entity_GetTransform(uint64_t entityID, glm::mat4 *outTransform)
+void Saffron_Entity_GetTransform(Uint64 entityID, glm::mat4 *outTransform)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -54,7 +54,7 @@ void Saffron_Entity_GetTransform(uint64_t entityID, glm::mat4 *outTransform)
 	memcpy(outTransform, glm::value_ptr(transformComponent.Transform), sizeof(glm::mat4));
 }
 
-void Saffron_Entity_SetTransform(uint64_t entityID, glm::mat4 *inTransform)
+void Saffron_Entity_SetTransform(Uint64 entityID, glm::mat4 *inTransform)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -66,7 +66,7 @@ void Saffron_Entity_SetTransform(uint64_t entityID, glm::mat4 *inTransform)
 	memcpy(glm::value_ptr(transformComponent.Transform), inTransform, sizeof(glm::mat4));
 }
 
-void Saffron_Entity_CreateComponent(uint64_t entityID, void *type)
+void Saffron_Entity_CreateComponent(Uint64 entityID, void *type)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -78,7 +78,7 @@ void Saffron_Entity_CreateComponent(uint64_t entityID, void *type)
 	s_CreateComponentFuncs[monoType](entity);
 }
 
-bool Saffron_Entity_HasComponent(uint64_t entityID, void *type)
+bool Saffron_Entity_HasComponent(Uint64 entityID, void *type)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -91,7 +91,7 @@ bool Saffron_Entity_HasComponent(uint64_t entityID, void *type)
 	return result;
 }
 
-uint64_t Saffron_Entity_FindEntityByTag(MonoString *tag)
+Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -103,7 +103,7 @@ uint64_t Saffron_Entity_FindEntityByTag(MonoString *tag)
 	return 0;
 }
 
-void *Saffron_MeshComponent_GetMesh(uint64_t entityID)
+void *Saffron_MeshComponent_GetMesh(Uint64 entityID)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -115,7 +115,7 @@ void *Saffron_MeshComponent_GetMesh(uint64_t entityID)
 	return new Ref<Mesh>(meshComponent.Mesh);
 }
 
-void Saffron_MeshComponent_SetMesh(uint64_t entityID, Ref<Mesh> *inMesh)
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, Ref<Mesh> *inMesh)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -127,7 +127,7 @@ void Saffron_MeshComponent_SetMesh(uint64_t entityID, Ref<Mesh> *inMesh)
 	meshComponent.Mesh = inMesh ? *inMesh : nullptr;
 }
 
-void Saffron_RigidBody2DComponent_ApplyLinearImpulse(uint64_t entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake)
+void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -141,7 +141,7 @@ void Saffron_RigidBody2DComponent_ApplyLinearImpulse(uint64_t entityID, glm::vec
 	body->ApplyLinearImpulse(*reinterpret_cast<const b2Vec2 *>(impulse), body->GetWorldCenter() + *reinterpret_cast<const b2Vec2 *>(offset), wake);
 }
 
-void Saffron_RigidBody2DComponent_GetLinearVelocity(uint64_t entityID, glm::vec2 *outVelocity)
+void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *outVelocity)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -157,7 +157,7 @@ void Saffron_RigidBody2DComponent_GetLinearVelocity(uint64_t entityID, glm::vec2
 	*outVelocity = { velocity.x, velocity.y };
 }
 
-void Saffron_RigidBody2DComponent_SetLinearVelocity(uint64_t entityID, glm::vec2 *velocity)
+void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *velocity)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
@@ -288,6 +288,39 @@ void *Saffron_MeshFactory_CreatePlane(float width, float height)
 {
 	// TODO: Implement properly with MeshFactory class!
 	return new Ref<Mesh>(new Mesh("Assets/models/Plane1m.obj"));
+}
+
+Ref<SceneCamera> *Saffron_SceneCamera_Constructor(Uint32 width, Uint32 height)
+{
+	return new Ref<SceneCamera>(new SceneCamera(width, height));
+}
+
+void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this)
+{
+	delete _this;
+}
+
+Ref<SceneCamera> *Saffron_CameraComponent_GetCamera(Uint64 entityID)
+{
+	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	SE_CORE_ASSERT(scene, "No active scene!");
+	const auto &entityMap = scene->GetEntityMap();
+	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+
+	Entity entity = entityMap.at(entityID);
+	auto &cameraComponent = entity.GetComponent<CameraComponent>();
+
+	Ref<SceneCamera> test(cameraComponent.Camera);
+
+	Mesh mesh("TEST");
+
+	Ref<Mesh> *testMesh = new Ref<Mesh>(mesh);
+
+	return new Ref<SceneCamera>(cameraComponent.Camera);
+}
+
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCamera)
+{
 }
 }
 }

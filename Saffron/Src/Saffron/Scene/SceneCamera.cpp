@@ -5,6 +5,12 @@
 
 namespace Se
 {
+SceneCamera::SceneCamera(Uint32 width, Uint32 height, ProjectionType projectionType)
+{
+	SceneCamera::SetViewportSize(width, height);
+	UpdateCameraView();
+}
+
 void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
 {
 	m_ProjectionType = ProjectionType::Perspective;
@@ -23,11 +29,13 @@ void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 
 void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
 {
+	Camera::SetViewportSize(width, height);
 	switch ( m_ProjectionType )
 	{
 	case ProjectionType::Perspective:
 		m_ProjectionMatrix = glm::perspectiveFov(m_PerspectiveFOV, static_cast<float>(width), static_cast<float>(height), m_PerspectiveNear, m_PerspectiveFar);
 		break;
+
 	case ProjectionType::Orthographic:
 		const float aspect = static_cast<float>(width) / static_cast<float>(height);
 		const float Width = m_OrthographicSize * aspect;

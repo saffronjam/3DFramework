@@ -8,11 +8,13 @@ namespace Se
 class SceneCamera : public Camera
 {
 public:
-	enum class ProjectionType { Perspective = 0, Orthographic = 1 };
+	enum class ProjectionType : Int32 { Perspective = 0, Orthographic = 1 };
 public:
+	SceneCamera(Uint32 width = 1280, Uint32 height = 720, ProjectionType projectionType = ProjectionType::Perspective);
+
 	void SetPerspective(float verticalFOV, float nearClip = 0.01f, float farClip = 10000.0f);
 	void SetOrthographic(float size, float nearClip = -1.0f, float farClip = 1.0f);
-	void SetViewportSize(Uint32 width, Uint32 height);
+	void SetViewportSize(Uint32 width, Uint32 height) override;
 
 	void SetPerspectiveVerticalFOV(float verticalFov) { m_PerspectiveFOV = glm::radians(verticalFov); }
 	float GetPerspectiveVerticalFOV() const { return glm::degrees(m_PerspectiveFOV); }

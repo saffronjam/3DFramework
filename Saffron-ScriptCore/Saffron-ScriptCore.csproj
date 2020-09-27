@@ -60,6 +60,7 @@
     <Compile Include="Src\Saffron\Math\Vector2.cs" />
     <Compile Include="Src\Saffron\Math\Vector3.cs" />
     <Compile Include="Src\Saffron\Math\Vector4.cs" />
+    <Compile Include="Src\Saffron\Renderer\Camera.cs" />
     <Compile Include="Src\Saffron\Renderer\Color.cs" />
     <Compile Include="Src\Saffron\Renderer\Material.cs" />
     <Compile Include="Src\Saffron\Renderer\Mesh.cs" />

@@ -19,18 +19,18 @@ namespace Script
 bool Saffron_Input_IsKeyPressed(KeyCode key);
 
 // Entity
-void Saffron_Entity_GetTransform(uint64_t entityID, glm::mat4 *outTransform);
-void Saffron_Entity_SetTransform(uint64_t entityID, glm::mat4 *inTransform);
-void Saffron_Entity_CreateComponent(uint64_t entityID, void *type);
-bool Saffron_Entity_HasComponent(uint64_t entityID, void *type);
-uint64_t Saffron_Entity_FindEntityByTag(MonoString *tag);
+void Saffron_Entity_GetTransform(Uint64 entityID, glm::mat4 *outTransform);
+void Saffron_Entity_SetTransform(Uint64 entityID, glm::mat4 *inTransform);
+void Saffron_Entity_CreateComponent(Uint64 entityID, void *type);
+bool Saffron_Entity_HasComponent(Uint64 entityID, void *type);
+Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag);
 
-void *Saffron_MeshComponent_GetMesh(uint64_t entityID);
-void Saffron_MeshComponent_SetMesh(uint64_t entityID, Ref<Mesh> *inMesh);
+void *Saffron_MeshComponent_GetMesh(Uint64 entityID);
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, Ref<Mesh> *inMesh);
 
-void Saffron_RigidBody2DComponent_ApplyLinearImpulse(uint64_t entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake);
-void Saffron_RigidBody2DComponent_GetLinearVelocity(uint64_t entityID, glm::vec2 *outVelocity);
-void Saffron_RigidBody2DComponent_SetLinearVelocity(uint64_t entityID, glm::vec2 *velocity);
+void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake);
+void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *outVelocity);
+void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *velocity);
 
 // Renderer
 // Texture2D
@@ -57,6 +57,16 @@ Ref<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Ref<Mesh> *inMesh, int in
 int Saffron_Mesh_GetMaterialCount(Ref<Mesh> *inMesh);
 
 void *Saffron_MeshFactory_CreatePlane(float width, float height);
+
+// Scene Camera
+Ref<SceneCamera> *Saffron_SceneCamera_Constructor(Uint32 width, Uint32 height);
+void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this);
+// Camera Component
+Ref<SceneCamera> *Saffron_CameraComponent_GetCamera(Uint64 entityID);
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCamera);
+
+
+
 }
 }
 

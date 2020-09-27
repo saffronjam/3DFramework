@@ -84,7 +84,42 @@ namespace Se
 
     public class CameraComponent : Component
     {
-        // TODO
+
+
+
+        //       SceneCamera Camera;
+        //       bool Primary = true;
+
+        //       CameraComponent() = default;
+        //CameraComponent(const CameraComponent &other) = default;
+
+        //operator SceneCamera &() { return Camera; }
+
+        //   operator const SceneCamera &() const { return Camera; }
+
+        public Camera Camera
+        {
+            get
+            {
+                Camera result = new Camera(GetCamera_Native(Entity.ID));
+                return result;
+            }
+            set
+            {
+                IntPtr ptr = value == null ? IntPtr.Zero : value.m_UnmanagedInstance;
+                SetMesh_Native(Entity.ID, ptr);
+            }
+        }
+
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern IntPtr GetCamera_Native(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void SetCamera_Native(ulong entityID, IntPtr unmanagedInstance);
+
+
+
     }
 
     public class ScriptComponent : Component
