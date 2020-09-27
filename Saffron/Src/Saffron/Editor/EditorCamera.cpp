@@ -21,16 +21,14 @@ void EditorCamera::OnUpdate(Time ts)
 	{
 		if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
 		{
-			const glm::vec2 &mouse{ Input::GetMouseX(), Input::GetMouseY() };
-			const glm::vec2 delta = (mouse - m_InitialMousePosition) * ts.sec();
-			m_InitialMousePosition = mouse;
+			const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
 
 			if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
-				MousePan(delta);
+				MousePan(swipe);
 			else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
-				MouseRotate(delta);
+				MouseRotate(swipe);
 			else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
-				MouseZoom(delta.y);
+				MouseZoom(swipe.y);
 		}
 	}
 	else if ( m_ControllerStyle == ControllerStyle::Game )

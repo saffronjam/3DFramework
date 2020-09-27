@@ -19,5 +19,5 @@ public:
 
 Se::Application *Se::CreateApplication()
 {
-	return new SaffronBunApplication({ "Hazelnut", 1600, 900 });
+	return new SaffronBunApplication({ "Saffron Bun", 1600, 900 });
 }
