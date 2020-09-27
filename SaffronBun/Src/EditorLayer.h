@@ -130,6 +130,13 @@ private:
 	// Editor resources
 	Ref<Texture2D> m_CheckerboardTex;
 	Ref<Texture2D> m_PlayButtonTex;
+	Ref<Texture2D> m_PauseButtonTex;
+	Ref<Texture2D> m_StopButtonTex;
+	Ref<Texture2D> m_TranslateButtonTex;
+	Ref<Texture2D> m_RotateButtonTex;
+	Ref<Texture2D> m_ScaleButtonTex;
+	Ref<Texture2D> m_ControllerGameButtonTex;
+	Ref<Texture2D> m_ControllerMayaButtonTex;
 
 	glm::vec2 m_ViewportBounds[2];
 	int m_GizmoType = -1; // -1 = no gizmo

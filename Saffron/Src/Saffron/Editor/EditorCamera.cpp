@@ -16,18 +16,72 @@ void EditorCamera::Focus()
 
 void EditorCamera::OnUpdate(Time ts)
 {
-	if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
-	{
-		const glm::vec2 &mouse{ Input::GetMouseX(), Input::GetMouseY() };
-		const glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
-		m_InitialMousePosition = mouse;
 
-		if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
-			MousePan(delta);
-		else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
-			MouseRotate(delta);
-		else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
-			MouseZoom(delta.y);
+	if ( m_ControllerStyle == ControllerStyle::Maya )
+	{
+		if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
+		{
+			const glm::vec2 &mouse{ Input::GetMouseX(), Input::GetMouseY() };
+			const glm::vec2 delta = (mouse - m_InitialMousePosition) * ts.sec();
+			m_InitialMousePosition = mouse;
+
+			if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
+				MousePan(delta);
+			else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
+				MouseRotate(delta);
+			else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
+				MouseZoom(delta.y);
+		}
+	}
+	else if ( m_ControllerStyle == ControllerStyle::Game )
+	{
+		if ( Input::IsKeyPressed(SE_KEY_W) )
+		{
+			m_FocalPoint += GetForwardDirection() * m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_S) )
+		{
+			m_FocalPoint -= GetForwardDirection() * m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_A) )
+		{
+			m_FocalPoint -= GetRightDirection() * m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_D) )
+		{
+			m_FocalPoint += GetRightDirection() * m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_E) )
+		{
+			m_FocalPoint.y += m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_Q) )
+		{
+			m_FocalPoint.y -= m_MovementSpeed * ts.sec();
+		}
+
+		if ( Input::IsKeyPressed(SE_KEY_LEFT_SHIFT) )
+		{
+			m_MovementSpeed = 20.0f;
+		}
+		else
+		{
+			m_MovementSpeed = 10.0f;
+		}
+
+		if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
+		{
+			const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
+
+			m_Yaw += swipe.x;
+			m_Pitch += swipe.y;
+			m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f, Math::PI / 2.0f);
+		}
 	}
 
 	UpdateCameraView();
@@ -134,7 +188,7 @@ glm::vec2 EditorCamera::GetPanSpeed() const
 
 float EditorCamera::GetRotationSpeed() const
 {
-	return 0.8f;
+	return m_MovementSpeed / 10.0f;
 }
 
 float EditorCamera::GetZoomSpeed() const

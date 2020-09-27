@@ -91,6 +91,13 @@ void EditorLayer::OnAttach()
 	// Editor
 	m_CheckerboardTex = Texture2D::Create("Assets/Editor/Checkerboard.tga");
 	m_PlayButtonTex = Texture2D::Create("Assets/Editor/PlayButton.png");
+	m_PauseButtonTex = Texture2D::Create("Assets/Editor/PauseButton.png");
+	m_StopButtonTex = Texture2D::Create("Assets/Editor/StopButton.png");
+	m_TranslateButtonTex = Texture2D::Create("Assets/Editor/Translate_w.png");
+	m_RotateButtonTex = Texture2D::Create("Assets/Editor/Rotate_w.png");
+	m_ScaleButtonTex = Texture2D::Create("Assets/Editor/Scale_w.png");
+	m_ControllerGameButtonTex = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
+	m_ControllerMayaButtonTex = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
 
 	m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_EditorScene);
 	m_SceneHierarchyPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
@@ -130,6 +137,8 @@ void EditorLayer::OnScenePlay()
 
 	m_RuntimeScene->OnRuntimeStart();
 	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
+
+	m_GizmoType = -1;
 }
 
 void EditorLayer::OnSceneStop()
@@ -599,7 +608,10 @@ void EditorLayer::OnImGuiRender()
 
 	ImGui::End();
 
-	// ImGui::ShowDemoWindow();
+	// TODO: Move to header?
+	const auto ImGuiBlue = ImVec4{ 0.137f, 0.263f, 0.424f, 1.0f };
+	const auto ClearWhite = ImVec4{ 1.0f, 1.0f, 1.0f, 1.0f };
+	const auto FadedGrey = ImVec4{ 0.3f, 0.3f, 0.3f, 0.5f };
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(12, 0));
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(12, 4));
@@ -608,25 +620,68 @@ void EditorLayer::OnImGuiRender()
 	ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(0.8f, 0.8f, 0.8f, 0.0f));
 	ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
 	ImGui::Begin("Toolbar");
-	if ( m_SceneState == Scene::State::Edit )
+
+
+	Ref<Texture> ButtonTexture = m_SceneState == Scene::State::Edit ? m_PlayButtonTex : m_StopButtonTex;
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(ButtonTexture->GetRendererID()), ImVec2(25, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ClearWhite) )
 	{
-		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(0.9f, 0.9f, 0.9f, 1.0f)) )
-		{
-			OnScenePlay();
-		}
+		m_SceneState == Scene::State::Edit ? OnScenePlay() : OnSceneStop();
 	}
-	else if ( m_SceneState == Scene::State::Play )
+
+	ImGui::SameLine();
+	ImGui::Separator();
+	ImGui::SameLine();
+
+	ImVec4 TranslateColorTint = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? ImGuiBlue : ClearWhite;
+	ImVec4 RotateColorTint = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? ImGuiBlue : ClearWhite;
+	ImVec4 ScaleColorTint = m_GizmoType == ImGuizmo::OPERATION::SCALE ? ImGuiBlue : ClearWhite;
+	ImVec4 ControllerWASDTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Game ? ImGuiBlue : ClearWhite;
+	ImVec4 ControllerMayaTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Maya ? ImGuiBlue : ClearWhite;
+	if ( m_SceneState == Scene::State::Play )
 	{
-		if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(1.0f, 1.0f, 1.0f, 0.2f)) )
-		{
-			OnSceneStop();
-		}
+		TranslateColorTint = FadedGrey;
+		RotateColorTint = FadedGrey;
+		ScaleColorTint = FadedGrey;
+		ControllerWASDTint = FadedGrey;
+		ControllerMayaTint = FadedGrey;
+	}
+
+
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TranslateButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), TranslateColorTint) )
+	{
+		if ( m_SceneState == Scene::State::Edit )
+			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_PlayButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ImVec4(1.0f, 1.0f, 1.0f, 0.6f)) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_RotateButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), RotateColorTint) )
 	{
-		SE_CORE_INFO("PLAY!");
+		if ( m_SceneState == Scene::State::Edit )
+			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? -1 : ImGuizmo::OPERATION::ROTATE;
 	}
+	ImGui::SameLine();
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ScaleButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ScaleColorTint) )
+	{
+		if ( m_SceneState == Scene::State::Edit )
+			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::SCALE ? -1 : ImGuizmo::OPERATION::SCALE;
+	}
+
+	ImGui::SameLine();
+	ImGui::Separator();
+	ImGui::SameLine();
+
+	ImGui::SameLine();
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ControllerGameButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint) )
+	{
+		if ( m_SceneState == Scene::State::Edit )
+			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Game);
+	}
+	ImGui::SameLine();
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ControllerMayaButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint) )
+	{
+		if ( m_SceneState == Scene::State::Edit )
+			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Maya);
+	}
+
 	ImGui::End();
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
@@ -973,18 +1028,6 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 	{
 		switch ( event.GetKey() )
 		{
-		case KeyCode::A:
-			m_GizmoType = -1;
-			break;
-		case KeyCode::W:
-			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
-			break;
-		case KeyCode::E:
-			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
-			break;
-		case KeyCode::R:
-			m_GizmoType = ImGuizmo::OPERATION::SCALE;
-			break;
 		case KeyCode::Delete:
 			if ( !m_SelectionContext.empty() )
 			{

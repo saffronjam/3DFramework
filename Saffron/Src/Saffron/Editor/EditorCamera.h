@@ -12,6 +12,13 @@ namespace Se
 class EditorCamera : public Camera
 {
 public:
+	enum class ControllerStyle
+	{
+		Game = 0,
+		Maya = 1
+	};
+
+public:
 	EditorCamera() = default;
 	explicit EditorCamera(const glm::mat4 &projectionMatrix);
 
@@ -31,15 +38,15 @@ public:
 	glm::vec3 GetForwardDirection() const;
 	const glm::vec3 &GetPosition() const { return m_Position; }
 	glm::quat GetOrientation() const;
-
 	float GetExposure() const override { return m_Exposure; }
 	float &GetExposure() override { return m_Exposure; }
-
 	float GetPitch() const { return m_Pitch; }
 	float GetYaw() const { return m_Yaw; }
+	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 
 	void SetDistance(float distance) { m_Distance = distance; }
 	void SetViewportSize(Uint32 width, Uint32 height) { m_ViewportWidth = width; m_ViewportHeight = height; }
+	void SetControllerStyle(ControllerStyle style) { m_ControllerStyle = style; }
 
 private:
 	void UpdateCameraView();
@@ -68,6 +75,10 @@ private:
 	float m_Pitch, m_Yaw;
 
 	float m_Exposure = 0.8f;
+
+	float m_MovementSpeed = 10.0f;
+
+	ControllerStyle	m_ControllerStyle = ControllerStyle::Maya;
 
 	Uint32 m_ViewportWidth = 1280, m_ViewportHeight = 720;
 };

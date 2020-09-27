@@ -88,6 +88,7 @@ void Application::Run()
 
 			Renderer::WaitAndRender();
 		}
+		Input::OnUpdate();
 		m_Window->OnUpdate();
 
 		ts = Timer::GlobalMark();
@@ -105,6 +106,7 @@ void Application::OnEvent(const Event &event)
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(OnWindowClose));
 
+	Input::OnEvent(event);
 	m_Window->OnEvent(event);
 
 	for ( auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
