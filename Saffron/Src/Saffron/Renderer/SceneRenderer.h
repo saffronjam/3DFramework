@@ -8,6 +8,11 @@
 
 namespace Se
 {
+struct SceneRendererCameraData
+{
+	Camera Camera;
+	glm::mat4 ViewMatrix;
+};
 
 class SceneRenderer
 {
@@ -18,18 +23,13 @@ public:
 		bool ShowBoundingBoxes = false;
 	};
 
-	struct SceneCamera
-	{
-		Camera Camera;
-		glm::mat4 ViewMatrix;
-	};
 
 public:
 	static void Init();
 
 	static void SetViewportSize(Uint32 width, Uint32 height);
 
-	static void BeginScene(const Scene *scene, const SceneCamera &camera);
+	static void BeginScene(const Scene *scene, const SceneRendererCameraData &camera);
 	static void EndScene();
 
 	static void SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<MaterialInstance>

@@ -18,6 +18,9 @@ namespace Se
             this.a = a;
         }
 
+        public static implicit operator Vector4(Color color) => new Vector4(color.r, color.g, color.b, color.a);
+        public static implicit operator Vector3(Color color) => new Vector3(color.r, color.g, color.b);
+
         public static Color Black { get { return new Color(0.0f, 0.0f, 0.0f, 1.0f); } }
         public static Color Blue { get { return new Color(0.0f, 0.0f, 1.0f, 1.0f); } }
         public static Color Green { get { return new Color(0.0f, 1.0f, 0.0f, 1.0f); } }

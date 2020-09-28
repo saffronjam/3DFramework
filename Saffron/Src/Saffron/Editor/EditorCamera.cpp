@@ -103,6 +103,25 @@ void EditorCamera::Reset()
 }
 
 
+glm::vec3 EditorCamera::GetUpDirection() const
+{
+	return glm::rotate(GetOrientation(), glm::vec3(0.0f, 1.0f, 0.0f));
+}
+
+glm::vec3 EditorCamera::GetRightDirection() const
+{
+	return glm::rotate(GetOrientation(), glm::vec3(1.0f, 0.0f, 0.0f));
+}
+
+glm::vec3 EditorCamera::GetForwardDirection() const
+{
+	return glm::rotate(GetOrientation(), glm::vec3(0.0f, 0.0f, -1.0f));
+}
+
+glm::quat EditorCamera::GetOrientation() const
+{
+	return glm::quat(glm::vec3(-m_Pitch, -m_Yaw, 0.0f));
+}
 
 bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 {
@@ -110,6 +129,21 @@ bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 	MouseZoom(delta);
 	UpdateCameraView();
 	return false;
+}
+
+void EditorCamera::UpdateCameraView()
+{
+	m_Position = CalculatePosition();
+
+	const glm::quat orientation = GetOrientation();
+	m_Rotation = glm::eulerAngles(orientation) * (180.0f / Math::PI);
+	m_ViewMatrix = glm::translate(glm::mat4(1.0f), m_Position) * glm::toMat4(orientation);
+	m_ViewMatrix = glm::inverse(m_ViewMatrix);
+}
+
+glm::vec3 EditorCamera::CalculatePosition() const
+{
+	return m_FocalPoint - GetForwardDirection() * m_Distance;
 }
 
 void EditorCamera::MousePan(const glm::vec2 &delta)

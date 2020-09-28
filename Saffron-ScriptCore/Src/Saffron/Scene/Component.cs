@@ -84,19 +84,6 @@ namespace Se
 
     public class CameraComponent : Component
     {
-
-
-
-        //       SceneCamera Camera;
-        //       bool Primary = true;
-
-        //       CameraComponent() = default;
-        //CameraComponent(const CameraComponent &other) = default;
-
-        //operator SceneCamera &() { return Camera; }
-
-        //   operator const SceneCamera &() const { return Camera; }
-
         public Camera Camera
         {
             get
@@ -107,7 +94,7 @@ namespace Se
             set
             {
                 IntPtr ptr = value == null ? IntPtr.Zero : value.m_UnmanagedInstance;
-                SetMesh_Native(Entity.ID, ptr);
+                SetCamera_Native(Entity.ID, ptr);
             }
         }
 
@@ -117,9 +104,6 @@ namespace Se
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         internal static extern void SetCamera_Native(ulong entityID, IntPtr unmanagedInstance);
-
-
-
     }
 
     public class ScriptComponent : Component

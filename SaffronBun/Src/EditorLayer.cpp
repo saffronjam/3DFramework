@@ -307,12 +307,12 @@ bool EditorLayer::Property(const std::string &name, glm::vec2 &value, float min,
 	return changed;
 }
 
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, EditorLayer::PropertyFlag flags) const
+bool EditorLayer::Property(const std::string &name, glm::vec3 &value, PropertyFlag flags) const
 {
 	return Property(name, value, -1.0f, 1.0f, flags);
 }
 
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min, float max, EditorLayer::PropertyFlag flags) const
+bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min, float max, PropertyFlag flags) const
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();

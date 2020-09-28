@@ -19,7 +19,8 @@ struct SceneRendererData
 	const Scene *ActiveScene = nullptr;
 	struct SceneInfo
 	{
-		SceneRenderer::SceneCamera SceneCamera;
+		// TODO: Use ref instead of copying?
+		SceneRendererCameraData SceneRendererCameraData;
 
 		// Resources
 		Ref<MaterialInstance> SkyboxMaterial;
@@ -51,7 +52,6 @@ struct SceneRendererData
 
 static SceneRendererData sData;
 static Ref<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
-
 
 ///////////////////////////////////////////////////////////////////////////
 /// Scene Renderer
@@ -102,13 +102,13 @@ void SceneRenderer::SetViewportSize(Uint32 width, Uint32 height)
 	sData.CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
 }
 
-void SceneRenderer::BeginScene(const Scene *scene, const SceneCamera &camera)
+void SceneRenderer::BeginScene(const Scene *scene, const SceneRendererCameraData &camera)
 {
 	SE_CORE_ASSERT(!sData.ActiveScene, "No active scene");
 
 	sData.ActiveScene = scene;
 
-	sData.SceneData.SceneCamera = camera;
+	sData.SceneData.SceneRendererCameraData = camera;
 	sData.SceneData.SkyboxMaterial = scene->m_SkyboxMaterial;
 	sData.SceneData.SceneEnvironment = scene->m_Environment;
 	sData.SceneData.ActiveLight = scene->m_Light;
@@ -254,8 +254,8 @@ void SceneRenderer::GeometryPass()
 						 });
 	}
 
-	const auto viewProjection = sData.SceneData.SceneCamera.Camera.GetProjectionMatrix() * sData.SceneData.SceneCamera.ViewMatrix;
-	const glm::vec3 cameraPosition = glm::inverse(sData.SceneData.SceneCamera.ViewMatrix)[3];
+	const auto viewProjection = sData.SceneData.SceneRendererCameraData.Camera.GetProjectionMatrix() * sData.SceneData.SceneRendererCameraData.ViewMatrix;
+	const glm::vec3 cameraPosition = glm::inverse(sData.SceneData.SceneRendererCameraData.ViewMatrix)[3];
 
 	// Skybox
 	// TODO: Remove this unused line
@@ -369,7 +369,7 @@ void SceneRenderer::CompositePass()
 {
 	Renderer::BeginRenderPass(sData.CompositePass);
 	sData.CompositeShader->Bind();
-	sData.CompositeShader->SetFloat("u_Exposure", sData.SceneData.SceneCamera.Camera.GetExposure());
+	sData.CompositeShader->SetFloat("u_Exposure", sData.SceneData.SceneRendererCameraData.Camera.GetExposure());
 	sData.CompositeShader->SetInt("u_TextureSamples", sData.GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
 	sData.GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
 	Renderer::SubmitFullscreenQuad(nullptr);

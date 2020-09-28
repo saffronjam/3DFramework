@@ -80,6 +80,12 @@ void ScriptEngineRegistry::RegisterAll()
 
 	mono_add_internal_call("Se.MeshFactory::CreatePlane_Native", Script::Saffron_MeshFactory_CreatePlane);
 
+	mono_add_internal_call("Se.Camera::Constructor_Native", Script::Saffron_SceneCamera_Constructor);
+	mono_add_internal_call("Se.Camera::Destructor_Native", Script::Saffron_SceneCamera_Destructor);
+
+	mono_add_internal_call("Se.CameraComponent::GetCamera_Native", Script::Saffron_CameraComponent_GetCamera);
+	mono_add_internal_call("Se.CameraComponent::SetCamera_Native", Script::Saffron_CameraComponent_SetCamera);
+
 	// static bool IsKeyPressed(KeyCode key) { return s_Instance->IsKeyPressedImpl(key); }
 	// 
 	// static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }

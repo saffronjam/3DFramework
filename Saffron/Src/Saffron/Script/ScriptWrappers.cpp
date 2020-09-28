@@ -310,17 +310,19 @@ Ref<SceneCamera> *Saffron_CameraComponent_GetCamera(Uint64 entityID)
 	Entity entity = entityMap.at(entityID);
 	auto &cameraComponent = entity.GetComponent<CameraComponent>();
 
-	Ref<SceneCamera> test(cameraComponent.Camera);
-
-	Mesh mesh("TEST");
-
-	Ref<Mesh> *testMesh = new Ref<Mesh>(mesh);
-
 	return new Ref<SceneCamera>(cameraComponent.Camera);
 }
 
 void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCamera)
 {
+	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	SE_CORE_ASSERT(scene, "No active scene!");
+	const auto &entityMap = scene->GetEntityMap();
+	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+
+	Entity entity = entityMap.at(entityID);
+	auto &cameraComponent = entity.GetComponent<CameraComponent>();
+	cameraComponent.Camera = inCamera ? *inCamera : nullptr;
 }
 }
 }

@@ -637,7 +637,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 								   {
 									   // Projection Type
 									   const char *projTypeStrings[] = { "Perspective", "Orthographic" };
-									   const char *currentProj = projTypeStrings[static_cast<int>(cc.Camera.GetProjectionType())];
+									   const char *currentProj = projTypeStrings[static_cast<int>(cc.Camera->GetProjectionType())];
 									   if ( ImGui::BeginCombo("Projection", currentProj) )
 									   {
 										   for ( int type = 0; type < 2; type++ )
@@ -646,7 +646,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 											   if ( ImGui::Selectable(projTypeStrings[type], is_selected) )
 											   {
 												   currentProj = projTypeStrings[type];
-												   cc.Camera.SetProjectionType(static_cast<SceneCamera::ProjectionType>(type));
+												   cc.Camera->SetProjectionType(static_cast<SceneCamera::ProjectionType>(type));
 											   }
 											   if ( is_selected )
 												   ImGui::SetItemDefaultFocus();
@@ -656,35 +656,35 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 
 									   BeginPropertyGrid();
 									   // Perspective parameters
-									   if ( cc.Camera.GetProjectionType() == SceneCamera::ProjectionType::Perspective )
+									   if ( cc.Camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective )
 									   {
-										   float verticalFOV = cc.Camera.GetPerspectiveVerticalFOV();
+										   float verticalFOV = cc.Camera->GetPerspectiveVerticalFOV();
 										   if ( Property("Vertical FOV", verticalFOV) )
-											   cc.Camera.SetPerspectiveVerticalFOV(verticalFOV);
+											   cc.Camera->SetPerspectiveVerticalFOV(verticalFOV);
 
-										   float nearClip = cc.Camera.GetPerspectiveNearClip();
+										   float nearClip = cc.Camera->GetPerspectiveNearClip();
 										   if ( Property("Near Clip", nearClip) )
-											   cc.Camera.SetPerspectiveNearClip(nearClip);
+											   cc.Camera->SetPerspectiveNearClip(nearClip);
 										   ImGui::SameLine();
-										   float farClip = cc.Camera.GetPerspectiveFarClip();
+										   float farClip = cc.Camera->GetPerspectiveFarClip();
 										   if ( Property("Far Clip", farClip) )
-											   cc.Camera.SetPerspectiveFarClip(farClip);
+											   cc.Camera->SetPerspectiveFarClip(farClip);
 									   }
 
 									   // Orthographic parameters
-									   else if ( cc.Camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic )
+									   else if ( cc.Camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic )
 									   {
-										   float orthoSize = cc.Camera.GetOrthographicSize();
+										   float orthoSize = cc.Camera->GetOrthographicSize();
 										   if ( Property("Size", orthoSize) )
-											   cc.Camera.SetOrthographicSize(orthoSize);
+											   cc.Camera->SetOrthographicSize(orthoSize);
 
-										   float nearClip = cc.Camera.GetOrthographicNearClip();
+										   float nearClip = cc.Camera->GetOrthographicNearClip();
 										   if ( Property("Near Clip", nearClip) )
-											   cc.Camera.SetOrthographicNearClip(nearClip);
+											   cc.Camera->SetOrthographicNearClip(nearClip);
 										   ImGui::SameLine();
-										   float farClip = cc.Camera.GetOrthographicFarClip();
+										   float farClip = cc.Camera->GetOrthographicFarClip();
 										   if ( Property("Far Clip", farClip) )
-											   cc.Camera.SetOrthographicFarClip(farClip);
+											   cc.Camera->SetOrthographicFarClip(farClip);
 									   }
 
 									   EndPropertyGrid();

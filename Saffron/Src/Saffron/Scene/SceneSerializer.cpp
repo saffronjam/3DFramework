@@ -535,7 +535,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( cameraComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<CameraComponent>();
-				component.Camera = SceneCamera();
+				component.Camera = Ref<SceneCamera>::Create();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 
 				SE_CORE_INFO("  Primary Camera: {0}", component.Primary);

@@ -8,7 +8,6 @@ namespace Se
 SceneCamera::SceneCamera(Uint32 width, Uint32 height, ProjectionType projectionType)
 {
 	SceneCamera::SetViewportSize(width, height);
-	UpdateCameraView();
 }
 
 void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)

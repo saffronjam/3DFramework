@@ -259,17 +259,19 @@ void Scene::OnRenderRuntime(Time ts)
 	/////////////////////////////////////////////////////////////////////
 	Entity cameraEntity = GetMainCameraEntity();
 	if ( !cameraEntity )
+	{
+		SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
 		return;
+	}
 
-	const glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
-	SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
-	SceneCamera &camera = cameraEntity.GetComponent<CameraComponent>();
-	camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+	Ref<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
+	camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 
 	m_SkyboxMaterial->Set("u_TextureLod", m_SkyboxLod);
+	const glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 
 	auto group = m_Registry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::BeginScene(this, { static_cast<Camera>(camera), cameraViewMatrix });
+	SceneRenderer::BeginScene(this, { static_cast<Camera>(*camera), cameraViewMatrix });
 	for ( auto entity : group )
 	{
 		auto [transformComponent, meshComponent] = group.get<TransformComponent, MeshComponent>(entity);

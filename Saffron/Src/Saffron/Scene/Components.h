@@ -69,14 +69,13 @@ struct ScriptComponent
 
 struct CameraComponent
 {
-	SceneCamera Camera;
+	Ref<SceneCamera> Camera;
 	bool Primary = true;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator SceneCamera &() { return Camera; }
-	operator const SceneCamera &() const { return Camera; }
+	operator Ref<SceneCamera>() { return Camera; }
 };
 
 struct SpriteRendererComponent

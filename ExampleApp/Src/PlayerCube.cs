@@ -28,7 +28,7 @@ namespace Example
 
             MeshComponent meshComponent = GetComponent<MeshComponent>();
             m_MeshMaterial = meshComponent.Mesh.GetMaterial(0);
-            m_MeshMaterial.Set("u_Metalness", 0.0f);
+            //m_MeshMaterial.Set("u_Metalness", 0.0f);
 
             AddCollision2DBeginCallback(OnPlayerCollisionBegin);
             AddCollision2DEndCallback(OnPlayerCollisionEnd);
