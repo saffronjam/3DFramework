@@ -61,8 +61,8 @@ Entities:
       Tag: Player
     TransformComponent:
       Position: [-23.6932545, 1.59184527, -1.96369365e-06]
-      Rotation: [-0.0136924796, 0.00896147918, 0.083376132, 0.996383786]
-      Scale: [0.999999285, 0.999997854, 0.999999702]
+      Rotation: [-0.0136924814, 0.00896148011, 0.083376132, 0.996383786]
+      Scale: [0.999998569, 0.999997854, 0.999999702]
     ScriptComponent:
       ModuleName: Example.PlayerCube
       StoredFields:
@@ -91,7 +91,7 @@ Entities:
     TransformComponent:
       Position: [-29.6808929, 29.7597198, 0]
       Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [58.4176102, 4.4799552, 4.48000002]
+      Scale: [58.4175644, 4.47994947, 4.48000002]
     MeshComponent:
       AssetPath: assets\meshes\Cube1m.fbx
     RigidBody2DComponent:

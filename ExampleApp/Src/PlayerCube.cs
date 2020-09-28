@@ -56,6 +56,7 @@ namespace Example
             else if (Input.IsKeyPressed(KeyCode.A))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(-movementForce, 0), new Vector2(), true);
 
+
             if (Colliding && Input.IsKeyPressed(KeyCode.Space))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(0, JumpForce), new Vector2(0, 0), true);
 

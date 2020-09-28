@@ -82,6 +82,8 @@ void ScriptEngineRegistry::RegisterAll()
 
 	mono_add_internal_call("Se.Camera::Constructor_Native", Script::Saffron_SceneCamera_Constructor);
 	mono_add_internal_call("Se.Camera::Destructor_Native", Script::Saffron_SceneCamera_Destructor);
+	mono_add_internal_call("Se.Camera::GetProjectionMode_Native", Script::Saffron_SceneCamera_GetProjectionMode);
+	mono_add_internal_call("Se.Camera::SetProjectionMode_Native", Script::Saffron_SceneCamera_SetProjectionMode);
 
 	mono_add_internal_call("Se.CameraComponent::GetCamera_Native", Script::Saffron_CameraComponent_GetCamera);
 	mono_add_internal_call("Se.CameraComponent::SetCamera_Native", Script::Saffron_CameraComponent_SetCamera);

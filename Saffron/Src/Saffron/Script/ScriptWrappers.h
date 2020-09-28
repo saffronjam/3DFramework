@@ -61,8 +61,10 @@ void *Saffron_MeshFactory_CreatePlane(float width, float height);
 // Scene Camera
 Ref<SceneCamera> *Saffron_SceneCamera_Constructor(Uint32 width, Uint32 height);
 void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this);
+Uint32 Saffron_SceneCamera_GetProjectionMode(Ref<SceneCamera> *_this);
+void Saffron_SceneCamera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode);
 // Camera Component
-Ref<SceneCamera> *Saffron_CameraComponent_GetCamera(Uint64 entityID);
+void *Saffron_CameraComponent_GetCamera(Uint64 entityID);
 void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCamera);
 
 

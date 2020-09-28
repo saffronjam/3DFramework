@@ -637,7 +637,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 								   {
 									   // Projection Type
 									   const char *projTypeStrings[] = { "Perspective", "Orthographic" };
-									   const char *currentProj = projTypeStrings[static_cast<int>(cc.Camera->GetProjectionType())];
+									   const char *currentProj = projTypeStrings[static_cast<int>(cc.Camera->GetProjectionMode())];
 									   if ( ImGui::BeginCombo("Projection", currentProj) )
 									   {
 										   for ( int type = 0; type < 2; type++ )
@@ -646,7 +646,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 											   if ( ImGui::Selectable(projTypeStrings[type], is_selected) )
 											   {
 												   currentProj = projTypeStrings[type];
-												   cc.Camera->SetProjectionType(static_cast<SceneCamera::ProjectionType>(type));
+												   cc.Camera->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(type));
 											   }
 											   if ( is_selected )
 												   ImGui::SetItemDefaultFocus();
@@ -656,7 +656,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 
 									   BeginPropertyGrid();
 									   // Perspective parameters
-									   if ( cc.Camera->GetProjectionType() == SceneCamera::ProjectionType::Perspective )
+									   if ( cc.Camera->GetProjectionMode() == SceneCamera::ProjectionMode::Perspective )
 									   {
 										   float verticalFOV = cc.Camera->GetPerspectiveVerticalFOV();
 										   if ( Property("Vertical FOV", verticalFOV) )
@@ -672,7 +672,7 @@ void SceneHierarchyPanel::DrawComponents(Entity entity)
 									   }
 
 									   // Orthographic parameters
-									   else if ( cc.Camera->GetProjectionType() == SceneCamera::ProjectionType::Orthographic )
+									   else if ( cc.Camera->GetProjectionMode() == SceneCamera::ProjectionMode::Orthographic )
 									   {
 										   float orthoSize = cc.Camera->GetOrthographicSize();
 										   if ( Property("Size", orthoSize) )

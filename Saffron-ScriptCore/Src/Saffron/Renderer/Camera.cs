@@ -1,5 +1,4 @@
-﻿using Se;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,12 +11,12 @@ namespace Se
     {
         public enum ProjectionMode : uint
         {
-            Orthographic, Projection
+            Perspective, Orthographic
         }
 
-        public Camera(uint ViewportWidth, uint ViewportHeight, ProjectionMode Mode)
+        public Camera(uint viewportWidth, uint viewportHeight, ProjectionMode mode)
         {
-            m_UnmanagedInstance = Constructor_Native(ViewportWidth, ViewportHeight, Mode);
+            m_UnmanagedInstance = Constructor_Native(viewportWidth, viewportHeight, (uint)mode);
         }
 
         internal Camera(IntPtr unmanagedInstance)
@@ -29,11 +28,28 @@ namespace Se
             Destructor_Native(m_UnmanagedInstance);
         }
 
+        public ProjectionMode Projection
+        {
+            get
+            {
+                return (ProjectionMode)GetProjectionMode_Native(m_UnmanagedInstance);
+            }
+            set
+            {
+                SetProjectionMode_Native(m_UnmanagedInstance, (uint)value);
+            }
+        }
+
         internal IntPtr m_UnmanagedInstance;
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        public static extern IntPtr Constructor_Native(uint ViewportWidth, uint ViewportHeight, ProjectionMode Mode);
+        public static extern IntPtr Constructor_Native(uint viewportWidth, uint viewportHeight, uint mode);
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void Destructor_Native(IntPtr unmanagedInstance);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern uint GetProjectionMode_Native(IntPtr unmanagedInstance);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        public static extern void SetProjectionMode_Native(IntPtr unmanagedInstance, uint mode);
     }
 }

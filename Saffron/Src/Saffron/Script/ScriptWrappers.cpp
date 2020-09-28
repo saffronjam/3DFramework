@@ -300,7 +300,20 @@ void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this)
 	delete _this;
 }
 
-Ref<SceneCamera> *Saffron_CameraComponent_GetCamera(Uint64 entityID)
+Uint32 Saffron_SceneCamera_GetProjectionMode(Ref<SceneCamera> *_this)
+{
+	if ( _this )
+		return static_cast<Uint32>((*_this)->GetProjectionMode());
+	return 0;
+}
+
+void Saffron_SceneCamera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode)
+{
+	if ( _this )
+		(*_this)->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(mode));
+}
+
+void *Saffron_CameraComponent_GetCamera(Uint64 entityID)
 {
 	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
