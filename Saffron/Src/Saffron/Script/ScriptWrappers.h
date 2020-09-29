@@ -39,24 +39,29 @@ Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag);
 /// Texture2D
 ///////////////////////////////////////////////////////////////
 
-void *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
-void Saffron_Texture2D_Destructor(Ref<Texture2D> *_this);
-void Saffron_Texture2D_SetData(Ref<Texture2D> *_this, MonoArray *inData, Int32 count);
+Ref<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
+void Saffron_Texture2D_Destructor(Ref<Texture2D> *texture);
+void Saffron_Texture2D_SetData(Ref<Texture2D> *texture, MonoArray *data, Int32 count);
 
 
 ///////////////////////////////////////////////////////////////
 /// Material
 ///////////////////////////////////////////////////////////////
 
-void Saffron_Material_Destructor(Ref<Material> *_this);
-void Saffron_Material_SetFloat(Ref<Material> *_this, MonoString *uniform, float value);
-void Saffron_Material_SetTexture(Ref<Material> *_this, MonoString *uniform, Ref<Texture2D> *texture);
+void Saffron_Material_Destructor(Ref<Material> *material);
+void Saffron_Material_SetFloat(Ref<Material> *material, MonoString *uniform, float value);
+void Saffron_Material_SetTexture(Ref<Material> *material, MonoString *uniform, Ref<Texture2D> *texture);
 
-void Saffron_MaterialInstance_Destructor(Ref<MaterialInstance> *_this);
-void Saffron_MaterialInstance_SetFloat(Ref<MaterialInstance> *_this, MonoString *uniform, float value);
-void Saffron_MaterialInstance_SetVector3(Ref<MaterialInstance> *_this, MonoString *uniform, glm::vec3 *value);
-void Saffron_MaterialInstance_SetVector4(Ref<MaterialInstance> *_this, MonoString *uniform, glm::vec4 *value);
-void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *_this, MonoString *uniform, Ref<Texture2D> *texture);
+
+///////////////////////////////////////////////////////////////
+/// Material Instance
+///////////////////////////////////////////////////////////////
+
+void Saffron_MaterialInstance_Destructor(Ref<MaterialInstance> *instance);
+void Saffron_MaterialInstance_SetFloat(Ref<MaterialInstance> *instance, MonoString *uniform, float value);
+void Saffron_MaterialInstance_SetVector3(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value);
+void Saffron_MaterialInstance_SetVector4(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value);
+void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *instance, MonoString *uniform, Ref<Texture2D> *texture);
 
 
 ///////////////////////////////////////////////////////////////
@@ -64,12 +69,17 @@ void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *_this, MonoStrin
 ///////////////////////////////////////////////////////////////
 
 Ref<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath);
-void Saffron_Mesh_Destructor(Ref<Mesh> *_this);
-Ref<Material> *Saffron_Mesh_GetMaterial(Ref<Mesh> *inMesh);
-Ref<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Ref<Mesh> *inMesh, int index);
-int Saffron_Mesh_GetMaterialCount(Ref<Mesh> *inMesh);
+void Saffron_Mesh_Destructor(Ref<Mesh> *mesh);
+Ref<Material> *Saffron_Mesh_GetMaterial(Ref<Mesh> *mesh);
+Ref<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Ref<Mesh> *mesh, int index);
+int Saffron_Mesh_GetMaterialCount(Ref<Mesh> *mesh);
 
-void *Saffron_MeshFactory_CreatePlane(float width, float height);
+
+///////////////////////////////////////////////////////////////
+/// Mesh Factory
+///////////////////////////////////////////////////////////////
+
+Ref<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height);
 
 
 ///////////////////////////////////////////////////////////////
@@ -77,10 +87,10 @@ void *Saffron_MeshFactory_CreatePlane(float width, float height);
 ///////////////////////////////////////////////////////////////
 
 Ref<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
-void Saffron_Camera_Destructor(Ref<SceneCamera> *_this);
+void Saffron_Camera_Destructor(Ref<SceneCamera> *camera);
 
-Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *_this);
-void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode);
+Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *camera);
+void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *camera, Uint32 mode);
 
 //void Saffron_SceneCamera_SetPerspectiveVerticalFOV(Ref<SceneCamera> *_this, float verticalFov);
 //float Saffron_SceneCamera_GetPerspectiveVerticalFOV(Ref<SceneCamera> *_this);
@@ -135,6 +145,33 @@ void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 
 void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *outVelocity);
 void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *velocity);
 
+
+///////////////////////////////////////////////////////////////
+/// Collider2D Component
+///////////////////////////////////////////////////////////////
+
+void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, glm::vec2 *offset);
+void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, glm::vec2 *offset);
+float Saffron_Collider2DComponent_GetDensity(Uint64 entityID);
+void Saffron_Collider2DComponent_SetDensity(Uint64 entityID, float density);
+float Saffron_Collider2DComponent_GetFriction(Uint64 entityID);
+void Saffron_Collider2DComponent_SetFriction(Uint64 entityID, float friction);
+
+
+///////////////////////////////////////////////////////////////
+/// BoxCollider2D Component
+///////////////////////////////////////////////////////////////
+
+void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, glm::vec2 *size);
+void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, glm::vec2 *size);
+
+
+///////////////////////////////////////////////////////////////
+/// CircleCollider2D Component
+///////////////////////////////////////////////////////////////
+
+float Saffron_CircleCollider2DComponent_GetRadius(Uint64 entityID);
+void Saffron_CircleCollider2DComponent_SetRadius(Uint64 entityID, float radius);
 
 }
 }

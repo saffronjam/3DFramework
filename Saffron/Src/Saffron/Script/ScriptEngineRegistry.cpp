@@ -10,6 +10,12 @@
 
 namespace Se
 {
+
+#define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Se." << #className << "::" << #functionName << "_Native";\
+	mono_add_internal_call(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
+	RegisterFunctionBuffer.str("");\
+	RegisterFunctionBuffer.clear();
+
 std::unordered_map<MonoType *, std::function<bool(Entity &)>> s_HasComponentFuncs;
 std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentFuncs;
 
@@ -37,6 +43,7 @@ static void InitComponentTypes()
 	ComponentRegisterType(SpriteRendererComponent);
 	ComponentRegisterType(RigidBody2DComponent);
 	ComponentRegisterType(BoxCollider2DComponent);
+	ComponentRegisterType(CircleCollider2DComponent);
 }
 
 void ScriptEngineRegistry::RegisterAll()
@@ -44,12 +51,6 @@ void ScriptEngineRegistry::RegisterAll()
 	InitComponentTypes();
 
 	std::ostringstream RegisterFunctionBuffer;
-
-#define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Se." << #className << "::" << #functionName << "_Native";\
-	mono_add_internal_call(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
-	RegisterFunctionBuffer.str("");\
-	RegisterFunctionBuffer.clear();
-
 
 	ADD_INTERNAL_CALL_MONO(Entity, GetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);
