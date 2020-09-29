@@ -21,7 +21,7 @@ namespace Script
 ///////////////////////////////////////////////////////////////
 
 bool Saffron_Input_IsKeyPressed(KeyCode key);
-bool Saffron_Input_IsButtonPress(ButtonCode key);
+bool Saffron_Input_IsMouseButtonPressed(ButtonCode key);
 
 
 ///////////////////////////////////////////////////////////////
@@ -76,11 +76,11 @@ void *Saffron_MeshFactory_CreatePlane(float width, float height);
 /// Scene Camera
 ///////////////////////////////////////////////////////////////
 
-Ref<SceneCamera> *Saffron_SceneCamera_Constructor(Uint32 width, Uint32 height);
-void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this);
+Ref<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
+void Saffron_Camera_Destructor(Ref<SceneCamera> *_this);
 
-Uint32 Saffron_SceneCamera_GetProjectionMode(Ref<SceneCamera> *_this);
-void Saffron_SceneCamera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode);
+Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *_this);
+void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode);
 
 //void Saffron_SceneCamera_SetPerspectiveVerticalFOV(Ref<SceneCamera> *_this, float verticalFov);
 //float Saffron_SceneCamera_GetPerspectiveVerticalFOV(Ref<SceneCamera> *_this);

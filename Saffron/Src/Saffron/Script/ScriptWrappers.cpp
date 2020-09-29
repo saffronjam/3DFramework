@@ -295,24 +295,24 @@ void *Saffron_MeshFactory_CreatePlane(float width, float height)
 	return new Ref<Mesh>(new Mesh("Assets/models/Plane1m.obj"));
 }
 
-Ref<SceneCamera> *Saffron_SceneCamera_Constructor(Uint32 width, Uint32 height)
+Ref<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height)
 {
 	return new Ref<SceneCamera>(new SceneCamera(width, height));
 }
 
-void Saffron_SceneCamera_Destructor(Ref<SceneCamera> *_this)
+void Saffron_Camera_Destructor(Ref<SceneCamera> *_this)
 {
 	delete _this;
 }
 
-Uint32 Saffron_SceneCamera_GetProjectionMode(Ref<SceneCamera> *_this)
+Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *_this)
 {
 	if ( _this )
 		return static_cast<Uint32>((*_this)->GetProjectionMode());
 	return 0;
 }
 
-void Saffron_SceneCamera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode)
+void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *_this, Uint32 mode)
 {
 	if ( _this )
 		(*_this)->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(mode));

@@ -15,7 +15,7 @@ std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentF
 
 extern MonoImage *s_CoreAssemblyImage;
 
-#define Component_RegisterType(Type) \
+#define ComponentRegisterType(Type) \
 	{\
 		MonoType* type = mono_reflection_type_from_name("Se." #Type, s_CoreAssemblyImage);\
 		if (type) {\
@@ -29,76 +29,76 @@ extern MonoImage *s_CoreAssemblyImage;
 
 static void InitComponentTypes()
 {
-	Component_RegisterType(TagComponent);
-	Component_RegisterType(TransformComponent);
-	Component_RegisterType(MeshComponent);
-	Component_RegisterType(ScriptComponent);
-	Component_RegisterType(CameraComponent);
-	Component_RegisterType(SpriteRendererComponent);
-	Component_RegisterType(RigidBody2DComponent);
-	Component_RegisterType(BoxCollider2DComponent);
+	ComponentRegisterType(TagComponent);
+	ComponentRegisterType(TransformComponent);
+	ComponentRegisterType(MeshComponent);
+	ComponentRegisterType(ScriptComponent);
+	ComponentRegisterType(CameraComponent);
+	ComponentRegisterType(SpriteRendererComponent);
+	ComponentRegisterType(RigidBody2DComponent);
+	ComponentRegisterType(BoxCollider2DComponent);
 }
 
 void ScriptEngineRegistry::RegisterAll()
 {
 	InitComponentTypes();
 
-	mono_add_internal_call("Se.Entity::GetTransform_Native", Script::Saffron_Entity_GetTransform);
-	mono_add_internal_call("Se.Entity::SetTransform_Native", Script::Saffron_Entity_SetTransform);
-	mono_add_internal_call("Se.Entity::CreateComponent_Native", Script::Saffron_Entity_CreateComponent);
-	mono_add_internal_call("Se.Entity::HasComponent_Native", Script::Saffron_Entity_HasComponent);
-	mono_add_internal_call("Se.Entity::FindEntityByTag_Native", Script::Saffron_Entity_FindEntityByTag);
+	std::ostringstream RegisterFunctionBuffer;
 
-	mono_add_internal_call("Se.MeshComponent::GetMesh_Native", Script::Saffron_MeshComponent_GetMesh);
-	mono_add_internal_call("Se.MeshComponent::SetMesh_Native", Script::Saffron_MeshComponent_SetMesh);
-
-	mono_add_internal_call("Se.RigidBody2DComponent::ApplyLinearImpulse_Native", Script::Saffron_RigidBody2DComponent_ApplyLinearImpulse);
-	mono_add_internal_call("Se.RigidBody2DComponent::GetLinearVelocity_Native", Script::Saffron_RigidBody2DComponent_GetLinearVelocity);
-	mono_add_internal_call("Se.RigidBody2DComponent::SetLinearVelocity_Native", Script::Saffron_RigidBody2DComponent_SetLinearVelocity);
-
-	mono_add_internal_call("Se.Input::IsKeyPressed_Native", Script::Saffron_Input_IsKeyPressed);
-
-	mono_add_internal_call("Se.Texture2D::Constructor_Native", Script::Saffron_Texture2D_Constructor);
-	mono_add_internal_call("Se.Texture2D::Destructor_Native", Script::Saffron_Texture2D_Destructor);
-	mono_add_internal_call("Se.Texture2D::SetData_Native", Script::Saffron_Texture2D_SetData);
-
-	mono_add_internal_call("Se.Material::Destructor_Native", Script::Saffron_Material_Destructor);
-	mono_add_internal_call("Se.Material::SetFloat_Native", Script::Saffron_Material_SetFloat);
-	mono_add_internal_call("Se.Material::SetTexture_Native", Script::Saffron_Material_SetTexture);
-
-	mono_add_internal_call("Se.MaterialInstance::Destructor_Native", Script::Saffron_MaterialInstance_Destructor);
-	mono_add_internal_call("Se.MaterialInstance::SetFloat_Native", Script::Saffron_MaterialInstance_SetFloat);
-	mono_add_internal_call("Se.MaterialInstance::SetVector3_Native", Script::Saffron_MaterialInstance_SetVector3);
-	mono_add_internal_call("Se.MaterialInstance::SetVector4_Native", Script::Saffron_MaterialInstance_SetVector4);
-	mono_add_internal_call("Se.MaterialInstance::SetTexture_Native", Script::Saffron_MaterialInstance_SetTexture);
-
-	mono_add_internal_call("Se.Mesh::Constructor_Native", Script::Saffron_Mesh_Constructor);
-	mono_add_internal_call("Se.Mesh::Destructor_Native", Script::Saffron_Mesh_Destructor);
-	mono_add_internal_call("Se.Mesh::GetMaterial_Native", Script::Saffron_Mesh_GetMaterial);
-	mono_add_internal_call("Se.Mesh::GetMaterialByIndex_Native", Script::Saffron_Mesh_GetMaterialByIndex);
-	mono_add_internal_call("Se.Mesh::GetMaterialCount_Native", Script::Saffron_Mesh_GetMaterialCount);
-
-	mono_add_internal_call("Se.MeshFactory::CreatePlane_Native", Script::Saffron_MeshFactory_CreatePlane);
-
-	mono_add_internal_call("Se.Camera::Constructor_Native", Script::Saffron_SceneCamera_Constructor);
-	mono_add_internal_call("Se.Camera::Destructor_Native", Script::Saffron_SceneCamera_Destructor);
-	mono_add_internal_call("Se.Camera::GetProjectionMode_Native", Script::Saffron_SceneCamera_GetProjectionMode);
-	mono_add_internal_call("Se.Camera::SetProjectionMode_Native", Script::Saffron_SceneCamera_SetProjectionMode);
-
-	mono_add_internal_call("Se.CameraComponent::GetCamera_Native", Script::Saffron_CameraComponent_GetCamera);
-	mono_add_internal_call("Se.CameraComponent::SetCamera_Native", Script::Saffron_CameraComponent_SetCamera);
-
-	mono_add_internal_call("Se.ScriptComponent::GetModuleName_Native", Script::Saffron_ScriptComponent_GetModuleName);
-	mono_add_internal_call("Se.ScriptComponent::SetModuleName_Native", Script::Saffron_ScriptComponent_SetModuleName);
+#define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Se." << #className << "::" << #functionName << "_Native";\
+	mono_add_internal_call(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
+	RegisterFunctionBuffer.str("");\
+	RegisterFunctionBuffer.clear();
 
 
+	ADD_INTERNAL_CALL_MONO(Entity, GetTransform);
+	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);
+	ADD_INTERNAL_CALL_MONO(Entity, CreateComponent);
+	ADD_INTERNAL_CALL_MONO(Entity, HasComponent);
+	ADD_INTERNAL_CALL_MONO(Entity, FindEntityByTag);
 
-	// static bool IsKeyPressed(KeyCode key) { return s_Instance->IsKeyPressedImpl(key); }
-	// 
-	// static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }
-	// static std::pair<float, float> GetMousePosition() { return s_Instance->GetMousePositionImpl(); }
-	// static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
-	// static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
+	ADD_INTERNAL_CALL_MONO(MeshComponent, GetMesh);
+	ADD_INTERNAL_CALL_MONO(MeshComponent, SetMesh);
+
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, ApplyLinearImpulse);
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, GetLinearVelocity);
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, SetLinearVelocity);
+
+	ADD_INTERNAL_CALL_MONO(Input, IsKeyPressed);
+	ADD_INTERNAL_CALL_MONO(Input, IsMouseButtonPressed);
+
+	ADD_INTERNAL_CALL_MONO(Texture2D, Constructor);
+	ADD_INTERNAL_CALL_MONO(Texture2D, Destructor);
+	ADD_INTERNAL_CALL_MONO(Texture2D, SetData);
+
+	ADD_INTERNAL_CALL_MONO(Material, Destructor);
+	ADD_INTERNAL_CALL_MONO(Material, SetFloat);
+	ADD_INTERNAL_CALL_MONO(Material, SetTexture);
+
+	ADD_INTERNAL_CALL_MONO(MaterialInstance, Destructor);
+	ADD_INTERNAL_CALL_MONO(MaterialInstance, SetFloat);
+	ADD_INTERNAL_CALL_MONO(MaterialInstance, SetVector3);
+	ADD_INTERNAL_CALL_MONO(MaterialInstance, SetVector4);
+	ADD_INTERNAL_CALL_MONO(MaterialInstance, SetTexture);
+
+	ADD_INTERNAL_CALL_MONO(Mesh, Constructor);
+	ADD_INTERNAL_CALL_MONO(Mesh, Destructor);
+	ADD_INTERNAL_CALL_MONO(Mesh, GetMaterial);
+	ADD_INTERNAL_CALL_MONO(Mesh, GetMaterialByIndex);
+	ADD_INTERNAL_CALL_MONO(Mesh, GetMaterialCount);
+
+	ADD_INTERNAL_CALL_MONO(MeshFactory, CreatePlane);
+
+	ADD_INTERNAL_CALL_MONO(Camera, Constructor);
+	ADD_INTERNAL_CALL_MONO(Camera, Destructor);
+	ADD_INTERNAL_CALL_MONO(Camera, GetProjectionMode);
+	ADD_INTERNAL_CALL_MONO(Camera, SetProjectionMode);
+
+	ADD_INTERNAL_CALL_MONO(CameraComponent, GetCamera);
+	ADD_INTERNAL_CALL_MONO(CameraComponent, SetCamera);
+
+	ADD_INTERNAL_CALL_MONO(ScriptComponent, GetModuleName);
+	ADD_INTERNAL_CALL_MONO(ScriptComponent, SetModuleName);
+
 }
-
 }
