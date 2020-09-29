@@ -50,7 +50,7 @@ namespace Example
         void OnUpdate(float ts)
         {
             if (Input.IsKeyPressed(KeyCode.B))
-                m_CircleCollider2DComponent.Friction = 0.0f;
+                m_CircleCollider2DComponent.Radius = 0.0f;
 
             float movementForce = HorizontalForce;
 

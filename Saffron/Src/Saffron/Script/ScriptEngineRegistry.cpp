@@ -101,5 +101,18 @@ void ScriptEngineRegistry::RegisterAll()
 	ADD_INTERNAL_CALL_MONO(ScriptComponent, GetModuleName);
 	ADD_INTERNAL_CALL_MONO(ScriptComponent, SetModuleName);
 
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, GetOffset);
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, SetOffset);
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, GetDensity);
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, SetDensity);
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, GetFriction);
+	ADD_INTERNAL_CALL_MONO(Collider2DComponent, SetFriction);
+
+	ADD_INTERNAL_CALL_MONO(BoxCollider2DComponent, GetSize);
+	ADD_INTERNAL_CALL_MONO(BoxCollider2DComponent, SetSize);
+
+	ADD_INTERNAL_CALL_MONO(CircleCollider2DComponent, GetRadius);
+	ADD_INTERNAL_CALL_MONO(CircleCollider2DComponent, SetRadius);
+
 }
 }

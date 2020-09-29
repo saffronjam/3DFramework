@@ -237,9 +237,32 @@ void Scene::OnUpdate(Time ts)
 		for ( auto entity : view )
 		{
 			Entity e = { entity, this };
+
 			auto &transform = e.Transform();
 			auto &rb2d = e.GetComponent<RigidBody2DComponent>();
 			auto *body = static_cast<b2Body *>(rb2d.RuntimeBody);
+
+		
+			if ( e.HasComponent<BoxCollider2DComponent>() )
+			{
+				auto &component = e.GetComponent<BoxCollider2DComponent>();
+				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
+				fixture->SetDensity(component.Density);
+				fixture->SetFriction(component.Friction);
+				auto *polygonShape = dynamic_cast<b2PolygonShape *>(fixture->GetShape());
+				polygonShape->SetAsBox(component.Size.x, component.Size.y);
+			}
+			if ( e.HasComponent<CircleCollider2DComponent>() )
+			{
+				auto &component = e.GetComponent<CircleCollider2DComponent>();
+				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
+				fixture->SetDensity(component.Density);
+				fixture->SetFriction(component.Friction);
+				auto *circleShape = dynamic_cast<b2CircleShape *>(fixture->GetShape());
+				circleShape->m_radius = component.Radius;
+			}
+
+			body->ResetMassData();
 
 			const auto &position = body->GetPosition();
 			auto [translation, rotationQuat, scale] = GetTransformDecomposition(transform);
@@ -380,7 +403,6 @@ void Scene::OnRuntimeStart()
 		for ( auto entity : view )
 		{
 			Entity e = { entity, this };
-			[[maybe_unused]] UUID entityID = e.GetComponent<IDComponent>().ID;
 			auto &transform = e.Transform();
 			auto &rigidBody2D = m_Registry.get<RigidBody2DComponent>(entity);
 
@@ -411,7 +433,6 @@ void Scene::OnRuntimeStart()
 		for ( auto entity : view )
 		{
 			Entity e = { entity, this };
-			[[maybe_unused]] auto &transform = e.Transform();
 
 			auto &boxCollider2D = m_Registry.get<BoxCollider2DComponent>(entity);
 			if ( e.HasComponent<RigidBody2DComponent>() )
@@ -427,7 +448,8 @@ void Scene::OnRuntimeStart()
 				fixtureDef.shape = &polygonShape;
 				fixtureDef.density = boxCollider2D.Density;
 				fixtureDef.friction = boxCollider2D.Friction;
-				body->CreateFixture(&fixtureDef);
+				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
+				boxCollider2D.RuntimeFixture = fixture;
 			}
 		}
 	}
@@ -437,7 +459,6 @@ void Scene::OnRuntimeStart()
 		for ( auto entity : view )
 		{
 			Entity e = { entity, this };
-			[[maybe_unused]] auto &transform = e.Transform();
 
 			auto &circleCollider2D = m_Registry.get<CircleCollider2DComponent>(entity);
 			if ( e.HasComponent<RigidBody2DComponent>() )
@@ -453,7 +474,8 @@ void Scene::OnRuntimeStart()
 				fixtureDef.shape = &circleShape;
 				fixtureDef.density = circleCollider2D.Density;
 				fixtureDef.friction = circleCollider2D.Friction;
-				body->CreateFixture(&fixtureDef);
+				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
+				circleCollider2D.RuntimeFixture = fixture;
 			}
 		}
 	}
