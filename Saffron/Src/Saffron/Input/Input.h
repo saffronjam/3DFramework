@@ -3,7 +3,7 @@
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Events/MouseEvent.h"
 #include "Saffron/Input/KeyCodes.h"
-#include "Saffron/Input/MouseCodes.h"
+#include "Saffron/Input/MouseButtonCodes.h"
 
 namespace Se {
 
@@ -12,7 +12,7 @@ class Input
 public:
 	static bool IsKeyPressed(KeyCode keycode);
 
-	static bool IsMouseButtonPressed(ButtonCode button);
+	static bool IsMouseButtonPressed(MouseButtonCode button);
 	static float GetMouseX();
 	static float GetMouseY();
 	static glm::vec2 GetMousePosition();

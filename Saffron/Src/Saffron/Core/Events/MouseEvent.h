@@ -2,7 +2,7 @@
 
 #include "Saffron/Core/Event.h"
 #include "Saffron/Core/Math/SaffronMath.h"
-#include "Saffron/Input/MouseCodes.h"
+#include "Saffron/Input/MouseButtonCodes.h"
 
 namespace Se
 {
@@ -14,9 +14,9 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MousePressEvent(ButtonCode button) : m_Button(button) {}
+	explicit MousePressEvent(MouseButtonCode button) : m_Button(button) {}
 
-	ButtonCode GetButton() const { return m_Button; }
+	MouseButtonCode GetButton() const { return m_Button; }
 	std::string ToString() const override
 	{
 		std::ostringstream oss;
@@ -25,7 +25,7 @@ public:
 	}
 
 private:
-	ButtonCode m_Button;
+	MouseButtonCode m_Button;
 };
 
 class MouseReleaseEvent : public Event
@@ -35,9 +35,9 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseReleaseEvent(ButtonCode button) : m_Button(button) {}
+	explicit MouseReleaseEvent(MouseButtonCode button) : m_Button(button) {}
 
-	ButtonCode GetButton() const { return m_Button; }
+	MouseButtonCode GetButton() const { return m_Button; }
 	std::string ToString() const override
 	{
 		std::ostringstream oss;
@@ -46,7 +46,7 @@ public:
 	}
 
 private:
-	ButtonCode m_Button;
+	MouseButtonCode m_Button;
 };
 
 class MouseScrollEvent : public Event

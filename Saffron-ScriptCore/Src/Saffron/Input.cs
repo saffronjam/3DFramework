@@ -10,13 +10,19 @@ namespace Se
     public class Input
     {
 
-        public static bool IsKeyPressed(KeyCode keycode)
+        public static bool IsKeyPressed(KeyCode key)
         {
-            return IsKeyPressed_Native(keycode);
+            return IsKeyPressed_Native(key);
+        }
+        public static bool IsMouseButtonPressed(MouseButtonCode mouseButton)
+        {
+            return IsMouseButtonPressed_Native(mouseButton);
         }
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool IsKeyPressed_Native(KeyCode keycode);
+        private static extern bool IsKeyPressed_Native(KeyCode key);
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        private static extern bool IsMouseButtonPressed_Native(MouseButtonCode mouseButton);
 
     }
 }

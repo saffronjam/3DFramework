@@ -66,9 +66,9 @@ bool Saffron_Input_IsKeyPressed(KeyCode key)
 	return Input::IsKeyPressed(key);
 }
 
-bool Saffron_Input_IsMouseButtonPressed(ButtonCode key)
+bool Saffron_Input_IsMouseButtonPressed(MouseButtonCode mouseButton)
 {
-	return Input::IsMouseButtonPressed(key);
+	return Input::IsMouseButtonPressed(mouseButton);
 }
 
 

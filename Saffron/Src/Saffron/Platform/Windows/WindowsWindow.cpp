@@ -216,9 +216,9 @@ void WindowsWindow::SetupGLFWCallbacks()
 							   {
 								   auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
 								   if ( action == GLFW_PRESS )
-									   pWnd->PushEvent<MousePressEvent>(static_cast<ButtonCode>(button));
+									   pWnd->PushEvent<MousePressEvent>(static_cast<MouseButtonCode>(button));
 								   else if ( action == GLFW_RELEASE )
-									   pWnd->PushEvent<MouseReleaseEvent>(static_cast<ButtonCode>(button));
+									   pWnd->PushEvent<MouseReleaseEvent>(static_cast<MouseButtonCode>(button));
 							   });
 	glfwSetScrollCallback(m_NativeWindow, [](GLFWwindow *window, double xoffset, double yoffset)
 						  {
