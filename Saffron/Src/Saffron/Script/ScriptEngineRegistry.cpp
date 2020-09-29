@@ -88,6 +88,11 @@ void ScriptEngineRegistry::RegisterAll()
 	mono_add_internal_call("Se.CameraComponent::GetCamera_Native", Script::Saffron_CameraComponent_GetCamera);
 	mono_add_internal_call("Se.CameraComponent::SetCamera_Native", Script::Saffron_CameraComponent_SetCamera);
 
+	mono_add_internal_call("Se.ScriptComponent::GetModuleName_Native", Script::Saffron_ScriptComponent_GetModuleName);
+	mono_add_internal_call("Se.ScriptComponent::SetModuleName_Native", Script::Saffron_ScriptComponent_SetModuleName);
+
+
+
 	// static bool IsKeyPressed(KeyCode key) { return s_Instance->IsKeyPressedImpl(key); }
 	// 
 	// static bool IsMouseButtonPressed(MouseCode button) { return s_Instance->IsMouseButtonPressedImpl(button); }

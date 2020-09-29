@@ -37,6 +37,11 @@ bool Saffron_Input_IsKeyPressed(KeyCode key)
 	return Input::IsKeyPressed(key);
 }
 
+bool Saffron_Input_IsMouseButtonPressed(ButtonCode key)
+{
+	return Input::IsMouseButtonPressed(key);
+}
+
 
 ////////////////////////////////////////////////////////////////
 // Entity //////////////////////////////////////////////////////
@@ -336,6 +341,31 @@ void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCame
 	Entity entity = entityMap.at(entityID);
 	auto &cameraComponent = entity.GetComponent<CameraComponent>();
 	cameraComponent.Camera = inCamera ? *inCamera : nullptr;
+}
+
+MonoString *Saffron_ScriptComponent_GetModuleName(Uint64 entityID)
+{
+	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	SE_CORE_ASSERT(scene, "No active scene!");
+	const auto &entityMap = scene->GetEntityMap();
+	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+
+	Entity entity = entityMap.at(entityID);
+	auto &scriptComponent = entity.GetComponent<ScriptComponent>();
+
+	return ScriptEngine::CreateMonoString(scriptComponent.ModuleName.c_str());
+}
+
+void Saffron_ScriptComponent_SetModuleName(Uint64 entityID, MonoString *moduleName)
+{
+	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	SE_CORE_ASSERT(scene, "No active scene!");
+	const auto &entityMap = scene->GetEntityMap();
+	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+
+	Entity entity = entityMap.at(entityID);
+	auto &scriptComponent = entity.GetComponent<ScriptComponent>();
+	scriptComponent.ModuleName = mono_string_to_utf8(moduleName);
 }
 }
 }

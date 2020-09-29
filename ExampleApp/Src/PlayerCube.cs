@@ -15,6 +15,7 @@ namespace Example
 
         private RigidBody2DComponent m_PhysicsBody;
         private MaterialInstance m_MeshMaterial;
+        private ScriptComponent m_ScriptComponent;
 
         int m_CollisionCounter = 0;
 
@@ -24,11 +25,12 @@ namespace Example
 
         void OnCreate()
         {
+            m_ScriptComponent = GetComponent<ScriptComponent>();
+
             m_PhysicsBody = GetComponent<RigidBody2DComponent>();
 
             MeshComponent meshComponent = GetComponent<MeshComponent>();
-            m_MeshMaterial = meshComponent.Mesh.GetMaterial(0);
-            //m_MeshMaterial.Set("u_Metalness", 0.0f);
+            m_MeshMaterial = meshComponent.Mesh.GetMaterial(0); ;
 
             AddCollision2DBeginCallback(OnPlayerCollisionBegin);
             AddCollision2DEndCallback(OnPlayerCollisionEnd);
@@ -45,6 +47,9 @@ namespace Example
         }
         void OnUpdate(float ts)
         {
+            if (Input.IsKeyPressed(KeyCode.B))
+                m_ScriptComponent.ModuleName = "";
+
             float movementForce = HorizontalForce;
 
             if (!Colliding)

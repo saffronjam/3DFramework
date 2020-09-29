@@ -687,6 +687,11 @@ EntityInstanceData &ScriptEngine::GetEntityInstanceData(UUID sceneID, UUID entit
 	return entityIDMap.at(entityID);
 }
 
+MonoString *ScriptEngine::CreateMonoString(const char *string)
+{
+	return mono_string_new(s_MonoDomain, string);
+}
+
 EntityInstanceMap &ScriptEngine::GetEntityInstanceMap()
 {
 	return s_EntityInstanceMap;

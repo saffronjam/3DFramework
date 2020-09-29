@@ -108,7 +108,24 @@ namespace Se
 
     public class ScriptComponent : Component
     {
-        // TODO
+        public String ModuleName
+        {
+            get
+            {
+                return GetModuleName_Native(Entity.ID);
+            }
+            set
+            {
+                SetModuleName_Native(Entity.ID, value);
+            }
+        }
+
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern String GetModuleName_Native(ulong entityID);
+
+        [MethodImpl(MethodImplOptions.InternalCall)]
+        internal static extern void SetModuleName_Native(ulong entityID, String moduleName);
     }
 
     public class SpriteRendererComponent : Component

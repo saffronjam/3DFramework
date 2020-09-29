@@ -20,7 +20,8 @@
     <OutputPath>..\SaffronBun\Assets\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Debug-windows-x86_64\ExampleApp\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,7 +32,8 @@
     <OutputPath>..\SaffronBun\Assets\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Release-windows-x86_64\ExampleApp\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -42,7 +44,8 @@
     <OutputPath>..\SaffronBun\Assets\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Bin-Int\Dist-windows-x86_64\ExampleApp\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -54,7 +57,6 @@
     <Compile Include="Src\Noise.cs" />
     <Compile Include="Src\PlayerCube.cs" />
     <Compile Include="Src\RandomColor.cs" />
-    <Compile Include="Src\Script.cs" />
     <Compile Include="Src\Sink.cs" />
   </ItemGroup>
   <ItemGroup>
