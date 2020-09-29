@@ -30,30 +30,21 @@ public:
 	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 	const glm::mat4 &GetViewMatrix() const { return m_ViewMatrix; }
 	glm::mat4 GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
-	float GetDistance() const { return m_Distance; }
 	const glm::vec3 &GetPosition() const { return m_Position; }
 	float GetPitch() const { return m_Pitch; }
 	float GetYaw() const { return m_Yaw; }
 	glm::vec3 GetUpDirection() const;
 	glm::vec3 GetRightDirection() const;
 	glm::vec3 GetForwardDirection() const;
-	glm::quat GetOrientation() const;
 
 	void SetControllerStyle(ControllerStyle style) { m_ControllerStyle = style; }
-	void SetDistance(float distance) { m_Distance = distance; }
 
 private:
 	bool OnMouseScroll(const MouseScrollEvent &event);
 
 	void UpdateCameraView();
-	glm::vec3 CalculatePosition() const;
 
-	void MousePan(const glm::vec2 &delta);
-	void MouseRotate(const glm::vec2 &delta);
-	void MouseZoom(float delta);
 
-	glm::vec2 GetPanSpeed() const;
-	float GetRotationSpeed() const;
 	float GetZoomSpeed() const;
 
 private:
@@ -61,10 +52,14 @@ private:
 	ControllerStyle	m_ControllerStyle = ControllerStyle::Maya;
 
 	glm::mat4 m_ViewMatrix{};
-	glm::vec3 m_Position{}, m_Rotation{}, m_FocalPoint{};
+	glm::vec3 m_Position{ 0.0f, 0.0f, 0.0f };
 
-	float m_Distance{};
-	float m_Pitch{}, m_Yaw{};
+	glm::vec3 m_Forward{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_Up{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_Right{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_WorldUp{ 0.0f, 1.0f, 0.0f };
+
+	float m_Pitch = 0.0f, m_Yaw = 0.0f;
 
 
 };

@@ -118,7 +118,6 @@ void EditorLayer::OnSceneChange()
 	{
 		OnSceneStop();
 	}
-	m_EditorCamera.Reset();
 	m_EditorScene->SetSelectedEntity({});
 	m_SelectionContext.clear();
 }
