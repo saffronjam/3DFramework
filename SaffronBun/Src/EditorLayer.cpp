@@ -37,8 +37,14 @@ static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(con
 EditorLayer::EditorLayer()
 	:
 	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)),
-	m_SceneType(Scene::Type::Model), m_ViewportBounds{}
+	m_ViewportBounds{},
+	m_SceneType(Scene::Type::Model),
+	m_GuiTerminal(new GuiTerminal)
 {
+	Log::AddClientSink(m_GuiTerminal);
+
+	//ImGui::ShowDemoWindow()
+		//Log::AddCoreSink(m_GuiTerminal);
 }
 
 void EditorLayer::OnAttach()
@@ -496,6 +502,13 @@ void EditorLayer::OnImGuiRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace Demo", &p_open, window_flags);
+
+
+	m_GuiTerminal->Draw("GuiTerminal");
+
+
+
+
 	ImGui::PopStyleVar();
 
 	if ( opt_fullscreen )

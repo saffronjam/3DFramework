@@ -3,13 +3,33 @@
 #include "Saffron/System/Macros.h"
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/sink.h>
+#include <spdlog/sinks/base_sink.h>
 
 namespace Se {
 
 class Log
 {
 public:
+	struct Severity
+	{
+		enum Level
+		{
+			Trace = 0,
+			Debug = 1,
+			Info = 2,
+			Warn = 3,
+			Err = 4,
+			Critical = 5,
+			Off = 6
+		};
+	};
+
+public:
 	static void Init();
+
+	static void AddCoreSink(spdlog::sink_ptr sink);
+	static void AddClientSink(spdlog::sink_ptr sink);
 
 	static std::shared_ptr<spdlog::logger> &GetCoreLogger() { return s_CoreLogger; }
 	static std::shared_ptr<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }
@@ -32,3 +52,4 @@ private:
 #define SE_WARN(...)	Se::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define SE_ERROR(...)	Se::Log::GetClientLogger()->error(__VA_ARGS__)
 #define SE_FATAL(...)	Se::Log::GetClientLogger()->critical(__VA_ARGS__)
+

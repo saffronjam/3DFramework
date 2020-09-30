@@ -4,10 +4,12 @@
 
 #include "Saffron/Core/Application.h"
 #include "Saffron/Input/Input.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
 
 
-namespace Se {
+namespace Se
+{
 
 glm::vec2 Input::m_MousePosition = { 0.0f, 0.0f };
 glm::vec2 Input::m_LastMousePosition = { 0.0f, 0.0f };

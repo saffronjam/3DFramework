@@ -7,6 +7,7 @@
 #include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Gui/GuiTerminal.h"
 
 namespace Se
 {
@@ -75,6 +76,7 @@ private:
 	float GetSnapValue() const;
 private:
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
+	std::shared_ptr<GuiTerminal> m_GuiTerminal;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
 	std::filesystem::path m_SceneFilePath;
