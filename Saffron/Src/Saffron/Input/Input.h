@@ -16,6 +16,7 @@ public:
 	static float GetMouseX();
 	static float GetMouseY();
 	static glm::vec2 GetMousePosition();
+	static glm::vec2 GetMousePositionNDC();
 	static glm::vec2 GetMouseSwipe();
 
 	static void OnUpdate();

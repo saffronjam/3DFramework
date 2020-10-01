@@ -1,19 +1,22 @@
 #pragma once
 
-#include "Saffron/System/Macros.h"
+#include <mutex>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/sink.h>
+#include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/base_sink.h>
+
+#include "Saffron/System/Macros.h"
+
 
 namespace Se {
 
 class Log
 {
 public:
-	struct Severity
+	struct Level
 	{
-		enum Level
+		enum LevelEnum
 		{
 			Trace = 0,
 			Debug = 1,
@@ -28,8 +31,8 @@ public:
 public:
 	static void Init();
 
-	static void AddCoreSink(spdlog::sink_ptr sink);
-	static void AddClientSink(spdlog::sink_ptr sink);
+	static void AddCoreSink(std::shared_ptr<class LogSink> sink);
+	static void AddClientSink(std::shared_ptr<class LogSink> sink);
 
 	static std::shared_ptr<spdlog::logger> &GetCoreLogger() { return s_CoreLogger; }
 	static std::shared_ptr<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }

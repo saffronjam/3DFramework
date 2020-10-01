@@ -43,6 +43,12 @@ glm::vec2 Input::GetMousePosition()
 	return m_MousePosition;
 }
 
+glm::vec2 Input::GetMousePositionNDC()
+{
+	const ImVec2 mousePos = ImGui::GetMousePos();
+	return { mousePos.x, mousePos.y };
+}
+
 glm::vec2 Input::GetMouseSwipe()
 {
 	glm::vec2 swipe = m_MousePosition - m_LastMousePosition;

@@ -53,7 +53,6 @@ public:
 	void SaveActiveScene() const;
 	void LoadNewScene(const std::string &filepath);
 private:
-	glm::vec2 GetMouseViewportSpace() const;
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
 
 	struct SelectedSubmesh
@@ -76,7 +75,6 @@ private:
 	float GetSnapValue() const;
 private:
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
-	std::shared_ptr<GuiTerminal> m_GuiTerminal;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
 	std::filesystem::path m_SceneFilePath;
@@ -140,7 +138,6 @@ private:
 	Ref<Texture2D> m_ControllerGameButtonTex;
 	Ref<Texture2D> m_ControllerMayaButtonTex;
 
-	glm::vec2 m_ViewportBounds[2];
 	int m_GizmoType = -1; // -1 = no gizmo
 	float m_SnapValue = 0.5f;
 	float m_RotationSnapValue = 45.0f;
@@ -150,8 +147,6 @@ private:
 	bool m_UIShowBoundingBoxes = false;
 	bool m_UIShowBoundingBoxesOnTop = false;
 
-	bool m_ViewportPanelMouseOver = false;
-	bool m_ViewportPanelFocused = false;
 
 	Scene::Type m_SceneType;
 	Scene::State m_SceneState = Scene::State::Edit;

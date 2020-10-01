@@ -37,14 +37,9 @@ static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(con
 EditorLayer::EditorLayer()
 	:
 	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)),
-	m_ViewportBounds{},
-	m_SceneType(Scene::Type::Model),
-	m_GuiTerminal(new GuiTerminal)
+	m_SceneType(Scene::Type::Model)
 {
-	Log::AddClientSink(m_GuiTerminal);
-
-	//ImGui::ShowDemoWindow()
-		//Log::AddCoreSink(m_GuiTerminal);
+	GuiTerminal::Init();
 }
 
 void EditorLayer::OnAttach()
@@ -236,7 +231,7 @@ void EditorLayer::OnUpdate(Time ts)
 	}
 	case Scene::State::Play:
 	{
-		if ( m_ViewportPanelFocused )
+		if ( EditorViewport::Focused )
 			m_EditorCamera.OnUpdate(ts);
 
 		m_RuntimeScene->OnUpdate(ts);
@@ -245,7 +240,7 @@ void EditorLayer::OnUpdate(Time ts)
 	}
 	case Scene::State::Pause:
 	{
-		if ( m_ViewportPanelFocused )
+		if ( EditorViewport::Focused )
 			m_EditorCamera.OnUpdate(ts);
 
 		m_RuntimeScene->OnRenderRuntime(ts);
@@ -503,12 +498,6 @@ void EditorLayer::OnImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace Demo", &p_open, window_flags);
 
-
-	m_GuiTerminal->Draw("GuiTerminal");
-
-
-
-
 	ImGui::PopStyleVar();
 
 	if ( opt_fullscreen )
@@ -705,8 +694,8 @@ void EditorLayer::OnImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	ImGui::Begin("Viewport");
 
-	m_ViewportPanelMouseOver = ImGui::IsWindowHovered();
-	m_ViewportPanelFocused = ImGui::IsWindowFocused();
+	EditorViewport::Hovered = ImGui::IsWindowHovered();
+	EditorViewport::Focused = ImGui::IsWindowFocused();
 
 	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	auto viewportSize = ImGui::GetContentRegionAvail();
@@ -724,8 +713,8 @@ void EditorLayer::OnImGuiRender()
 	minBound.y += viewportOffset.y;
 
 	ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-	m_ViewportBounds[0] = { minBound.x, minBound.y };
-	m_ViewportBounds[1] = { maxBound.x, maxBound.y };
+	EditorViewport::TopLeft = { minBound.x, minBound.y };
+	EditorViewport::BottomRight = { maxBound.x, maxBound.y };
 	m_AllowViewportCameraEvents = ImGui::IsMouseHoveringRect(minBound, maxBound);
 
 	// Gizmos
@@ -1010,6 +999,7 @@ void EditorLayer::OnImGuiRender()
 	ImGui::End();
 
 	ScriptEngine::OnImGuiRender();
+	GuiTerminal::OnImGuiRender();
 
 	ImGui::End();
 }
@@ -1018,7 +1008,7 @@ void EditorLayer::OnEvent(const Event &event)
 {
 	if ( m_SceneState == Scene::State::Edit )
 	{
-		if ( m_ViewportPanelMouseOver )
+		if ( EditorViewport::Hovered )
 			m_EditorCamera.OnEvent(event);
 
 		m_EditorScene->OnEvent(event);
@@ -1036,7 +1026,7 @@ void EditorLayer::OnEvent(const Event &event)
 
 bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 {
-	if ( m_ViewportPanelFocused )
+	if ( EditorViewport::Focused )
 	{
 		switch ( event.GetKey() )
 		{
@@ -1105,7 +1095,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
 	if ( event.GetButton() == SE_BUTTON_LEFT && !Input::IsKeyPressed(SE_KEY_LEFT_ALT) && !ImGuizmo::IsOver() && m_SceneState != Scene::State::Play )
 	{
-		const auto MousePosition = GetMouseViewportSpace();
+		const auto MousePosition = EditorViewport::GetMousePosition();
 		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 		{
 			auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);
@@ -1179,17 +1169,6 @@ bool EditorLayer::OnWindowDropFiles(const WindowDropFilesEvent &event)
 	return false;
 }
 
-glm::vec2 EditorLayer::GetMouseViewportSpace() const
-{
-	auto [x, y] = ImGui::GetMousePos();
-	x -= m_ViewportBounds[0].x;
-	y -= m_ViewportBounds[0].y;
-	const auto viewportWidth = m_ViewportBounds[1].x - m_ViewportBounds[0].x;
-	const auto viewportHeight = m_ViewportBounds[1].y - m_ViewportBounds[0].y;
-
-	return { (x / viewportWidth) * 2.0f - 1.0f, ((y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
-}
-
 std::pair<glm::vec3, glm::vec3> EditorLayer::CastRay(float mx, float my) const
 {
 	const glm::vec4 mouseClipPos = { mx, my, -1.0f, 1.0f };
@@ -1221,7 +1200,7 @@ void EditorLayer::OnEntityDeleted(Entity e)
 
 Ray EditorLayer::CastMouseRay() const
 {
-	const auto MousePosition = GetMouseViewportSpace();
+	const auto MousePosition = EditorViewport::GetMousePosition();
 	if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 	{
 		auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);

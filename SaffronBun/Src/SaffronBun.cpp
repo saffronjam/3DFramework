@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	virtual void OnInit() override
+	void OnInit() override
 	{
 		PushLayer(new Se::EditorLayer());
 	}

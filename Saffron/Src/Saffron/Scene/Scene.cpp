@@ -242,7 +242,7 @@ void Scene::OnUpdate(Time ts)
 			auto &rb2d = e.GetComponent<RigidBody2DComponent>();
 			auto *body = static_cast<b2Body *>(rb2d.RuntimeBody);
 
-		
+
 			if ( e.HasComponent<BoxCollider2DComponent>() )
 			{
 				auto &component = e.GetComponent<BoxCollider2DComponent>();

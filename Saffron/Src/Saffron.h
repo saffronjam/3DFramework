@@ -33,6 +33,7 @@
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Camera.h"
 #include "Saffron/Renderer/Material.h"
+#include "Saffron/Renderer/EditorViewport.h"
 // ---------------------------------------------------
 
 // Scenes
