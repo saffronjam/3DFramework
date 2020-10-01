@@ -74,6 +74,8 @@ private:
 
 	float GetSnapValue() const;
 private:
+	int m_Style;
+
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
