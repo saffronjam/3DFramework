@@ -2,21 +2,15 @@
 
 #include "Saffron.h"
 
-#include "Saffron/Gui/GuiLayer.h"
-#include "Saffron/Editor/EditorCamera.h"
-#include "imgui/imgui_internal.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include <glm/gtx/quaternion.hpp>
-
 #include <string>
 
+#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Editor/SceneHierarchyPanel.h"
+#include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Gui/GuiTerminal.h"
 
-namespace Se {
+namespace Se
+{
 
 class EditorLayer : public Layer
 {
@@ -27,16 +21,17 @@ public:
 	};
 public:
 	EditorLayer();
-	virtual ~EditorLayer();
+	virtual ~EditorLayer() = default;
 
-	virtual void OnAttach() override;
-	virtual void OnDetach() override;
-	virtual void OnUpdate(Time ts) override;
+	void OnAttach() override;
+	void OnDetach() override;
+	void OnUpdate(Time ts) override;
 
-	virtual void OnImGuiRender() override;
-	virtual void OnEvent(const Event &event) override;
+	void OnImGuiRender() override;
+	void OnEvent(const Event &event) override;
 	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
 	bool OnMouseButtonPressed(const MousePressEvent &event);
+	bool OnWindowDropFiles(const WindowDropFilesEvent &event);
 
 	// ImGui UI helpers
 	bool Property(const std::string &name, bool &value);
@@ -51,16 +46,18 @@ public:
 	void ShowBoundingBoxes(bool show, bool onTop = false);
 	void SelectEntity(Entity entity);
 
-	void OpenScene();
-	void SaveScene() const;
-	void SaveSceneAs();
+	void NewScenePrompt();
+	void OpenScenePrompt();
+	void SaveSceneAsPrompt();
+
+	void SaveActiveScene() const;
+	void LoadNewScene(const std::string &filepath);
 private:
-	glm::vec2 GetMouseViewportSpace() const;
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
 
 	struct SelectedSubmesh
 	{
-		Se::Entity Entity;
+		Entity Entity;
 		Submesh *Mesh = nullptr;
 		float Distance = 0.0f;
 	};
@@ -69,6 +66,7 @@ private:
 	void OnEntityDeleted(Entity e);
 	Ray CastMouseRay() const;
 
+	void OnSceneChange();
 	void OnScenePlay();
 	void OnSceneStop();
 
@@ -76,10 +74,12 @@ private:
 
 	float GetSnapValue() const;
 private:
+	int m_Style;
+
 	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
-	std::string m_SceneFilePath;
+	std::filesystem::path m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorCamera m_EditorCamera;
@@ -128,17 +128,18 @@ private:
 
 	float m_EnvMapRotation = 0.0f;
 
-	enum class SceneType : uint32_t
-	{
-		Spheres = 0, Model = 1
-	};
-	SceneType m_SceneType;
 
 	// Editor resources
 	Ref<Texture2D> m_CheckerboardTex;
 	Ref<Texture2D> m_PlayButtonTex;
+	Ref<Texture2D> m_PauseButtonTex;
+	Ref<Texture2D> m_StopButtonTex;
+	Ref<Texture2D> m_TranslateButtonTex;
+	Ref<Texture2D> m_RotateButtonTex;
+	Ref<Texture2D> m_ScaleButtonTex;
+	Ref<Texture2D> m_ControllerGameButtonTex;
+	Ref<Texture2D> m_ControllerMayaButtonTex;
 
-	glm::vec2 m_ViewportBounds[2];
 	int m_GizmoType = -1; // -1 = no gizmo
 	float m_SnapValue = 0.5f;
 	float m_RotationSnapValue = 45.0f;
@@ -148,14 +149,9 @@ private:
 	bool m_UIShowBoundingBoxes = false;
 	bool m_UIShowBoundingBoxesOnTop = false;
 
-	bool m_ViewportPanelMouseOver = false;
-	bool m_ViewportPanelFocused = false;
 
-	enum class SceneState
-	{
-		Edit = 0, Play = 1, Pause = 2
-	};
-	SceneState m_SceneState = SceneState::Edit;
+	Scene::Type m_SceneType;
+	Scene::State m_SceneState = Scene::State::Edit;
 
 	enum class SelectionMode
 	{

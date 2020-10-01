@@ -20,6 +20,8 @@ public:
 	template<typename T>
 	T &GetComponent();
 	template<typename T>
+	const T &GetComponent() const;
+	template<typename T>
 	bool HasComponent();
 	template<typename T>
 	void RemoveComponent();
@@ -57,6 +59,13 @@ T &Entity::AddComponent(Args&&... args)
 
 template <typename T>
 T &Entity::GetComponent()
+{
+	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
+	return m_Scene->m_Registry.get<T>(m_EntityHandle);
+}
+
+template <typename T>
+const T &Entity::GetComponent() const
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
 	return m_Scene->m_Registry.get<T>(m_EntityHandle);

@@ -8,11 +8,13 @@ namespace Se
 class SceneCamera : public Camera
 {
 public:
-	enum class ProjectionType { Perspective = 0, Orthographic = 1 };
+	enum class ProjectionMode : Int32 { Perspective = 0, Orthographic = 1 };
 public:
+	SceneCamera(Uint32 width = 1280, Uint32 height = 720, ProjectionMode projectionType = ProjectionMode::Perspective);
+
 	void SetPerspective(float verticalFOV, float nearClip = 0.01f, float farClip = 10000.0f);
 	void SetOrthographic(float size, float nearClip = -1.0f, float farClip = 1.0f);
-	void SetViewportSize(Uint32 width, Uint32 height);
+	void SetViewportSize(Uint32 width, Uint32 height) override;
 
 	void SetPerspectiveVerticalFOV(float verticalFov) { m_PerspectiveFOV = glm::radians(verticalFov); }
 	float GetPerspectiveVerticalFOV() const { return glm::degrees(m_PerspectiveFOV); }
@@ -28,10 +30,10 @@ public:
 	void SetOrthographicFarClip(float farClip) { m_OrthographicFar = farClip; }
 	float GetOrthographicFarClip() const { return m_OrthographicFar; }
 
-	void SetProjectionType(ProjectionType type) { m_ProjectionType = type; }
-	ProjectionType GetProjectionType() const { return m_ProjectionType; }
+	void SetProjectionMode(ProjectionMode type) { m_ProjectionMode = type; }
+	ProjectionMode GetProjectionMode() const { return m_ProjectionMode; }
 private:
-	ProjectionType m_ProjectionType = ProjectionType::Perspective;
+	ProjectionMode m_ProjectionMode = ProjectionMode::Perspective;
 
 	float m_PerspectiveFOV = glm::radians(45.0f);
 	float m_PerspectiveNear = 0.01f, m_PerspectiveFar = 10000.0f;

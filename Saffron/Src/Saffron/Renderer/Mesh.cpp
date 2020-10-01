@@ -228,12 +228,16 @@ Mesh::Mesh(const std::string &filename)
 		// Indices
 		for ( size_t i = 0; i < mesh->mNumFaces; i++ )
 		{
-			SE_CORE_ASSERT(mesh->mFaces[i].mNumIndices == 3, "Must have 3 indices.");
-			Index index = { mesh->mFaces[i].mIndices[0], mesh->mFaces[i].mIndices[1], mesh->mFaces[i].mIndices[2] };
+			const auto &face = mesh->mFaces[i];
+			SE_CORE_ASSERT(face.mNumIndices == 3, "Must have 3 indices.");
+			Index index = { face.mIndices[0], face.mIndices[1], face.mIndices[2] };
 			m_Indices.push_back(index);
 
 			if ( !m_IsAnimated )
-				m_TriangleCache[m].emplace_back(m_StaticVertices[index.V1 + submesh.BaseVertex], m_StaticVertices[index.V2 + submesh.BaseVertex], m_StaticVertices[index.V3 + submesh.BaseVertex]);
+				m_TriangleCache[static_cast<Uint32>(m)].emplace_back(m_StaticVertices[index.V1 + submesh.BaseVertex],
+																	 m_StaticVertices[index.V2 + submesh.BaseVertex],
+																	 m_StaticVertices[index.V3 + submesh.BaseVertex]
+				);
 		}
 
 
@@ -530,7 +534,7 @@ Mesh::Mesh(const std::string &filename)
 	VertexBuffer::Layout vertexLayout;
 	if ( m_IsAnimated )
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), m_AnimatedVertices.size() * sizeof(AnimatedVertex));
+		m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float3, "a_Normal" },
@@ -543,7 +547,7 @@ Mesh::Mesh(const std::string &filename)
 	}
 	else
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), m_StaticVertices.size() * sizeof(Vertex));
+		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float3, "a_Normal" },
@@ -553,7 +557,7 @@ Mesh::Mesh(const std::string &filename)
 		};
 	}
 
-	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), m_Indices.size() * sizeof(Index));
+	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
 
 	Pipeline::Specification pipelineSpecification;
 	pipelineSpecification.Layout = vertexLayout;

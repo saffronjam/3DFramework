@@ -178,7 +178,7 @@ void Renderer2D::BeginScene(const glm::mat4 &viewProj, bool depthTest)
 
 void Renderer2D::EndScene()
 {
-	Uint32 dataSize = reinterpret_cast<Uint8 *>(sData.QuadVertexBufferPtr) - reinterpret_cast<Uint8 *>(sData.QuadVertexBufferBase);
+	Uint32 dataSize = static_cast<Uint32>(sData.QuadVertexBufferPtr - sData.QuadVertexBufferBase);
 	if ( dataSize )
 	{
 		sData.QuadVertexBuffer->SetData(sData.QuadVertexBufferBase, dataSize);
@@ -195,7 +195,7 @@ void Renderer2D::EndScene()
 		sData.Stats.DrawCalls++;
 	}
 
-	dataSize = reinterpret_cast<Uint8 *>(sData.LineVertexBufferPtr) - reinterpret_cast<Uint8 *>(sData.LineVertexBufferBase);
+	dataSize = static_cast<Uint32>(sData.LineVertexBufferPtr - sData.LineVertexBufferBase);
 	if ( dataSize )
 	{
 		sData.LineVertexBuffer->SetData(sData.LineVertexBufferBase, dataSize);

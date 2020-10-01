@@ -90,7 +90,7 @@ namespace Se
         private static extern void CreateComponent_Native(ulong entityID, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasComponent_Native(ulong entityID, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] 
+        [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void GetTransform_Native(ulong entityID, out Matrix4 matrix);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetTransform_Native(ulong entityID, ref Matrix4 matrix);

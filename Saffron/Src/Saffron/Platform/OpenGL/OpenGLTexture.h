@@ -70,7 +70,7 @@ public:
 
 	bool operator==(const Texture &other) const override;
 private:
-	RendererID m_RendererID;
+	RendererID m_RendererID{};
 	Format m_Format;
 	Uint32 m_Width, m_Height;
 

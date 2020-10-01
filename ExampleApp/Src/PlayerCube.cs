@@ -15,6 +15,8 @@ namespace Example
 
         private RigidBody2DComponent m_PhysicsBody;
         private MaterialInstance m_MeshMaterial;
+        private ScriptComponent m_ScriptComponent;
+        private CircleCollider2DComponent m_CircleCollider2DComponent;
 
         int m_CollisionCounter = 0;
 
@@ -24,11 +26,13 @@ namespace Example
 
         void OnCreate()
         {
+            m_ScriptComponent = GetComponent<ScriptComponent>();
+            m_CircleCollider2DComponent = GetComponent<CircleCollider2DComponent>();
+
             m_PhysicsBody = GetComponent<RigidBody2DComponent>();
 
             MeshComponent meshComponent = GetComponent<MeshComponent>();
-            m_MeshMaterial = meshComponent.Mesh.GetMaterial(0);
-            m_MeshMaterial.Set("u_Metalness", 0.0f);
+            m_MeshMaterial = meshComponent.Mesh.GetMaterial(0); ;
 
             AddCollision2DBeginCallback(OnPlayerCollisionBegin);
             AddCollision2DEndCallback(OnPlayerCollisionEnd);
@@ -45,6 +49,9 @@ namespace Example
         }
         void OnUpdate(float ts)
         {
+            if (Input.IsKeyPressed(KeyCode.B))
+                m_CircleCollider2DComponent.Radius = 0.0f;
+
             float movementForce = HorizontalForce;
 
             if (!Colliding)
@@ -56,7 +63,8 @@ namespace Example
             else if (Input.IsKeyPressed(KeyCode.A))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(-movementForce, 0), new Vector2(), true);
 
-            if (Colliding && Input.IsKeyPressed(KeyCode.Space))
+
+            if (Colliding && Input.IsMouseButtonPressed(MouseButtonCode.Right))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(0, JumpForce), new Vector2(0, 0), true);
 
             if (m_CollisionCounter > 0)
@@ -64,9 +72,9 @@ namespace Example
             else
                 m_MeshMaterial.Set("u_AlbedoColor", new Vector3(0.8f, 0.8f, 0.8f));
 
-            Vector2 linearVelocity = m_PhysicsBody.GetLinearVelocity();
+            Vector2 linearVelocity = m_PhysicsBody.LinearVelocity;
             linearVelocity.Clamp(new Vector2(-MaxSpeed.X, -1000), MaxSpeed);
-            m_PhysicsBody.SetLinearVelocity(linearVelocity);
+            m_PhysicsBody.LinearVelocity = linearVelocity;
 
             if (Input.IsKeyPressed(KeyCode.R))
             {

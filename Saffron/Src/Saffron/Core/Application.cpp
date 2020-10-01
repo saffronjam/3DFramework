@@ -88,6 +88,7 @@ void Application::Run()
 
 			Renderer::WaitAndRender();
 		}
+		Input::OnUpdate();
 		m_Window->OnUpdate();
 
 		ts = Timer::GlobalMark();
@@ -95,11 +96,17 @@ void Application::Run()
 	OnShutdown();
 }
 
+void Application::Exit()
+{
+	m_Running = false;
+}
+
 void Application::OnEvent(const Event &event)
 {
 	const EventDispatcher dispatcher(event);
 	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(OnWindowClose));
 
+	Input::OnEvent(event);
 	m_Window->OnEvent(event);
 
 	for ( auto it = m_LayerStack.end(); it != m_LayerStack.begin(); )
@@ -116,7 +123,7 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 	return true;
 }
 
-std::string Application::OpenFile(const char *filter) const
+std::filesystem::path Application::OpenFile(const char *filter) const
 {
 	OPENFILENAMEA ofn;       // common dialog box structure
 	CHAR szFile[260] = { 0 };       // if using TCHAR macros
@@ -138,7 +145,7 @@ std::string Application::OpenFile(const char *filter) const
 	return std::string();
 }
 
-std::string Application::SaveFile(const char *filter) const
+std::filesystem::path Application::SaveFile(const char *filter) const
 {
 	OPENFILENAMEA ofn;       // common dialog box structure
 	CHAR szFile[260] = { 0 };       // if using TCHAR macros
@@ -148,16 +155,17 @@ std::string Application::SaveFile(const char *filter) const
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
 	ofn.lpstrFile = szFile;
+	ofn.lpstrDefExt = "ssc";
 	ofn.nMaxFile = sizeof(szFile);
 	ofn.lpstrFilter = filter;
 	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT;
 
 	if ( GetSaveFileNameA(&ofn) == TRUE )
 	{
 		return ofn.lpstrFile;
 	}
-	return std::string();
+	return std::filesystem::path();
 }
 
 float Application::GetTime() const

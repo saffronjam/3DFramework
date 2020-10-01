@@ -56,14 +56,14 @@ OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wra
 }
 
 OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
-	: m_FilePath(path)
+	: m_Width(0), m_Height(0), m_FilePath(path)
 {
 	int width, height, channels;
 	if ( stbi_is_hdr(path.c_str()) )
 	{
 		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", path, sRGB);
 
-		m_ImageData = Buffer::Encapsulate((Uint8 *)stbi_loadf(path.c_str(), &width, &height, &channels, 0));
+		m_ImageData = Buffer::Encapsulate(reinterpret_cast<Uint8 *>(stbi_loadf(path.c_str(), &width, &height, &channels, 0)));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_IsHDR = true;
 		m_Format = Format::Float16;
@@ -226,7 +226,7 @@ OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
 
 	std::array<Uint8 *, 6> faces{};
 	for ( auto &face : faces )
-		face = new Uint8[faceWidth * faceHeight * 3]; // 3 BPP
+		face = new Uint8[static_cast<Int32>(faceWidth * faceHeight) * 3]; // 3 BPP
 
 	int faceIndex = 0;
 
@@ -238,9 +238,9 @@ OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
 			for ( size_t x = 0; x < faceWidth; x++ )
 			{
 				const size_t xOffset = x + i * faceWidth;
-				faces[faceIndex][(x + y * faceWidth) * 3 + 0] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 0];
-				faces[faceIndex][(x + y * faceWidth) * 3 + 1] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 1];
-				faces[faceIndex][(x + y * faceWidth) * 3 + 2] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 2];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 0] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 0];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 1] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 1];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 2] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 2];
 			}
 		}
 		faceIndex++;
@@ -258,9 +258,9 @@ OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
 			for ( size_t x = 0; x < faceWidth; x++ )
 			{
 				const size_t xOffset = x + faceWidth;
-				faces[faceIndex][(x + y * faceWidth) * 3 + 0] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 0];
-				faces[faceIndex][(x + y * faceWidth) * 3 + 1] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 1];
-				faces[faceIndex][(x + y * faceWidth) * 3 + 2] = m_ImageData[(xOffset + yOffset * m_Width) * 3 + 2];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 0] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 0];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 1] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 1];
+				faces[faceIndex][(x + y * faceWidth) * 3 + 2] = m_ImageData[(static_cast<int>(xOffset + yOffset) * m_Width) * 3 + 2];
 			}
 		}
 		faceIndex++;

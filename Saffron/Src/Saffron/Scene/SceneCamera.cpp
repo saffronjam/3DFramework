@@ -5,9 +5,14 @@
 
 namespace Se
 {
+SceneCamera::SceneCamera(Uint32 width, Uint32 height, ProjectionMode projectionType)
+{
+	SceneCamera::SetViewportSize(width, height);
+}
+
 void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
 {
-	m_ProjectionType = ProjectionType::Perspective;
+	m_ProjectionMode = ProjectionMode::Perspective;
 	m_PerspectiveFOV = verticalFOV;
 	m_PerspectiveNear = nearClip;
 	m_PerspectiveFar = farClip;
@@ -15,7 +20,7 @@ void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farCli
 
 void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 {
-	m_ProjectionType = ProjectionType::Orthographic;
+	m_ProjectionMode = ProjectionMode::Orthographic;
 	m_OrthographicSize = size;
 	m_OrthographicNear = nearClip;
 	m_OrthographicFar = farClip;
@@ -23,12 +28,14 @@ void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 
 void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
 {
-	switch ( m_ProjectionType )
+	Camera::SetViewportSize(width, height);
+	switch ( m_ProjectionMode )
 	{
-	case ProjectionType::Perspective:
+	case ProjectionMode::Perspective:
 		m_ProjectionMatrix = glm::perspectiveFov(m_PerspectiveFOV, static_cast<float>(width), static_cast<float>(height), m_PerspectiveNear, m_PerspectiveFar);
 		break;
-	case ProjectionType::Orthographic:
+
+	case ProjectionMode::Orthographic:
 		const float aspect = static_cast<float>(width) / static_cast<float>(height);
 		const float Width = m_OrthographicSize * aspect;
 		const float Height = m_OrthographicSize;

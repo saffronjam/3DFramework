@@ -1,6 +1,8 @@
 #pragma once
 
 #include <sstream>
+#include <utility>
+#include <filesystem>
 
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Event.h"
@@ -82,4 +84,30 @@ public:
 	std::string ToString() const override { return GetName(); }
 
 };
+
+class WindowDropFilesEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowDropFiles);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowDropFilesEvent(std::vector<std::filesystem::path> filepaths) : m_Filepaths(std::move(filepaths)) {}
+
+	const std::vector<std::filesystem::path> &GetPaths() const { return m_Filepaths; }
+	std::string ToString() const override
+	{
+		std::ostringstream oss;
+		oss << GetName() << " Paths: ";
+		for ( const auto &filepath : m_Filepaths )
+		{
+			oss << "[ " << filepath.string() << " ]";
+		}
+		return oss.str();
+	}
+
+private:
+	std::vector<std::filesystem::path> m_Filepaths;
+};
+
 }

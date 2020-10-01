@@ -9,10 +9,10 @@
 extern "C" {
 	typedef struct _MonoObject MonoObject;
 	typedef struct _MonoClassField MonoClassField;
+	typedef struct _MonoString MonoString;
 }
 
 namespace Se {
-
 
 ///////////////////////////////////////////////////////////////////////////
 /// Forwards Declarations
@@ -143,6 +143,8 @@ public:
 
 	static EntityInstanceMap &GetEntityInstanceMap();
 	static EntityInstanceData &GetEntityInstanceData(UUID sceneID, UUID entityID);
+
+	static MonoString *CreateMonoString(const char *string);
 
 	// Debug
 	static void OnImGuiRender();

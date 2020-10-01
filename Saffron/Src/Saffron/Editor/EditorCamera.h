@@ -12,61 +12,55 @@ namespace Se
 class EditorCamera : public Camera
 {
 public:
+	enum class ControllerStyle
+	{
+		Game = 0,
+		Maya = 1
+	};
+
+public:
 	EditorCamera() = default;
 	explicit EditorCamera(const glm::mat4 &projectionMatrix);
 
-	void Focus();
 	void OnUpdate(Time ts);
 	bool OnEvent(const Event &event);
 
-	float GetDistance() const { return m_Distance; }
+	void Reset();
 
+	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 	const glm::mat4 &GetViewMatrix() const { return m_ViewMatrix; }
 	glm::mat4 GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
-
+	const glm::vec3 &GetPosition() const { return m_Position; }
+	float GetPitch() const { return m_Pitch; }
+	float GetYaw() const { return m_Yaw; }
 	glm::vec3 GetUpDirection() const;
 	glm::vec3 GetRightDirection() const;
 	glm::vec3 GetForwardDirection() const;
-	const glm::vec3 &GetPosition() const { return m_Position; }
-	glm::quat GetOrientation() const;
 
-	float GetExposure() const override { return m_Exposure; }
-	float &GetExposure() override { return m_Exposure; }
-
-	float GetPitch() const { return m_Pitch; }
-	float GetYaw() const { return m_Yaw; }
-
-	void SetDistance(float distance) { m_Distance = distance; }
-	void SetViewportSize(Uint32 width, Uint32 height) { m_ViewportWidth = width; m_ViewportHeight = height; }
+	void SetControllerStyle(ControllerStyle style) { m_ControllerStyle = style; }
 
 private:
-	void UpdateCameraView();
-
 	bool OnMouseScroll(const MouseScrollEvent &event);
 
-	void MousePan(const glm::vec2 &delta);
-	void MouseRotate(const glm::vec2 &delta);
-	void MouseZoom(float delta);
+	void UpdateCameraView();
 
-	glm::vec3 CalculatePosition() const;
 
-	glm::vec2 GetPanSpeed() const;
-	float GetRotationSpeed() const;
 	float GetZoomSpeed() const;
 
 private:
+	float m_MovementSpeed = 10.0f;
+	ControllerStyle	m_ControllerStyle = ControllerStyle::Maya;
+
 	glm::mat4 m_ViewMatrix{};
-	glm::vec3 m_Position{}, m_Rotation{}, m_FocalPoint{};
+	glm::vec3 m_Position{ 0.0f, 0.0f, 0.0f };
 
-	bool m_Panning{}, m_Rotating{};
-	glm::vec2 m_InitialMousePosition{};
-	glm::vec3 m_InitialFocalPoint{}, m_InitialRotation{};
+	glm::vec3 m_Forward{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_Up{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_Right{ 0.0f, 0.0f, 0.0f };
+	glm::vec3 m_WorldUp{ 0.0f, 1.0f, 0.0f };
 
-	float m_Distance;
-	float m_Pitch, m_Yaw;
+	float m_Pitch = 0.0f, m_Yaw = 0.0f;
 
-	float m_Exposure = 0.8f;
 
-	Uint32 m_ViewportWidth = 1280, m_ViewportHeight = 720;
 };
 }

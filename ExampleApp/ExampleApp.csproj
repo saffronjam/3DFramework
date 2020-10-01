@@ -54,7 +54,6 @@
     <Compile Include="Src\Noise.cs" />
     <Compile Include="Src\PlayerCube.cs" />
     <Compile Include="Src\RandomColor.cs" />
-    <Compile Include="Src\Script.cs" />
     <Compile Include="Src\Sink.cs" />
   </ItemGroup>
   <ItemGroup>

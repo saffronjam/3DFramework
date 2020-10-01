@@ -11,7 +11,7 @@ public:
 	{
 	}
 
-	virtual void OnInit() override
+	void OnInit() override
 	{
 		PushLayer(new Se::EditorLayer());
 	}
@@ -19,5 +19,5 @@ public:
 
 Se::Application *Se::CreateApplication()
 {
-	return new SaffronBunApplication({ "Hazelnut", 1600, 900 });
+	return new SaffronBunApplication({ "Saffron Bun", 1600, 900 });
 }

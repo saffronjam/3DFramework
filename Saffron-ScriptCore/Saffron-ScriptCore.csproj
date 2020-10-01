@@ -57,13 +57,14 @@
     <Compile Include="Src\Saffron\Math\Vector2.cs" />
     <Compile Include="Src\Saffron\Math\Vector3.cs" />
     <Compile Include="Src\Saffron\Math\Vector4.cs" />
+    <Compile Include="Src\Saffron\MouseButtonCodes.cs" />
+    <Compile Include="Src\Saffron\Renderer\Camera.cs" />
     <Compile Include="Src\Saffron\Renderer\Color.cs" />
     <Compile Include="Src\Saffron\Renderer\Material.cs" />
     <Compile Include="Src\Saffron\Renderer\Mesh.cs" />
     <Compile Include="Src\Saffron\Renderer\MeshFactory.cs" />
     <Compile Include="Src\Saffron\Renderer\Texture2D.cs" />
     <Compile Include="Src\Saffron\Scene\Component.cs" />
-    <Compile Include="Src\Saffron\SpriteRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>

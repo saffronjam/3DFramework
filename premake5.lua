@@ -130,6 +130,7 @@ project "Saffron"
 		
 		defines 
 		{ 
+			"_CRT_SECURE_NO_WARNINGS",
 			"SE_PLATFORM_WINDOWS",
 			"SE_BUILD_DLL"
 		}
@@ -222,6 +223,7 @@ project "SaffronBun"
 				
 		defines 
 		{ 
+			"_CRT_SECURE_NO_WARNINGS",
 			"SE_PLATFORM_WINDOWS"
 		}
 	

@@ -69,14 +69,13 @@ struct ScriptComponent
 
 struct CameraComponent
 {
-	SceneCamera Camera;
+	Ref<SceneCamera> Camera;
 	bool Primary = true;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator SceneCamera &() { return Camera; }
-	operator const SceneCamera &() const { return Camera; }
+	operator Ref<SceneCamera>() { return Camera; }
 };
 
 struct SpriteRendererComponent
@@ -102,31 +101,28 @@ struct RigidBody2DComponent
 	RigidBody2DComponent(const RigidBody2DComponent &other) = default;
 };
 
-struct BoxCollider2DComponent
+struct Collider2DComponent
 {
 	glm::vec2 Offset = { 0.0f,0.0f };
-	glm::vec2 Size = { 1.0f, 1.0f };
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
 
 	// Storage for runtime
 	void *RuntimeFixture = nullptr;
+};
+
+struct BoxCollider2DComponent : Collider2DComponent
+{
+	glm::vec2 Size = { 1.0f, 1.0f };
 
 	BoxCollider2DComponent() = default;
 	BoxCollider2DComponent(const BoxCollider2DComponent &other) = default;
 };
 
-struct CircleCollider2DComponent
+struct CircleCollider2DComponent : Collider2DComponent
 {
-	glm::vec2 Offset = { 0.0f,0.0f };
 	float Radius = 1.0f;
-
-	float Density = 1.0f;
-	float Friction = 1.0f;
-
-	// Storage for runtime
-	void *RuntimeFixture = nullptr;
 
 	CircleCollider2DComponent() = default;
 	CircleCollider2DComponent(const CircleCollider2DComponent &other) = default;

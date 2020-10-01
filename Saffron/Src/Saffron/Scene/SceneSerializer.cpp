@@ -358,7 +358,7 @@ void SceneSerializer::Serialize(const std::string &filepath)
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "Scene";
-	out << YAML::Value << "Scene Name";
+	out << YAML::Value << m_Scene->GetName();
 	SerializeEnvironment(out, m_Scene);
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
@@ -396,6 +396,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 
 	auto sceneName = data["Scene"].as<std::string>();
 	SE_CORE_INFO("Deserializing scene '{0}'", sceneName);
+	m_Scene->SetName(sceneName);
 
 	auto environment = data["Environment"];
 	if ( environment )
@@ -534,7 +535,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( cameraComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<CameraComponent>();
-				component.Camera = SceneCamera();
+				component.Camera = Ref<SceneCamera>::Create();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 
 				SE_CORE_INFO("  Primary Camera: {0}", component.Primary);
