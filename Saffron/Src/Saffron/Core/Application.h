@@ -3,14 +3,11 @@
 #include "Saffron/Base.h"
 #include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Core/LayerStack.h"
-#include "Saffron/Core/Timer.h"
 #include "Saffron/Core/Window.h"
 #include "Saffron/Gui/GuiLayer.h"
 
-namespace Se {
-
-
-
+namespace Se
+{
 class Application
 {
 public:
@@ -60,7 +57,7 @@ private:
 	static Application *s_Instance;
 };
 
-// Implemented by CLIENT
+// Implemented by client
 Application *CreateApplication();
 
 }

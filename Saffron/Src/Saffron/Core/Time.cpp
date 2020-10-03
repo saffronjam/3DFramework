@@ -38,6 +38,17 @@ Time &Time::operator*=(float multiplier)
 	return *this = *this * multiplier;
 }
 
+Time &Time::operator/(float multiplier)
+{
+	m_Time /= multiplier;
+	return *this;
+}
+
+Time &Time::operator/=(float multiplier)
+{
+	return *this = *this / multiplier;
+}
+
 float Time::operator()() const
 {
 	return m_Time;

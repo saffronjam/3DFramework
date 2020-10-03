@@ -18,10 +18,7 @@ public:
 	Time Peek() const;
 	Time PeekTotal() const;
 
-	static Time GlobalMark();
-	static Time GlobalPeek();
-	static Time GlobalTotal();
-
+	const char *GetName();
 	TimePoint GetStart() const;
 	TimePoint GetInitialStart() const;
 
@@ -29,8 +26,5 @@ protected:
 	const char *m_Name;
 	TimePoint m_LastTimePoint;
 	TimePoint m_InitialTimePoint;
-
-	static TimePoint m_GlobalLastTimePoint;
-	static TimePoint m_GlobalInitialTimePoint;
 };
 }

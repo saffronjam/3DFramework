@@ -42,6 +42,5 @@ private:
 	GLFWcursor *m_ImGuiMouseCursors[9] = { nullptr };
 
 	bool m_VSync;
-	Time ts = Time::Zero();
 };
 }

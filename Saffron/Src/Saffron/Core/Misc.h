@@ -1,24 +1,23 @@
 #pragma once
 
+#include <tuple>
+
+#include "Saffron/Core/Math/SaffronMath.h"
 
 namespace Se
 {
-namespace Misc
+class Misc
 {
-namespace Details
-{
-struct SturcturedVoid {};
-inline SturcturedVoid NoValue{};
+public:
+	struct TransformDecomposition
+	{
+		glm::vec3 Translation;
+		glm::quat Rotation;
+		glm::vec3 Scale;
+	};
 
-template <typename T>
-struct NonVoid { using Type = T; };
-template <>
-struct NonVoid<void> { using Type = SturcturedVoid; };
-};
-
-template <typename T>
-using NonVoid = typename Details::NonVoid<T>::Type;
-
+public:
+	static TransformDecomposition GetTransformDecomposition(const glm::mat4 &transform);
 };
 
 }

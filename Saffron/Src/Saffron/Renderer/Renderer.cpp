@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RendererAPI.h"
@@ -70,6 +72,40 @@ void Renderer::Init()
 	s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
 
 	Renderer2D::Init();
+}
+
+void Renderer::OnImGuiRender()
+{
+	const Time ts = GlobalTimer::GetStep();
+
+	static Time CachedFrametime = Time::Zero();
+	static Time AverageFrameTimeCounter = Time::Zero();
+	static Uint32 m_CachedFrameCounter = 0;
+	m_CachedFrameCounter++;
+	if ( (AverageFrameTimeCounter += ts).sec() > 1.0f )
+	{
+		CachedFrametime = AverageFrameTimeCounter / static_cast<float>(m_CachedFrameCounter);
+		AverageFrameTimeCounter = Time::Zero();
+		m_CachedFrameCounter = 0;
+	}
+
+	static Time SavedTS = Time::Zero();
+	static Time Counter = Time::Zero();
+	if ( (Counter += ts).sec() > 0.1f )
+	{
+		SavedTS = ts;
+		Counter = Time::Zero();
+	}
+
+	ImGui::Begin("Renderer");
+	auto &caps = RendererAPI::GetCapabilities();
+	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
+	ImGui::Text("Renderer: %s", caps.Renderer.c_str());
+	ImGui::Text("Version: %s", caps.Version.c_str());
+	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", SavedTS.ms(), 1.0f / SavedTS.sec());
+	ImGui::Text("Average: ");
+	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", CachedFrametime.ms(), 1.0f / CachedFrametime.sec());
+	ImGui::End();
 }
 
 void Renderer::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)

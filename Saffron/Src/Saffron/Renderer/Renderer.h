@@ -15,6 +15,8 @@ class Renderer
 public:
 	static void Init();
 
+	static void OnImGuiRender();
+
 	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
 	// Commands

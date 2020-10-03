@@ -2,7 +2,9 @@
 
 #include <filesystem>
 
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Gui/GuiTerminal.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -24,21 +26,11 @@ static void ImGuiShowHelpMarker(const char *desc)
 	}
 }
 
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
-{
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
 
 EditorLayer::EditorLayer()
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
-	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)),
-	m_SceneType(Scene::Type::Model)
+	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f))
 {
 	Gui::Init();
 	GuiTerminal::Init();
@@ -49,15 +41,15 @@ void EditorLayer::OnAttach()
 	Gui::SetStyle(static_cast<Gui::Style>(m_Style));
 
 	// Editor
-	m_CheckerboardTex = Texture2D::Create("Assets/Editor/Checkerboard.tga");
-	m_PlayButtonTex = Texture2D::Create("Assets/Editor/PlayButton.png");
-	m_PauseButtonTex = Texture2D::Create("Assets/Editor/PauseButton.png");
-	m_StopButtonTex = Texture2D::Create("Assets/Editor/StopButton.png");
-	m_TranslateButtonTex = Texture2D::Create("Assets/Editor/Translate_w.png");
-	m_RotateButtonTex = Texture2D::Create("Assets/Editor/Rotate_w.png");
-	m_ScaleButtonTex = Texture2D::Create("Assets/Editor/Scale_w.png");
-	m_ControllerGameButtonTex = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
-	m_ControllerMayaButtonTex = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
+	m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+	m_TexStore["PlayButton"] = Texture2D::Create("Assets/Editor/PlayButton.png");
+	m_TexStore["PauseButton"] = Texture2D::Create("Assets/Editor/PauseButton.png");
+	m_TexStore["StopButton"] = Texture2D::Create("Assets/Editor/StopButton.png");
+	m_TexStore["TranslateButton"] = Texture2D::Create("Assets/Editor/Translate_w.png");
+	m_TexStore["RotateButton"] = Texture2D::Create("Assets/Editor/Rotate_w.png");
+	m_TexStore["ScaleButton"] = Texture2D::Create("Assets/Editor/Scale_w.png");
+	m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
+	m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
 
 	m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_EditorScene);
 	m_SceneHierarchyPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
@@ -130,8 +122,10 @@ float EditorLayer::GetSnapValue() const
 	}
 }
 
-void EditorLayer::OnUpdate(Time ts)
+void EditorLayer::OnUpdate()
 {
+	const Time ts = GlobalTimer::GetStep();
+
 	switch ( m_SceneState )
 	{
 	case Scene::State::Edit:
@@ -174,7 +168,7 @@ void EditorLayer::OnUpdate(Time ts)
 			if ( selection.Entity.HasComponent<BoxCollider2DComponent>() )
 			{
 				const auto &size = selection.Entity.GetComponent<BoxCollider2DComponent>().Size;
-				auto [translation, rotationQuat, scale] = GetTransformDecomposition(selection.Entity.GetComponent<TransformComponent>().Transform);
+				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(selection.Entity.GetComponent<TransformComponent>().Transform);
 				const glm::vec3 rotation = glm::eulerAngles(rotationQuat);
 
 				Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass(), false);
@@ -206,116 +200,6 @@ void EditorLayer::OnUpdate(Time ts)
 		break;
 	}
 	}
-}
-
-bool EditorLayer::Property(const std::string &name, bool &value)
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	const bool result = ImGui::Checkbox(id.c_str(), &value);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return result;
-}
-
-bool EditorLayer::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags) const
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
-	else
-		changed = ImGui::DragFloat(id.c_str(), &value, 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec2 &value, EditorLayer::PropertyFlag flags) const
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec2 &value, float min, float max, PropertyFlag flags) const
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, PropertyFlag flags) const
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec3 &value, float min, float max, PropertyFlag flags) const
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
-		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat3(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec4 &value, PropertyFlag flags) const
-{
-	return Property(name, value, -1.0f, 1.0f, flags);
-}
-
-bool EditorLayer::Property(const std::string &name, glm::vec4 &value, float min, float max, PropertyFlag flags) const
-{
-	ImGui::Text(name.c_str());
-	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
-
-	const std::string id = "##" + name;
-	bool changed;
-	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::ColorProperty) )
-		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if ( flags == PropertyFlag::SliderProperty )
-		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
-	else
-		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
-
-	ImGui::PopItemWidth();
-	ImGui::NextColumn();
-
-	return changed;
 }
 
 void EditorLayer::ShowBoundingBoxes(bool show, bool onTop)
@@ -487,19 +371,19 @@ void EditorLayer::OnImGuiRender()
 	ImGui::AlignTextToFramePadding();
 
 	auto &light = m_EditorScene->GetLight();
-	Property("Light Direction", light.Direction, PropertyFlag::SliderProperty);
-	Property("Light Radiance", light.Radiance, PropertyFlag::ColorProperty);
-	Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, PropertyFlag::SliderProperty);
+	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
+	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
+	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, Gui::PropertyFlag::Slider);
 
-	Property("Exposure", m_EditorCamera.GetExposure(), 0.0f, 5.0f, PropertyFlag::SliderProperty);
+	Gui::Property("Exposure", m_EditorCamera.GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
 
-	Property("Radiance Prefiltering", m_RadiancePrefilter);
-	Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, PropertyFlag::SliderProperty);
+	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
+	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
 
 	if ( m_SceneState == Scene::State::Edit )
 	{
 		float physics2DGravity = m_EditorScene->GetPhysics2DGravity();
-		if ( Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, PropertyFlag::DragProperty) )
+		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
 		{
 			m_EditorScene->SetPhysics2DGravity(physics2DGravity);
 		}
@@ -507,15 +391,15 @@ void EditorLayer::OnImGuiRender()
 	else if ( m_SceneState == Scene::State::Play )
 	{
 		float physics2DGravity = m_RuntimeScene->GetPhysics2DGravity();
-		if ( Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, PropertyFlag::DragProperty) )
+		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
 		{
 			m_RuntimeScene->SetPhysics2DGravity(physics2DGravity);
 		}
 	}
 
-	if ( Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
 		ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-	if ( m_UIShowBoundingBoxes && Property("On Top", m_UIShowBoundingBoxesOnTop) )
+	if ( m_UIShowBoundingBoxes && Gui::Property("On Top", m_UIShowBoundingBoxesOnTop) )
 		ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
 
 	char *label = m_SelectionMode == SelectionMode::Entity ? "Entity" : "Mesh";
@@ -582,7 +466,7 @@ void EditorLayer::OnImGuiRender()
 	ImGui::Begin("Toolbar");
 
 
-	Ref<Texture> ButtonTexture = m_SceneState == Scene::State::Edit ? m_PlayButtonTex : m_StopButtonTex;
+	Ref<Texture> ButtonTexture = m_SceneState == Scene::State::Edit ? m_TexStore["PlayButton"] : m_TexStore["StopButton"];
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(ButtonTexture->GetRendererID()), ImVec2(25, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ClearWhite) )
 	{
 		m_SceneState == Scene::State::Edit ? OnScenePlay() : OnSceneStop();
@@ -607,19 +491,19 @@ void EditorLayer::OnImGuiRender()
 	}
 
 
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TranslateButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), TranslateColorTint) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["TranslateButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), TranslateColorTint) )
 	{
 		if ( m_SceneState == Scene::State::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_RotateButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), RotateColorTint) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["RotateButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), RotateColorTint) )
 	{
 		if ( m_SceneState == Scene::State::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? -1 : ImGuizmo::OPERATION::ROTATE;
 	}
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ScaleButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ScaleColorTint) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ScaleButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ScaleColorTint) )
 	{
 		if ( m_SceneState == Scene::State::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::SCALE ? -1 : ImGuizmo::OPERATION::SCALE;
@@ -630,13 +514,13 @@ void EditorLayer::OnImGuiRender()
 	ImGui::SameLine();
 
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ControllerGameButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerGameButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint) )
 	{
 		if ( m_SceneState == Scene::State::Edit )
 			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Game);
 	}
 	ImGui::SameLine();
-	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_ControllerMayaButtonTex->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint) )
+	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerMayaButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint) )
 	{
 		if ( m_SceneState == Scene::State::Edit )
 			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Maya);
@@ -822,7 +706,7 @@ void EditorLayer::OnImGuiRender()
 							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
 							Ref<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
-							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -867,7 +751,7 @@ void EditorLayer::OnImGuiRender()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
 							Ref<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
-							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -903,7 +787,7 @@ void EditorLayer::OnImGuiRender()
 							auto &metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
 							Ref<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
-							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -941,7 +825,7 @@ void EditorLayer::OnImGuiRender()
 							auto &roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
 							Ref<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
-							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_CheckerboardTex->GetRendererID()), ImVec2(64, 64));
+							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
 							{
@@ -980,6 +864,7 @@ void EditorLayer::OnImGuiRender()
 
 	ScriptEngine::OnImGuiRender();
 	GuiTerminal::OnImGuiRender();
+	Renderer::OnImGuiRender();
 
 	ImGui::End();
 }

@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Core/Events/KeyboardEvent.h"
 #include "Saffron/Core/Events/MouseEvent.h"
 #include "Saffron/Gui/Gui.h"
@@ -98,8 +99,6 @@ void WindowsWindow::OnUpdate()
 	const ImGuiMouseCursor ImGuiCursor = ImGui::GetMouseCursor();
 	glfwSetCursor(m_NativeWindow, m_ImGuiMouseCursors[ImGuiCursor] ? m_ImGuiMouseCursors[ImGuiCursor] : m_ImGuiMouseCursors[ImGuiMouseCursor_Arrow]);
 	glfwSetInputMode(m_NativeWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-
-	ts = Timer::GlobalPeek();
 }
 
 void WindowsWindow::OnEvent(const Event &event)
