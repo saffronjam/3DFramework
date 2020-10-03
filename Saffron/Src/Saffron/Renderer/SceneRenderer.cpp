@@ -19,7 +19,6 @@ struct SceneRendererData
 	const Scene *ActiveScene = nullptr;
 	struct SceneInfo
 	{
-		// TODO: Use ref instead of copying?
 		SceneRendererCameraData SceneRendererCameraData;
 
 		// Resources
@@ -258,10 +257,9 @@ void SceneRenderer::GeometryPass()
 	const glm::vec3 cameraPosition = glm::inverse(sData.SceneData.SceneRendererCameraData.ViewMatrix)[3];
 
 	// Skybox
-	// TODO: Remove this unused line
 	auto skyboxShader = sData.SceneData.SkyboxMaterial->GetShader();
 	sData.SceneData.SkyboxMaterial->Set("u_InverseVP", glm::inverse(viewProjection));
-	Renderer::SubmitFullscreenQuad(sData.SceneData.SkyboxMaterial);
+	Renderer::SubmitQuad(sData.SceneData.SkyboxMaterial);
 
 	// Render entities
 	for ( auto &dc : sData.DrawList )
@@ -372,7 +370,7 @@ void SceneRenderer::CompositePass()
 	sData.CompositeShader->SetFloat("u_Exposure", sData.SceneData.SceneRendererCameraData.Camera.GetExposure());
 	sData.CompositeShader->SetInt("u_TextureSamples", sData.GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
 	sData.GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
-	Renderer::SubmitFullscreenQuad(nullptr);
+	Renderer::SubmitQuad(nullptr);
 	Renderer::EndRenderPass();
 }
 }

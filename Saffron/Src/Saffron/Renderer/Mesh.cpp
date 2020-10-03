@@ -72,7 +72,7 @@ struct LogStream : Assimp::LogStream
 		}
 	}
 
-	virtual void write(const char *message) override
+	void write(const char *message) override
 	{
 		SE_CORE_ERROR("Assimp error: {0}", message);
 	}

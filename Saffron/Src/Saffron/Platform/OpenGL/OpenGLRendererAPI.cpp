@@ -58,7 +58,7 @@ void RendererAPI::Init()
 	glEnable(GL_STENCIL_TEST);
 
 	// Setup renderer capabilities
-	auto &capabilities = RendererAPI::GetCapabilities();
+	auto &capabilities = GetCapabilities();
 	capabilities.Vendor = reinterpret_cast<const char *>(glGetString(GL_VENDOR));
 	capabilities.Renderer = reinterpret_cast<const char *>(glGetString(GL_RENDERER));
 	capabilities.Version = reinterpret_cast<const char *>(glGetString(GL_VERSION));

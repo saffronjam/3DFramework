@@ -27,7 +27,6 @@ public:
 	// For OpenGL
 	static void ClearMagenta();
 
-
 	static Ref<ShaderLibrary> GetShaderLibrary();
 
 	template<typename FuncT>
@@ -39,7 +38,6 @@ public:
 	static void EndRenderPass();
 
 	static void SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
-	static void SubmitFullscreenQuad(Ref<MaterialInstance> material);
 	static void SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial = nullptr);
 
 	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));

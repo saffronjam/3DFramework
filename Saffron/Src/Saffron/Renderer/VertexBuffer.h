@@ -77,11 +77,9 @@ public:
 
 	virtual void Bind() const = 0;
 
-	virtual const Layout &GetLayout() const = 0;
 	virtual unsigned int GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	virtual void SetLayout(const Layout &layout) = 0;
 	virtual void SetData(void *buffer, Uint32 size, Uint32 offset = 0) = 0;
 	virtual void SetData(const Buffer &buffer, Uint32 offset = 0) = 0;
 

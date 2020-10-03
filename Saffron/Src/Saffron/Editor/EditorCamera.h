@@ -49,7 +49,7 @@ private:
 
 private:
 	float m_MovementSpeed = 10.0f;
-	ControllerStyle	m_ControllerStyle = ControllerStyle::Maya;
+	ControllerStyle	m_ControllerStyle = ControllerStyle::Game;
 
 	glm::mat4 m_ViewMatrix{};
 	glm::vec3 m_Position{ 0.0f, 0.0f, 0.0f };

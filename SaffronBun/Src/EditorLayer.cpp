@@ -135,12 +135,13 @@ void EditorLayer::OnUpdate()
 
 		m_EditorScene->OnRenderEditor(ts, m_EditorCamera);
 
-		if ( m_DrawOnTopBoundingBoxes )
+		if ( false )
 		{
 			Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass(), false);
 			const auto viewProj = m_EditorCamera.GetViewProjection();
 			Renderer2D::BeginScene(viewProj, false);
-			// TODO: Renderer::DrawAABB(m_MeshEntity.GetComponent<MeshComponent>(), m_MeshEntity.GetComponent<TransformComponent>());
+			Renderer::DrawAABB(AABB{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 100.0f, 100.0f, 100.0f } }, glm::mat4(1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
+			Renderer2D::DrawLine(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 100.0f, 100.0f, 100.0f }, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 			Renderer2D::EndScene();
 			Renderer::EndRenderPass();
 		}
@@ -559,9 +560,6 @@ void EditorLayer::OnImGuiRender()
 	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 10000.0f));
 	m_EditorCamera.SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
 	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID()), viewportSize, { 0, 1 }, { 1, 0 });
-
-
-
 
 	auto windowSize = ImGui::GetWindowSize();
 	ImVec2 minBound = ImGui::GetWindowPos();

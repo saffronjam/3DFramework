@@ -49,6 +49,11 @@ public:
 		bool UseTexture = false;
 	};
 
+	enum class SelectionMode
+	{
+		None = 0, Entity = 1, SubMesh = 2
+	};
+
 public:
 	EditorLayer();
 	virtual ~EditorLayer() = default;
@@ -119,11 +124,6 @@ private:
 	bool m_UIShowBoundingBoxesOnTop = false;
 
 	Scene::State m_SceneState = Scene::State::Edit;
-
-	enum class SelectionMode
-	{
-		None = 0, Entity = 1, SubMesh = 2
-	};
 
 	SelectionMode m_SelectionMode = SelectionMode::Entity;
 	std::vector<SelectedSubmesh> m_SelectionContext;
