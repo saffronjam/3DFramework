@@ -49,7 +49,7 @@ struct SceneRendererData
 	SceneRenderer::Options Options;
 };
 
-static SceneRendererData sData;
+static SceneRendererData s_Data;
 static Ref<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
 
 ///////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ void SceneRenderer::Init()
 
 	RenderPass::Specification geoRenderPassSpec;
 	geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
-	sData.GeoPass = RenderPass::Create(geoRenderPassSpec);
+	s_Data.GeoPass = RenderPass::Create(geoRenderPassSpec);
 
 	Framebuffer::Specification compFramebufferSpec;
 	compFramebufferSpec.Width = 1280;
@@ -77,47 +77,47 @@ void SceneRenderer::Init()
 
 	RenderPass::Specification compRenderPassSpec;
 	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
-	sData.CompositePass = RenderPass::Create(compRenderPassSpec);
+	s_Data.CompositePass = RenderPass::Create(compRenderPassSpec);
 
-	sData.CompositeShader = Shader::Create("Assets/Shaders/SceneComposite.glsl");
-	sData.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
+	s_Data.CompositeShader = Shader::Create("Assets/Shaders/SceneComposite.glsl");
+	s_Data.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
 
 	// Grid
 	const auto gridShader = Shader::Create("Assets/Shaders/Grid.glsl");
-	sData.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
+	s_Data.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
 	const float gridScale = 16.025f, gridSize = 0.025f;
-	sData.GridMaterial->Set("u_Scale", gridScale);
-	sData.GridMaterial->Set("u_Res", gridSize);
+	s_Data.GridMaterial->Set("u_Scale", gridScale);
+	s_Data.GridMaterial->Set("u_Res", gridSize);
 
 	// Outline
 	const auto outlineShader = Shader::Create("Assets/Shaders/Outline.glsl");
-	sData.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
-	sData.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
+	s_Data.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
+	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
 }
 
 void SceneRenderer::SetViewportSize(Uint32 width, Uint32 height)
 {
-	sData.GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
-	sData.CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	s_Data.GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	s_Data.CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
 }
 
 void SceneRenderer::BeginScene(const Scene *scene, const SceneRendererCameraData &camera)
 {
-	SE_CORE_ASSERT(!sData.ActiveScene, "No active scene");
+	SE_CORE_ASSERT(!s_Data.ActiveScene, "Already an active scene");
 
-	sData.ActiveScene = scene;
+	s_Data.ActiveScene = scene;
 
-	sData.SceneData.SceneRendererCameraData = camera;
-	sData.SceneData.SkyboxMaterial = scene->m_SkyboxMaterial;
-	sData.SceneData.SceneEnvironment = scene->m_Environment;
-	sData.SceneData.ActiveLight = scene->m_Light;
+	s_Data.SceneData.SceneRendererCameraData = camera;
+	s_Data.SceneData.SkyboxMaterial = scene->m_SkyboxMaterial;
+	s_Data.SceneData.SceneEnvironment = scene->m_Environment;
+	s_Data.SceneData.ActiveLight = scene->m_Light;
 }
 
 void SceneRenderer::EndScene()
 {
-	SE_CORE_ASSERT(sData.ActiveScene, "No active scene");
+	SE_CORE_ASSERT(s_Data.ActiveScene, "No active scene");
 
-	sData.ActiveScene = nullptr;
+	s_Data.ActiveScene = nullptr;
 
 	FlushDrawList();
 }
@@ -126,12 +126,12 @@ void SceneRenderer::SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform
 							   const Ref<MaterialInstance> &overrideMaterial)
 {
 	// TODO: Culling, sorting, etc.
-	sData.DrawList.push_back({ mesh, overrideMaterial, transform });
+	s_Data.DrawList.push_back({ mesh, overrideMaterial, transform });
 }
 
 void SceneRenderer::SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform)
 {
-	sData.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
+	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
 }
 
 std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
@@ -199,41 +199,41 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 
 Ref<RenderPass> SceneRenderer::GetFinalRenderPass()
 {
-	return sData.CompositePass;
+	return s_Data.CompositePass;
 }
 
 Ref<Texture2D> SceneRenderer::GetFinalColorBuffer()
 {
-	// return sData.CompositePass->GetSpecification().TargetFramebuffer;
+	// return s_Data.CompositePass->GetSpecification().TargetFramebuffer;
 	SE_CORE_ASSERT(false, "Not implemented");
 	return nullptr;
 }
 
 Uint32 SceneRenderer::GetFinalColorBufferRendererID()
 {
-	return sData.CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
+	return s_Data.CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
 }
 
 SceneRenderer::Options &SceneRenderer::GetOptions()
 {
-	return sData.Options;
+	return s_Data.Options;
 }
 
 void SceneRenderer::FlushDrawList()
 {
-	SE_CORE_ASSERT(!sData.ActiveScene, "");
+	SE_CORE_ASSERT(!s_Data.ActiveScene, "");
 
 	GeometryPass();
 	CompositePass();
 
-	sData.DrawList.clear();
-	sData.SelectedMeshDrawList.clear();
-	sData.SceneData = {};
+	s_Data.DrawList.clear();
+	s_Data.SelectedMeshDrawList.clear();
+	s_Data.SceneData = {};
 }
 
 void SceneRenderer::GeometryPass()
 {
-	const bool outline = !sData.SelectedMeshDrawList.empty();
+	const bool outline = !s_Data.SelectedMeshDrawList.empty();
 
 	if ( outline )
 	{
@@ -243,7 +243,7 @@ void SceneRenderer::GeometryPass()
 						 });
 	}
 
-	Renderer::BeginRenderPass(sData.GeoPass);
+	Renderer::BeginRenderPass(s_Data.GeoPass);
 
 	if ( outline )
 	{
@@ -253,28 +253,28 @@ void SceneRenderer::GeometryPass()
 						 });
 	}
 
-	const auto viewProjection = sData.SceneData.SceneRendererCameraData.Camera.GetProjectionMatrix() * sData.SceneData.SceneRendererCameraData.ViewMatrix;
-	const glm::vec3 cameraPosition = glm::inverse(sData.SceneData.SceneRendererCameraData.ViewMatrix)[3];
+	const auto viewProjection = s_Data.SceneData.SceneRendererCameraData.Camera.GetProjectionMatrix() * s_Data.SceneData.SceneRendererCameraData.ViewMatrix;
+	const glm::vec3 cameraPosition = glm::inverse(s_Data.SceneData.SceneRendererCameraData.ViewMatrix)[3];
 
 	// Skybox
-	auto skyboxShader = sData.SceneData.SkyboxMaterial->GetShader();
-	sData.SceneData.SkyboxMaterial->Set("u_InverseVP", glm::inverse(viewProjection));
-	Renderer::SubmitQuad(sData.SceneData.SkyboxMaterial);
+	auto skyboxShader = s_Data.SceneData.SkyboxMaterial->GetShader();
+	s_Data.SceneData.SkyboxMaterial->Set("u_InverseVP", glm::inverse(viewProjection));
+	Renderer::SubmitQuad(s_Data.SceneData.SkyboxMaterial);
 
 	// Render entities
-	for ( auto &dc : sData.DrawList )
+	for ( auto &dc : s_Data.DrawList )
 	{
 		auto baseMaterial = dc.Mesh->GetMaterial();
 		baseMaterial->Set("u_ViewProjectionMatrix", viewProjection);
 		baseMaterial->Set("u_CameraPosition", cameraPosition);
 
 		// Environment (TODO: don't do this per mesh)
-		baseMaterial->Set("u_EnvRadianceTex", sData.SceneData.SceneEnvironment.RadianceMap);
-		baseMaterial->Set("u_EnvIrradianceTex", sData.SceneData.SceneEnvironment.IrradianceMap);
-		baseMaterial->Set("u_BRDFLUTTexture", sData.BRDFLUT);
+		baseMaterial->Set("u_EnvRadianceTex", s_Data.SceneData.SceneEnvironment.RadianceMap);
+		baseMaterial->Set("u_EnvIrradianceTex", s_Data.SceneData.SceneEnvironment.IrradianceMap);
+		baseMaterial->Set("u_BRDFLUTTexture", s_Data.BRDFLUT);
 
 		// Set lights (TODO: move to light environment and don't do per mesh)
-		baseMaterial->Set("lights", sData.SceneData.ActiveLight);
+		baseMaterial->Set("lights", s_Data.SceneData.ActiveLight);
 
 		const auto overrideMaterial = nullptr; // dc.Material;
 		Renderer::SubmitMesh(dc.Mesh, dc.Transform, overrideMaterial);
@@ -288,19 +288,19 @@ void SceneRenderer::GeometryPass()
 							 glStencilMask(0xff);
 						 });
 	}
-	for ( auto &dc : sData.SelectedMeshDrawList )
+	for ( auto &dc : s_Data.SelectedMeshDrawList )
 	{
 		auto baseMaterial = dc.Mesh->GetMaterial();
 		baseMaterial->Set("u_ViewProjectionMatrix", viewProjection);
 		baseMaterial->Set("u_CameraPosition", cameraPosition);
 
 		// Environment (TODO: don't do this per mesh)
-		baseMaterial->Set("u_EnvRadianceTex", sData.SceneData.SceneEnvironment.RadianceMap);
-		baseMaterial->Set("u_EnvIrradianceTex", sData.SceneData.SceneEnvironment.IrradianceMap);
-		baseMaterial->Set("u_BRDFLUTTexture", sData.BRDFLUT);
+		baseMaterial->Set("u_EnvRadianceTex", s_Data.SceneData.SceneEnvironment.RadianceMap);
+		baseMaterial->Set("u_EnvIrradianceTex", s_Data.SceneData.SceneEnvironment.IrradianceMap);
+		baseMaterial->Set("u_BRDFLUTTexture", s_Data.BRDFLUT);
 
 		// Set lights (TODO: move to light environment and don't do per mesh)
-		baseMaterial->Set("lights", sData.SceneData.ActiveLight);
+		baseMaterial->Set("lights", s_Data.SceneData.ActiveLight);
 
 		const auto overrideMaterial = nullptr; // dc.Material;
 		Renderer::SubmitMesh(dc.Mesh, dc.Transform, overrideMaterial);
@@ -320,10 +320,10 @@ void SceneRenderer::GeometryPass()
 						 });
 
 		// Draw outline here
-		sData.OutlineMaterial->Set("u_ViewProjection", viewProjection);
-		for ( auto &dc : sData.SelectedMeshDrawList )
+		s_Data.OutlineMaterial->Set("u_ViewProjection", viewProjection);
+		for ( auto &dc : s_Data.SelectedMeshDrawList )
 		{
-			Renderer::SubmitMesh(dc.Mesh, dc.Transform, sData.OutlineMaterial);
+			Renderer::SubmitMesh(dc.Mesh, dc.Transform, s_Data.OutlineMaterial);
 		}
 
 		Renderer::Submit([]()
@@ -331,9 +331,9 @@ void SceneRenderer::GeometryPass()
 							 glPointSize(10);
 							 glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
 						 });
-		for ( auto &dc : sData.SelectedMeshDrawList )
+		for ( auto &dc : s_Data.SelectedMeshDrawList )
 		{
-			Renderer::SubmitMesh(dc.Mesh, dc.Transform, sData.OutlineMaterial);
+			Renderer::SubmitMesh(dc.Mesh, dc.Transform, s_Data.OutlineMaterial);
 		}
 
 		Renderer::Submit([]()
@@ -348,14 +348,14 @@ void SceneRenderer::GeometryPass()
 	// Grid
 	if ( GetOptions().ShowGrid )
 	{
-		sData.GridMaterial->Set("u_ViewProjection", viewProjection);
-		Renderer::SubmitQuad(sData.GridMaterial, glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(16.0f)));
+		s_Data.GridMaterial->Set("u_ViewProjection", viewProjection);
+		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(16.0f)));
 	}
 
 	if ( GetOptions().ShowBoundingBoxes )
 	{
 		Renderer2D::BeginScene(viewProjection);
-		for ( auto &dc : sData.DrawList )
+		for ( auto &dc : s_Data.DrawList )
 			Renderer::DrawAABB(dc.Mesh, dc.Transform);
 		Renderer2D::EndScene();
 	}
@@ -365,11 +365,11 @@ void SceneRenderer::GeometryPass()
 
 void SceneRenderer::CompositePass()
 {
-	Renderer::BeginRenderPass(sData.CompositePass);
-	sData.CompositeShader->Bind();
-	sData.CompositeShader->SetFloat("u_Exposure", sData.SceneData.SceneRendererCameraData.Camera.GetExposure());
-	sData.CompositeShader->SetInt("u_TextureSamples", sData.GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
-	sData.GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
+	Renderer::BeginRenderPass(s_Data.CompositePass);
+	s_Data.CompositeShader->Bind();
+	s_Data.CompositeShader->SetFloat("u_Exposure", s_Data.SceneData.SceneRendererCameraData.Camera.GetExposure());
+	s_Data.CompositeShader->SetInt("u_TextureSamples", s_Data.GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
+	s_Data.GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
 	Renderer::SubmitQuad(nullptr);
 	Renderer::EndRenderPass();
 }

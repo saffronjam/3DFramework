@@ -164,14 +164,8 @@ void Renderer2D::BeginScene(const glm::mat4 &viewProj, bool depthTest)
 	s_Data.CameraViewProj = viewProj;
 	s_Data.DepthTest = depthTest;
 
-	s_Data.TextureShader->Bind();
-	s_Data.TextureShader->SetMat4("u_ViewProjection", viewProj);
-
 	s_Data.QuadIndexCount = 0;
 	s_Data.QuadVertexBufferPtr = s_Data.QuadVertexBufferBase;
-
-	s_Data.LineShader->Bind();
-	s_Data.LineShader->SetMat4("u_ViewProjection", s_Data.CameraViewProj);
 
 	s_Data.LineIndexCount = 0;
 	s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
