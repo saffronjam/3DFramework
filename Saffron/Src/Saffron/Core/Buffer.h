@@ -10,8 +10,7 @@ public:
 	Buffer();
 	Buffer(Uint8 *data, Uint32 size);
 
-	template<typename T>
-	static Buffer Copy(T *data, Uint32 size);
+	static Buffer Copy(const void *data, Uint32 size);
 	static Buffer Copy(const Buffer &buffer);
 	static Buffer Encapsulate(Uint8 *data);
 
@@ -45,15 +44,6 @@ private:
 	Uint32 m_Size;
 };
 
-
-template <typename T>
-Buffer Buffer::Copy(T *data, Uint32 size)
-{
-	Buffer buffer;
-	buffer.Allocate(size);
-	memcpy(buffer.m_Data, data, size);
-	return buffer;
-}
 
 template <typename T>
 T &Buffer::Read(Uint32 offset)

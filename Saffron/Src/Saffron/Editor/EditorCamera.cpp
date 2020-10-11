@@ -12,7 +12,6 @@ EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
 
 void EditorCamera::OnUpdate(Time ts)
 {
-
 	if ( m_ControllerStyle == ControllerStyle::Maya )
 	{
 		if ( Input::IsKeyPressed(KeyCode::LeftAlt) )

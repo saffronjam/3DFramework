@@ -8,7 +8,7 @@ class OpenGLRenderPass : public RenderPass
 {
 public:
 	explicit OpenGLRenderPass(const Specification &specification);
-	virtual ~OpenGLRenderPass() = default;
+	~OpenGLRenderPass() override = default;
 
 	Specification &GetSpecification() override { return m_Specification; }
 	const Specification &GetSpecification() const override { return m_Specification; }

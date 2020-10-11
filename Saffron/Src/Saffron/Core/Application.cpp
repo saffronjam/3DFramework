@@ -7,8 +7,8 @@
 #include <GLFW/glfw3native.h>
 
 #include "Saffron/Core/Application.h"
+#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Renderer/Framebuffer.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -33,7 +33,7 @@ Application::Application(const Properties &properties)
 	Renderer::Init();
 	Renderer::WaitAndRender();
 
-	ts = Timer::GlobalMark();
+	ts = GlobalTimer::Mark();
 }
 
 Application::~Application()
@@ -57,14 +57,6 @@ void Application::RenderGui()
 {
 	m_GuiLayer->Begin();
 
-	ImGui::Begin("Renderer");
-	auto &caps = RendererAPI::GetCapabilities();
-	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
-	ImGui::Text("Renderer: %s", caps.Renderer.c_str());
-	ImGui::Text("Version: %s", caps.Version.c_str());
-	ImGui::Text("Frame Time: %.2fms\n", ts.ms());
-	ImGui::End();
-
 	for ( Layer *layer : m_LayerStack )
 		layer->OnImGuiRender();
 
@@ -80,7 +72,7 @@ void Application::Run()
 		if ( !m_Minimized )
 		{
 			for ( Layer *layer : m_LayerStack )
-				layer->OnUpdate(ts);
+				layer->OnUpdate();
 
 			// Render ImGui on render thread
 			Application *app = this;
@@ -91,7 +83,7 @@ void Application::Run()
 		Input::OnUpdate();
 		m_Window->OnUpdate();
 
-		ts = Timer::GlobalMark();
+		GlobalTimer::Mark();
 	}
 	OnShutdown();
 }

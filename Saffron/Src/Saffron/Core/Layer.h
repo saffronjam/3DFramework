@@ -13,7 +13,7 @@ public:
 
 	virtual void OnAttach() {}
 	virtual void OnDetach() {}
-	virtual void OnUpdate(Time ts) {}
+	virtual void OnUpdate() {}
 	virtual void OnImGuiRender() {}
 	virtual void OnEvent(const Event &event) {}
 

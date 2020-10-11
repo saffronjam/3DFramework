@@ -9,6 +9,14 @@ Buffer::Buffer() : Buffer(nullptr, 0) {}
 
 Buffer::Buffer(Uint8 *data, Uint32 size) : m_Data(data), m_Size(size) {}
 
+Buffer Buffer::Copy(const void *data, Uint32 size)
+{
+	Buffer buffer;
+	buffer.Allocate(size);
+	memcpy(buffer.m_Data, data, size);
+	return buffer;
+}
+
 Buffer Buffer::Copy(const Buffer &buffer)
 {
 	return Copy(buffer.Data(), buffer.Size());
@@ -30,7 +38,7 @@ void Buffer::Allocate(Uint32 size)
 		m_Data = nullptr;
 	}
 
-	if (size == 0)
+	if ( size == 0 )
 		return;
 
 	m_Data = new Uint8[size];

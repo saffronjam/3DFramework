@@ -13,6 +13,7 @@ static GLenum OpenGLUsage(VertexBuffer::Usage usage)
 	{
 	case VertexBuffer::Usage::Static:	return GL_STATIC_DRAW;
 	case VertexBuffer::Usage::Dynamic:	return GL_DYNAMIC_DRAW;
+	case VertexBuffer::Usage::None:
 	default:
 		SE_CORE_ASSERT(false, "Unknown vertex buffer usage");
 		return 0;

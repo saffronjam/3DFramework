@@ -2,6 +2,8 @@
 
 #include <glad/glad.h>
 
+#include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RendererAPI.h"
@@ -29,7 +31,7 @@ static RendererData s_Data;
 void Renderer::Init()
 {
 	s_Data.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
-	Renderer::Submit([]() { RendererAPI::Init(); });
+	Submit([]() { RendererAPI::Init(); });
 
 	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Static.glsl");
 	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Anim.glsl");
@@ -44,7 +46,7 @@ void Renderer::Init()
 		glm::vec2 TexCoord;
 	};
 
-	QuadVertex *data = new QuadVertex[4];
+	auto *data = new QuadVertex[4];
 
 	data[0].Position = glm::vec3(x, y, 0.1f);
 	data[0].TexCoord = glm::vec2(0, 0);
@@ -58,18 +60,61 @@ void Renderer::Init()
 	data[3].Position = glm::vec3(x, y + height, 0.1f);
 	data[3].TexCoord = glm::vec2(0, 1);
 
-	Pipeline::Specification pipelineSpecification;
-	pipelineSpecification.Layout = {
+	Pipeline::Specification Specification;
+	Specification.Layout = {
 		{ ShaderDataType::Float3, "a_Position" },
 		{ ShaderDataType::Float2, "a_TexCoord" }
 	};
-	s_Data.m_FullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
+	s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
 
 	s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
 	Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
 	s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
 
 	Renderer2D::Init();
+}
+
+void Renderer::OnImGuiRender()
+{
+	const Time ts = GlobalTimer::GetStep();
+
+	static Time CachedFrametime = Time::Zero();
+	static Time AverageFrameTimeCounter = Time::Zero();
+	static Uint32 m_CachedFrameCounter = 0;
+	m_CachedFrameCounter++;
+	if ( (AverageFrameTimeCounter += ts).sec() > 1.0f )
+	{
+		CachedFrametime = AverageFrameTimeCounter / static_cast<float>(m_CachedFrameCounter);
+		AverageFrameTimeCounter = Time::Zero();
+		m_CachedFrameCounter = 0;
+	}
+
+	static Time SavedTS = Time::Zero();
+	static Time Counter = Time::Zero();
+	if ( (Counter += ts).sec() > 0.1f )
+	{
+		SavedTS = ts;
+		Counter = Time::Zero();
+	}
+
+	const auto &caps = RendererAPI::GetCapabilities();
+	const auto &stats = Renderer2D::GetStats();
+
+	ImGui::Begin("Renderer");
+	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
+	ImGui::Text("Renderer: %s", caps.Renderer.c_str());
+	ImGui::Text("Version: %s", caps.Version.c_str());
+	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", SavedTS.ms(), 1.0f / SavedTS.sec());
+	ImGui::Text("Average: ");
+	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", CachedFrametime.ms(), 1.0f / CachedFrametime.sec());
+	ImGui::Text("\n");
+	ImGui::Text("2D Renderering Statistics: ");
+	ImGui::Text("Draw Calls: %u", stats.DrawCalls);
+	ImGui::Text("Line Calls: %u", stats.LineCount);
+	ImGui::Text("Quad Count: %u", stats.QuadCount);
+	ImGui::Text("Total Index Count: %u", stats.GetTotalIndexCount());
+	ImGui::Text("Total Vertex Count: %u", stats.GetTotalVertexCount());
+	ImGui::End();
 }
 
 void Renderer::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
@@ -151,21 +196,6 @@ void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &trans
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitFullscreenQuad(Ref<MaterialInstance> material)
-{
-	bool depthTest = true;
-	if ( material )
-	{
-		material->Bind();
-		depthTest = material->GetFlag(Material::Flag::DepthTest);
-	}
-
-	s_Data.m_FullscreenQuadVertexBuffer->Bind();
-	s_Data.m_FullscreenQuadPipeline->Bind();
-	s_Data.m_FullscreenQuadIndexBuffer->Bind();
-	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
-}
-
 void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
@@ -175,7 +205,7 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 	mesh->m_Pipeline->Bind();
 	mesh->m_IndexBuffer->Bind();
 
-	auto &materials = mesh->GetMaterials();
+	auto materials = mesh->GetMaterials();
 	for ( Submesh &submesh : mesh->m_Submeshes )
 	{
 		// Material
@@ -193,14 +223,14 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 		}
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
 
-		Renderer::Submit([submesh, material]() {
+		Submit([submesh, material]() {
 			if ( material->GetFlag(Material::Flag::DepthTest) )
 				glEnable(GL_DEPTH_TEST);
 			else
 				glDisable(GL_DEPTH_TEST);
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, (void *)(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
-						 });
+			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
+			   });
 	}
 }
 
@@ -214,7 +244,7 @@ void Renderer::DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::v
 	}
 }
 
-void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color /*= glm::vec4(1.0f)*/)
+void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
 {
 	glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
 	glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };

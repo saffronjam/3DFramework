@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Gui/Gui.h"
 
 namespace Se
@@ -78,5 +79,116 @@ void Gui::SetStyle(Style style)
 		m_CurrentStyle = style;
 	}
 }
+
+bool Gui::Property(const std::string &name, bool &value)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	const bool result = ImGui::Checkbox(id.c_str(), &value);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return result;
+}
+
+bool Gui::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed;
+	if ( flags == PropertyFlag::Slider )
+		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
+	else
+		changed = ImGui::DragFloat(id.c_str(), &value, 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool Gui::Property(const std::string &name, glm::vec2 &value, Gui::PropertyFlag flags)
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool Gui::Property(const std::string &name, glm::vec2 &value, float min, float max, PropertyFlag flags)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed;
+	if ( flags == PropertyFlag::Slider )
+		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool Gui::Property(const std::string &name, glm::vec3 &value, PropertyFlag flags)
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool Gui::Property(const std::string &name, glm::vec3 &value, float min, float max, PropertyFlag flags)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed;
+	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color) )
+		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if ( flags == PropertyFlag::Slider )
+		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat3(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
+bool Gui::Property(const std::string &name, glm::vec4 &value, PropertyFlag flags)
+{
+	return Property(name, value, -1.0f, 1.0f, flags);
+}
+
+bool Gui::Property(const std::string &name, glm::vec4 &value, float min, float max, PropertyFlag flags)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed;
+	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color) )
+		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if ( flags == PropertyFlag::Slider )
+		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
+	else
+		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
+
 }
 

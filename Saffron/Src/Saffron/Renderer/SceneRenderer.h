@@ -11,7 +11,7 @@ namespace Se
 struct SceneRendererCameraData
 {
 	Camera Camera;
-	glm::mat4 ViewMatrix;
+	glm::mat4 ViewMatrix{};
 };
 
 class SceneRenderer

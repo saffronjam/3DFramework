@@ -8,6 +8,7 @@
 #include "Saffron/Core/Log.h"
 #include "Saffron/Core/Time.h"
 #include "Saffron/Core/Timer.h"
+#include "Saffron/Core/GlobalTimer.h"
 
 #include "Saffron/Core/Event.h"
 #include "Saffron/Core/Events/AppEvent.h"
