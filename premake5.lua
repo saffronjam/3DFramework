@@ -278,16 +278,16 @@ group ""
 -- Sandbox Workspace
 -- --------------------------------------
 
-workspace "Sandbox"
-	architecture "x64"
-	targetdir "build"
+-- workspace "Sandbox"
+	-- architecture "x64"
+	-- targetdir "build"
 	
-	configurations 
-	{ 
-		"Debug", 
-		"Release",
-		"Dist"
-	}
+	-- configurations 
+	-- { 
+		-- "Debug", 
+		-- "Release",
+		-- "Dist"
+	-- }
 
 
 -- --------------------------------------

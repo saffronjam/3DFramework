@@ -23,7 +23,6 @@ public:
 		bool ShowBoundingBoxes = false;
 	};
 
-
 public:
 	static void Init();
 

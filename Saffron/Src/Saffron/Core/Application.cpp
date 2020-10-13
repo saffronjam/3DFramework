@@ -28,7 +28,7 @@ Application::Application(const Properties &properties)
 	m_GuiLayer = new GuiLayer("ImGui");
 	PushOverlay(m_GuiLayer);
 
-	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
+	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll", "C:/Users/ownem/source/repos/SaffronEngine/ExampleApp/Src");
 
 	Renderer::Init();
 	Renderer::WaitAndRender();
@@ -80,6 +80,7 @@ void Application::Run()
 
 			Renderer::WaitAndRender();
 		}
+		ScriptEngine::OnUpdate();
 		Input::OnUpdate();
 		m_Window->OnUpdate();
 

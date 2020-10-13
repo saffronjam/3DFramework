@@ -27,6 +27,7 @@
 
 #include "Saffron/Debug/Instrumentor.h"
 #include "Saffron/Core/Log.h"
+#include "Saffron/Core/Assert.h"
 
 // Math
 #include <Saffron/Core/Math/Mat4.h>

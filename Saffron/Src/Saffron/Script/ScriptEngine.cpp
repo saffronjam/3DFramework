@@ -9,6 +9,7 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
+#include "Saffron/Script/ScriptManager.h"
 
 namespace Se {
 
@@ -45,8 +46,8 @@ static FieldType GetSaffronFieldType(MonoType *monoType)
 	case MONO_TYPE_VALUETYPE:
 	{
 		char *name = mono_type_get_name(monoType);
-		if ( strcmp(name, "Saffron.Vector2") == 0 )	return FieldType::Vec2;
-		if ( strcmp(name, "Saffron.Vector3") == 0 )	return FieldType::Vec3;
+		if ( strcmp(name, "Se.Vector2") == 0 )	return FieldType::Vec2;
+		if ( strcmp(name, "Se.Vector3") == 0 )	return FieldType::Vec3;
 		return FieldType::Vec4;
 	}
 	default: return FieldType::None;
@@ -381,9 +382,11 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 ///////////////////////////////////////////////////////////////////////////
 
 
-void ScriptEngine::Init(const std::string &assemblyPath)
+void ScriptEngine::Init(std::string assemblyPath, std::string scriptFolderPath)
 {
-	s_AssemblyPath = assemblyPath;
+	ScriptManager::Init(std::filesystem::path(std::move(scriptFolderPath)));
+
+	s_AssemblyPath = std::move(assemblyPath);
 
 	InitMono();
 
@@ -396,6 +399,61 @@ void ScriptEngine::Shutdown()
 	s_SceneContext = nullptr;
 	s_EntityInstanceMap.clear();
 }
+
+
+void ScriptEngine::OnUpdate()
+{
+	ScriptManager::SyncScriptPaths();
+}
+
+void ScriptEngine::OnImGuiRender()
+{
+	ScriptManager::OnGuiRender();
+	ImGui::Begin("Script Engine Debug");
+	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
+	{
+		bool opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(sceneID)), "Scene (%llx)", static_cast<Uint64>(sceneID));
+		if ( opened )
+		{
+			Ref<Scene> scene = Scene::GetScene(sceneID);
+			for ( auto &[entityID, entityInstanceData] : entityMap )
+			{
+				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
+				std::string entityName = "Unnamed Entity";
+				if ( entity.HasComponent<TagComponent>() )
+					entityName = entity.GetComponent<TagComponent>().Tag;
+				opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(entityID)), "%s (%llx)", entityName.c_str(), static_cast<Uint64>(entityID));
+				if ( opened )
+				{
+					for ( auto &[moduleName, fieldMap] : entityInstanceData.ModuleFieldMap )
+					{
+						opened = ImGui::TreeNode(moduleName.c_str());
+						if ( opened )
+						{
+							for ( auto &[fieldName, field] : fieldMap )
+							{
+
+								opened = ImGui::TreeNodeEx(static_cast<void *>(&field), ImGuiTreeNodeFlags_Leaf, fieldName.c_str());
+								if ( opened )
+								{
+
+									ImGui::TreePop();
+								}
+							}
+							ImGui::TreePop();
+						}
+					}
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+	ImGui::End();
+}
+
+
+
 
 void ScriptEngine::OnSceneDestruct(UUID sceneID)
 {
@@ -695,52 +753,6 @@ MonoString *ScriptEngine::CreateMonoString(const char *string)
 EntityInstanceMap &ScriptEngine::GetEntityInstanceMap()
 {
 	return s_EntityInstanceMap;
-}
-
-// Debug
-void ScriptEngine::OnImGuiRender()
-{
-	ImGui::Begin("Script Engine Debug");
-	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
-	{
-		bool opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(sceneID)), "Scene (%llx)", static_cast<Uint64>(sceneID));
-		if ( opened )
-		{
-			Ref<Scene> scene = Scene::GetScene(sceneID);
-			for ( auto &[entityID, entityInstanceData] : entityMap )
-			{
-				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
-				std::string entityName = "Unnamed Entity";
-				if ( entity.HasComponent<TagComponent>() )
-					entityName = entity.GetComponent<TagComponent>().Tag;
-				opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(entityID)), "%s (%llx)", entityName.c_str(), static_cast<Uint64>(entityID));
-				if ( opened )
-				{
-					for ( auto &[moduleName, fieldMap] : entityInstanceData.ModuleFieldMap )
-					{
-						opened = ImGui::TreeNode(moduleName.c_str());
-						if ( opened )
-						{
-							for ( auto &[fieldName, field] : fieldMap )
-							{
-
-								opened = ImGui::TreeNodeEx(static_cast<void *>(&field), ImGuiTreeNodeFlags_Leaf, fieldName.c_str());
-								if ( opened )
-								{
-
-									ImGui::TreePop();
-								}
-							}
-							ImGui::TreePop();
-						}
-					}
-					ImGui::TreePop();
-				}
-			}
-			ImGui::TreePop();
-		}
-	}
-	ImGui::End();
 }
 
 
