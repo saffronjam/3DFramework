@@ -37,7 +37,8 @@ void ScriptManager::OnGuiRender()
 
 		if ( ImGui::BeginDragDropSource(ImGuiDragDropFlags_None) )
 		{
-			ImGui::SetDragDropPayload("DND_DEMO_CELL", &i, sizeof(size_t));
+			Drop drop = { i ,m_ScriptFolderPath };
+			ImGui::SetDragDropPayload("DND_DEMO_CELL", &drop, sizeof(Drop));
 			ImGui::Text("%s", m_ScriptNames[i].c_str());
 			ImGui::EndDragDropSource();
 		}
@@ -45,10 +46,10 @@ void ScriptManager::OnGuiRender()
 		{
 			if ( const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("DND_DEMO_CELL") )
 			{
-				IM_ASSERT(payload->DataSize == sizeof(size_t));
-				const auto payloadIndex = *static_cast<const size_t *>(payload->Data);
-				std::swap(m_ScriptNames[i], m_ScriptNames[payloadIndex]);
-				std::swap(m_ScriptPaths[i], m_ScriptPaths[payloadIndex]);
+				IM_ASSERT(payload->DataSize == sizeof(Drop));
+				const auto drop = *static_cast<Drop *>(payload->Data);
+				std::swap(m_ScriptNames[i], m_ScriptNames[drop.StorageIndex]);
+				std::swap(m_ScriptPaths[i], m_ScriptPaths[drop.StorageIndex]);
 			}
 			ImGui::EndDragDropTarget();
 		}

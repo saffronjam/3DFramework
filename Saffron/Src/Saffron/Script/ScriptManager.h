@@ -9,6 +9,13 @@ namespace Se
 class ScriptManager
 {
 public:
+	struct Drop
+	{
+		size_t StorageIndex;
+		std::filesystem::path Path;
+	};
+
+public:
 	static void Init(std::filesystem::path path);
 
 	static void OnGuiRender();
