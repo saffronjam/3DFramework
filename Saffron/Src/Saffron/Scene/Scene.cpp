@@ -384,11 +384,14 @@ void Scene::OnRuntimeStart()
 
 	{
 		auto view = m_Registry.view<ScriptComponent>();
-		for ( auto entity : view )
+		for ( auto eent : view )
 		{
-			Entity e = { entity, this };
-			if ( ScriptEngine::ModuleExists(e.GetComponent<ScriptComponent>().ModuleName) )
-				ScriptEngine::InstantiateEntityClass(e);
+			Entity entity = { eent, this };
+			auto component = entity.GetComponent<ScriptComponent>();
+			if ( ScriptEngine::ModuleExists(component.ModuleName) )
+			{
+				ScriptEngine::InstantiateEntityClass(entity);
+			}
 		}
 	}
 

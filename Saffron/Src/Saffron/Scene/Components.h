@@ -58,12 +58,37 @@ struct MeshComponent
 struct ScriptComponent
 {
 	std::string ModuleName;
+	std::string NamespaceName;
+	std::string ClassName;
 
 	ScriptComponent() = default;
 	ScriptComponent(const ScriptComponent &other) = default;
 	explicit ScriptComponent(std::string moduleName)
 		: ModuleName(std::move(moduleName))
 	{
+		if ( ModuleName.find('.') != std::string::npos )
+		{
+			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
+			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
+		}
+		else
+		{
+			ClassName = ModuleName;
+		}
+	}
+
+	void ChangeModule(std::string moduleName)
+	{
+		ModuleName = std::move(moduleName);
+		if ( ModuleName.find('.') != std::string::npos )
+		{
+			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
+			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
+		}
+		else
+		{
+			ClassName = ModuleName;
+		}
 	}
 };
 

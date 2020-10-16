@@ -49,6 +49,11 @@ public:
 		bool UseTexture = false;
 	};
 
+	enum class SceneState : int
+	{
+		Edit = 0, Play = 1, Pause = 2
+	};
+
 	enum class SelectionMode
 	{
 		None = 0, Entity = 1, SubMesh = 2
@@ -123,7 +128,7 @@ private:
 	bool m_UIShowBoundingBoxes = false;
 	bool m_UIShowBoundingBoxesOnTop = false;
 
-	Scene::State m_SceneState = Scene::State::Edit;
+	SceneState m_SceneState = SceneState::Edit;
 
 	SelectionMode m_SelectionMode = SelectionMode::Entity;
 	std::vector<SelectedSubmesh> m_SelectionContext;

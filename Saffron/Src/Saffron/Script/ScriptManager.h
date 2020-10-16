@@ -12,7 +12,7 @@ public:
 	struct Drop
 	{
 		size_t StorageIndex;
-		std::filesystem::path Path;
+		std::filesystem::path *Path;
 	};
 
 public:

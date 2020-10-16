@@ -136,7 +136,7 @@ public:
 	const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
 	const std::string &GetFilePath() const { return m_FilePath; }
 
-	const std::vector<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
+	std::vector<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
 private:
 	void BoneTransform(float time);
 	void ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const glm::mat4 &ParentTransform);

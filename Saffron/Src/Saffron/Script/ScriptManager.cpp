@@ -25,6 +25,7 @@ void ScriptManager::OnGuiRender()
 
 	ImGui::Begin("Scripts");
 
+	ImGui::ShowDemoWindow();
 
 	const int noCollums = std::max(1, static_cast<int>(ImGui::GetContentRegionAvailWidth() / 100.0f));
 
@@ -37,7 +38,7 @@ void ScriptManager::OnGuiRender()
 
 		if ( ImGui::BeginDragDropSource(ImGuiDragDropFlags_None) )
 		{
-			Drop drop = { i ,m_ScriptFolderPath };
+			Drop drop = { i, new std::filesystem::path(m_ScriptPaths[i]) };
 			ImGui::SetDragDropPayload("DND_DEMO_CELL", &drop, sizeof(Drop));
 			ImGui::Text("%s", m_ScriptNames[i].c_str());
 			ImGui::EndDragDropSource();

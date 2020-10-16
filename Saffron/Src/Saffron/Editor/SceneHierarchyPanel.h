@@ -9,7 +9,7 @@ namespace Se
 class SceneHierarchyPanel
 {
 public:
-	SceneHierarchyPanel(const Ref<Scene> &scene);
+	explicit SceneHierarchyPanel(const Ref<Scene> &scene);
 
 	void SetContext(const Ref<Scene> &context);
 	void SetSelected(Entity entity);
@@ -25,6 +25,8 @@ private:
 private:
 	Ref<Scene> m_Context;
 	Entity m_SelectionContext;
+
+	std::string m_CachedNewModuleName = "NONE";
 
 	std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 };

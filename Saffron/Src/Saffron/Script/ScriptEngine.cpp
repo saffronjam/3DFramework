@@ -86,6 +86,7 @@ static MonoAssembly *s_AppAssembly = nullptr;
 static MonoAssembly *s_CoreAssembly = nullptr;
 
 static EntityInstanceMap s_EntityInstanceMap;
+static std::map<std::string, MonoClass *> s_ClassCacheMap;
 
 static MonoMethod *GetMethod(MonoImage *image, const std::string &methodDesc);
 
@@ -109,7 +110,7 @@ struct EntityScriptClass
 	MonoMethod *OnCollision2DBeginMethod = nullptr;
 	MonoMethod *OnCollision2DEndMethod = nullptr;
 
-	void InitClassMethods(MonoImage *image)
+	void SyncClassMethods(MonoImage *image)
 	{
 		OnCreateMethod = GetMethod(image, FullName + ":OnCreate()");
 		OnUpdateMethod = GetMethod(image, FullName + ":OnUpdate(single)");
@@ -118,6 +119,21 @@ struct EntityScriptClass
 		OnCollision2DBeginMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DBegin(single)");
 		OnCollision2DEndMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DEnd(single)");
 	}
+
+	void SetScript(std::string moduleName)
+	{
+		FullName = std::move(moduleName);
+		if ( FullName.find('.') != std::string::npos )
+		{
+			NamespaceName = FullName.substr(0, FullName.find_last_of('.'));
+			ClassName = FullName.substr(FullName.find_last_of('.') + 1);
+		}
+		else
+		{
+			ClassName = FullName;
+		}
+	}
+
 };
 
 
@@ -196,9 +212,9 @@ static MonoAssembly *LoadAssembly(const std::string &path)
 	MonoAssembly *assembly = LoadAssemblyFromFile(path.c_str());
 
 	if ( !assembly )
-		SE_ERROR("Could not load assembly: {0}", path);
+		SE_CORE_WARN("Could not load assembly: {0}", path);
 	else
-		SE_INFO("Successfully loaded assembly: {0}", path);
+		SE_CORE_INFO("Successfully loaded assembly: {0}", path);
 
 	return assembly;
 }
@@ -207,25 +223,56 @@ static MonoImage *GetAssemblyImage(MonoAssembly *assembly)
 {
 	MonoImage *image = mono_assembly_get_image(assembly);
 	if ( !image )
-		SE_ERROR("mono_assembly_get_image failed");
+		SE_CORE_ERROR("mono_assembly_get_image failed");
 
 	return image;
 }
 
 static MonoClass *GetClass(MonoImage *image, const EntityScriptClass &scriptClass)
 {
-	MonoClass *monoClass = mono_class_from_name(image, scriptClass.NamespaceName.c_str(), scriptClass.ClassName.c_str());
-	if ( !monoClass )
-		SE_ERROR("mono_class_from_name failed");
+	if ( s_ClassCacheMap.find(scriptClass.FullName) == s_ClassCacheMap.end() )
+	{
+		MonoClass *monoClass = mono_class_from_name(image, scriptClass.NamespaceName.c_str(), scriptClass.ClassName.c_str());
+		if ( !monoClass )
+			SE_CORE_WARN("mono_class_from_name failed");
+		s_ClassCacheMap.emplace(scriptClass.FullName, monoClass);
+	}
+	return s_ClassCacheMap[scriptClass.FullName];
+}
 
-	return monoClass;
+static MonoClass *GetClass(MonoImage *image, const std::string &namespaceName, const std::string &className)
+{
+	const std::string fullName = namespaceName.size() ? namespaceName + "." + className : className;
+	if ( s_ClassCacheMap.find(fullName) == s_ClassCacheMap.end() )
+	{
+		MonoClass *monoClass = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
+		if ( !monoClass )
+			SE_CORE_WARN("mono_class_from_name failed");
+		s_ClassCacheMap.emplace(fullName, monoClass);
+	}
+	return s_ClassCacheMap[fullName];
+}
+
+static MonoClass *GetClass(MonoImage *image, const std::string &fullName)
+{
+	std::string namespaceName, className;
+	if ( fullName.find('.') != std::string::npos )
+	{
+		namespaceName = fullName.substr(0, fullName.find_last_of('.'));
+		className = fullName.substr(fullName.find_last_of('.') + 1);
+	}
+	else
+	{
+		className = fullName;
+	}
+	return GetClass(image, namespaceName, className);
 }
 
 static Uint32 Instantiate(EntityScriptClass &scriptClass)
 {
 	MonoObject *instance = mono_object_new(s_MonoDomain, scriptClass.Class);
 	if ( !instance )
-		SE_ERROR("mono_object_new failed");
+		SE_CORE_WARN("mono_object_new failed");
 
 	mono_runtime_object_init(instance);
 	const Uint32 handle = mono_gchandle_new(instance, false);
@@ -236,11 +283,11 @@ static MonoMethod *GetMethod(MonoImage *image, const std::string &methodDesc)
 {
 	MonoMethodDesc *desc = mono_method_desc_new(methodDesc.c_str(), NULL);
 	if ( !desc )
-		SE_ERROR("mono_method_desc_new failed");
+		SE_CORE_WARN("mono_method_desc_new failed");
 
 	MonoMethod *method = mono_method_desc_search_in_image(desc, image);
 	if ( !method )
-		SE_ERROR("mono_method_desc_search_in_image failed");
+		SE_CORE_WARN("mono_method_desc_search_in_image failed");
 
 	return method;
 }
@@ -495,6 +542,7 @@ void ScriptEngine::LoadSaffronRuntimeAssembly(const std::string &path)
 void ScriptEngine::ReloadAssembly(const std::string &path)
 {
 	LoadSaffronRuntimeAssembly(path);
+	s_ClassCacheMap.clear();
 	if ( !s_EntityInstanceMap.empty() )
 	{
 		Ref<Scene> scene = GetCurrentSceneContext();
@@ -610,18 +658,7 @@ void ScriptEngine::OnScriptComponentDestroyed(UUID sceneID, UUID entityID)
 
 bool ScriptEngine::ModuleExists(const std::string &moduleName)
 {
-	std::string NamespaceName, ClassName;
-	if ( moduleName.find('.') != std::string::npos )
-	{
-		NamespaceName = moduleName.substr(0, moduleName.find_last_of('.'));
-		ClassName = moduleName.substr(moduleName.find_last_of('.') + 1);
-	}
-	else
-	{
-		ClassName = moduleName;
-	}
-
-	MonoClass *monoClass = mono_class_from_name(s_AppAssemblyImage, NamespaceName.c_str(), ClassName.c_str());
+	MonoClass *monoClass = GetClass(s_AppAssemblyImage, moduleName);
 	return monoClass != nullptr;
 }
 
@@ -640,19 +677,10 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 	}
 
 	EntityScriptClass &scriptClass = s_EntityClassMap[moduleName];
-	scriptClass.FullName = moduleName;
-	if ( moduleName.find('.') != std::string::npos )
-	{
-		scriptClass.NamespaceName = moduleName.substr(0, moduleName.find_last_of('.'));
-		scriptClass.ClassName = moduleName.substr(moduleName.find_last_of('.') + 1);
-	}
-	else
-	{
-		scriptClass.ClassName = moduleName;
-	}
+	scriptClass.SetScript(moduleName);
 
 	scriptClass.Class = GetClass(s_AppAssemblyImage, scriptClass);
-	scriptClass.InitClassMethods(s_AppAssemblyImage);
+	scriptClass.SyncClassMethods(s_AppAssemblyImage);
 
 	EntityInstanceData &entityInstanceData = s_EntityInstanceMap[scene->GetUUID()][id];
 	EntityInstance &entityInstance = entityInstanceData.Instance;
@@ -718,11 +746,16 @@ void ScriptEngine::InstantiateEntityClass(Entity entity)
 	SE_CORE_ASSERT(entityInstance.ScriptClass);
 	entityInstance.Handle = Instantiate(*entityInstance.ScriptClass);
 
-	MonoProperty *entityIDProperty = mono_class_get_property_from_name(entityInstance.ScriptClass->Class, "ID");
-	mono_property_get_get_method(entityIDProperty);
-	MonoMethod *entityIDSetMethod = mono_property_get_set_method(entityIDProperty);
-	void *param[] = { &id };
-	CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
+	MonoClass *entityClass = GetClass(s_CoreAssemblyImage, "Se", "Entity");
+	SE_CORE_ASSERT(entityClass, "Failed to load entity class when checking for subclass");
+	if ( mono_class_is_subclass_of(entityInstance.ScriptClass->Class, entityClass, false) )
+	{
+		MonoProperty *entityIDProperty = mono_class_get_property_from_name(entityInstance.ScriptClass->Class, "ID");
+		mono_property_get_get_method(entityIDProperty);
+		MonoMethod *entityIDSetMethod = mono_property_get_set_method(entityIDProperty);
+		void *param[] = { &id };
+		CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
+	}
 
 	// Set all public fields to appropriate values
 	ScriptModuleFieldMap &moduleFieldMap = entityInstanceData.ModuleFieldMap;
