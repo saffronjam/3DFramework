@@ -40,10 +40,38 @@ static void PopID()
 	s_UIContextID--;
 }
 
-static void BeginPropertyGrid()
+static void BeginPropertyGrid(float width = -1.0)
 {
 	PushID();
 	ImGui::Columns(2);
+}
+
+static void EndPropertyGrid()
+{
+	ImGui::Columns(1);
+	PopID();
+}
+
+static void InfoModal(const char *title, const char *text, bool open)
+{
+	if ( open )
+	{
+		PushID();
+
+		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::OpenPopup(title);
+
+		if ( ImGui::BeginPopupModal(title) )
+		{
+			ImGui::Text(text);
+			if ( ImGui::Button("Dismiss") )
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		PopID();
+	}
 }
 
 
@@ -281,11 +309,6 @@ static bool Property(const char *label, glm::vec4 &value, float delta = 0.1f)
 	return modified;
 }
 
-static void EndPropertyGrid()
-{
-	ImGui::Columns(1);
-	PopID();
-}
 
 
 
@@ -329,12 +352,115 @@ void SceneHierarchyPanel::OnImGuiRender()
 										   DrawEntityNode(e);
 								   });
 
-		if ( ImGui::BeginPopupContextWindow(nullptr, 1, false) )
+		bool createNewEntity = false;
+		bool failedCreateEntity = false;
+		if ( ImGui::BeginPopupContextWindow("Create Entity Context", 1, false) )
 		{
 			if ( ImGui::MenuItem("Create Entity") )
 			{
-
+				createNewEntity = true;
 			}
+			ImGui::EndPopup();
+		}
+		if ( createNewEntity )
+		{
+			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+			ImGui::OpenPopup("Create new Entity");
+		}
+
+		ImGui::SetNextWindowContentSize(ImVec2(400, 0.0f));
+		if ( ImGui::BeginPopupModal("Create new Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize) )
+		{
+			static std::string entityName;
+			static bool meshComponent = false;
+			static bool scriptComponent = false;
+			static int scriptChosen = 0;
+			static bool cameraComponent = false;
+			static bool spriteRendererComponent = false;
+			static bool rigidBody2DComponent = false;
+			static bool boxCollider2DComponent = false;
+			static bool circleCollider2DComponent = false;
+
+			bool badEntityName = false;
+
+			BeginPropertyGrid();
+			Property("Name", entityName);
+			Property("Mesh", meshComponent);
+			Property("Script", scriptComponent);
+			if ( scriptComponent )
+			{
+				ImGui::NextColumn();
+				std::ostringstream oss;
+				for ( const auto &scriptName : ScriptManager::GetScriptNames() ) { oss << scriptName.Class << '\0'; }
+				oss << '\0';
+				ImGui::Combo("##EntityCreateScriptComboOption", &scriptChosen, oss.str().c_str());
+				ImGui::NextColumn();
+			}
+			Property("Camera", cameraComponent);
+			Property("Sprite", spriteRendererComponent);
+			Property("Rigid Body 2D", rigidBody2DComponent);
+			Property("Box Collider 2D", boxCollider2DComponent);
+			Property("Circle Collider 2D", circleCollider2DComponent);
+
+			if ( ImGui::Button("Cancel") )
+			{
+				scriptChosen = 0;
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine(0, 5);
+			if ( ImGui::Button("Create") )
+			{
+				if ( entityName.empty() )
+				{
+					badEntityName = true;
+				}
+				else
+				{
+					Entity newEntity = m_Context->CreateEntity(entityName);
+					if ( meshComponent )
+					{
+						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+						newEntity.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
+						meshComponent = false;
+					}
+					if ( scriptComponent )
+					{
+						newEntity.AddComponent<ScriptComponent>(ScriptManager::GetScriptNames().at(scriptChosen).Full);
+						scriptComponent = false;
+					}
+					if ( cameraComponent )
+					{
+						newEntity.AddComponent<CameraComponent>();
+						cameraComponent = false;
+					}
+					if ( spriteRendererComponent )
+					{
+						newEntity.AddComponent<SpriteRendererComponent>();
+						spriteRendererComponent = false;
+					}
+					if ( rigidBody2DComponent )
+					{
+						newEntity.AddComponent<RigidBody2DComponent>();
+						rigidBody2DComponent = false;
+					}
+					if ( boxCollider2DComponent )
+					{
+						newEntity.AddComponent<BoxCollider2DComponent>();
+						boxCollider2DComponent = false;
+					}
+					if ( circleCollider2DComponent )
+					{
+						newEntity.AddComponent<CircleCollider2DComponent>();
+						circleCollider2DComponent = false;
+					}
+					entityName.clear();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+
+
+			EndPropertyGrid();
+
 			ImGui::EndPopup();
 		}
 
@@ -363,7 +489,8 @@ void SceneHierarchyPanel::OnImGuiRender()
 				{
 					if ( ImGui::Button("Mesh") )
 					{
-						m_SelectionContext.AddComponent<MeshComponent>();
+						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+						m_SelectionContext.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -445,12 +572,13 @@ void SceneHierarchyPanel::OnImGuiRender()
 
 void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 {
-	const char *name = "Unnamed Entity";
+	std::string name = "Unnamed";
 	if ( entity.HasComponent<TagComponent>() )
-		name = entity.GetComponent<TagComponent>().Tag.c_str();
+		name = entity.GetComponent<TagComponent>().Tag;
 
 	const ImGuiTreeNodeFlags node_flags = (entity == m_SelectionContext ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(&entity), node_flags, name);
+
+	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(&entity.GetComponent<IDComponent>().ID), node_flags, name.c_str());
 	if ( ImGui::IsItemClicked() )
 	{
 		m_SelectionContext = entity;
@@ -470,11 +598,10 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
 		if ( entity.HasComponent<MeshComponent>() )
 		{
-			[[maybe_unused]] auto mesh = entity.GetComponent<MeshComponent>().Mesh;
-			// if (mesh)
-			// 	DrawMeshNode(mesh);
+			const auto mesh = entity.GetComponent<MeshComponent>().Mesh;
+			if ( mesh )
+				DrawMeshNode(mesh, entity.GetComponent<IDComponent>().ID);
 		}
-
 		ImGui::TreePop();
 	}
 
@@ -489,14 +616,13 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	}
 }
 
-void SceneHierarchyPanel::DrawMeshNode(const Ref<Mesh> &mesh, Uint32 &imguiMeshID) const
+void SceneHierarchyPanel::DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const
 {
-	static char imguiName[128];
-	memset(imguiName, 0, 128);
-	sprintf(imguiName, "Mesh##%d", imguiMeshID++);
+	std::ostringstream oss;
+	oss << "Mesh##" << entityUUID;
 
 	// Mesh Hierarchy
-	if ( ImGui::TreeNode(imguiName) )
+	if ( ImGui::TreeNode(oss.str().c_str()) )
 	{
 		auto *rootNode = mesh->m_Scene->mRootNode;
 		MeshNodeHierarchy(mesh, rootNode);
@@ -504,7 +630,9 @@ void SceneHierarchyPanel::DrawMeshNode(const Ref<Mesh> &mesh, Uint32 &imguiMeshI
 	}
 }
 
-void SceneHierarchyPanel::MeshNodeHierarchy(const Ref<Mesh> &mesh, aiNode *node, const glm::mat4 &parentTransform,
+void SceneHierarchyPanel::MeshNodeHierarchy(const Ref<Mesh> &mesh,
+											aiNode *node,
+											const glm::mat4 &parentTransform,
 											Uint32 level) const
 {
 	const glm::mat4 localTransform = Mat4FromAssimpMat4(node->mTransformation);

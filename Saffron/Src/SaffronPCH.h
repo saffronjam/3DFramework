@@ -13,6 +13,7 @@
 #include <optional>
 #include <iomanip>
 #include <filesystem>
+#include <bitset>
 
 #include <atomic>
 #include <string>

@@ -492,7 +492,7 @@ void Scene::OnRuntimeStop()
 	m_IsPlaying = false;
 }
 
-Entity Scene::CreateEntity(const std::string &name)
+Entity Scene::CreateEntity(std::string name)
 {
 	auto entity = Entity{ m_Registry.create(), this };
 	auto &idComponent = entity.AddComponent<IDComponent>();
@@ -500,7 +500,7 @@ Entity Scene::CreateEntity(const std::string &name)
 
 	entity.AddComponent<TransformComponent>(glm::mat4(1.0f));
 	if ( !name.empty() )
-		entity.AddComponent<TagComponent>(name);
+		entity.AddComponent<TagComponent>(std::move(name));
 
 	m_EntityIDMap[idComponent.ID] = entity;
 	return entity;

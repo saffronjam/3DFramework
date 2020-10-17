@@ -19,7 +19,7 @@ public:
 	void OnImGuiRender();
 private:
 	void DrawEntityNode(Entity entity);
-	void DrawMeshNode(const Ref<Mesh> &mesh, Uint32 &imguiMeshID) const;
+	void DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const;
 	void MeshNodeHierarchy(const Ref<Mesh> &mesh, aiNode *node, const glm::mat4 &parentTransform = glm::mat4(1.0f), Uint32 level = 0) const;
 	void DrawComponents(Entity entity);
 private:

@@ -81,12 +81,14 @@ void EditorLayer::OnScenePlay()
 
 void EditorLayer::OnSceneStop()
 {
+	m_SelectionContext.clear();
+
 	m_RuntimeScene->OnRuntimeStop();
 	m_SceneState = SceneState::Edit;
 
 	ScriptEngine::SetSceneContext(m_EditorScene);
 	m_SceneHierarchyPanel->SetContext(m_EditorScene);
-	
+
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
 }
@@ -623,8 +625,18 @@ void EditorLayer::OnImGuiRender()
 
 		if ( ImGui::BeginMenu("Script") )
 		{
+			if ( m_SceneState == SceneState::Play )
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+			}
 			if ( ImGui::MenuItem("Reload C# Assembly") )
 				ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
+			if ( m_SceneState == SceneState::Play )
+			{
+				ImGui::PopItemFlag();
+				ImGui::PopStyleVar();
+			}
 
 			ImGui::MenuItem("Reload assembly on play", nullptr, &m_ReloadScriptOnPlay);
 			ImGui::EndMenu();

@@ -58,7 +58,7 @@ public:
 	void OnRuntimeStop();
 
 
-	Entity CreateEntity(const std::string &name = "");
+	Entity CreateEntity(std::string name = "");
 	Entity CreateEntityWithID(UUID uuid, const std::string &name = "", bool runtimeMap = false);
 	void DestroyEntity(Entity entity);
 
