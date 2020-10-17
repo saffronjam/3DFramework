@@ -13,19 +13,6 @@
 
 namespace Se
 {
-static void ImGuiShowHelpMarker(const char *desc)
-{
-	ImGui::TextDisabled("(?)");
-	if ( ImGui::IsItemHovered() )
-	{
-		ImGui::BeginTooltip();
-		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-		ImGui::TextUnformatted(desc);
-		ImGui::PopTextWrapPos();
-		ImGui::EndTooltip();
-	}
-}
-
 
 EditorLayer::EditorLayer()
 	:
@@ -66,7 +53,7 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnSceneChange()
 {
-	if ( m_SceneState == Scene::State::Play )
+	if ( m_SceneState == SceneState::Play )
 	{
 		OnSceneStop();
 	}
@@ -78,7 +65,7 @@ void EditorLayer::OnScenePlay()
 {
 	m_SelectionContext.clear();
 
-	m_SceneState = Scene::State::Play;
+	m_SceneState = SceneState::Play;
 
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
@@ -94,15 +81,16 @@ void EditorLayer::OnScenePlay()
 
 void EditorLayer::OnSceneStop()
 {
+	m_SelectionContext.clear();
+
 	m_RuntimeScene->OnRuntimeStop();
-	m_SceneState = Scene::State::Edit;
+	m_SceneState = SceneState::Edit;
+
+	ScriptEngine::SetSceneContext(m_EditorScene);
+	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
-
-	m_SelectionContext.clear();
-	ScriptEngine::SetSceneContext(m_EditorScene);
-	m_SceneHierarchyPanel->SetContext(m_EditorScene);
 }
 
 void EditorLayer::UpdateWindowTitle(const std::string &sceneName)
@@ -128,7 +116,7 @@ void EditorLayer::OnUpdate()
 
 	switch ( m_SceneState )
 	{
-	case Scene::State::Edit:
+	case SceneState::Edit:
 	{
 		//if (m_ViewportPanelFocused)
 		m_EditorCamera.OnUpdate(ts);
@@ -183,16 +171,13 @@ void EditorLayer::OnUpdate()
 
 		break;
 	}
-	case Scene::State::Play:
+	case SceneState::Play:
 	{
-		if ( EditorViewport::Focused )
-			m_EditorCamera.OnUpdate(ts);
-
 		m_RuntimeScene->OnUpdate(ts);
 		m_RuntimeScene->OnRenderRuntime(ts);
 		break;
 	}
-	case Scene::State::Pause:
+	case SceneState::Pause:
 	{
 		if ( EditorViewport::Focused )
 			m_EditorCamera.OnUpdate(ts);
@@ -381,7 +366,7 @@ void EditorLayer::OnImGuiRender()
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
 
-	if ( m_SceneState == Scene::State::Edit )
+	if ( m_SceneState == SceneState::Edit )
 	{
 		float physics2DGravity = m_EditorScene->GetPhysics2DGravity();
 		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
@@ -389,7 +374,7 @@ void EditorLayer::OnImGuiRender()
 			m_EditorScene->SetPhysics2DGravity(physics2DGravity);
 		}
 	}
-	else if ( m_SceneState == Scene::State::Play )
+	else if ( m_SceneState == SceneState::Play )
 	{
 		float physics2DGravity = m_RuntimeScene->GetPhysics2DGravity();
 		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
@@ -467,10 +452,10 @@ void EditorLayer::OnImGuiRender()
 	ImGui::Begin("Toolbar");
 
 
-	Ref<Texture> ButtonTexture = m_SceneState == Scene::State::Edit ? m_TexStore["PlayButton"] : m_TexStore["StopButton"];
+	Ref<Texture> ButtonTexture = m_SceneState == SceneState::Edit ? m_TexStore["PlayButton"] : m_TexStore["StopButton"];
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(ButtonTexture->GetRendererID()), ImVec2(25, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ClearWhite) )
 	{
-		m_SceneState == Scene::State::Edit ? OnScenePlay() : OnSceneStop();
+		m_SceneState == SceneState::Edit ? OnScenePlay() : OnSceneStop();
 	}
 
 	ImGui::SameLine();
@@ -482,7 +467,7 @@ void EditorLayer::OnImGuiRender()
 	ImVec4 ScaleColorTint = m_GizmoType == ImGuizmo::OPERATION::SCALE ? ImGuiBlue : ClearWhite;
 	ImVec4 ControllerWASDTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Game ? ImGuiBlue : ClearWhite;
 	ImVec4 ControllerMayaTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Maya ? ImGuiBlue : ClearWhite;
-	if ( m_SceneState == Scene::State::Play )
+	if ( m_SceneState == SceneState::Play )
 	{
 		TranslateColorTint = FadedGrey;
 		RotateColorTint = FadedGrey;
@@ -494,19 +479,19 @@ void EditorLayer::OnImGuiRender()
 
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["TranslateButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), TranslateColorTint) )
 	{
-		if ( m_SceneState == Scene::State::Edit )
+		if ( m_SceneState == SceneState::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
 	}
 	ImGui::SameLine();
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["RotateButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), RotateColorTint) )
 	{
-		if ( m_SceneState == Scene::State::Edit )
+		if ( m_SceneState == SceneState::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? -1 : ImGuizmo::OPERATION::ROTATE;
 	}
 	ImGui::SameLine();
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ScaleButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ScaleColorTint) )
 	{
-		if ( m_SceneState == Scene::State::Edit )
+		if ( m_SceneState == SceneState::Edit )
 			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::SCALE ? -1 : ImGuizmo::OPERATION::SCALE;
 	}
 
@@ -517,13 +502,13 @@ void EditorLayer::OnImGuiRender()
 	ImGui::SameLine();
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerGameButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint) )
 	{
-		if ( m_SceneState == Scene::State::Edit )
+		if ( m_SceneState == SceneState::Edit )
 			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Game);
 	}
 	ImGui::SameLine();
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerMayaButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint) )
 	{
-		if ( m_SceneState == Scene::State::Edit )
+		if ( m_SceneState == SceneState::Edit )
 			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Maya);
 	}
 
@@ -640,8 +625,18 @@ void EditorLayer::OnImGuiRender()
 
 		if ( ImGui::BeginMenu("Script") )
 		{
+			if ( m_SceneState == SceneState::Play )
+			{
+				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+			}
 			if ( ImGui::MenuItem("Reload C# Assembly") )
 				ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
+			if ( m_SceneState == SceneState::Play )
+			{
+				ImGui::PopItemFlag();
+				ImGui::PopStyleVar();
+			}
 
 			ImGui::MenuItem("Reload assembly on play", nullptr, &m_ReloadScriptOnPlay);
 			ImGui::EndMenu();
@@ -869,14 +864,14 @@ void EditorLayer::OnImGuiRender()
 
 void EditorLayer::OnEvent(const Event &event)
 {
-	if ( m_SceneState == Scene::State::Edit )
+	if ( m_SceneState == SceneState::Edit )
 	{
 		if ( EditorViewport::Hovered )
 			m_EditorCamera.OnEvent(event);
 
 		m_EditorScene->OnEvent(event);
 	}
-	else if ( m_SceneState == Scene::State::Play )
+	else if ( m_SceneState == SceneState::Play )
 	{
 		m_RuntimeScene->OnEvent(event);
 	}
@@ -956,7 +951,11 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 
 bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
-	if ( event.GetButton() == SE_BUTTON_LEFT && !Input::IsKeyPressed(SE_KEY_LEFT_ALT) && !ImGuizmo::IsOver() && m_SceneState != Scene::State::Play )
+	if ( EditorViewport::Focused &&
+		event.GetButton() == SE_BUTTON_LEFT &&
+		!Input::IsKeyPressed(SE_KEY_LEFT_ALT) &&
+		!ImGuizmo::IsOver() &&
+		m_SceneState != SceneState::Play )
 	{
 		const auto MousePosition = EditorViewport::GetMousePosition();
 		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
@@ -1013,7 +1012,7 @@ bool EditorLayer::OnWindowDropFiles(const WindowDropFilesEvent &event)
 	const auto &paths = event.GetPaths();
 
 	// If user dropped a scene in window
-	if ( m_SceneState == Scene::State::Edit && paths.size() == 1 )
+	if ( m_SceneState == SceneState::Edit && paths.size() == 1 )
 	{
 		const auto &scenePath = paths.front();
 		if ( scenePath.extension() == ".ssc" )

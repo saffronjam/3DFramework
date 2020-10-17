@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Editor/EditorCamera.h"
+#include "Saffron/Renderer/EditorViewport.h"
 
 namespace Se
 {
@@ -12,71 +13,74 @@ EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
 
 void EditorCamera::OnUpdate(Time ts)
 {
-	if ( m_ControllerStyle == ControllerStyle::Maya )
+	if ( EditorViewport::Focused )
 	{
-		if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
+		if ( m_ControllerStyle == ControllerStyle::Maya )
 		{
-			const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
+			if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
+			{
+				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
 
-			//if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
-			//	MousePan(swipe);
-			//else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
-			//	MouseRotate(swipe);
-			//else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
-			//	MouseZoom(swipe.y);
+				//if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
+				//	MousePan(swipe);
+				//else if ( Input::IsMouseButtonPressed(SE_BUTTON_LEFT) )
+				//	MouseRotate(swipe);
+				//else if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
+				//	MouseZoom(swipe.y);
+			}
 		}
+		else if ( m_ControllerStyle == ControllerStyle::Game )
+		{
+			if ( Input::IsKeyPressed(SE_KEY_W) )
+			{
+				m_Position += GetForwardDirection() * m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_S) )
+			{
+				m_Position -= GetForwardDirection() * m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_A) )
+			{
+				m_Position -= GetRightDirection() * m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_D) )
+			{
+				m_Position += GetRightDirection() * m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_E) )
+			{
+				m_Position.y += m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_Q) )
+			{
+				m_Position.y -= m_MovementSpeed * ts.sec();
+			}
+
+			if ( Input::IsKeyPressed(SE_KEY_LEFT_SHIFT) )
+			{
+				m_MovementSpeed = 20.0f;
+			}
+			else
+			{
+				m_MovementSpeed = 10.0f;
+			}
+
+			if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
+			{
+				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
+
+				m_Yaw += swipe.x;
+				m_Pitch -= swipe.y;
+				m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
+			}
+		}
+
 	}
-	else if ( m_ControllerStyle == ControllerStyle::Game )
-	{
-		if ( Input::IsKeyPressed(SE_KEY_W) )
-		{
-			m_Position += GetForwardDirection() * m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_S) )
-		{
-			m_Position -= GetForwardDirection() * m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_A) )
-		{
-			m_Position -= GetRightDirection() * m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_D) )
-		{
-			m_Position += GetRightDirection() * m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_E) )
-		{
-			m_Position.y += m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_Q) )
-		{
-			m_Position.y -= m_MovementSpeed * ts.sec();
-		}
-
-		if ( Input::IsKeyPressed(SE_KEY_LEFT_SHIFT) )
-		{
-			m_MovementSpeed = 20.0f;
-		}
-		else
-		{
-			m_MovementSpeed = 10.0f;
-		}
-
-		if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
-		{
-			const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
-
-			m_Yaw += swipe.x;
-			m_Pitch -= swipe.y;
-			m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
-		}
-	}
-
 	UpdateCameraView();
 }
 

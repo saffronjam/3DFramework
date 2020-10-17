@@ -104,7 +104,7 @@ Entities:
       Rotation: [0.942591429, 0, 0, -0.333948225]
       Scale: [6.00000048, 6.00000048, 4.48000002]
     ScriptComponent:
-      ModuleName: Example.PlayerCube
+      ModuleName: Script.PlayerCube
       StoredFields:
         - Name: HorizontalForce
           Type: 1
@@ -128,7 +128,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [50, 1, 50]
     ScriptComponent:
-      ModuleName: Example.Sink
+      ModuleName: Script.Sink
       StoredFields:
         - Name: SinkSpeed
           Type: 1
@@ -149,7 +149,7 @@ Entities:
       Rotation: [0.995602965, -0.0936739072, 0, 0]
       Scale: [1, 0.999999821, 0.999999821]
     ScriptComponent:
-      ModuleName: Example.BasicController
+      ModuleName: Script.BasicController
       StoredFields:
         - Name: Speed
           Type: 1

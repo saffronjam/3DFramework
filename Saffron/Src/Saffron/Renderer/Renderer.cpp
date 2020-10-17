@@ -76,6 +76,8 @@ void Renderer::Init()
 
 void Renderer::OnImGuiRender()
 {
+
+
 	const Time ts = GlobalTimer::GetStep();
 
 	static Time CachedFrametime = Time::Zero();

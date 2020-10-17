@@ -9,7 +9,7 @@ namespace Se
 class SceneHierarchyPanel
 {
 public:
-	SceneHierarchyPanel(const Ref<Scene> &scene);
+	explicit SceneHierarchyPanel(const Ref<Scene> &scene);
 
 	void SetContext(const Ref<Scene> &context);
 	void SetSelected(Entity entity);
@@ -19,12 +19,14 @@ public:
 	void OnImGuiRender();
 private:
 	void DrawEntityNode(Entity entity);
-	void DrawMeshNode(const Ref<Mesh> &mesh, Uint32 &imguiMeshID) const;
+	void DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const;
 	void MeshNodeHierarchy(const Ref<Mesh> &mesh, aiNode *node, const glm::mat4 &parentTransform = glm::mat4(1.0f), Uint32 level = 0) const;
 	void DrawComponents(Entity entity);
 private:
 	Ref<Scene> m_Context;
 	Entity m_SelectionContext;
+
+	std::string m_CachedNewModuleName = "NONE";
 
 	std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 };

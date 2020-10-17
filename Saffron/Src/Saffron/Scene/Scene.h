@@ -41,10 +41,6 @@ public:
 		Spheres = 0, Model = 1
 	};
 
-	enum class State
-	{
-		Edit = 0, Play = 1, Pause = 2
-	};
 
 public:
 	Scene(std::string name = "Scene");
@@ -62,7 +58,7 @@ public:
 	void OnRuntimeStop();
 
 
-	Entity CreateEntity(const std::string &name = "");
+	Entity CreateEntity(std::string name = "");
 	Entity CreateEntityWithID(UUID uuid, const std::string &name = "", bool runtimeMap = false);
 	void DestroyEntity(Entity entity);
 
@@ -95,22 +91,22 @@ public:
 	void SetSelectedEntity(entt::entity entity) { m_SelectedEntity = entity; }
 private:
 	UUID m_SceneID;
-	entt::entity m_SceneEntity;
-	entt::registry m_Registry;
-
 	std::string m_Name;
-	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
-	EntityMap m_EntityIDMap;
+	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	Light m_Light;
 	float m_LightMultiplier = 0.3f;
+
+	entt::entity m_SceneEntity;
+	entt::registry m_Registry;
+	entt::entity m_SelectedEntity{};
+	EntityMap m_EntityIDMap;
 
 	Environment m_Environment;
 	Ref<TextureCube> m_SkyboxTexture;
 	Ref<MaterialInstance> m_SkyboxMaterial;
 
-	entt::entity m_SelectedEntity{};
 
 	Entity *m_PhysicsBodyEntityBuffer = nullptr;
 

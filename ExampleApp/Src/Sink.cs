@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Se;
 
-namespace Example
+namespace Script
 {
     class Sink : Entity
     {

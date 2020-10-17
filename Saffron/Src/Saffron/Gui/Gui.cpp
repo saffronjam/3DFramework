@@ -190,5 +190,17 @@ bool Gui::Property(const std::string &name, glm::vec4 &value, float min, float m
 	return changed;
 }
 
+void Gui::HelpMarker(const std::string &desc)
+{
+	ImGui::TextDisabled("(?)");
+	if ( ImGui::IsItemHovered() )
+	{
+		ImGui::BeginTooltip();
+		ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+		ImGui::TextUnformatted(desc.c_str());
+		ImGui::PopTextWrapPos();
+		ImGui::EndTooltip();
+	}
+}
 }
 

@@ -54,8 +54,7 @@ namespace Se
 
         public Matrix4 GetTransform()
         {
-            Matrix4 mat4Instance;
-            GetTransform_Native(ID, out mat4Instance);
+            GetTransform_Native(ID, out var mat4Instance);
             return mat4Instance;
         }
 

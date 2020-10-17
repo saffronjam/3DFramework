@@ -13,6 +13,7 @@
 #include <optional>
 #include <iomanip>
 #include <filesystem>
+#include <bitset>
 
 #include <atomic>
 #include <string>
@@ -27,6 +28,7 @@
 
 #include "Saffron/Debug/Instrumentor.h"
 #include "Saffron/Core/Log.h"
+#include "Saffron/Core/Assert.h"
 
 // Math
 #include <Saffron/Core/Math/Mat4.h>
