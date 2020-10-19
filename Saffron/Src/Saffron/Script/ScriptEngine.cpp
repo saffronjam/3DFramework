@@ -9,7 +9,6 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
-#include "Saffron/Script/ScriptManager.h"
 
 namespace Se {
 
@@ -429,10 +428,8 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 ///////////////////////////////////////////////////////////////////////////
 
 
-void ScriptEngine::Init(std::string assemblyPath, std::string scriptFolderPath)
+void ScriptEngine::Init(std::string assemblyPath)
 {
-	ScriptManager::Init(std::filesystem::path(std::move(scriptFolderPath)));
-
 	s_AssemblyPath = std::move(assemblyPath);
 
 	InitMono();
@@ -450,12 +447,10 @@ void ScriptEngine::Shutdown()
 
 void ScriptEngine::OnUpdate()
 {
-	ScriptManager::SyncScriptPaths();
 }
 
-void ScriptEngine::OnImGuiRender()
+void ScriptEngine::OnGuiRender()
 {
-	ScriptManager::OnGuiRender();
 	ImGui::Begin("Script Engine Debug");
 	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
 	{

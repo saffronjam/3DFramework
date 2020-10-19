@@ -13,8 +13,6 @@
 namespace Se
 {
 
-RendererAPI::Type RendererAPI::m_sCurrentAPI = Type::OpenGL;
-
 struct RendererData
 {
 	Ref<RenderPass> m_ActiveRenderPass;
@@ -26,7 +24,9 @@ struct RendererData
 	Ref<Pipeline> m_FullscreenQuadPipeline;
 };
 
-static RendererData s_Data;
+
+RendererAPI::Type RendererAPI::m_sCurrentAPI = Type::OpenGL;
+RendererData Renderer::s_Data;
 
 void Renderer::Init()
 {
@@ -74,10 +74,8 @@ void Renderer::Init()
 	Renderer2D::Init();
 }
 
-void Renderer::OnImGuiRender()
+void Renderer::OnGuiRender()
 {
-
-
 	const Time ts = GlobalTimer::GetStep();
 
 	static Time CachedFrametime = Time::Zero();

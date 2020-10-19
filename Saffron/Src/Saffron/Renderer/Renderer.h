@@ -15,7 +15,7 @@ class Renderer
 public:
 	static void Init();
 
-	static void OnImGuiRender();
+	static void OnGuiRender();
 
 	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
@@ -45,6 +45,7 @@ public:
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
+	static struct RendererData s_Data;
 };
 
 template <typename FuncT>

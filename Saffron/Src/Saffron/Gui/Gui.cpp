@@ -8,6 +8,14 @@ namespace Se
 
 Gui::Style Gui::m_CurrentStyle = Style::Light;
 
+///////////////////////////////////////////////////////////////////////////
+/// Statics
+///////////////////////////////////////////////////////////////////////////
+
+static int s_UIContextID = 0;
+static Uint32 s_Counter = 0;
+static char s_IDBuffer[16];
+
 void Gui::Init()
 {
 	ImGuiStyle &style = ImGui::GetStyle();
@@ -58,6 +66,19 @@ void Gui::Init()
 	SetStyle(Style::Dark);
 }
 
+void Gui::BeginPropertyGrid(float width)
+{
+	PushID();
+	ImGui::Columns(2);
+	ImGui::AlignTextToFramePadding();
+}
+
+void Gui::EndPropertyGrid()
+{
+	ImGui::Columns(1);
+	PopID();
+}
+
 void Gui::SetStyle(Style style)
 {
 	ImGuiStyle &imguiStyle = ImGui::GetStyle();
@@ -80,6 +101,65 @@ void Gui::SetStyle(Style style)
 	}
 }
 
+void Gui::PushID()
+{
+	ImGui::PushID(s_UIContextID++);
+	s_Counter = 0;
+}
+
+void Gui::PopID()
+{
+	ImGui::PopID();
+	s_UIContextID--;
+}
+
+void Gui::Property(const char *label, const char *value)
+{
+	ImGui::Text(label);
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	s_IDBuffer[0] = '#';
+	s_IDBuffer[1] = '#';
+	memset(s_IDBuffer + 2, 0, 14);
+	_itoa(s_Counter++, s_IDBuffer + 2, 16);
+	ImGui::InputText(s_IDBuffer, const_cast<char *>(value), 256, ImGuiInputTextFlags_ReadOnly);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+}
+
+bool Gui::Property(const char *label, std::string &value, bool error)
+{
+	bool modified = false;
+
+	ImGui::Text(label);
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	char buffer[256];
+	strcpy(buffer, value.c_str());
+
+	s_IDBuffer[0] = '#';
+	s_IDBuffer[1] = '#';
+	memset(s_IDBuffer + 2, 0, 14);
+	_itoa(s_Counter++, s_IDBuffer + 2, 16);
+
+	if ( error )
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
+	if ( ImGui::InputText(s_IDBuffer, buffer, 256) )
+	{
+		value = buffer;
+		modified = true;
+	}
+	if ( error )
+		ImGui::PopStyleColor();
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return modified;
+}
+
 bool Gui::Property(const std::string &name, bool &value)
 {
 	ImGui::Text(name.c_str());
@@ -95,6 +175,24 @@ bool Gui::Property(const std::string &name, bool &value)
 	return result;
 }
 
+bool Gui::Property(const std::string &name, int &value, int min, int max, PropertyFlag flags)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+	ImGui::PushItemWidth(-1);
+
+	const std::string id = "##" + name;
+	bool changed;
+	if ( flags == PropertyFlag::Slider )
+		changed = ImGui::SliderInt(id.c_str(), &value, min, max);
+	else
+		changed = ImGui::DragInt(id.c_str(), &value, 1.0f, min, max);
+
+	ImGui::PopItemWidth();
+	ImGui::NextColumn();
+
+	return changed;
+}
 bool Gui::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
@@ -200,6 +298,28 @@ void Gui::HelpMarker(const std::string &desc)
 		ImGui::TextUnformatted(desc.c_str());
 		ImGui::PopTextWrapPos();
 		ImGui::EndTooltip();
+	}
+}
+
+void Gui::InfoModal(const char *title, const char *text, bool open)
+{
+	if ( open )
+	{
+		PushID();
+
+		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+		ImGui::OpenPopup(title);
+
+		if ( ImGui::BeginPopupModal(title) )
+		{
+			ImGui::Text(text);
+			if ( ImGui::Button("Dismiss") )
+			{
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::EndPopup();
+		}
+		PopID();
 	}
 }
 }

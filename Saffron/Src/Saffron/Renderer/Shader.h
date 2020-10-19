@@ -118,6 +118,8 @@ public:
 public:
 	virtual ~Shader() = default;
 
+	static void OnGuiRender();
+
 	virtual void Reload() = 0;
 
 	virtual void Bind() = 0;

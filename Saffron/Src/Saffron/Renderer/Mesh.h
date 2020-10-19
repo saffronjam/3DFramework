@@ -121,7 +121,7 @@ public:
 class Mesh : public RefCounted
 {
 public:
-	Mesh(const std::string &filename);
+	Mesh(std::string filename);
 	~Mesh();
 
 	void OnUpdate(Time ts);
@@ -134,7 +134,7 @@ public:
 	Ref<Material> GetMaterial() const { return m_BaseMaterial; }
 	std::vector<Ref<MaterialInstance>> GetMaterials() const { return m_Materials; }
 	const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
-	const std::string &GetFilePath() const { return m_FilePath; }
+	const std::string &GetFilepath() const { return m_Filepath; }
 
 	std::vector<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
 private:
@@ -186,9 +186,9 @@ private:
 	float m_TimeMultiplier = 1.0f;
 	bool m_AnimationPlaying = true;
 
-	std::string m_FilePath;
+	std::string m_Filepath;
 
 	friend class Renderer;
-	friend class SceneHierarchyPanel;
+	friend class EntityPanel;
 };
 }

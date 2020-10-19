@@ -112,11 +112,11 @@ using EntityInstanceMap = std::unordered_map<UUID, std::unordered_map<UUID, Enti
 class ScriptEngine
 {
 public:
-	static void Init(std::string assemblyPath, std::string scriptFolderPath);
+	static void Init(std::string assemblyPath);
 	static void Shutdown();
 
 	static void OnUpdate();
-	static void OnImGuiRender();
+	static void OnGuiRender();
 	static void OnSceneDestruct(UUID sceneID);
 
 	static void LoadSaffronRuntimeAssembly(const std::string &path);

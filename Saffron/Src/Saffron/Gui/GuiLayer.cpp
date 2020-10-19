@@ -85,7 +85,7 @@ void GuiLayer::OnDetach()
 	ImGui::DestroyContext();
 }
 
-void GuiLayer::OnImGuiRender()
+void GuiLayer::OnGuiRender()
 {
 }
 

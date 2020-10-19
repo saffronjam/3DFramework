@@ -1,7 +1,7 @@
 #include "SaffronPCH.h"
 
 #define GLFW_EXPOSE_NATIVE_WIN32
-#include <Commdlg.h>
+#include <commdlg.h>
 #include <Windows.h>
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
@@ -28,7 +28,7 @@ Application::Application(const Properties &properties)
 	m_GuiLayer = new GuiLayer("ImGui");
 	PushOverlay(m_GuiLayer);
 
-	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll", "../ExampleApp/Src");
+	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
 
 	Renderer::Init();
 	Renderer::WaitAndRender();
@@ -58,7 +58,7 @@ void Application::RenderGui()
 	m_GuiLayer->Begin();
 
 	for ( Layer *layer : m_LayerStack )
-		layer->OnImGuiRender();
+		layer->OnGuiRender();
 
 	m_GuiLayer->End();
 }
@@ -74,15 +74,16 @@ void Application::Run()
 			for ( Layer *layer : m_LayerStack )
 				layer->OnUpdate();
 
+			ScriptEngine::OnUpdate();
+			Input::OnUpdate();
+			m_Window->OnUpdate();
+
 			// Render ImGui on render thread
 			Application *app = this;
 			Renderer::Submit([app]() { app->RenderGui(); });
 
 			Renderer::WaitAndRender();
 		}
-		ScriptEngine::OnUpdate();
-		Input::OnUpdate();
-		m_Window->OnUpdate();
 
 		GlobalTimer::Mark();
 	}

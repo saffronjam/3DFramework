@@ -132,18 +132,18 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 /// Mesh
 ////////////////////////////////////////////////////////////////////////
 
-Mesh::Mesh(const std::string &filename)
-	: m_FilePath(filename)
+Mesh::Mesh(std::string filename)
+	: m_Filepath(std::move(filename))
 {
 	LogStream::Initialize();
 
-	SE_CORE_INFO("Loading mesh: {0}", filename.c_str());
+	SE_CORE_INFO("Loading mesh: {0}", m_Filepath.c_str());
 
 	m_Importer = std::make_unique<Assimp::Importer>();
 
-	const aiScene *scene = m_Importer->ReadFile(filename, s_MeshImportFlags);
+	const aiScene *scene = m_Importer->ReadFile(m_Filepath, s_MeshImportFlags);
 	if ( !scene || !scene->HasMeshes() )
-		SE_CORE_ERROR("Failed to load mesh file: {0}", filename);
+		SE_CORE_ERROR("Failed to load mesh file: {0}", m_Filepath);
 
 	m_Scene = scene;
 
@@ -288,7 +288,7 @@ Mesh::Mesh(const std::string &filename)
 	// Materials
 	if ( scene->HasMaterials() )
 	{
-		SE_MESH_LOG("---- Materials - {0} ----", filename);
+		SE_MESH_LOG("---- Materials - {0} ----", m_Filepath);
 
 		m_Textures.resize(scene->mNumMaterials);
 		m_Materials.resize(scene->mNumMaterials);
@@ -322,7 +322,7 @@ Mesh::Mesh(const std::string &filename)
 			if ( hasAlbedoMap )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = filename;
+				std::filesystem::path path = m_Filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
 				std::string texturePath = parentPath.string();
@@ -352,7 +352,7 @@ Mesh::Mesh(const std::string &filename)
 			if ( aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = filename;
+				std::filesystem::path path = m_Filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
 				std::string texturePath = parentPath.string();
@@ -379,7 +379,7 @@ Mesh::Mesh(const std::string &filename)
 			if ( aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = filename;
+				std::filesystem::path path = m_Filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
 				std::string texturePath = parentPath.string();
@@ -406,7 +406,7 @@ Mesh::Mesh(const std::string &filename)
 			if ( aiMaterial->Get("$raw.ReflectionFactor|file", aiPTI_String, 0, aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = filename;
+				std::filesystem::path path = m_Filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= std::string(aiTexPath.data);
 				std::string texturePath = parentPath.string();
@@ -498,7 +498,7 @@ Mesh::Mesh(const std::string &filename)
 						metalnessTextureFound = true;
 
 						// TODO: Temp - this should be handled by Saffron's filesystem
-						std::filesystem::path path = filename;
+						std::filesystem::path path = m_Filepath;
 						auto parentPath = path.parent_path();
 						parentPath /= str;
 						std::string texturePath = parentPath.string();
@@ -564,8 +564,7 @@ Mesh::Mesh(const std::string &filename)
 	m_Pipeline = Pipeline::Create(pipelineSpecification);
 }
 
-Mesh::~Mesh()
-= default;
+Mesh::~Mesh() = default;
 
 void Mesh::OnUpdate(Time ts)
 {

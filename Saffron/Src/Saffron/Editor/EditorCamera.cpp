@@ -1,7 +1,7 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Renderer/EditorViewport.h"
+#include "Saffron/Editor/EditorViewport.h"
 
 namespace Se
 {
@@ -13,7 +13,7 @@ EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
 
 void EditorCamera::OnUpdate(Time ts)
 {
-	if ( EditorViewport::Focused )
+	if ( EditorViewport::IsFocused() )
 	{
 		if ( m_ControllerStyle == ControllerStyle::Maya )
 		{

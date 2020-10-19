@@ -52,6 +52,7 @@ public:
 	void OnRenderRuntime(Time ts);
 	void OnRenderEditor(Time ts, const EditorCamera &editorCamera);
 	void OnEvent(const Event &event);
+	void OnGuiRender();
 
 	// Runtime
 	void OnRuntimeStart();
@@ -107,16 +108,17 @@ private:
 	Ref<TextureCube> m_SkyboxTexture;
 	Ref<MaterialInstance> m_SkyboxMaterial;
 
-
 	Entity *m_PhysicsBodyEntityBuffer = nullptr;
 
+	bool m_RadiancePrefilter = false;
+	float m_EnvMapRotation = 0.0f;
 	float m_SkyboxLod = 1.0f;
 	bool m_IsPlaying = false;
 
 	friend class Entity;
 	friend class SceneRenderer;
 	friend class SceneSerializer;
-	friend class SceneHierarchyPanel;
+	friend class EntityPanel;
 
 	friend void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity);
 	friend void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity);

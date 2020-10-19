@@ -253,7 +253,7 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 		out << YAML::BeginMap; // MeshComponent
 
 		auto mesh = entity.GetComponent<MeshComponent>().Mesh;
-		out << YAML::Key << "AssetPath" << YAML::Value << mesh->GetFilePath();
+		out << YAML::Key << "AssetPath" << YAML::Value << mesh->GetFilepath();
 
 		out << YAML::EndMap; // MeshComponent
 	}

@@ -7,7 +7,7 @@ namespace Se
 {
 class TerminalSink : public LogSink
 {
-	friend class GuiTerminal;
+	friend class EditorTerminal;
 
 public:
 	void Clear();

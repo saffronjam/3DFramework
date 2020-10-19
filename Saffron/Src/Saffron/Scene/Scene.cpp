@@ -2,6 +2,8 @@
 
 #include <box2d/box2d.h>
 
+#include "Saffron/Core/Application.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/SceneRenderer.h"
 #include "Saffron/Scene/Components.h"
 #include "Saffron/Scene/Entity.h"
@@ -376,6 +378,41 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 
 void Scene::OnEvent(const Event &event)
 {
+}
+
+void Scene::OnGuiRender()
+{
+	ImGui::Begin("Environment");
+
+	if ( ImGui::Button("Load Environment Map") )
+	{
+		std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
+		if ( !filepath.empty() )
+			SetEnvironment(Environment::Load(filepath.string()));
+	}
+
+	ImGui::SliderFloat("Skybox LOD", &GetSkyboxLod(), 0.0f, 11.0f);
+
+
+	Gui::BeginPropertyGrid();
+
+	auto &light = GetLight();
+	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
+	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
+	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, Gui::PropertyFlag::Slider);
+	//Gui::Property("Exposure", GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
+	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
+	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
+
+	float physics2DGravity = GetPhysics2DGravity();
+	if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
+	{
+		SetPhysics2DGravity(physics2DGravity);
+	}
+
+	Gui::EndPropertyGrid();
+
+	ImGui::End();
 }
 
 void Scene::OnRuntimeStart()

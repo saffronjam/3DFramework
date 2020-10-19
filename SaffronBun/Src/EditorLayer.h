@@ -5,7 +5,7 @@
 #include <string>
 
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Editor/SceneHierarchyPanel.h"
+#include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Gui/GuiLayer.h"
 
 namespace Se
@@ -67,7 +67,7 @@ public:
 	void OnDetach() override;
 	void OnUpdate() override;
 
-	void OnImGuiRender() override;
+	void OnGuiRender() override;
 	void OnEvent(const Event &event) override;
 	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
 	bool OnMouseButtonPressed(const MousePressEvent &event);
@@ -99,8 +99,6 @@ private:
 private:
 	int m_Style;
 
-	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
-
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
 	std::filesystem::path m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
@@ -114,15 +112,14 @@ private:
 	std::vector<Ref<MaterialInstance>> m_MetalSphereMaterialInstances;
 	std::vector<Ref<MaterialInstance>> m_DielectricSphereMaterialInstances;
 
-	// PBR params
-	bool m_RadiancePrefilter = false;
-	float m_EnvMapRotation = 0.0f;
-
 	// Editor resources
 	std::map<std::string, Ref<Texture2D>> m_TexStore;
 
+	Ref<AssetPanel> m_AssetPanel;
+	Ref<EntityPanel> m_EntityPanel;
+	Ref<ScriptPanel> m_ScriptPanel;
+
 	int m_GizmoType = -1;
-	bool m_AllowViewportCameraEvents = false;
 	bool m_DrawOnTopBoundingBoxes = false;
 
 	bool m_UIShowBoundingBoxes = false;
