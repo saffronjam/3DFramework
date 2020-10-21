@@ -22,6 +22,7 @@ EditorLayer::EditorLayer()
 {
 	EditorTerminal::Init();
 	Gui::Init();
+
 }
 
 void EditorLayer::OnAttach()
@@ -117,7 +118,7 @@ void EditorLayer::OnScenePlay()
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 
-	m_RuntimeScene = Ref<Scene>::Create();
+	m_RuntimeScene = Ref<Scene>::Create("Runtime Scene");
 	m_EditorScene->CopyTo(m_RuntimeScene);
 
 	m_RuntimeScene->OnRuntimeStart();
@@ -270,8 +271,8 @@ void EditorLayer::NewScenePrompt()
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
-		newScene->SetEnvironment(Environment::Load("Assets/Env/birchwood_4k.hdr"));
-		const Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
+		newScene->SetEnvironment(Scene::Environment::Load("Assets/Env/birchwood_4k.hdr"));
+		const Scene::Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
 		newScene->SetLight(light);
 
 		m_EditorScene = newScene;
@@ -319,7 +320,7 @@ void EditorLayer::LoadNewScene(const std::string &filepath)
 {
 	if ( filepath != m_SceneFilePath.string() )
 	{
-		const Ref<Scene> newScene = Ref<Scene>::Create();
+		const Ref<Scene> newScene = Ref<Scene>::Create("Editor scene");
 		SceneSerializer serializer(newScene);
 		if ( !serializer.Deserialize(filepath) )
 		{

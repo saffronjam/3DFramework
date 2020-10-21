@@ -3,7 +3,7 @@
 #include <box2d/box2d.h>
 #include <mono/jit/jit.h>
 
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Script/ScriptWrappers.h"
 
 namespace Se

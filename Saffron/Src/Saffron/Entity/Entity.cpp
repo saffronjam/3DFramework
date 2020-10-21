@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
+#include "Saffron/Scene/Scene.h"
 
 namespace Se
 {

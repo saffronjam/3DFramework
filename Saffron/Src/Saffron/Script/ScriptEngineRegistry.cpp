@@ -2,8 +2,8 @@
 
 #include <mono/jit/jit.h>
 
-#include "Saffron/Scene/Components.h"
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/EntityComponents.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
 #include "Saffron/Script/ScriptWrappers.h"

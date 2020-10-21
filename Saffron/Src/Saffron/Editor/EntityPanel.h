@@ -1,16 +1,16 @@
 #pragma once
 
 #include "Saffron/Editor/ScriptPanel.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/Scene.h"
-#include "Saffron/Scene/Entity.h"
 
 namespace Se
 {
 class EntityPanel : public RefCounted
 {
 public:
-	EntityPanel(const Ref<Scene> &context);
+	explicit EntityPanel(const Ref<Scene> &context);
 
 	void OnGuiRender(const Ref<ScriptPanel> &scriptPanel);
 

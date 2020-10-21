@@ -2,7 +2,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Scene/SceneSerializer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -362,15 +362,15 @@ void SceneSerializer::Serialize(const std::string &filepath)
 	SerializeEnvironment(out, m_Scene);
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
-	m_Scene->m_Registry.each([&](auto entityID)
-							 {
-								 Entity entity = { entityID, m_Scene.Raw() };
-								 if ( !entity || !entity.HasComponent<IDComponent>() )
-									 return;
+	m_Scene->GetEntityRegistry().each([&](auto entityID)
+									  {
+										  Entity entity = { entityID, m_Scene.Raw() };
+										  if ( !entity || !entity.HasComponent<IDComponent>() )
+											  return;
 
-								 SerializeEntity(out, entity);
+										  SerializeEntity(out, entity);
 
-							 });
+									  });
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
@@ -402,7 +402,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 	if ( environment )
 	{
 		auto envPath = environment["AssetPath"].as<std::string>();
-		m_Scene->SetEnvironment(Environment::Load(envPath));
+		m_Scene->SetEnvironment(Scene::Environment::Load(envPath));
 
 		auto lightNode = environment["Light"];
 		if ( lightNode )

@@ -42,8 +42,8 @@
 // ---------------------------------------------------
 
 // Scenes
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Scene/SceneCamera.h"
 #include "Saffron/Scene/SceneSerializer.h"
-#include "Saffron/Scene/Components.h"
+#include "Saffron/Entity/EntityComponents.h"

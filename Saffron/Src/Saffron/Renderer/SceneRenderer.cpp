@@ -23,8 +23,8 @@ struct SceneRendererData
 
 		// Resources
 		Ref<MaterialInstance> SkyboxMaterial;
-		Environment SceneEnvironment;
-		Light ActiveLight;
+		Scene::Environment SceneEnvironment;
+		Scene::Light ActiveLight;
 	} SceneData;
 
 	Ref<Texture2D> BRDFLUT;
@@ -108,9 +108,9 @@ void SceneRenderer::BeginScene(const Scene *scene, const SceneRendererCameraData
 	s_Data.ActiveScene = scene;
 
 	s_Data.SceneData.SceneRendererCameraData = camera;
-	s_Data.SceneData.SkyboxMaterial = scene->m_SkyboxMaterial;
-	s_Data.SceneData.SceneEnvironment = scene->m_Environment;
-	s_Data.SceneData.ActiveLight = scene->m_Light;
+	s_Data.SceneData.SkyboxMaterial = scene->GetSkybox().Material;
+	s_Data.SceneData.SceneEnvironment = scene->GetEnvironment();
+	s_Data.SceneData.ActiveLight = scene->GetLight();
 }
 
 void SceneRenderer::EndScene()

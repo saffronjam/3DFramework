@@ -2,33 +2,18 @@
 
 #include <unordered_map>
 
-#include <entt/entt.hpp>
 
 #include "Saffron/Core/Time.h"
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Editor/EditorCamera.h"
+#include "Saffron/Entity/EntityRegistry.h"
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/Material.h"
 
 
 namespace Se
 {
-struct Environment
-{
-	std::string FilePath;
-	Ref<TextureCube> RadianceMap;
-	Ref<TextureCube> IrradianceMap;
 
-	static Environment Load(const std::string &filepath);
-};
-
-struct Light
-{
-	glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-	glm::vec3 Radiance = { 0.0f, 0.0f, 0.0f };
-
-	float Multiplier = 1.0f;
-};
 
 class Entity;
 using EntityMap = std::unordered_map<UUID, Entity>;
@@ -36,40 +21,58 @@ using EntityMap = std::unordered_map<UUID, Entity>;
 class Scene : public RefCounted
 {
 public:
-	enum class Type : Uint32
+	struct Environment
 	{
-		Spheres = 0, Model = 1
+		std::string FilePath;
+		Ref<TextureCube> RadianceMap;
+		Ref<TextureCube> IrradianceMap;
+
+		static Environment Load(const std::string &filepath);
 	};
 
+	struct Light
+	{
+		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
+		glm::vec3 Radiance = { 0.0f, 0.0f, 0.0f };
+
+		float Multiplier = 1.0f;
+	};
+
+	struct Skybox
+	{
+		Ref<TextureCube> Texture;
+		Ref<MaterialInstance> Material;
+	};
 
 public:
-	Scene(std::string name = "Scene");
+	explicit Scene(std::string name = "Scene");
 	~Scene();
-
-	void Init();
 
 	void OnUpdate(Time ts);
 	void OnRenderRuntime(Time ts);
 	void OnRenderEditor(Time ts, const EditorCamera &editorCamera);
 	void OnEvent(const Event &event);
 	void OnGuiRender();
-
-	// Runtime
 	void OnRuntimeStart();
 	void OnRuntimeStop();
-
 
 	Entity CreateEntity(std::string name = "");
 	Entity CreateEntityWithID(UUID uuid, const std::string &name = "", bool runtimeMap = false);
 	void DestroyEntity(Entity entity);
 
-	void DuplicateEntity(Entity entity);
 	template<typename T>
 	auto GetAllEntitiesWith();
+	void DuplicateEntity(Entity entity);
 	Entity FindEntityByTag(const std::string &tag);
 	const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
+	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
+	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
 
 	void CopyTo(Ref<Scene> &target);
+
+	entt::entity GetEntity() const { return m_SceneEntity; }
+
+	bool IsPlaying() const { return m_IsPlaying; }
 
 	const std::string &GetName() const { return m_Name; }
 	Light &GetLight() { return m_Light; }
@@ -78,15 +81,14 @@ public:
 	float &GetSkyboxLod() { return m_SkyboxLod; }
 	UUID GetUUID() const { return m_SceneID; }
 	static Ref<Scene> GetScene(UUID uuid);
-	float GetPhysics2DGravity() const;
+	Skybox GetSkybox() const { return m_Skybox; }
 
 	void SetName(std::string name);
 	void SetLight(const Light &light);
 	void SetViewportSize(Uint32 width, Uint32 height);
 	void SetEnvironment(const Environment &environment);
 	const Environment &GetEnvironment() const { return m_Environment; }
-	void SetSkybox(const Ref<TextureCube> &skybox);
-	void SetPhysics2DGravity(float gravity);
+	void SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture);
 
 	// Editor-specific
 	void SetSelectedEntity(entt::entity entity) { m_SelectedEntity = entity; }
@@ -100,25 +102,17 @@ private:
 	float m_LightMultiplier = 0.3f;
 
 	entt::entity m_SceneEntity;
-	entt::registry m_Registry;
+	EntityRegistry m_EntityRegistry;
 	entt::entity m_SelectedEntity{};
 	EntityMap m_EntityIDMap;
 
 	Environment m_Environment;
-	Ref<TextureCube> m_SkyboxTexture;
-	Ref<MaterialInstance> m_SkyboxMaterial;
-
-	Entity *m_PhysicsBodyEntityBuffer = nullptr;
+	Skybox m_Skybox;
 
 	bool m_RadiancePrefilter = false;
 	float m_EnvMapRotation = 0.0f;
 	float m_SkyboxLod = 1.0f;
 	bool m_IsPlaying = false;
-
-	friend class Entity;
-	friend class SceneRenderer;
-	friend class SceneSerializer;
-	friend class EntityPanel;
 
 	friend void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity);
 	friend void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity);
@@ -127,7 +121,7 @@ private:
 template <typename T>
 auto Scene::GetAllEntitiesWith()
 {
-	return m_Registry.view<T>();
+	return m_EntityRegistry.view<T>();
 }
 }
 

@@ -5,7 +5,7 @@
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
 
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
@@ -493,9 +493,6 @@ void ScriptEngine::OnGuiRender()
 	}
 	ImGui::End();
 }
-
-
-
 
 void ScriptEngine::OnSceneDestruct(UUID sceneID)
 {

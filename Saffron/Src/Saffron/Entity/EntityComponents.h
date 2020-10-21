@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Saffron/Core/UUID.h"
+#include "Saffron/Physics/PhysicsWorld2D.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/SceneCamera.h"
 
@@ -9,6 +10,11 @@ namespace Se
 struct IDComponent
 {
 	UUID ID = 0;
+};
+
+struct SceneComponent
+{
+	UUID SceneID;
 };
 
 struct TagComponent
@@ -151,6 +157,16 @@ struct CircleCollider2DComponent : Collider2DComponent
 
 	CircleCollider2DComponent() = default;
 	CircleCollider2DComponent(const CircleCollider2DComponent &other) = default;
+};
+
+struct PhysicsWorld2DComponent
+{
+	PhysicsWorld2D World;
+
+	PhysicsWorld2DComponent(Scene &scene)
+		: World(scene)
+	{
+	}
 };
 }
 

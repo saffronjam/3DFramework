@@ -3,13 +3,15 @@
 #include <entt/entt.hpp>
 
 #include "Saffron/Core/UUID.h"
+#include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Scene/Scene.h"
-#include "Saffron/Scene/Components.h"
 
 namespace Se
 {
+
 class Entity
 {
+	friend class Scene;
 public:
 	Entity() = default;
 	Entity(entt::entity handle, Scene *scene);
@@ -26,8 +28,8 @@ public:
 	template<typename T>
 	void RemoveComponent();
 
-	glm::mat4 &Transform() { return m_Scene->m_Registry.get<TransformComponent>(m_EntityHandle); }
-	const glm::mat4 &Transform() const { return m_Scene->m_Registry.get<TransformComponent>(m_EntityHandle); }
+	glm::mat4 &Transform() { return m_Scene->GetEntityRegistry().get<TransformComponent>(m_EntityHandle); }
+	const glm::mat4 &Transform() const { return m_Scene->GetEntityRegistry().get<TransformComponent>(m_EntityHandle); }
 
 	operator Uint32 () const { return static_cast<Uint32>(m_EntityHandle); }
 	operator entt::entity() const { return m_EntityHandle; }
@@ -54,34 +56,34 @@ template <typename T, typename ... Args>
 T &Entity::AddComponent(Args&&... args)
 {
 	SE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-	return m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+	return m_Scene->GetEntityRegistry().emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
 }
 
 template <typename T>
 T &Entity::GetComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Scene->m_Registry.get<T>(m_EntityHandle);
+	return m_Scene->GetEntityRegistry().get<T>(m_EntityHandle);
 }
 
 template <typename T>
 const T &Entity::GetComponent() const
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Scene->m_Registry.get<T>(m_EntityHandle);
+	return m_Scene->GetEntityRegistry().get<T>(m_EntityHandle);
 }
 
 template <typename T>
 bool Entity::HasComponent()
 {
-	return m_Scene->m_Registry.has<T>(m_EntityHandle);
+	return m_Scene->GetEntityRegistry().has<T>(m_EntityHandle);
 }
 
 template <typename T>
 void Entity::RemoveComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	m_Scene->m_Registry.remove<T>(m_EntityHandle);
+	m_Scene->GetEntityRegistry().remove<T>(m_EntityHandle);
 }
 }
 

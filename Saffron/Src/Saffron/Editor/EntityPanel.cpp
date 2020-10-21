@@ -116,12 +116,12 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Ref<ScriptPanel> &scriptPanel)
 	ImGui::Begin("Scene Hierarchy");
 	if ( m_Context )
 	{
-		m_Context->m_Registry.each([&](auto entity)
-								   {
-									   Entity e(entity, m_Context.Raw());
-									   if ( e.HasComponent<IDComponent>() )
-										   DrawEntityNode(e);
-								   });
+		m_Context->GetEntityRegistry().each([&](auto entity)
+											{
+												Entity e(entity, m_Context.Raw());
+												if ( e.HasComponent<IDComponent>() )
+													DrawEntityNode(e);
+											});
 
 		bool createNewEntity = false;
 		if ( ImGui::BeginPopupContextWindow("Create Entity Context", 1, false) )
@@ -870,7 +870,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											   auto &publicFields = moduleFieldMap.at(sc.ModuleName);
 											   for ( auto &[name, field] : publicFields )
 											   {
-												   const bool isRuntime = m_Context->m_IsPlaying && field.IsRuntimeAvailable();
+												   const bool isRuntime = m_Context->IsPlaying() && field.IsRuntimeAvailable();
 												   switch ( field.Type )
 												   {
 												   case FieldType::Int:
