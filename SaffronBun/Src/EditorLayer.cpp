@@ -235,12 +235,6 @@ void EditorLayer::OnUpdate()
 	}
 }
 
-void EditorLayer::ShowBoundingBoxes(bool show, bool onTop)
-{
-	SceneRenderer::GetOptions().ShowBoundingBoxes = show && !onTop;
-	m_DrawOnTopBoundingBoxes = show && onTop;
-}
-
 void EditorLayer::SelectEntity(Entity entity)
 {
 	OnUnselected(m_SelectedEntity);
@@ -380,24 +374,6 @@ void EditorLayer::OnGuiRender()
 		const ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
 	}
-
-	if ( ImGui::Begin("TMP OTHER OPTIONS") )
-	{
-		Gui::BeginPropertyGrid();
-		if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
-			ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-		if ( m_UIShowBoundingBoxes && Gui::Property("On Top", m_UIShowBoundingBoxesOnTop) )
-			ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-
-		char *label = m_SelectionMode == SelectionMode::Entity ? "Entity" : "Mesh";
-		if ( ImGui::Button(label) )
-		{
-			m_SelectionMode = m_SelectionMode == SelectionMode::Entity ? SelectionMode::SubMesh : SelectionMode::Entity;
-		}
-		Gui::EndPropertyGrid();
-	}
-	ImGui::End();
-
 
 	// TODO: Move to header?
 	const auto ImGuiBlue = ImVec4{ 0.137f, 0.263f, 0.424f, 1.0f };
@@ -595,11 +571,6 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 	{
 		switch ( event.GetKey() )
 		{
-		case KeyCode::B:
-			// Toggle bounding boxes 
-			m_UIShowBoundingBoxes = !m_UIShowBoundingBoxes;
-			ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-			break;
 		case KeyCode::D:
 			if ( m_SelectedEntity )
 			{

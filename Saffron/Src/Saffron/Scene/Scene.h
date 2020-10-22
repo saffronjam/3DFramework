@@ -92,6 +92,9 @@ public:
 
 	// Editor-specific
 	void SetSelectedEntity(entt::entity entity) { m_SelectedEntity = entity; }
+
+	void ShowBoundingBoxes(bool show);
+
 private:
 	UUID m_SceneID;
 	std::string m_Name;
@@ -113,6 +116,7 @@ private:
 	float m_EnvMapRotation = 0.0f;
 	float m_SkyboxLod = 1.0f;
 	bool m_IsPlaying = false;
+	bool m_UIShowBoundingBoxes = false;
 
 	friend void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity);
 	friend void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity);

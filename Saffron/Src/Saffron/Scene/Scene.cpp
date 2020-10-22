@@ -239,11 +239,11 @@ void Scene::OnEvent(const Event &event)
 
 void Scene::OnGuiRender()
 {
-	ImGui::Begin("Environment");
+	ImGui::Begin("Scene");
 
 	if ( ImGui::Button("Load Environment Map") )
 	{
-		std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
+		const std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
 		if ( !filepath.empty() )
 			SetEnvironment(Environment::Load(filepath.string()));
 	}
@@ -260,8 +260,10 @@ void Scene::OnGuiRender()
 	//Gui::Property("Exposure", GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
-
+	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+		ShowBoundingBoxes(m_UIShowBoundingBoxes);
 	Gui::EndPropertyGrid();
+
 
 	ImGui::End();
 
@@ -458,4 +460,8 @@ void Scene::SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture)
 	m_Skybox.Material->Set("u_Texture", skyboxTexture);
 }
 
+void Scene::ShowBoundingBoxes(bool show)
+{
+	SceneRenderer::GetOptions().ShowBoundingBoxes = show;
+}
 }

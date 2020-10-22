@@ -117,10 +117,6 @@ private:
 	Ref<ScriptPanel> m_ScriptPanel;
 
 	int m_GizmoType = -1;
-	bool m_DrawOnTopBoundingBoxes = false;
-
-	bool m_UIShowBoundingBoxes = false;
-	bool m_UIShowBoundingBoxesOnTop = false;
 
 	SceneState m_SceneState = SceneState::Edit;
 
