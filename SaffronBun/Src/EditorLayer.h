@@ -14,12 +14,6 @@ namespace Se
 class EditorLayer : public Layer
 {
 public:
-	struct SelectedSubmesh
-	{
-		Entity Entity;
-		Submesh *Mesh = nullptr;
-		float Distance = 0.0f;
-	};
 
 	struct AlbedoInput
 	{
@@ -85,8 +79,9 @@ public:
 private:
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
 
-	void OnSelected(const SelectedSubmesh &selectionContext);
-	void OnEntityDeleted(Entity e);
+	void OnSelected(Entity entity);
+	void OnUnselected(Entity entity);
+	void OnEntityDeleted(Entity entity);
 	Ray CastMouseRay() const;
 
 	void OnSceneChange();
@@ -104,6 +99,8 @@ private:
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorCamera m_EditorCamera;
+	ViewportPane m_MainViewport;
+	ViewportPane m_MiniViewport;
 
 	Ref<Shader> m_BrushShader;
 	Ref<Material> m_SphereBaseMaterial;
@@ -128,7 +125,7 @@ private:
 	SceneState m_SceneState = SceneState::Edit;
 
 	SelectionMode m_SelectionMode = SelectionMode::Entity;
-	std::vector<SelectedSubmesh> m_SelectionContext;
+	Entity m_SelectedEntity;
 };
 
 }

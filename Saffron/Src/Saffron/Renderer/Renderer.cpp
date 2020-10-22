@@ -4,6 +4,8 @@
 
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Renderer/Material.h"
+#include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RendererAPI.h"

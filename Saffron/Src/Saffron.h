@@ -19,7 +19,7 @@
 #include "Saffron/Core/Math/Ray.h"
 
 #include "Saffron/Editor/AssetPanel.h"
-#include "Saffron/Editor/EditorViewport.h"
+#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Editor/ScriptPanel.h"
 

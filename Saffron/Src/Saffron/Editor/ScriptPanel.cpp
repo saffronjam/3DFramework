@@ -15,8 +15,6 @@ void ScriptPanel::OnGuiRender()
 {
 	ImGui::Begin("Scripts");
 
-	ImGui::ShowDemoWindow();
-
 	const int noCollums = std::max(1, static_cast<int>(ImGui::GetContentRegionAvailWidth() / 100.0f));
 
 	ImGui::SetNextItemWidth(ImGui::GetFontSize() * static_cast<float>(noCollums));

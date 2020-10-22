@@ -8,6 +8,7 @@
 
 #include "Saffron/Core/Application.h"
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Input/Input.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"

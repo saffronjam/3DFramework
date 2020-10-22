@@ -4,6 +4,7 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Renderer/Shader.h"
+#include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Texture.h"
 
 namespace Se
@@ -85,13 +86,19 @@ Ref<T> Material::GetResource(const std::string &name)
 template <typename T>
 void Material::Set(const std::string &name, const T &value)
 {
-	auto decl = FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
-	auto &buffer = GetUniformBufferTarget(decl);
-	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
+	Renderer::Submit([=]()
+					 {
+						 {
+							 auto decl = FindUniformDeclaration(name);
+							 SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+							 auto &buffer = GetUniformBufferTarget(decl);
+							 buffer.Write(&value, decl->GetSize(), decl->GetOffset());
 
-	for ( auto mi : m_MaterialInstances )
-		mi->OnMaterialValueUpdated(decl);
+							 for ( auto mi : m_MaterialInstances )
+								 mi->OnMaterialValueUpdated(decl);
+						 }
+					 });
+
 }
 
 
@@ -194,16 +201,19 @@ Ref<T> MaterialInstance::TryGetResource(const std::string &name)
 template <typename T>
 void MaterialInstance::Set(const std::string &name, const T &value)
 {
-	auto *decl = m_Material->FindUniformDeclaration(name);
-	if ( !decl )
-		return;
+	Renderer::Submit([=]()
+					 {
+						 auto *decl = m_Material->FindUniformDeclaration(name);
+						 if ( !decl )
+							 return;
 
-	//TODO: Fix so I can exchange 'x' with $name
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
-	auto &buffer = GetUniformBufferTarget(decl);
+						 //TODO: Fix so I can exchange 'x' with $name
+						 SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+						 auto &buffer = GetUniformBufferTarget(decl);
 
-	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
+						 buffer.Write(&value, decl->GetSize(), decl->GetOffset());
 
-	m_OverriddenValues.insert(name);
+						 m_OverriddenValues.insert(name);
+					 });
 }
 }

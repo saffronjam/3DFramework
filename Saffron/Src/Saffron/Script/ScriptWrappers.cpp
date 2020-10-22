@@ -4,6 +4,7 @@
 #include <mono/jit/jit.h>
 
 #include "Saffron/Entity/Entity.h"
+#include "Saffron/Input/Input.h"
 #include "Saffron/Script/ScriptWrappers.h"
 
 namespace Se

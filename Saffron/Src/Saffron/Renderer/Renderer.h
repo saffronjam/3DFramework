@@ -1,13 +1,15 @@
 #pragma once
 
-#include "Saffron/Renderer/Material.h"
-#include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Core/Math/AABB.h"
 #include "Saffron/Renderer/PrimitiveType.h"
 #include "Saffron/Renderer/RenderCommandQueue.h"
 #include "Saffron/Renderer/RenderPass.h"
 
 namespace Se
 {
+class Material;
+class Mesh;
+class MaterialInstance;
 class ShaderLibrary;
 
 class Renderer

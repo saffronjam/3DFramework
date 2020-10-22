@@ -150,7 +150,9 @@ void Scene::OnRenderRuntime(Time ts)
 	const glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::BeginScene(this, { static_cast<Camera>(*camera), cameraViewMatrix });
+
+	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<Camera *>(camera.Raw()), cameraViewMatrix });
+	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{
 		auto [transformComponent, meshComponent] = group.get<TransformComponent, MeshComponent>(entity);
@@ -192,7 +194,8 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::BeginScene(this, { static_cast<Camera>(editorCamera), editorCamera.GetViewMatrix() });
+	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<const Camera *>(&editorCamera), editorCamera.GetViewMatrix() });
+	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{
 		auto [meshComponent, transformComponent] = group.get<MeshComponent, TransformComponent>(entity);

@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Editor/EditorViewport.h"
+#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/SceneRenderer.h"
@@ -8,19 +8,24 @@
 namespace Se
 {
 
-glm::vec2 EditorViewport::m_TopLeft{ 0.0f, 0.0f };
-glm::vec2 EditorViewport::m_BottomRight{ 0.0f, 0.0f };
-bool EditorViewport::m_Hovered = false;
-bool EditorViewport::m_Focused = false;
-std::function<void()> EditorViewport::m_PostRenderFunction;
-
-void EditorViewport::OnUpdate()
+ViewportPane::ViewportPane(std::string renderTargetIdentifier)
+	:
+	m_RenderTargetIdentifier(std::move(renderTargetIdentifier)),
+	m_TopLeft(0.0f, 0.0f),
+	m_BottomRight(100.0f, 100.0f),
+	m_Hovered(false),
+	m_Focused(false),
+	m_PostRenderFunction([]() {})
 {
-
 }
 
-void EditorViewport::OnGuiRender()
+void ViewportPane::OnGuiRender()
 {
+	if ( !SceneRenderer::IsRenderTargetEnabled(m_RenderTargetIdentifier) )
+	{
+		return;
+	}
+
 	const auto &tl = GetTopLeft();
 	const auto &br = GetBottomRight();
 	if ( IsFocused() )
@@ -33,7 +38,22 @@ void EditorViewport::OnGuiRender()
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("Viewport");
+	// Todo: Move to header
+	const std::string viewportID = "Viewport##" + m_RenderTargetIdentifier;
+	ImGui::Begin(viewportID.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
+
+	if ( ImGui::IsWindowDocked() )
+	{
+		auto *wnd = ImGui::FindWindowByName(viewportID.c_str());
+		if ( wnd )
+		{
+			ImGuiDockNode *node = wnd->DockNode;
+			if ( node && !node->IsHiddenTabBar() )
+			{
+				node->WantHiddenTabBarToggle = true;
+			}
+		}
+	}
 
 	m_Hovered = ImGui::IsWindowHovered();
 	m_Focused = ImGui::IsWindowFocused();
@@ -49,22 +69,24 @@ void EditorViewport::OnGuiRender()
 	m_BottomRight = { maxBound.x, maxBound.y };
 
 	const auto viewportSize = GetViewportSize();
-	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID()), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
+	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID(m_RenderTargetIdentifier)), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
 
 	m_PostRenderFunction();
 
 	ImGui::End();
 	ImGui::PopStyleVar();
+
+	SceneRenderer::SetRenderTargetSize(m_RenderTargetIdentifier, static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
 }
 
-bool EditorViewport::InViewport(glm::vec2 positionNDC)
+bool ViewportPane::InViewport(glm::vec2 positionNDC) const
 {
 	positionNDC.x -= m_TopLeft.x;
 	positionNDC.y -= m_TopLeft.y;
 	return positionNDC.x < m_BottomRight.x &&positionNDC.y < m_BottomRight.y;
 }
 
-glm::vec2 EditorViewport::GetMousePosition()
+glm::vec2 ViewportPane::GetMousePosition() const
 {
 	glm::vec2 position = Input::GetMousePositionNDC();
 	position.x -= m_TopLeft.x;
@@ -75,7 +97,7 @@ glm::vec2 EditorViewport::GetMousePosition()
 	return { (position.x / viewportWidth) * 2.0f - 1.0f, ((position.y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
 }
 
-glm::vec2 EditorViewport::GetViewportSize()
+glm::vec2 ViewportPane::GetViewportSize() const
 {
 	return GetBottomRight() - GetTopLeft();
 }

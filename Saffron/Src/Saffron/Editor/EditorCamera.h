@@ -4,7 +4,7 @@
 #include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Time.h"
-#include "Saffron/Input/Input.h"
+#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Renderer/Camera.h"
 
 namespace Se
@@ -19,8 +19,8 @@ public:
 	};
 
 public:
-	EditorCamera() = default;
-	explicit EditorCamera(const glm::mat4 &projectionMatrix);
+	explicit EditorCamera(const ViewportPane &mainViewport);
+	EditorCamera(const ViewportPane &mainViewport, const glm::mat4 &projectionMatrix);
 
 	void OnUpdate(Time ts);
 	bool OnEvent(const Event &event);
@@ -48,6 +48,8 @@ private:
 	float GetZoomSpeed() const;
 
 private:
+	const ViewportPane &m_EditorViewport;
+
 	float m_MovementSpeed = 10.0f;
 	ControllerStyle	m_ControllerStyle = ControllerStyle::Game;
 
