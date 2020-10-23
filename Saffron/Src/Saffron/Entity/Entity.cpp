@@ -5,7 +5,10 @@
 
 namespace Se
 {
-Entity::Entity(entt::entity handle, Scene *scene) : m_EntityHandle(handle), m_Scene(scene)
+Entity::Entity(EntityHandle handle, Scene *scene)
+	: m_Scene(scene),
+	m_Registry(&scene->GetEntityRegistry()),
+	m_EntityHandle(handle)
 {
 }
 
@@ -19,7 +22,9 @@ bool Entity::operator!=(const Entity &other) const
 	return !(*this == other);
 }
 
-Entity::Entity(const std::string &name)
+UUID Entity::GetSceneUUID() const
 {
+	return m_Scene->GetUUID();
 }
+
 }

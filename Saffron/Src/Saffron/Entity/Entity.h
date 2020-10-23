@@ -3,19 +3,18 @@
 #include <entt/entt.hpp>
 
 #include "Saffron/Core/UUID.h"
+#include "Saffron/Entity/EntityHandle.h"
+#include "Saffron/Entity/EntityRegistry.h"
 #include "Saffron/Entity/EntityComponents.h"
-#include "Saffron/Scene/Scene.h"
 
 namespace Se
 {
-
 class Entity
 {
 	friend class Scene;
 public:
 	Entity() = default;
-	Entity(entt::entity handle, Scene *scene);
-	~Entity() = default;
+	Entity(EntityHandle handle, Scene *scene);
 
 	template<typename T, typename... Args>
 	T &AddComponent(Args&&... args);
@@ -24,12 +23,12 @@ public:
 	template<typename T>
 	const T &GetComponent() const;
 	template<typename T>
-	bool HasComponent();
+	bool HasComponent() const;
 	template<typename T>
 	void RemoveComponent();
 
-	glm::mat4 &Transform() { return m_Scene->GetEntityRegistry().get<TransformComponent>(m_EntityHandle); }
-	const glm::mat4 &Transform() const { return m_Scene->GetEntityRegistry().get<TransformComponent>(m_EntityHandle); }
+	glm::mat4 &Transform() { return GetComponent<TransformComponent>(); }
+	const glm::mat4 &Transform() const { return GetComponent<TransformComponent>(); }
 
 	operator Uint32 () const { return static_cast<Uint32>(m_EntityHandle); }
 	operator entt::entity() const { return m_EntityHandle; }
@@ -38,52 +37,52 @@ public:
 	bool operator!=(const Entity &other) const;
 
 	UUID GetUUID() { return GetComponent<IDComponent>().ID; }
-	UUID GetSceneUUID() const { return m_Scene->GetUUID(); }
+	UUID GetSceneUUID() const;
+	Scene *GetScene() { return m_Scene; }
+	const Scene *GetScene() const { return m_Scene; }
+
+	static Entity Null() { return { entt::null, nullptr }; }
 
 private:
-	explicit Entity(const std::string &name);
+	class Scene *m_Scene = nullptr;
+	EntityRegistry *m_Registry = nullptr;
+	EntityHandle m_EntityHandle{ entt::null };
 
-private:
-	entt::entity m_EntityHandle{ entt::null };
-	Scene *m_Scene = nullptr;
-
-	friend class Scene;
 	friend class SceneSerializer;
-	friend class ScriptEngine;
 };
 
 template <typename T, typename ... Args>
 T &Entity::AddComponent(Args&&... args)
 {
 	SE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-	return m_Scene->GetEntityRegistry().emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+	return m_Registry->emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
 }
 
 template <typename T>
 T &Entity::GetComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Scene->GetEntityRegistry().get<T>(m_EntityHandle);
+	return m_Registry->get<T>(m_EntityHandle);
 }
 
 template <typename T>
 const T &Entity::GetComponent() const
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Scene->GetEntityRegistry().get<T>(m_EntityHandle);
+	return m_Registry->get<T>(m_EntityHandle);
 }
 
 template <typename T>
-bool Entity::HasComponent()
+bool Entity::HasComponent() const
 {
-	return m_Scene->GetEntityRegistry().has<T>(m_EntityHandle);
+	return m_Registry->has<T>(m_EntityHandle);
 }
 
 template <typename T>
 void Entity::RemoveComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	m_Scene->GetEntityRegistry().remove<T>(m_EntityHandle);
+	m_Registry->remove<T>(m_EntityHandle);
 }
 }
 

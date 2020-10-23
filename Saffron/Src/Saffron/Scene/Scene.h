@@ -2,18 +2,16 @@
 
 #include <unordered_map>
 
-
 #include "Saffron/Core/Time.h"
 #include "Saffron/Core/UUID.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Entity/EntityRegistry.h"
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/Material.h"
 
-
 namespace Se
 {
-
 
 class Entity;
 using EntityMap = std::unordered_map<UUID, Entity>;
@@ -91,7 +89,7 @@ public:
 	void SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture);
 
 	// Editor-specific
-	void SetSelectedEntity(entt::entity entity) { m_SelectedEntity = entity; }
+	void SetSelectedEntity(Entity entity);
 
 	void ShowBoundingBoxes(bool show);
 
@@ -104,10 +102,10 @@ private:
 	Light m_Light;
 	float m_LightMultiplier = 0.3f;
 
-	entt::entity m_SceneEntity;
 	EntityRegistry m_EntityRegistry;
-	entt::entity m_SelectedEntity{};
 	EntityMap m_EntityIDMap;
+	Entity m_SceneEntity;
+	Entity m_SelectedEntity{};
 
 	Environment m_Environment;
 	Skybox m_Skybox;

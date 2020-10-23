@@ -4,6 +4,5 @@
 
 namespace Se
 {
-using EntityRegistry = entt::registry;
+using EntityHandle = entt::entity;
 }
-

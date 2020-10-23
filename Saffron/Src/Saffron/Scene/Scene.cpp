@@ -86,13 +86,13 @@ Scene::Environment Scene::Environment::Load(const std::string &filepath)
 ///////////////////////////////////////////////////////////////////////////
 
 Scene::Scene(std::string name)
-	: m_Name(std::move(name))
+	: m_Name(std::move(name)),
+	m_SceneEntity(m_EntityRegistry.create(), this)
 {
 	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
 	m_EntityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
-	m_SceneEntity = m_EntityRegistry.create();
-	m_EntityRegistry.emplace<SceneComponent>(m_SceneEntity, m_SceneID);
 
+	m_EntityRegistry.emplace<SceneComponent>(m_SceneEntity, m_SceneID);
 	m_EntityRegistry.emplace<PhysicsWorld2DComponent>(m_SceneEntity, *this);
 
 	s_ActiveScenes[m_SceneID] = this;
@@ -339,11 +339,7 @@ void Scene::DestroyEntity(Entity entity)
 
 void Scene::DuplicateEntity(Entity entity)
 {
-	Entity newEntity;
-	if ( entity.HasComponent<TagComponent>() )
-		newEntity = CreateEntity(entity.GetComponent<TagComponent>().Tag);
-	else
-		newEntity = CreateEntity();
+	Entity newEntity = entity.HasComponent<TagComponent>() ? CreateEntity(entity.GetComponent<TagComponent>().Tag) : CreateEntity();
 
 	CopyComponentIfExists<TransformComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
 	CopyComponentIfExists<MeshComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
@@ -366,7 +362,7 @@ Entity Scene::FindEntityByTag(const std::string &tag)
 			return Entity(entity, this);
 	}
 
-	return Entity{};
+	return Entity::Null();
 }
 
 void Scene::CopyTo(Ref<Scene> &target)
@@ -421,7 +417,7 @@ Entity Scene::GetMainCameraEntity()
 		if ( comp.Primary )
 			return { entity, this };
 	}
-	return {};
+	return Entity::Null();
 }
 
 Ref<Scene> Scene::GetScene(UUID uuid)
@@ -458,6 +454,11 @@ void Scene::SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture)
 {
 	m_Skybox.Texture = skyboxTexture;
 	m_Skybox.Material->Set("u_Texture", skyboxTexture);
+}
+
+void Scene::SetSelectedEntity(Entity entity)
+{
+	m_SelectedEntity = entity;
 }
 
 void Scene::ShowBoundingBoxes(bool show)
