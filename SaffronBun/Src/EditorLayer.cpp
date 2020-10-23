@@ -113,8 +113,6 @@ void EditorLayer::OnSceneChange()
 
 void EditorLayer::OnScenePlay()
 {
-	m_SelectedEntity = {};
-
 	m_SceneState = SceneState::Play;
 
 	if ( m_ReloadScriptOnPlay )
@@ -127,17 +125,34 @@ void EditorLayer::OnScenePlay()
 	m_EntityPanel->SetContext(m_RuntimeScene);
 
 	m_GizmoType = -1;
+
+	// Swap selected entity to the copied entity in the runtime scene
+	if ( m_SelectedEntity )
+	{
+		const auto &entityMap = m_RuntimeScene->GetEntityMap();
+		const UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		if ( entityMap.find(selectedEntityUUID) != entityMap.end() )
+			m_SelectedEntity = entityMap.at(selectedEntityUUID);
+	}
 }
 
 void EditorLayer::OnSceneStop()
 {
-	m_SelectedEntity = {};
-
 	m_RuntimeScene->OnRuntimeStop();
 	m_SceneState = SceneState::Edit;
 
 	ScriptEngine::SetSceneContext(m_EditorScene);
 	m_EntityPanel->SetContext(m_EditorScene);
+
+	// Swap selected entity to the copied entity in the editor scene
+	if ( m_SelectedEntity )
+	{
+		const auto &entityMap = m_EditorScene->GetEntityMap();
+		const UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		if ( entityMap.find(selectedEntityUUID) != entityMap.end() )
+			m_SelectedEntity = entityMap.at(selectedEntityUUID);
+	}
+	m_EditorScene->SetSelectedEntity(m_SelectedEntity);
 
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
@@ -520,7 +535,7 @@ void EditorLayer::OnGuiRender()
 
 	ImGui::End();
 
-	// Corrent viewport and camera matrices
+	// Correct viewport and camera matrices
 	const auto mainViewportSize = m_MainViewport.GetViewportSize();
 	m_EditorScene->SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
 	if ( m_RuntimeScene )

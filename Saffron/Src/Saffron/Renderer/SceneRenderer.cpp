@@ -37,8 +37,6 @@ struct SceneRendererData
 	};
 	std::map<std::string, RenderTarget> RenderTargets;
 
-
-
 	struct DrawCommand
 	{
 		Ref<Mesh> Mesh;
