@@ -780,6 +780,4 @@ EntityInstanceMap &ScriptEngine::GetEntityInstanceMap()
 	return s_EntityInstanceMap;
 }
 
-
-
 }

@@ -4,6 +4,19 @@
 
 namespace Se
 {
+
+const Window *FileIOManager::m_Window = nullptr;
+
+FileIOManager::Filter FileIOManager::Filter::Empty()
+{
+	return Filter("All Files", { "*.*" });
+}
+
+void FileIOManager::Init(const Window &window)
+{
+	m_Window = &window;
+}
+
 std::vector<fs::directory_entry> FileIOManager::GetFiles(const fs::path &directoryPath,
 														 const std::string &extension)
 {

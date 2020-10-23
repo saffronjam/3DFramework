@@ -3,9 +3,10 @@
 #include <filesystem>
 
 #include "Saffron/Core/Misc.h"
+#include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Editor/ViewportPane.h"
-#include "Saffron/Gui/Gui.h"
 #include "Saffron/Editor/EditorTerminal.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -258,8 +259,7 @@ void EditorLayer::SelectEntity(Entity entity)
 
 void EditorLayer::NewScenePrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 
 	if ( !filepath.empty() )
 	{
@@ -286,8 +286,7 @@ void EditorLayer::NewScenePrompt()
 
 void EditorLayer::OpenScenePrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.OpenFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::OpenFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 	if ( !filepath.empty() )
 	{
 		LoadNewScene(filepath.string());
@@ -296,8 +295,7 @@ void EditorLayer::OpenScenePrompt()
 
 void EditorLayer::SaveSceneAsPrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 	if ( !filepath.empty() )
 	{
 		m_SceneFilePath = filepath;

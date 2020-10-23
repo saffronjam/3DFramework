@@ -374,7 +374,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = Application::Get().OpenFile("");
+									const std::filesystem::path filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
@@ -419,7 +419,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = Application::Get().OpenFile("");
+									const std::filesystem::path filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										normalMap = Texture2D::Create(filepath.string());
@@ -455,7 +455,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = Application::Get().OpenFile("");
+									const std::filesystem::path filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										metalnessMap = Texture2D::Create(filepath.string());
@@ -493,7 +493,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = Application::Get().OpenFile("");
+									const std::filesystem::path filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										roughnessMap = Texture2D::Create(filepath.string());
@@ -745,7 +745,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									 ImGui::NextColumn();
 									 if ( ImGui::Button("Open...##openmesh") )
 									 {
-										 const fs::path filepath = Application::Get().OpenFile();
+										 const fs::path filepath = FileIOManager::OpenFile();
 										 if ( !filepath.empty() )
 											 mc.Mesh = Ref<Mesh>::Create(filepath.string());
 									 }

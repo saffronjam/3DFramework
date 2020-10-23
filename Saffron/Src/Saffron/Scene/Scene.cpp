@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/Application.h"
+#include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Gui/Gui.h"
@@ -243,7 +244,7 @@ void Scene::OnGuiRender()
 
 	if ( ImGui::Button("Load Environment Map") )
 	{
-		const std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
+		const fs::path filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
 		if ( !filepath.empty() )
 			SetEnvironment(Environment::Load(filepath.string()));
 	}
