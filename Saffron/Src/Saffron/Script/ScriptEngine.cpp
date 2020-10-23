@@ -5,11 +5,10 @@
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
 
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
-#include "Saffron/Script/ScriptManager.h"
 
 namespace Se {
 
@@ -429,10 +428,8 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 ///////////////////////////////////////////////////////////////////////////
 
 
-void ScriptEngine::Init(std::string assemblyPath, std::string scriptFolderPath)
+void ScriptEngine::Init(std::string assemblyPath)
 {
-	ScriptManager::Init(std::filesystem::path(std::move(scriptFolderPath)));
-
 	s_AssemblyPath = std::move(assemblyPath);
 
 	InitMono();
@@ -450,12 +447,10 @@ void ScriptEngine::Shutdown()
 
 void ScriptEngine::OnUpdate()
 {
-	ScriptManager::SyncScriptPaths();
 }
 
-void ScriptEngine::OnImGuiRender()
+void ScriptEngine::OnGuiRender()
 {
-	ScriptManager::OnGuiRender();
 	ImGui::Begin("Script Engine Debug");
 	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
 	{
@@ -498,9 +493,6 @@ void ScriptEngine::OnImGuiRender()
 	}
 	ImGui::End();
 }
-
-
-
 
 void ScriptEngine::OnSceneDestruct(UUID sceneID)
 {
@@ -596,7 +588,7 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 
 void ScriptEngine::OnCreateEntity(Entity entity)
 {
-	OnCreateEntity(entity.m_Scene->GetUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCreateEntity(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
 }
 
 void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
@@ -618,7 +610,7 @@ void ScriptEngine::OnUpdateEntity(UUID sceneID, UUID entityID, Time ts)
 
 void ScriptEngine::OnCollision2DBegin(Entity entity)
 {
-	OnCollision2DBegin(entity.m_Scene->GetUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision2DBegin(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
 }
 
 void ScriptEngine::OnCollision2DBegin(UUID sceneID, UUID entityID)
@@ -634,7 +626,7 @@ void ScriptEngine::OnCollision2DBegin(UUID sceneID, UUID entityID)
 
 void ScriptEngine::OnCollision2DEnd(Entity entity)
 {
-	OnCollision2DEnd(entity.m_Scene->GetUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision2DEnd(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
 }
 
 void ScriptEngine::OnCollision2DEnd(UUID sceneID, UUID entityID)
@@ -664,7 +656,7 @@ bool ScriptEngine::ModuleExists(const std::string &moduleName)
 
 void ScriptEngine::InitScriptEntity(Entity entity)
 {
-	Scene *scene = entity.m_Scene;
+	Scene *scene = entity.GetScene();
 	const UUID id = entity.GetComponent<IDComponent>().ID;
 	auto &moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
 	if ( moduleName.empty() )
@@ -737,7 +729,7 @@ void ScriptEngine::ShutdownScriptEntity(Entity entity, const std::string &module
 
 void ScriptEngine::InstantiateEntityClass(Entity entity)
 {
-	Scene *scene = entity.m_Scene;
+	Scene *scene = entity.GetScene();
 	UUID id = entity.GetComponent<IDComponent>().ID;
 	auto &moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
 
@@ -787,7 +779,5 @@ EntityInstanceMap &ScriptEngine::GetEntityInstanceMap()
 {
 	return s_EntityInstanceMap;
 }
-
-
 
 }

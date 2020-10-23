@@ -18,6 +18,11 @@
 #include "Saffron/Core/Math/AABB.h"
 #include "Saffron/Core/Math/Ray.h"
 
+#include "Saffron/Editor/AssetPanel.h"
+#include "Saffron/Editor/ViewportPane.h"
+#include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/ScriptPanel.h"
+
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 
@@ -34,12 +39,11 @@
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Camera.h"
 #include "Saffron/Renderer/Material.h"
-#include "Saffron/Renderer/EditorViewport.h"
 // ---------------------------------------------------
 
 // Scenes
-#include "Saffron/Scene/Entity.h"
+#include "Saffron/Entity/Entity.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Scene/SceneCamera.h"
 #include "Saffron/Scene/SceneSerializer.h"
-#include "Saffron/Scene/Components.h"
+#include "Saffron/Entity/EntityComponents.h"

@@ -3,8 +3,10 @@
 #include <filesystem>
 
 #include "Saffron/Core/Misc.h"
+#include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Editor/ViewportPane.h"
+#include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Gui/GuiTerminal.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -17,10 +19,15 @@ namespace Se
 EditorLayer::EditorLayer()
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
-	m_EditorCamera(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f))
+	m_EditorCamera(m_MainViewport, glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)),
+	m_MainViewport("MainRenderTarget"),
+	m_MiniViewport("MiniRenderTarget")
 {
+	EditorTerminal::Init();
 	Gui::Init();
-	GuiTerminal::Init();
+
+	SceneRenderer::AddRenderTarget("MiniRenderTarget", 200, 100);
+	SceneRenderer::DisableRenderTarget("MiniRenderTarget");
 }
 
 void EditorLayer::OnAttach()
@@ -38,13 +45,57 @@ void EditorLayer::OnAttach()
 	m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
 	m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
 
-	m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>(m_EditorScene);
-	m_SceneHierarchyPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
-	m_SceneHierarchyPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
+	m_AssetPanel = Ref<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
+	m_EntityPanel = Ref<EntityPanel>::Create(m_EditorScene);
+	m_ScriptPanel = Ref<ScriptPanel>::Create("../ExampleApp/Src");
+
+	m_EntityPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
+	m_EntityPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
 
 	LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc");
 
 	ScriptEngine::SetSceneContext(m_EditorScene);
+
+
+	m_MainViewport.SetPostRenderCallback([this]()
+										 {
+											 // Gizmos
+											 if ( m_GizmoType != -1 && m_SelectedEntity )
+											 {
+												 const auto viewportSize = m_MainViewport.GetViewportSize();
+												 ImGuizmo::SetDrawlist();
+												 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+
+												 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+
+												 auto &entityTransform = m_SelectedEntity.Transform();
+												 const float snapValue = GetSnapValue();
+												 float snapValues[3] = { snapValue, snapValue, snapValue };
+												 if ( m_SelectionMode == SelectionMode::Entity )
+												 {
+													 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+																		  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
+																		  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																		  ImGuizmo::LOCAL,
+																		  glm::value_ptr(entityTransform),
+																		  nullptr,
+																		  snap ? snapValues : nullptr);
+												 }
+												 else
+												 {
+													 glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
+													 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+																		  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
+																		  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																		  ImGuizmo::LOCAL,
+																		  glm::value_ptr(transformBase),
+																		  nullptr,
+																		  snap ? snapValues : nullptr);
+
+													 m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+												 }
+											 }
+										 });
 }
 
 void EditorLayer::OnDetach()
@@ -58,36 +109,51 @@ void EditorLayer::OnSceneChange()
 		OnSceneStop();
 	}
 	m_EditorScene->SetSelectedEntity({});
-	m_SelectionContext.clear();
+	m_SelectedEntity = {};
 }
 
 void EditorLayer::OnScenePlay()
 {
-	m_SelectionContext.clear();
-
 	m_SceneState = SceneState::Play;
 
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 
-	m_RuntimeScene = Ref<Scene>::Create();
+	m_RuntimeScene = Ref<Scene>::Create("Runtime Scene");
 	m_EditorScene->CopyTo(m_RuntimeScene);
 
 	m_RuntimeScene->OnRuntimeStart();
-	m_SceneHierarchyPanel->SetContext(m_RuntimeScene);
+	m_EntityPanel->SetContext(m_RuntimeScene);
 
 	m_GizmoType = -1;
+
+	// Swap selected entity to the copied entity in the runtime scene
+	if ( m_SelectedEntity )
+	{
+		const auto &entityMap = m_RuntimeScene->GetEntityMap();
+		const UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		if ( entityMap.find(selectedEntityUUID) != entityMap.end() )
+			m_SelectedEntity = entityMap.at(selectedEntityUUID);
+	}
 }
 
 void EditorLayer::OnSceneStop()
 {
-	m_SelectionContext.clear();
-
 	m_RuntimeScene->OnRuntimeStop();
 	m_SceneState = SceneState::Edit;
 
 	ScriptEngine::SetSceneContext(m_EditorScene);
-	m_SceneHierarchyPanel->SetContext(m_EditorScene);
+	m_EntityPanel->SetContext(m_EditorScene);
+
+	// Swap selected entity to the copied entity in the editor scene
+	if ( m_SelectedEntity )
+	{
+		const auto &entityMap = m_EditorScene->GetEntityMap();
+		const UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		if ( entityMap.find(selectedEntityUUID) != entityMap.end() )
+			m_SelectedEntity = entityMap.at(selectedEntityUUID);
+	}
+	m_EditorScene->SetSelectedEntity(m_SelectedEntity);
 
 	// Unload runtime scene
 	m_RuntimeScene = nullptr;
@@ -125,7 +191,7 @@ void EditorLayer::OnUpdate()
 
 		if ( false )
 		{
-			Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass(), false);
+			Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass("MainRenderTarget"), false);
 			const auto viewProj = m_EditorCamera.GetViewProjection();
 			Renderer2D::BeginScene(viewProj, false);
 			Renderer::DrawAABB(AABB{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 100.0f, 100.0f, 100.0f } }, glm::mat4(1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
@@ -134,33 +200,15 @@ void EditorLayer::OnUpdate()
 			Renderer::EndRenderPass();
 		}
 
-		if ( !m_SelectionContext.empty() && false )
+		if ( m_SelectedEntity )
 		{
-			auto &selection = m_SelectionContext[0];
-
-			if ( selection.Mesh && selection.Entity.HasComponent<MeshComponent>() )
+			if ( m_SelectedEntity.HasComponent<BoxCollider2DComponent>() )
 			{
-				Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass(), false);
-				auto viewProj = m_EditorCamera.GetViewProjection();
-				Renderer2D::BeginScene(viewProj, false);
-				glm::vec4 color = (m_SelectionMode == SelectionMode::Entity) ? glm::vec4{ 1.0f, 1.0f, 1.0f, 1.0f } : glm::vec4{ 0.2f, 0.9f, 0.2f, 1.0f };
-				Renderer::DrawAABB(selection.Mesh->BoundingBox, selection.Entity.GetComponent<TransformComponent>().Transform * selection.Mesh->Transform, color);
-				Renderer2D::EndScene();
-				Renderer::EndRenderPass();
-			}
-		}
-
-		if ( !m_SelectionContext.empty() )
-		{
-			auto &selection = m_SelectionContext[0];
-
-			if ( selection.Entity.HasComponent<BoxCollider2DComponent>() )
-			{
-				const auto &size = selection.Entity.GetComponent<BoxCollider2DComponent>().Size;
-				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(selection.Entity.GetComponent<TransformComponent>().Transform);
+				const auto &size = m_SelectedEntity.GetComponent<BoxCollider2DComponent>().Size;
+				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
 				const glm::vec3 rotation = glm::eulerAngles(rotationQuat);
 
-				Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass(), false);
+				Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass("MainRenderTarget"), false);
 				const auto viewProj = m_EditorCamera.GetViewProjection();
 				Renderer2D::BeginScene(viewProj, false);
 				Renderer2D::DrawRotatedQuad({ translation.x, translation.y }, size * 2.0f, glm::degrees(rotation.z), { 1.0f, 0.0f, 1.0f, 1.0f });
@@ -179,39 +227,39 @@ void EditorLayer::OnUpdate()
 	}
 	case SceneState::Pause:
 	{
-		if ( EditorViewport::Focused )
+		if ( m_MainViewport.IsFocused() )
 			m_EditorCamera.OnUpdate(ts);
 
 		m_RuntimeScene->OnRenderRuntime(ts);
 		break;
 	}
 	}
-}
 
-void EditorLayer::ShowBoundingBoxes(bool show, bool onTop)
-{
-	SceneRenderer::GetOptions().ShowBoundingBoxes = show && !onTop;
-	m_DrawOnTopBoundingBoxes = show && onTop;
+	if ( m_SelectedEntity )
+	{
+		if ( m_SelectedEntity.HasComponent<CameraComponent>() && m_SelectedEntity.HasComponent<TransformComponent>() )
+		{
+			Ref<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
+
+			const auto viewportSize = m_MiniViewport.GetViewportSize();
+			camera->SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
+			const glm::mat4 cameraViewMatrix = glm::inverse(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
+
+			SceneRenderer::SetCameraData("MiniRenderTarget", { camera.Raw(), cameraViewMatrix });
+			SceneRenderer::EnableRenderTarget("MiniRenderTarget");
+		}
+	}
 }
 
 void EditorLayer::SelectEntity(Entity entity)
 {
-	SelectedSubmesh selection;
-	if ( entity.HasComponent<MeshComponent>() )
-	{
-		selection.Mesh = &entity.GetComponent<MeshComponent>().Mesh->GetSubmeshes()[0];
-	}
-	selection.Entity = entity;
-	m_SelectionContext.clear();
-	m_SelectionContext.push_back(selection);
-
-	m_EditorScene->SetSelectedEntity(entity);
+	OnUnselected(m_SelectedEntity);
+	OnSelected(entity);
 }
 
 void EditorLayer::NewScenePrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 
 	if ( !filepath.empty() )
 	{
@@ -220,13 +268,13 @@ void EditorLayer::NewScenePrompt()
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
-		newScene->SetEnvironment(Environment::Load("Assets/Env/birchwood_4k.hdr"));
-		const Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
+		newScene->SetEnvironment(Scene::Environment::Load("Assets/Env/birchwood_4k.hdr"));
+		const Scene::Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
 		newScene->SetLight(light);
 
 		m_EditorScene = newScene;
 		UpdateWindowTitle(sceneName);
-		m_SceneHierarchyPanel->SetContext(m_EditorScene);
+		m_EntityPanel->SetContext(m_EditorScene);
 		ScriptEngine::SetSceneContext(m_EditorScene);
 
 		m_SceneFilePath = filepath;
@@ -238,8 +286,7 @@ void EditorLayer::NewScenePrompt()
 
 void EditorLayer::OpenScenePrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.OpenFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::OpenFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 	if ( !filepath.empty() )
 	{
 		LoadNewScene(filepath.string());
@@ -248,8 +295,7 @@ void EditorLayer::OpenScenePrompt()
 
 void EditorLayer::SaveSceneAsPrompt()
 {
-	auto &app = Application::Get();
-	const std::filesystem::path filepath = app.SaveFile("Saffron Scene (*.ssc)\0*.ssc\0");
+	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
 	if ( !filepath.empty() )
 	{
 		m_SceneFilePath = filepath;
@@ -269,7 +315,7 @@ void EditorLayer::LoadNewScene(const std::string &filepath)
 {
 	if ( filepath != m_SceneFilePath.string() )
 	{
-		const Ref<Scene> newScene = Ref<Scene>::Create();
+		const Ref<Scene> newScene = Ref<Scene>::Create("Editor scene");
 		SceneSerializer serializer(newScene);
 		if ( !serializer.Deserialize(filepath) )
 		{
@@ -280,11 +326,10 @@ void EditorLayer::LoadNewScene(const std::string &filepath)
 		m_EditorScene = newScene;
 
 		UpdateWindowTitle(m_EditorScene->GetName());
-		m_SceneHierarchyPanel->SetContext(m_EditorScene);
+		m_EntityPanel->SetContext(m_EditorScene);
 		ScriptEngine::SetSceneContext(m_EditorScene);
 
-		m_EditorScene->SetSelectedEntity({});
-		m_SelectionContext.clear();
+		OnUnselected(m_SelectedEntity);
 
 		m_SceneFilePath = filepath;
 
@@ -297,13 +342,14 @@ void EditorLayer::LoadNewScene(const std::string &filepath)
 	}
 }
 
-void EditorLayer::OnImGuiRender()
+void EditorLayer::OnGuiRender()
 {
+
 	static bool p_open = true;
 
 	static bool opt_fullscreen_persistent = true;
 	static ImGuiDockNodeFlags opt_flags = ImGuiDockNodeFlags_None;
-	bool opt_fullscreen = opt_fullscreen_persistent;
+	const bool opt_fullscreen = opt_fullscreen_persistent;
 
 	// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
 	// because it would be confusing to have two docking targets within each others.
@@ -327,6 +373,8 @@ void EditorLayer::OnImGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::Begin("DockSpace Demo", &p_open, window_flags);
 
+	ImGui::ShowDemoWindow();
+
 	ImGui::PopStyleVar();
 
 	if ( opt_fullscreen )
@@ -336,107 +384,9 @@ void EditorLayer::OnImGuiRender()
 	ImGuiIO &io = ImGui::GetIO();
 	if ( io.ConfigFlags & ImGuiConfigFlags_DockingEnable )
 	{
-		ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
+		const ImGuiID dockspace_id = ImGui::GetID("MyDockspace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), opt_flags);
 	}
-
-	// Editor Panel ------------------------------------------------------------------------------
-	ImGui::Begin("Model");
-	ImGui::Begin("Environment");
-
-	if ( ImGui::Button("Load Environment Map") )
-	{
-		std::filesystem::path filepath = Application::Get().OpenFile("*.hdr");
-		if ( !filepath.empty() )
-			m_EditorScene->SetEnvironment(Environment::Load(filepath.string()));
-	}
-
-	ImGui::SliderFloat("Skybox LOD", &m_EditorScene->GetSkyboxLod(), 0.0f, 11.0f);
-
-	ImGui::Columns(2);
-	ImGui::AlignTextToFramePadding();
-
-	auto &light = m_EditorScene->GetLight();
-	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
-	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
-	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, Gui::PropertyFlag::Slider);
-
-	Gui::Property("Exposure", m_EditorCamera.GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
-
-	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
-	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
-
-	if ( m_SceneState == SceneState::Edit )
-	{
-		float physics2DGravity = m_EditorScene->GetPhysics2DGravity();
-		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
-		{
-			m_EditorScene->SetPhysics2DGravity(physics2DGravity);
-		}
-	}
-	else if ( m_SceneState == SceneState::Play )
-	{
-		float physics2DGravity = m_RuntimeScene->GetPhysics2DGravity();
-		if ( Gui::Property("Gravity", physics2DGravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
-		{
-			m_RuntimeScene->SetPhysics2DGravity(physics2DGravity);
-		}
-	}
-
-	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
-		ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-	if ( m_UIShowBoundingBoxes && Gui::Property("On Top", m_UIShowBoundingBoxesOnTop) )
-		ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-
-	char *label = m_SelectionMode == SelectionMode::Entity ? "Entity" : "Mesh";
-	if ( ImGui::Button(label) )
-	{
-		m_SelectionMode = m_SelectionMode == SelectionMode::Entity ? SelectionMode::SubMesh : SelectionMode::Entity;
-	}
-
-	ImGui::Columns(1);
-
-	ImGui::End();
-
-	ImGui::Separator();
-	{
-		ImGui::Text("Mesh");
-		/*auto meshComponent = m_MeshEntity.GetComponent<MeshComponent>();
-		std::string fullpath = meshComponent.Mesh ? meshComponent.Mesh->GetFilePath() : "None";
-		size_t found = fullpath.find_last_of("/\\");
-		std::string path = found != std::string::npos ? fullpath.substr(found + 1) : fullpath;
-		ImGui::Text(path.c_str()); ImGui::SameLine();
-		if (ImGui::Button("...##Mesh"))
-		{
-			std::string filename = Application::Get().OpenFile("");
-			if (filename != "")
-			{
-				auto newMesh = Ref<Mesh>::Create(filename);
-				// m_MeshMaterial.reset(new MaterialInstance(newMesh->GetMaterial()));
-				// m_MeshEntity->SetMaterial(m_MeshMaterial);
-				meshComponent.Mesh = newMesh;
-			}
-		}*/
-	}
-	ImGui::Separator();
-
-	if ( ImGui::TreeNode("Shaders") )
-	{
-		auto &shaders = Shader::m_sAllShaders;
-		for ( auto &shader : shaders )
-		{
-			if ( ImGui::TreeNode(shader->GetName().c_str()) )
-			{
-				std::string buttonName = "Reload##" + shader->GetName();
-				if ( ImGui::Button(buttonName.c_str()) )
-					shader->Reload();
-				ImGui::TreePop();
-			}
-		}
-		ImGui::TreePop();
-	}
-
-	ImGui::End();
 
 	// TODO: Move to header?
 	const auto ImGuiBlue = ImVec4{ 0.137f, 0.263f, 0.424f, 1.0f };
@@ -513,92 +463,9 @@ void EditorLayer::OnImGuiRender()
 	}
 
 	ImGui::End();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleColor();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar();
-	ImGui::PopStyleVar();
+	ImGui::PopStyleColor(3);
+	ImGui::PopStyleVar(3);
 
-	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	ImGui::Begin("Viewport");
-
-	EditorViewport::Hovered = ImGui::IsWindowHovered();
-	EditorViewport::Focused = ImGui::IsWindowFocused();
-	const auto &tl = EditorViewport::TopLeft;
-	const auto &br = EditorViewport::BottomRight;
-	if ( EditorViewport::Focused )
-	{
-		ImGui::GetForegroundDrawList()->AddRect(ImVec2(tl.x, tl.y), ImVec2(br.x, br.y), IM_COL32(255, 140, 0, 180));
-	}
-	else
-	{
-		ImGui::GetForegroundDrawList()->AddRect(ImVec2(tl.x, tl.y), ImVec2(br.x, br.y), IM_COL32(255, 140, 0, 80));
-	}
-
-	auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
-	auto viewportSize = ImGui::GetContentRegionAvail();
-	SceneRenderer::SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	m_EditorScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	if ( m_RuntimeScene )
-		m_RuntimeScene->SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), viewportSize.x, viewportSize.y, 0.1f, 10000.0f));
-	m_EditorCamera.SetViewportSize(static_cast<uint32_t>(viewportSize.x), static_cast<uint32_t>(viewportSize.y));
-	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID()), viewportSize, { 0, 1 }, { 1, 0 });
-
-	auto windowSize = ImGui::GetWindowSize();
-	ImVec2 minBound = ImGui::GetWindowPos();
-	minBound.x += viewportOffset.x;
-	minBound.y += viewportOffset.y;
-
-	ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
-	EditorViewport::TopLeft = { minBound.x, minBound.y };
-	EditorViewport::BottomRight = { maxBound.x, maxBound.y };
-	m_AllowViewportCameraEvents = ImGui::IsMouseHoveringRect(minBound, maxBound);
-
-	// Gizmos
-	if ( m_GizmoType != -1 && !m_SelectionContext.empty() )
-	{
-		auto &selection = m_SelectionContext[0];
-
-		auto rw = static_cast<float>(ImGui::GetWindowWidth());
-		auto rh = static_cast<float>(ImGui::GetWindowHeight());
-		ImGuizmo::SetOrthographic(false);
-		ImGuizmo::SetDrawlist();
-		ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, rw, rh);
-
-		bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-
-		auto &entityTransform = selection.Entity.Transform();
-		float snapValue = GetSnapValue();
-		float snapValues[3] = { snapValue, snapValue, snapValue };
-		if ( m_SelectionMode == SelectionMode::Entity )
-		{
-			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-								 ImGuizmo::LOCAL,
-								 glm::value_ptr(entityTransform),
-								 nullptr,
-								 snap ? snapValues : nullptr);
-		}
-		else
-		{
-			glm::mat4 transformBase = entityTransform * selection.Mesh->Transform;
-			ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-								 glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-								 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-								 ImGuizmo::LOCAL,
-								 glm::value_ptr(transformBase),
-								 nullptr,
-								 snap ? snapValues : nullptr);
-
-			selection.Mesh->Transform = glm::inverse(entityTransform) * transformBase;
-		}
-	}
-
-	ImGui::End();
-	ImGui::PopStyleVar();
 
 	if ( ImGui::BeginMenuBar() )
 	{
@@ -653,220 +520,33 @@ void EditorLayer::OnImGuiRender()
 		ImGui::EndMenuBar();
 	}
 
-	m_SceneHierarchyPanel->OnImGuiRender();
-
-	ImGui::Begin("Materials");
-
-	if ( !m_SelectionContext.empty() )
-	{
-		Entity selectedEntity = m_SelectionContext.front().Entity;
-		if ( selectedEntity.HasComponent<MeshComponent>() )
-		{
-			Ref<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
-			if ( mesh )
-			{
-				auto materials = mesh->GetMaterials();
-				static uint32_t selectedMaterialIndex = 0;
-				for ( uint32_t i = 0; i < materials.size(); i++ )
-				{
-					auto &materialInstance = materials[i];
-
-					ImGuiTreeNodeFlags node_flags = (selectedMaterialIndex == i ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_Leaf;
-					bool opened = ImGui::TreeNodeEx(static_cast<void *>(&materialInstance), node_flags, materialInstance->GetName().c_str());
-					if ( ImGui::IsItemClicked() )
-					{
-						selectedMaterialIndex = i;
-					}
-					if ( opened )
-						ImGui::TreePop();
-
-				}
-
-				ImGui::Separator();
-
-				// Selected material
-				if ( selectedMaterialIndex < materials.size() )
-				{
-					auto &materialInstance = materials[selectedMaterialIndex];
-					ImGui::Text("Shader: %s", materialInstance->GetShader()->GetName().c_str());
-					// Textures ------------------------------------------------------------------------------
-					{
-						// Albedo
-						if ( ImGui::CollapsingHeader("Albedo", nullptr, ImGuiTreeNodeFlags_DefaultOpen) )
-						{
-							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-
-							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
-							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
-							Ref<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
-							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
-							ImGui::PopStyleVar();
-							if ( ImGui::IsItemHovered() )
-							{
-								if ( albedoMap )
-								{
-									ImGui::BeginTooltip();
-									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(albedoMap->GetPath().c_str());
-									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(albedoMap->GetRendererID()), ImVec2(384, 384));
-									ImGui::EndTooltip();
-								}
-								if ( ImGui::IsItemClicked() )
-								{
-									std::filesystem::path filepath = Application::Get().OpenFile("");
-									if ( !filepath.empty() )
-									{
-										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
-										materialInstance->Set("u_AlbedoTexture", albedoMap);
-									}
-								}
-							}
-							ImGui::SameLine();
-							ImGui::BeginGroup();
-							if ( ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap) )
-								materialInstance->Set<float>("u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
-
-							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.sRGB))
-							{
-								if (m_AlbedoInput.TextureMap)
-									m_AlbedoInput.TextureMap = Texture2D::Create(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.sRGB);
-							}*/
-							ImGui::EndGroup();
-							ImGui::SameLine();
-							ImGui::ColorEdit3("Color##Albedo", glm::value_ptr(albedoColor), ImGuiColorEditFlags_NoInputs);
-						}
-					}
-					{
-						// Normals
-						if ( ImGui::CollapsingHeader("Normals", nullptr, ImGuiTreeNodeFlags_DefaultOpen) )
-						{
-							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
-							Ref<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
-							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
-							ImGui::PopStyleVar();
-							if ( ImGui::IsItemHovered() )
-							{
-								if ( normalMap )
-								{
-									ImGui::BeginTooltip();
-									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(normalMap->GetPath().c_str());
-									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(normalMap->GetRendererID()), ImVec2(384, 384));
-									ImGui::EndTooltip();
-								}
-								if ( ImGui::IsItemClicked() )
-								{
-									std::filesystem::path filepath = Application::Get().OpenFile("");
-									if ( !filepath.empty() )
-									{
-										normalMap = Texture2D::Create(filepath.string());
-										materialInstance->Set("u_NormalTexture", normalMap);
-									}
-								}
-							}
-							ImGui::SameLine();
-							if ( ImGui::Checkbox("Use##NormalMap", &useNormalMap) )
-								materialInstance->Set<float>("u_NormalTexToggle", useNormalMap ? 1.0f : 0.0f);
-						}
-					}
-					{
-						// Metalness
-						if ( ImGui::CollapsingHeader("Metalness", nullptr, ImGuiTreeNodeFlags_DefaultOpen) )
-						{
-							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-							auto &metalnessValue = materialInstance->Get<float>("u_Metalness");
-							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
-							Ref<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
-							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
-							ImGui::PopStyleVar();
-							if ( ImGui::IsItemHovered() )
-							{
-								if ( metalnessMap )
-								{
-									ImGui::BeginTooltip();
-									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(metalnessMap->GetPath().c_str());
-									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(metalnessMap->GetRendererID()), ImVec2(384, 384));
-									ImGui::EndTooltip();
-								}
-								if ( ImGui::IsItemClicked() )
-								{
-									std::filesystem::path filepath = Application::Get().OpenFile("");
-									if ( !filepath.empty() )
-									{
-										metalnessMap = Texture2D::Create(filepath.string());
-										materialInstance->Set("u_MetalnessTexture", metalnessMap);
-									}
-								}
-							}
-							ImGui::SameLine();
-							if ( ImGui::Checkbox("Use##MetalnessMap", &useMetalnessMap) )
-								materialInstance->Set<float>("u_MetalnessTexToggle", useMetalnessMap ? 1.0f : 0.0f);
-							ImGui::SameLine();
-							ImGui::SliderFloat("Value##MetalnessInput", &metalnessValue, 0.0f, 1.0f);
-						}
-					}
-					{
-						// Roughness
-						if ( ImGui::CollapsingHeader("Roughness", nullptr, ImGuiTreeNodeFlags_DefaultOpen) )
-						{
-							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
-							auto &roughnessValue = materialInstance->Get<float>("u_Roughness");
-							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
-							Ref<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
-							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
-							ImGui::PopStyleVar();
-							if ( ImGui::IsItemHovered() )
-							{
-								if ( roughnessMap )
-								{
-									ImGui::BeginTooltip();
-									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(roughnessMap->GetPath().c_str());
-									ImGui::PopTextWrapPos();
-									ImGui::Image(reinterpret_cast<void *>(roughnessMap->GetRendererID()), ImVec2(384, 384));
-									ImGui::EndTooltip();
-								}
-								if ( ImGui::IsItemClicked() )
-								{
-									std::filesystem::path filepath = Application::Get().OpenFile("");
-									if ( !filepath.empty() )
-									{
-										roughnessMap = Texture2D::Create(filepath.string());
-										materialInstance->Set("u_RoughnessTexture", roughnessMap);
-									}
-								}
-							}
-							ImGui::SameLine();
-							if ( ImGui::Checkbox("Use##RoughnessMap", &useRoughnessMap) )
-								materialInstance->Set<float>("u_RoughnessTexToggle", useRoughnessMap ? 1.0f : 0.0f);
-							ImGui::SameLine();
-							ImGui::SliderFloat("Value##RoughnessInput", &roughnessValue, 0.0f, 1.0f);
-						}
-					}
-				}
-			}
-		}
-	}
+	EditorTerminal::OnGuiRender();
+	Renderer::OnGuiRender();
+	ScriptEngine::OnGuiRender();
+	Shader::OnGuiRender();
+	m_MainViewport.OnGuiRender();
+	m_MiniViewport.OnGuiRender();
+	m_AssetPanel->OnGuiRender();
+	m_EntityPanel->OnGuiRender(m_ScriptPanel);
+	m_ScriptPanel->OnGuiRender();
+	m_SceneState == SceneState::Edit ? m_EditorScene->OnGuiRender() : m_RuntimeScene->OnGuiRender();
 
 	ImGui::End();
 
-	ScriptEngine::OnImGuiRender();
-	GuiTerminal::OnImGuiRender();
-	Renderer::OnImGuiRender();
-
-	ImGui::End();
+	// Correct viewport and camera matrices
+	const auto mainViewportSize = m_MainViewport.GetViewportSize();
+	m_EditorScene->SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
+	if ( m_RuntimeScene )
+		m_RuntimeScene->SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
+	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), mainViewportSize.x, mainViewportSize.y, 0.1f, 10000.0f));
+	m_EditorCamera.SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
 }
 
 void EditorLayer::OnEvent(const Event &event)
 {
 	if ( m_SceneState == SceneState::Edit )
 	{
-		if ( EditorViewport::Hovered )
+		if ( m_MainViewport.IsHovered() )
 			m_EditorCamera.OnEvent(event);
 
 		m_EditorScene->OnEvent(event);
@@ -884,18 +564,15 @@ void EditorLayer::OnEvent(const Event &event)
 
 bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 {
-	if ( EditorViewport::Focused )
+	if ( m_MainViewport.IsFocused() )
 	{
 		switch ( event.GetKey() )
 		{
 		case KeyCode::Delete:
-			if ( !m_SelectionContext.empty() )
+			if ( m_SelectedEntity )
 			{
-				const Entity selectedEntity = m_SelectionContext[0].Entity;
-				m_EditorScene->DestroyEntity(selectedEntity);
-				m_SelectionContext.clear();
-				m_EditorScene->SetSelectedEntity({});
-				m_SceneHierarchyPanel->SetSelected({});
+				OnUnselected(m_SelectedEntity);
+				m_EditorScene->DestroyEntity(m_SelectedEntity);
 			}
 			break;
 		default:
@@ -907,16 +584,10 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 	{
 		switch ( event.GetKey() )
 		{
-		case KeyCode::B:
-			// Toggle bounding boxes 
-			m_UIShowBoundingBoxes = !m_UIShowBoundingBoxes;
-			ShowBoundingBoxes(m_UIShowBoundingBoxes, m_UIShowBoundingBoxesOnTop);
-			break;
 		case KeyCode::D:
-			if ( !m_SelectionContext.empty() )
+			if ( m_SelectedEntity )
 			{
-				const Entity selectedEntity = m_SelectionContext[0].Entity;
-				m_EditorScene->DuplicateEntity(selectedEntity);
+				m_EditorScene->DuplicateEntity(m_SelectedEntity);
 			}
 			break;
 		case KeyCode::G:
@@ -951,19 +622,30 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 
 bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
-	if ( EditorViewport::Focused &&
+	if ( m_MainViewport.IsFocused() &&
 		event.GetButton() == SE_BUTTON_LEFT &&
 		!Input::IsKeyPressed(SE_KEY_LEFT_ALT) &&
 		!ImGuizmo::IsOver() &&
 		m_SceneState != SceneState::Play )
 	{
-		const auto MousePosition = EditorViewport::GetMousePosition();
+		const auto MousePosition = m_MainViewport.GetMousePosition();
 		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 		{
 			auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);
 
-			m_SelectionContext.clear();
-			m_EditorScene->SetSelectedEntity({});
+			if ( m_SelectedEntity )
+			{
+				OnUnselected(m_SelectedEntity);
+			}
+
+			struct Selection
+			{
+				Entity Entity;
+				Submesh *Submesh = nullptr;
+				float Distance = 0.0f;
+			};
+
+			static std::vector<Selection> selections;
 			auto meshEntities = m_EditorScene->GetAllEntitiesWith<MeshComponent>();
 			for ( auto e : meshEntities )
 			{
@@ -973,7 +655,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 					continue;
 
 				auto &submeshes = mesh->GetSubmeshes();
-				for ( uint32_t i = 0; i < submeshes.size(); i++ )
+				for ( Uint32 i = 0; i < submeshes.size(); i++ )
 				{
 					auto &submesh = submeshes[i];
 					Ray ray = {
@@ -990,17 +672,19 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 						{
 							if ( ray.IntersectsTriangle(triangle.V0.Position, triangle.V1.Position, triangle.V2.Position, t) )
 							{
-								SE_WARN("INTERSECTION: {0}, t={1}", submesh.NodeName, t);
-								m_SelectionContext.push_back({ entity, &submesh, t });
+								selections.push_back({ entity, &submesh, t });
 								break;
 							}
 						}
 					}
 				}
 			}
-			std::sort(m_SelectionContext.begin(), m_SelectionContext.end(), [](auto &a, auto &b) { return a.Distance < b.Distance; });
-			if ( !m_SelectionContext.empty() )
-				OnSelected(m_SelectionContext[0]);
+			std::sort(selections.begin(), selections.end(), [](auto &a, auto &b) { return a.Distance < b.Distance; });
+			if ( !selections.empty() )
+			{
+				OnSelected(selections.front().Entity);
+			}
+			selections.clear();
 
 		}
 	}
@@ -1045,24 +729,32 @@ std::pair<glm::vec3, glm::vec3> EditorLayer::CastRay(float mx, float my) const
 	return { rayPos, rayDir };
 }
 
-void EditorLayer::OnSelected(const SelectedSubmesh &selectionContext)
+void EditorLayer::OnSelected(Entity entity)
 {
-	m_SceneHierarchyPanel->SetSelected(selectionContext.Entity);
-	m_EditorScene->SetSelectedEntity(selectionContext.Entity);
+	m_SelectedEntity = entity;
+	m_EntityPanel->SetSelected(entity);
+	m_EditorScene->SetSelectedEntity(entity);
 }
 
-void EditorLayer::OnEntityDeleted(Entity e)
+void EditorLayer::OnUnselected(Entity entity)
 {
-	if ( m_SelectionContext[0].Entity == e )
+	SceneRenderer::DisableRenderTarget("MiniRenderTarget");
+	m_SelectedEntity = {};
+	m_EntityPanel->SetSelected({});
+	m_EditorScene->SetSelectedEntity({});
+}
+
+void EditorLayer::OnEntityDeleted(Entity entity)
+{
+	if ( m_SelectedEntity == entity )
 	{
-		m_SelectionContext.clear();
 		m_EditorScene->SetSelectedEntity({});
 	}
 }
 
 Ray EditorLayer::CastMouseRay() const
 {
-	const auto MousePosition = EditorViewport::GetMousePosition();
+	const auto MousePosition = m_MainViewport.GetMousePosition();
 	if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 	{
 		auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);

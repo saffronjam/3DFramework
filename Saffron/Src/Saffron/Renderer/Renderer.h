@@ -1,13 +1,15 @@
 #pragma once
 
-#include "Saffron/Renderer/Material.h"
-#include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Core/Math/AABB.h"
 #include "Saffron/Renderer/PrimitiveType.h"
 #include "Saffron/Renderer/RenderCommandQueue.h"
 #include "Saffron/Renderer/RenderPass.h"
 
 namespace Se
 {
+class Material;
+class Mesh;
+class MaterialInstance;
 class ShaderLibrary;
 
 class Renderer
@@ -15,7 +17,7 @@ class Renderer
 public:
 	static void Init();
 
-	static void OnImGuiRender();
+	static void OnGuiRender();
 
 	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
@@ -45,6 +47,7 @@ public:
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
+	static struct RendererData s_Data;
 };
 
 template <typename FuncT>

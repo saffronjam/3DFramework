@@ -1,10 +1,11 @@
 #include "SaffronPCH.h"
 
-#include <box2d/box2d.h>
-
+#include "Saffron/Core/Application.h"
+#include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Entity/Entity.h"
+#include "Saffron/Entity/EntityComponents.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/SceneRenderer.h"
-#include "Saffron/Scene/Components.h"
-#include "Saffron/Scene/Entity.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -16,19 +17,7 @@ namespace Se
 /// Statics
 ///////////////////////////////////////////////////////////////////////////
 
-[[maybe_unused]] static const std::string DefaultEntityName = "Entity";
 std::unordered_map<UUID, Scene *> s_ActiveScenes;
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Helper structs
-///////////////////////////////////////////////////////////////////////////
-
-struct SceneComponent
-{
-	UUID SceneID;
-};
-
 
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
@@ -57,16 +46,6 @@ static void OnScriptComponentDestroy(entt::registry &registry, entt::entity enti
 	ScriptEngine::OnScriptComponentDestroyed(sceneID, entityID);
 }
 
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
-{
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
-
 template<typename T>
 static void CopyComponent(entt::registry &dstRegistry, entt::registry &srcRegistry, const std::unordered_map<UUID, entt::entity> &enttMap)
 {
@@ -91,82 +70,12 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 }
 
 
-///////////////////////////////////////////////////////////////////////////
-/// Physics implementation, TODO: MOVE TO OTHER FILE!
-///////////////////////////////////////////////////////////////////////////
-
-struct Box2DWorldComponent
-{
-	std::unique_ptr<b2World> World;
-};
-
-class ContactListener : public b2ContactListener
-{
-public:
-	void BeginContact(b2Contact *contact) override
-	{
-		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
-
-		// TODO: improve these if checks
-		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )
-			ScriptEngine::OnCollision2DBegin(a);
-
-		if ( b.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(b.GetComponent<ScriptComponent>().ModuleName) )
-			ScriptEngine::OnCollision2DBegin(b);
-	}
-
-	/// Called when two fixtures cease to touch.
-	void EndContact(b2Contact *contact) override
-	{
-		Entity &a = *static_cast<Entity *>(contact->GetFixtureA()->GetBody()->GetUserData());
-		Entity &b = *static_cast<Entity *>(contact->GetFixtureB()->GetBody()->GetUserData());
-
-		// TODO: improve these if checks
-		if ( a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(a.GetComponent<ScriptComponent>().ModuleName) )
-			ScriptEngine::OnCollision2DEnd(a);
-
-		if ( b.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(b.GetComponent<ScriptComponent>().ModuleName) )
-			ScriptEngine::OnCollision2DEnd(b);
-	}
-
-	/// This is called after a contact is updated. This allows you to inspect a
-	/// contact before it goes to the solver. If you are careful, you can modify the
-	/// contact manifold (e.g. disable contact).
-	/// A copy of the old manifold is provided so that you can detect changes.
-	/// Note: this is called only for awake bodies.
-	/// Note: this is called even when the number of contact points is zero.
-	/// Note: this is not called for sensors.
-	/// Note: if you set the number of contact points to zero, you will not
-	/// get an EndContact callback. However, you may get a BeginContact callback
-	/// the next step.
-	void PreSolve(b2Contact *contact, const b2Manifold *oldManifold) override
-	{
-		B2_NOT_USED(contact);
-		B2_NOT_USED(oldManifold);
-	}
-
-	/// This lets you inspect a contact after the solver is finished. This is useful
-	/// for inspecting impulses.
-	/// Note: the contact manifold does not include time of impact impulses, which can be
-	/// arbitrarily large if the sub-step is small. Hence the impulse is provided explicitly
-	/// in a separate data structure.
-	/// Note: this is only called for contacts that are touching, solid, and awake.
-	void PostSolve(b2Contact *contact, const b2ContactImpulse *impulse) override
-	{
-		B2_NOT_USED(contact);
-		B2_NOT_USED(impulse);
-	}
-};
-
-static ContactListener s_Box2DContactListener;
-
 
 ///////////////////////////////////////////////////////////////////////////
 /// Environment
 ///////////////////////////////////////////////////////////////////////////
 
-Environment Environment::Load(const std::string &filepath)
+Scene::Environment Scene::Environment::Load(const std::string &filepath)
 {
 	auto [radiance, irradiance] = SceneRenderer::CreateEnvironmentMap(filepath);
 	return { filepath, radiance, irradiance };
@@ -178,101 +87,49 @@ Environment Environment::Load(const std::string &filepath)
 ///////////////////////////////////////////////////////////////////////////
 
 Scene::Scene(std::string name)
-	: m_Name(std::move(name))
+	: m_Name(std::move(name)),
+	m_SceneEntity(m_EntityRegistry.create(), this)
 {
-	m_Registry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
-	m_Registry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
+	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
+	m_EntityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
 
-	m_SceneEntity = m_Registry.create();
-	m_Registry.emplace<SceneComponent>(m_SceneEntity, m_SceneID);
-
-	// TODO: Obviously not necessary in all cases
-	Box2DWorldComponent &b2dWorld = m_Registry.emplace<Box2DWorldComponent>(m_SceneEntity, std::make_unique<b2World>(b2Vec2{ 0.0f, -9.8f }));
-	b2dWorld.World->SetContactListener(&s_Box2DContactListener);
+	m_EntityRegistry.emplace<SceneComponent>(m_SceneEntity, m_SceneID);
+	m_EntityRegistry.emplace<PhysicsWorld2DComponent>(m_SceneEntity, *this);
 
 	s_ActiveScenes[m_SceneID] = this;
 
-	Init();
+	const auto skyboxShader = Shader::Create("Assets/shaders/Skybox.glsl");
+	m_Skybox.Material = MaterialInstance::Create(Material::Create(skyboxShader));
+	m_Skybox.Material->SetFlag(Material::Flag::DepthTest, false);
 }
 
 Scene::~Scene()
 {
-	m_Registry.on_destroy<ScriptComponent>().disconnect();
+	m_EntityRegistry.on_destroy<ScriptComponent>().disconnect();
+	m_EntityRegistry.clear();
 
-	m_Registry.clear();
 	s_ActiveScenes.erase(m_SceneID);
 	ScriptEngine::OnSceneDestruct(m_SceneID);
 }
 
-void Scene::Init()
-{
-	const auto skyboxShader = Shader::Create("Assets/shaders/Skybox.glsl");
-	m_SkyboxMaterial = MaterialInstance::Create(Material::Create(skyboxShader));
-	m_SkyboxMaterial->SetFlag(Material::Flag::DepthTest, false);
-}
-
 void Scene::OnUpdate(Time ts)
 {
+
 	// Update all entities
 	{
-		auto view = m_Registry.view<ScriptComponent>();
+		auto view = m_EntityRegistry.view<ScriptComponent>();
 		for ( auto entity : view )
 		{
-			const UUID entityID = m_Registry.get<IDComponent>(entity).ID;
+			const UUID entityID = m_EntityRegistry.get<IDComponent>(entity).ID;
 			Entity e = { entity, this };
 			if ( ScriptEngine::ModuleExists(e.GetComponent<ScriptComponent>().ModuleName) )
 				ScriptEngine::OnUpdateEntity(m_SceneID, entityID, ts);
 		}
 	}
 
-	// Box2D physics
-	const auto sceneView = m_Registry.view<Box2DWorldComponent>();
-	auto &box2DWorld = m_Registry.get<Box2DWorldComponent>(sceneView.front()).World;
-	const Int32 velocityIterations = 6;
-	const Int32 positionIterations = 2;
-	box2DWorld->Step(ts.sec(), velocityIterations, positionIterations);
+	if ( m_EntityRegistry.has<PhysicsWorld2DComponent>(m_SceneEntity) )
+		m_EntityRegistry.get<PhysicsWorld2DComponent>(m_SceneEntity).World.OnUpdate();
 
-	{
-		auto view = m_Registry.view<RigidBody2DComponent>();
-		for ( auto entity : view )
-		{
-			Entity e = { entity, this };
-
-			auto &transform = e.Transform();
-			auto &rb2d = e.GetComponent<RigidBody2DComponent>();
-			auto *body = static_cast<b2Body *>(rb2d.RuntimeBody);
-
-
-			if ( e.HasComponent<BoxCollider2DComponent>() )
-			{
-				auto &component = e.GetComponent<BoxCollider2DComponent>();
-				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
-				fixture->SetDensity(component.Density);
-				fixture->SetFriction(component.Friction);
-				auto *polygonShape = dynamic_cast<b2PolygonShape *>(fixture->GetShape());
-				polygonShape->SetAsBox(component.Size.x, component.Size.y);
-			}
-			if ( e.HasComponent<CircleCollider2DComponent>() )
-			{
-				auto &component = e.GetComponent<CircleCollider2DComponent>();
-				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
-				fixture->SetDensity(component.Density);
-				fixture->SetFriction(component.Friction);
-				auto *circleShape = dynamic_cast<b2CircleShape *>(fixture->GetShape());
-				circleShape->m_radius = component.Radius;
-			}
-
-			body->ResetMassData();
-
-			const auto &position = body->GetPosition();
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(transform);
-			const glm::vec3 rotation = glm::eulerAngles(rotationQuat);
-
-			transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, transform[3].z }) *
-				glm::toMat4(glm::quat({ rotation.x, rotation.y, body->GetAngle() })) *
-				glm::scale(glm::mat4(1.0f), scale);
-		}
-	}
 }
 
 void Scene::OnRenderRuntime(Time ts)
@@ -290,11 +147,13 @@ void Scene::OnRenderRuntime(Time ts)
 	Ref<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
 	camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 
-	m_SkyboxMaterial->Set("u_TextureLod", m_SkyboxLod);
+	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 	const glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 
-	auto group = m_Registry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::BeginScene(this, { static_cast<Camera>(*camera), cameraViewMatrix });
+	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
+
+	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<Camera *>(camera.Raw()), cameraViewMatrix });
+	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{
 		auto [transformComponent, meshComponent] = group.get<TransformComponent, MeshComponent>(entity);
@@ -313,7 +172,7 @@ void Scene::OnRenderRuntime(Time ts)
 		// Render all sprites
 	Renderer2D::BeginScene(*camera);
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
+		auto group = m_EntityRegistry.group<TransformComponent>(entt::get<SpriteRenderer>);
 		for ( auto entity : group )
 		{
 			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRenderer>(entity);
@@ -333,10 +192,11 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 	/////////////////////////////////////////////////////////////////////
 	// RENDER 3D SCENE
 	/////////////////////////////////////////////////////////////////////
-	m_SkyboxMaterial->Set("u_TextureLod", m_SkyboxLod);
+	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
-	auto group = m_Registry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::BeginScene(this, { static_cast<Camera>(editorCamera), editorCamera.GetViewMatrix() });
+	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
+	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<const Camera *>(&editorCamera), editorCamera.GetViewMatrix() });
+	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{
 		auto [meshComponent, transformComponent] = group.get<MeshComponent, TransformComponent>(entity);
@@ -359,7 +219,7 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 	// Render all sprites
 	Renderer2D::BeginScene(*camera);
 	{
-		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRenderer>);
+		auto group = m_EntityRegistry.group<TransformComponent>(entt::get<SpriteRenderer>);
 		for ( auto entity : group )
 		{
 			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRenderer>(entity);
@@ -378,12 +238,45 @@ void Scene::OnEvent(const Event &event)
 {
 }
 
+void Scene::OnGuiRender()
+{
+	ImGui::Begin("Scene");
+
+	if ( ImGui::Button("Load Environment Map") )
+	{
+		const fs::path filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
+		if ( !filepath.empty() )
+			SetEnvironment(Environment::Load(filepath.string()));
+	}
+
+	ImGui::SliderFloat("Skybox LOD", &GetSkyboxLod(), 0.0f, 11.0f);
+
+
+	Gui::BeginPropertyGrid();
+
+	auto &light = GetLight();
+	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
+	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
+	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, Gui::PropertyFlag::Slider);
+	//Gui::Property("Exposure", GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
+	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
+	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
+	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+		ShowBoundingBoxes(m_UIShowBoundingBoxes);
+	Gui::EndPropertyGrid();
+
+
+	ImGui::End();
+
+	m_EntityRegistry.get<PhysicsWorld2DComponent>(m_SceneEntity).World.OnGuiRender();
+}
+
 void Scene::OnRuntimeStart()
 {
 	ScriptEngine::SetSceneContext(this);
 
 	{
-		auto view = m_Registry.view<ScriptComponent>();
+		auto view = m_EntityRegistry.view<ScriptComponent>();
 		for ( auto eent : view )
 		{
 			Entity entity = { eent, this };
@@ -395,106 +288,22 @@ void Scene::OnRuntimeStart()
 		}
 	}
 
-	// Box2D physics
-	auto sceneView = m_Registry.view<Box2DWorldComponent>();
-	auto &world = m_Registry.get<Box2DWorldComponent>(sceneView.front()).World;
+	if ( m_EntityRegistry.has<PhysicsWorld2DComponent>(m_SceneEntity) )
+		m_EntityRegistry.get<PhysicsWorld2DComponent>(m_SceneEntity).World.OnStart();
 
-	{
-		auto view = m_Registry.view<RigidBody2DComponent>();
-		m_PhysicsBodyEntityBuffer = new Entity[view.size()];
-		Uint32 physicsBodyEntityBufferIndex = 0;
-		for ( auto entity : view )
-		{
-			Entity e = { entity, this };
-			auto &transform = e.Transform();
-			auto &rigidBody2D = m_Registry.get<RigidBody2DComponent>(entity);
 
-			b2BodyDef bodyDef;
-			if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Static )
-				bodyDef.type = b2_staticBody;
-			else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Dynamic )
-				bodyDef.type = b2_dynamicBody;
-			else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Kinematic )
-				bodyDef.type = b2_kinematicBody;
-			bodyDef.position.Set(transform[3].x, transform[3].y);
-
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(transform);
-			glm::vec3 rotation = glm::eulerAngles(rotationQuat);
-			bodyDef.angle = rotation.z;
-
-			b2Body *body = world->CreateBody(&bodyDef);
-			body->SetFixedRotation(rigidBody2D.FixedRotation);
-			Entity *entityStorage = &m_PhysicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
-			*entityStorage = e;
-			body->SetUserData(static_cast<void *>(entityStorage));
-			rigidBody2D.RuntimeBody = body;
-		}
-	}
-
-	{
-		auto view = m_Registry.view<BoxCollider2DComponent>();
-		for ( auto entity : view )
-		{
-			Entity e = { entity, this };
-
-			auto &boxCollider2D = m_Registry.get<BoxCollider2DComponent>(entity);
-			if ( e.HasComponent<RigidBody2DComponent>() )
-			{
-				auto &rigidBody2D = e.GetComponent<RigidBody2DComponent>();
-				SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
-				auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
-
-				b2PolygonShape polygonShape;
-				polygonShape.SetAsBox(boxCollider2D.Size.x, boxCollider2D.Size.y);
-
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &polygonShape;
-				fixtureDef.density = boxCollider2D.Density;
-				fixtureDef.friction = boxCollider2D.Friction;
-				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
-				boxCollider2D.RuntimeFixture = fixture;
-			}
-		}
-	}
-
-	{
-		auto view = m_Registry.view<CircleCollider2DComponent>();
-		for ( auto entity : view )
-		{
-			Entity e = { entity, this };
-
-			auto &circleCollider2D = m_Registry.get<CircleCollider2DComponent>(entity);
-			if ( e.HasComponent<RigidBody2DComponent>() )
-			{
-				auto &rigidBody2D = e.GetComponent<RigidBody2DComponent>();
-				SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
-				auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
-
-				b2CircleShape circleShape;
-				circleShape.m_radius = circleCollider2D.Radius;
-
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &circleShape;
-				fixtureDef.density = circleCollider2D.Density;
-				fixtureDef.friction = circleCollider2D.Friction;
-				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
-				circleCollider2D.RuntimeFixture = fixture;
-			}
-		}
-	}
 
 	m_IsPlaying = true;
 }
 
 void Scene::OnRuntimeStop()
 {
-	delete[] m_PhysicsBodyEntityBuffer;
 	m_IsPlaying = false;
 }
 
 Entity Scene::CreateEntity(std::string name)
 {
-	auto entity = Entity{ m_Registry.create(), this };
+	auto entity = Entity{ m_EntityRegistry.create(), this };
 	auto &idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = {};
 
@@ -508,7 +317,7 @@ Entity Scene::CreateEntity(std::string name)
 
 Entity Scene::CreateEntityWithID(UUID uuid, const std::string &name, bool runtimeMap)
 {
-	auto entity = Entity{ m_Registry.create(), this };
+	auto entity = Entity{ m_EntityRegistry.create(), this };
 	auto &idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = uuid;
 
@@ -526,31 +335,27 @@ void Scene::DestroyEntity(Entity entity)
 	if ( entity.HasComponent<ScriptComponent>() )
 		ScriptEngine::OnScriptComponentDestroyed(m_SceneID, entity.GetUUID());
 
-	m_Registry.destroy(entity.m_EntityHandle);
+	m_EntityRegistry.destroy(entity.m_EntityHandle);
 }
 
 void Scene::DuplicateEntity(Entity entity)
 {
-	Entity newEntity;
-	if ( entity.HasComponent<TagComponent>() )
-		newEntity = CreateEntity(entity.GetComponent<TagComponent>().Tag);
-	else
-		newEntity = CreateEntity();
+	Entity newEntity = entity.HasComponent<TagComponent>() ? CreateEntity(entity.GetComponent<TagComponent>().Tag) : CreateEntity();
 
-	CopyComponentIfExists<TransformComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<MeshComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<ScriptComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<CameraComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<SpriteRendererComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<RigidBody2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<BoxCollider2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
-	CopyComponentIfExists<CircleCollider2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_Registry);
+	CopyComponentIfExists<TransformComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<MeshComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<ScriptComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<CameraComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<SpriteRendererComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<RigidBody2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<BoxCollider2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
+	CopyComponentIfExists<CircleCollider2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
 }
 
 Entity Scene::FindEntityByTag(const std::string &tag)
 {
 	// TODO: If this becomes used often, consider indexing by tag
-	auto view = m_Registry.view<TagComponent>();
+	auto view = m_EntityRegistry.view<TagComponent>();
 	for ( auto entity : view )
 	{
 		const auto &candidate = view.get<TagComponent>(entity).Tag;
@@ -558,7 +363,7 @@ Entity Scene::FindEntityByTag(const std::string &tag)
 			return Entity(entity, this);
 	}
 
-	return Entity{};
+	return Entity::Null();
 }
 
 void Scene::CopyTo(Ref<Scene> &target)
@@ -568,46 +373,52 @@ void Scene::CopyTo(Ref<Scene> &target)
 	target->m_LightMultiplier = m_LightMultiplier;
 
 	target->m_Environment = m_Environment;
-	target->m_SkyboxTexture = m_SkyboxTexture;
-	target->m_SkyboxMaterial = m_SkyboxMaterial;
+	target->m_Skybox = m_Skybox;
 	target->m_SkyboxLod = m_SkyboxLod;
 
 	std::unordered_map<UUID, entt::entity> enttMap;
-	auto idComponents = m_Registry.view<IDComponent>();
+	auto idComponents = m_EntityRegistry.view<IDComponent>();
 	for ( auto entity : idComponents )
 	{
-		auto uuid = m_Registry.get<IDComponent>(entity).ID;
+		auto uuid = m_EntityRegistry.get<IDComponent>(entity).ID;
 		const Entity e = target->CreateEntityWithID(uuid, "", true);
 		enttMap[uuid] = e.m_EntityHandle;
 	}
 
-	CopyComponent<TagComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<TransformComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<MeshComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<ScriptComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<CameraComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<SpriteRendererComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<RigidBody2DComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<BoxCollider2DComponent>(target->m_Registry, m_Registry, enttMap);
-	CopyComponent<CircleCollider2DComponent>(target->m_Registry, m_Registry, enttMap);
+	CopyComponent<TagComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<TransformComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<MeshComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<ScriptComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<CameraComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<SpriteRendererComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<RigidBody2DComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<BoxCollider2DComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
+	CopyComponent<CircleCollider2DComponent>(target->m_EntityRegistry, m_EntityRegistry, enttMap);
 
 	const auto &entityInstanceMap = ScriptEngine::GetEntityInstanceMap();
 	if ( entityInstanceMap.find(target->GetUUID()) != entityInstanceMap.end() )
 		ScriptEngine::CopyEntityScriptData(target->GetUUID(), m_SceneID);
 
-	target->SetPhysics2DGravity(GetPhysics2DGravity());
+	auto &world = m_EntityRegistry.get<PhysicsWorld2DComponent>(m_SceneEntity).World;
+	target->GetEntityRegistry().get<PhysicsWorld2DComponent>(target->GetEntity()).World.SetGravity(world.GetGravity());
+	/*if ( m_EntityRegistry.has<PhysicsWorld2DComponent>(m_SceneEntity) )
+	{
+		if ( !target->GetEntityRegistry().has<PhysicsWorld2DComponent>(target->GetEntity()) )
+
+	}*/
 }
+
 
 Entity Scene::GetMainCameraEntity()
 {
-	auto view = m_Registry.view<CameraComponent>();
+	auto view = m_EntityRegistry.view<CameraComponent>();
 	for ( auto entity : view )
 	{
 		auto &comp = view.get<CameraComponent>(entity);
 		if ( comp.Primary )
 			return { entity, this };
 	}
-	return {};
+	return Entity::Null();
 }
 
 Ref<Scene> Scene::GetScene(UUID uuid)
@@ -616,11 +427,6 @@ Ref<Scene> Scene::GetScene(UUID uuid)
 		return s_ActiveScenes.at(uuid);
 
 	return {};
-}
-
-float Scene::GetPhysics2DGravity() const
-{
-	return m_Registry.get<Box2DWorldComponent>(m_SceneEntity).World->GetGravity().y;
 }
 
 void Scene::SetName(std::string name)
@@ -642,19 +448,22 @@ void Scene::SetViewportSize(Uint32 width, Uint32 height)
 void Scene::SetEnvironment(const Environment &environment)
 {
 	m_Environment = environment;
-	SetSkybox(environment.RadianceMap);
+	SetSkyboxTexture(environment.RadianceMap);
 }
 
-void Scene::SetSkybox(const Ref<TextureCube> &skybox)
+void Scene::SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture)
 {
-	m_SkyboxTexture = skybox;
-	m_SkyboxMaterial->Set("u_Texture", skybox);
+	m_Skybox.Texture = skyboxTexture;
+	m_Skybox.Material->Set("u_Texture", skyboxTexture);
 }
 
-void Scene::SetPhysics2DGravity(float gravity)
+void Scene::SetSelectedEntity(Entity entity)
 {
-	m_Registry.get<Box2DWorldComponent>(m_SceneEntity).World->SetGravity({ 0.0f, gravity });
-
+	m_SelectedEntity = entity;
 }
 
+void Scene::ShowBoundingBoxes(bool show)
+{
+	SceneRenderer::GetOptions().ShowBoundingBoxes = show;
+}
 }

@@ -5,7 +5,7 @@
 #include <string>
 
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Editor/SceneHierarchyPanel.h"
+#include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Gui/GuiLayer.h"
 
 namespace Se
@@ -14,12 +14,6 @@ namespace Se
 class EditorLayer : public Layer
 {
 public:
-	struct SelectedSubmesh
-	{
-		Entity Entity;
-		Submesh *Mesh = nullptr;
-		float Distance = 0.0f;
-	};
 
 	struct AlbedoInput
 	{
@@ -67,7 +61,7 @@ public:
 	void OnDetach() override;
 	void OnUpdate() override;
 
-	void OnImGuiRender() override;
+	void OnGuiRender() override;
 	void OnEvent(const Event &event) override;
 	bool OnKeyboardPressEvent(const KeyboardPressEvent &event);
 	bool OnMouseButtonPressed(const MousePressEvent &event);
@@ -85,8 +79,9 @@ public:
 private:
 	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
 
-	void OnSelected(const SelectedSubmesh &selectionContext);
-	void OnEntityDeleted(Entity e);
+	void OnSelected(Entity entity);
+	void OnUnselected(Entity entity);
+	void OnEntityDeleted(Entity entity);
 	Ray CastMouseRay() const;
 
 	void OnSceneChange();
@@ -99,13 +94,13 @@ private:
 private:
 	int m_Style;
 
-	Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
-
 	Ref<Scene> m_RuntimeScene, m_EditorScene;
 	std::filesystem::path m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorCamera m_EditorCamera;
+	ViewportPane m_MainViewport;
+	ViewportPane m_MiniViewport;
 
 	Ref<Shader> m_BrushShader;
 	Ref<Material> m_SphereBaseMaterial;
@@ -114,24 +109,19 @@ private:
 	std::vector<Ref<MaterialInstance>> m_MetalSphereMaterialInstances;
 	std::vector<Ref<MaterialInstance>> m_DielectricSphereMaterialInstances;
 
-	// PBR params
-	bool m_RadiancePrefilter = false;
-	float m_EnvMapRotation = 0.0f;
-
 	// Editor resources
 	std::map<std::string, Ref<Texture2D>> m_TexStore;
 
-	int m_GizmoType = -1;
-	bool m_AllowViewportCameraEvents = false;
-	bool m_DrawOnTopBoundingBoxes = false;
+	Ref<AssetPanel> m_AssetPanel;
+	Ref<EntityPanel> m_EntityPanel;
+	Ref<ScriptPanel> m_ScriptPanel;
 
-	bool m_UIShowBoundingBoxes = false;
-	bool m_UIShowBoundingBoxesOnTop = false;
+	int m_GizmoType = -1;
 
 	SceneState m_SceneState = SceneState::Edit;
 
 	SelectionMode m_SelectionMode = SelectionMode::Entity;
-	std::vector<SelectedSubmesh> m_SelectionContext;
+	Entity m_SelectedEntity;
 };
 
 }

@@ -33,12 +33,8 @@ public:
 	void PushOverlay(Layer *layer);
 	void RenderGui();
 
-	std::filesystem::path OpenFile(const char *filter = "All\0*.*\0") const;
-	std::filesystem::path SaveFile(const char *filter = "All\0*.*\0") const;
-
 	Window &GetWindow() { return *m_Window; }
 	static Application &Get() { return *s_Instance; }
-	float GetTime() const; // TODO: This should be in "Platform"
 
 	static const char *GetConfigurationName();
 	static const char *GetPlatformName();

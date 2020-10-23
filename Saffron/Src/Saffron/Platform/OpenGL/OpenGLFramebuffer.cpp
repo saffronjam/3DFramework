@@ -109,15 +109,19 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 
 void OpenGLFramebuffer::Bind() const
 {
-	Renderer::Submit([=]() {
-		glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
-		glViewport(0, 0, m_Specification.Width, m_Specification.Height);
+	Renderer::Submit([=]()
+					 {
+						 glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
+						 glViewport(0, 0, m_Specification.Width, m_Specification.Height);
 					 });
 }
 
 void OpenGLFramebuffer::Unbind() const
 {
-	Renderer::Submit([=]() { glBindFramebuffer(GL_FRAMEBUFFER, 0); });
+	Renderer::Submit([=]()
+					 {
+						 glBindFramebuffer(GL_FRAMEBUFFER, 0);
+					 });
 }
 
 void OpenGLFramebuffer::BindTexture(Uint32 slot) const

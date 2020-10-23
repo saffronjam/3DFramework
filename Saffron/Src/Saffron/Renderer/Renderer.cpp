@@ -4,6 +4,8 @@
 
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Renderer/Material.h"
+#include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RendererAPI.h"
@@ -12,8 +14,6 @@
 
 namespace Se
 {
-
-RendererAPI::Type RendererAPI::m_sCurrentAPI = Type::OpenGL;
 
 struct RendererData
 {
@@ -26,7 +26,9 @@ struct RendererData
 	Ref<Pipeline> m_FullscreenQuadPipeline;
 };
 
-static RendererData s_Data;
+
+RendererAPI::Type RendererAPI::m_sCurrentAPI = Type::OpenGL;
+RendererData Renderer::s_Data;
 
 void Renderer::Init()
 {
@@ -74,10 +76,8 @@ void Renderer::Init()
 	Renderer2D::Init();
 }
 
-void Renderer::OnImGuiRender()
+void Renderer::OnGuiRender()
 {
-
-
 	const Time ts = GlobalTimer::GetStep();
 
 	static Time CachedFrametime = Time::Zero();

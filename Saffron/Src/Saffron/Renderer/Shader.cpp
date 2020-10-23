@@ -1,5 +1,6 @@
 ﻿#include "SaffronPCH.h"
 
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Shader.h"
 #include "Saffron/Platform/OpenGL/OpenGLShader.h"
 
@@ -7,6 +8,25 @@ namespace Se
 {
 
 std::vector<Ref<Shader>> Shader::m_sAllShaders;
+
+void Shader::OnGuiRender()
+{
+	ImGui::Begin("Shaders");
+
+	auto &shaders = Shader::m_sAllShaders;
+	for ( auto &shader : shaders )
+	{
+		if ( ImGui::TreeNode(shader->GetName().c_str()) )
+		{
+			std::string buttonName = "Reload##" + shader->GetName();
+			if ( ImGui::Button(buttonName.c_str()) )
+				shader->Reload();
+			ImGui::TreePop();
+		}
+	}
+
+	ImGui::End();
+}
 
 Ref<Shader> Shader::Create(const std::string &filepath)
 {

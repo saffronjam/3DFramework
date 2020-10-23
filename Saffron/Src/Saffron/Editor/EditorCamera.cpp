@@ -1,19 +1,26 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Input/Input.h"
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Renderer/EditorViewport.h"
 
 namespace Se
 {
-EditorCamera::EditorCamera(const glm::mat4 &projectionMatrix)
-	: Camera(projectionMatrix)
+EditorCamera::EditorCamera(const ViewportPane &mainViewport)
+	: m_EditorViewport(mainViewport)
+{
+	Reset();
+}
+
+EditorCamera::EditorCamera(const ViewportPane &mainViewport, const glm::mat4 &projectionMatrix)
+	: Camera(projectionMatrix),
+	m_EditorViewport(mainViewport)
 {
 	Reset();
 }
 
 void EditorCamera::OnUpdate(Time ts)
 {
-	if ( EditorViewport::Focused )
+	if ( m_EditorViewport.IsFocused() )
 	{
 		if ( m_ControllerStyle == ControllerStyle::Maya )
 		{

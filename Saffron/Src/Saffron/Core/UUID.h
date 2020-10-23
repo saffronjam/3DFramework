@@ -20,6 +20,9 @@ public:
 	{
 		return m_UUID == other.m_UUID;
 	}
+
+	static UUID Null() { return UUID(0ull); }
+
 private:
 	Uint64 m_UUID;
 };

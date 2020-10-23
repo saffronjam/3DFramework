@@ -1,13 +1,10 @@
 #include "SaffronPCH.h"
 
-#define GLFW_EXPOSE_NATIVE_WIN32
-#include <Commdlg.h>
-#include <Windows.h>
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
 
 #include "Saffron/Core/Application.h"
+#include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Input/Input.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -28,7 +25,8 @@ Application::Application(const Properties &properties)
 	m_GuiLayer = new GuiLayer("ImGui");
 	PushOverlay(m_GuiLayer);
 
-	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll", "../ExampleApp/Src");
+	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
+	FileIOManager::Init(*m_Window);
 
 	Renderer::Init();
 	Renderer::WaitAndRender();
@@ -58,7 +56,7 @@ void Application::RenderGui()
 	m_GuiLayer->Begin();
 
 	for ( Layer *layer : m_LayerStack )
-		layer->OnImGuiRender();
+		layer->OnGuiRender();
 
 	m_GuiLayer->End();
 }
@@ -74,15 +72,16 @@ void Application::Run()
 			for ( Layer *layer : m_LayerStack )
 				layer->OnUpdate();
 
+			ScriptEngine::OnUpdate();
+			Input::OnUpdate();
+			m_Window->OnUpdate();
+
 			// Render ImGui on render thread
 			Application *app = this;
 			Renderer::Submit([app]() { app->RenderGui(); });
 
 			Renderer::WaitAndRender();
 		}
-		ScriptEngine::OnUpdate();
-		Input::OnUpdate();
-		m_Window->OnUpdate();
 
 		GlobalTimer::Mark();
 	}
@@ -114,56 +113,6 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 {
 	m_Running = false;
 	return true;
-}
-
-std::filesystem::path Application::OpenFile(const char *filter) const
-{
-	OPENFILENAMEA ofn;       // common dialog box structure
-	CHAR szFile[260] = { 0 };       // if using TCHAR macros
-
-	// Initialize OPENFILENAME
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
-	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = filter;
-	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
-
-	if ( GetOpenFileNameA(&ofn) == TRUE )
-	{
-		return ofn.lpstrFile;
-	}
-	return std::string();
-}
-
-std::filesystem::path Application::SaveFile(const char *filter) const
-{
-	OPENFILENAMEA ofn;       // common dialog box structure
-	CHAR szFile[260] = { 0 };       // if using TCHAR macros
-
-	// Initialize OPENFILENAME
-	ZeroMemory(&ofn, sizeof(OPENFILENAME));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
-	ofn.lpstrFile = szFile;
-	ofn.lpstrDefExt = "ssc";
-	ofn.nMaxFile = sizeof(szFile);
-	ofn.lpstrFilter = filter;
-	ofn.nFilterIndex = 1;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT;
-
-	if ( GetSaveFileNameA(&ofn) == TRUE )
-	{
-		return ofn.lpstrFile;
-	}
-	return std::filesystem::path();
-}
-
-float Application::GetTime() const
-{
-	return static_cast<float>(glfwGetTime());
 }
 
 const char *Application::GetConfigurationName()
