@@ -18,28 +18,28 @@ public:
 	struct AlbedoInput
 	{
 		glm::vec3 Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
-		Ref<Texture2D> TextureMap;
+		Shared<Texture2D> TextureMap;
 		bool sRGB = true;
 		bool UseTexture = false;
 	};
 
 	struct NormalInput
 	{
-		Ref<Texture2D> TextureMap;
+		Shared<Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 
 	struct MetalnessInput
 	{
 		float Value = 1.0f;
-		Ref<Texture2D> TextureMap;
+		Shared<Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 
 	struct RoughnessInput
 	{
 		float Value = 0.2f;
-		Ref<Texture2D> TextureMap;
+		Shared<Texture2D> TextureMap;
 		bool UseTexture = false;
 	};
 
@@ -94,7 +94,7 @@ private:
 private:
 	int m_Style;
 
-	Ref<Scene> m_RuntimeScene, m_EditorScene;
+	Shared<Scene> m_RuntimeScene, m_EditorScene;
 	std::filesystem::path m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
@@ -102,19 +102,19 @@ private:
 	ViewportPane m_MainViewport;
 	ViewportPane m_MiniViewport;
 
-	Ref<Shader> m_BrushShader;
-	Ref<Material> m_SphereBaseMaterial;
+	Shared<Shader> m_BrushShader;
+	Shared<Material> m_SphereBaseMaterial;
 
-	Ref<Material> m_MeshMaterial;
-	std::vector<Ref<MaterialInstance>> m_MetalSphereMaterialInstances;
-	std::vector<Ref<MaterialInstance>> m_DielectricSphereMaterialInstances;
+	Shared<Material> m_MeshMaterial;
+	std::vector<Shared<MaterialInstance>> m_MetalSphereMaterialInstances;
+	std::vector<Shared<MaterialInstance>> m_DielectricSphereMaterialInstances;
 
 	// Editor resources
-	std::map<std::string, Ref<Texture2D>> m_TexStore;
+	std::map<std::string, Shared<Texture2D>> m_TexStore;
 
-	Ref<AssetPanel> m_AssetPanel;
-	Ref<EntityPanel> m_EntityPanel;
-	Ref<ScriptPanel> m_ScriptPanel;
+	Shared<AssetPanel> m_AssetPanel;
+	Shared<EntityPanel> m_EntityPanel;
+	Shared<ScriptPanel> m_ScriptPanel;
 
 	int m_GizmoType = -1;
 

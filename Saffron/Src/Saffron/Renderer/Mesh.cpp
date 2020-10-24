@@ -149,8 +149,8 @@ Mesh::Mesh(std::string filename)
 
 	m_IsAnimated = scene->mAnimations != nullptr;
 	m_MeshShader = m_IsAnimated ? Renderer::GetShaderLibrary()->Get("SaffronPBR_Anim") : Renderer::GetShaderLibrary()->Get("SaffronPBR_Static");
-	m_BaseMaterial = Ref<Material>::Create(m_MeshShader);
-	// m_MaterialInstance = Ref<MaterialInstance>::Create(m_BaseMaterial);
+	m_BaseMaterial = Shared<Material>::Create(m_MeshShader);
+	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
 	m_InverseTransform = glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
 	Uint32 vertexCount = 0;
@@ -297,7 +297,7 @@ Mesh::Mesh(std::string filename)
 			auto *aiMaterial = scene->mMaterials[i];
 			auto aiMaterialName = aiMaterial->GetName();
 
-			auto mi = Ref<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
+			auto mi = Shared<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
 			m_Materials[i] = mi;
 
 			SE_MESH_LOG("  {0} (Index = {1})", aiMaterialName.data, i);

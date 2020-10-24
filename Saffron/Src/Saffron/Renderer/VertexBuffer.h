@@ -13,7 +13,7 @@ enum class ShaderDataType
 
 static Uint32 ShaderDataTypeSize(ShaderDataType type);
 
-class VertexBuffer : public RefCounted
+class VertexBuffer : public ReferenceCounted
 {
 public:
 	///////////////////////////////////////////////////////////////
@@ -83,8 +83,8 @@ public:
 	virtual void SetData(void *buffer, Uint32 size, Uint32 offset = 0) = 0;
 	virtual void SetData(const Buffer &buffer, Uint32 offset = 0) = 0;
 
-	static Ref<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
-	static Ref<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
+	static Shared<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
+	static Shared<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
 };
 
 

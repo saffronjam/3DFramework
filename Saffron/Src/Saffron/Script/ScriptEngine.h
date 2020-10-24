@@ -122,8 +122,8 @@ public:
 	static void LoadSaffronRuntimeAssembly(const std::string &path);
 	static void ReloadAssembly(const std::string &path);
 
-	static void SetSceneContext(const Ref<Scene> &scene);
-	static const Ref<Scene> &GetCurrentSceneContext();
+	static void SetSceneContext(const Shared<Scene> &scene);
+	static const Shared<Scene> &GetCurrentSceneContext();
 
 	static void CopyEntityScriptData(UUID dst, UUID src);
 

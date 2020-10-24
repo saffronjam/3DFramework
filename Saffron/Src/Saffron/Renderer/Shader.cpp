@@ -7,7 +7,7 @@
 namespace Se
 {
 
-std::vector<Ref<Shader>> Shader::m_sAllShaders;
+std::vector<Shared<Shader>> Shader::m_sAllShaders;
 
 void Shader::OnGuiRender()
 {
@@ -28,14 +28,14 @@ void Shader::OnGuiRender()
 	ImGui::End();
 }
 
-Ref<Shader> Shader::Create(const std::string &filepath)
+Shared<Shader> Shader::Create(const std::string &filepath)
 {
-	Ref<Shader> result = nullptr;
+	Shared<Shader> result = nullptr;
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath); break;
+	case RendererAPI::Type::OpenGL: result = Shared<OpenGLShader>::Create(filepath); break;
 	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
@@ -44,9 +44,9 @@ Ref<Shader> Shader::Create(const std::string &filepath)
 	return result;
 }
 
-Ref<Shader> Shader::CreateFromString(const std::string &source)
+Shared<Shader> Shader::CreateFromString(const std::string &source)
 {
-	Ref<Shader> result = nullptr;
+	Shared<Shader> result = nullptr;
 
 	switch ( RendererAPI::Current() )
 	{
@@ -60,7 +60,7 @@ Ref<Shader> Shader::CreateFromString(const std::string &source)
 	return result;
 }
 
-void ShaderLibrary::Add(const Ref<Shader> &shader)
+void ShaderLibrary::Add(const Shared<Shader> &shader)
 {
 	const auto &name = shader->GetName();
 	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
@@ -69,7 +69,7 @@ void ShaderLibrary::Add(const Ref<Shader> &shader)
 
 void ShaderLibrary::Load(const std::string &path)
 {
-	const auto shader = Ref<Shader>(Shader::Create(path));
+	const auto shader = Shared<Shader>(Shader::Create(path));
 	const auto &name = shader->GetName();
 	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
 	m_Shaders[name] = shader;
@@ -78,10 +78,10 @@ void ShaderLibrary::Load(const std::string &path)
 void ShaderLibrary::Load(const std::string &name, const std::string &path)
 {
 	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
-	m_Shaders[name] = Ref<Shader>(Shader::Create(path));
+	m_Shaders[name] = Shared<Shader>(Shader::Create(path));
 }
 
-const Ref<Shader> &ShaderLibrary::Get(const std::string &name) const
+const Shared<Shader> &ShaderLibrary::Get(const std::string &name) const
 {
 	SE_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end());
 	return m_Shaders.at(name);

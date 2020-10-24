@@ -9,7 +9,7 @@
 namespace Se
 {
 
-class Texture : public RefCounted
+class Texture : public ReferenceCounted
 {
 public:
 	enum class Format
@@ -49,8 +49,8 @@ public:
 class Texture2D : public Texture
 {
 public:
-	static Ref<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
-	static Ref<Texture2D> Create(const std::string &path, bool sRGB = false);
+	static Shared<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
+	static Shared<Texture2D> Create(const std::string &path, bool sRGB = false);
 
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
@@ -66,8 +66,8 @@ public:
 class TextureCube : public Texture
 {
 public:
-	static Ref<TextureCube> Create(Format format, Uint32 width, Uint32 height);
-	static Ref<TextureCube> Create(const std::string &path);
+	static Shared<TextureCube> Create(Format format, Uint32 width, Uint32 height);
+	static Shared<TextureCube> Create(const std::string &path);
 
 	virtual const std::string &GetPath() const = 0;
 };

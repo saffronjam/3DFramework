@@ -7,7 +7,7 @@
 namespace Se
 {
 
-class Event : public RefCounted
+class Event : public ReferenceCounted
 {
 	friend class EventDispather;
 public:

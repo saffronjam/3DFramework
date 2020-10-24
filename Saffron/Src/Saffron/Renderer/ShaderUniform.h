@@ -44,7 +44,7 @@ protected:
 /////////////////////////////////////////
 /// Shader Uniform Buffer Declaration ///
 /////////////////////////////////////////
-class ShaderUniformBufferDeclaration : public RefCounted
+class ShaderUniformBufferDeclaration : public ReferenceCounted
 {
 public:
 	using List = std::vector<ShaderUniformBufferDeclaration *>;

@@ -10,7 +10,7 @@
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public RefCounted
+class Window : public ReferenceCounted
 {
 public:
 	using EventCallback = std::function<void(const Event &)>;
@@ -58,7 +58,7 @@ public:
 	virtual bool IsVSync() const = 0;
 	virtual bool IsMinimized() const = 0;
 
-	static Ref<Window> Create(const Properties &properties = Properties());
+	static Shared<Window> Create(const Properties &properties = Properties());
 
 protected:
 	std::string m_Title;
@@ -66,14 +66,14 @@ protected:
 	Uint32 m_Width, m_Height;
 
 private:
-	std::vector<Ref<Event>> m_Events;
+	std::vector<Shared<Event>> m_Events;
 	std::optional<EventCallback> m_EventCallback;
 };
 
 template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
-	m_Events.emplace_back(Ref<T>::Create(std::forward<Params>(params)...));
+	m_Events.emplace_back(Shared<T>::Create(std::forward<Params>(params)...));
 	//SE_INFO("{0}", m_Events.back()->ToString());
 }
 

@@ -327,7 +327,7 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 	out << YAML::EndMap; // Entity
 }
 
-static void SerializeEnvironment(YAML::Emitter &out, const Ref<Scene> &scene)
+static void SerializeEnvironment(YAML::Emitter &out, const Shared<Scene> &scene)
 {
 	out << YAML::Key << "Environment";
 	out << YAML::Value;
@@ -348,7 +348,7 @@ static void SerializeEnvironment(YAML::Emitter &out, const Ref<Scene> &scene)
 /// Scene Serializer
 ///////////////////////////////////////////////////////////////////////////
 
-SceneSerializer::SceneSerializer(const Ref<Scene> &scene)
+SceneSerializer::SceneSerializer(const Shared<Scene> &scene)
 	: m_Scene(scene)
 {
 }
@@ -526,7 +526,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 				auto meshPath = meshComponent["AssetPath"].as<std::string>();
 				// TEMP (because script creates mesh component...)
 				if ( !deserializedEntity.HasComponent<MeshComponent>() )
-					deserializedEntity.AddComponent<MeshComponent>(Ref<Mesh>::Create(meshPath));
+					deserializedEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(meshPath));
 
 				SE_CORE_INFO("  Mesh Asset Path: {0}", meshPath);
 			}
@@ -535,7 +535,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( cameraComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<CameraComponent>();
-				component.Camera = Ref<SceneCamera>::Create();
+				component.Camera = Shared<SceneCamera>::Create();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 
 				SE_CORE_INFO("  Primary Camera: {0}", component.Primary);

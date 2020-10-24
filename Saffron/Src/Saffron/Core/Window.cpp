@@ -50,11 +50,11 @@ const glm::vec2 &Window::GetPosition() const
 	return m_Position;
 }
 
-Ref<Window> Window::Create(const Properties &properties)
+Shared<Window> Window::Create(const Properties &properties)
 {
 	// TODO: Use RendererAPI::Current()
 #ifdef SE_PLATFORM_WINDOWS
-	return Ref<WindowsWindow>::Create(properties);
+	return Shared<WindowsWindow>::Create(properties);
 #else
 	SE_CORE_ASSERT(false, "Unknown platform!");
 	return nullptr;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <tuple>
-
 #include "Saffron/Core/Math/SaffronMath.h"
 
 namespace Se

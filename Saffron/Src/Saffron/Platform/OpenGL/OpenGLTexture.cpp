@@ -29,7 +29,7 @@ static GLenum ConvertToOpenGLTextureFormat(Texture::Format format)
 OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wrap wrap)
 	: m_RendererID(0), m_Format(format), m_Wrap(wrap), m_Width(width), m_Height(height)
 {
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance]() mutable
 					 {
 						 glGenTextures(1, &instance->m_RendererID);
@@ -84,7 +84,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
 	m_Width = width;
 	m_Height = height;
 
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, sRGB]() mutable
 					 {
 						 // TODO: Consolidate properly
@@ -130,7 +130,7 @@ OpenGLTexture2D::~OpenGLTexture2D()
 
 void OpenGLTexture2D::Bind(Uint32 slot) const
 {
-	Ref<const OpenGLTexture2D> instance = this;
+	Shared<const OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, slot]() { glBindTextureUnit(slot, instance->m_RendererID); });
 }
 
@@ -147,7 +147,7 @@ void OpenGLTexture2D::Lock()
 void OpenGLTexture2D::Unlock()
 {
 	m_Locked = false;
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance]() { glTextureSubImage2D(
 		instance->m_RendererID,
 		0, 0, 0,
@@ -191,7 +191,7 @@ OpenGLTextureCube::OpenGLTextureCube(Format format, Uint32 width, Uint32 height)
 	: m_RendererID(0), m_Format(format), m_Width(width), m_Height(height)
 {
 	Uint32 levels = CalculateMipMapCount(width, height);
-	Ref<OpenGLTextureCube> instance = this;
+	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, levels]() mutable
 					 {
 						 glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &instance->m_RendererID);
@@ -266,7 +266,7 @@ OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
 		faceIndex++;
 	}
 
-	Ref<OpenGLTextureCube> instance = this;
+	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, faceWidth, faceHeight, faces]() mutable
 					 {
 						 glGenTextures(1, &instance->m_RendererID);
@@ -306,7 +306,7 @@ OpenGLTextureCube::~OpenGLTextureCube()
 
 void OpenGLTextureCube::Bind(Uint32 slot) const
 {
-	Ref<const OpenGLTextureCube> instance = this;
+	Shared<const OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, slot]() { glBindTextureUnit(slot, instance->m_RendererID); });
 }
 

@@ -20,42 +20,42 @@ struct SceneRendererData
 	struct SceneInfo
 	{
 		// Resources
-		Ref<MaterialInstance> SkyboxMaterial;
+		Shared<MaterialInstance> SkyboxMaterial;
 		Scene::Environment SceneEnvironment;
 		Scene::Light ActiveLight;
 	} SceneData;
 
-	Ref<Texture2D> BRDFLUT;
-	Ref<Shader> CompositeShader;
+	Shared<Texture2D> BRDFLUT;
+	Shared<Shader> CompositeShader;
 
 	struct RenderTarget
 	{
 		bool Enabled;
 		SceneRendererCameraData CameraData;
-		Ref<RenderPass> GeoPass;
-		Ref<RenderPass> CompositePass;
+		Shared<RenderPass> GeoPass;
+		Shared<RenderPass> CompositePass;
 	};
 	std::map<std::string, RenderTarget> RenderTargets;
 
 	struct DrawCommand
 	{
-		Ref<Mesh> Mesh;
-		Ref<MaterialInstance> Material;
+		Shared<Mesh> Mesh;
+		Shared<MaterialInstance> Material;
 		glm::mat4 Transform;
 	};
 	std::vector<DrawCommand> DrawList;
 	std::vector<DrawCommand> SelectedMeshDrawList;
 
 	// Grid
-	Ref<MaterialInstance> GridMaterial;
-	Ref<MaterialInstance> OutlineMaterial;
+	Shared<MaterialInstance> GridMaterial;
+	Shared<MaterialInstance> OutlineMaterial;
 
 	SceneRenderer::Options Options;
 
 };
 
 static SceneRendererData s_Data;
-static Ref<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
+static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
 
 ///////////////////////////////////////////////////////////////////////////
 /// Scene Renderer
@@ -152,27 +152,27 @@ void SceneRenderer::EndScene()
 	FlushDrawList();
 }
 
-void SceneRenderer::SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform,
-							   const Ref<MaterialInstance> &overrideMaterial)
+void SceneRenderer::SubmitMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform,
+							   const Shared<MaterialInstance> &overrideMaterial)
 {
 	// TODO: Culling, sorting, etc.
 	s_Data.DrawList.push_back({ mesh, overrideMaterial, transform });
 }
 
-void SceneRenderer::SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform)
+void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform)
 {
 	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
 }
 
-std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
+std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
 {
 	const Uint32 cubemapSize = 2048;
 	const Uint32 irradianceMapSize = 32;
 
-	Ref<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
+	Shared<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 	if ( !equirectangularConversionShader )
 		equirectangularConversionShader = Shader::Create("Assets/Shaders/EquirectangularToCubeMap.glsl");
-	Ref<Texture2D> envEquirect = Texture2D::Create(filepath);
+	Shared<Texture2D> envEquirect = Texture2D::Create(filepath);
 	SE_CORE_ASSERT(envEquirect->GetFormat() == Texture::Format::Float16, "Texture is not HDR!");
 
 	equirectangularConversionShader->Bind();
@@ -188,7 +188,7 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 	if ( !envFilteringShader )
 		envFilteringShader = Shader::Create("Assets/Shaders/EnvironmentMipFilter.glsl");
 
-	Ref<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
+	Shared<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 
 	Renderer::Submit([envUnfiltered, envFiltered]()
 					 {
@@ -214,7 +214,7 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 	if ( !envIrradianceShader )
 		envIrradianceShader = Shader::Create("Assets/Shaders/EnvironmentIrradiance.glsl");
 
-	Ref<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
+	Shared<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
 	envIrradianceShader->Bind();
 	envFiltered->Bind();
 	Renderer::Submit([irradianceMap]()
@@ -227,13 +227,13 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 	return { envFiltered, irradianceMap };
 }
 
-Ref<RenderPass> SceneRenderer::GetFinalRenderPass(const std::string &renderTargetIdentifier)
+Shared<RenderPass> SceneRenderer::GetFinalRenderPass(const std::string &renderTargetIdentifier)
 {
 	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
 	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass;
 }
 
-Ref<Texture2D> SceneRenderer::GetFinalColorBuffer(const std::string &renderTargetIdentifier)
+Shared<Texture2D> SceneRenderer::GetFinalColorBuffer(const std::string &renderTargetIdentifier)
 {
 	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
 	// return s_Data.CompositePass->GetSpecification().TargetFramebuffer;

@@ -49,16 +49,16 @@ struct TransformComponent
 
 struct MeshComponent
 {
-	Ref<Mesh> Mesh;
+	Shared<Mesh> Mesh;
 
 	MeshComponent() = default;
 	MeshComponent(const MeshComponent &other) = default;
-	explicit MeshComponent(const Ref<Se::Mesh> &mesh)
+	explicit MeshComponent(const Shared<Se::Mesh> &mesh)
 		: Mesh(mesh)
 	{
 	}
 
-	operator Ref<Se::Mesh>() const { return Mesh; }
+	operator Shared<Se::Mesh>() const { return Mesh; }
 };
 
 struct ScriptComponent
@@ -100,19 +100,19 @@ struct ScriptComponent
 
 struct CameraComponent
 {
-	Ref<SceneCamera> Camera;
+	Shared<SceneCamera> Camera;
 	bool Primary = true;
 
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator Ref<SceneCamera>() { return Camera; }
+	operator Shared<SceneCamera>() { return Camera; }
 };
 
 struct SpriteRendererComponent
 {
 	glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Ref<Texture2D> Texture;
+	Shared<Texture2D> Texture;
 	float TilingFactor = 1.0f;
 
 	SpriteRendererComponent() = default;

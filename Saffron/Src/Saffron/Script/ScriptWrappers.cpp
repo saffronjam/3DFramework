@@ -35,7 +35,7 @@ enum class ComponentID
 
 Entity GetEntityFromActiveScene(UUID entityID)
 {
-	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
 	const auto &entityMap = scene->GetEntityMap();
 	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
@@ -50,9 +50,9 @@ T &GetComponentWithCheck(Entity entity)
 	return entity.GetComponent<T>();
 }
 
-Ref<Scene> GetSceneWithCheck()
+Shared<Scene> GetSceneWithCheck()
 {
-	Ref<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
 	return scene;
 }
@@ -108,7 +108,7 @@ bool Saffron_Entity_HasComponent(Uint64 entityID, void *type)
 
 Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag)
 {
-	Ref<Scene> scene = GetSceneWithCheck();
+	Shared<Scene> scene = GetSceneWithCheck();
 	Entity entity = scene->FindEntityByTag(mono_string_to_utf8(tag));
 	return entity ? entity.GetComponent<IDComponent>().ID : 0;
 }
@@ -117,10 +117,10 @@ void *Saffron_MeshComponent_GetMesh(Uint64 entityID)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &meshComponent = entity.GetComponent<MeshComponent>();
-	return new Ref<Mesh>(meshComponent.Mesh);
+	return new Shared<Mesh>(meshComponent.Mesh);
 }
 
-void Saffron_MeshComponent_SetMesh(Uint64 entityID, Ref<Mesh> *inMesh)
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &meshComponent = entity.GetComponent<MeshComponent>();
@@ -229,51 +229,51 @@ void Saffron_CircleCollider2DComponent_SetRadius(Uint64 entityID, float radius)
 	component.Radius = radius;
 }
 
-Ref<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath)
+Shared<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath)
 {
 	auto *result = new Mesh(mono_string_to_utf8(filepath));
-	return new Ref<Mesh>(result);
+	return new Shared<Mesh>(result);
 }
 
-void Saffron_Mesh_Destructor(Ref<Mesh> *mesh)
+void Saffron_Mesh_Destructor(Shared<Mesh> *mesh)
 {
 	delete mesh;
 }
 
-Ref<Material> *Saffron_Mesh_GetMaterial(Ref<Mesh> *mesh)
+Shared<Material> *Saffron_Mesh_GetMaterial(Shared<Mesh> *mesh)
 {
-	return new Ref<Material>((*mesh)->GetMaterial());
+	return new Shared<Material>((*mesh)->GetMaterial());
 }
 
-Ref<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Ref<Mesh> *mesh, int index)
+Shared<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Shared<Mesh> *mesh, int index)
 {
 	const auto &materials = (*mesh)->GetMaterials();
 	SE_CORE_ASSERT(index < materials.size());
-	return new Ref<MaterialInstance>(materials[index]);
+	return new Shared<MaterialInstance>(materials[index]);
 }
 
-int Saffron_Mesh_GetMaterialCount(Ref<Mesh> *mesh)
+size_t Saffron_Mesh_GetMaterialCount(Shared<Mesh> *mesh)
 {
 	const auto &materials = (*mesh)->GetMaterials();
 	return materials.size();
 }
 
-Ref<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height)
+Shared<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height)
 {
 	const auto result = Texture2D::Create(Texture::Format::RGBA, width, height);
-	return new Ref<Texture2D>(result);
+	return new Shared<Texture2D>(result);
 }
 
-void Saffron_Texture2D_Destructor(Ref<Texture2D> *texture)
+void Saffron_Texture2D_Destructor(Shared<Texture2D> *texture)
 {
 	delete texture;
 }
 
-void Saffron_Texture2D_SetData(Ref<Texture2D> *texture, MonoArray *data, Int32 count)
+void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int32 count)
 {
 	SE_ASSERT(data);
 
-	Ref<Texture2D> &instance = *texture;
+	Shared<Texture2D> &instance = *texture;
 
 	instance->Lock();
 	Buffer buffer = instance->GetWriteableBuffer();
@@ -281,7 +281,7 @@ void Saffron_Texture2D_SetData(Ref<Texture2D> *texture, MonoArray *data, Int32 c
 	SE_CORE_ASSERT(dataSize <= buffer.Size());
 	// Convert RGBA32F color to RGBA8
 	auto *pixels = static_cast<Uint8 *>(buffer.Data());
-	for ( int i = 0; i < instance->GetWidth() * instance->GetHeight(); i++ )
+	for ( Uint32 i = 0; i < instance->GetWidth() * instance->GetHeight(); i++ )
 	{
 		glm::vec4 &value = mono_array_get(data, glm::vec4, i);
 		*pixels++ = static_cast<Uint32>(value.x * 255.0f);
@@ -292,76 +292,76 @@ void Saffron_Texture2D_SetData(Ref<Texture2D> *texture, MonoArray *data, Int32 c
 	instance->Unlock();
 }
 
-void Saffron_Material_Destructor(Ref<Material> *material)
+void Saffron_Material_Destructor(Shared<Material> *material)
 {
 	delete material;
 }
 
-void Saffron_Material_SetFloat(Ref<Material> *material, MonoString *uniform, float value)
+void Saffron_Material_SetFloat(Shared<Material> *material, MonoString *uniform, float value)
 {
 	SE_ASSERT(uniform);
-	Ref<Material> &instance = *static_cast<Ref<Material> *>(material);
+	Shared<Material> &instance = *static_cast<Shared<Material> *>(material);
 	instance->Set(mono_string_to_utf8(uniform), value);
 }
 
-void Saffron_Material_SetTexture(Ref<Material> *material, MonoString *uniform, Ref<Texture2D> *texture)
+void Saffron_Material_SetTexture(Shared<Material> *material, MonoString *uniform, Shared<Texture2D> *texture)
 {
 	SE_ASSERT(uniform && texture);
-	Ref<Material> &instance = *static_cast<Ref<Material> *>(material);
+	Shared<Material> &instance = *static_cast<Shared<Material> *>(material);
 	instance->Set(mono_string_to_utf8(uniform), *texture);
 }
 
-void Saffron_MaterialInstance_Destructor(Ref<MaterialInstance> *instance)
+void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance> *instance)
 {
 	delete instance;
 }
 
-void Saffron_MaterialInstance_SetFloat(Ref<MaterialInstance> *instance, MonoString *uniform, float value)
+void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoString *uniform, float value)
 {
 	SE_ASSERT(uniform);
 	(*instance)->Set(mono_string_to_utf8(uniform), value);
 }
 
-void Saffron_MaterialInstance_SetVector3(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value)
+void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
-void Saffron_MaterialInstance_SetVector4(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value)
+void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
-void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *instance, MonoString *uniform, Ref<Texture2D> *texture)
+void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance> *instance, MonoString *uniform, Shared<Texture2D> *texture)
 {
 	SE_ASSERT(uniform && texture);
 	(*instance)->Set(mono_string_to_utf8(uniform), *texture);
 }
 
-Ref<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height)
+Shared<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height)
 {
 	// TODO: Implement properly with MeshFactory class!
-	return new Ref<Mesh>(new Mesh("Assets/models/Plane1m.obj"));
+	return new Shared<Mesh>(new Mesh("Assets/models/Plane1m.obj"));
 }
 
-Ref<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height)
+Shared<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height)
 {
-	return new Ref<SceneCamera>(new SceneCamera(width, height));
+	return new Shared<SceneCamera>(new SceneCamera(width, height));
 }
 
-void Saffron_Camera_Destructor(Ref<SceneCamera> *camera)
+void Saffron_Camera_Destructor(Shared<SceneCamera> *camera)
 {
 	delete camera;
 }
 
-Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *camera)
+Uint32 Saffron_Camera_GetProjectionMode(Shared<SceneCamera> *camera)
 {
 	return static_cast<Uint32>((*camera)->GetProjectionMode());
 }
 
-void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *camera, Uint32 mode)
+void Saffron_Camera_SetProjectionMode(Shared<SceneCamera> *camera, Uint32 mode)
 {
 	(*camera)->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(mode));
 }
@@ -370,10 +370,10 @@ void *Saffron_CameraComponent_GetCamera(Uint64 entityID)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &cameraComponent = entity.GetComponent<CameraComponent>();
-	return new Ref<SceneCamera>(cameraComponent.Camera);
+	return new Shared<SceneCamera>(cameraComponent.Camera);
 }
 
-void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *camera)
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, Shared<SceneCamera> *camera)
 {
 	SE_ASSERT(camera);
 	Entity entity = GetEntityFromActiveScene(entityID);

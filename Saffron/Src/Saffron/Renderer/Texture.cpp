@@ -28,42 +28,42 @@ Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
 	return levels;
 }
 
-Ref<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wrap wrap)
+Shared<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wrap wrap)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL:	return Ref<OpenGLTexture2D>::Create(format, width, height, wrap);
+	case RendererAPI::Type::OpenGL:	return Shared<OpenGLTexture2D>::Create(format, width, height, wrap);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 }
 
-Ref<Texture2D> Texture2D::Create(const std::string &path, bool sRGB)
+Shared<Texture2D> Texture2D::Create(const std::string &path, bool sRGB)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL:	return Ref<OpenGLTexture2D>::Create(path, sRGB);
+	case RendererAPI::Type::OpenGL:	return Shared<OpenGLTexture2D>::Create(path, sRGB);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 }
 
-Ref<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
+Shared<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: return Ref<OpenGLTextureCube>::Create(format, width, height);
+	case RendererAPI::Type::OpenGL: return Shared<OpenGLTextureCube>::Create(format, width, height);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 }
 
-Ref<TextureCube> TextureCube::Create(const std::string &path)
+Shared<TextureCube> TextureCube::Create(const std::string &path)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: return Ref<OpenGLTextureCube>::Create(path);
+	case RendererAPI::Type::OpenGL: return Shared<OpenGLTextureCube>::Create(path);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 }

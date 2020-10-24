@@ -138,9 +138,9 @@ OpenGLShader::OpenGLShader(const std::string &filepath)
 	OpenGLShader::Reload();
 }
 
-Ref<OpenGLShader> OpenGLShader::CreateFromString(const std::string &source)
+Shared<OpenGLShader> OpenGLShader::CreateFromString(const std::string &source)
 {
-	Ref<OpenGLShader> shader = Ref<OpenGLShader>::Create();
+	Shared<OpenGLShader> shader = Shared<OpenGLShader>::Create();
 	shader->Load(source);
 	return shader;
 }
@@ -712,7 +712,7 @@ GLenum OpenGLShader::ShaderTypeFromString(const std::string &type)
 	return GL_NONE;
 }
 
-void OpenGLShader::ResolveAndSetUniforms(const Ref<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer)
+void OpenGLShader::ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer)
 {
 	const auto &uniforms = decl->GetUniformDeclarations();
 	for ( auto *uniform : uniforms )

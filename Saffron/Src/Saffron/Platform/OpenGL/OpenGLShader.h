@@ -12,7 +12,7 @@ class OpenGLShader : public Shader
 public:
 	OpenGLShader() = default;
 	OpenGLShader(const std::string &filepath);
-	static Ref<OpenGLShader> CreateFromString(const std::string &source);
+	static Shared<OpenGLShader> CreateFromString(const std::string &source);
 
 	void Bind() override;
 
@@ -50,7 +50,7 @@ private:
 	void CompileAndUploadShader();
 	static GLenum ShaderTypeFromString(const std::string &type);
 
-	void ResolveAndSetUniforms(const Ref<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer);
+	void ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer);
 	void ResolveAndSetUniform(OpenGLShaderUniformDeclaration *uniform, const Buffer &buffer);
 	void ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration *uniform, const Buffer &buffer);
 	void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration &field, const Uint8 *data, Int32 offset);
@@ -96,8 +96,8 @@ private:
 
 	ShaderUniformBufferDeclaration::List m_VSRendererUniformBuffers;
 	ShaderUniformBufferDeclaration::List m_PSRendererUniformBuffers;
-	Ref<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
-	Ref<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
+	Shared<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
+	Shared<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
 	ShaderResourceDeclaration::List m_Resources;
 	ShaderStruct::List m_Structs;
 

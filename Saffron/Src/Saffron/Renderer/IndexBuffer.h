@@ -6,7 +6,7 @@
 
 namespace Se {
 
-class IndexBuffer : public RefCounted
+class IndexBuffer : public ReferenceCounted
 {
 public:
 	virtual ~IndexBuffer() = default;
@@ -20,9 +20,9 @@ public:
 	virtual Uint32 GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	static Ref<IndexBuffer> Create(Uint32 size);
-	static Ref<IndexBuffer> Create(void *data, Uint32 size = 0);
-	static Ref<IndexBuffer> Create(const Buffer &buffer);
+	static Shared<IndexBuffer> Create(Uint32 size);
+	static Shared<IndexBuffer> Create(void *data, Uint32 size = 0);
+	static Shared<IndexBuffer> Create(const Buffer &buffer);
 };
 
 }

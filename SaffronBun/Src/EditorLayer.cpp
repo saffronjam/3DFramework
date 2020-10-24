@@ -45,9 +45,9 @@ void EditorLayer::OnAttach()
 	m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
 	m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
 
-	m_AssetPanel = Ref<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
-	m_EntityPanel = Ref<EntityPanel>::Create(m_EditorScene);
-	m_ScriptPanel = Ref<ScriptPanel>::Create("../ExampleApp/Src");
+	m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
+	m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
+	m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
 
 	m_EntityPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
 	m_EntityPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
@@ -119,7 +119,7 @@ void EditorLayer::OnScenePlay()
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 
-	m_RuntimeScene = Ref<Scene>::Create("Runtime Scene");
+	m_RuntimeScene = Shared<Scene>::Create("Runtime Scene");
 	m_EditorScene->CopyTo(m_RuntimeScene);
 
 	m_RuntimeScene->OnRuntimeStart();
@@ -239,7 +239,7 @@ void EditorLayer::OnUpdate()
 	{
 		if ( m_SelectedEntity.HasComponent<CameraComponent>() && m_SelectedEntity.HasComponent<TransformComponent>() )
 		{
-			Ref<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
+			Shared<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
 
 			const auto viewportSize = m_MiniViewport.GetViewportSize();
 			camera->SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
@@ -264,7 +264,7 @@ void EditorLayer::NewScenePrompt()
 	if ( !filepath.empty() )
 	{
 		std::string sceneName = filepath.stem().string();
-		Ref<Scene> newScene = Ref<Scene>::Create(sceneName);
+		Shared<Scene> newScene = Shared<Scene>::Create(sceneName);
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
@@ -315,7 +315,7 @@ void EditorLayer::LoadNewScene(const std::string &filepath)
 {
 	if ( filepath != m_SceneFilePath.string() )
 	{
-		const Ref<Scene> newScene = Ref<Scene>::Create("Editor scene");
+		const Shared<Scene> newScene = Shared<Scene>::Create("Editor scene");
 		SceneSerializer serializer(newScene);
 		if ( !serializer.Deserialize(filepath) )
 		{
@@ -402,7 +402,7 @@ void EditorLayer::OnGuiRender()
 	ImGui::Begin("Toolbar");
 
 
-	Ref<Texture> ButtonTexture = m_SceneState == SceneState::Edit ? m_TexStore["PlayButton"] : m_TexStore["StopButton"];
+	Shared<Texture> ButtonTexture = m_SceneState == SceneState::Edit ? m_TexStore["PlayButton"] : m_TexStore["StopButton"];
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(ButtonTexture->GetRendererID()), ImVec2(25, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ClearWhite) )
 	{
 		m_SceneState == SceneState::Edit ? OnScenePlay() : OnSceneStop();

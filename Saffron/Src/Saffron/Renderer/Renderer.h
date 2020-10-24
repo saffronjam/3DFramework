@@ -29,21 +29,21 @@ public:
 	// For OpenGL
 	static void ClearMagenta();
 
-	static Ref<ShaderLibrary> GetShaderLibrary();
+	static Shared<ShaderLibrary> GetShaderLibrary();
 
 	template<typename FuncT>
 	static void Submit(FuncT &&func);
 	static void WaitAndRender();
 
 	// ~Actual~ Renderer here... TODO: remove confusion later
-	static void BeginRenderPass(Ref<RenderPass> renderPass, bool clear = true);
+	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);
 	static void EndRenderPass();
 
-	static void SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
-	static void SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial = nullptr);
+	static void SubmitQuad(Shared<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
+	static void SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
 
 	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
-	static void DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	static void DrawAABB(Shared<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();

@@ -77,14 +77,14 @@ static void DrawComponent(const std::string &name, Entity entity, UIFunction uiF
 /// Entity Panel
 ///////////////////////////////////////////////////////////////////////////
 
-EntityPanel::EntityPanel(const Ref<Scene> &context)
+EntityPanel::EntityPanel(const Shared<Scene> &context)
 	:
 	m_Context(context)
 {
 	m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
 }
 
-void EntityPanel::OnGuiRender(const Ref<ScriptPanel> &scriptPanel)
+void EntityPanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 {
 	OnGuiRenderSceneHierarchy(scriptPanel);
 	OnGuiRenderMaterial();
@@ -92,7 +92,7 @@ void EntityPanel::OnGuiRender(const Ref<ScriptPanel> &scriptPanel)
 }
 
 
-void EntityPanel::SetContext(const Ref<Scene> &context)
+void EntityPanel::SetContext(const Shared<Scene> &context)
 {
 	m_Context = context;
 	if ( m_SelectionContext )
@@ -111,7 +111,7 @@ void EntityPanel::SetSelected(Entity entity)
 	m_SelectionContext = entity;
 }
 
-void EntityPanel::OnGuiRenderSceneHierarchy(const Ref<ScriptPanel> &scriptPanel)
+void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPanel)
 {
 	ImGui::Begin("Scene Hierarchy");
 	if ( m_Context )
@@ -190,7 +190,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Ref<ScriptPanel> &scriptPanel)
 					if ( meshComponent )
 					{
 						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
-						newEntity.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
+						newEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 						meshComponent = false;
 					}
 					if ( scriptComponent )
@@ -261,7 +261,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Ref<ScriptPanel> &scriptPanel)
 					if ( ImGui::Button("Mesh") )
 					{
 						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
-						m_SelectionContext.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
+						m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 						ImGui::CloseCurrentPopup();
 					}
 				}
@@ -322,7 +322,7 @@ void EntityPanel::OnGuiRenderMaterial()
 		Entity selectedEntity = m_SelectionContext;
 		if ( selectedEntity.HasComponent<MeshComponent>() )
 		{
-			Ref<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
+			Shared<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
 			if ( mesh )
 			{
 				auto materials = mesh->GetMaterials();
@@ -358,7 +358,7 @@ void EntityPanel::OnGuiRenderMaterial()
 
 							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
-							Ref<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
+							Shared<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -403,7 +403,7 @@ void EntityPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
-							Ref<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
+							Shared<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
 							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -439,7 +439,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
-							Ref<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
+							Shared<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
 							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -477,7 +477,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
-							Ref<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
+							Shared<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
 							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -526,7 +526,7 @@ void EntityPanel::OnGuiRenderMeshDebug()
 	}
 	else if ( m_SelectionContext.HasComponent<MeshComponent>() )
 	{
-		Ref<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
+		Shared<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
 		ImGui::TextWrapped("File: %s", mesh->GetFilepath().c_str());
 
 		if ( mesh->m_IsAnimated )
@@ -594,7 +594,7 @@ void EntityPanel::DrawEntityNode(Entity entity)
 	}
 }
 
-void EntityPanel::DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const
+void EntityPanel::DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const
 {
 	std::ostringstream oss;
 	oss << "Mesh##" << entityUUID;
@@ -608,7 +608,7 @@ void EntityPanel::DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const
 	}
 }
 
-void EntityPanel::MeshNodeHierarchy(const Ref<Mesh> &mesh,
+void EntityPanel::MeshNodeHierarchy(const Shared<Mesh> &mesh,
 									aiNode *node,
 									const glm::mat4 &parentTransform,
 									Uint32 level) const
@@ -736,7 +736,7 @@ void EntityPanel::DrawComponents(Entity entity)
 										 {
 											 SE_CORE_ASSERT(payload->DataSize == sizeof(ScriptPanel::Drop));
 											 const auto drop = *static_cast<ScriptPanel::Drop *>(payload->Data);
-											 mc.Mesh = Ref<Mesh>::Create(drop.Stat->Path.string());
+											 mc.Mesh = Shared<Mesh>::Create(drop.Stat->Path.string());
 											 delete drop.Stat;
 										 }
 										 ImGui::EndDragDropTarget();
@@ -747,7 +747,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									 {
 										 const fs::path filepath = FileIOManager::OpenFile();
 										 if ( !filepath.empty() )
-											 mc.Mesh = Ref<Mesh>::Create(filepath.string());
+											 mc.Mesh = Shared<Mesh>::Create(filepath.string());
 									 }
 
 									 Gui::EndPropertyGrid();

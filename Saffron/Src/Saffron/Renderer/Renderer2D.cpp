@@ -40,28 +40,28 @@ struct Renderer2DData
 	static const Uint32 MaxLineVertices = MaxLines * 2;
 	static const Uint32 MaxLineIndices = MaxLines * 6;
 
-	Ref<Pipeline> QuadPipeline;
-	Ref<VertexBuffer> QuadVertexBuffer;
-	Ref<IndexBuffer> QuadIndexBuffer;
+	Shared<Pipeline> QuadPipeline;
+	Shared<VertexBuffer> QuadVertexBuffer;
+	Shared<IndexBuffer> QuadIndexBuffer;
 
-	Ref<Shader> TextureShader;
-	Ref<Texture2D> WhiteTexture;
+	Shared<Shader> TextureShader;
+	Shared<Texture2D> WhiteTexture;
 
 	Uint32 QuadIndexCount = 0;
 	QuadVertex *QuadVertexBufferBase = nullptr;
 	QuadVertex *QuadVertexBufferPtr = nullptr;
 
-	std::array<Ref<Texture2D>, MaxTextureSlots> TextureSlots;
+	std::array<Shared<Texture2D>, MaxTextureSlots> TextureSlots;
 	Uint32 TextureSlotIndex = 1; // 0 = white texture
 
 	glm::vec4 QuadVertexPositions[4]{};
 
 	// Lines
-	Ref<Pipeline> LinePipeline;
-	Ref<VertexBuffer> LineVertexBuffer;
-	Ref<IndexBuffer> LineIndexBuffer;
+	Shared<Pipeline> LinePipeline;
+	Shared<VertexBuffer> LineVertexBuffer;
+	Shared<IndexBuffer> LineIndexBuffer;
 
-	Ref<Shader> LineShader;
+	Shared<Shader> LineShader;
 
 	Uint32 LineIndexCount = 0;
 	LineVertex *LineVertexBufferBase = nullptr;
@@ -235,7 +235,7 @@ void Renderer2D::DrawQuad(const glm::mat4 &transform, const glm::vec4 &color)
 	s_Data.Stats.QuadCount++;
 }
 
-void Renderer2D::DrawQuad(const glm::mat4 &transform, const Ref<Texture2D> &texture, float tilingFactor,
+void Renderer2D::DrawQuad(const glm::mat4 &transform, const Shared<Texture2D> &texture, float tilingFactor,
 						  const glm::vec4 &tintColor)
 {
 	constexpr size_t quadVertexCount = 4;
@@ -330,14 +330,14 @@ void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, cons
 	s_Data.Stats.QuadCount++;
 }
 
-void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Ref<Texture2D> &texture,
+void Renderer2D::DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Shared<Texture2D> &texture,
 						  float tilingFactor, const glm::vec4 &tintColor)
 {
 	DrawQuad({ position.x, position.y, 0.0f }, size, texture, tilingFactor, tintColor);
 
 }
 
-void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Ref<Texture2D> &texture,
+void Renderer2D::DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Shared<Texture2D> &texture,
 						  float tilingFactor, const glm::vec4 &tintColor)
 {
 	if ( s_Data.QuadIndexCount >= Renderer2DData::MaxIndices )
@@ -452,14 +452,14 @@ void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &siz
 }
 
 void Renderer2D::DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation,
-								 const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
+								 const Shared<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 {
 	DrawRotatedQuad({ position.x, position.y, 0.0f }, size, rotation, texture, tilingFactor, tintColor);
 
 }
 
 void Renderer2D::DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation,
-								 const Ref<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
+								 const Shared<Texture2D> &texture, float tilingFactor, const glm::vec4 &tintColor)
 {
 	if ( s_Data.QuadIndexCount >= Renderer2DData::MaxIndices )
 		FlushAndReset();

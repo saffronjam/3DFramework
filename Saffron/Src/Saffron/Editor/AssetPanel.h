@@ -4,7 +4,7 @@
 
 namespace  Se
 {
-class AssetPanel : public RefCounted
+class AssetPanel : public ReferenceCounted
 {
 public:
 	struct AssetStat

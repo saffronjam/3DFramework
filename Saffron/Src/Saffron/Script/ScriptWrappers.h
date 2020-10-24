@@ -39,72 +39,72 @@ Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag);
 /// Texture2D
 ///////////////////////////////////////////////////////////////
 
-Ref<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
-void Saffron_Texture2D_Destructor(Ref<Texture2D> *texture);
-void Saffron_Texture2D_SetData(Ref<Texture2D> *texture, MonoArray *data, Int32 count);
+Shared<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
+void Saffron_Texture2D_Destructor(Shared<Texture2D> *texture);
+void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int32 count);
 
 
 ///////////////////////////////////////////////////////////////
 /// Material
 ///////////////////////////////////////////////////////////////
 
-void Saffron_Material_Destructor(Ref<Material> *material);
-void Saffron_Material_SetFloat(Ref<Material> *material, MonoString *uniform, float value);
-void Saffron_Material_SetTexture(Ref<Material> *material, MonoString *uniform, Ref<Texture2D> *texture);
+void Saffron_Material_Destructor(Shared<Material> *material);
+void Saffron_Material_SetFloat(Shared<Material> *material, MonoString *uniform, float value);
+void Saffron_Material_SetTexture(Shared<Material> *material, MonoString *uniform, Shared<Texture2D> *texture);
 
 
 ///////////////////////////////////////////////////////////////
 /// Material Instance
 ///////////////////////////////////////////////////////////////
 
-void Saffron_MaterialInstance_Destructor(Ref<MaterialInstance> *instance);
-void Saffron_MaterialInstance_SetFloat(Ref<MaterialInstance> *instance, MonoString *uniform, float value);
-void Saffron_MaterialInstance_SetVector3(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value);
-void Saffron_MaterialInstance_SetVector4(Ref<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value);
-void Saffron_MaterialInstance_SetTexture(Ref<MaterialInstance> *instance, MonoString *uniform, Ref<Texture2D> *texture);
+void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance> *instance);
+void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoString *uniform, float value);
+void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value);
+void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value);
+void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance> *instance, MonoString *uniform, Shared<Texture2D> *texture);
 
 
 ///////////////////////////////////////////////////////////////
 /// Mesh
 ///////////////////////////////////////////////////////////////
 
-Ref<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath);
-void Saffron_Mesh_Destructor(Ref<Mesh> *mesh);
-Ref<Material> *Saffron_Mesh_GetMaterial(Ref<Mesh> *mesh);
-Ref<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Ref<Mesh> *mesh, int index);
-int Saffron_Mesh_GetMaterialCount(Ref<Mesh> *mesh);
+Shared<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath);
+void Saffron_Mesh_Destructor(Shared<Mesh> *mesh);
+Shared<Material> *Saffron_Mesh_GetMaterial(Shared<Mesh> *mesh);
+Shared<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Shared<Mesh> *mesh, int index);
+size_t Saffron_Mesh_GetMaterialCount(Shared<Mesh> *mesh);
 
 
 ///////////////////////////////////////////////////////////////
 /// Mesh Factory
 ///////////////////////////////////////////////////////////////
 
-Ref<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height);
+Shared<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height);
 
 
 ///////////////////////////////////////////////////////////////
 /// Scene Camera
 ///////////////////////////////////////////////////////////////
 
-Ref<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
-void Saffron_Camera_Destructor(Ref<SceneCamera> *camera);
+Shared<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
+void Saffron_Camera_Destructor(Shared<SceneCamera> *camera);
 
-Uint32 Saffron_Camera_GetProjectionMode(Ref<SceneCamera> *camera);
-void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *camera, Uint32 mode);
+Uint32 Saffron_Camera_GetProjectionMode(Shared<SceneCamera> *camera);
+void Saffron_Camera_SetProjectionMode(Shared<SceneCamera> *camera, Uint32 mode);
 
-//void Saffron_SceneCamera_SetPerspectiveVerticalFOV(Ref<SceneCamera> *_this, float verticalFov);
-//float Saffron_SceneCamera_GetPerspectiveVerticalFOV(Ref<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetPerspectiveNearClip(Ref<SceneCamera> *_this, float nearClip);
-//float Saffron_SceneCamera_GetPerspectiveNearClip(Ref<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetPerspectiveFarClip(Ref<SceneCamera> *_this, float farClip);
-//float Saffron_SceneCamera_GetPerspectiveFarClip(Ref<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveVerticalFOV(Shared<SceneCamera> *_this, float verticalFov);
+//float Saffron_SceneCamera_GetPerspectiveVerticalFOV(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveNearClip(Shared<SceneCamera> *_this, float nearClip);
+//float Saffron_SceneCamera_GetPerspectiveNearClip(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveFarClip(Shared<SceneCamera> *_this, float farClip);
+//float Saffron_SceneCamera_GetPerspectiveFarClip(Shared<SceneCamera> *_this);
 //
-//void Saffron_SceneCamera_SetOrthographicSize(Ref<SceneCamera> *_this, float size);
-//float Saffron_SceneCamera_GetOrthographicSize(Ref<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetOrthographicNearClip(Ref<SceneCamera> *_this, float nearClip);
-//float Saffron_SceneCamera_GetOrthographicNearClip(Ref<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetOrthographicFarClip(Ref<SceneCamera> *_this, float farClip);
-//float Saffron_SceneCamera_GetOrthographicFarClip(Ref<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicSize(Shared<SceneCamera> *_this, float size);
+//float Saffron_SceneCamera_GetOrthographicSize(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicNearClip(Shared<SceneCamera> *_this, float nearClip);
+//float Saffron_SceneCamera_GetOrthographicNearClip(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicFarClip(Shared<SceneCamera> *_this, float farClip);
+//float Saffron_SceneCamera_GetOrthographicFarClip(Shared<SceneCamera> *_this);
 
 
 ///////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ void Saffron_Camera_SetProjectionMode(Ref<SceneCamera> *camera, Uint32 mode);
 ///////////////////////////////////////////////////////////////
 
 void *Saffron_CameraComponent_GetCamera(Uint64 entityID);
-void Saffron_CameraComponent_SetCamera(Uint64 entityID, Ref<SceneCamera> *inCamera);
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, Shared<SceneCamera> *inCamera);
 
 ///////////////////////////////////////////////////////////////
 /// Script Component
@@ -134,7 +134,7 @@ void Saffron_ScriptComponent_SetModuleName(Uint64 entityID, MonoString *moduleNa
 ///////////////////////////////////////////////////////////////
 
 void *Saffron_MeshComponent_GetMesh(Uint64 entityID);
-void Saffron_MeshComponent_SetMesh(Uint64 entityID, Ref<Mesh> *inMesh);
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh);
 
 
 ///////////////////////////////////////////////////////////////

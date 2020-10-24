@@ -17,13 +17,13 @@ namespace Se
 
 struct RendererData
 {
-	Ref<RenderPass> m_ActiveRenderPass;
+	Shared<RenderPass> m_ActiveRenderPass;
 	RenderCommandQueue m_CommandQueue;
-	Ref<ShaderLibrary> m_ShaderLibrary;
+	Shared<ShaderLibrary> m_ShaderLibrary;
 
-	Ref<VertexBuffer> m_FullscreenQuadVertexBuffer;
-	Ref<IndexBuffer> m_FullscreenQuadIndexBuffer;
-	Ref<Pipeline> m_FullscreenQuadPipeline;
+	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
+	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
+	Shared<Pipeline> m_FullscreenQuadPipeline;
 };
 
 
@@ -32,7 +32,7 @@ RendererData Renderer::s_Data;
 
 void Renderer::Init()
 {
-	s_Data.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
+	s_Data.m_ShaderLibrary = Shared<ShaderLibrary>::Create();
 	Submit([]() { RendererAPI::Init(); });
 
 	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Static.glsl");
@@ -148,7 +148,7 @@ void Renderer::ClearMagenta()
 	Clear(1, 0, 1);
 }
 
-Ref<ShaderLibrary> Renderer::GetShaderLibrary()
+Shared<ShaderLibrary> Renderer::GetShaderLibrary()
 {
 	return s_Data.m_ShaderLibrary;
 }
@@ -158,7 +158,7 @@ void Renderer::WaitAndRender()
 	s_Data.m_CommandQueue.Execute();
 }
 
-void Renderer::BeginRenderPass(Ref<RenderPass> renderPass, bool clear)
+void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 {
 	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
 
@@ -180,7 +180,7 @@ void Renderer::EndRenderPass()
 	s_Data.m_ActiveRenderPass = nullptr;
 }
 
-void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform)
+void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4 &transform)
 {
 	bool depthTest = true;
 	if ( material )
@@ -198,7 +198,7 @@ void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &trans
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial)
+void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -236,7 +236,7 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 	}
 }
 
-void Renderer::DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
+void Renderer::DrawAABB(Shared<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
 {
 	for ( Submesh &submesh : mesh->m_Submeshes )
 	{

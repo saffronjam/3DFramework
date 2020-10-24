@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class ScriptPanel : public RefCounted
+class ScriptPanel : public ReferenceCounted
 {
 public:
 	struct ScriptStat

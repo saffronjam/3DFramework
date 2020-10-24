@@ -16,14 +16,14 @@ namespace Se
 class Entity;
 using EntityMap = std::unordered_map<UUID, Entity>;
 
-class Scene : public RefCounted
+class Scene : public ReferenceCounted
 {
 public:
 	struct Environment
 	{
 		std::string FilePath;
-		Ref<TextureCube> RadianceMap;
-		Ref<TextureCube> IrradianceMap;
+		Shared<TextureCube> RadianceMap;
+		Shared<TextureCube> IrradianceMap;
 
 		static Environment Load(const std::string &filepath);
 	};
@@ -38,8 +38,8 @@ public:
 
 	struct Skybox
 	{
-		Ref<TextureCube> Texture;
-		Ref<MaterialInstance> Material;
+		Shared<TextureCube> Texture;
+		Shared<MaterialInstance> Material;
 	};
 
 public:
@@ -66,7 +66,7 @@ public:
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
 
-	void CopyTo(Ref<Scene> &target);
+	void CopyTo(Shared<Scene> &target);
 
 	entt::entity GetEntity() const { return m_SceneEntity; }
 
@@ -78,7 +78,7 @@ public:
 	Entity GetMainCameraEntity();
 	float &GetSkyboxLod() { return m_SkyboxLod; }
 	UUID GetUUID() const { return m_SceneID; }
-	static Ref<Scene> GetScene(UUID uuid);
+	static Shared<Scene> GetScene(UUID uuid);
 	Skybox GetSkybox() const { return m_Skybox; }
 
 	void SetName(std::string name);
@@ -86,7 +86,7 @@ public:
 	void SetViewportSize(Uint32 width, Uint32 height);
 	void SetEnvironment(const Environment &environment);
 	const Environment &GetEnvironment() const { return m_Environment; }
-	void SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture);
+	void SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture);
 
 	// Editor-specific
 	void SetSelectedEntity(Entity entity);

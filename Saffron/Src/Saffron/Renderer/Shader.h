@@ -11,7 +11,7 @@
 
 namespace Se
 {
-class Shader : public RefCounted
+class Shader : public ReferenceCounted
 {
 public:
 	struct Uniform
@@ -150,23 +150,23 @@ public:
 
 	virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
 
-	static Ref<Shader> Create(const std::string &filepath);
-	static Ref<Shader> CreateFromString(const std::string &source);
+	static Shared<Shader> Create(const std::string &filepath);
+	static Shared<Shader> CreateFromString(const std::string &source);
 
 	// TODO: Create Asset manager and remove this
-	static std::vector<Ref<Shader>> m_sAllShaders;
+	static std::vector<Shared<Shader>> m_sAllShaders;
 };
 
-class ShaderLibrary : public RefCounted
+class ShaderLibrary : public ReferenceCounted
 {
 public:
-	void Add(const Ref<Shader> &shader);
+	void Add(const Shared<Shader> &shader);
 	void Load(const std::string &path);
 	void Load(const std::string &name, const std::string &path);
 
-	const Ref<Shader> &Get(const std::string &name) const;
+	const Shared<Shader> &Get(const std::string &name) const;
 private:
-	std::unordered_map<std::string, Ref<Shader>> m_Shaders;
+	std::unordered_map<std::string, Shared<Shader>> m_Shaders;
 };
 
 }

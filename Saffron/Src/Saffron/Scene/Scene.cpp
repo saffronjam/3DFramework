@@ -144,7 +144,7 @@ void Scene::OnRenderRuntime(Time ts)
 		return;
 	}
 
-	Ref<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
+	Shared<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
 	camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
@@ -298,6 +298,9 @@ void Scene::OnRuntimeStart()
 
 void Scene::OnRuntimeStop()
 {
+	if ( m_EntityRegistry.has<PhysicsWorld2DComponent>(m_SceneEntity) )
+		m_EntityRegistry.get<PhysicsWorld2DComponent>(m_SceneEntity).World.OnStop();
+
 	m_IsPlaying = false;
 }
 
@@ -366,7 +369,7 @@ Entity Scene::FindEntityByTag(const std::string &tag)
 	return Entity::Null();
 }
 
-void Scene::CopyTo(Ref<Scene> &target)
+void Scene::CopyTo(Shared<Scene> &target)
 {
 	// Environment
 	target->m_Light = m_Light;
@@ -421,7 +424,7 @@ Entity Scene::GetMainCameraEntity()
 	return Entity::Null();
 }
 
-Ref<Scene> Scene::GetScene(UUID uuid)
+Shared<Scene> Scene::GetScene(UUID uuid)
 {
 	if ( s_ActiveScenes.find(uuid) != s_ActiveScenes.end() )
 		return s_ActiveScenes.at(uuid);
@@ -451,7 +454,7 @@ void Scene::SetEnvironment(const Environment &environment)
 	SetSkyboxTexture(environment.RadianceMap);
 }
 
-void Scene::SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture)
+void Scene::SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture)
 {
 	m_Skybox.Texture = skyboxTexture;
 	m_Skybox.Material->Set("u_Texture", skyboxTexture);

@@ -37,14 +37,14 @@ public:
 	static void BeginScene(const Scene *scene);
 	static void EndScene();
 
-	static void SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<MaterialInstance>
+	static void SubmitMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f), const Shared<MaterialInstance>
 						   &overrideMaterial = nullptr);
-	static void SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f));
+	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f));
 
-	static std::pair<Ref<TextureCube>, Ref<TextureCube>> CreateEnvironmentMap(const std::string &filepath);
+	static std::pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const std::string &filepath);
 
-	static Ref<RenderPass> GetFinalRenderPass(const std::string &renderTargetIdentifier);
-	static Ref<Texture2D> GetFinalColorBuffer(const std::string &renderTargetIdentifier);
+	static Shared<RenderPass> GetFinalRenderPass(const std::string &renderTargetIdentifier);
+	static Shared<Texture2D> GetFinalColorBuffer(const std::string &renderTargetIdentifier);
 	// TODO: Temp
 	static Uint32 GetFinalColorBufferRendererID(const std::string &renderTargetIdentifier);
 	static Options &GetOptions();

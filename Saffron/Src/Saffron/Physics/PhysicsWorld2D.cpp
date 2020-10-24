@@ -91,6 +91,7 @@ PhysicsWorld2D::PhysicsWorld2D(Scene &scene)
 
 PhysicsWorld2D::~PhysicsWorld2D()
 {
+	OnStop();
 	delete[] m_PhysicsBodyEntityBuffer;
 	m_PhysicsBodyEntityBuffer = nullptr;
 }
@@ -190,6 +191,9 @@ void PhysicsWorld2D::OnGuiRender()
 
 void PhysicsWorld2D::OnStart()
 {
+	if ( m_FilledWorld )
+		return;
+
 	{
 		auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
 		m_PhysicsBodyEntityBuffer = new Entity[view.size()];
@@ -273,6 +277,28 @@ void PhysicsWorld2D::OnStart()
 				circleCollider2D.RuntimeFixture = fixture;
 			}
 		}
+	}
+}
+
+void PhysicsWorld2D::OnStop()
+{
+	if ( !m_FilledWorld )
+		return;
+
+	b2Body *body = m_NativeWorld->GetBodyList();
+	while ( body )
+	{
+		b2Body *nextBody = body->GetNext();
+		b2Fixture *fixture = body->GetFixtureList();
+		while ( fixture )
+		{
+			b2Fixture *nextFixture = fixture->GetNext();
+			body->DestroyFixture(fixture);
+			fixture = nextFixture;
+		}
+
+		m_NativeWorld->DestroyBody(body);
+		body = nextBody;
 	}
 }
 

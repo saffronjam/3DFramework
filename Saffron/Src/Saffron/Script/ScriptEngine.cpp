@@ -75,7 +75,7 @@ const char *FieldTypeToString(FieldType type)
 
 static MonoDomain *s_MonoDomain = nullptr;
 static std::string s_AssemblyPath;
-static Ref<Scene> s_SceneContext;
+static Shared<Scene> s_SceneContext;
 
 // Assembly images
 MonoImage *s_AppAssemblyImage = nullptr;
@@ -457,7 +457,7 @@ void ScriptEngine::OnGuiRender()
 		bool opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(sceneID)), "Scene (%llx)", static_cast<Uint64>(sceneID));
 		if ( opened )
 		{
-			Ref<Scene> scene = Scene::GetScene(sceneID);
+			Shared<Scene> scene = Scene::GetScene(sceneID);
 			for ( auto &[entityID, entityInstanceData] : entityMap )
 			{
 				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
@@ -537,7 +537,7 @@ void ScriptEngine::ReloadAssembly(const std::string &path)
 	s_ClassCacheMap.clear();
 	if ( !s_EntityInstanceMap.empty() )
 	{
-		Ref<Scene> scene = GetCurrentSceneContext();
+		Shared<Scene> scene = GetCurrentSceneContext();
 		SE_CORE_ASSERT(scene, "No active scene!");
 		if ( s_EntityInstanceMap.find(scene->GetUUID()) != s_EntityInstanceMap.end() )
 		{
@@ -552,12 +552,12 @@ void ScriptEngine::ReloadAssembly(const std::string &path)
 	}
 }
 
-void ScriptEngine::SetSceneContext(const Ref<Scene> &scene)
+void ScriptEngine::SetSceneContext(const Shared<Scene> &scene)
 {
 	s_SceneContext = scene;
 }
 
-const Ref<Scene> &ScriptEngine::GetCurrentSceneContext()
+const Shared<Scene> &ScriptEngine::GetCurrentSceneContext()
 {
 	return s_SceneContext;
 }

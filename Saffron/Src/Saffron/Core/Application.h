@@ -43,7 +43,7 @@ private:
 	bool OnWindowClose(const WindowCloseEvent &event);
 
 private:
-	Ref<Window> m_Window;
+	Shared<Window> m_Window;
 	bool m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
 	GuiLayer *m_GuiLayer;

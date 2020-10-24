@@ -18,6 +18,7 @@ public:
 	void OnUpdate();
 	void OnGuiRender();
 	void OnStart();
+	void OnStop();
 
 	glm::vec2 GetGravity() const;
 	void SetGravity(const glm::vec2 &gravity);
@@ -26,6 +27,7 @@ private:
 	b2World *m_NativeWorld;
 	Scene *m_Scene;
 	class Entity *m_PhysicsBodyEntityBuffer;
+	bool m_FilledWorld = false;
 };
 }
 

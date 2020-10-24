@@ -10,14 +10,14 @@ namespace Se
 /// Framebuffer
 ///////////////////////////////////////////////////////////////////////////
 
-Ref<Framebuffer> Framebuffer::Create(const Specification &spec)
+Shared<Framebuffer> Framebuffer::Create(const Specification &spec)
 {
-	Ref<Framebuffer> result = nullptr;
+	Shared<Framebuffer> result = nullptr;
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:		SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
-	case RendererAPI::Type::OpenGL:		result = Ref<OpenGLFramebuffer>::Create(spec); break;
+	case RendererAPI::Type::OpenGL:		result = Shared<OpenGLFramebuffer>::Create(spec); break;
 	default:							SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;;
 	}
 
@@ -39,7 +39,7 @@ std::weak_ptr<Framebuffer> FramebufferPool::AllocateBuffer()
 	return std::weak_ptr<Framebuffer>();
 }
 
-void FramebufferPool::Add(const Ref<Framebuffer> &framebuffer)
+void FramebufferPool::Add(const Shared<Framebuffer> &framebuffer)
 {
 }
 }

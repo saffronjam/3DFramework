@@ -118,7 +118,7 @@ public:
 	std::string NodeName, MeshName;
 };
 
-class Mesh : public RefCounted
+class Mesh : public ReferenceCounted
 {
 public:
 	Mesh(std::string filename);
@@ -130,10 +130,10 @@ public:
 	std::vector<Submesh> &GetSubmeshes() { return m_Submeshes; }
 	const std::vector<Submesh> &GetSubmeshes() const { return m_Submeshes; }
 
-	Ref<Shader> GetMeshShader() const { return m_MeshShader; }
-	Ref<Material> GetMaterial() const { return m_BaseMaterial; }
-	std::vector<Ref<MaterialInstance>> GetMaterials() const { return m_Materials; }
-	const std::vector<Ref<Texture2D>> &GetTextures() const { return m_Textures; }
+	Shared<Shader> GetMeshShader() const { return m_MeshShader; }
+	Shared<Material> GetMaterial() const { return m_BaseMaterial; }
+	std::vector<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }
+	const std::vector<Shared<Texture2D>> &GetTextures() const { return m_Textures; }
 	const std::string &GetFilepath() const { return m_Filepath; }
 
 	std::vector<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
@@ -159,9 +159,9 @@ private:
 	Uint32 m_BoneCount = 0;
 	std::vector<BoneInfo> m_BoneInfo;
 
-	Ref<Pipeline> m_Pipeline;
-	Ref<VertexBuffer> m_VertexBuffer;
-	Ref<IndexBuffer> m_IndexBuffer;
+	Shared<Pipeline> m_Pipeline;
+	Shared<VertexBuffer> m_VertexBuffer;
+	Shared<IndexBuffer> m_IndexBuffer;
 
 	std::vector<Vertex> m_StaticVertices;
 	std::vector<AnimatedVertex> m_AnimatedVertices;
@@ -171,11 +171,11 @@ private:
 	const aiScene *m_Scene;
 
 	// Materials
-	Ref<Shader> m_MeshShader;
-	Ref<Material> m_BaseMaterial;
-	std::vector<Ref<Texture2D>> m_Textures;
-	std::vector<Ref<Texture2D>> m_NormalMaps;
-	std::vector<Ref<MaterialInstance>> m_Materials;
+	Shared<Shader> m_MeshShader;
+	Shared<Material> m_BaseMaterial;
+	std::vector<Shared<Texture2D>> m_Textures;
+	std::vector<Shared<Texture2D>> m_NormalMaps;
+	std::vector<Shared<MaterialInstance>> m_Materials;
 
 	std::unordered_map<Uint32, std::vector<Triangle>> m_TriangleCache;
 
