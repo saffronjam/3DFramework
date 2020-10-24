@@ -21,17 +21,17 @@ class Scene : public ReferenceCounted
 public:
 	struct Environment
 	{
-		std::string FilePath;
+		String FilePath;
 		Shared<TextureCube> RadianceMap;
 		Shared<TextureCube> IrradianceMap;
 
-		static Environment Load(const std::string &filepath);
+		static Environment Load(const String &filepath);
 	};
 
 	struct Light
 	{
-		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Radiance = { 0.0f, 0.0f, 0.0f };
+		Vector3f Direction = { 0.0f, 0.0f, 0.0f };
+		Vector3f Radiance = { 0.0f, 0.0f, 0.0f };
 
 		float Multiplier = 1.0f;
 	};
@@ -43,7 +43,7 @@ public:
 	};
 
 public:
-	explicit Scene(std::string name = "Scene");
+	explicit Scene(String name = "Scene");
 	~Scene();
 
 	void OnUpdate(Time ts);
@@ -54,14 +54,14 @@ public:
 	void OnRuntimeStart();
 	void OnRuntimeStop();
 
-	Entity CreateEntity(std::string name = "");
-	Entity CreateEntityWithID(UUID uuid, const std::string &name = "", bool runtimeMap = false);
+	Entity CreateEntity(String name = "");
+	Entity CreateEntityWithID(UUID uuid, const String &name = "", bool runtimeMap = false);
 	void DestroyEntity(Entity entity);
 
 	template<typename T>
 	auto GetAllEntitiesWith();
 	void DuplicateEntity(Entity entity);
-	Entity FindEntityByTag(const std::string &tag);
+	Entity FindEntityByTag(const String &tag);
 	const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
@@ -72,7 +72,7 @@ public:
 
 	bool IsPlaying() const { return m_IsPlaying; }
 
-	const std::string &GetName() const { return m_Name; }
+	const String &GetName() const { return m_Name; }
 	Light &GetLight() { return m_Light; }
 	const Light &GetLight() const { return m_Light; }
 	Entity GetMainCameraEntity();
@@ -81,7 +81,7 @@ public:
 	static Shared<Scene> GetScene(UUID uuid);
 	Skybox GetSkybox() const { return m_Skybox; }
 
-	void SetName(std::string name);
+	void SetName(String name);
 	void SetLight(const Light &light);
 	void SetViewportSize(Uint32 width, Uint32 height);
 	void SetEnvironment(const Environment &environment);
@@ -95,7 +95,7 @@ public:
 
 private:
 	UUID m_SceneID;
-	std::string m_Name;
+	String m_Name;
 
 	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 

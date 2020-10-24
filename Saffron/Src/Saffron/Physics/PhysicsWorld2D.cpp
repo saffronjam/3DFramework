@@ -3,6 +3,7 @@
 #include <box2d/box2d.h>
 
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Physics/PhysicsWorld2D.h"
@@ -10,23 +11,6 @@
 
 namespace Se
 {
-
-//////////////////////////////////////////////////////////////
-/// Helper functions
-//////////////////////////////////////////////////////////////
-
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
-{
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
-
-
-
 //////////////////////////////////////////////////////////////
 /// Contact Listener
 //////////////////////////////////////////////////////////////
@@ -166,12 +150,12 @@ void PhysicsWorld2D::OnUpdate()
 			body->ResetMassData();
 
 			const auto &position = body->GetPosition();
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(transform);
-			const glm::vec3 rotation = glm::eulerAngles(rotationQuat);
+			const auto decomposition = Misc::GetTransformDecomposition(transform);
+			const Vector3f rotation = glm::eulerAngles(decomposition.Rotation);
 
-			transform = glm::translate(glm::mat4(1.0f), { position.x, position.y, transform[3].z }) *
+			transform = glm::translate(Matrix4f(1.0f), { position.x, position.y, transform[3].z }) *
 				glm::toMat4(glm::quat({ rotation.x, rotation.y, body->GetAngle() })) *
-				glm::scale(glm::mat4(1.0f), scale);
+				glm::scale(Matrix4f(1.0f), decomposition.Scale);
 		}
 	}
 }
@@ -213,8 +197,8 @@ void PhysicsWorld2D::OnStart()
 				bodyDef.type = b2_kinematicBody;
 			bodyDef.position.Set(transform[3].x, transform[3].y);
 
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(transform);
-			glm::vec3 rotation = glm::eulerAngles(rotationQuat);
+			const auto decomposition = Misc::GetTransformDecomposition(transform);
+			Vector3f rotation = glm::eulerAngles(decomposition.Rotation);
 			bodyDef.angle = rotation.z;
 
 			b2Body *body = m_NativeWorld->CreateBody(&bodyDef);
@@ -302,13 +286,13 @@ void PhysicsWorld2D::OnStop()
 	}
 }
 
-glm::vec2 PhysicsWorld2D::GetGravity() const
+Vector2f PhysicsWorld2D::GetGravity() const
 {
 	const b2Vec2 b2Gravity = m_NativeWorld->GetGravity();
-	return glm::vec2(b2Gravity.x, b2Gravity.y);
+	return Vector2f(b2Gravity.x, b2Gravity.y);
 }
 
-void PhysicsWorld2D::SetGravity(const glm::vec2 &gravity)
+void PhysicsWorld2D::SetGravity(const Vector2f &gravity)
 {
 	m_NativeWorld->SetGravity(b2Vec2{ gravity.x, gravity.y });
 }

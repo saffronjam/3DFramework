@@ -65,7 +65,7 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	{
 		double x, y;
 		glfwGetCursorPos(m_NativeWindow, &x, &y);
-		PushEvent<MouseMoveEvent>(glm::vec2(x, y));
+		PushEvent<MouseMoveEvent>(Vector2f(x, y));
 	}
 	{
 		glfwSetWindowPos(m_NativeWindow, static_cast<int>(m_Position.x), static_cast<int>(m_Position.y));
@@ -132,7 +132,7 @@ void *WindowsWindow::GetNativeWindow() const
 	return m_NativeWindow;
 }
 
-void WindowsWindow::SetTitle(std::string title)
+void WindowsWindow::SetTitle(String title)
 {
 	SE_PROFILE_FUNCTION();
 
@@ -227,7 +227,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetCursorPosCallback(m_NativeWindow, [](GLFWwindow *window, double xpos, double ypos)
 							 {
 								 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-								 pWnd->PushEvent<MouseMoveEvent>(glm::vec2(xpos, ypos));
+								 pWnd->PushEvent<MouseMoveEvent>(Vector2f(xpos, ypos));
 							 });
 	glfwSetCursorEnterCallback(m_NativeWindow, [](GLFWwindow *window, int enter)
 							   {
@@ -247,7 +247,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetWindowPosCallback(m_NativeWindow, [](GLFWwindow *window, int xpos, int ypos)
 							 {
 								 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-								 pWnd->PushEvent<WindowMoveEvent>(glm::vec2(xpos, ypos));
+								 pWnd->PushEvent<WindowMoveEvent>(Vector2f(xpos, ypos));
 							 });
 	glfwSetWindowFocusCallback(m_NativeWindow, [](GLFWwindow *window, int focus)
 							   {
@@ -265,7 +265,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetDropCallback(m_NativeWindow, [](GLFWwindow *window, int count, const char **paths)
 						{
 							auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-							std::vector<std::filesystem::path> filepaths(count);
+							ArrayList<Filepath> filepaths(count);
 							for ( int i = 0; i < count; i++ )
 							{
 								filepaths[i] = paths[i];

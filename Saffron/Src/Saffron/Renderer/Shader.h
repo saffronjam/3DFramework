@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+
 #include <unordered_map>
 
 #include "Saffron/Base.h"
@@ -33,13 +33,13 @@ public:
 		{
 			Type DeclType;
 			std::ptrdiff_t Offset;
-			std::string Name;
+			String Name;
 		};
 
 		struct Buffer
 		{
 			Uint8 *Data;
-			std::vector<Decl> Uniforms;
+			ArrayList<Decl> Uniforms;
 		};
 
 		struct BufferBase
@@ -64,10 +64,10 @@ public:
 			unsigned int GetUniformCount() const override { return U; }
 
 			template<typename T>
-			void Push(const std::string &name, const T &data) {}
+			void Push(const String &name, const T &data) {}
 
 			template<>
-			void Push(const std::string &name, const float &data)
+			void Push(const String &name, const float &data)
 			{
 				Uniforms[Index++] = { Type::Float, Cursor, name };
 				memcpy(Buffer + Cursor, &data, sizeof(float));
@@ -75,27 +75,27 @@ public:
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::vec3 &data)
+			void Push(const String &name, const Vector3f &data)
 			{
 				Uniforms[Index++] = { Type::Float3, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec3));
-				Cursor += sizeof(glm::vec3);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Vector3f));
+				Cursor += sizeof(Vector3f);
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::vec4 &data)
+			void Push(const String &name, const Vector4f &data)
 			{
 				Uniforms[Index++] = { Type::Float4, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec4));
-				Cursor += sizeof(glm::vec4);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Vector4f));
+				Cursor += sizeof(Vector4f);
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::mat4 &data)
+			void Push(const String &name, const Matrix4f &data)
 			{
 				Uniforms[Index++] = { Type::Matrix4x4, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::mat4));
-				Cursor += sizeof(glm::mat4);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Matrix4f));
+				Cursor += sizeof(Matrix4f);
 			}
 
 			~BufferDeclaration() override = default;
@@ -127,14 +127,14 @@ public:
 	virtual void UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer) = 0;
 
 	// TODO: Implement materials and remove these
-	virtual void SetFloat(const std::string &name, float value) = 0;
-	virtual void SetInt(const std::string &name, int value) = 0;
-	virtual void SetFloat3(const std::string &name, const glm::vec3 &value) = 0;
-	virtual void SetMat4(const std::string &name, const glm::mat4 &value) = 0;
-	virtual void SetMat4FromRenderThread(const std::string &name, const glm::mat4 &value, bool bind = true) = 0;
-	virtual void SetIntArray(const std::string &name, int *values, Uint32 size) = 0;
+	virtual void SetFloat(const String &name, float value) = 0;
+	virtual void SetInt(const String &name, int value) = 0;
+	virtual void SetFloat3(const String &name, const Vector3f &value) = 0;
+	virtual void SetMat4(const String &name, const Matrix4f &value) = 0;
+	virtual void SetMat4FromRenderThread(const String &name, const Matrix4f &value, bool bind = true) = 0;
+	virtual void SetIntArray(const String &name, int *values, Uint32 size) = 0;
 
-	virtual const std::string &GetName() const = 0;
+	virtual const String &GetName() const = 0;
 
 	virtual void SetVSMaterialUniformBuffer(const Buffer &buffer) = 0;
 	virtual void SetPSMaterialUniformBuffer(const Buffer &buffer) = 0;
@@ -150,23 +150,23 @@ public:
 
 	virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
 
-	static Shared<Shader> Create(const std::string &filepath);
-	static Shared<Shader> CreateFromString(const std::string &source);
+	static Shared<Shader> Create(const String &filepath);
+	static Shared<Shader> CreateFromString(const String &source);
 
 	// TODO: Create Asset manager and remove this
-	static std::vector<Shared<Shader>> m_sAllShaders;
+	static ArrayList<Shared<Shader>> m_sAllShaders;
 };
 
 class ShaderLibrary : public ReferenceCounted
 {
 public:
 	void Add(const Shared<Shader> &shader);
-	void Load(const std::string &path);
-	void Load(const std::string &name, const std::string &path);
+	void Load(const String &path);
+	void Load(const String &name, const String &path);
 
-	const Shared<Shader> &Get(const std::string &name) const;
+	const Shared<Shader> &Get(const String &name) const;
 private:
-	std::unordered_map<std::string, Shared<Shader>> m_Shaders;
+	std::unordered_map<String, Shared<Shader>> m_Shaders;
 };
 
 }

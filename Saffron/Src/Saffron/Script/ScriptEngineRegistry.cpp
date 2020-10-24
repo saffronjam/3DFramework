@@ -16,8 +16,8 @@ namespace Se
 	RegisterFunctionBuffer.str("");\
 	RegisterFunctionBuffer.clear();
 
-std::unordered_map<MonoType *, std::function<bool(Entity &)>> s_HasComponentFuncs;
-std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentFuncs;
+UnorderedMap<MonoType *, Function<bool(Entity &)>> s_HasComponentFuncs;
+UnorderedMap<MonoType *, Function<void(Entity &)>> s_CreateComponentFuncs;
 
 extern MonoImage *s_CoreAssemblyImage;
 
@@ -50,7 +50,7 @@ void ScriptEngineRegistry::RegisterAll()
 {
 	InitComponentTypes();
 
-	std::ostringstream RegisterFunctionBuffer;
+	OutputStringStream RegisterFunctionBuffer;
 
 	ADD_INTERNAL_CALL_MONO(Entity, GetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);

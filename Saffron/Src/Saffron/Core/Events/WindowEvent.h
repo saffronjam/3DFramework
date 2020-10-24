@@ -20,9 +20,9 @@ public:
 
 	int GetWidth() const { return m_Width; }
 	int GetHeight() const { return m_Height; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " " << m_Width << "x" << m_Height;
 		return oss.str();
 	}
@@ -38,18 +38,18 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowMoveEvent(const glm::vec2 &position) : m_Position(position) {}
+	explicit WindowMoveEvent(const Vector2f &position) : m_Position(position) {}
 
-	const glm::vec2 &GetPosition() const { return m_Position; }
-	std::string ToString() const override
+	const Vector2f &GetPosition() const { return m_Position; }
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Position: " << m_Position.x << ", " << m_Position.y;
 		return oss.str();
 	}
 
 private:
-	glm::vec2 m_Position;
+	Vector2f m_Position;
 };
 
 class WindowGainFocusEvent : public Event
@@ -59,7 +59,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	std::string ToString() const override { return GetName(); }
+	String ToString() const override { return GetName(); }
 
 };
 
@@ -70,7 +70,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	std::string ToString() const override { return GetName(); }
+	String ToString() const override { return GetName(); }
 
 };
 
@@ -81,7 +81,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	std::string ToString() const override { return GetName(); }
+	String ToString() const override { return GetName(); }
 
 };
 
@@ -92,12 +92,12 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowDropFilesEvent(std::vector<std::filesystem::path> filepaths) : m_Filepaths(std::move(filepaths)) {}
+	explicit WindowDropFilesEvent(ArrayList<Filepath> filepaths) : m_Filepaths(std::move(filepaths)) {}
 
-	const std::vector<std::filesystem::path> &GetPaths() const { return m_Filepaths; }
-	std::string ToString() const override
+	const ArrayList<Filepath> &GetPaths() const { return m_Filepaths; }
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Paths: ";
 		for ( const auto &filepath : m_Filepaths )
 		{
@@ -107,7 +107,7 @@ public:
 	}
 
 private:
-	std::vector<std::filesystem::path> m_Filepaths;
+	ArrayList<Filepath> m_Filepaths;
 };
 
 }

@@ -14,8 +14,8 @@ struct LogMessage
 	{
 	}
 
-	std::string Raw;
-	std::string Formatted;
+	String Raw;
+	String Formatted;
 	Log::Level::LevelEnum Level;
 };
 }

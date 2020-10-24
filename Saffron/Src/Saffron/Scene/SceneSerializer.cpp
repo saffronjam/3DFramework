@@ -2,6 +2,8 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Scene/SceneSerializer.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -13,9 +15,9 @@
 namespace YAML {
 
 template<>
-struct convert<glm::vec2>
+struct convert<Se::Vector2f>
 {
-	static Node encode(const glm::vec2 &rhs)
+	static Node encode(const Se::Vector2f &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -23,7 +25,7 @@ struct convert<glm::vec2>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec2 &rhs)
+	static bool decode(const Node &node, Se::Vector2f &rhs)
 	{
 		if ( !node.IsSequence() || node.size() != 2 )
 			return false;
@@ -35,9 +37,9 @@ struct convert<glm::vec2>
 };
 
 template<>
-struct convert<glm::vec3>
+struct convert<Se::Vector3f>
 {
-	static Node encode(const glm::vec3 &rhs)
+	static Node encode(const Se::Vector3f &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -46,7 +48,7 @@ struct convert<glm::vec3>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec3 &rhs)
+	static bool decode(const Node &node, Se::Vector3f &rhs)
 	{
 		if ( !node.IsSequence() || node.size() != 3 )
 			return false;
@@ -59,9 +61,9 @@ struct convert<glm::vec3>
 };
 
 template<>
-struct convert<glm::vec4>
+struct convert<Se::Vector4f>
 {
-	static Node encode(const glm::vec4 &rhs)
+	static Node encode(const Se::Vector4f &rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -71,7 +73,7 @@ struct convert<glm::vec4>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::vec4 &rhs)
+	static bool decode(const Node &node, Se::Vector4f &rhs)
 	{
 		if ( !node.IsSequence() || node.size() != 4 )
 			return false;
@@ -119,21 +121,21 @@ namespace Se
 /// YAML - Operator overloading
 ///////////////////////////////////////////////////////////////////////////
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec2 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const Vector2f &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec3 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const Vector3f &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::vec4 &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const Vector4f &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -151,16 +153,6 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const glm::quat &v)
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
-
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
-{
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
 
 static void SerializeEntity(YAML::Emitter &out, Entity entity)
 {
@@ -186,10 +178,10 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 		out << YAML::BeginMap; // TransformComponent
 
 		auto &transform = entity.GetComponent<TransformComponent>().Transform;
-		auto [pos, rot, scale] = GetTransformDecomposition(transform);
-		out << YAML::Key << "Position" << YAML::Value << pos;
-		out << YAML::Key << "Rotation" << YAML::Value << rot;
-		out << YAML::Key << "Scale" << YAML::Value << scale;
+		const auto decomposition = Misc::GetTransformDecomposition(transform);
+		out << YAML::Key << "Position" << YAML::Value << decomposition.Translation;
+		out << YAML::Key << "Rotation" << YAML::Value << decomposition.Rotation;
+		out << YAML::Key << "Scale" << YAML::Value << decomposition.Scale;
 
 		out << YAML::EndMap; // TransformComponent
 	}
@@ -228,13 +220,13 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 					out << field.GetStoredValue<float>();
 					break;
 				case FieldType::Vec2:
-					out << field.GetStoredValue<glm::vec2>();
+					out << field.GetStoredValue<Vector2f>();
 					break;
 				case FieldType::Vec3:
-					out << field.GetStoredValue<glm::vec3>();
+					out << field.GetStoredValue<Vector3f>();
 					break;
 				case FieldType::Vec4:
-					out << field.GetStoredValue<glm::vec4>();
+					out << field.GetStoredValue<Vector4f>();
 					break;
 				default:
 					out << "Invalid value";
@@ -353,7 +345,7 @@ SceneSerializer::SceneSerializer(const Shared<Scene> &scene)
 {
 }
 
-void SceneSerializer::Serialize(const std::string &filepath)
+void SceneSerializer::Serialize(const String &filepath)
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
@@ -374,42 +366,42 @@ void SceneSerializer::Serialize(const std::string &filepath)
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
-	std::ofstream fout(filepath);
+	OutputStream fout(filepath);
 	fout << out.c_str();
 }
 
-void SceneSerializer::SerializeRuntime(const std::string &filepath)
+void SceneSerializer::SerializeRuntime(const String &filepath)
 {
 	// TODO: Implement
 	SE_CORE_ASSERT(false);
 }
 
-bool SceneSerializer::Deserialize(const std::string &filepath)
+bool SceneSerializer::Deserialize(const String &filepath)
 {
-	std::ifstream stream(filepath);
-	std::stringstream strStream;
+	InputStream stream(filepath);
+	StringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node data = YAML::Load(strStream.str());
 	if ( !data["Scene"] )
 		return false;
 
-	auto sceneName = data["Scene"].as<std::string>();
+	auto sceneName = data["Scene"].as<String>();
 	SE_CORE_INFO("Deserializing scene '{0}'", sceneName);
 	m_Scene->SetName(sceneName);
 
 	auto environment = data["Environment"];
 	if ( environment )
 	{
-		auto envPath = environment["AssetPath"].as<std::string>();
+		auto envPath = environment["AssetPath"].as<String>();
 		m_Scene->SetEnvironment(Scene::Environment::Load(envPath));
 
 		auto lightNode = environment["Light"];
 		if ( lightNode )
 		{
 			auto &light = m_Scene->GetLight();
-			light.Direction = lightNode["Direction"].as<glm::vec3>();
-			light.Radiance = lightNode["Radiance"].as<glm::vec3>();
+			light.Direction = lightNode["Direction"].as<Vector3f>();
+			light.Radiance = lightNode["Radiance"].as<Vector3f>();
 			light.Multiplier = lightNode["Multiplier"].as<float>();
 		}
 	}
@@ -421,10 +413,10 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 		{
 			auto uuid = entity["Entity"].as<uint64_t>();
 
-			std::string name;
+			String name;
 			auto tagComponent = entity["TagComponent"];
 			if ( tagComponent )
-				name = tagComponent["Tag"].as<std::string>();
+				name = tagComponent["Tag"].as<String>();
 
 			SE_CORE_INFO("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
@@ -435,12 +427,12 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			{
 				// Entities always have transforms
 				auto &transform = deserializedEntity.GetComponent<TransformComponent>().Transform;
-				auto translation = transformComponent["Position"].as<glm::vec3>();
+				auto translation = transformComponent["Position"].as<Vector3f>();
 				auto rotation = transformComponent["Rotation"].as<glm::quat>();
-				auto scale = transformComponent["Scale"].as<glm::vec3>();
+				auto scale = transformComponent["Scale"].as<Vector3f>();
 
-				transform = glm::translate(glm::mat4(1.0f), translation) *
-					glm::toMat4(rotation) * glm::scale(glm::mat4(1.0f), scale);
+				transform = glm::translate(Matrix4f(1.0f), translation) *
+					glm::toMat4(rotation) * glm::scale(Matrix4f(1.0f), scale);
 
 				SE_CORE_INFO("  Entity Transform:");
 				SE_CORE_INFO("    Translation: {0}, {1}, {2}", translation.x, translation.y, translation.z);
@@ -451,7 +443,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			auto scriptComponent = entity["ScriptComponent"];
 			if ( scriptComponent )
 			{
-				auto moduleName = scriptComponent["ModuleName"].as<std::string>();
+				auto moduleName = scriptComponent["ModuleName"].as<String>();
 				deserializedEntity.AddComponent<ScriptComponent>(moduleName);
 
 				SE_CORE_INFO("  Script Module: {0}", moduleName);
@@ -464,7 +456,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 						for ( auto field : storedFields )
 						{
 							// TODO: Look over overwritten variables
-							auto name = field["Name"].as<std::string>();
+							auto name = field["Name"].as<String>();
 							FieldType type = static_cast<FieldType>(field["Type"].as<uint32_t>());
 							EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(m_Scene->GetUUID(), uuid);
 							auto &moduleFieldMap = data.ModuleFieldMap;
@@ -499,17 +491,17 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 							}
 							case FieldType::Vec2:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<glm::vec2>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector2f>());
 								break;
 							}
 							case FieldType::Vec3:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<glm::vec3>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector3f>());
 								break;
 							}
 							case FieldType::Vec4:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<glm::vec4>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector4f>());
 								break;
 							}
 							default:
@@ -523,7 +515,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			auto meshComponent = entity["MeshComponent"];
 			if ( meshComponent )
 			{
-				auto meshPath = meshComponent["AssetPath"].as<std::string>();
+				auto meshPath = meshComponent["AssetPath"].as<String>();
 				// TEMP (because script creates mesh component...)
 				if ( !deserializedEntity.HasComponent<MeshComponent>() )
 					deserializedEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(meshPath));
@@ -545,7 +537,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( spriteRendererComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<SpriteRendererComponent>();
-				component.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+				component.Color = spriteRendererComponent["Color"].as<Vector4f>();
 				component.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
 			}
 
@@ -561,8 +553,8 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( boxCollider2DComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<BoxCollider2DComponent>();
-				component.Offset = boxCollider2DComponent["Offset"].as<glm::vec2>();
-				component.Size = boxCollider2DComponent["Size"].as<glm::vec2>();
+				component.Offset = boxCollider2DComponent["Offset"].as<Vector2f>();
+				component.Size = boxCollider2DComponent["Size"].as<Vector2f>();
 				component.Density = boxCollider2DComponent["Density"] ? boxCollider2DComponent["Density"].as<float>() : 1.0f;
 				component.Friction = boxCollider2DComponent["Friction"] ? boxCollider2DComponent["Friction"].as<float>() : 1.0f;
 			}
@@ -571,7 +563,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 			if ( circleCollider2DComponent )
 			{
 				auto &component = deserializedEntity.AddComponent<CircleCollider2DComponent>();
-				component.Offset = circleCollider2DComponent["Offset"].as<glm::vec2>();
+				component.Offset = circleCollider2DComponent["Offset"].as<Vector2f>();
 				component.Radius = circleCollider2DComponent["Radius"].as<float>();
 				component.Density = circleCollider2DComponent["Density"] ? circleCollider2DComponent["Density"].as<float>() : 1.0f;
 				component.Friction = circleCollider2DComponent["Friction"] ? circleCollider2DComponent["Friction"].as<float>() : 1.0f;
@@ -582,7 +574,7 @@ bool SceneSerializer::Deserialize(const std::string &filepath)
 	return true;
 }
 
-bool SceneSerializer::DeserializeRuntime(const std::string &filepath)
+bool SceneSerializer::DeserializeRuntime(const String &filepath)
 {
 	// Not implemented
 	SE_CORE_ASSERT(false);

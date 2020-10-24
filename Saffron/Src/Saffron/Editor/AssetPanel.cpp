@@ -5,7 +5,7 @@
 
 namespace Se
 {
-AssetPanel::AssetPanel(fs::path path)
+AssetPanel::AssetPanel(Filepath path)
 	: m_AssetFolderPath(std::move(path))
 {
 	SyncAssetPaths();
@@ -47,7 +47,7 @@ void AssetPanel::SyncAssetPaths()
 	{
 		m_AssetStats.clear();
 		auto rawPaths = FileIOManager::GetFiles(m_AssetFolderPath, ".fbx");
-		std::for_each(rawPaths.begin(), rawPaths.end(), [&](const fs::directory_entry &entry) mutable
+		std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry &entry) mutable
 					  {
 						  m_AssetStats.emplace_back(entry.path().stem().string(), entry.path().extension().string(), entry.path());
 					  });

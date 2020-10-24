@@ -20,22 +20,22 @@ private:
 	friend class OpenGLShader;
 
 private:
-	std::string m_Name;
+	String m_Name;
 	Uint32 m_Register = 0;
 	Uint32 m_Count;
 	Type m_Type;
 
 public:
-	OpenGLShaderResourceDeclaration(Type type, std::string name, Uint32 count);
+	OpenGLShaderResourceDeclaration(Type type, String name, Uint32 count);
 
-	const std::string &GetName() const override { return m_Name; }
+	const String &GetName() const override { return m_Name; }
 	Uint32 GetRegister() const override { return m_Register; }
 	Uint32 GetCount() const override { return m_Count; }
 
 	Type GetType() const { return m_Type; }
 public:
-	static Type StringToType(const std::string &type);
-	static std::string TypeToString(Type type);
+	static Type StringToType(const String &type);
+	static String TypeToString(Type type);
 };
 
 /////////////////////////////////////////
@@ -56,7 +56,7 @@ public:
 private:
 	ShaderStruct *m_Struct;
 
-	std::string m_Name;
+	String m_Name;
 	Uint32 m_Count;
 	Uint32 m_Size;
 	Uint32 m_Offset{};
@@ -66,10 +66,10 @@ private:
 	mutable Int32 m_Location{};
 
 public:
-	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, std::string name, Uint32 count = 1);
-	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct *uniformStruct, std::string name, Uint32 count = 1);
+	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, String name, Uint32 count = 1);
+	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct *uniformStruct, String name, Uint32 count = 1);
 
-	const std::string &GetName() const override { return m_Name; }
+	const String &GetName() const override { return m_Name; }
 	Uint32 GetSize() const override { return m_Size; }
 	Uint32 GetCount() const override { return m_Count; }
 	Uint32 GetOffset() const override { return m_Offset; }
@@ -84,8 +84,8 @@ protected:
 	void SetOffset(Uint32 offset) override;
 public:
 	static Uint32 SizeOfUniformType(Type type);
-	static Type StringToType(const std::string &type);
-	static std::string TypeToString(Type type);
+	static Type StringToType(const String &type);
+	static String TypeToString(Type type);
 };
 
 ///////////////////////////////////
@@ -94,7 +94,7 @@ public:
 struct GLShaderUniformField
 {
 	OpenGLShaderUniformDeclaration::Type Type;
-	std::string Name;
+	String Name;
 	Uint32 Count;
 	mutable Uint32 Size;
 	mutable Int32 Location;
@@ -108,23 +108,23 @@ class OpenGLShaderUniformBufferDeclaration : public ShaderUniformBufferDeclarati
 private:
 	friend class Shader;
 private:
-	std::string m_Name;
+	String m_Name;
 	ShaderUniformDeclaration::List m_Uniforms;
 	Uint32 m_Register;
 	Uint32 m_Size;
 	ShaderDomain m_Domain;
 public:
-	OpenGLShaderUniformBufferDeclaration(std::string name, ShaderDomain domain);
+	OpenGLShaderUniformBufferDeclaration(String name, ShaderDomain domain);
 
 	void PushUniform(OpenGLShaderUniformDeclaration *uniform);
 
-	const std::string &GetName() const override { return m_Name; }
+	const String &GetName() const override { return m_Name; }
 	Uint32 GetRegister() const override { return m_Register; }
 	Uint32 GetSize() const override { return m_Size; }
 	ShaderDomain GetDomain() const { return m_Domain; }
 	const ShaderUniformDeclaration::List &GetUniformDeclarations() const override { return m_Uniforms; }
 
-	ShaderUniformDeclaration *FindUniform(const std::string &name) override;
+	ShaderUniformDeclaration *FindUniform(const String &name) override;
 };
 
 }

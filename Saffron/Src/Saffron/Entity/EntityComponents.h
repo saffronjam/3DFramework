@@ -19,32 +19,32 @@ struct SceneComponent
 
 struct TagComponent
 {
-	std::string Tag;
+	String Tag;
 
 	TagComponent() = default;
 	TagComponent(const TagComponent &other) = default;
-	explicit TagComponent(std::string tag)
+	explicit TagComponent(String tag)
 		: Tag(std::move(tag))
 	{
 	}
 
-	operator std::string &() { return Tag; }
-	operator const std::string &() const { return Tag; }
+	operator String &() { return Tag; }
+	operator const String &() const { return Tag; }
 };
 
 struct TransformComponent
 {
-	glm::mat4 Transform;
+	Matrix4f Transform;
 
 	TransformComponent() = default;
 	TransformComponent(const TransformComponent &other) = default;
-	explicit TransformComponent(const glm::mat4 &transform)
+	explicit TransformComponent(const Matrix4f &transform)
 		: Transform(transform)
 	{
 	}
 
-	operator glm::mat4 &() { return Transform; }
-	operator const glm::mat4 &() const { return Transform; }
+	operator Matrix4f &() { return Transform; }
+	operator const Matrix4f &() const { return Transform; }
 };
 
 struct MeshComponent
@@ -63,16 +63,16 @@ struct MeshComponent
 
 struct ScriptComponent
 {
-	std::string ModuleName;
-	std::string NamespaceName;
-	std::string ClassName;
+	String ModuleName;
+	String NamespaceName;
+	String ClassName;
 
 	ScriptComponent() = default;
 	ScriptComponent(const ScriptComponent &other) = default;
-	explicit ScriptComponent(std::string moduleName)
+	explicit ScriptComponent(String moduleName)
 		: ModuleName(std::move(moduleName))
 	{
-		if ( ModuleName.find('.') != std::string::npos )
+		if ( ModuleName.find('.') != String::npos )
 		{
 			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
 			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
@@ -83,10 +83,10 @@ struct ScriptComponent
 		}
 	}
 
-	void ChangeModule(std::string moduleName)
+	void ChangeModule(String moduleName)
 	{
 		ModuleName = std::move(moduleName);
-		if ( ModuleName.find('.') != std::string::npos )
+		if ( ModuleName.find('.') != String::npos )
 		{
 			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
 			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
@@ -111,7 +111,7 @@ struct CameraComponent
 
 struct SpriteRendererComponent
 {
-	glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Vector4f Color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	Shared<Texture2D> Texture;
 	float TilingFactor = 1.0f;
 
@@ -134,7 +134,7 @@ struct RigidBody2DComponent
 
 struct Collider2DComponent
 {
-	glm::vec2 Offset = { 0.0f,0.0f };
+	Vector2f Offset = { 0.0f,0.0f };
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
@@ -145,7 +145,7 @@ struct Collider2DComponent
 
 struct BoxCollider2DComponent : Collider2DComponent
 {
-	glm::vec2 Size = { 1.0f, 1.0f };
+	Vector2f Size = { 1.0f, 1.0f };
 
 	BoxCollider2DComponent() = default;
 	BoxCollider2DComponent(const BoxCollider2DComponent &other) = default;

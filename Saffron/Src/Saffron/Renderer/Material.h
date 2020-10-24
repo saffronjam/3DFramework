@@ -33,16 +33,16 @@ public:
 
 	Uint32 GetFlags() const { return m_MaterialFlags; }
 	template<typename T>
-	T &Get(const std::string &name);
+	T &Get(const String &name);
 	template<typename T>
-	Shared<T> GetResource(const std::string &name);
+	Shared<T> GetResource(const String &name);
 
 	void SetFlag(Flag flag) { m_MaterialFlags |= static_cast<Uint32>(flag); }
 	template <typename T>
-	void Set(const std::string &name, const T &value);
-	void Set(const std::string &name, const Shared<Texture> &texture);
-	void Set(const std::string &name, const Shared<Texture2D> &texture);
-	void Set(const std::string &name, const Shared<TextureCube> &texture);
+	void Set(const String &name, const T &value);
+	void Set(const String &name, const Shared<Texture> &texture);
+	void Set(const String &name, const Shared<Texture2D> &texture);
+	void Set(const String &name, const Shared<TextureCube> &texture);
 
 	static Shared<Material> Create(const Shared<Shader> &shader);
 
@@ -51,8 +51,8 @@ private:
 	void OnShaderReloaded();
 	void BindTextures();
 
-	ShaderUniformDeclaration *FindUniformDeclaration(const std::string &name);
-	ShaderResourceDeclaration *FindResourceDeclaration(const std::string &name);
+	ShaderUniformDeclaration *FindUniformDeclaration(const String &name);
+	ShaderResourceDeclaration *FindResourceDeclaration(const String &name);
 	Buffer &GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclaration);
 private:
 	Shared<Shader> m_Shader;
@@ -60,13 +60,13 @@ private:
 
 	Buffer m_VSUniformStorageBuffer;
 	Buffer m_PSUniformStorageBuffer;
-	std::vector<Shared<Texture>> m_Textures;
+	ArrayList<Shared<Texture>> m_Textures;
 
 	Uint32 m_MaterialFlags{};
 };
 
 template <typename T>
-T &Material::Get(const std::string &name)
+T &Material::Get(const String &name)
 {
 	auto decl = FindUniformDeclaration(name);
 	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
@@ -75,7 +75,7 @@ T &Material::Get(const std::string &name)
 }
 
 template <typename T>
-Shared<T> Material::GetResource(const std::string &name)
+Shared<T> Material::GetResource(const String &name)
 {
 	auto decl = FindResourceDeclaration(name);
 	Uint32 slot = decl->GetRegister();
@@ -84,7 +84,7 @@ Shared<T> Material::GetResource(const std::string &name)
 }
 
 template <typename T>
-void Material::Set(const std::string &name, const T &value)
+void Material::Set(const String &name, const T &value)
 {
 	Renderer::Submit([=]()
 					 {
@@ -115,28 +115,28 @@ class MaterialInstance : public ReferenceCounted
 {
 	friend class Material;
 public:
-	MaterialInstance(const Shared<Material> &material, std::string name = "");
+	MaterialInstance(const Shared<Material> &material, String name = "");
 	virtual ~MaterialInstance();
 
 	void Bind();
 
-	const std::string &GetName() const { return m_Name; }
+	const String &GetName() const { return m_Name; }
 	Shared<Shader> GetShader() { return m_Material->m_Shader; }
 	Uint32 GetFlags() const { return m_Material->m_MaterialFlags; }
 	bool GetFlag(Material::Flag flag) const { return static_cast<Uint32>(flag) & m_Material->m_MaterialFlags; }
 	template<typename T>
-	T &Get(const std::string &name);
+	T &Get(const String &name);
 	template<typename T>
-	Shared<T> GetResource(const std::string &name);
+	Shared<T> GetResource(const String &name);
 	template<typename T>
-	Shared<T> TryGetResource(const std::string &name);
+	Shared<T> TryGetResource(const String &name);
 
 	void SetFlag(Material::Flag flag, bool value = true);
 	template <typename T>
-	void Set(const std::string &name, const T &value);
-	void Set(const std::string &name, const Shared<Texture> &texture);
-	void Set(const std::string &name, const Shared<Texture2D> &texture);
-	void Set(const std::string &name, const Shared<TextureCube> &texture);
+	void Set(const String &name, const T &value);
+	void Set(const String &name, const Shared<Texture> &texture);
+	void Set(const String &name, const Shared<Texture2D> &texture);
+	void Set(const String &name, const Shared<TextureCube> &texture);
 
 public:
 	static Shared<MaterialInstance> Create(const Shared<Material> &material);
@@ -147,14 +147,14 @@ private:
 	void OnMaterialValueUpdated(ShaderUniformDeclaration *decl);
 private:
 	Shared<Material> m_Material;
-	std::string m_Name;
+	String m_Name;
 
 	Buffer m_VSUniformStorageBuffer;
 	Buffer m_PSUniformStorageBuffer;
-	std::vector<Shared<Texture>> m_Textures;
+	ArrayList<Shared<Texture>> m_Textures;
 
 	// TODO: This is temporary; come up with a proper system to track overrides
-	std::unordered_set<std::string> m_OverriddenValues;
+	std::unordered_set<String> m_OverriddenValues;
 };
 
 
@@ -166,7 +166,7 @@ private:
 ////////////////////////////////////////////////////////////////
 
 template <typename T>
-T &MaterialInstance::Get(const std::string &name)
+T &MaterialInstance::Get(const String &name)
 {
 	auto *decl = m_Material->FindUniformDeclaration(name);
 	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
@@ -175,7 +175,7 @@ T &MaterialInstance::Get(const std::string &name)
 }
 
 template <typename T>
-Shared<T> MaterialInstance::GetResource(const std::string &name)
+Shared<T> MaterialInstance::GetResource(const String &name)
 {
 	const auto *decl = m_Material->FindResourceDeclaration(name);
 	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
@@ -185,7 +185,7 @@ Shared<T> MaterialInstance::GetResource(const std::string &name)
 }
 
 template <typename T>
-Shared<T> MaterialInstance::TryGetResource(const std::string &name)
+Shared<T> MaterialInstance::TryGetResource(const String &name)
 {
 	const auto *decl = m_Material->FindResourceDeclaration(name);
 	if ( !decl )
@@ -199,7 +199,7 @@ Shared<T> MaterialInstance::TryGetResource(const std::string &name)
 }
 
 template <typename T>
-void MaterialInstance::Set(const std::string &name, const T &value)
+void MaterialInstance::Set(const String &name, const T &value)
 {
 	Renderer::Submit([=]()
 					 {

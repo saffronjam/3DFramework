@@ -11,8 +11,8 @@
 namespace Se
 {
 
-glm::vec2 Input::m_MousePosition = { 0.0f, 0.0f };
-glm::vec2 Input::m_LastMousePosition = { 0.0f, 0.0f };
+Vector2f Input::m_MousePosition = { 0.0f, 0.0f };
+Vector2f Input::m_LastMousePosition = { 0.0f, 0.0f };
 
 bool Input::IsKeyPressed(KeyCode keycode)
 {
@@ -38,20 +38,20 @@ float Input::GetMouseY()
 	return m_MousePosition.y;
 }
 
-glm::vec2 Input::GetMousePosition()
+Vector2f Input::GetMousePosition()
 {
 	return m_MousePosition;
 }
 
-glm::vec2 Input::GetMousePositionNDC()
+Vector2f Input::GetMousePositionNDC()
 {
 	const ImVec2 mousePos = ImGui::GetMousePos();
 	return { mousePos.x, mousePos.y };
 }
 
-glm::vec2 Input::GetMouseSwipe()
+Vector2f Input::GetMouseSwipe()
 {
-	glm::vec2 swipe = m_MousePosition - m_LastMousePosition;
+	Vector2f swipe = m_MousePosition - m_LastMousePosition;
 	if ( glm::length(swipe) > 100.0f )
 		swipe = { 0.0f, 0.0f };
 	return swipe;

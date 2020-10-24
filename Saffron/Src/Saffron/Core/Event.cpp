@@ -4,7 +4,7 @@
 namespace Se
 {
 
-std::string Event::ToString() const
+String Event::ToString() const
 {
 	return GetName();
 }

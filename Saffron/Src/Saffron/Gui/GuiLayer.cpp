@@ -10,7 +10,7 @@
 namespace Se
 {
 
-GuiLayer::GuiLayer(const std::string &name)
+GuiLayer::GuiLayer(const String &name)
 {
 }
 

@@ -9,12 +9,12 @@ class AssetPanel : public ReferenceCounted
 public:
 	struct AssetStat
 	{
-		std::string Full;
-		std::string Stem;
-		std::string Type;
-		fs::path Path;
+		String Full;
+		String Stem;
+		String Type;
+		Filepath Path;
 
-		AssetStat(std::string stem, std::string type, fs::path path)
+		AssetStat(String stem, String type, Filepath path)
 			:Full(stem + type),
 			Stem(std::move(stem)),
 			Type(std::move(type)),
@@ -35,16 +35,16 @@ public:
 	};
 
 public:
-	AssetPanel(fs::path path);
+	AssetPanel(Filepath path);
 
 	void OnGuiRender();
 	void SyncAssetPaths();
 
-	const std::vector<AssetStat> &GetAssetStats() const { return m_AssetStats; }
+	const ArrayList<AssetStat> &GetAssetStats() const { return m_AssetStats; }
 
 private:
-	fs::path m_AssetFolderPath;
-	std::vector<AssetStat> m_AssetStats;
+	Filepath m_AssetFolderPath;
+	ArrayList<AssetStat> m_AssetStats;
 };
 }
 

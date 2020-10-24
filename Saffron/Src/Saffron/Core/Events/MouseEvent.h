@@ -17,9 +17,9 @@ public:
 	explicit MousePressEvent(MouseButtonCode button) : m_Button(button) {}
 
 	MouseButtonCode GetButton() const { return m_Button; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Button: " << m_Button;
 		return oss.str();
 	}
@@ -38,9 +38,9 @@ public:
 	explicit MouseReleaseEvent(MouseButtonCode button) : m_Button(button) {}
 
 	MouseButtonCode GetButton() const { return m_Button; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Button: " << m_Button;
 		return oss.str();
 	}
@@ -61,9 +61,9 @@ public:
 	float GetOffsetX() const { return m_OffsetX; }
 	float GetOffsetY() const { return m_OffsetY; }
 
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::stringstream ss;
+		StringStream ss;
 		ss << GetName() << " Offsets: " << GetOffsetX() << ", " << GetOffsetY();
 		return ss.str();
 	}
@@ -79,18 +79,18 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseMoveEvent(const glm::vec2 &position) : m_Position(position) {}
+	explicit MouseMoveEvent(const Vector2f &position) : m_Position(position) {}
 
-	const glm::vec2 &GetPosition() const { return m_Position; }
-	std::string ToString() const override
+	const Vector2f &GetPosition() const { return m_Position; }
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Position: " << m_Position.x << ", " << m_Position.y;
 		return oss.str();
 	}
 
 private:
-	glm::vec2 m_Position;
+	Vector2f m_Position;
 };
 
 class MouseEnterEvent : public Event
@@ -100,7 +100,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	std::string ToString() const override { return GetName(); }
+	String ToString() const override { return GetName(); }
 };
 
 class MouseLeaveEvent : public Event
@@ -110,7 +110,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	std::string ToString() const override { return GetName(); }
+	String ToString() const override { return GetName(); }
 
 };
 

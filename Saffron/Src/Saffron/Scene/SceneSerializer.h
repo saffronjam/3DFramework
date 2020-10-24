@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+
 
 #include "Saffron/Scene/Scene.h"
 
@@ -11,11 +11,11 @@ class SceneSerializer
 public:
 	SceneSerializer(const Shared<Scene> &scene);
 
-	void Serialize(const std::string &filepath);
-	void SerializeRuntime(const std::string &filepath);
+	void Serialize(const String &filepath);
+	void SerializeRuntime(const String &filepath);
 
-	bool Deserialize(const std::string &filepath);
-	bool DeserializeRuntime(const std::string &filepath);
+	bool Deserialize(const String &filepath);
+	bool DeserializeRuntime(const String &filepath);
 private:
 	Shared<Scene> m_Scene;
 };

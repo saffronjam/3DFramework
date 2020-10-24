@@ -75,7 +75,7 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 /// Environment
 ///////////////////////////////////////////////////////////////////////////
 
-Scene::Environment Scene::Environment::Load(const std::string &filepath)
+Scene::Environment Scene::Environment::Load(const String &filepath)
 {
 	auto [radiance, irradiance] = SceneRenderer::CreateEnvironmentMap(filepath);
 	return { filepath, radiance, irradiance };
@@ -86,7 +86,7 @@ Scene::Environment Scene::Environment::Load(const std::string &filepath)
 /// Scene
 ///////////////////////////////////////////////////////////////////////////
 
-Scene::Scene(std::string name)
+Scene::Scene(String name)
 	: m_Name(std::move(name)),
 	m_SceneEntity(m_EntityRegistry.create(), this)
 {
@@ -148,7 +148,7 @@ void Scene::OnRenderRuntime(Time ts)
 	camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
-	const glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
+	const Matrix4f cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 
@@ -244,7 +244,7 @@ void Scene::OnGuiRender()
 
 	if ( ImGui::Button("Load Environment Map") )
 	{
-		const fs::path filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
+		const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
 		if ( !filepath.empty() )
 			SetEnvironment(Environment::Load(filepath.string()));
 	}
@@ -304,13 +304,13 @@ void Scene::OnRuntimeStop()
 	m_IsPlaying = false;
 }
 
-Entity Scene::CreateEntity(std::string name)
+Entity Scene::CreateEntity(String name)
 {
 	auto entity = Entity{ m_EntityRegistry.create(), this };
 	auto &idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = {};
 
-	entity.AddComponent<TransformComponent>(glm::mat4(1.0f));
+	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if ( !name.empty() )
 		entity.AddComponent<TagComponent>(std::move(name));
 
@@ -318,13 +318,13 @@ Entity Scene::CreateEntity(std::string name)
 	return entity;
 }
 
-Entity Scene::CreateEntityWithID(UUID uuid, const std::string &name, bool runtimeMap)
+Entity Scene::CreateEntityWithID(UUID uuid, const String &name, bool runtimeMap)
 {
 	auto entity = Entity{ m_EntityRegistry.create(), this };
 	auto &idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = uuid;
 
-	entity.AddComponent<TransformComponent>(glm::mat4(1.0f));
+	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if ( !name.empty() )
 		entity.AddComponent<TagComponent>(name);
 
@@ -355,7 +355,7 @@ void Scene::DuplicateEntity(Entity entity)
 	CopyComponentIfExists<CircleCollider2DComponent>(newEntity.m_EntityHandle, entity.m_EntityHandle, m_EntityRegistry);
 }
 
-Entity Scene::FindEntityByTag(const std::string &tag)
+Entity Scene::FindEntityByTag(const String &tag)
 {
 	// TODO: If this becomes used often, consider indexing by tag
 	auto view = m_EntityRegistry.view<TagComponent>();
@@ -432,7 +432,7 @@ Shared<Scene> Scene::GetScene(UUID uuid)
 	return {};
 }
 
-void Scene::SetName(std::string name)
+void Scene::SetName(String name)
 {
 	m_Name = std::move(name);
 }

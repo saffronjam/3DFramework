@@ -3,7 +3,6 @@
 #include "Saffron/Config.h"
 #include "Layer.h"
 
-#include <vector>
 
 namespace Se {
 
@@ -18,10 +17,10 @@ public:
 	void PopLayer(Layer *layer);
 	void PopOverlay(Layer *overlay);
 
-	std::vector<Layer *>::iterator begin() { return m_Layers.begin(); }
-	std::vector<Layer *>::iterator end() { return m_Layers.end(); }
+	ArrayList<Layer *>::iterator begin() { return m_Layers.begin(); }
+	ArrayList<Layer *>::iterator end() { return m_Layers.end(); }
 private:
-	std::vector<Layer *> m_Layers;
+	ArrayList<Layer *> m_Layers;
 	unsigned int m_LayerInsertIndex = 0;
 };
 

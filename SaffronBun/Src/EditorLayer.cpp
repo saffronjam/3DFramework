@@ -159,9 +159,9 @@ void EditorLayer::OnSceneStop()
 	m_RuntimeScene = nullptr;
 }
 
-void EditorLayer::UpdateWindowTitle(const std::string &sceneName)
+void EditorLayer::UpdateWindowTitle(const String &sceneName)
 {
-	const std::string title = sceneName + " - SaffronBun - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
+	const String title = sceneName + " - SaffronBun - " + Application::GetPlatformName() + " (" + Application::GetConfigurationName() + ")";
 	Application::Get().GetWindow().SetTitle(title);
 }
 
@@ -194,8 +194,8 @@ void EditorLayer::OnUpdate()
 			Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass("MainRenderTarget"), false);
 			const auto viewProj = m_EditorCamera.GetViewProjection();
 			Renderer2D::BeginScene(viewProj, false);
-			Renderer::DrawAABB(AABB{ glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 100.0f, 100.0f, 100.0f } }, glm::mat4(1.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.0f));
-			Renderer2D::DrawLine(glm::vec3{ 0.0f, 0.0f, 0.0f }, glm::vec3{ 100.0f, 100.0f, 100.0f }, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+			Renderer::DrawAABB(AABB{ Vector3f{ 0.0f, 0.0f, 0.0f }, Vector3f{ 100.0f, 100.0f, 100.0f } }, glm::mat4(1.0f), Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
+			Renderer2D::DrawLine(Vector3f{ 0.0f, 0.0f, 0.0f }, Vector3f{ 100.0f, 100.0f, 100.0f }, Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
 			Renderer2D::EndScene();
 			Renderer::EndRenderPass();
 		}
@@ -206,7 +206,7 @@ void EditorLayer::OnUpdate()
 			{
 				const auto &size = m_SelectedEntity.GetComponent<BoxCollider2DComponent>().Size;
 				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
-				const glm::vec3 rotation = glm::eulerAngles(rotationQuat);
+				const Vector3f rotation = glm::eulerAngles(rotationQuat);
 
 				Renderer::BeginRenderPass(SceneRenderer::GetFinalRenderPass("MainRenderTarget"), false);
 				const auto viewProj = m_EditorCamera.GetViewProjection();
@@ -263,7 +263,7 @@ void EditorLayer::NewScenePrompt()
 
 	if ( !filepath.empty() )
 	{
-		std::string sceneName = filepath.stem().string();
+		String sceneName = filepath.stem().string();
 		Shared<Scene> newScene = Shared<Scene>::Create(sceneName);
 
 		// Default construct environment and light
@@ -311,7 +311,7 @@ void EditorLayer::SaveActiveScene() const
 	serializer.Serialize(m_SceneFilePath.string());
 }
 
-void EditorLayer::LoadNewScene(const std::string &filepath)
+void EditorLayer::LoadNewScene(const String &filepath)
 {
 	if ( filepath != m_SceneFilePath.string() )
 	{
@@ -645,7 +645,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 				float Distance = 0.0f;
 			};
 
-			static std::vector<Selection> selections;
+			static ArrayList<Selection> selections;
 			auto meshEntities = m_EditorScene->GetAllEntitiesWith<MeshComponent>();
 			for ( auto e : meshEntities )
 			{
@@ -659,7 +659,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 				{
 					auto &submesh = submeshes[i];
 					Ray ray = {
-						glm::inverse(entity.Transform() * submesh.Transform) * glm::vec4(origin, 1.0f),
+						glm::inverse(entity.Transform() * submesh.Transform) * Vector4f(origin, 1.0f),
 						glm::inverse(glm::mat3(entity.Transform()) * glm::mat3(submesh.Transform)) * direction
 					};
 
@@ -715,16 +715,16 @@ bool EditorLayer::OnWindowDropFiles(const WindowDropFilesEvent &event)
 	return false;
 }
 
-std::pair<glm::vec3, glm::vec3> EditorLayer::CastRay(float mx, float my) const
+std::pair<Vector3f, Vector3f> EditorLayer::CastRay(float mx, float my) const
 {
-	const glm::vec4 mouseClipPos = { mx, my, -1.0f, 1.0f };
+	const Vector4f mouseClipPos = { mx, my, -1.0f, 1.0f };
 
 	const auto inverseProj = glm::inverse(m_EditorCamera.GetProjectionMatrix());
 	const auto inverseView = glm::inverse(glm::mat3(m_EditorCamera.GetViewMatrix()));
 
-	const glm::vec4 ray = inverseProj * mouseClipPos;
-	glm::vec3 rayPos = m_EditorCamera.GetPosition();
-	glm::vec3 rayDir = inverseView * glm::vec3(ray);
+	const Vector4f ray = inverseProj * mouseClipPos;
+	Vector3f rayPos = m_EditorCamera.GetPosition();
+	Vector3f rayDir = inverseView * Vector3f(ray);
 
 	return { rayPos, rayDir };
 }

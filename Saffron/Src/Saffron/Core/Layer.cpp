@@ -3,7 +3,7 @@
 
 namespace Se {
 
-Layer::Layer(const std::string &name)
+Layer::Layer(const String &name)
 	: m_DebugName(name)
 {
 }

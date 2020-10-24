@@ -55,7 +55,7 @@ OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wra
 	m_ImageData.Allocate(width * height * GetBPP(m_Format));
 }
 
-OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
+OpenGLTexture2D::OpenGLTexture2D(const String &path, bool sRGB)
 	: m_Width(0), m_Height(0), m_FilePath(path)
 {
 	int width, height, channels;
@@ -207,7 +207,7 @@ OpenGLTextureCube::OpenGLTextureCube(Format format, Uint32 width, Uint32 height)
 
 // TODO: Revisit this, as currently env maps are being loaded as equirectangular 2D images
 //       so this is an old path
-OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
+OpenGLTextureCube::OpenGLTextureCube(const String &path)
 	: m_Format(Format::None), m_Width(0), m_Height(0), m_FilePath(path)
 {
 	int width, height, channels;

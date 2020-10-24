@@ -4,7 +4,7 @@
 
 namespace Se
 {
-Ray::Ray(const glm::vec3 &origin, const glm::vec3 &direction) : Origin(origin), Direction(direction) {}
+Ray::Ray(const Vector3f &origin, const Vector3f &direction) : Origin(origin), Direction(direction) {}
 
 Ray Ray::Zero()
 {
@@ -13,15 +13,15 @@ Ray Ray::Zero()
 
 bool Ray::IntersectsAABB(const AABB &aabb, float &t) const
 {
-	glm::vec3 dirfrac;
+	Vector3f dirfrac;
 	// r.dir is unit direction vector of ray
 	dirfrac.x = 1.0f / Direction.x;
 	dirfrac.y = 1.0f / Direction.y;
 	dirfrac.z = 1.0f / Direction.z;
 	// lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
 	// r.org is origin of ray
-	const glm::vec3 &lb = aabb.Min;
-	const glm::vec3 &rt = aabb.Max;
+	const Vector3f &lb = aabb.Min;
+	const Vector3f &rt = aabb.Max;
 	const float t1 = (lb.x - Origin.x) * dirfrac.x;
 	const float t2 = (rt.x - Origin.x) * dirfrac.x;
 	const float t3 = (lb.y - Origin.y) * dirfrac.y;
@@ -52,15 +52,15 @@ bool Ray::IntersectsAABB(const AABB &aabb, float &t) const
 	return true;
 }
 
-bool Ray::IntersectsTriangle(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C, float &t) const
+bool Ray::IntersectsTriangle(const Vector3f &A, const Vector3f &B, const Vector3f &C, float &t) const
 {
-	const glm::vec3 E1 = B - A;
-	const glm::vec3 E2 = C - A;
-	const glm::vec3 N = cross(E1, E2);
+	const Vector3f E1 = B - A;
+	const Vector3f E2 = C - A;
+	const Vector3f N = cross(E1, E2);
 	const float det = -glm::dot(Direction, N);
 	const float invdet = 1.0f / det;
-	const glm::vec3 AO = Origin - A;
-	const glm::vec3 DAO = glm::cross(AO, Direction);
+	const Vector3f AO = Origin - A;
+	const Vector3f DAO = glm::cross(AO, Direction);
 	const float u = glm::dot(E2, DAO) * invdet;
 	const float v = -glm::dot(E1, DAO) * invdet;
 	t = glm::dot(AO, N) * invdet;

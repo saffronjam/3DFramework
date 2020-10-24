@@ -11,7 +11,7 @@ EditorCamera::EditorCamera(const ViewportPane &mainViewport)
 	Reset();
 }
 
-EditorCamera::EditorCamera(const ViewportPane &mainViewport, const glm::mat4 &projectionMatrix)
+EditorCamera::EditorCamera(const ViewportPane &mainViewport, const Matrix4f &projectionMatrix)
 	: Camera(projectionMatrix),
 	m_EditorViewport(mainViewport)
 {
@@ -26,7 +26,7 @@ void EditorCamera::OnUpdate(Time ts)
 		{
 			if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
 			{
-				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
+				const Vector2f swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
 
 				//if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
 				//	MousePan(swipe);
@@ -79,7 +79,7 @@ void EditorCamera::OnUpdate(Time ts)
 
 			if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
 			{
-				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
+				const Vector2f swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
 
 				m_Yaw += swipe.x;
 				m_Pitch -= swipe.y;
@@ -107,17 +107,17 @@ void EditorCamera::Reset()
 }
 
 
-glm::vec3 EditorCamera::GetUpDirection() const
+Vector3f EditorCamera::GetUpDirection() const
 {
 	return m_Up;
 }
 
-glm::vec3 EditorCamera::GetRightDirection() const
+Vector3f EditorCamera::GetRightDirection() const
 {
 	return m_Right;
 }
 
-glm::vec3 EditorCamera::GetForwardDirection() const
+Vector3f EditorCamera::GetForwardDirection() const
 {
 	return m_Forward;
 }
@@ -132,7 +132,7 @@ bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 
 void EditorCamera::UpdateCameraView()
 {
-	glm::vec3 front;
+	Vector3f front;
 	front.x = std::cos(m_Yaw) * std::cos(m_Pitch);
 	front.y = std::sin(m_Pitch);
 	front.z = std::sin(m_Yaw) * std::cos(m_Pitch);

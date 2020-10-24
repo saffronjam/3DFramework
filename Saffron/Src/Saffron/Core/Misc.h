@@ -9,13 +9,13 @@ class Misc
 public:
 	struct TransformDecomposition
 	{
-		glm::vec3 Translation;
-		glm::quat Rotation;
-		glm::vec3 Scale;
+		Vector3f Translation;
+		Quaternion Rotation;
+		Vector3f Scale;
 	};
 
 public:
-	static TransformDecomposition GetTransformDecomposition(const glm::mat4 &transform);
+	static TransformDecomposition GetTransformDecomposition(const Matrix4f &transform);
 };
 
 }

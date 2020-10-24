@@ -7,13 +7,13 @@ namespace Se
 {
 struct Ray
 {
-	glm::vec3 Origin{}, Direction{};
+	Vector3f Origin{}, Direction{};
 
-	Ray(const glm::vec3 &origin, const glm::vec3 &direction);
+	Ray(const Vector3f &origin, const Vector3f &direction);
 
 	static Ray Zero();
 
 	bool IntersectsAABB(const AABB &aabb, float &t) const;
-	bool IntersectsTriangle(const glm::vec3 &A, const glm::vec3 &B, const glm::vec3 &C, float &t) const;
+	bool IntersectsTriangle(const Vector3f &A, const Vector3f &B, const Vector3f &C, float &t) const;
 };
 }

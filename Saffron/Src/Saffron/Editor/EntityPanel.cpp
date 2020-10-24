@@ -14,16 +14,16 @@
 namespace Se
 {
 
-glm::mat4 Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
+Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
 
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
 
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
+static Tuple<Vector3f, glm::quat, Vector3f> GetTransformDecomposition(const Matrix4f &transform)
 {
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
+	Vector3f scale, translation, skew;
+	Vector4f perspective;
 	glm::quat orientation;
 	glm::decompose(transform, scale, orientation, translation, skew, perspective);
 
@@ -32,7 +32,7 @@ static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(con
 
 
 template<typename T, typename UIFunction>
-static void DrawComponent(const std::string &name, Entity entity, UIFunction uiFunction)
+static void DrawComponent(const String &name, Entity entity, UIFunction uiFunction)
 {
 	if ( entity.HasComponent<T>() )
 	{
@@ -141,7 +141,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 		ImGui::SetNextWindowContentSize(ImVec2(400, 0.0f));
 		if ( ImGui::BeginPopupModal("Create new Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize) )
 		{
-			static std::string entityName;
+			static String entityName;
 			static bool meshComponent = false;
 			static bool scriptComponent = false;
 			static int scriptChosen = 0;
@@ -160,7 +160,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 			if ( scriptComponent )
 			{
 				ImGui::NextColumn();
-				std::ostringstream oss;
+				OutputStringStream oss;
 				for ( const auto &scriptName : scriptPanel->GetScriptStats() ) { oss << scriptName.Class << '\0'; }
 				oss << '\0';
 				ImGui::Combo("##EntityCreateScriptComboOption", &scriptChosen, oss.str().c_str());
@@ -189,7 +189,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 					Entity newEntity = m_Context->CreateEntity(entityName);
 					if ( meshComponent )
 					{
-						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+						const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
 						newEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 						meshComponent = false;
 					}
@@ -260,7 +260,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 				{
 					if ( ImGui::Button("Mesh") )
 					{
-						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+						const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
 						m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 						ImGui::CloseCurrentPopup();
 					}
@@ -356,7 +356,7 @@ void EntityPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
-							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
+							auto &albedoColor = materialInstance->Get<Vector3f>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
 							Shared<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
@@ -374,7 +374,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
@@ -419,7 +419,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										normalMap = Texture2D::Create(filepath.string());
@@ -455,7 +455,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										metalnessMap = Texture2D::Create(filepath.string());
@@ -493,7 +493,7 @@ void EntityPanel::OnGuiRenderMaterial()
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										roughnessMap = Texture2D::Create(filepath.string());
@@ -550,7 +550,7 @@ void EntityPanel::OnGuiRenderMeshDebug()
 
 void EntityPanel::DrawEntityNode(Entity entity)
 {
-	std::string name = "Unnamed";
+	String name = "Unnamed";
 	if ( entity.HasComponent<TagComponent>() )
 		name = entity.GetComponent<TagComponent>().Tag;
 
@@ -596,7 +596,7 @@ void EntityPanel::DrawEntityNode(Entity entity)
 
 void EntityPanel::DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const
 {
-	std::ostringstream oss;
+	OutputStringStream oss;
 	oss << "Mesh##" << entityUUID;
 
 	// Mesh Hierarchy
@@ -610,11 +610,11 @@ void EntityPanel::DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const
 
 void EntityPanel::MeshNodeHierarchy(const Shared<Mesh> &mesh,
 									aiNode *node,
-									const glm::mat4 &parentTransform,
+									const Matrix4f &parentTransform,
 									Uint32 level) const
 {
-	const glm::mat4 localTransform = Mat4FromAssimpMat4(node->mTransformation);
-	const glm::mat4 transform = parentTransform * localTransform;
+	const Matrix4f localTransform = Mat4FromAssimpMat4(node->mTransformation);
+	const Matrix4f transform = parentTransform * localTransform;
 
 	if ( ImGui::TreeNode(node->mName.C_Str()) )
 	{
@@ -652,7 +652,7 @@ void EntityPanel::DrawComponents(Entity entity)
 		memcpy(buffer, tag.c_str(), tag.length());
 		if ( ImGui::InputText("##Tag", buffer, 256) )
 		{
-			tag = std::string(buffer);
+			tag = String(buffer);
 		}
 	}
 
@@ -668,7 +668,7 @@ void EntityPanel::DrawComponents(Entity entity)
 		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform") )
 		{
 			auto [translation, rotationQuat, scale] = GetTransformDecomposition(tc);
-			glm::vec3 rotation = glm::degrees(glm::eulerAngles(rotationQuat));
+			Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
 			ImGui::Columns(2);
 			ImGui::Text("Translation");
@@ -679,7 +679,7 @@ void EntityPanel::DrawComponents(Entity entity)
 
 			if ( ImGui::DragFloat3("##translation", glm::value_ptr(translation), 0.25f) )
 			{
-				//tc.Transform[3] = glm::vec4(translation, 1.0f);
+				//tc.Transform[3] = Vector4f(translation, 1.0f);
 				updateTransform = true;
 			}
 
@@ -693,7 +693,7 @@ void EntityPanel::DrawComponents(Entity entity)
 			if ( ImGui::DragFloat3("##rotation", glm::value_ptr(rotation), 0.25f) )
 			{
 				updateTransform = true;
-				// tc.Transform[3] = glm::vec4(translation, 1.0f);
+				// tc.Transform[3] = Vector4f(translation, 1.0f);
 			}
 
 			ImGui::PopItemWidth();
@@ -715,9 +715,9 @@ void EntityPanel::DrawComponents(Entity entity)
 
 			if ( updateTransform )
 			{
-				tc.Transform = glm::translate(glm::mat4(1.0f), translation) *
+				tc.Transform = glm::translate(Matrix4f(1.0f), translation) *
 					glm::toMat4(glm::quat(glm::radians(rotation))) *
-					glm::scale(glm::mat4(1.0f), scale);
+					glm::scale(Matrix4f(1.0f), scale);
 			}
 
 			ImGui::TreePop();
@@ -745,7 +745,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									 ImGui::NextColumn();
 									 if ( ImGui::Button("Open...##openmesh") )
 									 {
-										 const fs::path filepath = FileIOManager::OpenFile();
+										 const Filepath filepath = FileIOManager::OpenFile();
 										 if ( !filepath.empty() )
 											 mc.Mesh = Shared<Mesh>::Create(filepath.string());
 									 }
@@ -817,7 +817,7 @@ void EntityPanel::DrawComponents(Entity entity)
 
 	DrawComponent<ScriptComponent>("Script", entity, [=](ScriptComponent &sc) mutable
 								   {
-									   static std::string cachedNewModuleName;
+									   static String cachedNewModuleName;
 
 									   Gui::BeginPropertyGrid();
 									   Gui::Property("Module Name", sc.ModuleName.c_str());
@@ -899,7 +899,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec2:
 												   {
-													   glm::vec2 value = isRuntime ? field.GetRuntimeValue<glm::vec2>() : field.GetStoredValue<glm::vec2>();
+													   Vector2f value = isRuntime ? field.GetRuntimeValue<Vector2f>() : field.GetStoredValue<Vector2f>();
 													   if ( Gui::Property(field.Name, value, 0.2f) )
 													   {
 														   if ( isRuntime )
@@ -911,7 +911,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec3:
 												   {
-													   glm::vec3 value = isRuntime ? field.GetRuntimeValue<glm::vec3>() : field.GetStoredValue<glm::vec3>();
+													   Vector3f value = isRuntime ? field.GetRuntimeValue<Vector3f>() : field.GetStoredValue<Vector3f>();
 													   if ( Gui::Property(field.Name, value, 0.2f) )
 													   {
 														   if ( isRuntime )
@@ -923,7 +923,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec4:
 												   {
-													   glm::vec4 value = isRuntime ? field.GetRuntimeValue<glm::vec4>() : field.GetStoredValue<glm::vec4>();
+													   Vector4f value = isRuntime ? field.GetRuntimeValue<Vector4f>() : field.GetStoredValue<Vector4f>();
 													   if ( Gui::Property(field.Name, value, 0.2f) )
 													   {
 														   if ( isRuntime )

@@ -18,15 +18,15 @@ public:
 public:
 	struct Properties
 	{
-		std::string Title;
+		String Title;
 		Uint32 Width;
 		Uint32 Height;
-		glm::vec2 Position;
+		Vector2f Position;
 
-		explicit Properties(std::string title = "Saffron Engine",
+		explicit Properties(String title = "Saffron Engine",
 							Uint32 width = 1280,
 							Uint32 height = 720,
-							const glm::vec2 position = { 100.0f, 100.0f })
+							const Vector2f position = { 100.0f, 100.0f })
 			: Title(std::move(title)), Width(width), Height(height), Position(position)
 		{
 		}
@@ -49,11 +49,11 @@ public:
 
 	virtual Uint32 GetWidth() const;
 	virtual Uint32 GetHeight() const;
-	virtual const glm::vec2 &GetPosition() const;
+	virtual const Vector2f &GetPosition() const;
 	virtual void *GetNativeWindow() const = 0;
 
 	// Window attributes
-	virtual void SetTitle(std::string title) = 0;
+	virtual void SetTitle(String title) = 0;
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
 	virtual bool IsMinimized() const = 0;
@@ -61,12 +61,12 @@ public:
 	static Shared<Window> Create(const Properties &properties = Properties());
 
 protected:
-	std::string m_Title;
-	glm::vec2 m_Position;
+	String m_Title;
+	Vector2f m_Position;
 	Uint32 m_Width, m_Height;
 
 private:
-	std::vector<Shared<Event>> m_Events;
+	ArrayList<Shared<Event>> m_Events;
 	std::optional<EventCallback> m_EventCallback;
 };
 

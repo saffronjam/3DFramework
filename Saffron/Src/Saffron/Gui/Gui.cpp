@@ -1,6 +1,5 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Gui/Gui.h"
 
 namespace Se
@@ -129,7 +128,7 @@ void Gui::Property(const char *label, const char *value)
 	ImGui::NextColumn();
 }
 
-bool Gui::Property(const char *label, std::string &value, bool error)
+bool Gui::Property(const char *label, String &value, bool error)
 {
 	bool modified = false;
 
@@ -160,13 +159,13 @@ bool Gui::Property(const char *label, std::string &value, bool error)
 	return modified;
 }
 
-bool Gui::Property(const std::string &name, bool &value)
+bool Gui::Property(const String &name, bool &value)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	const bool result = ImGui::Checkbox(id.c_str(), &value);
 
 	ImGui::PopItemWidth();
@@ -175,13 +174,13 @@ bool Gui::Property(const std::string &name, bool &value)
 	return result;
 }
 
-bool Gui::Property(const std::string &name, int &value, int min, int max, PropertyFlag flags)
+bool Gui::Property(const String &name, int &value, int min, int max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	bool changed;
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderInt(id.c_str(), &value, min, max);
@@ -193,13 +192,13 @@ bool Gui::Property(const std::string &name, int &value, int min, int max, Proper
 
 	return changed;
 }
-bool Gui::Property(const std::string &name, float &value, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String &name, float &value, float min, float max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	bool changed;
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
@@ -212,18 +211,18 @@ bool Gui::Property(const std::string &name, float &value, float min, float max, 
 	return changed;
 }
 
-bool Gui::Property(const std::string &name, glm::vec2 &value, Gui::PropertyFlag flags)
+bool Gui::Property(const String &name, Vector2f &value, Gui::PropertyFlag flags)
 {
 	return Property(name, value, -1.0f, 1.0f, flags);
 }
 
-bool Gui::Property(const std::string &name, glm::vec2 &value, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector2f &value, float min, float max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	bool changed;
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
@@ -236,18 +235,18 @@ bool Gui::Property(const std::string &name, glm::vec2 &value, float min, float m
 	return changed;
 }
 
-bool Gui::Property(const std::string &name, glm::vec3 &value, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector3f &value, PropertyFlag flags)
 {
 	return Property(name, value, -1.0f, 1.0f, flags);
 }
 
-bool Gui::Property(const std::string &name, glm::vec3 &value, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector3f &value, float min, float max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	bool changed;
 	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color) )
 		changed = ImGui::ColorEdit3(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
@@ -262,18 +261,18 @@ bool Gui::Property(const std::string &name, glm::vec3 &value, float min, float m
 	return changed;
 }
 
-bool Gui::Property(const std::string &name, glm::vec4 &value, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector4f &value, PropertyFlag flags)
 {
 	return Property(name, value, -1.0f, 1.0f, flags);
 }
 
-bool Gui::Property(const std::string &name, glm::vec4 &value, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector4f &value, float min, float max, PropertyFlag flags)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	const std::string id = "##" + name;
+	const String id = "##" + name;
 	bool changed;
 	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color) )
 		changed = ImGui::ColorEdit4(id.c_str(), glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
@@ -288,7 +287,7 @@ bool Gui::Property(const std::string &name, glm::vec4 &value, float min, float m
 	return changed;
 }
 
-void Gui::HelpMarker(const std::string &desc)
+void Gui::HelpMarker(const String &desc)
 {
 	ImGui::TextDisabled("(?)");
 	if ( ImGui::IsItemHovered() )

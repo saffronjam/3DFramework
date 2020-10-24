@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Time.h"
@@ -53,10 +53,10 @@ struct EntityInstance
 // TODO: This needs to somehow work for strings...
 struct PublicField
 {
-	std::string Name;
+	String Name;
 	FieldType Type;
 
-	PublicField(std::string name, FieldType type);
+	PublicField(String name, FieldType type);
 	PublicField(const PublicField &) = delete;
 	PublicField(PublicField &&other);
 	~PublicField();
@@ -89,7 +89,7 @@ private:
 	friend class ScriptEngine;
 };
 
-using ScriptModuleFieldMap = std::unordered_map<std::string, std::unordered_map<std::string, PublicField>>;
+using ScriptModuleFieldMap = UnorderedMap<String, UnorderedMap<String, PublicField>>;
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,7 @@ struct EntityInstanceData
 	ScriptModuleFieldMap ModuleFieldMap;
 };
 
-using EntityInstanceMap = std::unordered_map<UUID, std::unordered_map<UUID, EntityInstanceData>>;
+using EntityInstanceMap = UnorderedMap<UUID, UnorderedMap<UUID, EntityInstanceData>>;
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -112,15 +112,15 @@ using EntityInstanceMap = std::unordered_map<UUID, std::unordered_map<UUID, Enti
 class ScriptEngine
 {
 public:
-	static void Init(std::string assemblyPath);
+	static void Init(String assemblyPath);
 	static void Shutdown();
 
 	static void OnUpdate();
 	static void OnGuiRender();
 	static void OnSceneDestruct(UUID sceneID);
 
-	static void LoadSaffronRuntimeAssembly(const std::string &path);
-	static void ReloadAssembly(const std::string &path);
+	static void LoadSaffronRuntimeAssembly(const String &path);
+	static void ReloadAssembly(const String &path);
 
 	static void SetSceneContext(const Shared<Scene> &scene);
 	static const Shared<Scene> &GetCurrentSceneContext();
@@ -138,9 +138,9 @@ public:
 
 	static void OnScriptComponentDestroyed(UUID sceneID, UUID entityID);
 
-	static bool ModuleExists(const std::string &moduleName);
+	static bool ModuleExists(const String &moduleName);
 	static void InitScriptEntity(Entity entity);
-	static void ShutdownScriptEntity(Entity entity, const std::string &moduleName);
+	static void ShutdownScriptEntity(Entity entity, const String &moduleName);
 	static void InstantiateEntityClass(Entity entity);
 
 	static EntityInstanceMap &GetEntityInstanceMap();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SaffronPCH.h"
+#include "Saffron/Base.h"
 
 namespace Se
 {
@@ -13,6 +13,6 @@ public:
 	bool TryLock();
 
 private:
-	std::mutex m_mutex;
+	Mutex m_Mutex;
 };
 }

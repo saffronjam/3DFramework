@@ -26,14 +26,14 @@ private:
 
 	void DrawEntityNode(Entity entity);
 	void DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const;
-	void MeshNodeHierarchy(const Shared<Mesh> &mesh, aiNode *node, const glm::mat4 &parentTransform = glm::mat4(1.0f), Uint32 level = 0) const;
+	void MeshNodeHierarchy(const Shared<Mesh> &mesh, aiNode *node, const Matrix4f &parentTransform = Matrix4f(1.0f), Uint32 level = 0) const;
 	void DrawComponents(Entity entity);
 
 private:
 	Shared<Scene> m_Context;
 	Entity m_SelectionContext;
 
-	std::map<std::string, Shared<Texture2D>> m_TexStore;
+	Map<String, Shared<Texture2D>> m_TexStore;
 
 	std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 };

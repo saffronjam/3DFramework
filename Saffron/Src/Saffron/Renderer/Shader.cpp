@@ -7,7 +7,7 @@
 namespace Se
 {
 
-std::vector<Shared<Shader>> Shader::m_sAllShaders;
+ArrayList<Shared<Shader>> Shader::m_sAllShaders;
 
 void Shader::OnGuiRender()
 {
@@ -18,7 +18,7 @@ void Shader::OnGuiRender()
 	{
 		if ( ImGui::TreeNode(shader->GetName().c_str()) )
 		{
-			std::string buttonName = "Reload##" + shader->GetName();
+			String buttonName = "Reload##" + shader->GetName();
 			if ( ImGui::Button(buttonName.c_str()) )
 				shader->Reload();
 			ImGui::TreePop();
@@ -28,7 +28,7 @@ void Shader::OnGuiRender()
 	ImGui::End();
 }
 
-Shared<Shader> Shader::Create(const std::string &filepath)
+Shared<Shader> Shader::Create(const String &filepath)
 {
 	Shared<Shader> result = nullptr;
 
@@ -44,7 +44,7 @@ Shared<Shader> Shader::Create(const std::string &filepath)
 	return result;
 }
 
-Shared<Shader> Shader::CreateFromString(const std::string &source)
+Shared<Shader> Shader::CreateFromString(const String &source)
 {
 	Shared<Shader> result = nullptr;
 
@@ -67,7 +67,7 @@ void ShaderLibrary::Add(const Shared<Shader> &shader)
 	m_Shaders[name] = shader;
 }
 
-void ShaderLibrary::Load(const std::string &path)
+void ShaderLibrary::Load(const String &path)
 {
 	const auto shader = Shared<Shader>(Shader::Create(path));
 	const auto &name = shader->GetName();
@@ -75,13 +75,13 @@ void ShaderLibrary::Load(const std::string &path)
 	m_Shaders[name] = shader;
 }
 
-void ShaderLibrary::Load(const std::string &name, const std::string &path)
+void ShaderLibrary::Load(const String &name, const String &path)
 {
 	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
 	m_Shaders[name] = Shared<Shader>(Shader::Create(path));
 }
 
-const Shared<Shader> &ShaderLibrary::Get(const std::string &name) const
+const Shared<Shader> &ShaderLibrary::Get(const String &name) const
 {
 	SE_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end());
 	return m_Shaders.at(name);

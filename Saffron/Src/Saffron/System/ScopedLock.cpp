@@ -3,14 +3,14 @@
 
 namespace Se
 {
-ScopedLock::ScopedLock(std::mutex &mutex)
-	: m_mutex(mutex)
+ScopedLock::ScopedLock(Mutex &mutex)
+	: m_Mutex(mutex)
 {
-	m_mutex.lock();
+	m_Mutex.lock();
 }
 
 ScopedLock::~ScopedLock()
 {
-	m_mutex.unlock();
+	m_Mutex.unlock();
 }
 }

@@ -1,6 +1,6 @@
 #include "SaffronPCH.h"
 
-#include <string>
+
 
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Texture.h"
@@ -38,7 +38,7 @@ Shared<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, 
 	}
 }
 
-Shared<Texture2D> Texture2D::Create(const std::string &path, bool sRGB)
+Shared<Texture2D> Texture2D::Create(const String &path, bool sRGB)
 {
 	switch ( RendererAPI::Current() )
 	{
@@ -58,7 +58,7 @@ Shared<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 heig
 	}
 }
 
-Shared<TextureCube> TextureCube::Create(const std::string &path)
+Shared<TextureCube> TextureCube::Create(const String &path)
 {
 	switch ( RendererAPI::Current() )
 	{

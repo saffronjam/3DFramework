@@ -28,8 +28,8 @@ bool Saffron_Input_IsMouseButtonPressed(MouseButtonCode mouseButton);
 /// Entity
 ///////////////////////////////////////////////////////////////
 
-void Saffron_Entity_GetTransform(Uint64 entityID, glm::mat4 *outTransform);
-void Saffron_Entity_SetTransform(Uint64 entityID, glm::mat4 *inTransform);
+void Saffron_Entity_GetTransform(Uint64 entityID, Matrix4f *outTransform);
+void Saffron_Entity_SetTransform(Uint64 entityID, Matrix4f *inTransform);
 void Saffron_Entity_CreateComponent(Uint64 entityID, void *type);
 bool Saffron_Entity_HasComponent(Uint64 entityID, void *type);
 Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag);
@@ -59,8 +59,8 @@ void Saffron_Material_SetTexture(Shared<Material> *material, MonoString *uniform
 
 void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance> *instance);
 void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoString *uniform, float value);
-void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value);
-void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value);
+void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, Vector3f *value);
+void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, Vector4f *value);
 void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance> *instance, MonoString *uniform, Shared<Texture2D> *texture);
 
 
@@ -141,17 +141,17 @@ void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh);
 /// RigidBody2D Component
 ///////////////////////////////////////////////////////////////
 
-void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake);
-void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *outVelocity);
-void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *velocity);
+void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, Vector2f *impulse, Vector2f *offset, bool wake);
+void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, Vector2f *outVelocity);
+void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, Vector2f *velocity);
 
 
 ///////////////////////////////////////////////////////////////
 /// Collider2D Component
 ///////////////////////////////////////////////////////////////
 
-void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, glm::vec2 *offset);
-void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, glm::vec2 *offset);
+void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, Vector2f *offset);
+void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, Vector2f *offset);
 float Saffron_Collider2DComponent_GetDensity(Uint64 entityID);
 void Saffron_Collider2DComponent_SetDensity(Uint64 entityID, float density);
 float Saffron_Collider2DComponent_GetFriction(Uint64 entityID);
@@ -162,8 +162,8 @@ void Saffron_Collider2DComponent_SetFriction(Uint64 entityID, float friction);
 /// BoxCollider2D Component
 ///////////////////////////////////////////////////////////////
 
-void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, glm::vec2 *size);
-void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, glm::vec2 *size);
+void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, Vector2f *size);
+void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, Vector2f *size);
 
 
 ///////////////////////////////////////////////////////////////

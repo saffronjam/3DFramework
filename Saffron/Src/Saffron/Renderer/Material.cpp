@@ -31,7 +31,7 @@ void Material::Bind()
 	BindTextures();
 }
 
-void Material::Set(const std::string &name, const Shared<Texture> &texture)
+void Material::Set(const String &name, const Shared<Texture> &texture)
 {
 	ShaderResourceDeclaration *decl = FindResourceDeclaration(name);
 	const Uint32 slot = decl->GetRegister();
@@ -40,12 +40,12 @@ void Material::Set(const std::string &name, const Shared<Texture> &texture)
 	m_Textures[slot] = texture;
 }
 
-void Material::Set(const std::string &name, const Shared<Texture2D> &texture)
+void Material::Set(const String &name, const Shared<Texture2D> &texture)
 {
 	Set(name, static_cast<const Shared<Texture> &>(texture));
 }
 
-void Material::Set(const std::string &name, const Shared<TextureCube> &texture)
+void Material::Set(const String &name, const Shared<TextureCube> &texture)
 {
 	Set(name, static_cast<const Shared<Texture> &>(texture));
 }
@@ -93,7 +93,7 @@ void Material::BindTextures()
 	}
 }
 
-ShaderUniformDeclaration *Material::FindUniformDeclaration(const std::string &name)
+ShaderUniformDeclaration *Material::FindUniformDeclaration(const String &name)
 {
 	if ( m_VSUniformStorageBuffer )
 	{
@@ -117,7 +117,7 @@ ShaderUniformDeclaration *Material::FindUniformDeclaration(const std::string &na
 	return nullptr;
 }
 
-ShaderResourceDeclaration *Material::FindResourceDeclaration(const std::string &name)
+ShaderResourceDeclaration *Material::FindResourceDeclaration(const String &name)
 {
 	const auto &resources = m_Shader->GetResources();
 	for ( ShaderResourceDeclaration *resource : resources )
@@ -147,7 +147,7 @@ Buffer &Material::GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclar
 /// Material Instance
 ////////////////////////////////////////////////////////////////
 
-MaterialInstance::MaterialInstance(const Shared<Material> &material, std::string name)
+MaterialInstance::MaterialInstance(const Shared<Material> &material, String name)
 	: m_Material(material), m_Name(std::move(name))
 {
 	m_Material->m_MaterialInstances.insert(this);
@@ -181,7 +181,7 @@ void MaterialInstance::Bind()
 	}
 }
 
-void MaterialInstance::Set(const std::string &name, const Shared<Texture> &texture)
+void MaterialInstance::Set(const String &name, const Shared<Texture> &texture)
 {
 	const auto *decl = m_Material->FindResourceDeclaration(name);
 	if ( !decl )
@@ -195,12 +195,12 @@ void MaterialInstance::Set(const std::string &name, const Shared<Texture> &textu
 	m_Textures[slot] = texture;
 }
 
-void MaterialInstance::Set(const std::string &name, const Shared<Texture2D> &texture)
+void MaterialInstance::Set(const String &name, const Shared<Texture2D> &texture)
 {
 	Set(name, static_cast<const Shared<Texture> &>(texture));
 }
 
-void MaterialInstance::Set(const std::string &name, const Shared<TextureCube> &texture)
+void MaterialInstance::Set(const String &name, const Shared<TextureCube> &texture)
 {
 	Set(name, static_cast<const Shared<Texture> &>(texture));
 }

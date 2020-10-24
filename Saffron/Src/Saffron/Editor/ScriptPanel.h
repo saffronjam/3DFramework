@@ -9,12 +9,12 @@ class ScriptPanel : public ReferenceCounted
 public:
 	struct ScriptStat
 	{
-		std::string Full;
-		std::string Namespace;
-		std::string Class;
-		fs::path Path;
+		String Full;
+		String Namespace;
+		String Class;
+		Filepath Path;
 
-		ScriptStat(std::string namespaceName, std::string className, fs::path path)
+		ScriptStat(String namespaceName, String className, Filepath path)
 			:Full(namespaceName + className),
 			Namespace(std::move(namespaceName)),
 			Class(std::move(className)),
@@ -34,15 +34,15 @@ public:
 	};
 
 public:
-	ScriptPanel(fs::path path);
+	ScriptPanel(Filepath path);
 
 	void OnGuiRender();
 	void SyncScriptPaths();
 
-	const std::vector<ScriptStat> &GetScriptStats() const { return m_ScriptStats; }
+	const ArrayList<ScriptStat> &GetScriptStats() const { return m_ScriptStats; }
 
 private:
-	fs::path m_ScriptFolderPath;
-	std::vector<ScriptStat> m_ScriptStats;
+	Filepath m_ScriptFolderPath;
+	ArrayList<ScriptStat> m_ScriptStats;
 };
 }

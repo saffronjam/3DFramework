@@ -29,7 +29,7 @@ const char *FormatFilter(const FileIOManager::Filter &filter)
 	return buffer;
 }
 
-fs::path FileIOManager::OpenFile(const Filter &filter)
+Filepath FileIOManager::OpenFile(const Filter &filter)
 {
 	SE_CORE_ASSERT(m_Window, "FileIOManager was not initialized");
 
@@ -52,10 +52,10 @@ fs::path FileIOManager::OpenFile(const Filter &filter)
 	{
 		return ofn.lpstrFile;
 	}
-	return fs::path();
+	return Filepath();
 }
 
-fs::path FileIOManager::SaveFile(const Filter &filter)
+Filepath FileIOManager::SaveFile(const Filter &filter)
 {
 	SE_CORE_ASSERT(m_Window, "FileIOManager was not initialized");
 
@@ -80,7 +80,7 @@ fs::path FileIOManager::SaveFile(const Filter &filter)
 	{
 		return ofn.lpstrFile;
 	}
-	return fs::path();
+	return Filepath();
 }
 
 

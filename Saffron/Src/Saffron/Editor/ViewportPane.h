@@ -7,27 +7,27 @@ namespace Se
 class ViewportPane
 {
 public:
-	explicit ViewportPane(std::string renderTargetIdentifier);
+	explicit ViewportPane(String renderTargetIdentifier);
 
 	void OnGuiRender();
 
-	bool InViewport(glm::vec2 positionNDC) const;
+	bool InViewport(Vector2f positionNDC) const;
 
-	glm::vec2 GetMousePosition() const;
-	glm::vec2 GetViewportSize() const;
-	const glm::vec2 &GetTopLeft() const { return m_TopLeft; }
-	const glm::vec2 &GetBottomRight() const { return m_BottomRight; }
+	Vector2f GetMousePosition() const;
+	Vector2f GetViewportSize() const;
+	const Vector2f &GetTopLeft() const { return m_TopLeft; }
+	const Vector2f &GetBottomRight() const { return m_BottomRight; }
 	bool IsHovered() const { return m_Hovered; }
 	bool IsFocused() const { return m_Focused; }
 
 	void SetPostRenderCallback(std::function<void()> fn) { m_PostRenderFunction = fn; }
-	void SetRenderTargetIdentifier(std::string renderTargetIdentifier) { m_RenderTargetIdentifier = std::move(renderTargetIdentifier); }
+	void SetRenderTargetIdentifier(String renderTargetIdentifier) { m_RenderTargetIdentifier = std::move(renderTargetIdentifier); }
 
 private:
-	std::string m_RenderTargetIdentifier;
+	String m_RenderTargetIdentifier;
 
-	glm::vec2 m_TopLeft;
-	glm::vec2 m_BottomRight;
+	Vector2f m_TopLeft;
+	Vector2f m_BottomRight;
 	bool m_Hovered;
 	bool m_Focused;
 	std::function<void()> m_PostRenderFunction;

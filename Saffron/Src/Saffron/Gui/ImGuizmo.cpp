@@ -227,9 +227,9 @@ public:
 	void Transform(const matrix_t &matrix);
 	void Transform(const vec_t &s, const matrix_t &matrix);
 
-	void TransformVector(const matrix_t &matrix);
+	void TransformArrayList(const matrix_t &matrix);
 	void TransformPoint(const matrix_t &matrix);
-	void TransformVector(const vec_t &v, const matrix_t &matrix) { (*this) = v; this->TransformVector(matrix); }
+	void TransformArrayList(const vec_t &v, const matrix_t &matrix) { (*this) = v; this->TransformArrayList(matrix); }
 	void TransformPoint(const vec_t &v, const matrix_t &matrix) { (*this) = v; this->TransformPoint(matrix); }
 
 	float &operator [] (size_t index) { return static_cast<float *>(&x)[index]; }
@@ -413,7 +413,7 @@ void vec_t::TransformPoint(const matrix_t &matrix)
 }
 
 
-void vec_t::TransformVector(const matrix_t &matrix)
+void vec_t::TransformArrayList(const matrix_t &matrix)
 {
 	vec_t out;
 
@@ -613,7 +613,7 @@ struct Context
 	vec_t mCameraDir;
 	vec_t mCameraUp;
 	vec_t mRayOrigin;
-	vec_t mRayVector;
+	vec_t mRayArrayList;
 
 	float  mRadiusSquareCenter;
 	ImVec2 mScreenSquareCenter;
@@ -632,7 +632,7 @@ struct Context
 	vec_t mMatrixOrigin;
 
 	// rotation
-	vec_t mRotationVectorSource;
+	vec_t mRotationArrayListSource;
 	float mRotationAngle;
 	float mRotationAngleOrigin;
 	//vec_t mWorldToLocalAxis;
@@ -791,10 +791,10 @@ inline vec_t PointOnSegment(const vec_t &point, const vec_t &vertPos1, const vec
 	return vertPos1 + V * t;
 }
 
-static float IntersectRayPlane(const vec_t &rOrigin, const vec_t &rVector, const vec_t &plan)
+static float IntersectRayPlane(const vec_t &rOrigin, const vec_t &rArrayList, const vec_t &plan)
 {
 	float numer = plan.Dot3(rOrigin) - plan.w;
-	float denom = plan.Dot3(rVector);
+	float denom = plan.Dot3(rArrayList);
 
 	if ( fabsf(denom) < FLT_EPSILON )  // normal is orthogonal to vector, cant intersect
 		return -1.0f;
@@ -900,7 +900,7 @@ static void ComputeContext(const float *view, const float *projection, float *ma
 	gContext.mScreenFactor = gGizmoSizeClipSpace / (pointRight.x / pointRight.w - gContext.mMVP.v.position.x / gContext.mMVP.v.position.w);
 
 	vec_t rightViewInverse = viewInverse.v.right;
-	rightViewInverse.TransformVector(gContext.mModelInverse);
+	rightViewInverse.TransformArrayList(gContext.mModelInverse);
 	float rightLength = GetSegmentLengthClipSpace(makeVect(0.f, 0.f), rightViewInverse);
 	gContext.mScreenFactor = gGizmoSizeClipSpace / rightLength;
 
@@ -909,7 +909,7 @@ static void ComputeContext(const float *view, const float *projection, float *ma
 	gContext.mScreenSquareMin = ImVec2(centerSSpace.x - 10.f, centerSSpace.y - 10.f);
 	gContext.mScreenSquareMax = ImVec2(centerSSpace.x + 10.f, centerSSpace.y + 10.f);
 
-	ComputeCameraRay(gContext.mRayOrigin, gContext.mRayVector);
+	ComputeCameraRay(gContext.mRayOrigin, gContext.mRayArrayList);
 }
 
 static void ComputeColors(ImU32 *colors, int type, OPERATION operation)
@@ -1020,15 +1020,15 @@ static void ComputeSnap(vec_t &value, float *snap)
 
 static float ComputeAngleOnPlan()
 {
-	const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
-	vec_t localPos = Normalized(gContext.mRayOrigin + gContext.mRayVector * len - gContext.mModel.v.position);
+	const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan);
+	vec_t localPos = Normalized(gContext.mRayOrigin + gContext.mRayArrayList * len - gContext.mModel.v.position);
 
-	vec_t perpendicularVector;
-	perpendicularVector.Cross(gContext.mRotationVectorSource, gContext.mTranslationPlan);
-	perpendicularVector.Normalize();
-	float acosAngle = Clamp(Dot(localPos, gContext.mRotationVectorSource), -0.9999f, 0.9999f);
+	vec_t perpendicularArrayList;
+	perpendicularArrayList.Cross(gContext.mRotationArrayListSource, gContext.mTranslationPlan);
+	perpendicularArrayList.Normalize();
+	float acosAngle = Clamp(Dot(localPos, gContext.mRotationArrayListSource), -0.9999f, 0.9999f);
 	float angle = acosf(acosAngle);
-	angle *= (Dot(localPos, perpendicularVector) < 0.f) ? 1.f : -1.f;
+	angle *= (Dot(localPos, perpendicularArrayList) < 0.f) ? 1.f : -1.f;
 	return angle;
 }
 
@@ -1052,7 +1052,7 @@ static void DrawRotationGizmo(int type)
 		cameraToModelNormalized = Normalized(gContext.mModel.v.position - gContext.mCameraEye);
 	}
 
-	cameraToModelNormalized.TransformVector(gContext.mModelInverse);
+	cameraToModelNormalized.TransformArrayList(gContext.mModelInverse);
 
 	gContext.mRadiusSquareCenter = screenRotateSize * gContext.mHeight;
 
@@ -1088,10 +1088,10 @@ static void DrawRotationGizmo(int type)
 		for ( unsigned int i = 1; i < halfCircleSegmentCount; i++ )
 		{
 			float ng = gContext.mRotationAngle * (static_cast<float>(i - 1) / static_cast<float>(halfCircleSegmentCount - 1));
-			matrix_t rotateVectorMatrix;
-			rotateVectorMatrix.RotationAxis(gContext.mTranslationPlan, ng);
+			matrix_t rotateArrayListMatrix;
+			rotateArrayListMatrix.RotationAxis(gContext.mTranslationPlan, ng);
 			vec_t pos;
-			pos.TransformPoint(gContext.mRotationVectorSource, rotateVectorMatrix);
+			pos.TransformPoint(gContext.mRotationArrayListSource, rotateArrayListMatrix);
 			pos *= gContext.mScreenFactor;
 			circlePos[i] = worldToPos(pos + gContext.mModel.v.position, gContext.mViewProjection);
 		}
@@ -1295,7 +1295,7 @@ static void HandleAndDrawLocalBounds(float *bounds, matrix_t *matrix, float *sna
 		for ( unsigned int i = 0; i < 3; i++ )
 		{
 			vec_t dirPlaneNormalWorld;
-			dirPlaneNormalWorld.TransformVector(directionUnary[i], gContext.mModelSource);
+			dirPlaneNormalWorld.TransformArrayList(directionUnary[i], gContext.mModelSource);
 			dirPlaneNormalWorld.Normalize();
 
 			float dt = fabsf(Dot(Normalized(gContext.mCameraEye - gContext.mModelSource.v.position), dirPlaneNormalWorld));
@@ -1459,12 +1459,12 @@ static void HandleAndDrawLocalBounds(float *bounds, matrix_t *matrix, float *sna
 			scale.SetToIdentity();
 
 			// compute projected mouse position on plan
-			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mBoundsPlan);
-			vec_t newPos = gContext.mRayOrigin + gContext.mRayVector * len;
+			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mBoundsPlan);
+			vec_t newPos = gContext.mRayOrigin + gContext.mRayArrayList * len;
 
 			// compute a reference and delta vectors base on mouse move
-			vec_t deltaVector = (newPos - gContext.mBoundsPivot).Abs();
-			vec_t referenceVector = (gContext.mBoundsAnchor - gContext.mBoundsPivot).Abs();
+			vec_t deltaArrayList = (newPos - gContext.mBoundsPivot).Abs();
+			vec_t referenceArrayList = (gContext.mBoundsAnchor - gContext.mBoundsPivot).Abs();
 
 			// for 1 or 2 axes, compute a ratio that's used for scale and snap it based on resulting length
 			for ( int i = 0; i < 2; i++ )
@@ -1476,10 +1476,10 @@ static void HandleAndDrawLocalBounds(float *bounds, matrix_t *matrix, float *sna
 				float ratioAxis = 1.f;
 				vec_t axisDir = gContext.mBoundsMatrix.component[axisIndex1].Abs();
 
-				float dtAxis = axisDir.Dot(referenceVector);
+				float dtAxis = axisDir.Dot(referenceArrayList);
 				float boundSize = bounds[axisIndex1 + 3] - bounds[axisIndex1];
 				if ( dtAxis > FLT_EPSILON )
-					ratioAxis = axisDir.Dot(deltaVector) / dtAxis;
+					ratioAxis = axisDir.Dot(deltaArrayList) / dtAxis;
 
 				if ( snapValues )
 				{
@@ -1537,12 +1537,12 @@ static int GetScaleType()
 		vec_t dirPlaneX, dirPlaneY, dirAxis;
 		bool belowAxisLimit, belowPlaneLimit;
 		ComputeTripodAxisAndVisibility(i, dirAxis, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit);
-		dirAxis.TransformVector(gContext.mModel);
-		dirPlaneX.TransformVector(gContext.mModel);
-		dirPlaneY.TransformVector(gContext.mModel);
+		dirAxis.TransformArrayList(gContext.mModel);
+		dirPlaneX.TransformArrayList(gContext.mModel);
+		dirPlaneY.TransformArrayList(gContext.mModel);
 
-		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, BuildPlan(gContext.mModel.v.position, dirAxis));
-		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len;
+		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, BuildPlan(gContext.mModel.v.position, dirAxis));
+		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayArrayList * len;
 
 		const ImVec2 posOnPlanScreen = worldToPos(posOnPlan, gContext.mViewProjection);
 		const ImVec2 axisStartOnScreen = worldToPos(gContext.mModel.v.position + dirAxis * gContext.mScreenFactor * 0.1f, gContext.mViewProjection);
@@ -1573,14 +1573,14 @@ static int GetRotateType()
 		// pickup plan
 		vec_t pickupPlan = BuildPlan(gContext.mModel.v.position, planNormals[i]);
 
-		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, pickupPlan);
-		vec_t localPos = gContext.mRayOrigin + gContext.mRayVector * len - gContext.mModel.v.position;
+		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, pickupPlan);
+		vec_t localPos = gContext.mRayOrigin + gContext.mRayArrayList * len - gContext.mModel.v.position;
 
-		if ( Dot(Normalized(localPos), gContext.mRayVector) > FLT_EPSILON )
+		if ( Dot(Normalized(localPos), gContext.mRayArrayList) > FLT_EPSILON )
 			continue;
 
 		vec_t idealPosOnCircle = Normalized(localPos);
-		idealPosOnCircle.TransformVector(gContext.mModelInverse);
+		idealPosOnCircle.TransformArrayList(gContext.mModelInverse);
 		ImVec2 idealPosOnCircleScreen = worldToPos(idealPosOnCircle * gContext.mScreenFactor, gContext.mMVP);
 
 		// gContext.mDrawList->AddCircle(idealPosOnCircleScreen, 5.f, 0xFFFFFFFF);
@@ -1610,12 +1610,12 @@ static int GetMoveType(vec_t *gizmoHitProportion)
 		vec_t dirPlaneX, dirPlaneY, dirAxis;
 		bool belowAxisLimit, belowPlaneLimit;
 		ComputeTripodAxisAndVisibility(i, dirAxis, dirPlaneX, dirPlaneY, belowAxisLimit, belowPlaneLimit);
-		dirAxis.TransformVector(gContext.mModel);
-		dirPlaneX.TransformVector(gContext.mModel);
-		dirPlaneY.TransformVector(gContext.mModel);
+		dirAxis.TransformArrayList(gContext.mModel);
+		dirPlaneX.TransformArrayList(gContext.mModel);
+		dirPlaneY.TransformArrayList(gContext.mModel);
 
-		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, BuildPlan(gContext.mModel.v.position, dirAxis));
-		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len;
+		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, BuildPlan(gContext.mModel.v.position, dirAxis));
+		vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayArrayList * len;
 
 		const ImVec2 posOnPlanScreen = worldToPos(posOnPlan, gContext.mViewProjection);
 		const ImVec2 axisStartOnScreen = worldToPos(gContext.mModel.v.position + dirAxis * gContext.mScreenFactor * 0.1f, gContext.mViewProjection);
@@ -1646,8 +1646,8 @@ static void HandleTranslation(float *matrix, float *deltaMatrix, int &type, floa
 	if ( gContext.mbUsing )
 	{
 		ImGui::CaptureMouseFromApp();
-		const float len = fabsf(IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan)); // near plan
-		vec_t newPos = gContext.mRayOrigin + gContext.mRayVector * len;
+		const float len = fabsf(IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan)); // near plan
+		vec_t newPos = gContext.mRayOrigin + gContext.mRayArrayList * len;
 
 
 
@@ -1674,9 +1674,9 @@ static void HandleTranslation(float *matrix, float *deltaMatrix, int &type, floa
 				modelSourceNormalized.OrthoNormalize();
 				matrix_t modelSourceNormalizedInverse;
 				modelSourceNormalizedInverse.Inverse(modelSourceNormalized);
-				cumulativeDelta.TransformVector(modelSourceNormalizedInverse);
+				cumulativeDelta.TransformArrayList(modelSourceNormalizedInverse);
 				ComputeSnap(cumulativeDelta, snap);
-				cumulativeDelta.TransformVector(modelSourceNormalized);
+				cumulativeDelta.TransformArrayList(modelSourceNormalized);
 			}
 			else
 			{
@@ -1721,14 +1721,14 @@ static void HandleTranslation(float *matrix, float *deltaMatrix, int &type, floa
 			vec_t cameraToModelNormalized = Normalized(gContext.mModel.v.position - gContext.mCameraEye);
 			for ( unsigned int i = 0; i < 3; i++ )
 			{
-				vec_t orthoVector = Cross(movePlanNormal[i], cameraToModelNormalized);
-				movePlanNormal[i].Cross(orthoVector);
+				vec_t orthoArrayList = Cross(movePlanNormal[i], cameraToModelNormalized);
+				movePlanNormal[i].Cross(orthoArrayList);
 				movePlanNormal[i].Normalize();
 			}
 			// pickup plan
 			gContext.mTranslationPlan = BuildPlan(gContext.mModel.v.position, movePlanNormal[type - MOVE_X]);
-			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
-			gContext.mTranslationPlanOrigin = gContext.mRayOrigin + gContext.mRayVector * len;
+			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan);
+			gContext.mTranslationPlanOrigin = gContext.mRayOrigin + gContext.mRayArrayList * len;
 			gContext.mMatrixOrigin = gContext.mModel.v.position;
 
 			gContext.mRelativeOrigin = (gContext.mTranslationPlanOrigin - gContext.mModel.v.position) * (1.f / gContext.mScreenFactor);
@@ -1756,8 +1756,8 @@ static void HandleScale(float *matrix, float *deltaMatrix, int &type, float *sna
 			// pickup plan
 
 			gContext.mTranslationPlan = BuildPlan(gContext.mModel.v.position, movePlanNormal[type - SCALE_X]);
-			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
-			gContext.mTranslationPlanOrigin = gContext.mRayOrigin + gContext.mRayVector * len;
+			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan);
+			gContext.mTranslationPlanOrigin = gContext.mRayOrigin + gContext.mRayArrayList * len;
 			gContext.mMatrixOrigin = gContext.mModel.v.position;
 			gContext.mScale.Set(1.f, 1.f, 1.f);
 			gContext.mRelativeOrigin = (gContext.mTranslationPlanOrigin - gContext.mModel.v.position) * (1.f / gContext.mScreenFactor);
@@ -1769,8 +1769,8 @@ static void HandleScale(float *matrix, float *deltaMatrix, int &type, float *sna
 	if ( gContext.mbUsing )
 	{
 		ImGui::CaptureMouseFromApp();
-		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
-		vec_t newPos = gContext.mRayOrigin + gContext.mRayVector * len;
+		const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan);
+		vec_t newPos = gContext.mRayOrigin + gContext.mRayArrayList * len;
 		vec_t newOrigin = newPos - gContext.mRelativeOrigin * gContext.mScreenFactor;
 		vec_t delta = newOrigin - gContext.mModel.v.position;
 
@@ -1782,8 +1782,8 @@ static void HandleScale(float *matrix, float *deltaMatrix, int &type, float *sna
 			float lengthOnAxis = Dot(axisValue, delta);
 			delta = axisValue * lengthOnAxis;
 
-			vec_t baseVector = gContext.mTranslationPlanOrigin - gContext.mModel.v.position;
-			float ratio = Dot(axisValue, baseVector + delta) / Dot(axisValue, baseVector);
+			vec_t baseArrayList = gContext.mTranslationPlanOrigin - gContext.mModel.v.position;
+			float ratio = Dot(axisValue, baseArrayList + delta) / Dot(axisValue, baseArrayList);
 
 			gContext.mScale[axisIndex] = max(ratio, 0.001f);
 		}
@@ -1858,9 +1858,9 @@ static void HandleRotation(float *matrix, float *deltaMatrix, int &type, float *
 				gContext.mTranslationPlan = BuildPlan(gContext.mModelSource.v.position, directionUnary[type - ROTATE_X]);
 			}
 
-			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, gContext.mTranslationPlan);
-			vec_t localPos = gContext.mRayOrigin + gContext.mRayVector * len - gContext.mModel.v.position;
-			gContext.mRotationVectorSource = Normalized(localPos);
+			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, gContext.mTranslationPlan);
+			vec_t localPos = gContext.mRayOrigin + gContext.mRayArrayList * len - gContext.mModel.v.position;
+			gContext.mRotationArrayListSource = Normalized(localPos);
 			gContext.mRotationAngleOrigin = ComputeAngleOnPlan();
 		}
 	}
@@ -1877,7 +1877,7 @@ static void HandleRotation(float *matrix, float *deltaMatrix, int &type, float *
 		}
 		vec_t rotationAxisLocalSpace;
 
-		rotationAxisLocalSpace.TransformVector(makeVect(gContext.mTranslationPlan.x, gContext.mTranslationPlan.y, gContext.mTranslationPlan.z, 0.f), gContext.mModelInverse);
+		rotationAxisLocalSpace.TransformArrayList(makeVect(gContext.mTranslationPlan.x, gContext.mTranslationPlan.y, gContext.mTranslationPlan.z, 0.f), gContext.mModelInverse);
 		rotationAxisLocalSpace.Normalize();
 
 		matrix_t deltaRotation;
@@ -2062,7 +2062,7 @@ void DrawCube(const float *view, const float *projection, const float *matrix)
 		const vec_t n = directionUnary[normalIndex] * invert;
 		vec_t viewSpaceNormal = n;
 		vec_t viewSpacePoint = n * 0.5f;
-		viewSpaceNormal.TransformVector(modelView);
+		viewSpaceNormal.TransformArrayList(modelView);
 		viewSpaceNormal.Normalize();
 		viewSpacePoint.TransformPoint(modelView);
 		const vec_t viewSpaceFacePlan = BuildPlan(viewSpacePoint, viewSpaceNormal);
@@ -2075,7 +2075,7 @@ void DrawCube(const float *view, const float *projection, const float *matrix)
 		/*
 		vec_t cullPos, cullNormal;
 		cullPos.TransformPoint(faceCoords[0] * 0.5f * invert, model);
-		cullNormal.TransformVector(directionUnary[normalIndex] * invert, model);
+		cullNormal.TransformArrayList(directionUnary[normalIndex] * invert, model);
 		float dt = Dot(Normalized(cullPos - viewInverse.v.position), Normalized(cullNormal));
 		if (dt>0.f)
 		{
@@ -2130,7 +2130,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 	// set context
 	gContext.mViewMat = cubeView;
 	gContext.mProjectionMat = cubeProjection;
-	ComputeCameraRay(gContext.mRayOrigin, gContext.mRayVector, position, size);
+	ComputeCameraRay(gContext.mRayOrigin, gContext.mRayArrayList, position, size);
 
 	const matrix_t res = cubeView * cubeProjection;
 
@@ -2153,9 +2153,9 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 			const int perpXIndex = (normalIndex + 1) % 3;
 			const int perpYIndex = (normalIndex + 2) % 3;
 			const float invert = (iFace > 2) ? -1.f : 1.f;
-			const vec_t indexVectorX = directionUnary[perpXIndex] * invert;
-			const vec_t indexVectorY = directionUnary[perpYIndex] * invert;
-			const vec_t boxOrigin = directionUnary[normalIndex] * -invert - indexVectorX - indexVectorY;
+			const vec_t indexArrayListX = directionUnary[perpXIndex] * invert;
+			const vec_t indexArrayListY = directionUnary[perpYIndex] * invert;
+			const vec_t boxOrigin = directionUnary[normalIndex] * -invert - indexArrayListX - indexArrayListY;
 			const vec_t faceCoords[4] = { directionUnary[normalIndex] + directionUnary[perpXIndex] + directionUnary[perpYIndex],
 										  directionUnary[normalIndex] + directionUnary[perpXIndex] - directionUnary[perpYIndex],
 										  directionUnary[normalIndex] - directionUnary[perpXIndex] - directionUnary[perpYIndex],
@@ -2165,7 +2165,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 			const vec_t n = directionUnary[normalIndex] * invert;
 			vec_t viewSpaceNormal = n;
 			vec_t viewSpacePoint = n * 0.5f;
-			viewSpaceNormal.TransformVector(cubeView);
+			viewSpaceNormal.TransformArrayList(cubeView);
 			viewSpaceNormal.Normalize();
 			viewSpacePoint.TransformPoint(cubeView);
 			const vec_t viewSpaceFacePlan = BuildPlan(viewSpacePoint, viewSpaceNormal);
@@ -2178,8 +2178,8 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 
 			const vec_t facePlan = BuildPlan(n * 0.5f, n);
 
-			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayVector, facePlan);
-			vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayVector * len - (n * 0.5f);
+			const float len = IntersectRayPlane(gContext.mRayOrigin, gContext.mRayArrayList, facePlan);
+			vec_t posOnPlan = gContext.mRayOrigin + gContext.mRayArrayList * len - (n * 0.5f);
 
 			float localx = Dot(directionUnary[perpXIndex], posOnPlan) * invert + 0.5f;
 			float localy = Dot(directionUnary[perpYIndex], posOnPlan) * invert + 0.5f;
@@ -2190,7 +2190,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 			const vec_t origin = directionUnary[normalIndex] - dx - dy;
 			for ( int iPanel = 0; iPanel < 9; iPanel++ )
 			{
-				vec_t boxCoord = boxOrigin + indexVectorX * static_cast<float>(iPanel % 3) + indexVectorY * static_cast<float>(iPanel / 3) + makeVect(1.f, 1.f, 1.f);
+				vec_t boxCoord = boxOrigin + indexArrayListX * static_cast<float>(iPanel % 3) + indexArrayListY * static_cast<float>(iPanel / 3) + makeVect(1.f, 1.f, 1.f);
 				const ImVec2 p = panelPosition[iPanel] * 2.f;
 				const ImVec2 s = panelSize[iPanel] * 2.f;
 				ImVec2 faceCoordsScreen[4];
@@ -2295,7 +2295,7 @@ void ViewManipulate(float *view, float length, ImVec2 position, ImVec2 size, ImU
 		roll = rx * ry;
 
 		vec_t newDir = viewInverse.v.dir;
-		newDir.TransformVector(roll);
+		newDir.TransformArrayList(roll);
 		newDir.Normalize();
 
 		// clamp

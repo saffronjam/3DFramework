@@ -35,16 +35,16 @@ struct SceneRendererData
 		Shared<RenderPass> GeoPass;
 		Shared<RenderPass> CompositePass;
 	};
-	std::map<std::string, RenderTarget> RenderTargets;
+	Map<String, RenderTarget> RenderTargets;
 
 	struct DrawCommand
 	{
 		Shared<Mesh> Mesh;
 		Shared<MaterialInstance> Material;
-		glm::mat4 Transform;
+		Matrix4f Transform;
 	};
-	std::vector<DrawCommand> DrawList;
-	std::vector<DrawCommand> SelectedMeshDrawList;
+	ArrayList<DrawCommand> DrawList;
+	ArrayList<DrawCommand> SelectedMeshDrawList;
 
 	// Grid
 	Shared<MaterialInstance> GridMaterial;
@@ -81,7 +81,7 @@ void SceneRenderer::Init()
 	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
 }
 
-void SceneRenderer::AddRenderTarget(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height)
+void SceneRenderer::AddRenderTarget(const String &renderTargetIdentifier, Uint32 width, Uint32 height)
 {
 	Framebuffer::Specification geoFramebufferSpec;
 	geoFramebufferSpec.Width = width;
@@ -107,28 +107,28 @@ void SceneRenderer::AddRenderTarget(const std::string &renderTargetIdentifier, U
 	EnableRenderTarget(renderTargetIdentifier);
 }
 
-void SceneRenderer::SetRenderTargetSize(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height)
+void SceneRenderer::SetRenderTargetSize(const String &renderTargetIdentifier, Uint32 width, Uint32 height)
 {
 	s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
 	s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
 }
 
-void SceneRenderer::SetCameraData(const std::string &renderTargetIdentifier, const SceneRendererCameraData &cameraData)
+void SceneRenderer::SetCameraData(const String &renderTargetIdentifier, const SceneRendererCameraData &cameraData)
 {
 	s_Data.RenderTargets[renderTargetIdentifier].CameraData = cameraData;
 }
 
-void SceneRenderer::EnableRenderTarget(const std::string &renderTargetIdentifier)
+void SceneRenderer::EnableRenderTarget(const String &renderTargetIdentifier)
 {
 	s_Data.RenderTargets[renderTargetIdentifier].Enabled = true;
 }
 
-void SceneRenderer::DisableRenderTarget(const std::string &renderTargetIdentifier)
+void SceneRenderer::DisableRenderTarget(const String &renderTargetIdentifier)
 {
 	s_Data.RenderTargets[renderTargetIdentifier].Enabled = false;
 }
 
-bool SceneRenderer::IsRenderTargetEnabled(const std::string &renderTargetIdentifier)
+bool SceneRenderer::IsRenderTargetEnabled(const String &renderTargetIdentifier)
 {
 	return s_Data.RenderTargets[renderTargetIdentifier].Enabled;
 }
@@ -152,19 +152,19 @@ void SceneRenderer::EndScene()
 	FlushDrawList();
 }
 
-void SceneRenderer::SubmitMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform,
+void SceneRenderer::SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform,
 							   const Shared<MaterialInstance> &overrideMaterial)
 {
 	// TODO: Culling, sorting, etc.
 	s_Data.DrawList.push_back({ mesh, overrideMaterial, transform });
 }
 
-void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform)
+void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform)
 {
 	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
 }
 
-std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
+std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const String &filepath)
 {
 	const Uint32 cubemapSize = 2048;
 	const Uint32 irradianceMapSize = 32;
@@ -227,13 +227,13 @@ std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnviron
 	return { envFiltered, irradianceMap };
 }
 
-Shared<RenderPass> SceneRenderer::GetFinalRenderPass(const std::string &renderTargetIdentifier)
+Shared<RenderPass> SceneRenderer::GetFinalRenderPass(const String &renderTargetIdentifier)
 {
 	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
 	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass;
 }
 
-Shared<Texture2D> SceneRenderer::GetFinalColorBuffer(const std::string &renderTargetIdentifier)
+Shared<Texture2D> SceneRenderer::GetFinalColorBuffer(const String &renderTargetIdentifier)
 {
 	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
 	// return s_Data.CompositePass->GetSpecification().TargetFramebuffer;
@@ -241,7 +241,7 @@ Shared<Texture2D> SceneRenderer::GetFinalColorBuffer(const std::string &renderTa
 	return nullptr;
 }
 
-Uint32 SceneRenderer::GetFinalColorBufferRendererID(const std::string &renderTargetIdentifier)
+Uint32 SceneRenderer::GetFinalColorBufferRendererID(const String &renderTargetIdentifier)
 {
 	SE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
 	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
@@ -269,7 +269,7 @@ void SceneRenderer::FlushDrawList()
 	s_Data.SceneData = {};
 }
 
-void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
+void SceneRenderer::GeometryPass(const String &renderTargetIdentifier)
 {
 	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
 	if ( !camData.Camera )
@@ -298,7 +298,7 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 						 });
 	}
 	const auto viewProjection = camData.Camera->GetProjectionMatrix() * camData.ViewMatrix;
-	const glm::vec3 cameraPosition = glm::inverse(camData.ViewMatrix)[3];
+	const Vector3f cameraPosition = glm::inverse(camData.ViewMatrix)[3];
 
 	// Skybox
 	auto skyboxShader = s_Data.SceneData.SkyboxMaterial->GetShader();
@@ -394,7 +394,7 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 	if ( GetOptions().ShowGrid )
 	{
 		s_Data.GridMaterial->Set("u_ViewProjection", viewProjection);
-		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(16.0f)));
+		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(Matrix4f(1.0f), glm::radians(90.0f), Vector3f(1.0f, 0.0f, 0.0f)) * glm::scale(Matrix4f(1.0f), Vector3f(16.0f)));
 	}
 
 	if ( GetOptions().ShowBoundingBoxes )
@@ -408,7 +408,7 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 	Renderer::EndRenderPass();
 }
 
-void SceneRenderer::CompositePass(const std::string &renderTargetIdentifier)
+void SceneRenderer::CompositePass(const String &renderTargetIdentifier)
 {
 	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
 	if ( !camData.Camera )

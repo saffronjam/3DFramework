@@ -9,7 +9,7 @@ class GuiLayer : public Layer
 {
 public:
 	GuiLayer() = default;
-	explicit GuiLayer(const std::string &name);
+	explicit GuiLayer(const String &name);
 	virtual ~GuiLayer() = default;
 
 	void Begin();

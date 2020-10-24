@@ -5,10 +5,10 @@
 namespace Se
 {
 
-Misc::TransformDecomposition Misc::GetTransformDecomposition(const glm::mat4 &transform)
+Misc::TransformDecomposition Misc::GetTransformDecomposition(const Matrix4f &transform)
 {
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
+	Vector3f scale, translation, skew;
+	Vector4f perspective;
 	glm::quat orientation;
 	glm::decompose(transform, scale, orientation, translation, skew, perspective);
 

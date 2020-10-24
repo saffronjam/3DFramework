@@ -5,7 +5,7 @@
 namespace Se
 {
 
-void Instrumentor::BeginSession(const std::string &name, const std::string &filepath)
+void Instrumentor::BeginSession(const String &name, const String &filepath)
 {
 	std::lock_guard lock(m_Mutex);
 	if ( m_CurrentSession )
@@ -44,7 +44,7 @@ void Instrumentor::EndSession()
 
 void Instrumentor::WriteProfile(const ProfileResult &result)
 {
-	std::stringstream json;
+	StringStream json;
 
 	json << std::setprecision(3) << std::fixed;
 	json << R"(,{)";

@@ -8,7 +8,7 @@
 namespace Se
 {
 
-ViewportPane::ViewportPane(std::string renderTargetIdentifier)
+ViewportPane::ViewportPane(String renderTargetIdentifier)
 	:
 	m_RenderTargetIdentifier(std::move(renderTargetIdentifier)),
 	m_TopLeft(0.0f, 0.0f),
@@ -39,7 +39,7 @@ void ViewportPane::OnGuiRender()
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	// Todo: Move to header
-	const std::string viewportID = "Viewport##" + m_RenderTargetIdentifier;
+	const String viewportID = "Viewport##" + m_RenderTargetIdentifier;
 	ImGui::Begin(viewportID.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
 
 	if ( ImGui::IsWindowDocked() )
@@ -79,16 +79,16 @@ void ViewportPane::OnGuiRender()
 	SceneRenderer::SetRenderTargetSize(m_RenderTargetIdentifier, static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
 }
 
-bool ViewportPane::InViewport(glm::vec2 positionNDC) const
+bool ViewportPane::InViewport(Vector2f positionNDC) const
 {
 	positionNDC.x -= m_TopLeft.x;
 	positionNDC.y -= m_TopLeft.y;
 	return positionNDC.x < m_BottomRight.x &&positionNDC.y < m_BottomRight.y;
 }
 
-glm::vec2 ViewportPane::GetMousePosition() const
+Vector2f ViewportPane::GetMousePosition() const
 {
-	glm::vec2 position = Input::GetMousePositionNDC();
+	Vector2f position = Input::GetMousePositionNDC();
 	position.x -= m_TopLeft.x;
 	position.y -= m_TopLeft.y;
 	const auto viewportWidth = m_BottomRight.x - m_TopLeft.x;
@@ -97,7 +97,7 @@ glm::vec2 ViewportPane::GetMousePosition() const
 	return { (position.x / viewportWidth) * 2.0f - 1.0f, ((position.y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
 }
 
-glm::vec2 ViewportPane::GetViewportSize() const
+Vector2f ViewportPane::GetViewportSize() const
 {
 	return GetBottomRight() - GetTopLeft();
 }

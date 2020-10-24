@@ -39,11 +39,11 @@ public:
 	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);
 	static void EndRenderPass();
 
-	static void SubmitQuad(Shared<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
-	static void SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
+	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
 
-	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
-	static void DrawAABB(Shared<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	static void DrawAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
+	static void DrawAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
@@ -59,7 +59,7 @@ void Renderer::Submit(FuncT &&func)
 		pFunc();
 
 		// NOTE: Instead of destroying we could try and enforce all items to be trivially destructible
-		// however some items like uniforms which contain std::strings still exist for now
+		// however some items like uniforms which contain Strings still exist for now
 		// static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
 		pFunc.~FuncT();
 	};

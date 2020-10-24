@@ -13,7 +13,7 @@ class Application
 public:
 	struct Properties
 	{
-		std::string Name;
+		String Name;
 		Uint32 WindowWidth, WindowHeight;
 	};
 

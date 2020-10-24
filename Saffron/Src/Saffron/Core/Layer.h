@@ -8,7 +8,7 @@ namespace Se {
 class Layer
 {
 public:
-	Layer(const std::string &name = "Layer");
+	Layer(const String &name = "Layer");
 	virtual ~Layer();
 
 	virtual void OnAttach() {}
@@ -17,9 +17,9 @@ public:
 	virtual void OnGuiRender() {}
 	virtual void OnEvent(const Event &event) {}
 
-	const std::string &GetName() const { return m_DebugName; }
+	const String &GetName() const { return m_DebugName; }
 protected:
-	std::string m_DebugName;
+	String m_DebugName;
 };
 
 }

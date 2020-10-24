@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Saffron/Core/Math/SaffronMath.h"
+
 class b2World;
 
 namespace Se
@@ -20,8 +22,8 @@ public:
 	void OnStart();
 	void OnStop();
 
-	glm::vec2 GetGravity() const;
-	void SetGravity(const glm::vec2 &gravity);
+	Vector2f GetGravity() const;
+	void SetGravity(const Vector2f &gravity);
 
 private:
 	b2World *m_NativeWorld;

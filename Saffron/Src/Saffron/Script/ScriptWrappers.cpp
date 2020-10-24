@@ -14,8 +14,8 @@ namespace Se
 /// Externs
 ///////////////////////////////////////////////////////////////////////////
 
-extern std::unordered_map<MonoType *, std::function<bool(Entity &)>> s_HasComponentFuncs;
-extern std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentFuncs;
+extern UnorderedMap<MonoType *, Function<bool(Entity &)>> s_HasComponentFuncs;
+extern UnorderedMap<MonoType *, Function<void(Entity &)>> s_CreateComponentFuncs;
 
 namespace Script
 {
@@ -77,18 +77,18 @@ bool Saffron_Input_IsMouseButtonPressed(MouseButtonCode mouseButton)
 // Entity //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
 
-void Saffron_Entity_GetTransform(Uint64 entityID, glm::mat4 *outTransform)
+void Saffron_Entity_GetTransform(Uint64 entityID, Matrix4f *outTransform)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &transformComponent = entity.GetComponent<TransformComponent>();
-	memcpy(outTransform, glm::value_ptr(transformComponent.Transform), sizeof(glm::mat4));
+	memcpy(outTransform, glm::value_ptr(transformComponent.Transform), sizeof(Matrix4f));
 }
 
-void Saffron_Entity_SetTransform(Uint64 entityID, glm::mat4 *inTransform)
+void Saffron_Entity_SetTransform(Uint64 entityID, Matrix4f *inTransform)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &transformComponent = entity.GetComponent<TransformComponent>();
-	memcpy(glm::value_ptr(transformComponent.Transform), inTransform, sizeof(glm::mat4));
+	memcpy(glm::value_ptr(transformComponent.Transform), inTransform, sizeof(Matrix4f));
 }
 
 void Saffron_Entity_CreateComponent(Uint64 entityID, void *type)
@@ -127,7 +127,7 @@ void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh)
 	meshComponent.Mesh = inMesh ? *inMesh : nullptr;
 }
 
-void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 *impulse, glm::vec2 *offset, bool wake)
+void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, Vector2f *impulse, Vector2f *offset, bool wake)
 {
 	SE_CORE_ASSERT(impulse && offset);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -136,7 +136,7 @@ void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, glm::vec2 
 	body->ApplyLinearImpulse(*reinterpret_cast<const b2Vec2 *>(impulse), body->GetWorldCenter() + *reinterpret_cast<const b2Vec2 *>(offset), wake);
 }
 
-void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *outVelocity)
+void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, Vector2f *outVelocity)
 {
 	SE_CORE_ASSERT(outVelocity);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -146,7 +146,7 @@ void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, glm::vec2 *
 	*outVelocity = { velocity.x, velocity.y };
 }
 
-void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *velocity)
+void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, Vector2f *velocity)
 {
 	SE_CORE_ASSERT(velocity);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -155,7 +155,7 @@ void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, glm::vec2 *
 	body->SetLinearVelocity({ velocity->x, velocity->y });
 }
 
-void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, glm::vec2 *offset)
+void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, Vector2f *offset)
 {
 	SE_CORE_ASSERT(offset);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -163,7 +163,7 @@ void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, glm::vec2 *offset)
 	*offset = component.Offset;
 }
 
-void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, glm::vec2 *offset)
+void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, Vector2f *offset)
 {
 	SE_CORE_ASSERT(offset);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -199,7 +199,7 @@ void Saffron_Collider2DComponent_SetFriction(Uint64 entityID, float friction)
 	component.Friction = friction;
 }
 
-void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, glm::vec2 *size)
+void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, Vector2f *size)
 {
 	SE_CORE_ASSERT(size);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -207,7 +207,7 @@ void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, glm::vec2 *size)
 	*size = component.Size;
 }
 
-void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, glm::vec2 *size)
+void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, Vector2f *size)
 {
 	SE_CORE_ASSERT(size);
 	const Entity entity = GetEntityFromActiveScene(entityID);
@@ -277,13 +277,13 @@ void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int3
 
 	instance->Lock();
 	Buffer buffer = instance->GetWriteableBuffer();
-	const Uint32 dataSize = count * sizeof(glm::vec4) / 4;
+	const Uint32 dataSize = count * sizeof(Vector4f) / 4;
 	SE_CORE_ASSERT(dataSize <= buffer.Size());
 	// Convert RGBA32F color to RGBA8
 	auto *pixels = static_cast<Uint8 *>(buffer.Data());
 	for ( Uint32 i = 0; i < instance->GetWidth() * instance->GetHeight(); i++ )
 	{
-		glm::vec4 &value = mono_array_get(data, glm::vec4, i);
+		Vector4f &value = mono_array_get(data, Vector4f, i);
 		*pixels++ = static_cast<Uint32>(value.x * 255.0f);
 		*pixels++ = static_cast<Uint32>(value.y * 255.0f);
 		*pixels++ = static_cast<Uint32>(value.z * 255.0f);
@@ -322,13 +322,13 @@ void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoS
 	(*instance)->Set(mono_string_to_utf8(uniform), value);
 }
 
-void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec3 *value)
+void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, Vector3f *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
-void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, glm::vec4 *value)
+void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, Vector4f *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);

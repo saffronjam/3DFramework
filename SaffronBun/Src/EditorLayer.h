@@ -17,7 +17,7 @@ public:
 
 	struct AlbedoInput
 	{
-		glm::vec3 Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
+		Vector3f Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
 		Shared<Texture2D> TextureMap;
 		bool sRGB = true;
 		bool UseTexture = false;
@@ -75,9 +75,9 @@ public:
 	void SaveSceneAsPrompt();
 
 	void SaveActiveScene() const;
-	void LoadNewScene(const std::string &filepath);
+	void LoadNewScene(const String &filepath);
 private:
-	std::pair<glm::vec3, glm::vec3> CastRay(float mx, float my) const;
+	std::pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
 
 	void OnSelected(Entity entity);
 	void OnUnselected(Entity entity);
@@ -88,7 +88,7 @@ private:
 	void OnScenePlay();
 	void OnSceneStop();
 
-	void UpdateWindowTitle(const std::string &sceneName);
+	void UpdateWindowTitle(const String &sceneName);
 
 	float GetSnapValue() const;
 private:
@@ -106,11 +106,11 @@ private:
 	Shared<Material> m_SphereBaseMaterial;
 
 	Shared<Material> m_MeshMaterial;
-	std::vector<Shared<MaterialInstance>> m_MetalSphereMaterialInstances;
-	std::vector<Shared<MaterialInstance>> m_DielectricSphereMaterialInstances;
+	ArrayList<Shared<MaterialInstance>> m_MetalSphereMaterialInstances;
+	ArrayList<Shared<MaterialInstance>> m_DielectricSphereMaterialInstances;
 
 	// Editor resources
-	std::map<std::string, Shared<Texture2D>> m_TexStore;
+	Map<String, Shared<Texture2D>> m_TexStore;
 
 	Shared<AssetPanel> m_AssetPanel;
 	Shared<EntityPanel> m_EntityPanel;

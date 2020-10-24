@@ -4,7 +4,7 @@
 
 namespace Se
 {
-Camera::Camera(const glm::mat4 &projectionMatrix)
+Camera::Camera(const Matrix4f &projectionMatrix)
 	: m_ProjectionMatrix(projectionMatrix)
 {
 }

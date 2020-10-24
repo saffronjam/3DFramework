@@ -27,8 +27,8 @@ public:
 	template<typename T>
 	void RemoveComponent();
 
-	glm::mat4 &Transform() { return GetComponent<TransformComponent>(); }
-	const glm::mat4 &Transform() const { return GetComponent<TransformComponent>(); }
+	Matrix4f &Transform() { return GetComponent<TransformComponent>(); }
+	const Matrix4f &Transform() const { return GetComponent<TransformComponent>(); }
 
 	operator Uint32 () const { return static_cast<Uint32>(m_EntityHandle); }
 	operator entt::entity() const { return m_EntityHandle; }

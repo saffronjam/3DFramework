@@ -11,7 +11,7 @@ namespace Se
 struct SceneRendererCameraData
 {
 	const Camera *Camera = nullptr;
-	glm::mat4 ViewMatrix{};
+	Matrix4f ViewMatrix{};
 };
 
 class SceneRenderer
@@ -26,32 +26,32 @@ public:
 public:
 	static void Init();
 
-	static void AddRenderTarget(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height);
-	static void SetRenderTargetSize(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height);
-	static void SetCameraData(const std::string &renderTargetIdentifier, const SceneRendererCameraData &cameraData);
+	static void AddRenderTarget(const String &renderTargetIdentifier, Uint32 width, Uint32 height);
+	static void SetRenderTargetSize(const String &renderTargetIdentifier, Uint32 width, Uint32 height);
+	static void SetCameraData(const String &renderTargetIdentifier, const SceneRendererCameraData &cameraData);
 
-	static void EnableRenderTarget(const std::string &renderTargetIdentifier);
-	static void DisableRenderTarget(const std::string &renderTargetIdentifier);
-	static bool IsRenderTargetEnabled(const std::string &renderTargetIdentifier);
+	static void EnableRenderTarget(const String &renderTargetIdentifier);
+	static void DisableRenderTarget(const String &renderTargetIdentifier);
+	static bool IsRenderTargetEnabled(const String &renderTargetIdentifier);
 
 	static void BeginScene(const Scene *scene);
 	static void EndScene();
 
-	static void SubmitMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f), const Shared<MaterialInstance>
+	static void SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f), const Shared<MaterialInstance>
 						   &overrideMaterial = nullptr);
-	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f));
+	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f));
 
-	static std::pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const std::string &filepath);
+	static std::pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const String &filepath);
 
-	static Shared<RenderPass> GetFinalRenderPass(const std::string &renderTargetIdentifier);
-	static Shared<Texture2D> GetFinalColorBuffer(const std::string &renderTargetIdentifier);
+	static Shared<RenderPass> GetFinalRenderPass(const String &renderTargetIdentifier);
+	static Shared<Texture2D> GetFinalColorBuffer(const String &renderTargetIdentifier);
 	// TODO: Temp
-	static Uint32 GetFinalColorBufferRendererID(const std::string &renderTargetIdentifier);
+	static Uint32 GetFinalColorBufferRendererID(const String &renderTargetIdentifier);
 	static Options &GetOptions();
 private:
 	static void FlushDrawList();
-	static void GeometryPass(const std::string &renderTargetIdentifier);
-	static void CompositePass(const std::string &renderTargetIdentifier);
+	static void GeometryPass(const String &renderTargetIdentifier);
+	static void CompositePass(const String &renderTargetIdentifier);
 };
 
 }

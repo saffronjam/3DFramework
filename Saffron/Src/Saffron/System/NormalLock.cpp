@@ -5,16 +5,16 @@ namespace Se
 {
 void NormalLock::Lock()
 {
-	m_mutex.lock();
+	m_Mutex.lock();
 }
 
 void NormalLock::Unlock()
 {
-	m_mutex.unlock();
+	m_Mutex.unlock();
 }
 
-bool NormalLock::TryLock() 
+bool NormalLock::TryLock()
 {
-	return m_mutex.try_lock();
+	return m_Mutex.try_lock();
 }
 }

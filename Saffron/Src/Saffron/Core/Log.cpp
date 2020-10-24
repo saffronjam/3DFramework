@@ -21,14 +21,14 @@ void Log::Init()
 
 void Log::AddCoreSink(std::shared_ptr<LogSink> sink)
 {
-	auto &sinks = const_cast<std::vector<spdlog::sink_ptr> &>(s_CoreLogger->sinks());
+	auto &sinks = const_cast<ArrayList<spdlog::sink_ptr> &>(s_CoreLogger->sinks());
 	sinks.push_back(std::dynamic_pointer_cast<spdlog::sinks::sink>(sink));
 }
 
 
 void Log::AddClientSink(std::shared_ptr<LogSink> sink)
 {
-	auto &sinks = const_cast<std::vector<spdlog::sink_ptr> &>(s_ClientLogger->sinks());
+	auto &sinks = const_cast<ArrayList<spdlog::sink_ptr> &>(s_ClientLogger->sinks());
 	sinks.push_back(std::reinterpret_pointer_cast<spdlog::sinks::sink>(sink));
 }
 }

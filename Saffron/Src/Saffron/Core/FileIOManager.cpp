@@ -17,18 +17,18 @@ void FileIOManager::Init(const Window &window)
 	m_Window = &window;
 }
 
-std::vector<fs::directory_entry> FileIOManager::GetFiles(const fs::path &directoryPath,
-														 const std::string &extension)
+ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath &directoryPath,
+											   const String &extension)
 {
-	std::vector<fs::directory_entry> output;
-	std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const fs::directory_entry &entry)
+	ArrayList<DirectoryEntry> output;
+	std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const DirectoryEntry &entry)
 				 {
 					 return entry.path().extension() == extension;
 				 });
 	return output;
 }
 
-size_t FileIOManager::GetFileCount(const fs::path &directoryPath, const std::string &extension)
+size_t FileIOManager::GetFileCount(const Filepath &directoryPath, const String &extension)
 {
 	// Try to return early if no extension is given
 	if ( extension.empty() )
@@ -36,22 +36,22 @@ size_t FileIOManager::GetFileCount(const fs::path &directoryPath, const std::str
 		return std::distance(fs::directory_iterator(directoryPath), fs::directory_iterator{});
 	}
 
-	return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const fs::directory_entry &entry)
+	return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const DirectoryEntry &entry)
 						 {
 							 return entry.path().extension() == extension;
 						 });
 }
 
-size_t FileIOManager::Write(const Uint8 *data, size_t size, const fs::path &filepath, bool overwrite)
+size_t FileIOManager::Write(const Uint8 *data, size_t size, const Filepath &filepath, bool overwrite)
 {
 	const bool fileExists = FileExists(filepath);
 	if ( !fileExists || fileExists && overwrite )
 	{
-		std::ofstream ofstream;
+		OutputStream ofstream;
 		ofstream.open(filepath);
 		if ( ofstream.good() )
 		{
-			auto start = ofstream.tellp();
+			const auto start = ofstream.tellp();
 			ofstream.write(reinterpret_cast<const Int8 *>(data), size);
 			return ofstream.tellp() - start;
 		}
@@ -60,18 +60,18 @@ size_t FileIOManager::Write(const Uint8 *data, size_t size, const fs::path &file
 	return 0;
 }
 
-size_t FileIOManager::Write(const Buffer buffer, const fs::path &filepath, bool overwrite)
+size_t FileIOManager::Write(const Buffer buffer, const Filepath &filepath, bool overwrite)
 {
 	return Write(buffer.Data(), buffer.Size(), filepath, overwrite);
 }
 
-bool FileIOManager::FileExists(const fs::path &filepath)
+bool FileIOManager::FileExists(const Filepath &filepath)
 {
 	std::error_code errorCode;
 	return fs::exists(filepath, errorCode);
 }
 
-bool FileIOManager::Copy(const fs::path &source, const fs::path &destination)
+bool FileIOManager::Copy(const Filepath &source, const Filepath &destination)
 {
 	std::error_code errorCode;
 	fs::copy_file(source, destination, errorCode);

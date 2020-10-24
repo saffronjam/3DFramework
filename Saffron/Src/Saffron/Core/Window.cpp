@@ -45,7 +45,7 @@ Uint32 Window::GetHeight() const
 	return m_Height;
 }
 
-const glm::vec2 &Window::GetPosition() const
+const Vector2f &Window::GetPosition() const
 {
 	return m_Position;
 }

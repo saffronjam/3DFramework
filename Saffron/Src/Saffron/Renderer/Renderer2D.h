@@ -22,24 +22,24 @@ public:
 	static void Init();
 	static void Shutdown();
 
-	static void BeginScene(const glm::mat4 &viewProj, bool depthTest = true);
+	static void BeginScene(const Matrix4f &viewProj, bool depthTest = true);
 	static void EndScene();
 
 	// Primitives
-	static void DrawQuad(const glm::mat4 &transform, const glm::vec4 &color);
-	static void DrawQuad(const glm::mat4 &transform, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = glm::vec4(1.0f));
+	static void DrawQuad(const Matrix4f &transform, const Vector4f &color);
+	static void DrawQuad(const Matrix4f &transform, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const Vector4f &tintColor = Vector4f(1.0f));
 
-	static void DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const glm::vec4 &color);
-	static void DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const glm::vec4 &color);
-	static void DrawQuad(const glm::vec2 &position, const glm::vec2 &size, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = glm::vec4(1.0f));
-	static void DrawQuad(const glm::vec3 &position, const glm::vec2 &size, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = glm::vec4(1.0f));
+	static void DrawQuad(const Vector2f &position, const Vector2f &size, const Vector4f &color);
+	static void DrawQuad(const Vector3f &position, const Vector2f &size, const Vector4f &color);
+	static void DrawQuad(const Vector2f &position, const Vector2f &size, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const Vector4f &tintColor = Vector4f(1.0f));
+	static void DrawQuad(const Vector3f &position, const Vector2f &size, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const Vector4f &tintColor = Vector4f(1.0f));
 
-	static void DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation, const glm::vec4 &color);
-	static void DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation, const glm::vec4 &color);
-	static void DrawRotatedQuad(const glm::vec2 &position, const glm::vec2 &size, float rotation, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = glm::vec4(1.0f));
-	static void DrawRotatedQuad(const glm::vec3 &position, const glm::vec2 &size, float rotation, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const glm::vec4 &tintColor = glm::vec4(1.0f));
+	static void DrawRotatedQuad(const Vector2f &position, const Vector2f &size, float rotation, const Vector4f &color);
+	static void DrawRotatedQuad(const Vector3f &position, const Vector2f &size, float rotation, const Vector4f &color);
+	static void DrawRotatedQuad(const Vector2f &position, const Vector2f &size, float rotation, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const Vector4f &tintColor = Vector4f(1.0f));
+	static void DrawRotatedQuad(const Vector3f &position, const Vector2f &size, float rotation, const Shared<Texture2D> &texture, float tilingFactor = 1.0f, const Vector4f &tintColor = Vector4f(1.0f));
 
-	static void DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const glm::vec4 &color = glm::vec4(1.0f));
+	static void DrawLine(const Vector3f &p0, const Vector3f &p1, const Vector4f &color = Vector4f(1.0f));
 
 	static const Statistics &GetStats();
 	static void ResetStats();

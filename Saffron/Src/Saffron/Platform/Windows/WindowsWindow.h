@@ -23,7 +23,7 @@ public:
 	void *GetNativeWindow() const override;
 
 	// Window attributes
-	void SetTitle(std::string title) override;
+	void SetTitle(String title) override;
 	void SetVSync(bool enabled) override;
 	bool IsVSync() const override;
 	bool IsMinimized() const override;

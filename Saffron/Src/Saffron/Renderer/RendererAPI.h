@@ -17,9 +17,9 @@ public:
 
 	struct Capabilities
 	{
-		std::string Vendor;
-		std::string Renderer;
-		std::string Version;
+		String Vendor;
+		String Renderer;
+		String Version;
 
 		int MaxSamples = 0;
 		float MaxAnisotropy = 0.0f;

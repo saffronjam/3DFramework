@@ -1,21 +1,22 @@
 ﻿#pragma once
 
 #include "Saffron/Core/Timer.h"
+#include "Saffron/System/TypeDefs.h"
 
 namespace Se
 {
 struct ProfileResult
 {
-	std::string Name;
+	String Name;
 
 	Timer::TimePoint Start;
 	Time ElapsedTime;
-	std::thread::id ThreadID;
+	Thread::id ThreadID;
 };
 
 struct InstrumentationSession
 {
-	std::string Name;
+	String Name;
 };
 
 class Instrumentor
@@ -24,7 +25,7 @@ public:
 	Instrumentor(const Instrumentor &) = delete;
 	Instrumentor(Instrumentor &&) = delete;
 
-	void BeginSession(const std::string &name, const std::string &filepath = "results.json");
+	void BeginSession(const String &name, const String &filepath = "results.json");
 	void EndSession();
 
 	void WriteProfile(const ProfileResult &result);
@@ -42,9 +43,9 @@ private:
 	void InternalEndSession();
 
 private:
-	std::mutex m_Mutex;
+	Mutex m_Mutex;
 	InstrumentationSession *m_CurrentSession;
-	std::ofstream m_OutputStream;
+	OutputStream m_OutputStream;
 };
 
 class InstrumentationTimer : public Timer

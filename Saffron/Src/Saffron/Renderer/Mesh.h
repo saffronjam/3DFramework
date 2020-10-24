@@ -28,11 +28,11 @@ namespace Se
 
 struct Vertex
 {
-	glm::vec3 Position;
-	glm::vec3 Normal;
-	glm::vec3 Tangent;
-	glm::vec3 Binormal;
-	glm::vec2 TexCoord;
+	Vector3f Position;
+	Vector3f Normal;
+	Vector3f Tangent;
+	Vector3f Binormal;
+	Vector2f TexCoord;
 };
 
 
@@ -42,11 +42,11 @@ struct Vertex
 
 struct AnimatedVertex
 {
-	glm::vec3 Position{};
-	glm::vec3 Normal{};
-	glm::vec3 Tangent{};
-	glm::vec3 Binormal{};
-	glm::vec2 TexCoord{};
+	Vector3f Position{};
+	Vector3f Normal{};
+	Vector3f Tangent{};
+	Vector3f Binormal{};
+	Vector2f TexCoord{};
 
 	Uint32 IDs[4] = { 0, 0,0, 0 };
 	float Weights[4]{ 0.0f, 0.0f, 0.0f, 0.0f };
@@ -75,8 +75,8 @@ static_assert(sizeof(Index) == 3 * sizeof(Uint32));
 
 struct BoneInfo
 {
-	glm::mat4 BoneOffset;
-	glm::mat4 FinalTransformation;
+	Matrix4f BoneOffset;
+	Matrix4f FinalTransformation;
 };
 
 
@@ -112,72 +112,72 @@ public:
 	Uint32 MaterialIndex{};
 	Uint32 IndexCount{};
 
-	glm::mat4 Transform{};
+	Matrix4f Transform{};
 	AABB BoundingBox;
 
-	std::string NodeName, MeshName;
+	String NodeName, MeshName;
 };
 
 class Mesh : public ReferenceCounted
 {
 public:
-	Mesh(std::string filename);
+	Mesh(String filename);
 	~Mesh();
 
 	void OnUpdate(Time ts);
 	void DumpVertexBuffer();
 
-	std::vector<Submesh> &GetSubmeshes() { return m_Submeshes; }
-	const std::vector<Submesh> &GetSubmeshes() const { return m_Submeshes; }
+	ArrayList<Submesh> &GetSubmeshes() { return m_Submeshes; }
+	const ArrayList<Submesh> &GetSubmeshes() const { return m_Submeshes; }
 
 	Shared<Shader> GetMeshShader() const { return m_MeshShader; }
 	Shared<Material> GetMaterial() const { return m_BaseMaterial; }
-	std::vector<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }
-	const std::vector<Shared<Texture2D>> &GetTextures() const { return m_Textures; }
-	const std::string &GetFilepath() const { return m_Filepath; }
+	ArrayList<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }
+	const ArrayList<Shared<Texture2D>> &GetTextures() const { return m_Textures; }
+	const String &GetFilepath() const { return m_Filepath; }
 
-	std::vector<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
+	ArrayList<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
 private:
 	void BoneTransform(float time);
-	void ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const glm::mat4 &ParentTransform);
-	void TraverseNodes(aiNode *node, const glm::mat4 &parentTransform = glm::mat4(1.0f), Uint32 level = 0);
+	void ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const Matrix4f &ParentTransform);
+	void TraverseNodes(aiNode *node, const Matrix4f &parentTransform = Matrix4f(1.0f), Uint32 level = 0);
 
-	const aiNodeAnim *FindNodeAnim(const aiAnimation *animation, const std::string &nodeName);
+	const aiNodeAnim *FindNodeAnim(const aiAnimation *animation, const String &nodeName);
 	Uint32 FindPosition(float AnimationTime, const aiNodeAnim *pNodeAnim);
 	Uint32 FindRotation(float AnimationTime, const aiNodeAnim *pNodeAnim);
 	Uint32 FindScaling(float AnimationTime, const aiNodeAnim *pNodeAnim);
-	glm::vec3 InterpolateTranslation(float animationTime, const aiNodeAnim *nodeAnim);
+	Vector3f InterpolateTranslation(float animationTime, const aiNodeAnim *nodeAnim);
 	glm::quat InterpolateRotation(float animationTime, const aiNodeAnim *nodeAnim);
-	glm::vec3 InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim);
+	Vector3f InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim);
 private:
-	std::vector<Submesh> m_Submeshes;
+	ArrayList<Submesh> m_Submeshes;
 
 	std::unique_ptr<Assimp::Importer> m_Importer;
 
-	glm::mat4 m_InverseTransform{};
+	Matrix4f m_InverseTransform{};
 
 	Uint32 m_BoneCount = 0;
-	std::vector<BoneInfo> m_BoneInfo;
+	ArrayList<BoneInfo> m_BoneInfo;
 
 	Shared<Pipeline> m_Pipeline;
 	Shared<VertexBuffer> m_VertexBuffer;
 	Shared<IndexBuffer> m_IndexBuffer;
 
-	std::vector<Vertex> m_StaticVertices;
-	std::vector<AnimatedVertex> m_AnimatedVertices;
-	std::vector<Index> m_Indices;
-	std::unordered_map<std::string, Uint32> m_BoneMapping;
-	std::vector<glm::mat4> m_BoneTransforms;
+	ArrayList<Vertex> m_StaticVertices;
+	ArrayList<AnimatedVertex> m_AnimatedVertices;
+	ArrayList<Index> m_Indices;
+	std::unordered_map<String, Uint32> m_BoneMapping;
+	ArrayList<Matrix4f> m_BoneTransforms;
 	const aiScene *m_Scene;
 
 	// Materials
 	Shared<Shader> m_MeshShader;
 	Shared<Material> m_BaseMaterial;
-	std::vector<Shared<Texture2D>> m_Textures;
-	std::vector<Shared<Texture2D>> m_NormalMaps;
-	std::vector<Shared<MaterialInstance>> m_Materials;
+	ArrayList<Shared<Texture2D>> m_Textures;
+	ArrayList<Shared<Texture2D>> m_NormalMaps;
+	ArrayList<Shared<MaterialInstance>> m_Materials;
 
-	std::unordered_map<Uint32, std::vector<Triangle>> m_TriangleCache;
+	std::unordered_map<Uint32, ArrayList<Triangle>> m_TriangleCache;
 
 	// Animation
 	bool m_IsAnimated = false;
@@ -186,7 +186,7 @@ private:
 	float m_TimeMultiplier = 1.0f;
 	bool m_AnimationPlaying = true;
 
-	std::string m_Filepath;
+	String m_Filepath;
 
 	friend class Renderer;
 	friend class EntityPanel;

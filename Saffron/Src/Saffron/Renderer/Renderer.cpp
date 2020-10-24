@@ -44,23 +44,23 @@ void Renderer::Init()
 	const float x = -1, y = -1, width = 2, height = 2;
 	struct QuadVertex
 	{
-		glm::vec3 Position;
-		glm::vec2 TexCoord;
+		Vector3f Position;
+		Vector2f TexCoord;
 	};
 
 	auto *data = new QuadVertex[4];
 
-	data[0].Position = glm::vec3(x, y, 0.1f);
-	data[0].TexCoord = glm::vec2(0, 0);
+	data[0].Position = Vector3f(x, y, 0.1f);
+	data[0].TexCoord = Vector2f(0, 0);
 
-	data[1].Position = glm::vec3(x + width, y, 0.1f);
-	data[1].TexCoord = glm::vec2(1, 0);
+	data[1].Position = Vector3f(x + width, y, 0.1f);
+	data[1].TexCoord = Vector2f(1, 0);
 
-	data[2].Position = glm::vec3(x + width, y + height, 0.1f);
-	data[2].TexCoord = glm::vec2(1, 1);
+	data[2].Position = Vector3f(x + width, y + height, 0.1f);
+	data[2].TexCoord = Vector2f(1, 1);
 
-	data[3].Position = glm::vec3(x, y + height, 0.1f);
-	data[3].TexCoord = glm::vec2(0, 1);
+	data[3].Position = Vector3f(x, y + height, 0.1f);
+	data[3].TexCoord = Vector2f(0, 1);
 
 	Pipeline::Specification Specification;
 	Specification.Layout = {
@@ -168,7 +168,7 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 	renderPass->GetSpecification().TargetFramebuffer->Bind();
 	if ( clear )
 	{
-		const glm::vec4 &clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
+		const Vector4f &clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
 		Submit([=]() { RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a); });
 	}
 }
@@ -180,7 +180,7 @@ void Renderer::EndRenderPass()
 	s_Data.m_ActiveRenderPass = nullptr;
 }
 
-void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4 &transform)
+void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform)
 {
 	bool depthTest = true;
 	if ( material )
@@ -198,7 +198,7 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4 &tr
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<MaterialInstance> overrideMaterial)
+void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -219,7 +219,7 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<
 		{
 			for ( size_t i = 0; i < mesh->m_BoneTransforms.size(); i++ )
 			{
-				std::string uniformName = std::string("u_BoneTransforms[") + std::to_string(i) + std::string("]");
+				String uniformName = String("u_BoneTransforms[") + std::to_string(i) + String("]");
 				mesh->m_MeshShader->SetMat4(uniformName, mesh->m_BoneTransforms[i]);
 			}
 		}
@@ -236,7 +236,7 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4 &transform, Shared<
 	}
 }
 
-void Renderer::DrawAABB(Shared<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
+void Renderer::DrawAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color)
 {
 	for ( Submesh &submesh : mesh->m_Submeshes )
 	{
@@ -246,22 +246,22 @@ void Renderer::DrawAABB(Shared<Mesh> mesh, const glm::mat4 &transform, const glm
 	}
 }
 
-void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
+void Renderer::DrawAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color)
 {
-	glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
-	glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
+	Vector4f min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
+	Vector4f max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
 
-	glm::vec4 corners[8] =
+	Vector4f corners[8] =
 	{
-		transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
 
-		transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
 	};
 
 	for ( Uint32 i = 0; i < 4; i++ )

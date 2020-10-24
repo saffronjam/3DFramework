@@ -1,17 +1,17 @@
 #pragma once
 
-#include "SaffronPCH.h"
+#include "Saffron/Base.h"
 
 namespace Se
 {
 class ScopedLock
 {
 public:
-	ScopedLock(std::mutex &mutex);
+	ScopedLock(Mutex &mutex);
 	~ScopedLock();
 
 private:
-	std::mutex &m_mutex;
+	Mutex &m_Mutex;
 };
 }
 
