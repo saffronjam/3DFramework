@@ -6,7 +6,7 @@
 namespace Se
 {
 ScriptPanel::ScriptPanel(Filepath path)
-	: m_ScriptFolderPath(std::move(path))
+	: m_ScriptFolderPath(Move(path))
 {
 	SyncScriptPaths();
 }

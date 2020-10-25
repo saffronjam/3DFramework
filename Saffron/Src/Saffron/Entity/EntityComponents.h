@@ -24,7 +24,7 @@ struct TagComponent
 	TagComponent() = default;
 	TagComponent(const TagComponent &other) = default;
 	explicit TagComponent(String tag)
-		: Tag(std::move(tag))
+		: Tag(Move(tag))
 	{
 	}
 
@@ -70,7 +70,7 @@ struct ScriptComponent
 	ScriptComponent() = default;
 	ScriptComponent(const ScriptComponent &other) = default;
 	explicit ScriptComponent(String moduleName)
-		: ModuleName(std::move(moduleName))
+		: ModuleName(Move(moduleName))
 	{
 		if ( ModuleName.find('.') != String::npos )
 		{
@@ -85,7 +85,7 @@ struct ScriptComponent
 
 	void ChangeModule(String moduleName)
 	{
-		ModuleName = std::move(moduleName);
+		ModuleName = Move(moduleName);
 		if ( ModuleName.find('.') != String::npos )
 		{
 			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));

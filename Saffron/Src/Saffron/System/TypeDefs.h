@@ -44,6 +44,8 @@ template<class FunctionType>
 using Function = std::function<FunctionType>;
 template<class... Types>
 using Tuple = std::tuple<Types...>;
+
+
 using String = std::string;
 using WideString = std::wstring;
 using Filepath = std::filesystem::path;
@@ -55,4 +57,10 @@ using OutputStringStream = std::ostringstream;
 using InputStringStream = std::istringstream;
 using Thread = std::thread;
 using Mutex = std::mutex;
+
+template<class MoveClass>
+constexpr auto &&Move(MoveClass &&moveClass)  noexcept
+{
+	return static_cast<std::remove_reference_t<MoveClass> &&>(moveClass);
+}
 }

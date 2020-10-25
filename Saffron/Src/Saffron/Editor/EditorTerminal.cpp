@@ -1,33 +1,33 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Editor/EditorTerminal.h"
-
+#include "Saffron/Gui/Gui.h"
 
 namespace Se
 {
 
-static EditorTerminal s_Terminal;
+// TODO: Implement as a GUI interface
+static Uint64 s_GuiID = 0;
 
-void EditorTerminal::Init()
+EditorTerminal::EditorTerminal()
 {
-	s_Terminal.m_Sink = std::make_shared<TerminalSink>();
+	m_Sink = std::make_shared<TerminalSink>();
 	Clear();
 	SetLevel(Log::Level::Info);
-	Log::AddClientSink(s_Terminal.m_Sink);
+	Log::AddClientSink(m_Sink);
 }
 
 void EditorTerminal::Clear()
 {
-	s_Terminal.m_Sink->Clear();
+	m_Sink->Clear();
 }
-
 
 void EditorTerminal::OnGuiRender()
 {
-	auto &sink = s_Terminal.m_Sink;
+	OutputStringStream oss;
+	oss << "Terminal##" << s_GuiID++;
 
-
-	if ( !ImGui::Begin("Terminal ") )
+	if ( !ImGui::Begin("Terminal") )
 	{
 		ImGui::End();
 		return;
@@ -36,7 +36,7 @@ void EditorTerminal::OnGuiRender()
 	// Options menu
 	if ( ImGui::BeginPopup("Options") )
 	{
-		ImGui::Checkbox("Auto-scroll", &sink->m_AutoScroll);
+		ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
 		ImGui::EndPopup();
 	}
 
@@ -48,7 +48,7 @@ void EditorTerminal::OnGuiRender()
 	ImGui::SameLine();
 	const bool copy = ImGui::Button("Copy");
 	ImGui::SameLine();
-	sink->m_Filter.Draw("Filter", -100.0f);
+	m_Filter.Draw("Filter", -100.0f);
 
 	ImGui::Separator();
 	ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -59,29 +59,29 @@ void EditorTerminal::OnGuiRender()
 		ImGui::LogToClipboard();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	const char *buf = sink->m_Buf.begin();
-	const char *buf_end = sink->m_Buf.end();
-	if ( sink->m_Filter.IsActive() )
+	const char *buf = m_Sink->m_TextBuffer.begin();
+	const char *buf_end = m_Sink->m_TextBuffer.end();
+	if ( m_Filter.IsActive() )
 	{
-		for ( int line_no = 0; line_no < sink->m_LineOffsets.Size; line_no++ )
+		for ( int line_no = 0; line_no < m_Sink->m_LineOffsets.size(); line_no++ )
 		{
-			const char *line_start = buf + sink->m_LineOffsets[line_no];
-			const char *line_end = (line_no + 1 < sink->m_LineOffsets.Size) ? (buf + sink->m_LineOffsets[line_no + 1] - 1) : buf_end;
-			if ( sink->m_Filter.PassFilter(line_start, line_end) )
+			const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
+			const char *line_end = (line_no + 1 < m_Sink->m_LineOffsets.size()) ? (buf + m_Sink->m_LineOffsets[line_no + 1] - 1) : buf_end;
+			if ( m_Filter.PassFilter(line_start, line_end) )
 				ImGui::TextUnformatted(line_start, line_end);
 		}
 	}
 	else
 	{
 		ImGuiListClipper clipper;
-		clipper.Begin(sink->m_LineOffsets.Size);
+		clipper.Begin(m_Sink->m_LineOffsets.size());
 		while ( clipper.Step() )
 		{
 			for ( int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++ )
 			{
-				const char *line_start = buf + sink->m_LineOffsets[line_no];
-				const char *line_end = (line_no + 1 < sink->m_LineOffsets.Size)
-					? (buf + sink->m_LineOffsets[line_no + 1] - 1)
+				const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
+				const char *line_end = (line_no + 1 < m_Sink->m_LineOffsets.size())
+					? (buf + m_Sink->m_LineOffsets[line_no + 1] - 1)
 					: buf_end;
 				ImGui::TextUnformatted(line_start, line_end);
 			}
@@ -90,15 +90,17 @@ void EditorTerminal::OnGuiRender()
 	}
 	ImGui::PopStyleVar();
 
-	if ( sink->m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() )
+	if ( m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() )
 		ImGui::SetScrollHereY(1.0f);
 
 	ImGui::EndChild();
 	ImGui::End();
+
+	s_GuiID--;
 }
 
 void EditorTerminal::SetLevel(Log::Level::LevelEnum level)
 {
-	s_Terminal.m_Sink->SetLevel(level);
+	m_Sink->SetLevel(level);
 }
 }

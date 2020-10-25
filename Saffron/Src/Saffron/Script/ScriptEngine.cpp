@@ -121,7 +121,7 @@ struct EntityScriptClass
 
 	void SetScript(String moduleName)
 	{
-		FullName = std::move(moduleName);
+		FullName = Move(moduleName);
 		if ( FullName.find('.') != String::npos )
 		{
 			NamespaceName = FullName.substr(0, FullName.find_last_of('.'));
@@ -349,14 +349,14 @@ MonoObject *EntityInstance::GetInstance() const
 ///////////////////////////////////////////////////////////////////////////
 
 PublicField::PublicField(String name, FieldType type)
-	: Name(std::move(name)), Type(type)
+	: Name(Move(name)), Type(type)
 {
 	m_StoredValueBuffer = AllocateBuffer(type);
 }
 
 PublicField::PublicField(PublicField &&other)
 {
-	Name = std::move(other.Name);
+	Name = Move(other.Name);
 	Type = other.Type;
 	m_EntityInstance = other.m_EntityInstance;
 	m_MonoClassField = other.m_MonoClassField;
@@ -430,7 +430,7 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 
 void ScriptEngine::Init(String assemblyPath)
 {
-	s_AssemblyPath = std::move(assemblyPath);
+	s_AssemblyPath = Move(assemblyPath);
 
 	InitMono();
 
@@ -684,7 +684,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 	std::unordered_map<String, PublicField> oldFields;
 	oldFields.reserve(fieldMap.size());
 	for ( auto &[fieldName, field] : fieldMap )
-		oldFields.emplace(fieldName, std::move(field));
+		oldFields.emplace(fieldName, Move(field));
 	fieldMap.clear();
 
 	// Retrieve public fields (TODO: cache these fields if the module is used more than once)
@@ -706,14 +706,14 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 
 			if ( oldFields.find(name) != oldFields.end() )
 			{
-				fieldMap.emplace(name, std::move(oldFields.at(name)));
+				fieldMap.emplace(name, Move(oldFields.at(name)));
 			}
 			else
 			{
 				PublicField field = { name, saffronFieldType };
 				field.m_EntityInstance = &entityInstance;
 				field.m_MonoClassField = iter;
-				fieldMap.emplace(name, std::move(field));
+				fieldMap.emplace(name, Move(field));
 			}
 		}
 	}

@@ -148,7 +148,7 @@ Buffer &Material::GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclar
 ////////////////////////////////////////////////////////////////
 
 MaterialInstance::MaterialInstance(const Shared<Material> &material, String name)
-	: m_Material(material), m_Name(std::move(name))
+	: m_Material(material), m_Name(Move(name))
 {
 	m_Material->m_MaterialInstances.insert(this);
 	AllocateStorage();

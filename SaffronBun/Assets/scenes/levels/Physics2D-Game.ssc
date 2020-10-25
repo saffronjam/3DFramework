@@ -91,7 +91,7 @@ Entities:
     TransformComponent:
       Position: [-29.6808929, 29.7597198, 0]
       Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [58.4144516, 4.47956038, 4.48000002]
+      Scale: [58.4143829, 4.47955179, 4.48000002]
     MeshComponent:
       AssetPath: assets\meshes\Cube1m.fbx
     RigidBody2DComponent:

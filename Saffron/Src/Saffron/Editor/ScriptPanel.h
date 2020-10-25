@@ -16,9 +16,9 @@ public:
 
 		ScriptStat(String namespaceName, String className, Filepath path)
 			:Full(namespaceName + className),
-			Namespace(std::move(namespaceName)),
-			Class(std::move(className)),
-			Path(std::move(path))
+			Namespace(Move(namespaceName)),
+			Class(Move(className)),
+			Path(Move(path))
 		{
 		}
 		ScriptStat(const ScriptStat &stat)

@@ -31,7 +31,7 @@ Uint32 ShaderDataTypeSize(ShaderDataType type)
 /// Vertex Buffer Element
 ///////////////////////////////////////////////////////////////
 
-VertexBuffer::Element::Element(ShaderDataType type, String name, bool normalized) : Name(std::move(name)),
+VertexBuffer::Element::Element(ShaderDataType type, String name, bool normalized) : Name(Move(name)),
 Type(type),
 Size(ShaderDataTypeSize(
 	type)),

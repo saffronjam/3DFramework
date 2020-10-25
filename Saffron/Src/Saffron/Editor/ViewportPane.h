@@ -20,8 +20,8 @@ public:
 	bool IsHovered() const { return m_Hovered; }
 	bool IsFocused() const { return m_Focused; }
 
-	void SetPostRenderCallback(std::function<void()> fn) { m_PostRenderFunction = fn; }
-	void SetRenderTargetIdentifier(String renderTargetIdentifier) { m_RenderTargetIdentifier = std::move(renderTargetIdentifier); }
+	void SetPostRenderCallback(Function<void()> fn) { m_PostRenderFunction = fn; }
+	void SetRenderTargetIdentifier(String renderTargetIdentifier) { m_RenderTargetIdentifier = Move(renderTargetIdentifier); }
 
 private:
 	String m_RenderTargetIdentifier;
@@ -30,7 +30,7 @@ private:
 	Vector2f m_BottomRight;
 	bool m_Hovered;
 	bool m_Focused;
-	std::function<void()> m_PostRenderFunction;
+	Function<void()> m_PostRenderFunction;
 
 };
 

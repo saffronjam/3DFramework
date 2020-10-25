@@ -4,8 +4,11 @@
 
 #include <string>
 
+#include "Saffron/Base.h"
 #include "Saffron/Editor/EditorCamera.h"
+#include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Gui/GuiLayer.h"
 
 namespace Se
@@ -67,7 +70,6 @@ public:
 	bool OnMouseButtonPressed(const MousePressEvent &event);
 	bool OnWindowDropFiles(const WindowDropFilesEvent &event);
 
-	void ShowBoundingBoxes(bool show, bool onTop = false);
 	void SelectEntity(Entity entity);
 
 	void NewScenePrompt();
@@ -93,12 +95,14 @@ private:
 	float GetSnapValue() const;
 private:
 	int m_Style;
+	int m_GizmoType = -1;
 
 	Shared<Scene> m_RuntimeScene, m_EditorScene;
-	std::filesystem::path m_SceneFilePath;
+	Filepath m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorCamera m_EditorCamera;
+	EditorTerminal m_EditorTerminal;
 	ViewportPane m_MainViewport;
 	ViewportPane m_MiniViewport;
 
@@ -115,8 +119,6 @@ private:
 	Shared<AssetPanel> m_AssetPanel;
 	Shared<EntityPanel> m_EntityPanel;
 	Shared<ScriptPanel> m_ScriptPanel;
-
-	int m_GizmoType = -1;
 
 	SceneState m_SceneState = SceneState::Edit;
 

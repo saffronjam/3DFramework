@@ -133,7 +133,7 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 ////////////////////////////////////////////////////////////////////////
 
 Mesh::Mesh(String filename)
-	: m_Filepath(std::move(filename))
+	: m_Filepath(Move(filename))
 {
 	LogStream::Initialize();
 

@@ -5,7 +5,7 @@
 namespace Se
 {
 ShaderStruct::ShaderStruct(String name)
-	: m_Name(std::move(name)), m_Size(0), m_Offset(0)
+	: m_Name(Move(name)), m_Size(0), m_Offset(0)
 {
 }
 

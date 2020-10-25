@@ -6,7 +6,7 @@
 namespace Se
 {
 AssetPanel::AssetPanel(Filepath path)
-	: m_AssetFolderPath(std::move(path))
+	: m_AssetFolderPath(Move(path))
 {
 	SyncAssetPaths();
 }

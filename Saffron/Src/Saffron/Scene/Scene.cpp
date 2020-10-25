@@ -87,7 +87,7 @@ Scene::Environment Scene::Environment::Load(const String &filepath)
 ///////////////////////////////////////////////////////////////////////////
 
 Scene::Scene(String name)
-	: m_Name(std::move(name)),
+	: m_Name(Move(name)),
 	m_SceneEntity(m_EntityRegistry.create(), this)
 {
 	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
@@ -312,7 +312,7 @@ Entity Scene::CreateEntity(String name)
 
 	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if ( !name.empty() )
-		entity.AddComponent<TagComponent>(std::move(name));
+		entity.AddComponent<TagComponent>(Move(name));
 
 	m_EntityIDMap[idComponent.ID] = entity;
 	return entity;
@@ -434,7 +434,7 @@ Shared<Scene> Scene::GetScene(UUID uuid)
 
 void Scene::SetName(String name)
 {
-	m_Name = std::move(name);
+	m_Name = Move(name);
 }
 
 void Scene::SetLight(const Light &light)

@@ -16,8 +16,8 @@ public:
 
 	void SetContext(const Shared<Scene> &context);
 	void SetSelected(Entity entity);
-	void SetSelectionChangedCallback(const std::function<void(Entity)> &func) { m_SelectionChangedCallback = func; }
-	void SetEntityDeletedCallback(const std::function<void(Entity)> &func) { m_EntityDeletedCallback = func; }
+	void SetSelectionChangedCallback(const Function<void(Entity)> &func) { m_SelectionChangedCallback = func; }
+	void SetEntityDeletedCallback(const Function<void(Entity)> &func) { m_EntityDeletedCallback = func; }
 
 private:
 	void OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPanel);
@@ -35,6 +35,6 @@ private:
 
 	Map<String, Shared<Texture2D>> m_TexStore;
 
-	std::function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
+	Function<void(Entity)> m_SelectionChangedCallback, m_EntityDeletedCallback;
 };
 }

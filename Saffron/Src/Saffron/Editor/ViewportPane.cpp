@@ -10,7 +10,7 @@ namespace Se
 
 ViewportPane::ViewportPane(String renderTargetIdentifier)
 	:
-	m_RenderTargetIdentifier(std::move(renderTargetIdentifier)),
+	m_RenderTargetIdentifier(Move(renderTargetIdentifier)),
 	m_TopLeft(0.0f, 0.0f),
 	m_BottomRight(100.0f, 100.0f),
 	m_Hovered(false),

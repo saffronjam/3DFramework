@@ -8,7 +8,7 @@ namespace Se
 /// OpenGL Shader Resource Declaration ///
 //////////////////////////////////////////
 OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, String name, Uint32 count)
-	: m_Name(std::move(name)), m_Count(count), m_Type(type)
+	: m_Name(Move(name)), m_Count(count), m_Type(type)
 {
 }
 
@@ -38,7 +38,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 															   String name, Uint32 count)
 	:
 	m_Struct(nullptr),
-	m_Name(std::move(name)),
+	m_Name(Move(name)),
 	m_Count(count),
 	m_Size(SizeOfUniformType(type) *count),
 	m_Domain(domain),
@@ -51,7 +51,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 															   String name, Uint32 count)
 	:
 	m_Struct(uniformStruct),
-	m_Name(std::move(name)),
+	m_Name(Move(name)),
 	m_Count(count),
 	m_Size(m_Struct->GetSize() *count),
 	m_Domain(domain),
@@ -115,7 +115,7 @@ String OpenGLShaderUniformDeclaration::TypeToString(Type type)
 ////////////////////////////////////////////////
 OpenGLShaderUniformBufferDeclaration::OpenGLShaderUniformBufferDeclaration(String name,
 																		   ShaderDomain domain)
-	: m_Name(std::move(name)), m_Register(0), m_Size(0), m_Domain(domain)
+	: m_Name(Move(name)), m_Register(0), m_Size(0), m_Domain(domain)
 
 {
 }

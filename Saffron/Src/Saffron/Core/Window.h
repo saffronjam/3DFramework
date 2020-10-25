@@ -13,7 +13,7 @@ namespace Se
 class Window : public ReferenceCounted
 {
 public:
-	using EventCallback = std::function<void(const Event &)>;
+	using EventCallback = Function<void(const Event &)>;
 
 public:
 	struct Properties
@@ -27,7 +27,7 @@ public:
 							Uint32 width = 1280,
 							Uint32 height = 720,
 							const Vector2f position = { 100.0f, 100.0f })
-			: Title(std::move(title)), Width(width), Height(height), Position(position)
+			: Title(Move(title)), Width(width), Height(height), Position(position)
 		{
 		}
 	};

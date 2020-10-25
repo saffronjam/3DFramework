@@ -16,9 +16,9 @@ public:
 
 		AssetStat(String stem, String type, Filepath path)
 			:Full(stem + type),
-			Stem(std::move(stem)),
-			Type(std::move(type)),
-			Path(std::move(path))
+			Stem(Move(stem)),
+			Type(Move(type)),
+			Path(Move(path))
 		{
 		}
 		AssetStat(const AssetStat &stat)

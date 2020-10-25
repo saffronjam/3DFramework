@@ -464,7 +464,7 @@ bool SceneSerializer::Deserialize(const String &filepath)
 							if ( publicFields.find(name) == publicFields.end() )
 							{
 								PublicField pf = { name, type };
-								publicFields.emplace(name, std::move(pf));
+								publicFields.emplace(name, Move(pf));
 							}
 							auto dataNode = field["Data"];
 							switch ( type )

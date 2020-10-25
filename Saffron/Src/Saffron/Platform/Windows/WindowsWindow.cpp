@@ -3,13 +3,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Core/Events/KeyboardEvent.h"
 #include "Saffron/Core/Events/MouseEvent.h"
+#include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
 #include "Saffron/Renderer/Renderer.h"
-#include "Saffron/System/ScopedLock.h"
 
 namespace Se
 {
@@ -27,8 +26,7 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	m_NativeWindow(nullptr),
 	m_VSync(false)
 {
-
-	static std::mutex mutex;
+	static Mutex mutex;
 	ScopedLock lock(mutex);
 
 	// Initialize GLFW
@@ -136,7 +134,7 @@ void WindowsWindow::SetTitle(String title)
 {
 	SE_PROFILE_FUNCTION();
 
-	m_Title = std::move(title);
+	m_Title = Move(title);
 	glfwSetWindowTitle(m_NativeWindow, m_Title.c_str());
 }
 

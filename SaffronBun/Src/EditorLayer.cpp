@@ -4,13 +4,10 @@
 
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Core/FileIOManager.h"
-#include "Saffron/Editor/ViewportPane.h"
-#include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Script/ScriptEngine.h"
-#include "Saffron/System/Macros.h"
 
 
 namespace Se
@@ -23,7 +20,6 @@ EditorLayer::EditorLayer()
 	m_MainViewport("MainRenderTarget"),
 	m_MiniViewport("MiniRenderTarget")
 {
-	EditorTerminal::Init();
 	Gui::Init();
 
 	SceneRenderer::AddRenderTarget("MiniRenderTarget", 200, 100);
@@ -520,10 +516,10 @@ void EditorLayer::OnGuiRender()
 		ImGui::EndMenuBar();
 	}
 
-	EditorTerminal::OnGuiRender();
 	Renderer::OnGuiRender();
 	ScriptEngine::OnGuiRender();
 	Shader::OnGuiRender();
+	m_EditorTerminal.OnGuiRender();
 	m_MainViewport.OnGuiRender();
 	m_MiniViewport.OnGuiRender();
 	m_AssetPanel->OnGuiRender();

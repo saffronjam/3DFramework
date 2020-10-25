@@ -92,7 +92,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowDropFilesEvent(ArrayList<Filepath> filepaths) : m_Filepaths(std::move(filepaths)) {}
+	explicit WindowDropFilesEvent(ArrayList<Filepath> filepaths) : m_Filepaths(Move(filepaths)) {}
 
 	const ArrayList<Filepath> &GetPaths() const { return m_Filepaths; }
 	String ToString() const override

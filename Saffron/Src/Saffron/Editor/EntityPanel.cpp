@@ -6,7 +6,6 @@
 #include "Saffron/Core/Application.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Editor/EntityPanel.h"
-#include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -839,7 +838,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   // Shutdown old script
 												   if ( ScriptEngine::ModuleExists(sc.ModuleName) )
 													   ScriptEngine::ShutdownScriptEntity(entity, sc.ModuleName);
-												   sc.ChangeModule(std::move(cachedNewModuleName));
+												   sc.ChangeModule(Move(cachedNewModuleName));
 												   // Startup new script
 												   if ( ScriptEngine::ModuleExists(sc.ModuleName) )
 													   ScriptEngine::InitScriptEntity(entity);

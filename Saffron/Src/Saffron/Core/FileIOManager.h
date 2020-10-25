@@ -23,8 +23,8 @@ public:
 
 		Filter() = default;
 		Filter(String description, ArrayList<String> extensions)
-			: Description(std::move(description)),
-			Extensions(std::move(extensions))
+			: Description(Move(description)),
+			Extensions(Move(extensions))
 		{
 		}
 	};

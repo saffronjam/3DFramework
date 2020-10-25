@@ -113,7 +113,7 @@ public:
 	//////////////////////////////////////////
 
 public:
-	using ShaderReloadedCallback = std::function<void()>;
+	using ShaderReloadedCallback = Function<void()>;
 
 public:
 	virtual ~Shader() = default;

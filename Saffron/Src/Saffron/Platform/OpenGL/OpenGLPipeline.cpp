@@ -30,7 +30,7 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 }
 
 OpenGLPipeline::OpenGLPipeline(Specification spec)
-	: m_Specification(std::move(spec))
+	: m_Specification(Move(spec))
 {
 	OpenGLPipeline::Invalidate();
 }
