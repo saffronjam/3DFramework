@@ -98,7 +98,7 @@ Scene::Scene(String name)
 
 	s_ActiveScenes[m_SceneID] = this;
 
-	const auto skyboxShader = Shader::Create("Assets/shaders/Skybox.glsl");
+	const auto skyboxShader = Shader::Create(Filepath{ "Assets/shaders/Skybox.glsl" });
 	m_Skybox.Material = MaterialInstance::Create(Material::Create(skyboxShader));
 	m_Skybox.Material->SetFlag(Material::Flag::DepthTest, false);
 }

@@ -1,12 +1,8 @@
 #include "SaffronPCH.h"
 #include "OpenGLShader.h"
 
-
-#include <sstream>
-#include <limits>
-
-#include <glm/gtc/type_ptr.hpp>
-
+#include "Saffron/Core/Misc.h"
+#include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/Renderer.h"
 
 namespace Se {
@@ -129,20 +125,17 @@ static bool IsTypeStringResource(const String &type)
 /// OpenGL Shader
 //////////////////////////////////////////////////////////////////
 
-OpenGLShader::OpenGLShader(const String &filepath)
-	: m_AssetPath(filepath)
+OpenGLShader::OpenGLShader(const Filepath &filepath)
+	: m_Filepath(filepath)
 {
-	const Filepath fsPath = filepath;
-	m_Name = fsPath.stem().string();
+	m_Name = m_Filepath.stem().string();
 
 	OpenGLShader::Reload();
 }
 
-Shared<OpenGLShader> OpenGLShader::CreateFromString(const String &source)
+OpenGLShader::OpenGLShader(const String &source)
 {
-	Shared<OpenGLShader> shader = Shared<OpenGLShader>::Create();
-	shader->Load(source);
-	return shader;
+	Load(source);
 }
 
 void OpenGLShader::Bind()
@@ -152,7 +145,7 @@ void OpenGLShader::Bind()
 
 void OpenGLShader::Reload()
 {
-	Load(ReadFromFile(m_AssetPath));
+	Load(ReadFromFile(m_Filepath));
 }
 
 void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
@@ -195,6 +188,21 @@ void OpenGLShader::UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer)
 			break;
 		}
 	}
+}
+
+size_t OpenGLShader::GetIdentifier()
+{
+	if ( !m_Filepath.empty() )
+	{
+		return Misc::HashFilepath(m_Filepath);
+	}
+
+	String fullSource;
+	for ( const auto &[glEnum, source] : m_ShaderSource )
+	{
+		fullSource += source;
+	}
+	return Misc::HashString(fullSource);
 }
 
 void OpenGLShader::SetVSMaterialUniformBuffer(const Buffer &buffer)
@@ -280,7 +288,7 @@ void OpenGLShader::Load(const String &source)
 					 });
 }
 
-String OpenGLShader::ReadFromFile(const String &filepath) const
+String OpenGLShader::ReadFromFile(const Filepath &filepath) const
 {
 	String result;
 	InputStream in(filepath, std::ios::in | std::ios::binary);
@@ -293,7 +301,7 @@ String OpenGLShader::ReadFromFile(const String &filepath) const
 	}
 	else
 	{
-		SE_CORE_ASSERT(false, "Could not load shader from file! Filepath: " + filepath);
+		SE_CORE_ASSERT(false, "Could not load shader from file! Filepath: " + filepath.string());
 	}
 	in.close();
 	return result;
@@ -490,7 +498,7 @@ Int32 OpenGLShader::GetUniformLocation(const String &name) const
 {
 	const Int32 result = glGetUniformLocation(m_RendererID, name.c_str());
 	if ( result == -1 )
-		SE_CORE_WARN("Could not find uniform '{0}' in shader {1}", name, m_AssetPath);
+		SE_CORE_WARN("Could not find uniform '{0}' in shader {1}", name, m_Filepath.string());
 
 	return result;
 }

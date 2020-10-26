@@ -16,6 +16,8 @@ public:
 
 public:
 	static TransformDecomposition GetTransformDecomposition(const Matrix4f &transform);
+	static size_t HashFilepath(const Filepath &filepath);
+	static size_t HashString(const String &string);
 };
 
 }

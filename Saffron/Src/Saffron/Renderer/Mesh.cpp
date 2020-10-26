@@ -6,6 +6,7 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/LogStream.hpp>
 
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
 
@@ -148,7 +149,9 @@ Mesh::Mesh(String filename)
 	m_Scene = scene;
 
 	m_IsAnimated = scene->mAnimations != nullptr;
-	m_MeshShader = m_IsAnimated ? Renderer::GetShaderLibrary()->Get("SaffronPBR_Anim") : Renderer::GetShaderLibrary()->Get("SaffronPBR_Static");
+
+	Filepath meshShaderPath = m_IsAnimated ? "Assets/Shaders/SaffronPBR_Anim.glsl" : "Assets/Shaders/SaffronPBR_Static.glsl";
+	m_MeshShader = Shared<Shader>(Shader::Create(meshShaderPath));
 	m_BaseMaterial = Shared<Material>::Create(m_MeshShader);
 	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
 	m_InverseTransform = glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));

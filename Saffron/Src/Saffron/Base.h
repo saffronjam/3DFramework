@@ -7,6 +7,7 @@
 #include "Saffron/Core/Assert.h"
 #include "Saffron/Core/Log.h"
 #include "Saffron/Core/SmartPointers.h"
+#include "Saffron/Core/UUID.h"
 #include "Saffron/System/Macros.h"
 #include "Saffron/System/TypeDefs.h"
 

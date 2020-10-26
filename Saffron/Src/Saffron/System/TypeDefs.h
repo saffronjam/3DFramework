@@ -11,6 +11,7 @@
 #include <sstream>
 #include <thread>
 #include <mutex>
+#include <atomic>
 
 namespace Se
 {
@@ -45,7 +46,6 @@ using Function = std::function<FunctionType>;
 template<class... Types>
 using Tuple = std::tuple<Types...>;
 
-
 using String = std::string;
 using WideString = std::wstring;
 using Filepath = std::filesystem::path;
@@ -57,6 +57,8 @@ using OutputStringStream = std::ostringstream;
 using InputStringStream = std::istringstream;
 using Thread = std::thread;
 using Mutex = std::mutex;
+template<typename ClassType>
+using Atomic = std::atomic<ClassType>;
 
 template<class MoveClass>
 constexpr auto &&Move(MoveClass &&moveClass)  noexcept

@@ -65,13 +65,13 @@ void SceneRenderer::Init()
 {
 	AddRenderTarget("MainRenderTarget", 1280, 720);
 
-	s_Data.CompositeShader = Shader::Create("Assets/Shaders/SceneComposite.glsl");
-	const auto outlineShader = Shader::Create("Assets/Shaders/Outline.glsl");
+	s_Data.CompositeShader = Shader::Create(Filepath{ "Assets/Shaders/SceneComposite.glsl" });
+	const auto outlineShader = Shader::Create(Filepath{ "Assets/Shaders/Outline.glsl" });
 	s_Data.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
 	s_Data.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
 
 	// Grid
-	const auto gridShader = Shader::Create("Assets/Shaders/Grid.glsl");
+	const auto gridShader = Shader::Create(Filepath{ "Assets/Shaders/Grid.glsl" });
 	s_Data.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
 	const float gridScale = 16.025f, gridSize = 0.025f;
 	s_Data.GridMaterial->Set("u_Scale", gridScale);
@@ -171,7 +171,7 @@ std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnviron
 
 	Shared<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 	if ( !equirectangularConversionShader )
-		equirectangularConversionShader = Shader::Create("Assets/Shaders/EquirectangularToCubeMap.glsl");
+		equirectangularConversionShader = Shader::Create(Filepath{ "Assets/Shaders/EquirectangularToCubeMap.glsl" });
 	Shared<Texture2D> envEquirect = Texture2D::Create(filepath);
 	SE_CORE_ASSERT(envEquirect->GetFormat() == Texture::Format::Float16, "Texture is not HDR!");
 
@@ -186,7 +186,7 @@ std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnviron
 
 
 	if ( !envFilteringShader )
-		envFilteringShader = Shader::Create("Assets/Shaders/EnvironmentMipFilter.glsl");
+		envFilteringShader = Shader::Create(Filepath{ "Assets/Shaders/EnvironmentMipFilter.glsl" });
 
 	Shared<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 
@@ -212,7 +212,7 @@ std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnviron
 					 });
 
 	if ( !envIrradianceShader )
-		envIrradianceShader = Shader::Create("Assets/Shaders/EnvironmentIrradiance.glsl");
+		envIrradianceShader = Shader::Create(Filepath{ "Assets/Shaders/EnvironmentIrradiance.glsl" });
 
 	Shared<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
 	envIrradianceShader->Bind();

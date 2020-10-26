@@ -122,7 +122,7 @@ void Renderer2D::Init()
 	s_Data.WhiteTexture->GetWriteableBuffer().Write(&whiteTextureData, sizeof(Uint32));
 	s_Data.WhiteTexture->Unlock();
 
-	s_Data.TextureShader = Shader::Create("Assets/Shaders/Renderer2D.glsl");
+	s_Data.TextureShader = Shader::Create(Filepath{ "Assets/Shaders/Renderer2D.glsl" });
 
 	// Set all texture slots to 0
 	s_Data.TextureSlots[0] = s_Data.WhiteTexture;
@@ -134,7 +134,7 @@ void Renderer2D::Init()
 
 	// Lines
 	{
-		s_Data.LineShader = Shader::Create("Assets/Shaders/Renderer2D_Line.glsl");
+		s_Data.LineShader = Shader::Create(Filepath{ "Assets/Shaders/Renderer2D_Line.glsl" });
 
 		Pipeline::Specification Specification;
 		Specification.Layout = {

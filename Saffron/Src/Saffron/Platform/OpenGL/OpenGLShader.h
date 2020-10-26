@@ -11,8 +11,8 @@ class OpenGLShader : public Shader
 {
 public:
 	OpenGLShader() = default;
-	OpenGLShader(const String &filepath);
-	static Shared<OpenGLShader> CreateFromString(const String &source);
+	OpenGLShader(const Filepath &filepath);
+	OpenGLShader(const String &source);
 
 	void Bind() override;
 
@@ -23,6 +23,7 @@ public:
 
 	RendererID GetRendererID() const override { return m_RendererID; }
 	const String &GetName() const override { return m_Name; }
+	size_t GetIdentifier() override;
 
 	void SetVSMaterialUniformBuffer(const Buffer &buffer) override;
 	void SetPSMaterialUniformBuffer(const Buffer &buffer) override;
@@ -36,7 +37,7 @@ public:
 private:
 	void Load(const String &source);
 
-	String ReadFromFile(const String &filepath) const;
+	String ReadFromFile(const Filepath &filepath) const;
 	std::unordered_map<GLenum, String> PreProcess(const String &source);
 	void Parse();
 	void ParseUniform(const String &statement, ShaderDomain domain);
@@ -89,7 +90,8 @@ private:
 	bool m_Loaded = false;
 	bool m_IsCompute = false;
 
-	String m_Name, m_AssetPath;
+	String m_Name;
+	Filepath m_Filepath;
 	std::unordered_map<GLenum, String> m_ShaderSource;
 
 	ArrayList<ShaderReloadedCallback> m_ShaderReloadedCallbacks;

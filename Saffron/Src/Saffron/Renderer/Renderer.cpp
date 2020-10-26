@@ -4,6 +4,7 @@
 
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
@@ -19,7 +20,6 @@ struct RendererData
 {
 	Shared<RenderPass> m_ActiveRenderPass;
 	RenderCommandQueue m_CommandQueue;
-	Shared<ShaderLibrary> m_ShaderLibrary;
 
 	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
 	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
@@ -32,11 +32,10 @@ RendererData Renderer::s_Data;
 
 void Renderer::Init()
 {
-	s_Data.m_ShaderLibrary = Shared<ShaderLibrary>::Create();
 	Submit([]() { RendererAPI::Init(); });
 
-	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Static.glsl");
-	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Anim.glsl");
+	Shader::Create(Filepath{ "Assets/Shaders/SaffronPBR_Static.glsl" });
+	Shader::Create(Filepath{ "Assets/Shaders/SaffronPBR_Anim.glsl" });
 
 	SceneRenderer::Init();
 
@@ -146,11 +145,6 @@ void Renderer::SetLineThickness(float thickness)
 void Renderer::ClearMagenta()
 {
 	Clear(1, 0, 1);
-}
-
-Shared<ShaderLibrary> Renderer::GetShaderLibrary()
-{
-	return s_Data.m_ShaderLibrary;
 }
 
 void Renderer::WaitAndRender()

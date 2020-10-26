@@ -23,7 +23,7 @@ private:
 	mutable std::atomic<Uint32> m_ReferenceCount = 0;
 };
 
-template<typename T>
+template<typename SharedType>
 class Shared
 {
 public:
@@ -37,24 +37,24 @@ public:
 	{
 	}
 
-	Shared(T *instance)
+	Shared(SharedType *instance)
 		: m_Instance(instance)
 	{
-		static_assert(std::is_base_of<ReferenceCounted, T>::value, "Class is not ReferenceCounted!");
+		static_assert(std::is_base_of<ReferenceCounted, SharedType>::value, "Class is not ReferenceCounted!");
 		IncreaseReferenceCount();
 	}
 
-	template<typename T2>
-	Shared(const Shared<T2> &other)
+	template<typename SharedType2>
+	Shared(const Shared<SharedType2> &other)
 	{
-		m_Instance = static_cast<T *>(other.m_Instance);
+		m_Instance = static_cast<SharedType *>(other.m_Instance);
 		IncreaseReferenceCount();
 	}
 
-	template<typename T2>
-	Shared(Shared<T2> &&other)
+	template<typename SharedType2>
+	Shared(Shared<SharedType2> &&other)
 	{
-		m_Instance = static_cast<T *>(other.m_Instance);
+		m_Instance = static_cast<SharedType *>(other.m_Instance);
 		other.m_Instance = nullptr;
 	}
 
@@ -63,7 +63,7 @@ public:
 		DecreaseReferenceCount();
 	}
 
-	Shared(const Shared<T> &other)
+	Shared(const Shared<SharedType> &other)
 		: m_Instance(other.m_Instance)
 	{
 		IncreaseReferenceCount();
@@ -76,7 +76,7 @@ public:
 		return *this;
 	}
 
-	Shared &operator=(const Shared<T> &other)
+	Shared &operator=(const Shared<SharedType> &other)
 	{
 		other.IncreaseReferenceCount();
 		DecreaseReferenceCount();
@@ -85,8 +85,8 @@ public:
 		return *this;
 	}
 
-	template<typename T2>
-	Shared &operator=(const Shared<T2> &other)
+	template<typename SharedType2>
+	Shared &operator=(const Shared<SharedType2> &other)
 	{
 		other.IncreaseReferenceCount();
 		DecreaseReferenceCount();
@@ -95,8 +95,8 @@ public:
 		return *this;
 	}
 
-	template<typename T2>
-	Shared &operator=(Shared<T2> &&other)
+	template<typename SharedType2>
+	Shared &operator=(Shared<SharedType2> &&other)
 	{
 		DecreaseReferenceCount();
 
@@ -108,16 +108,16 @@ public:
 	operator bool() { return m_Instance != nullptr; }
 	operator bool() const { return m_Instance != nullptr; }
 
-	T *operator->() { return m_Instance; }
-	const T *operator->() const { return m_Instance; }
+	SharedType *operator->() { return m_Instance; }
+	const SharedType *operator->() const { return m_Instance; }
 
-	T &operator*() { return *m_Instance; }
-	const T &operator*() const { return *m_Instance; }
+	SharedType &operator*() { return *m_Instance; }
+	const SharedType &operator*() const { return *m_Instance; }
 
-	T *Raw() { return  m_Instance; }
-	const T *Raw() const { return  m_Instance; }
+	SharedType *Raw() { return  m_Instance; }
+	const SharedType *Raw() const { return  m_Instance; }
 
-	void Reset(T *instance = nullptr)
+	void Reset(SharedType *instance = nullptr)
 	{
 		DecreaseReferenceCount();
 		m_Instance = instance;
@@ -125,9 +125,9 @@ public:
 	}
 
 	template<typename... Args>
-	static Shared<T> Create(Args&&... args)
+	static Shared<SharedType> Create(Args&&... args)
 	{
-		return Shared<T>(new T(std::forward<Args>(args)...));
+		return Shared<SharedType>(new SharedType(std::forward<Args>(args)...));
 	}
 
 private:
@@ -151,12 +151,12 @@ private:
 		}
 	}
 
-	template<class T2>
+	template<class SharedType2>
 	friend class Shared;
-	T *m_Instance;
+	SharedType *m_Instance;
 };
 
-template<typename T>
+template<typename WeakType>
 class Weak
 {
 public:
@@ -170,22 +170,22 @@ public:
 	{
 	}
 
-	Weak(T *instance)
+	Weak(WeakType *instance)
 		: m_Instance(instance)
 	{
-		static_assert(std::is_base_of<ReferenceCounted, T>::value, "Class is not ReferenceCounted!");
+		static_assert(std::is_base_of<ReferenceCounted, WeakType>::value, "Class is not ReferenceCounted!");
 	}
 
-	template<typename T2>
-	Weak(const Weak<T2> &other)
-		: m_Instance(static_cast<T *>(other.m_Instance))
+	template<typename WeakType2>
+	Weak(const Weak<WeakType2> &other)
+		: m_Instance(static_cast<WeakType *>(other.m_Instance))
 	{
 	}
 
-	template<typename T2>
-	Weak(Weak<T2> &&other)
+	template<typename WeakType2>
+	Weak(Weak<WeakType2> &&other)
 	{
-		m_Instance = static_cast<T *>(other.m_Instance);
+		m_Instance = static_cast<WeakType *>(other.m_Instance);
 		other.m_Instance = nullptr;
 	}
 
@@ -193,7 +193,7 @@ public:
 	{
 	}
 
-	Weak(const Weak<T> &other)
+	Weak(const Weak<WeakType> &other)
 		: m_Instance(other.m_Instance)
 	{
 	}
@@ -204,21 +204,21 @@ public:
 		return *this;
 	}
 
-	Weak &operator=(const Weak<T> &other)
+	Weak &operator=(const Weak<WeakType> &other)
 	{
 		m_Instance = other.m_Instance;
 		return *this;
 	}
 
-	template<typename T2>
-	Weak &operator=(const Weak<T2> &other)
+	template<typename WeakType2>
+	Weak &operator=(const Weak<WeakType2> &other)
 	{
 		m_Instance = other.m_Instance;
 		return *this;
 	}
 
-	template<typename T2>
-	Weak &operator=(Weak<T2> &&other)
+	template<typename WeakType2>
+	Weak &operator=(Weak<WeakType2> &&other)
 	{
 		m_Instance = other.m_Instance;
 		other.m_Instance = nullptr;
@@ -228,32 +228,32 @@ public:
 	operator bool() { return m_Instance != nullptr; }
 	operator bool() const { return m_Instance != nullptr; }
 
-	T *operator->() { return m_Instance; }
-	const T *operator->() const { return m_Instance; }
+	WeakType *operator->() { return m_Instance; }
+	const WeakType *operator->() const { return m_Instance; }
 
-	T &operator*() { return *m_Instance; }
-	const T &operator*() const { return *m_Instance; }
+	WeakType &operator*() { return *m_Instance; }
+	const WeakType &operator*() const { return *m_Instance; }
 
-	T *Raw() { return  m_Instance; }
-	const T *Raw() const { return  m_Instance; }
+	WeakType *Raw() { return  m_Instance; }
+	const WeakType *Raw() const { return  m_Instance; }
 
-	void Reset(T *instance = nullptr)
+	void Reset(WeakType *instance = nullptr)
 	{
 		m_Instance = instance;
 	}
 
 	template<typename... Args>
-	static Weak<T> Create(Args&&... args)
+	static Weak<WeakType> Create(Args&&... args)
 	{
-		return Weak<T>(new T(std::forward<Args>(args)...));
+		return Weak<WeakType>(new WeakType(std::forward<Args>(args)...));
 	}
 
-	template<class T2>
+	template<class WeakType2>
 	friend class Weak;
-	T *m_Instance;
+	WeakType *m_Instance;
 };
 
-template<typename T>
+template<typename UniqueType>
 class Unique
 {
 public:
@@ -267,20 +267,20 @@ public:
 	{
 	}
 
-	Unique(T *instance)
+	Unique(UniqueType *instance)
 		: m_Instance(instance)
 	{
-		static_assert(std::is_base_of<ReferenceCounted, T>::value, "Class is not ReferenceCounted!");
+		static_assert(std::is_base_of<ReferenceCounted, UniqueType>::value, "Class is not ReferenceCounted!");
 		Set();
 	}
 
-	template<typename T2>
-	Unique(const Unique<T2> &other) = delete;
+	template<typename UniqueType2>
+	Unique(const Unique<UniqueType2> &other) = delete;
 
-	template<typename T2>
-	Unique(Unique<T2> &&other)
+	template<typename UniqueType2>
+	Unique(Unique<UniqueType2> &&other)
 	{
-		m_Instance = static_cast<T *>(other.m_Instance);
+		m_Instance = static_cast<UniqueType *>(other.m_Instance);
 		other.m_Instance = nullptr;
 	}
 
@@ -289,7 +289,7 @@ public:
 		Unset();
 	}
 
-	Unique(const Unique<T> &other) = delete;
+	Unique(const Unique<UniqueType> &other) = delete;
 
 	Unique &operator=(std::nullptr_t)
 	{
@@ -298,13 +298,13 @@ public:
 		return *this;
 	}
 
-	Unique &operator=(const Unique<T> &other) = delete;
+	Unique &operator=(const Unique<UniqueType> &other) = delete;
 
-	template<typename T2>
-	Unique &operator=(const Unique<T2> &other) = delete;
+	template<typename UniqueType2>
+	Unique &operator=(const Unique<UniqueType2> &other) = delete;
 
-	template<typename T2>
-	Unique &operator=(Unique<T2> &&other)
+	template<typename UniqueType2>
+	Unique &operator=(Unique<UniqueType2> &&other)
 	{
 		Unset();
 		m_Instance = other.m_Instance;
@@ -315,16 +315,16 @@ public:
 	operator bool() { return m_Instance != nullptr; }
 	operator bool() const { return m_Instance != nullptr; }
 
-	T *operator->() { return m_Instance; }
-	const T *operator->() const { return m_Instance; }
+	UniqueType *operator->() { return m_Instance; }
+	const UniqueType *operator->() const { return m_Instance; }
 
-	T &operator*() { return *m_Instance; }
-	const T &operator*() const { return *m_Instance; }
+	UniqueType &operator*() { return *m_Instance; }
+	const UniqueType &operator*() const { return *m_Instance; }
 
-	T *Raw() { return  m_Instance; }
-	const T *Raw() const { return  m_Instance; }
+	UniqueType *Raw() { return  m_Instance; }
+	const UniqueType *Raw() const { return  m_Instance; }
 
-	void Reset(T *instance = nullptr)
+	void Reset(UniqueType *instance = nullptr)
 	{
 		Unset();
 		m_Instance = instance;
@@ -332,9 +332,9 @@ public:
 	}
 
 	template<typename... Args>
-	static Unique<T> Create(Args&&... args)
+	static Unique<UniqueType> Create(Args&&... args)
 	{
-		return Unique<T>(new T(std::forward<Args>(args)...));
+		return Unique<UniqueType>(new UniqueType(std::forward<Args>(args)...));
 	}
 
 private:
@@ -358,9 +358,9 @@ private:
 		}
 	}
 
-	template<class T2>
+	template<class UniqueType2>
 	friend class Unique;
-	T *m_Instance;
+	UniqueType *m_Instance;
 };
 
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/Config.h"
+#include "Saffron/Base.h"
 #include "Saffron/Renderer/Texture.h"
 
 namespace Se
@@ -9,11 +9,13 @@ class OpenGLTexture2D : public Texture2D
 {
 public:
 	OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wrap wrap);
-	OpenGLTexture2D(const String &path, bool sRGB);
+	OpenGLTexture2D(const Filepath &path, bool sRGB);
 	virtual ~OpenGLTexture2D();
 
 	void Bind(Uint32 slot = 0) const override;
 
+	// TODO: Implement proper texture identifiers
+	size_t GetIdentifier() override { return UUID(); }
 	Format GetFormat() const override { return m_Format; }
 	Uint32 GetWidth() const override { return m_Width; }
 	Uint32 GetHeight() const override { return m_Height; }
@@ -28,7 +30,7 @@ public:
 	bool Loaded() const override { return m_Loaded; }
 
 	Buffer &GetWriteableBuffer() override;
-	const String &GetPath() const override { return m_FilePath; }
+	const Filepath &GetFilepath() const override { return m_Filepath; }
 	RendererID GetRendererID() const override { return m_RendererID; }
 
 	bool operator==(const Texture &other) const override;
@@ -45,18 +47,20 @@ private:
 	bool m_Locked = false;
 	bool m_Loaded = false;
 
-	String m_FilePath;
+	Filepath m_Filepath;
 };
 
 class OpenGLTextureCube : public TextureCube
 {
 public:
 	OpenGLTextureCube(Format format, Uint32 width, Uint32 height);
-	OpenGLTextureCube(const String &path);
+	OpenGLTextureCube(const Filepath &path);
 	virtual ~OpenGLTextureCube();
 
 	void Bind(Uint32 slot = 0) const override;
 
+	// TODO: Implement proper texture identifiers
+	size_t GetIdentifier() override { return UUID(); }
 	Format GetFormat() const override { return m_Format; }
 	Uint32 GetWidth() const override { return m_Width; }
 	Uint32 GetHeight() const override { return m_Height; }
@@ -64,7 +68,7 @@ public:
 	// not present mips in data
 	Uint32 GetMipLevelCount() const override;
 
-	const String &GetPath() const override { return m_FilePath; }
+	const Filepath &GetFilepath() const override { return m_Filepath; }
 
 	RendererID GetRendererID() const override { return m_RendererID; }
 
@@ -76,7 +80,7 @@ private:
 
 	Buffer m_ImageData;
 
-	String m_FilePath;
+	Filepath m_Filepath;
 };
 }
 

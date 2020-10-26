@@ -8,10 +8,11 @@
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/ShaderUniform.h"
+#include "Saffron/Resource/Resource.h"
 
 namespace Se
 {
-class Shader : public ReferenceCounted
+class Shader : public Resource
 {
 public:
 	struct Uniform
@@ -150,23 +151,9 @@ public:
 
 	virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
 
-	static Shared<Shader> Create(const String &filepath);
-	static Shared<Shader> CreateFromString(const String &source);
+	static Shared<Shader> Create(const Filepath &filepath);
+	static Shared<Shader> Create(const String &source);
 
-	// TODO: Create Asset manager and remove this
-	static ArrayList<Shared<Shader>> m_sAllShaders;
-};
-
-class ShaderLibrary : public ReferenceCounted
-{
-public:
-	void Add(const Shared<Shader> &shader);
-	void Load(const String &path);
-	void Load(const String &name, const String &path);
-
-	const Shared<Shader> &Get(const String &name) const;
-private:
-	std::unordered_map<String, Shared<Shader>> m_Shaders;
 };
 
 }

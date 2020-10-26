@@ -55,23 +55,23 @@ OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wra
 	m_ImageData.Allocate(width * height * GetBPP(m_Format));
 }
 
-OpenGLTexture2D::OpenGLTexture2D(const String &path, bool sRGB)
-	: m_Width(0), m_Height(0), m_FilePath(path)
+OpenGLTexture2D::OpenGLTexture2D(const Filepath &filepath, bool sRGB)
+	: m_Width(0), m_Height(0), m_Filepath(filepath)
 {
 	int width, height, channels;
-	if ( stbi_is_hdr(path.c_str()) )
+	if ( stbi_is_hdr(m_Filepath.string().c_str()) )
 	{
-		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", path, sRGB);
+		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", m_Filepath.string(), sRGB);
 
-		m_ImageData = Buffer::Encapsulate(reinterpret_cast<Uint8 *>(stbi_loadf(path.c_str(), &width, &height, &channels, 0)));
+		m_ImageData = Buffer::Encapsulate(reinterpret_cast<Uint8 *>(stbi_loadf(m_Filepath.string().c_str(), &width, &height, &channels, 0)));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_IsHDR = true;
 		m_Format = Format::Float16;
 	}
 	else
 	{
-		SE_CORE_INFO("Loading texture {0}, sRGB={1}", path, sRGB);
-		m_ImageData = Buffer::Encapsulate(stbi_load(path.c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha));
+		SE_CORE_INFO("Loading texture {0}, sRGB={1}", m_Filepath.string(), sRGB);
+		m_ImageData = Buffer::Encapsulate(stbi_load(m_Filepath.string().c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_Format = Format::RGBA;
 	}
@@ -207,12 +207,12 @@ OpenGLTextureCube::OpenGLTextureCube(Format format, Uint32 width, Uint32 height)
 
 // TODO: Revisit this, as currently env maps are being loaded as equirectangular 2D images
 //       so this is an old path
-OpenGLTextureCube::OpenGLTextureCube(const String &path)
-	: m_Format(Format::None), m_Width(0), m_Height(0), m_FilePath(path)
+OpenGLTextureCube::OpenGLTextureCube(const Filepath &filepath)
+	: m_Format(Format::None), m_Width(0), m_Height(0), m_Filepath(filepath)
 {
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(false);
-	auto *stbiResult = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
+	auto *stbiResult = stbi_load(m_Filepath.string().c_str(), &width, &height, &channels, STBI_rgb);
 	m_ImageData = Buffer::Copy(stbiResult, width * height);
 	stbi_image_free(stbiResult);
 

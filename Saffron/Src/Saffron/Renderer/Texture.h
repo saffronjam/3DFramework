@@ -4,12 +4,13 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
+#include "Saffron/Resource/Resource.h"
 #include "Saffron/Renderer/RendererAPI.h"
 
 namespace Se
 {
 
-class Texture : public ReferenceCounted
+class Texture : public Resource
 {
 public:
 	enum class Format
@@ -50,7 +51,7 @@ class Texture2D : public Texture
 {
 public:
 	static Shared<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
-	static Shared<Texture2D> Create(const String &path, bool sRGB = false);
+	static Shared<Texture2D> Create(const Filepath &path, bool sRGB = false);
 
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
@@ -60,7 +61,7 @@ public:
 
 	virtual bool Loaded() const = 0;
 
-	virtual const String &GetPath() const = 0;
+	virtual const Filepath &GetFilepath() const = 0;
 };
 
 class TextureCube : public Texture
@@ -69,6 +70,6 @@ public:
 	static Shared<TextureCube> Create(Format format, Uint32 width, Uint32 height);
 	static Shared<TextureCube> Create(const String &path);
 
-	virtual const String &GetPath() const = 0;
+	virtual const Filepath &GetFilepath() const = 0;
 };
 }
