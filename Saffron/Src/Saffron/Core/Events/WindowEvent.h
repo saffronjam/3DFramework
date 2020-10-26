@@ -110,4 +110,47 @@ private:
 	ArrayList<Filepath> m_Filepaths;
 };
 
+class WindowNewTitleEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowNewTitle);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowNewTitleEvent(String title) : m_Title(Move(title)) {}
+
+	const String &GetTitle() const { return m_Title; }
+	String ToString() const override
+	{
+		OutputStringStream oss;
+		oss << GetName() << " Title: " << m_Title;
+		return oss.str();
+	}
+
+private:
+	String m_Title;
+};
+
+class WindowNewIconEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowNewIcon);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowNewIconEvent(Filepath filepath) : m_Filepath(Move(filepath)) {}
+
+	const Filepath &GetFilepath() const { return m_Filepath; }
+	String ToString() const override
+	{
+		OutputStringStream oss;
+		oss << GetName() << " Filepath: " << m_Filepath;
+		return oss.str();
+	}
+
+private:
+	Filepath m_Filepath;
+};
+
+
 }

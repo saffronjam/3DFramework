@@ -148,6 +148,9 @@ public:
 
 	static MonoString *CreateMonoString(const char *string);
 
+	static void AttachThread();
+	static void DetachThread();
+
 };
 
 

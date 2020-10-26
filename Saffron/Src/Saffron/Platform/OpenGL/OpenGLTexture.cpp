@@ -134,6 +134,15 @@ void OpenGLTexture2D::Bind(Uint32 slot) const
 	Renderer::Submit([instance, slot]() { glBindTextureUnit(slot, instance->m_RendererID); });
 }
 
+size_t OpenGLTexture2D::GetIdentifier()
+{
+	if ( !m_Filepath.empty() )
+	{
+		return Misc::HashFilepath(m_Filepath);
+	}
+	return UUID();
+}
+
 Uint32 OpenGLTexture2D::GetMipLevelCount() const
 {
 	return CalculateMipMapCount(m_Width, m_Height);

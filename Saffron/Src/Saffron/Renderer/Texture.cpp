@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Platform/OpenGL/OpenGLTexture.h"
@@ -49,6 +50,13 @@ Shared<Texture2D> Texture2D::Create(const Filepath &path, bool sRGB)
 {
 	Shared<OpenGLTexture2D> result;
 
+	const size_t identifier = Misc::HashFilepath(path);
+	if ( ResourceManager::Exists(identifier) )
+	{
+		SE_CORE_INFO("Reusing texture 2D: {}", path.string());
+		return ResourceManager::Get(identifier);
+	}
+
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); result = nullptr; break;
@@ -83,9 +91,16 @@ Shared<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 heig
 	return result;
 }
 
-Shared<TextureCube> TextureCube::Create(const String &path)
+Shared<TextureCube> TextureCube::Create(const Filepath &path)
 {
 	Shared<OpenGLTextureCube> result;
+
+	const size_t identifier = Misc::HashFilepath(path);
+	if ( ResourceManager::Exists(identifier) )
+	{
+		SE_CORE_INFO("Reusing texture CUBE: {}", path.string());
+		return ResourceManager::Get(identifier);
+	}
 
 	switch ( RendererAPI::Current() )
 	{

@@ -28,14 +28,7 @@ void ViewportPane::OnGuiRender()
 
 	const auto &tl = GetTopLeft();
 	const auto &br = GetBottomRight();
-	if ( IsFocused() )
-	{
-		ImGui::GetForegroundDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y), IM_COL32(255, 140, 0, 180));
-	}
-	else
-	{
-		ImGui::GetForegroundDrawList()->AddRect(ImVec2(tl.x, tl.y), ImVec2(br.x, br.y), IM_COL32(255, 140, 0, 80));
-	}
+
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 	// Todo: Move to header
@@ -70,6 +63,7 @@ void ViewportPane::OnGuiRender()
 
 	const auto viewportSize = GetViewportSize();
 	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID(m_RenderTargetIdentifier)), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
+	ImGui::GetWindowDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y), m_Focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f, ImDrawCornerFlags_All, 4);
 
 	m_PostRenderFunction();
 

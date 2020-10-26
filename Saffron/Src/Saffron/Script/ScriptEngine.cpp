@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
 #include <mono/jit/jit.h>
+#include <mono/metadata/threads.h>
 #include <mono/metadata/assembly.h>
 #include <mono/metadata/debug-helpers.h>
 #include <mono/metadata/attrdefs.h>
@@ -45,8 +46,8 @@ static FieldType GetSaffronFieldType(MonoType *monoType)
 	case MONO_TYPE_VALUETYPE:
 	{
 		char *name = mono_type_get_name(monoType);
-		if ( strcmp(name, "Se.ArrayList2") == 0 )	return FieldType::Vec2;
-		if ( strcmp(name, "Se.ArrayList3") == 0 )	return FieldType::Vec3;
+		if ( strcmp(name, "Se.Vector2") == 0 )	return FieldType::Vec2;
+		if ( strcmp(name, "Se.Vector3") == 0 )	return FieldType::Vec3;
 		return FieldType::Vec4;
 	}
 	default: return FieldType::None;
@@ -650,6 +651,8 @@ void ScriptEngine::OnScriptComponentDestroyed(UUID sceneID, UUID entityID)
 
 bool ScriptEngine::ModuleExists(const String &moduleName)
 {
+
+
 	MonoClass *monoClass = GetClass(s_AppAssemblyImage, moduleName);
 	return monoClass != nullptr;
 }
@@ -773,6 +776,16 @@ EntityInstanceData &ScriptEngine::GetEntityInstanceData(UUID sceneID, UUID entit
 MonoString *ScriptEngine::CreateMonoString(const char *string)
 {
 	return mono_string_new(s_MonoDomain, string);
+}
+
+void ScriptEngine::AttachThread()
+{
+	mono_thread_attach(s_MonoDomain);
+}
+
+void ScriptEngine::DetachThread()
+{
+	mono_thread_detach(mono_thread_current());
 }
 
 EntityInstanceMap &ScriptEngine::GetEntityInstanceMap()

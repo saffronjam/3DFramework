@@ -44,9 +44,10 @@ private:
 
 private:
 	Shared<Window> m_Window;
-	bool m_Running = true, m_Minimized = false;
+	bool m_ViewingSplashScreen = true, m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
 	GuiLayer *m_GuiLayer;
+	Mutex m_FinalPreloaderMessageMutex;
 
 	Time ts;
 

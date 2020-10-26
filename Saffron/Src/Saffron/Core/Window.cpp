@@ -50,6 +50,16 @@ const Vector2f &Window::GetPosition() const
 	return m_Position;
 }
 
+void Window::SetTitle(String title)
+{
+	PushEvent<WindowNewTitleEvent>(Move(title));
+}
+
+void Window::SetWindowIcon(Filepath filepath)
+{
+	PushEvent<WindowNewIconEvent>(Move(filepath));
+}
+
 Shared<Window> Window::Create(const Properties &properties)
 {
 	// TODO: Use RendererAPI::Current()

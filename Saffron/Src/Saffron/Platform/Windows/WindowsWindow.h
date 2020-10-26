@@ -23,7 +23,6 @@ public:
 	void *GetNativeWindow() const override;
 
 	// Window attributes
-	void SetTitle(String title) override;
 	void SetVSync(bool enabled) override;
 	bool IsVSync() const override;
 	bool IsMinimized() const override;
@@ -34,6 +33,8 @@ private:
 	bool OnGainFocus(const WindowGainFocusEvent &event);
 	bool OnLostFocus(const WindowLostFocusEvent &event);
 	bool OnClose(const WindowCloseEvent &event);
+	bool OnNewTitle(const WindowNewTitleEvent &event);
+	bool OnNewIcon(const WindowNewIconEvent &event);
 
 	void SetupGLFWCallbacks();
 

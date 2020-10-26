@@ -68,7 +68,7 @@ class TextureCube : public Texture
 {
 public:
 	static Shared<TextureCube> Create(Format format, Uint32 width, Uint32 height);
-	static Shared<TextureCube> Create(const String &path);
+	static Shared<TextureCube> Create(const Filepath &path);
 
 	virtual const Filepath &GetFilepath() const = 0;
 };

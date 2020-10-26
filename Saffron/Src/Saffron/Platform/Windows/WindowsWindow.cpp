@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
 #include "Saffron/Core/Events/KeyboardEvent.h"
 #include "Saffron/Core/Events/MouseEvent.h"
@@ -109,6 +110,8 @@ void WindowsWindow::OnEvent(const Event &event)
 	dispatcher.Try<WindowGainFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnGainFocus));
 	dispatcher.Try<WindowLostFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnLostFocus));
 	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
+	dispatcher.Try<WindowNewTitleEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewTitle));
+	dispatcher.Try<WindowNewIconEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewIcon));
 }
 
 void WindowsWindow::Close()
@@ -128,14 +131,6 @@ void WindowsWindow::Focus()
 void *WindowsWindow::GetNativeWindow() const
 {
 	return m_NativeWindow;
-}
-
-void WindowsWindow::SetTitle(String title)
-{
-	SE_PROFILE_FUNCTION();
-
-	m_Title = Move(title);
-	glfwSetWindowTitle(m_NativeWindow, m_Title.c_str());
 }
 
 void WindowsWindow::SetVSync(bool enabled)
@@ -188,6 +183,28 @@ bool WindowsWindow::OnLostFocus(const WindowLostFocusEvent &event)
 bool WindowsWindow::OnClose(const WindowCloseEvent &event)
 {
 	return false;
+}
+
+bool WindowsWindow::OnNewTitle(const WindowNewTitleEvent &event)
+{
+	glfwSetWindowTitle(m_NativeWindow, event.GetTitle().c_str());
+	m_Title = event.GetTitle();
+	return true;
+}
+
+bool WindowsWindow::OnNewIcon(const WindowNewIconEvent &event)
+{
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(event.GetFilepath().string().c_str(), &images[0].width, &images[0].height, nullptr, 4); //rgba channels
+	if ( !images[0].pixels )
+	{
+		SE_CORE_WARN("Failed to load window icon. Filepath: {0}", event.GetFilepath().string());
+		stbi_image_free(images[0].pixels);
+		return false;
+	}
+	glfwSetWindowIcon(m_NativeWindow, 1, images);
+	stbi_image_free(images[0].pixels);
+	return true;
 }
 
 void WindowsWindow::SetupGLFWCallbacks()

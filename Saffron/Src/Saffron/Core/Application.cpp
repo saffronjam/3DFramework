@@ -2,10 +2,13 @@
 
 
 #include "Saffron/Core/Application.h"
+#include "Saffron/Core/BatchLoader.h"
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Gui/SplashScreen.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -21,15 +24,16 @@ Application::Application(const Properties &properties)
 	m_Window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 	m_Window->SetEventCallback(SE_BIND_EVENT_FN(OnEvent));
 	m_Window->SetVSync(true);
+	m_Window->SetWindowIcon("Assets/Editor/Saffron_windowIcon.png");
+	m_Window->HandleBufferedEvents();
 
-	m_GuiLayer = new GuiLayer("ImGui");
+	m_GuiLayer = new GuiLayer("Gui");
 	PushOverlay(m_GuiLayer);
-
-	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
-	FileIOManager::Init(*m_Window);
 
 	Renderer::Init();
 	Renderer::WaitAndRender();
+	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
+	FileIOManager::Init(*m_Window);
 
 	ts = GlobalTimer::Mark();
 }
@@ -64,6 +68,32 @@ void Application::RenderGui()
 void Application::Run()
 {
 	OnInit();
+	BatchLoader::GetPreloader()->Submit([] {}, "Finalizing");
+
+	Thread preloaderWorker([&] {
+		ScriptEngine::AttachThread();
+		BatchLoader::GetPreloader()->Execute([&]
+											 {
+												 ScopedLock scopedLock(m_FinalPreloaderMessageMutex);
+												 m_ViewingSplashScreen = false;
+												 ScriptEngine::DetachThread();
+											 });
+						   });
+	SplashScreen splashScreen;
+	while ( m_ViewingSplashScreen )
+	{
+		ScopedLock scopedLock(m_FinalPreloaderMessageMutex);
+		m_GuiLayer->Begin();
+		splashScreen.OnGuiRender();
+		m_Window->OnUpdate();
+		m_Window->HandleBufferedEvents();
+		m_GuiLayer->End();
+		Renderer::WaitAndRender();
+		GlobalTimer::Mark();
+	}
+	preloaderWorker.join();
+	BatchLoader::InvalidatePreloader();
+
 	while ( m_Running )
 	{
 		m_Window->HandleBufferedEvents();
@@ -82,9 +112,9 @@ void Application::Run()
 
 			Renderer::WaitAndRender();
 		}
-
 		GlobalTimer::Mark();
-	}
+	};
+
 	OnShutdown();
 }
 

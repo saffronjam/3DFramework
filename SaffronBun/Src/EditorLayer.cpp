@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include "Saffron/Core/BatchLoader.h"
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Gui/Gui.h"
@@ -20,78 +21,96 @@ EditorLayer::EditorLayer()
 	m_MainViewport("MainRenderTarget"),
 	m_MiniViewport("MiniRenderTarget")
 {
-	Gui::Init();
 
-	SceneRenderer::AddRenderTarget("MiniRenderTarget", 200, 100);
-	SceneRenderer::DisableRenderTarget("MiniRenderTarget");
 }
 
 void EditorLayer::OnAttach()
 {
-	Gui::SetStyle(static_cast<Gui::Style>(m_Style));
 
-	// Editor
-	m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
-	m_TexStore["PlayButton"] = Texture2D::Create("Assets/Editor/PlayButton.png");
-	m_TexStore["PauseButton"] = Texture2D::Create("Assets/Editor/PauseButton.png");
-	m_TexStore["StopButton"] = Texture2D::Create("Assets/Editor/StopButton.png");
-	m_TexStore["TranslateButton"] = Texture2D::Create("Assets/Editor/Translate_w.png");
-	m_TexStore["RotateButton"] = Texture2D::Create("Assets/Editor/Rotate_w.png");
-	m_TexStore["ScaleButton"] = Texture2D::Create("Assets/Editor/Scale_w.png");
-	m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
-	m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
+	BatchLoader::GetPreloader()->Submit([this]
+										{
+											Gui::Init();
+											Gui::SetStyle(static_cast<Gui::Style>(m_Style));
+										}, "Initializing GUI"
+	);
 
-	m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
-	m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
-	m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
+	BatchLoader::GetPreloader()->Submit([]
+										{
+											SceneRenderer::AddRenderTarget("MiniRenderTarget", 200, 100);
+											SceneRenderer::DisableRenderTarget("MiniRenderTarget");
+										}, "Setting Up Secondary Render Target"
+	);
 
-	m_EntityPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
-	m_EntityPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
+	BatchLoader::GetPreloader()->Submit([this]
+										{
+											m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+											m_TexStore["Checkerboard2"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+											m_TexStore["PlayButton"] = Texture2D::Create("Assets/Editor/PlayButton.png");
+											m_TexStore["PauseButton"] = Texture2D::Create("Assets/Editor/PauseButton.png");
+											m_TexStore["StopButton"] = Texture2D::Create("Assets/Editor/StopButton.png");
+											m_TexStore["TranslateButton"] = Texture2D::Create("Assets/Editor/Translate_w.png");
+											m_TexStore["RotateButton"] = Texture2D::Create("Assets/Editor/Rotate_w.png");
+											m_TexStore["ScaleButton"] = Texture2D::Create("Assets/Editor/Scale_w.png");
+											m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
+											m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
+										}, "Loading Editor Textures");
 
-	LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc");
 
-	ScriptEngine::SetSceneContext(m_EditorScene);
+	BatchLoader::GetPreloader()->Submit([this]
+										{
+											m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
+											m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
+											m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
+										}, "Initializing Editor Panels");
 
 
-	m_MainViewport.SetPostRenderCallback([this]()
-										 {
-											 // Gizmos
-											 if ( m_GizmoType != -1 && m_SelectedEntity )
-											 {
-												 const auto viewportSize = m_MainViewport.GetViewportSize();
-												 ImGuizmo::SetDrawlist();
-												 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+	BatchLoader::GetPreloader()->Submit([this] {LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc"); }, "Loading default scene");
 
-												 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+	BatchLoader::GetPreloader()->Submit([this]
+										{
+											m_EntityPanel->SetSelectionChangedCallback([this](Entity entity) { SelectEntity(entity); });
+											m_EntityPanel->SetEntityDeletedCallback([this](Entity entity) { OnEntityDeleted(entity); });
+											m_MainViewport.SetPostRenderCallback([this]()
+																				 {
+																					 // Gizmos
+																					 if ( m_GizmoType != -1 && m_SelectedEntity )
+																					 {
+																						 const auto viewportSize = m_MainViewport.GetViewportSize();
+																						 ImGuizmo::SetDrawlist();
+																						 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
-												 auto &entityTransform = m_SelectedEntity.Transform();
-												 const float snapValue = GetSnapValue();
-												 float snapValues[3] = { snapValue, snapValue, snapValue };
-												 if ( m_SelectionMode == SelectionMode::Entity )
-												 {
-													 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-																		  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-																		  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																		  ImGuizmo::LOCAL,
-																		  glm::value_ptr(entityTransform),
-																		  nullptr,
-																		  snap ? snapValues : nullptr);
-												 }
-												 else
-												 {
-													 glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
-													 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-																		  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-																		  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																		  ImGuizmo::LOCAL,
-																		  glm::value_ptr(transformBase),
-																		  nullptr,
-																		  snap ? snapValues : nullptr);
+																						 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
 
-													 m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
-												 }
-											 }
-										 });
+																						 auto &entityTransform = m_SelectedEntity.Transform();
+																						 const float snapValue = GetSnapValue();
+																						 float snapValues[3] = { snapValue, snapValue, snapValue };
+																						 if ( m_SelectionMode == SelectionMode::Entity )
+																						 {
+																							 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+																												  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
+																												  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																												  ImGuizmo::LOCAL,
+																												  glm::value_ptr(entityTransform),
+																												  nullptr,
+																												  snap ? snapValues : nullptr);
+																						 }
+																						 else
+																						 {
+																							 glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
+																							 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
+																												  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
+																												  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																												  ImGuizmo::LOCAL,
+																												  glm::value_ptr(transformBase),
+																												  nullptr,
+																												  snap ? snapValues : nullptr);
+
+																							 m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+																						 }
+																					 }
+																				 });
+
+										}, "Setting Up System Callbacks");
 }
 
 void EditorLayer::OnDetach()

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Saffron/Core/Time.h"
 #include "Saffron/Core/Event.h"
 
 namespace Se {
@@ -11,6 +10,8 @@ public:
 	Layer(const String &name = "Layer");
 	virtual ~Layer();
 
+	virtual void OnPreload() {}
+	virtual void OnFinishPreload() {}
 	virtual void OnAttach() {}
 	virtual void OnDetach() {}
 	virtual void OnUpdate() {}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Renderer/Texture.h"
 
 namespace Se
@@ -14,8 +15,7 @@ public:
 
 	void Bind(Uint32 slot = 0) const override;
 
-	// TODO: Implement proper texture identifiers
-	size_t GetIdentifier() override { return UUID(); }
+	size_t GetIdentifier() override;
 	Format GetFormat() const override { return m_Format; }
 	Uint32 GetWidth() const override { return m_Width; }
 	Uint32 GetHeight() const override { return m_Height; }

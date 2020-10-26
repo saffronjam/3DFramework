@@ -53,7 +53,8 @@ public:
 	virtual void *GetNativeWindow() const = 0;
 
 	// Window attributes
-	virtual void SetTitle(String title) = 0;
+	void SetTitle(String title);
+	void SetWindowIcon(Filepath filepath);
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
 	virtual bool IsMinimized() const = 0;
