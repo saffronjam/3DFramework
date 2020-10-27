@@ -74,4 +74,9 @@ void SplashScreen::Hide()
 {
 	m_Hidden = true;
 }
+
+bool SplashScreen::IsIdle()
+{
+	return m_CurrentProgressView == m_GoalProgressView;
+}
 }

@@ -152,7 +152,7 @@ void Scene::OnRenderRuntime(Time ts)
 
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 
-	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<Camera *>(camera.Raw()), cameraViewMatrix });
+	SceneRenderer::GetMainTarget()->SetCameraData({ static_cast<Camera *>(camera.Raw()), cameraViewMatrix });
 	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{
@@ -195,7 +195,7 @@ void Scene::OnRenderEditor(Time ts, const EditorCamera &editorCamera)
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
-	SceneRenderer::SetCameraData("MainRenderTarget", { static_cast<const Camera *>(&editorCamera), editorCamera.GetViewMatrix() });
+	SceneRenderer::GetMainTarget()->SetCameraData({ static_cast<const Camera *>(&editorCamera), editorCamera.GetViewMatrix() });
 	SceneRenderer::BeginScene(this);
 	for ( auto entity : group )
 	{

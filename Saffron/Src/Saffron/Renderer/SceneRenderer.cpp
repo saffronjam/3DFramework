@@ -28,14 +28,8 @@ struct SceneRendererData
 	Shared<Texture2D> BRDFLUT;
 	Shared<Shader> CompositeShader;
 
-	struct RenderTarget
-	{
-		bool Enabled;
-		SceneRendererCameraData CameraData;
-		Shared<RenderPass> GeoPass;
-		Shared<RenderPass> CompositePass;
-	};
-	Map<String, RenderTarget> RenderTargets;
+	Shared<SceneRenderer::Target> MainRenderTarget;
+	ArrayList<Shared<SceneRenderer::Target>> RenderTargets;
 
 	struct DrawCommand
 	{
@@ -52,6 +46,7 @@ struct SceneRendererData
 
 	SceneRenderer::Options Options;
 
+
 };
 
 static SceneRendererData s_Data;
@@ -61,9 +56,70 @@ static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIr
 /// Scene Renderer
 ///////////////////////////////////////////////////////////////////////////
 
+Vector2u SceneRenderer::Target::GetSize()
+{
+	SE_CORE_ASSERT(m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Width == m_CompositePass->GetSpecification().TargetFramebuffer->GetSpecification().Width &&
+				   m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Height == m_CompositePass->GetSpecification().TargetFramebuffer->GetSpecification().Height);
+	return { m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Width, m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Height };
+}
+
+void SceneRenderer::Target::SetSize(Uint32 width, Uint32 height)
+{
+	m_GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	m_CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+}
+
+const Shared<Texture2D> &SceneRenderer::Target::GetFinalColorBuffer() const
+{
+	SE_CORE_ASSERT(false, "Not implemented");
+	return nullptr;
+}
+
+RendererID SceneRenderer::Target::GetFinalColorBufferRendererID() const
+{
+	return m_CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
+}
+
+Shared<SceneRenderer::Target> SceneRenderer::Target::Create(Uint32 width, Uint32 height)
+{
+	Shared<Target> target = Shared<Target>::Create();
+
+	Framebuffer::Specification geoFramebufferSpec;
+	geoFramebufferSpec.Width = width;
+	geoFramebufferSpec.Height = height;
+	geoFramebufferSpec.Format = Framebuffer::Format::RGBA16F;
+	geoFramebufferSpec.Samples = 8;
+	geoFramebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+
+	RenderPass::Specification geoRenderPassSpec;
+	geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
+	target->m_GeoPass = RenderPass::Create(geoRenderPassSpec);
+
+	Framebuffer::Specification compFramebufferSpec;
+	compFramebufferSpec.Width = 1280;
+	compFramebufferSpec.Height = 720;
+	compFramebufferSpec.Format = Framebuffer::Format::RGBA8;
+	compFramebufferSpec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
+
+	RenderPass::Specification compRenderPassSpec;
+	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
+	target->m_CompositePass = RenderPass::Create(compRenderPassSpec);
+
+	target->Enable();
+
+	s_Data.RenderTargets.push_back(target);
+
+	return target;
+}
+
+SceneRenderer::Target::~Target()
+{
+	//s_Data.RenderTargets.erase(std::find(s_Data.RenderTargets.begin(), s_Data.RenderTargets.end(), this));
+}
+
 void SceneRenderer::Init()
 {
-	AddRenderTarget("MainRenderTarget", 1280, 720);
+	s_Data.MainRenderTarget = Target::Create(1280, 720);
 
 	s_Data.CompositeShader = Shader::Create(Filepath{ "Assets/Shaders/SceneComposite.glsl" });
 	const auto outlineShader = Shader::Create(Filepath{ "Assets/Shaders/Outline.glsl" });
@@ -79,58 +135,6 @@ void SceneRenderer::Init()
 
 	// Outline
 	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
-}
-
-void SceneRenderer::AddRenderTarget(const String &renderTargetIdentifier, Uint32 width, Uint32 height)
-{
-	Framebuffer::Specification geoFramebufferSpec;
-	geoFramebufferSpec.Width = width;
-	geoFramebufferSpec.Height = height;
-	geoFramebufferSpec.Format = Framebuffer::Format::RGBA16F;
-	geoFramebufferSpec.Samples = 8;
-	geoFramebufferSpec.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
-
-	RenderPass::Specification geoRenderPassSpec;
-	geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass = RenderPass::Create(geoRenderPassSpec);
-
-	Framebuffer::Specification compFramebufferSpec;
-	compFramebufferSpec.Width = 1280;
-	compFramebufferSpec.Height = 720;
-	compFramebufferSpec.Format = Framebuffer::Format::RGBA8;
-	compFramebufferSpec.ClearColor = { 0.5f, 0.1f, 0.1f, 1.0f };
-
-	RenderPass::Specification compRenderPassSpec;
-	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
-	s_Data.RenderTargets[renderTargetIdentifier].CompositePass = RenderPass::Create(compRenderPassSpec);
-
-	EnableRenderTarget(renderTargetIdentifier);
-}
-
-void SceneRenderer::SetRenderTargetSize(const String &renderTargetIdentifier, Uint32 width, Uint32 height)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
-	s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
-}
-
-void SceneRenderer::SetCameraData(const String &renderTargetIdentifier, const SceneRendererCameraData &cameraData)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].CameraData = cameraData;
-}
-
-void SceneRenderer::EnableRenderTarget(const String &renderTargetIdentifier)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].Enabled = true;
-}
-
-void SceneRenderer::DisableRenderTarget(const String &renderTargetIdentifier)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].Enabled = false;
-}
-
-bool SceneRenderer::IsRenderTargetEnabled(const String &renderTargetIdentifier)
-{
-	return s_Data.RenderTargets[renderTargetIdentifier].Enabled;
 }
 
 void SceneRenderer::BeginScene(const Scene *scene)
@@ -227,24 +231,9 @@ std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnviron
 	return { envFiltered, irradianceMap };
 }
 
-Shared<RenderPass> SceneRenderer::GetFinalRenderPass(const String &renderTargetIdentifier)
+Shared<SceneRenderer::Target> &SceneRenderer::GetMainTarget()
 {
-	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass;
-}
-
-Shared<Texture2D> SceneRenderer::GetFinalColorBuffer(const String &renderTargetIdentifier)
-{
-	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	// return s_Data.CompositePass->GetSpecification().TargetFramebuffer;
-	SE_CORE_ASSERT(false, "Not implemented");
-	return nullptr;
-}
-
-Uint32 SceneRenderer::GetFinalColorBufferRendererID(const String &renderTargetIdentifier)
-{
-	SE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
+	return s_Data.MainRenderTarget;
 }
 
 SceneRenderer::Options &SceneRenderer::GetOptions()
@@ -256,12 +245,12 @@ void SceneRenderer::FlushDrawList()
 {
 	SE_CORE_ASSERT(!s_Data.ActiveScene, "");
 
-	for ( auto &[renderTargetIdentifier, rendererPass] : s_Data.RenderTargets )
+	for ( auto &target : s_Data.RenderTargets )
 	{
-		if ( s_Data.RenderTargets[renderTargetIdentifier].Enabled )
+		if ( target->IsEnabled() )
 		{
-			GeometryPass(renderTargetIdentifier);
-			CompositePass(renderTargetIdentifier);
+			GeometryPass(target);
+			CompositePass(target);
 		}
 	}
 	s_Data.DrawList.clear();
@@ -269,9 +258,9 @@ void SceneRenderer::FlushDrawList()
 	s_Data.SceneData = {};
 }
 
-void SceneRenderer::GeometryPass(const String &renderTargetIdentifier)
+void SceneRenderer::GeometryPass(const Shared<Target> &target)
 {
-	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
+	const CameraData &camData = target->GetCameraData();
 	if ( !camData.Camera )
 	{
 		return;
@@ -287,7 +276,7 @@ void SceneRenderer::GeometryPass(const String &renderTargetIdentifier)
 						 });
 	}
 
-	Renderer::BeginRenderPass(s_Data.RenderTargets[renderTargetIdentifier].GeoPass);
+	Renderer::BeginRenderPass(target->GetGeoPass());
 
 
 	if ( outline )
@@ -408,19 +397,19 @@ void SceneRenderer::GeometryPass(const String &renderTargetIdentifier)
 	Renderer::EndRenderPass();
 }
 
-void SceneRenderer::CompositePass(const String &renderTargetIdentifier)
+void SceneRenderer::CompositePass(const Shared<Target> &target)
 {
-	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
-	if ( !camData.Camera )
+	const CameraData &cameraData = target->GetCameraData();
+	if ( !cameraData.Camera )
 	{
 		return;
 	}
-	Renderer::BeginRenderPass(s_Data.RenderTargets[renderTargetIdentifier].CompositePass);
+	Renderer::BeginRenderPass(target->GetCompositePass());
 	s_Data.CompositeShader->Bind();
-	s_Data.CompositeShader->SetFloat("u_Exposure", camData.Camera->GetExposure());
-	s_Data.CompositeShader->SetInt("u_TextureSamples", s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
+	s_Data.CompositeShader->SetFloat("u_Exposure", cameraData.Camera->GetExposure());
+	s_Data.CompositeShader->SetInt("u_TextureSamples", target->GetGeoPass()->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
 
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
+	target->GetGeoPass()->GetSpecification().TargetFramebuffer->BindTexture();
 	Renderer::SubmitQuad(nullptr);
 	Renderer::EndRenderPass();
 }

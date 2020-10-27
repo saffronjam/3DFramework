@@ -559,15 +559,18 @@ void EntityPanel::DrawEntityNode(Entity entity)
 	if ( ImGui::IsItemClicked() )
 	{
 		m_SelectionContext = entity;
-		if ( m_SelectionChangedCallback )
-			m_SelectionChangedCallback(m_SelectionContext);
+		if ( m_OnEntityOption )
+			m_OnEntityOption(Event::NewSelection, m_SelectionContext);
 	}
 
 	bool entityDeleted = false;
+	bool entityViewInModelSpace = false;
 	if ( ImGui::BeginPopupContextItem() )
 	{
 		if ( ImGui::MenuItem("Delete") )
 			entityDeleted = true;
+		if ( ImGui::MenuItem("View in model space") )
+			entityViewInModelSpace = true;
 
 		ImGui::EndPopup();
 	}
@@ -585,12 +588,22 @@ void EntityPanel::DrawEntityNode(Entity entity)
 	// Defer deletion until end of node UI
 	if ( entityDeleted )
 	{
+		// TODO: Entity panel shouldn't do this?!
 		m_Context->DestroyEntity(entity);
 		if ( entity == m_SelectionContext )
 			m_SelectionContext = {};
 
-		m_EntityDeletedCallback(entity);
+		if ( m_OnEntityOption )
+			m_OnEntityOption(Event::Delete, entity);
 	}
+
+	if ( entityViewInModelSpace )
+	{
+		if ( m_OnEntityOption )
+			m_OnEntityOption(Event::ViewInModelSpace, entity);
+	}
+
+
 }
 
 void EntityPanel::DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const

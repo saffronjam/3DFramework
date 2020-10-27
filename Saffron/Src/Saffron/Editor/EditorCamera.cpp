@@ -2,6 +2,7 @@
 
 #include "Saffron/Input/Input.h"
 #include "Saffron/Editor/EditorCamera.h"
+#include "Saffron/Editor/ViewportPane.h"
 
 namespace Se
 {

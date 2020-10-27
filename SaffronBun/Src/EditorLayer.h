@@ -8,12 +8,10 @@
 #include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Editor/EntityPanel.h"
-#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Gui/GuiLayer.h"
 
 namespace Se
 {
-
 class EditorLayer : public Layer
 {
 public:
@@ -70,8 +68,6 @@ public:
 	bool OnMouseButtonPressed(const MousePressEvent &event);
 	bool OnWindowDropFiles(const WindowDropFilesEvent &event);
 
-	void SelectEntity(Entity entity);
-
 	void NewScenePrompt();
 	void OpenScenePrompt();
 	void SaveSceneAsPrompt();
@@ -81,9 +77,12 @@ public:
 private:
 	std::pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
 
+	void OnGuiRenderMenuBar();
+	void OnGuiRenderToolbar();
 	void OnSelected(Entity entity);
 	void OnUnselected(Entity entity);
 	void OnEntityDeleted(Entity entity);
+	void OnNewModelSpaceView(Entity entity);
 	Ray CastMouseRay() const;
 
 	void OnSceneChange();
@@ -96,22 +95,24 @@ private:
 private:
 	int m_Style;
 	int m_GizmoType = -1;
+	bool m_ModelSpaceEditor = false;
 
 	Shared<Scene> m_RuntimeScene, m_EditorScene;
+	Map<Entity, Pair<Shared<Scene>, ViewportPane>> m_EntityModelSpacesMap;
+	Shared<SceneRenderer::Target> m_MainTarget, m_MiniTarget;
+
 	Filepath m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
+	ViewportPane m_MainViewport, m_MiniViewport;
 	EditorCamera m_EditorCamera;
 	EditorTerminal m_EditorTerminal;
-	ViewportPane m_MainViewport;
-	ViewportPane m_MiniViewport;
 
 	Shared<Shader> m_BrushShader;
 	Shared<Material> m_SphereBaseMaterial;
 
 	Shared<Material> m_MeshMaterial;
-	ArrayList<Shared<MaterialInstance>> m_MetalSphereMaterialInstances;
-	ArrayList<Shared<MaterialInstance>> m_DielectricSphereMaterialInstances;
+	ArrayList<Shared<MaterialInstance>> m_MetalSphereMaterialInstances, m_DielectricSphereMaterialInstances;
 
 	// Editor resources
 	Map<String, Shared<Texture2D>> m_TexStore;

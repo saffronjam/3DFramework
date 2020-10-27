@@ -22,6 +22,11 @@ bool Entity::operator!=(const Entity &other) const
 	return !(*this == other);
 }
 
+bool Entity::operator<(const Entity &other) const
+{
+	return this->m_EntityHandle < other.m_EntityHandle;
+}
+
 UUID Entity::GetSceneUUID() const
 {
 	return m_Scene->GetUUID();

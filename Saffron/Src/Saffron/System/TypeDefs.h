@@ -45,6 +45,10 @@ template<class FunctionType>
 using Function = std::function<FunctionType>;
 template<class... Types>
 using Tuple = std::tuple<Types...>;
+template<typename ClassType>
+using Atomic = std::atomic<ClassType>;
+template<typename FirstClass, typename SecondClass>
+using Pair = std::pair<FirstClass, SecondClass>;
 
 using String = std::string;
 using WideString = std::wstring;
@@ -57,12 +61,17 @@ using OutputStringStream = std::ostringstream;
 using InputStringStream = std::istringstream;
 using Thread = std::thread;
 using Mutex = std::mutex;
-template<typename ClassType>
-using Atomic = std::atomic<ClassType>;
 
 template<class MoveClass>
 constexpr auto &&Move(MoveClass &&moveClass)  noexcept
 {
 	return static_cast<std::remove_reference_t<MoveClass> &&>(moveClass);
 }
+
+template<class FirstClass, class SecondClass>
+constexpr auto CreatePair(FirstClass &&first, SecondClass &second)  noexcept
+{
+	return std::make_pair(first, second);
+}
+
 }

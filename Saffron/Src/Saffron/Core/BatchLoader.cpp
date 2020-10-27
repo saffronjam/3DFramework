@@ -18,18 +18,22 @@ void BatchLoader::Submit(Function<void()> function, String shortDescription)
 	m_Queue.emplace_back(Move(function), Move(shortDescription));
 }
 
-void BatchLoader::Execute(Function<void()> onFinish)
+void BatchLoader::Execute()
 {
 	ScopedLock queueLock(m_QueueMutex);
 	m_Progress = 0.0f;
 	for ( const auto &[function, shortDescription] : m_Queue )
 	{
+		//ScopedLock scopedLock(m_ExecutionMutex);
+		if ( m_OnEachExecution )
+			m_OnEachExecution();
 		m_Status = &shortDescription;
 		function();
 		m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
 	}
 	m_Progress = 100.0f;
-	onFinish();
+	if ( m_OnFinish )
+		m_OnFinish();
 	m_Queue.clear();
 }
 

@@ -8,9 +8,9 @@
 namespace Se
 {
 
-ViewportPane::ViewportPane(String renderTargetIdentifier)
-	:
-	m_RenderTargetIdentifier(Move(renderTargetIdentifier)),
+ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target)
+	: m_WindowTitle(Move(windowTitle)),
+	m_Target(Move(target)),
 	m_TopLeft(0.0f, 0.0f),
 	m_BottomRight(100.0f, 100.0f),
 	m_Hovered(false),
@@ -21,7 +21,7 @@ ViewportPane::ViewportPane(String renderTargetIdentifier)
 
 void ViewportPane::OnGuiRender()
 {
-	if ( !SceneRenderer::IsRenderTargetEnabled(m_RenderTargetIdentifier) )
+	if ( !m_Target->IsEnabled() )
 	{
 		return;
 	}
@@ -31,13 +31,11 @@ void ViewportPane::OnGuiRender()
 
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
-	// Todo: Move to header
-	const String viewportID = "Viewport##" + m_RenderTargetIdentifier;
-	ImGui::Begin(viewportID.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
+	ImGui::Begin(m_WindowTitle.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
 
 	if ( ImGui::IsWindowDocked() )
 	{
-		auto *wnd = ImGui::FindWindowByName(viewportID.c_str());
+		auto *wnd = ImGui::FindWindowByName(m_WindowTitle.c_str());
 		if ( wnd )
 		{
 			ImGuiDockNode *node = wnd->DockNode;
@@ -62,7 +60,7 @@ void ViewportPane::OnGuiRender()
 	m_BottomRight = { maxBound.x, maxBound.y };
 
 	const auto viewportSize = GetViewportSize();
-	ImGui::Image(reinterpret_cast<void *>(SceneRenderer::GetFinalColorBufferRendererID(m_RenderTargetIdentifier)), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
+	ImGui::Image(reinterpret_cast<void *>(m_Target->GetFinalColorBufferRendererID()), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
 	ImGui::GetWindowDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y), m_Focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f, ImDrawCornerFlags_All, 4);
 
 	m_PostRenderFunction();
@@ -70,7 +68,7 @@ void ViewportPane::OnGuiRender()
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	SceneRenderer::SetRenderTargetSize(m_RenderTargetIdentifier, static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
+	m_Target->SetSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
 }
 
 bool ViewportPane::InViewport(Vector2f positionNDC) const

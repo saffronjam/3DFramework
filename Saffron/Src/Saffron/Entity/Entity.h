@@ -35,6 +35,7 @@ public:
 	operator bool() const { return static_cast<Uint32>(m_EntityHandle) && m_Scene; }
 	bool operator==(const Entity &other) const;
 	bool operator!=(const Entity &other) const;
+	bool operator<(const Entity &other) const;
 
 	UUID GetUUID() { return GetComponent<IDComponent>().ID; }
 	UUID GetSceneUUID() const;

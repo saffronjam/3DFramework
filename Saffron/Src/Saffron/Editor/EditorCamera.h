@@ -4,11 +4,11 @@
 #include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Time.h"
-#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Renderer/Camera.h"
 
 namespace Se
 {
+class ViewportPane;
 class EditorCamera : public Camera
 {
 public:
