@@ -130,6 +130,9 @@ public:
 	ArrayList<Submesh> &GetSubmeshes() { return m_Submeshes; }
 	const ArrayList<Submesh> &GetSubmeshes() const { return m_Submeshes; }
 
+	const Matrix4f &GetLocalTransform() const { return m_LocalTransform; }
+	void SetLocalTransform(Matrix4f localTransform) { m_LocalTransform = Move(localTransform); }
+
 	Shared<Shader> GetMeshShader() const { return m_MeshShader; }
 	Shared<Material> GetMaterial() const { return m_BaseMaterial; }
 	ArrayList<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }
@@ -166,7 +169,7 @@ private:
 	ArrayList<Vertex> m_StaticVertices;
 	ArrayList<AnimatedVertex> m_AnimatedVertices;
 	ArrayList<Index> m_Indices;
-	std::unordered_map<String, Uint32> m_BoneMapping;
+	UnorderedMap<String, Uint32> m_BoneMapping;
 	ArrayList<Matrix4f> m_BoneTransforms;
 	const aiScene *m_Scene;
 
@@ -176,8 +179,9 @@ private:
 	ArrayList<Shared<Texture2D>> m_Textures;
 	ArrayList<Shared<Texture2D>> m_NormalMaps;
 	ArrayList<Shared<MaterialInstance>> m_Materials;
+	Matrix4f m_LocalTransform;
 
-	std::unordered_map<Uint32, ArrayList<Triangle>> m_TriangleCache;
+	UnorderedMap<Uint32, ArrayList<Triangle>> m_TriangleCache;
 
 	// Animation
 	bool m_IsAnimated = false;

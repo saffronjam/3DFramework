@@ -257,10 +257,10 @@ void Scene::OnGuiRender()
 	auto &light = GetLight();
 	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
 	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
-	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, Gui::PropertyFlag::Slider);
+	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
 	//Gui::Property("Exposure", GetExposure(), 0.0f, 5.0f, Gui::PropertyFlag::Slider);
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
-	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, Gui::PropertyFlag::Slider);
+	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
 	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
 		ShowBoundingBoxes(m_UIShowBoundingBoxes);
 	Gui::EndPropertyGrid();

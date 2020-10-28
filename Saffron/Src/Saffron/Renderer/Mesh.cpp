@@ -134,7 +134,8 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 ////////////////////////////////////////////////////////////////////////
 
 Mesh::Mesh(String filename)
-	: m_Filepath(Move(filename))
+	: m_LocalTransform(1),
+	m_Filepath(Move(filename))
 {
 	LogStream::Initialize();
 
@@ -154,7 +155,7 @@ Mesh::Mesh(String filename)
 	m_MeshShader = Shared<Shader>(Shader::Create(meshShaderPath));
 	m_BaseMaterial = Shared<Material>::Create(m_MeshShader);
 	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
-	m_InverseTransform = glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
+	//m_InverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
 	Uint32 vertexCount = 0;
 	Uint32 indexCount = 0;
@@ -430,7 +431,7 @@ Mesh::Mesh(String filename)
 			{
 				SE_MESH_LOG("    No metalness texture");
 				mi->Set("u_Metalness", metalness);
-			}
+		}
 #endif
 
 			bool metalnessTextureFound = false;
@@ -487,7 +488,7 @@ Mesh::Mesh(String filename)
 				case aiTextureType_UNKNOWN:
 					SE_MESH_LOG("  Semantic = aiTextureType_UNKNOWN");
 					break;
-				}
+			}
 #endif
 
 				if ( prop->mType == aiPTI_String )
@@ -521,7 +522,7 @@ Mesh::Mesh(String filename)
 						break;
 					}
 				}
-			}
+	}
 
 			if ( !metalnessTextureFound )
 			{
@@ -530,9 +531,9 @@ Mesh::Mesh(String filename)
 				mi->Set("u_Metalness", metalness);
 				mi->Set("u_MetalnessTexToggle", 0.0f);
 			}
-		}
+}
 		SE_MESH_LOG("------------------------");
-	}
+}
 
 	VertexBuffer::Layout vertexLayout;
 	if ( m_IsAnimated )
@@ -590,7 +591,6 @@ void Mesh::OnUpdate(Time ts)
 
 void Mesh::DumpVertexBuffer()
 {
-	// TODO: Convert to ImGui
 	SE_MESH_LOG("------------------------------------------------------");
 	SE_MESH_LOG("Vertex Buffer Dump");
 	SE_MESH_LOG("Mesh: {0}", m_FilePath);

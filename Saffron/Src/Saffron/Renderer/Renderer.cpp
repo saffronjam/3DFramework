@@ -217,13 +217,11 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<M
 				mesh->m_MeshShader->SetMat4(uniformName, mesh->m_BoneTransforms[i]);
 			}
 		}
-		shader->SetMat4("u_Transform", transform * submesh.Transform);
+
+		shader->SetMat4("u_Transform", transform * submesh.Transform * mesh->GetLocalTransform());
 
 		Submit([submesh, material]() {
-			if ( material->GetFlag(Material::Flag::DepthTest) )
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
+			material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });

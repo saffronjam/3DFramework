@@ -2,10 +2,11 @@
 
 #include <assimp/scene.h>
 
-#include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Core/Application.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -18,17 +19,6 @@ Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
-
-static Tuple<Vector3f, glm::quat, Vector3f> GetTransformDecomposition(const Matrix4f &transform)
-{
-	Vector3f scale, translation, skew;
-	Vector4f perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
-
 
 template<typename T, typename UIFunction>
 static void DrawComponent(const String &name, Entity entity, UIFunction uiFunction)
@@ -631,13 +621,13 @@ void EntityPanel::MeshNodeHierarchy(const Shared<Mesh> &mesh,
 	if ( ImGui::TreeNode(node->mName.C_Str()) )
 	{
 		{
-			auto [translation, rotation, scale] = GetTransformDecomposition(transform);
+			auto [translation, rotation, scale] = Misc::GetTransformDecomposition(transform);
 			ImGui::Text("World Transform");
 			ImGui::Text("  Translation: %.2f, %.2f, %.2f", translation.x, translation.y, translation.z);
 			ImGui::Text("  Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
 		}
 		{
-			auto [translation, rotation, scale] = GetTransformDecomposition(localTransform);
+			auto [translation, rotation, scale] = Misc::GetTransformDecomposition(localTransform);
 			ImGui::Text("Local Transform");
 			ImGui::Text("  Translation: %.2f, %.2f, %.2f", translation.x, translation.y, translation.z);
 			ImGui::Text("  Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
@@ -679,57 +669,32 @@ void EntityPanel::DrawComponents(Entity entity)
 		auto &tc = entity.GetComponent<TransformComponent>();
 		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform") )
 		{
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(tc);
+			auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(tc);
 			Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
-			ImGui::Columns(2);
-			ImGui::Text("Translation");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
+			Gui::BeginPropertyGrid();
 
 			bool updateTransform = false;
-
-			if ( ImGui::DragFloat3("##translation", glm::value_ptr(translation), 0.25f) )
-			{
-				//tc.Transform[3] = Vector4f(translation, 1.0f);
-				updateTransform = true;
-			}
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-
-			ImGui::Text("Rotation");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			if ( ImGui::DragFloat3("##rotation", glm::value_ptr(rotation), 0.25f) )
-			{
-				updateTransform = true;
-				// tc.Transform[3] = Vector4f(translation, 1.0f);
-			}
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-
-			ImGui::Text("Scale");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			if ( ImGui::DragFloat3("##scale", glm::value_ptr(scale), 0.25f) )
+			if ( Gui::Property("Translation", translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 			{
 				updateTransform = true;
 			}
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-
-			ImGui::Columns(1);
+			if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag) )
+			{
+				updateTransform = true;
+			}
+			if ( Gui::Property("Scale", scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag) )
+			{
+				if ( scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f )
+					updateTransform = true;
+			}
+			Gui::EndPropertyGrid();
 
 			if ( updateTransform )
 			{
-				tc.Transform = glm::translate(Matrix4f(1.0f), translation) *
+				tc.Transform = glm::translate(translation) *
 					glm::toMat4(glm::quat(glm::radians(rotation))) *
-					glm::scale(Matrix4f(1.0f), scale);
+					glm::scale(scale);
 			}
 
 			ImGui::TreePop();
@@ -761,8 +726,36 @@ void EntityPanel::DrawComponents(Entity entity)
 										 if ( !filepath.empty() )
 											 mc.Mesh = Shared<Mesh>::Create(filepath.string());
 									 }
+									 ImGui::NextColumn();
+
+									 const auto &transform = mc.Mesh->GetLocalTransform();
+									 auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(transform);
+									 Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
+
+									 bool updateTransform = false;
+									 if ( Gui::Property("Translation", translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
+									 {
+										 updateTransform = true;
+									 }
+									 if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag) )
+									 {
+										 updateTransform = true;
+									 }
+									 if ( Gui::Property("Scale", scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag) )
+									 {
+										 if ( scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f )
+											 updateTransform = true;
+									 }
 
 									 Gui::EndPropertyGrid();
+
+									 if ( updateTransform )
+									 {
+										 const Matrix4f newTransform = glm::translate(translation) *
+											 glm::toMat4(glm::quat(glm::radians(rotation))) *
+											 glm::scale(scale);
+										 mc.Mesh->SetLocalTransform(newTransform);
+									 }
 								 });
 
 	DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent &cc)

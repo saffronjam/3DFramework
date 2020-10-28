@@ -165,7 +165,7 @@ void PhysicsWorld2D::OnGuiRender()
 	ImGui::Begin("Physics World 2D");
 	Gui::BeginPropertyGrid();
 	auto gravity = GetGravity();
-	if ( Gui::Property("Gravity", gravity, -10000.0f, 10000.0f, Gui::PropertyFlag::Drag) )
+	if ( Gui::Property("Gravity", gravity, -10000.0f, 10000.0f, 1.0f, Gui::PropertyFlag::Drag) )
 	{
 		SetGravity(gravity);
 	}

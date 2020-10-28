@@ -106,7 +106,7 @@ struct CameraComponent
 	CameraComponent() = default;
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator Shared<SceneCamera>() { return Camera; }
+	operator Shared<SceneCamera>() const { return Camera; }
 };
 
 struct SpriteRendererComponent
