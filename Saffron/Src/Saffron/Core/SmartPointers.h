@@ -6,9 +6,12 @@
 
 namespace Se
 {
+
 class ReferenceCounted
 {
 public:
+	virtual ~ReferenceCounted() = default;
+
 	void IncreaseReferenceCount() const
 	{
 		++m_ReferenceCount;
@@ -91,7 +94,10 @@ public:
 		other.IncreaseReferenceCount();
 		DecreaseReferenceCount();
 
-		m_Instance = other.m_Instance;
+		m_Instance = dynamic_cast<SharedType>(other.m_Instance);
+
+		SE_CORE_ASSERT(m_Instance, "Shared pointer type mismatch");
+
 		return *this;
 	}
 
@@ -128,6 +134,21 @@ public:
 	static Shared<SharedType> Create(Args&&... args)
 	{
 		return Shared<SharedType>(new SharedType(std::forward<Args>(args)...));
+	}
+
+
+	template <class SharedType2>
+	static Shared<SharedType> Cast(const Shared<SharedType2> &other) noexcept
+	{
+		// dynamic_cast for Shared that properly respects the reference count control block
+		const auto shared = dynamic_cast<const SharedType *>(other.Raw());
+
+		if ( shared )
+		{
+			return Shared<SharedType>(other);
+		}
+
+		return nullptr;
 	}
 
 private:

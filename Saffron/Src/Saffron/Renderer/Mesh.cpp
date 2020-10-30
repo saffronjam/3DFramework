@@ -6,6 +6,7 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/LogStream.hpp>
 
+#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
@@ -431,7 +432,7 @@ Mesh::Mesh(String filename)
 			{
 				SE_MESH_LOG("    No metalness texture");
 				mi->Set("u_Metalness", metalness);
-		}
+			}
 #endif
 
 			bool metalnessTextureFound = false;
@@ -488,7 +489,7 @@ Mesh::Mesh(String filename)
 				case aiTextureType_UNKNOWN:
 					SE_MESH_LOG("  Semantic = aiTextureType_UNKNOWN");
 					break;
-			}
+				}
 #endif
 
 				if ( prop->mType == aiPTI_String )
@@ -522,7 +523,7 @@ Mesh::Mesh(String filename)
 						break;
 					}
 				}
-	}
+			}
 
 			if ( !metalnessTextureFound )
 			{
@@ -531,9 +532,9 @@ Mesh::Mesh(String filename)
 				mi->Set("u_Metalness", metalness);
 				mi->Set("u_MetalnessTexToggle", 0.0f);
 			}
-}
+		}
 		SE_MESH_LOG("------------------------");
-}
+	}
 
 	VertexBuffer::Layout vertexLayout;
 	if ( m_IsAnimated )
@@ -570,8 +571,9 @@ Mesh::Mesh(String filename)
 
 Mesh::~Mesh() = default;
 
-void Mesh::OnUpdate(Time ts)
+void Mesh::OnUpdate()
 {
+	const auto ts = GlobalTimer::GetStep();
 	if ( m_IsAnimated )
 	{
 		if ( m_AnimationPlaying )

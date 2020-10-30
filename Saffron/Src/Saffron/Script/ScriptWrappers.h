@@ -32,7 +32,7 @@ void Saffron_Entity_GetTransform(Uint64 entityID, Matrix4f *outTransform);
 void Saffron_Entity_SetTransform(Uint64 entityID, Matrix4f *inTransform);
 void Saffron_Entity_CreateComponent(Uint64 entityID, void *type);
 bool Saffron_Entity_HasComponent(Uint64 entityID, void *type);
-Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag);
+Uint64 Saffron_Entity_GetEntity(MonoString *tag);
 
 
 ///////////////////////////////////////////////////////////////

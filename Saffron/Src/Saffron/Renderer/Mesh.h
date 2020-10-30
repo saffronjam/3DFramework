@@ -124,7 +124,7 @@ public:
 	Mesh(String filename);
 	~Mesh();
 
-	void OnUpdate(Time ts);
+	void OnUpdate();
 	void DumpVertexBuffer();
 
 	ArrayList<Submesh> &GetSubmeshes() { return m_Submeshes; }

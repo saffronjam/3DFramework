@@ -56,7 +56,7 @@ void ScriptEngineRegistry::RegisterAll()
 	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, CreateComponent);
 	ADD_INTERNAL_CALL_MONO(Entity, HasComponent);
-	ADD_INTERNAL_CALL_MONO(Entity, FindEntityByTag);
+	ADD_INTERNAL_CALL_MONO(Entity, GetEntity);
 
 	ADD_INTERNAL_CALL_MONO(MeshComponent, GetMesh);
 	ADD_INTERNAL_CALL_MONO(MeshComponent, SetMesh);

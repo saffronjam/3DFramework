@@ -8,7 +8,6 @@
 
 namespace Se
 {
-class ViewportPane;
 class EditorCamera : public Camera
 {
 public:
@@ -19,13 +18,16 @@ public:
 	};
 
 public:
-	explicit EditorCamera(const ViewportPane &mainViewport);
-	EditorCamera(const ViewportPane &mainViewport, const Matrix4f &projectionMatrix);
+	EditorCamera();
+	explicit EditorCamera(Matrix4f projectionMatrix);
 
-	void OnUpdate(Time ts);
+	void OnUpdate();
 	bool OnEvent(const Event &event);
 
 	void Reset();
+	void Enable() { m_Enabled = true; }
+	void Disable() { m_Enabled = false; }
+	bool IsEnabled() const { return m_Enabled; }
 
 	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 	const Matrix4f &GetViewMatrix() const { return m_ViewMatrix; }
@@ -48,8 +50,7 @@ private:
 	float GetZoomSpeed() const;
 
 private:
-	const ViewportPane &m_EditorViewport;
-
+	bool m_Enabled = true;
 	float m_MovementSpeed = 10.0f;
 	ControllerStyle	m_ControllerStyle = ControllerStyle::Game;
 

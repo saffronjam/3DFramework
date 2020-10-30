@@ -4,8 +4,8 @@
 
 namespace Se
 {
-Camera::Camera(const Matrix4f &projectionMatrix)
-	: m_ProjectionMatrix(projectionMatrix)
+Camera::Camera(Matrix4f projectionMatrix)
+	: m_ProjectionMatrix(Move(projectionMatrix))
 {
 }
 

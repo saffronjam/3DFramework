@@ -12,8 +12,6 @@ Gui::Style Gui::m_CurrentStyle = Style::Light;
 ///////////////////////////////////////////////////////////////////////////
 
 static int s_UIContextID = 0;
-static Uint32 s_Counter = 0;
-static char s_IDBuffer[16];
 
 void Gui::Init()
 {
@@ -103,7 +101,6 @@ void Gui::SetStyle(Style style)
 void Gui::PushID()
 {
 	ImGui::PushID(s_UIContextID++);
-	s_Counter = 0;
 }
 
 void Gui::PopID()
@@ -112,51 +109,39 @@ void Gui::PopID()
 	s_UIContextID--;
 }
 
-void Gui::Property(const char *label, const char *value)
+void Gui::Property(const String &name, const String &value)
 {
-	ImGui::Text(label);
+	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
-	s_IDBuffer[0] = '#';
-	s_IDBuffer[1] = '#';
-	memset(s_IDBuffer + 2, 0, 14);
-	_itoa(s_Counter++, s_IDBuffer + 2, 16);
-	ImGui::InputText(s_IDBuffer, const_cast<char *>(value), 256, ImGuiInputTextFlags_ReadOnly);
+	const String id = "##" + name;
+	ImGui::InputText(id.c_str(), const_cast<char *>(value.c_str()), 256, ImGuiInputTextFlags_ReadOnly);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
 }
 
-bool Gui::Property(const char *label, String &value, bool error)
+bool Gui::Property(const String &name, String &value)
 {
-	bool modified = false;
-
-	ImGui::Text(label);
+	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
 	ImGui::PushItemWidth(-1);
 
 	char buffer[256];
 	strcpy(buffer, value.c_str());
 
-	s_IDBuffer[0] = '#';
-	s_IDBuffer[1] = '#';
-	memset(s_IDBuffer + 2, 0, 14);
-	_itoa(s_Counter++, s_IDBuffer + 2, 16);
-
-	if ( error )
-		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.2f, 1.0f));
-	if ( ImGui::InputText(s_IDBuffer, buffer, 256) )
+	const String id = "##" + name;
+	bool changed = false;
+	if ( ImGui::InputText(id.c_str(), buffer, 256) )
 	{
 		value = buffer;
-		modified = true;
+		changed = true;
 	}
-	if ( error )
-		ImGui::PopStyleColor();
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
 
-	return modified;
+	return changed;
 }
 
 bool Gui::Property(const String &name, bool &value)
@@ -172,6 +157,42 @@ bool Gui::Property(const String &name, bool &value)
 	ImGui::NextColumn();
 
 	return result;
+}
+
+bool Gui::Property(const String &name, const String &text, const String &buttonName, const Function<void()> &onButtonPress)
+{
+	ImGui::Text(name.c_str());
+	ImGui::NextColumn();
+
+	const auto minButtonWidth = ImGui::CalcTextSize(buttonName.c_str()).x + 8.0f;
+	const auto textBoxWidth = ImGui::GetContentRegionAvailWidth() - minButtonWidth;
+
+	if ( textBoxWidth > 0.0f )
+	{
+		ImGui::PushItemWidth(textBoxWidth);
+		char buffer[256];
+		strcpy(buffer, text.c_str());
+		const String id = "##" + name;
+		ImGui::InputText(id.c_str(), const_cast<char *>(text.c_str()), 256, ImGuiInputTextFlags_ReadOnly);
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+	}
+
+	bool changed = false;
+	const auto contentRegionAvailable = ImGui::GetContentRegionAvailWidth();
+	if ( contentRegionAvailable > 0.0f )
+	{
+		if ( ImGui::Button(buttonName.c_str(), { ImGui::GetContentRegionAvailWidth(), 0.0f }) )
+		{
+			if ( onButtonPress )
+				onButtonPress();
+			changed = true;
+		}
+	}
+
+	ImGui::NextColumn();
+
+	return changed;
 }
 
 bool Gui::Property(const String &name, int &value, int min, int max, float step, PropertyFlag flags)
@@ -301,23 +322,21 @@ void Gui::HelpMarker(const String &desc)
 
 void Gui::InfoModal(const char *title, const char *text, bool open)
 {
-	if ( open )
+	if ( open && !ImGui::IsPopupOpen(title) )
 	{
-		PushID();
+		ImGui::OpenPopup("Bad Entity Name");
+	}
 
-		ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-		ImGui::OpenPopup(title);
+	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-		if ( ImGui::BeginPopupModal(title) )
+	if ( ImGui::BeginPopupModal("Bad Entity Name", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize) )
+	{
+		ImGui::Text("Bad Entity Name");
+		if ( ImGui::Button("Dismiss") )
 		{
-			ImGui::Text(text);
-			if ( ImGui::Button("Dismiss") )
-			{
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::EndPopup();
+			ImGui::CloseCurrentPopup();
 		}
-		PopID();
+		ImGui::EndPopup();
 	}
 }
 }

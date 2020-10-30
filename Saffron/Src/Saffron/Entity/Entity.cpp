@@ -8,13 +8,13 @@ namespace Se
 Entity::Entity(EntityHandle handle, Scene *scene)
 	: m_Scene(scene),
 	m_Registry(&scene->GetEntityRegistry()),
-	m_EntityHandle(handle)
+	m_Handle(handle)
 {
 }
 
 bool Entity::operator==(const Entity &other) const
 {
-	return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene;
+	return m_Handle == other.m_Handle && m_Scene == other.m_Scene;
 }
 
 bool Entity::operator!=(const Entity &other) const
@@ -24,7 +24,7 @@ bool Entity::operator!=(const Entity &other) const
 
 bool Entity::operator<(const Entity &other) const
 {
-	return this->m_EntityHandle < other.m_EntityHandle;
+	return this->m_Handle < other.m_Handle;
 }
 
 UUID Entity::GetSceneUUID() const

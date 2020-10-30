@@ -1,27 +1,27 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Editor/ViewportPane.h"
 
 namespace Se
 {
-EditorCamera::EditorCamera(const ViewportPane &mainViewport)
-	: m_EditorViewport(mainViewport)
+EditorCamera::EditorCamera()
 {
 	Reset();
 }
 
-EditorCamera::EditorCamera(const ViewportPane &mainViewport, const Matrix4f &projectionMatrix)
-	: Camera(projectionMatrix),
-	m_EditorViewport(mainViewport)
+EditorCamera::EditorCamera(Matrix4f projectionMatrix)
+	: Camera(Move(projectionMatrix))
 {
 	Reset();
 }
 
-void EditorCamera::OnUpdate(Time ts)
+void EditorCamera::OnUpdate()
 {
-	if ( m_EditorViewport.IsFocused() )
+	const auto ts = GlobalTimer::GetStep();
+
+	if ( m_Enabled )
 	{
 		if ( m_ControllerStyle == ControllerStyle::Maya )
 		{
@@ -88,14 +88,17 @@ void EditorCamera::OnUpdate(Time ts)
 			}
 		}
 
+		UpdateCameraView();
 	}
-	UpdateCameraView();
 }
 
 bool EditorCamera::OnEvent(const Event &event)
 {
-	const EventDispatcher dispatcher(event);
-	dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+	if ( m_Enabled )
+	{
+		const EventDispatcher dispatcher(event);
+		dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+	}
 	return false;
 }
 

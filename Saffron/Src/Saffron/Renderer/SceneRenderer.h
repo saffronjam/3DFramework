@@ -4,11 +4,10 @@
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/RenderPass.h"
 #include "Saffron/Renderer/Texture.h"
-#include "Saffron/Scene/Scene.h"
 
 namespace Se
 {
-
+class Scene;
 class SceneRenderer
 {
 public:
@@ -19,7 +18,7 @@ public:
 	};
 	struct CameraData
 	{
-		const Camera *Camera = nullptr;
+		const Shared<Camera> Camera;
 		Matrix4f ViewMatrix{};
 	};
 

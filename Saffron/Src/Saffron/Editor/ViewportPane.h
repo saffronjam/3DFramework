@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class ViewportPane
+class ViewportPane : public ReferenceCounted
 {
 public:
 	explicit ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target);

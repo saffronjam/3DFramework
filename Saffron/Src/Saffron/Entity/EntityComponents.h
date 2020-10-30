@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Saffron/Core/UUID.h"
+#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Physics/PhysicsWorld2D.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/SceneCamera.h"
@@ -36,12 +37,15 @@ struct TransformComponent
 {
 	Matrix4f Transform;
 
-	TransformComponent() = default;
-	TransformComponent(const TransformComponent &other) = default;
-	explicit TransformComponent(const Matrix4f &transform)
-		: Transform(transform)
+	TransformComponent()
+		: Transform(1)
 	{
 	}
+	TransformComponent(Matrix4f transform)
+		: Transform(Move(transform))
+	{
+	}
+	TransformComponent(const TransformComponent &other) = default;
 
 	operator Matrix4f &() { return Transform; }
 	operator const Matrix4f &() const { return Transform; }
@@ -103,7 +107,10 @@ struct CameraComponent
 	Shared<SceneCamera> Camera;
 	bool Primary = true;
 
-	CameraComponent() = default;
+	CameraComponent()
+		: Camera(Shared<SceneCamera>::Create())
+	{
+	}
 	CameraComponent(const CameraComponent &other) = default;
 
 	operator Shared<SceneCamera>() const { return Camera; }
@@ -159,6 +166,10 @@ struct CircleCollider2DComponent : Collider2DComponent
 	CircleCollider2DComponent(const CircleCollider2DComponent &other) = default;
 };
 
+////////////////////////////////////////////////////////
+/// Components for Scenes
+////////////////////////////////////////////////////////
+
 struct PhysicsWorld2DComponent
 {
 	PhysicsWorld2D World;
@@ -168,5 +179,21 @@ struct PhysicsWorld2DComponent
 	{
 	}
 };
-}
 
+struct EditorCameraComponent
+{
+	Shared<EditorCamera> Camera;
+
+	EditorCameraComponent()
+		: Camera(Shared<EditorCamera>::Create())
+	{
+	}
+	EditorCameraComponent(Matrix4f projectionMatrix)
+		: Camera(Shared<EditorCamera>::Create(projectionMatrix))
+	{
+	}
+	EditorCameraComponent(const EditorCameraComponent &other) = default;
+
+	operator Shared<EditorCameraComponent>() const { return Camera; }
+};
+}

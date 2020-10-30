@@ -2,12 +2,12 @@
 
 #include <assimp/scene.h>
 
-#include "Saffron/Core/Application.h"
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Scene/RuntimeScene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 
@@ -113,6 +113,7 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 											});
 
 		bool createNewEntity = false;
+		bool badEntityName = false;
 		if ( ImGui::BeginPopupContextWindow("Create Entity Context", 1, false) )
 		{
 			if ( ImGui::MenuItem("Create Entity") )
@@ -140,7 +141,6 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 			static bool boxCollider2DComponent = false;
 			static bool circleCollider2DComponent = false;
 
-			bool badEntityName = false;
 
 			Gui::BeginPropertyGrid();
 			Gui::Property("Name", entityName);
@@ -648,21 +648,18 @@ void EntityPanel::DrawComponents(Entity entity)
 
 	if ( entity.HasComponent<TagComponent>() )
 	{
-		auto &tag = entity.GetComponent<TagComponent>().Tag;
-		char buffer[256];
-		memset(buffer, 0, 256);
-		memcpy(buffer, tag.c_str(), tag.length());
-		if ( ImGui::InputText("##Tag", buffer, 256) )
+		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TagComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Identifiers") )
 		{
-			tag = String(buffer);
+			auto &tag = entity.GetComponent<TagComponent>().Tag;
+			Gui::BeginPropertyGrid();
+			// ID
+			Gui::Property("ID", std::to_string(static_cast<Uint64>(id)));
+			Gui::Property("Tag", tag);
+			Gui::EndPropertyGrid();
+			ImGui::TreePop();
 		}
+		ImGui::Separator();
 	}
-
-	// ID
-	ImGui::SameLine();
-	ImGui::TextDisabled("%llx", static_cast<Uint64>(id));
-
-	ImGui::Separator();
 
 	if ( entity.HasComponent<TransformComponent>() )
 	{
@@ -705,7 +702,12 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent &mc)
 								 {
 									 Gui::BeginPropertyGrid();
-									 Gui::Property("Name", mc.Mesh->GetFilepath().c_str());
+									 Gui::Property("Name", mc.Mesh->GetFilepath(), "Open...", [&]
+												   {
+													   const Filepath filepath = FileIOManager::OpenFile();
+													   if ( !filepath.empty() )
+														   mc.Mesh = Shared<Mesh>::Create(filepath.string());
+												   });
 
 									 if ( ImGui::BeginDragDropTarget() )
 									 {
@@ -718,15 +720,6 @@ void EntityPanel::DrawComponents(Entity entity)
 										 }
 										 ImGui::EndDragDropTarget();
 									 }
-
-									 ImGui::NextColumn();
-									 if ( ImGui::Button("Open...##openmesh") )
-									 {
-										 const Filepath filepath = FileIOManager::OpenFile();
-										 if ( !filepath.empty() )
-											 mc.Mesh = Shared<Mesh>::Create(filepath.string());
-									 }
-									 ImGui::NextColumn();
 
 									 const auto &transform = mc.Mesh->GetLocalTransform();
 									 auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(transform);
@@ -875,7 +868,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											   auto &publicFields = moduleFieldMap.at(sc.ModuleName);
 											   for ( auto &[name, field] : publicFields )
 											   {
-												   const bool isRuntime = m_Context->IsPlaying() && field.IsRuntimeAvailable();
+												   const bool isRuntime = Shared<RuntimeScene>::Cast(m_Context) && field.IsRuntimeAvailable();
 												   switch ( field.Type )
 												   {
 												   case FieldType::Int:

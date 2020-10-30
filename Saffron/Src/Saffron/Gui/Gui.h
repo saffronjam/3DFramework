@@ -29,9 +29,10 @@ public:
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();
 
-	static void Property(const char *label, const char *value);
-	static bool Property(const char *label, String &value, bool error = false);
+	static void Property(const String &name, const String &value);
+	static bool Property(const String &name, String &value);
 	static bool Property(const String &name, bool &value);
+	static bool Property(const String &name, const String &text, const String &buttonName, const Function<void()> &onButtonPress);
 	static bool Property(const String &name, int &value, int min = -1, int max = 1, float step = 1, PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String &name, float &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String &name, Vector2f &value, PropertyFlag flags);

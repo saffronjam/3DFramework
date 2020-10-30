@@ -106,10 +106,10 @@ bool Saffron_Entity_HasComponent(Uint64 entityID, void *type)
 	return result;
 }
 
-Uint64 Saffron_Entity_FindEntityByTag(MonoString *tag)
+Uint64 Saffron_Entity_GetEntity(MonoString *tag)
 {
 	Shared<Scene> scene = GetSceneWithCheck();
-	Entity entity = scene->FindEntityByTag(mono_string_to_utf8(tag));
+	Entity entity = scene->GetEntity(mono_string_to_utf8(tag));
 	return entity ? entity.GetComponent<IDComponent>().ID : 0;
 }
 

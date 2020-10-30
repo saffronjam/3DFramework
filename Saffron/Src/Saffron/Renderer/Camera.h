@@ -9,7 +9,7 @@ class Camera : public ReferenceCounted
 {
 public:
 	Camera() = default;
-	explicit Camera(const Matrix4f &projectionMatrix);
+	explicit Camera(Matrix4f projectionMatrix);
 	virtual ~Camera() = default;
 
 	const Matrix4f &GetProjectionMatrix() const { return m_ProjectionMatrix; }

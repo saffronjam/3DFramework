@@ -18,13 +18,8 @@ namespace Se
 EditorLayer::EditorLayer()
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
-	m_MainTarget(SceneRenderer::GetMainTarget()),
-	m_MiniTarget(SceneRenderer::Target::Create(100, 100)),
-	m_MainViewport("Editor view", m_MainTarget),
-	m_MiniViewport("Camera view", m_MiniTarget),
-	m_EditorCamera(m_MainViewport, glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f))
+	m_EditorScene(Shared<EditorScene>::Create())
 {
-
 }
 
 void EditorLayer::OnAttach()
@@ -80,45 +75,51 @@ void EditorLayer::OnAttach()
 																							 break;
 																						 }
 																					 });
-											m_MainViewport.SetPostRenderCallback([this]()
-																				 {
-																					 // Gizmos
-																					 if ( m_GizmoType != -1 && m_SelectedEntity )
-																					 {
-																						 const auto viewportSize = m_MainViewport.GetViewportSize();
-																						 ImGuizmo::SetDrawlist();
-																						 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+											m_ViewportPanes[m_FocusedScene].SetPostRenderCallback([this]()
+																								  {
+																									  // Gizmos
+																									  if ( m_GizmoType != -1 && m_SelectedEntity )
+																									  {
+																										  const auto viewportSize = m_FocusedViewport->GetViewportSize();
+																										  ImGuizmo::SetDrawlist();
+																										  ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
-																						 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+																										  const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
 
-																						 auto &entityTransform = m_SelectedEntity.Transform();
-																						 const float snapValue = GetSnapValue();
-																						 float snapValues[3] = { snapValue, snapValue, snapValue };
-																						 if ( m_SelectionMode == SelectionMode::Entity )
-																						 {
-																							 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-																												  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-																												  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																												  ImGuizmo::LOCAL,
-																												  glm::value_ptr(entityTransform),
-																												  nullptr,
-																												  snap ? snapValues : nullptr);
-																						 }
-																						 else
-																						 {
-																							 glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
-																							 ImGuizmo::Manipulate(glm::value_ptr(m_EditorCamera.GetViewMatrix()),
-																												  glm::value_ptr(m_EditorCamera.GetProjectionMatrix()),
-																												  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																												  ImGuizmo::LOCAL,
-																												  glm::value_ptr(transformBase),
-																												  nullptr,
-																												  snap ? snapValues : nullptr);
+																										  auto &entityTransform = m_SelectedEntity.Transform();
+																										  const float snapValue = GetSnapValue();
+																										  float snapValues[3] = { snapValue, snapValue, snapValue };
 
-																							 m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
-																						 }
-																					 }
-																				 });
+
+																										  if ( m_FocusedScene->GetEntity().HasComponent<EditorCameraComponent>() )
+																										  {
+																											  const auto &editorCamera = m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+																											  if ( m_SelectionMode == SelectionMode::Entity )
+																											  {
+																												  ImGuizmo::Manipulate(glm::value_ptr(m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera->GetViewMatrix()),
+																																	   glm::value_ptr(editorCamera->GetProjectionMatrix()),
+																																	   static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																																	   ImGuizmo::LOCAL,
+																																	   glm::value_ptr(entityTransform),
+																																	   nullptr,
+																																	   snap ? snapValues : nullptr);
+																											  }
+																											  else
+																											  {
+																												  glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
+																												  ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+																																	   glm::value_ptr(editorCamera->GetProjectionMatrix()),
+																																	   static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																																	   ImGuizmo::LOCAL,
+																																	   glm::value_ptr(transformBase),
+																																	   nullptr,
+																																	   snap ? snapValues : nullptr);
+
+																												  m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+																											  }
+																										  }
+																									  }
+																								  });
 
 										}, "Setting Up System Callbacks");
 }
@@ -144,10 +145,9 @@ void EditorLayer::OnScenePlay()
 	if ( m_ReloadScriptOnPlay )
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 
-	m_RuntimeScene = Shared<Scene>::Create("Runtime Scene");
-	m_EditorScene->CopyTo(m_RuntimeScene);
+	m_RuntimeScene = Shared<RuntimeScene>::Create("Runtime Scene", m_EditorScene);
 
-	m_RuntimeScene->OnRuntimeStart();
+	m_RuntimeScene->OnStart();
 	m_EntityPanel->SetContext(m_RuntimeScene);
 
 	m_GizmoType = -1;
@@ -164,7 +164,7 @@ void EditorLayer::OnScenePlay()
 
 void EditorLayer::OnSceneStop()
 {
-	m_RuntimeScene->OnRuntimeStop();
+	m_RuntimeScene->OnStop();
 	m_SceneState = SceneState::Edit;
 
 	ScriptEngine::SetSceneContext(m_EditorScene);
@@ -205,25 +205,30 @@ void EditorLayer::OnUpdate()
 {
 	const Time ts = GlobalTimer::GetStep();
 
+	for ( auto iter = m_ViewportPanes.begin(); iter != m_ViewportPanes.end(); iter++ )
+	{
+		auto &viewportPane = iter->first;
+		auto &scene = iter->second;
+
+		if ( scene->GetEntity().HasComponent<EditorCameraComponent>() )
+		{
+			auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+			if ( viewportPane.IsFocused() )
+				editorCamera->Enable();
+			else
+				editorCamera->Disable();
+		}
+
+		const auto viewportSize = viewportPane.GetViewportSize();
+		scene->SetViewportSize(viewportSize.x, viewportSize.y);
+	}
+
+
 	switch ( m_SceneState )
 	{
 	case SceneState::Edit:
 	{
-		//if (m_ViewportPanelFocused)
-		m_EditorCamera.OnUpdate(ts);
-
-		m_EditorScene->OnRenderEditor(ts, m_EditorCamera);
-
-		if ( false )
-		{
-			Renderer::BeginRenderPass(m_MainTarget->GetCompositePass(), false);
-			const auto viewProj = m_EditorCamera.GetViewProjection();
-			Renderer2D::BeginScene(viewProj, false);
-			Renderer::DrawAABB(AABB{ Vector3f{ 0.0f, 0.0f, 0.0f }, Vector3f{ 100.0f, 100.0f, 100.0f } }, glm::mat4(1.0f), Vector4f(1.0f, 0.0f, 0.0f, 0.0f));
-			Renderer2D::DrawLine(Vector3f{ 0.0f, 0.0f, 0.0f }, Vector3f{ 100.0f, 100.0f, 100.0f }, Vector4f(1.0f, 0.0f, 0.0f, 1.0f));
-			Renderer2D::EndScene();
-			Renderer::EndRenderPass();
-		}
+		m_EditorScene->OnRender();
 
 		if ( m_SelectedEntity )
 		{
@@ -233,8 +238,8 @@ void EditorLayer::OnUpdate()
 				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
 				const Vector3f rotation = glm::eulerAngles(rotationQuat);
 
-				Renderer::BeginRenderPass(m_MainTarget->GetCompositePass(), false);
-				const auto viewProj = m_EditorCamera.GetViewProjection();
+				Renderer::BeginRenderPass(m_FocusedScene->GetTarget()->GetCompositePass(), false);
+				const auto viewProj = m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera->GetViewProjection();
 				Renderer2D::BeginScene(viewProj, false);
 				Renderer2D::DrawRotatedQuad({ translation.x, translation.y }, size * 2.0f, glm::degrees(rotation.z), { 1.0f, 0.0f, 1.0f, 1.0f });
 				Renderer2D::EndScene();
@@ -246,33 +251,16 @@ void EditorLayer::OnUpdate()
 	}
 	case SceneState::Play:
 	{
-		m_RuntimeScene->OnUpdate(ts);
-		m_RuntimeScene->OnRenderRuntime(ts);
+		m_RuntimeScene->OnUpdate();
+		m_RuntimeScene->OnRender();
 		break;
 	}
 	case SceneState::Pause:
 	{
-		if ( m_MainViewport.IsFocused() )
-			m_EditorCamera.OnUpdate(ts);
-
-		m_RuntimeScene->OnRenderRuntime(ts);
+		m_EditorScene->OnUpdate();
+		m_RuntimeScene->OnRender();
 		break;
 	}
-	}
-
-	if ( m_SelectedEntity )
-	{
-		if ( m_SelectedEntity.HasComponent<CameraComponent>() && m_SelectedEntity.HasComponent<TransformComponent>() )
-		{
-			Shared<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
-
-			const auto viewportSize = m_MiniViewport.GetViewportSize();
-			camera->SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
-			const glm::mat4 cameraViewMatrix = glm::inverse(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
-
-			m_MiniTarget->SetCameraData({ camera.Raw(), cameraViewMatrix });
-			m_MiniTarget->Enable();
-		}
 	}
 }
 
@@ -284,7 +272,7 @@ void EditorLayer::NewScenePrompt()
 	if ( !filepath.empty() )
 	{
 		String sceneName = filepath.stem().string();
-		Shared<Scene> newScene = Shared<Scene>::Create(sceneName);
+		Shared<EditorScene> newScene = Shared<EditorScene>::Create(sceneName);
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
@@ -335,7 +323,7 @@ void EditorLayer::LoadNewScene(const String &filepath)
 {
 	if ( filepath != m_SceneFilePath.string() )
 	{
-		const Shared<Scene> newScene = Shared<Scene>::Create("Editor scene");
+		const Shared<EditorScene> newScene = Shared<EditorScene>::Create("Editor scene");
 		SceneSerializer serializer(newScene);
 		if ( !serializer.Deserialize(filepath) )
 		{
@@ -355,6 +343,8 @@ void EditorLayer::LoadNewScene(const String &filepath)
 
 		SaveActiveScene();
 		OnSceneChange();
+
+		m_FocusedScene = Shared<Scene>::Cast(m_EditorScene);
 	}
 	else
 	{
@@ -415,36 +405,20 @@ void EditorLayer::OnGuiRender()
 	ScriptEngine::OnGuiRender();
 	Shader::OnGuiRender();
 	m_EditorTerminal.OnGuiRender();
-	m_MainViewport.OnGuiRender();
-	m_MiniViewport.OnGuiRender();
 	m_AssetPanel->OnGuiRender();
 	m_EntityPanel->OnGuiRender(m_ScriptPanel);
 	m_ScriptPanel->OnGuiRender();
 	m_SceneState == SceneState::Edit ? m_EditorScene->OnGuiRender() : m_RuntimeScene->OnGuiRender();
 
-	for ( auto &[entity, modelView] : m_EntityModelSpacesMap )
-	{
-		modelView.second.OnGuiRender();
-	}
-
 	ImGui::End();
 
-	// Correct viewport and camera matrices
-	const auto mainViewportSize = m_MainViewport.GetViewportSize();
-	m_EditorScene->SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
-	if ( m_RuntimeScene )
-		m_RuntimeScene->SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
-	m_EditorCamera.SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), mainViewportSize.x, mainViewportSize.y, 0.1f, 10000.0f));
-	m_EditorCamera.SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
+
 }
 
 void EditorLayer::OnEvent(const Event &event)
 {
 	if ( m_SceneState == SceneState::Edit )
 	{
-		if ( m_MainViewport.IsHovered() )
-			m_EditorCamera.OnEvent(event);
-
 		m_EditorScene->OnEvent(event);
 	}
 	else if ( m_SceneState == SceneState::Play )
@@ -460,7 +434,7 @@ void EditorLayer::OnEvent(const Event &event)
 
 bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 {
-	if ( m_MainViewport.IsFocused() )
+	if ( m_ViewportPanes[m_FocusedScene].IsFocused() )
 	{
 		switch ( event.GetKey() )
 		{
@@ -518,13 +492,13 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 
 bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 {
-	if ( m_MainViewport.IsFocused() &&
+	if ( m_ViewportPanes[m_FocusedScene].IsFocused() &&
 		event.GetButton() == SE_BUTTON_LEFT &&
 		!Input::IsKeyPressed(SE_KEY_LEFT_ALT) &&
 		!ImGuizmo::IsOver() &&
 		m_SceneState != SceneState::Play )
 	{
-		const auto MousePosition = m_MainViewport.GetMousePosition();
+		const auto MousePosition = m_ViewportPanes[m_FocusedScene].GetMousePosition();
 		if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 		{
 			auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);
@@ -542,7 +516,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 			};
 
 			static ArrayList<Selection> selections;
-			auto meshEntities = m_EditorScene->GetAllEntitiesWith<MeshComponent>();
+			auto meshEntities = m_FocusedScene->GetEntityRegistry().view<MeshComponent>();
 			for ( auto e : meshEntities )
 			{
 				Entity entity = { e, m_EditorScene.Raw() };
@@ -615,14 +589,20 @@ std::pair<Vector3f, Vector3f> EditorLayer::CastRay(float mx, float my) const
 {
 	const Vector4f mouseClipPos = { mx, my, -1.0f, 1.0f };
 
-	const auto inverseProj = glm::inverse(m_EditorCamera.GetProjectionMatrix());
-	const auto inverseView = glm::inverse(glm::mat3(m_EditorCamera.GetViewMatrix()));
+	if ( m_FocusedScene->GetEntity().HasComponent<EditorCameraComponent>() )
+	{
+		const auto &editorCamera = m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
-	const Vector4f ray = inverseProj * mouseClipPos;
-	Vector3f rayPos = m_EditorCamera.GetPosition();
-	Vector3f rayDir = inverseView * Vector3f(ray);
+		const auto inverseProj = glm::inverse(editorCamera->GetProjectionMatrix());
+		const auto inverseView = glm::inverse(glm::mat3(editorCamera->GetViewMatrix()));
 
-	return { rayPos, rayDir };
+		const Vector4f ray = inverseProj * mouseClipPos;
+		const Vector3f rayPos = editorCamera->GetPosition();
+		const Vector3f rayDir = inverseView * Vector3f(ray);
+
+		return { rayPos, rayDir };
+	}
+	return {};
 }
 
 void EditorLayer::OnGuiRenderMenuBar()
@@ -709,9 +689,16 @@ void EditorLayer::OnGuiRenderToolbar()
 	ImVec4 TranslateColorTint = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? ImGuiBlue : ClearWhite;
 	ImVec4 RotateColorTint = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? ImGuiBlue : ClearWhite;
 	ImVec4 ScaleColorTint = m_GizmoType == ImGuizmo::OPERATION::SCALE ? ImGuiBlue : ClearWhite;
-	ImVec4 ControllerWASDTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Game ? ImGuiBlue : ClearWhite;
-	ImVec4 ControllerMayaTint = m_EditorCamera.GetControllerStyle() == EditorCamera::ControllerStyle::Maya ? ImGuiBlue : ClearWhite;
-	if ( m_SceneState == SceneState::Play )
+	ImVec4 ControllerWASDTint;
+	ImVec4 ControllerMayaTint;
+
+	if ( m_FocusedScene->GetEntity().HasComponent<EditorCameraComponent>() )
+	{
+		const auto &editorCamera = m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+		ControllerWASDTint = editorCamera->GetControllerStyle() == EditorCamera::ControllerStyle::Game ? ImGuiBlue : ClearWhite;
+		ControllerMayaTint = editorCamera->GetControllerStyle() == EditorCamera::ControllerStyle::Maya ? ImGuiBlue : ClearWhite;
+	}
+	else
 	{
 		TranslateColorTint = FadedGrey;
 		RotateColorTint = FadedGrey;
@@ -747,13 +734,13 @@ void EditorLayer::OnGuiRenderToolbar()
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerGameButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint) )
 	{
 		if ( m_SceneState == SceneState::Edit )
-			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Game);
+			m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(EditorCamera::ControllerStyle::Game);
 	}
 	ImGui::SameLine();
 	if ( ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerMayaButton"]->GetRendererID()), ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint) )
 	{
 		if ( m_SceneState == SceneState::Edit )
-			m_EditorCamera.SetControllerStyle(EditorCamera::ControllerStyle::Maya);
+			m_FocusedScene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(EditorCamera::ControllerStyle::Maya);
 	}
 
 	ImGui::End();
@@ -770,7 +757,6 @@ void EditorLayer::OnSelected(Entity entity)
 
 void EditorLayer::OnUnselected(Entity entity)
 {
-	m_MiniTarget->Disable();
 	m_SelectedEntity = {};
 	m_EntityPanel->SetSelected({});
 	m_EditorScene->SetSelectedEntity({});
@@ -786,23 +772,22 @@ void EditorLayer::OnEntityDeleted(Entity entity)
 
 void EditorLayer::OnNewModelSpaceView(Entity entity)
 {
-	if ( m_EntityModelSpacesMap.find(entity) != m_EntityModelSpacesMap.end() )
+	/*if ( m_EntityModelSpacesMap.find(entity) != m_EntityModelSpacesMap.end() )
 	{
 		return;
-	}
+	}*/
 
 	const auto tag = entity.GetComponent<TagComponent>().Tag;
-	const auto newScene = Shared<Scene>::Create("Model Space " + tag);
+	//const auto newScene = Shared<Scene>::Create("Model Space " + tag);
 	const auto newRenderTarget = SceneRenderer::Target::Create(100, 100);
 	const auto newViewportPane = ViewportPane(tag, newRenderTarget);
-	const auto pair = CreatePair(newScene, newViewportPane);
 
-	m_EntityModelSpacesMap.emplace(entity, pair);
+	//m_EntityModelSpacesMap.emplace(entity, CreatePair(newScene, newViewportPane));
 }
 
 Ray EditorLayer::CastMouseRay() const
 {
-	const auto MousePosition = m_MainViewport.GetMousePosition();
+	const auto MousePosition = m_ViewportPanes[m_FocusedScene].GetMousePosition();
 	if ( MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f )
 	{
 		auto [origin, direction] = CastRay(MousePosition.x, MousePosition.y);

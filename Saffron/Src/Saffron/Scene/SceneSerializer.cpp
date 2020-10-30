@@ -420,7 +420,7 @@ bool SceneSerializer::Deserialize(const String &filepath)
 
 			SE_CORE_INFO("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-			Entity deserializedEntity = m_Scene->CreateEntityWithID(uuid, name);
+			Entity deserializedEntity = m_Scene->CreateEntity(uuid, name);
 
 			auto transformComponent = entity["TransformComponent"];
 			if ( transformComponent )

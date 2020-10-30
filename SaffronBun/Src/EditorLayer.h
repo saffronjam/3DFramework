@@ -9,13 +9,15 @@
 #include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Scene/EditorScene.h"
+#include "Saffron/Scene/ModelSpaceScene.h"
+#include "Saffron/Scene/RuntimeScene.h"
 
 namespace Se
 {
 class EditorLayer : public Layer
 {
 public:
-
 	struct AlbedoInput
 	{
 		Vector3f Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
@@ -97,15 +99,15 @@ private:
 	int m_GizmoType = -1;
 	bool m_ModelSpaceEditor = false;
 
-	Shared<Scene> m_RuntimeScene, m_EditorScene;
-	Map<Entity, Pair<Shared<Scene>, ViewportPane>> m_EntityModelSpacesMap;
-	Shared<SceneRenderer::Target> m_MainTarget, m_MiniTarget;
+	Shared<EditorScene> m_EditorScene;
+	Shared<RuntimeScene> m_RuntimeScene;
+	ArrayList<Shared<ModelSpaceScene>> m_ModelSpaceScenes;
+	Shared<ViewportPane> m_FocusedViewport;
+	Map<ViewportPane, Shared<Scene>> m_ViewportPanes;
 
 	Filepath m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
-	ViewportPane m_MainViewport, m_MiniViewport;
-	EditorCamera m_EditorCamera;
 	EditorTerminal m_EditorTerminal;
 
 	Shared<Shader> m_BrushShader;
