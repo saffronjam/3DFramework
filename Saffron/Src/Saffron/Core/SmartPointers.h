@@ -111,6 +111,18 @@ public:
 		return *this;
 	}
 
+	template<typename SharedType2>
+	bool operator==(const Shared<SharedType2> &other) const
+	{
+		return m_Instance == other.m_Instance;
+	}
+
+	template<typename SharedType2>
+	bool operator!=(const Shared<SharedType2> &other) const
+	{
+		return !(*this == other);
+	}
+
 	operator bool() { return m_Instance != nullptr; }
 	operator bool() const { return m_Instance != nullptr; }
 

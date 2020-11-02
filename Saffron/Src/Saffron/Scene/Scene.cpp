@@ -75,7 +75,9 @@ Scene::Environment Scene::Environment::Load(const String &filepath)
 
 Scene::Scene(String name)
 	: m_Name(Move(name)),
-	m_SceneEntity(m_EntityRegistry.create(), this)
+	m_SceneEntity(m_EntityRegistry.create(), this),
+	m_ViewportWidth(100),
+	m_ViewportHeight(100)
 {
 	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
 	m_EntityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
@@ -170,6 +172,11 @@ void Scene::DuplicateEntity(Entity entity)
 void Scene::SetSelectedEntity(Entity entity)
 {
 	m_SelectedEntity = entity;
+}
+
+Entity Scene::GetSelectedEntity()
+{
+	return m_SelectedEntity;
 }
 
 void Scene::SetViewportSize(Uint32 width, Uint32 height)

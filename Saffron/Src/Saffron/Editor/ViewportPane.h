@@ -22,7 +22,7 @@ public:
 	bool IsFocused() const { return m_Focused; }
 
 	void SetPostRenderCallback(Function<void()> fn) { m_PostRenderFunction = fn; }
-	void SetRenderTargetIdentifier(Shared<SceneRenderer::Target> target) { m_Target = Move(target); }
+	void SetTarget(Shared<SceneRenderer::Target> target) { m_Target = Move(target); }
 
 private:
 	String m_WindowTitle;

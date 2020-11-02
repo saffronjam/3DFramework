@@ -14,12 +14,19 @@ public:
 	void OnRender() override;
 	void OnGuiRender() override;
 
+	void EnableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Enable(); }
+	void DisableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
+
+	Entity GetModelEntity() const { return m_Entity; }
 	const Shared<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
-	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
+	const Shared<SceneRenderer::Target> &GetTarget() const override { return m_Target; }
+
+	void SetViewportSize(Uint32 width, Uint32 height) override;
+	void SetSelectedEntity(Entity entity) override;
 
 private:
 	Entity m_Entity;
-	ViewportPane m_ViewportPane;
+	Shared<SceneRenderer::Target> m_Target;
 	Shared<EditorCamera> m_EditorCamera;
 
 	Matrix4f m_SavedTransform;

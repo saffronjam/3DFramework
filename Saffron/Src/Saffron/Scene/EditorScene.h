@@ -8,7 +8,7 @@ namespace  Se
 class EditorScene : public Scene
 {
 public:
-	EditorScene(String name = "Editor Scene");
+	EditorScene(String name);
 
 	void OnUpdate() override;
 	void OnRender() override;
@@ -20,8 +20,10 @@ public:
 
 	const Shared<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
 	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
+	const Shared<SceneRenderer::Target> &GetMiniTarget() const { return m_MiniTarget; };
 
 	void SetSelectedEntity(Entity entity) override;
+	void SetViewportSize(Uint32 width, Uint32 height) override;
 
 private:
 	Shared<SceneRenderer::Target> m_MiniTarget;

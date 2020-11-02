@@ -46,9 +46,9 @@ namespace Se
             return null;
         }
 
-        public Entity FindEntityByTag(string tag)
+        public Entity GetEntity(string tag)
         {
-            ulong entityID = FindEntityByTag_Native(tag);
+            ulong entityID = GetEntity_Native(tag);
             return new Entity(entityID);
         }
 
@@ -94,7 +94,7 @@ namespace Se
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetTransform_Native(ulong entityID, ref Matrix4 matrix);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern ulong FindEntityByTag_Native(string tag);
+        private static extern ulong GetEntity_Native(string tag);
 
     }
 }

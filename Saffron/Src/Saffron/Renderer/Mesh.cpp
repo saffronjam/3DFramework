@@ -569,8 +569,6 @@ Mesh::Mesh(String filename)
 	m_Pipeline = Pipeline::Create(pipelineSpecification);
 }
 
-Mesh::~Mesh() = default;
-
 void Mesh::OnUpdate()
 {
 	const auto ts = GlobalTimer::GetStep();
@@ -626,7 +624,6 @@ void Mesh::DumpVertexBuffer()
 	}
 	SE_MESH_LOG("------------------------------------------------------");
 }
-
 
 void Mesh::BoneTransform(float time)
 {

@@ -13,7 +13,7 @@ namespace Se
 {
 
 template<typename T>
-static void CopyComponent(EntityRegistry &dstRegistry, const EntityRegistry &srcRegistry, const Map<UUID, Entity> &entityMap)
+static void CopyComponent(EntityRegistry &dstRegistry, EntityRegistry &srcRegistry, const Map<UUID, Entity> &entityMap)
 {
 	auto components = srcRegistry.view<T>();
 	for ( auto entityHandle : components )
@@ -26,8 +26,7 @@ static void CopyComponent(EntityRegistry &dstRegistry, const EntityRegistry &src
 }
 
 RuntimeScene::RuntimeScene(String name, Shared<Scene> copyFrom)
-	: Scene(Move(name)),
-	m_ViewportPane(m_Name, SceneRenderer::GetMainTarget())
+	: Scene(Move(name))
 {
 	SE_CORE_ASSERT(copyFrom, "Runtime Scene must have a scene to copy from");
 
@@ -39,17 +38,17 @@ RuntimeScene::RuntimeScene(String name, Shared<Scene> copyFrom)
 	m_Skybox = copyFrom->GetSkybox();
 	m_SkyboxLod = copyFrom->GetSkyboxLod();
 
+	auto &otherRegistry = copyFrom->GetEntityRegistry();
 	Map<UUID, Entity> entityMap;
-	auto idComponents = m_EntityRegistry.view<IDComponent>();
+	auto idComponents = otherRegistry.view<IDComponent>();
 	for ( auto entityHandle : idComponents )
 	{
-		auto uuid = m_EntityRegistry.get<IDComponent>(entityHandle).ID;
-		auto tag = m_EntityRegistry.get<TagComponent>(entityHandle).Tag;
+		auto uuid = otherRegistry.get<IDComponent>(entityHandle).ID;
+		auto tag = otherRegistry.get<TagComponent>(entityHandle).Tag;
 		const Entity entity = CreateEntity(uuid, tag);
 		entityMap[uuid] = entity;
 	}
 
-	const auto &otherRegistry = copyFrom->GetEntityRegistry();
 	CopyComponent<TagComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<TransformComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<MeshComponent>(m_EntityRegistry, otherRegistry, entityMap);
@@ -105,7 +104,7 @@ void RuntimeScene::OnRender()
 	Shared<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
 	camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	SceneRenderer::GetMainTarget()->SetCameraData({ Shared<Camera>::Cast(camera) , cameraViewMatrix });
-	SceneRenderer::BeginScene(this);
+	SceneRenderer::BeginScene(this, { SceneRenderer::GetMainTarget() });
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 	for ( auto entity : group )
 	{
@@ -169,12 +168,8 @@ void RuntimeScene::OnGuiRender()
 
 	ImGui::End();
 
-	m_ViewportPane.OnGuiRender();
 	if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
 		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnGuiRender();
-
-	const auto mainViewportSize = m_ViewportPane.GetViewportSize();
-	SetViewportSize(static_cast<Uint32>(mainViewportSize.x), static_cast<Uint32>(mainViewportSize.y));
 }
 
 void RuntimeScene::OnStart()

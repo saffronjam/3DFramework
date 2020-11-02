@@ -345,7 +345,7 @@ SceneSerializer::SceneSerializer(const Shared<Scene> &scene)
 {
 }
 
-void SceneSerializer::Serialize(const String &filepath)
+void SceneSerializer::Serialize(const Filepath &filepath)
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
@@ -370,13 +370,13 @@ void SceneSerializer::Serialize(const String &filepath)
 	fout << out.c_str();
 }
 
-void SceneSerializer::SerializeRuntime(const String &filepath)
+void SceneSerializer::SerializeRuntime(const Filepath &filepath)
 {
 	// TODO: Implement
 	SE_CORE_ASSERT(false);
 }
 
-bool SceneSerializer::Deserialize(const String &filepath)
+bool SceneSerializer::Deserialize(const Filepath &filepath)
 {
 	InputStream stream(filepath);
 	StringStream strStream;
@@ -574,7 +574,7 @@ bool SceneSerializer::Deserialize(const String &filepath)
 	return true;
 }
 
-bool SceneSerializer::DeserializeRuntime(const String &filepath)
+bool SceneSerializer::DeserializeRuntime(const Filepath &filepath)
 {
 	// Not implemented
 	SE_CORE_ASSERT(false);

@@ -10,8 +10,8 @@ EditorScene::EditorScene(String name)
 	: Scene(Move(name)),
 	m_MiniTarget(SceneRenderer::Target::Create(100, 100))
 {
-	m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f));
-	m_EditorCamera = m_SelectedEntity.GetComponent<EditorCameraComponent>().Camera;
+	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
+	m_MiniTarget->Disable();
 }
 
 void EditorScene::OnUpdate()
@@ -37,7 +37,14 @@ void EditorScene::OnRender()
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
 	SceneRenderer::GetMainTarget()->SetCameraData({ Shared<Camera>::Cast(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
-	SceneRenderer::BeginScene(this);
+
+	ArrayList<Shared<SceneRenderer::Target>> targets = { SceneRenderer::GetMainTarget() };
+	if ( m_SceneEntity && m_SelectedEntity.HasComponent<CameraComponent>() )
+	{
+		targets.push_back(m_MiniTarget);
+	}
+
+	SceneRenderer::BeginScene(this, targets);
 	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 	for ( auto entity : group )
 	{
@@ -102,17 +109,12 @@ void EditorScene::OnGuiRender()
 		ShowBoundingBoxes(m_UIShowBoundingBoxes);
 	Gui::EndPropertyGrid();
 
-
 	ImGui::End();
 
 	if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
 	{
 		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnGuiRender();
 	}
-
-	auto &editorCamera = m_SceneEntity.GetComponent<EditorCameraComponent>().Camera;
-	editorCamera->SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), static_cast<float>(m_ViewportWidth), static_cast<float>(m_ViewportHeight), 0.1f, 10000.0f));
-	editorCamera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 }
 
 void EditorScene::OnEvent(const Event &event)
@@ -122,10 +124,14 @@ void EditorScene::OnEvent(const Event &event)
 
 void EditorScene::SetSelectedEntity(Entity entity)
 {
-	if ( !entity )
-	{
-		m_MiniTarget->Disable();
-	}
+	m_MiniTarget->Disable();
 	Scene::SetSelectedEntity(entity);
+}
+
+void EditorScene::SetViewportSize(Uint32 width, Uint32 height)
+{
+	m_EditorCamera->SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), static_cast<float>(width), static_cast<float>(height), 0.1f, 10000.0f));
+	m_EditorCamera->SetViewportSize(width, height);
+	Scene::SetViewportSize(width, height);
 }
 }

@@ -48,7 +48,7 @@ public:
 
 	enum class SceneState : int
 	{
-		Edit = 0, Play = 1, Pause = 2
+		Edit = 0, Play = 1, Pause = 3
 	};
 
 	enum class SelectionMode
@@ -75,9 +75,9 @@ public:
 	void SaveSceneAsPrompt();
 
 	void SaveActiveScene() const;
-	void LoadNewScene(const String &filepath);
+	void LoadNewScene(const Filepath &filepath);
 private:
-	std::pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
+	Pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
 
 	void OnGuiRenderMenuBar();
 	void OnGuiRenderToolbar();
@@ -87,13 +87,17 @@ private:
 	void OnNewModelSpaceView(Entity entity);
 	Ray CastMouseRay() const;
 
-	void OnSceneChange();
-	void OnScenePlay();
-	void OnSceneStop();
+	void OnSceneChange(Shared<Scene> scene, Entity selection);
+	void OnPlay();
+	void OnStop();
 
-	void UpdateWindowTitle(const String &sceneName);
+	void UpdateWindowTitle(String sceneName);
 
 	float GetSnapValue() const;
+
+	Shared<ViewportPane> GetActiveViewportPane() const;
+	Shared<Scene> GetActiveScene() const;
+
 private:
 	int m_Style;
 	int m_GizmoType = -1;
@@ -101,9 +105,11 @@ private:
 
 	Shared<EditorScene> m_EditorScene;
 	Shared<RuntimeScene> m_RuntimeScene;
-	ArrayList<Shared<ModelSpaceScene>> m_ModelSpaceScenes;
-	Shared<ViewportPane> m_FocusedViewport;
-	Map<ViewportPane, Shared<Scene>> m_ViewportPanes;
+	Shared<ViewportPane> m_MainViewportPane;
+	Shared<ViewportPane> m_MiniViewportPane;
+	ArrayList<Pair<Shared<ModelSpaceScene>, Shared<ViewportPane>>> m_ModelSpaceSceneViews;
+	mutable Shared<Scene> m_LastFocusedScene;
+	Shared<Scene> m_CachedActiveScene;
 
 	Filepath m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;

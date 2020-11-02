@@ -194,6 +194,6 @@ struct EditorCameraComponent
 	}
 	EditorCameraComponent(const EditorCameraComponent &other) = default;
 
-	operator Shared<EditorCameraComponent>() const { return Camera; }
+	operator Shared<EditorCamera>() const { return Camera; }
 };
 }

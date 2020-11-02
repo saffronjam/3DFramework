@@ -8,7 +8,7 @@ namespace Se
 class RuntimeScene : public Scene
 {
 public:
-	explicit RuntimeScene(String name = "Runtime Scene", Shared<Scene> copyFrom);
+	explicit RuntimeScene(String name, Shared<Scene> copyFrom);
 
 	void OnUpdate() override;
 	void OnRender() override;
@@ -18,8 +18,6 @@ public:
 
 	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
 
-private:
-	ViewportPane m_ViewportPane;
 };
 }
 

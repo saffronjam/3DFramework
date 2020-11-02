@@ -44,7 +44,7 @@ public:
 	};
 
 public:
-	explicit Scene(String name = "Scene");
+	explicit Scene(String name);
 	~Scene();
 
 	virtual void OnUpdate() = 0;
@@ -65,6 +65,7 @@ public:
 
 	virtual const Shared<SceneRenderer::Target> &GetTarget() const = 0;
 
+	virtual Entity GetSelectedEntity();
 	virtual	void SetSelectedEntity(Entity entity);
 	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
@@ -95,7 +96,7 @@ protected:
 	EntityRegistry m_EntityRegistry;
 	EntityMap m_EntityIDMap;
 	Entity m_SceneEntity;
-	Entity m_SelectedEntity{};
+	Entity m_SelectedEntity;
 
 	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 

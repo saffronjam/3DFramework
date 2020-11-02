@@ -18,7 +18,7 @@ public:
 	};
 	struct CameraData
 	{
-		const Shared<Camera> Camera;
+		Shared<Camera> Camera;
 		Matrix4f ViewMatrix{};
 	};
 
@@ -27,8 +27,6 @@ public:
 	public:
 		Target() = default;
 		~Target();
-
-		UUID GetUUID() const { return m_UUID; }
 
 		void Enable() { m_Enabled = true; }
 		void Disable() { m_Enabled = false; }
@@ -48,7 +46,6 @@ public:
 		static Shared<Target> Create(Uint32 width, Uint32 height);
 
 	private:
-		UUID m_UUID;
 		bool m_Enabled = true;
 		CameraData m_CameraData;
 		Shared<RenderPass> m_GeoPass;
@@ -58,14 +55,14 @@ public:
 public:
 	static void Init();
 
-	static void BeginScene(const Scene *scene);
+	static void BeginScene(const Scene *scene, ArrayList<Shared<Target>> targets);
 	static void EndScene();
 
 	static void SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f), const Shared<MaterialInstance>
 						   &overrideMaterial = nullptr);
 	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f));
 
-	static std::pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const String &filepath);
+	static Pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const String &filepath);
 
 	static Shared<Target> &GetMainTarget();
 	static Options &GetOptions();

@@ -54,8 +54,12 @@ static SceneRendererData s_Data;
 static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
 
 ///////////////////////////////////////////////////////////////////////////
-/// Scene Renderer
+/// Scene Renderer Target
 ///////////////////////////////////////////////////////////////////////////
+
+SceneRenderer::Target::~Target()
+{
+}
 
 Vector2u SceneRenderer::Target::GetSize()
 {
@@ -106,17 +110,17 @@ Shared<SceneRenderer::Target> SceneRenderer::Target::Create(Uint32 width, Uint32
 	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
 	target->m_CompositePass = RenderPass::Create(compRenderPassSpec);
 
-	target->Enable();
-
 	s_Data.RenderTargets.push_back(target);
+
+	target->Enable();
 
 	return target;
 }
 
-SceneRenderer::Target::~Target()
-{
-	//s_Data.RenderTargets.erase(std::find(s_Data.RenderTargets.begin(), s_Data.RenderTargets.end(), this));
-}
+
+///////////////////////////////////////////////////////////////////////////
+/// Scene Renderer
+///////////////////////////////////////////////////////////////////////////
 
 void SceneRenderer::Init()
 {
@@ -138,11 +142,12 @@ void SceneRenderer::Init()
 	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
 }
 
-void SceneRenderer::BeginScene(const Scene *scene)
+void SceneRenderer::BeginScene(const Scene *scene, ArrayList<Shared<Target>> targets)
 {
 	SE_CORE_ASSERT(!s_Data.ActiveScene, "Already an active scene");
 
 	s_Data.ActiveScene = scene;
+	s_Data.RenderTargets = Move(targets);
 	s_Data.SceneData.SkyboxMaterial = scene->GetSkybox().Material;
 	s_Data.SceneData.SceneEnvironment = scene->GetEnvironment();
 	s_Data.SceneData.ActiveLight = scene->GetLight();
@@ -169,7 +174,7 @@ void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f 
 	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
 }
 
-std::pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const String &filepath)
+Pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const String &filepath)
 {
 	const Uint32 cubemapSize = 2048;
 	const Uint32 irradianceMapSize = 32;

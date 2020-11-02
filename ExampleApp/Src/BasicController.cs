@@ -17,7 +17,7 @@ namespace Script
 
         public void OnCreate()
         {
-            m_PlayerEntity = FindEntityByTag("Player");
+            m_PlayerEntity = GetEntity("Player");
             m_CameraComponent = GetComponent<CameraComponent>();
         }
 

@@ -11,11 +11,11 @@ class SceneSerializer
 public:
 	SceneSerializer(const Shared<Scene> &scene);
 
-	void Serialize(const String &filepath);
-	void SerializeRuntime(const String &filepath);
+	void Serialize(const Filepath &filepath);
+	void SerializeRuntime(const Filepath &filepath);
 
-	bool Deserialize(const String &filepath);
-	bool DeserializeRuntime(const String &filepath);
+	bool Deserialize(const Filepath &filepath);
+	bool DeserializeRuntime(const Filepath &filepath);
 private:
 	Shared<Scene> m_Scene;
 };

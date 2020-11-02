@@ -122,7 +122,7 @@ class Mesh : public ReferenceCounted
 {
 public:
 	Mesh(String filename);
-	~Mesh();
+	~Mesh() = default;
 
 	void OnUpdate();
 	void DumpVertexBuffer();
@@ -140,6 +140,7 @@ public:
 	const String &GetFilepath() const { return m_Filepath; }
 
 	ArrayList<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
+
 private:
 	void BoneTransform(float time);
 	void ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const Matrix4f &ParentTransform);
@@ -152,6 +153,7 @@ private:
 	Vector3f InterpolateTranslation(float animationTime, const aiNodeAnim *nodeAnim);
 	glm::quat InterpolateRotation(float animationTime, const aiNodeAnim *nodeAnim);
 	Vector3f InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim);
+
 private:
 	ArrayList<Submesh> m_Submeshes;
 

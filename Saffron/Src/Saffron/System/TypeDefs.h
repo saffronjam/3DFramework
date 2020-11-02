@@ -40,6 +40,8 @@ using ArrayList = std::vector<T>;
 template<typename Key, typename Value>
 using Map = std::map<Key, Value>;
 template<typename Key, typename Value>
+using MultiMap = std::multimap<Key, Value>;
+template<typename Key, typename Value>
 using UnorderedMap = std::unordered_map<Key, Value>;
 template<class FunctionType>
 using Function = std::function<FunctionType>;

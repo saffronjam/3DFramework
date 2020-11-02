@@ -10,10 +10,9 @@ Time::Time(float seconds)
 {
 }
 
-Time &Time::operator+(const Time &rhs)
+Time Time::operator+(const Time &rhs)const
 {
-	m_Time += rhs.m_Time;
-	return *this;
+	return { m_Time + rhs.m_Time };
 }
 
 Time &Time::operator+=(const Time &rhs)
@@ -27,10 +26,9 @@ Time &Time::operator+=(float seconds)
 	return *this;
 }
 
-Time &Time::operator*(float multiplier)
+Time Time::operator*(float multiplier) const
 {
-	m_Time *= multiplier;
-	return *this;
+	return { m_Time * multiplier };
 }
 
 Time &Time::operator*=(float multiplier)
@@ -38,10 +36,9 @@ Time &Time::operator*=(float multiplier)
 	return *this = *this * multiplier;
 }
 
-Time &Time::operator/(float multiplier)
+Time Time::operator/(float multiplier) const
 {
-	m_Time /= multiplier;
-	return *this;
+	return { m_Time / multiplier };
 }
 
 Time &Time::operator/=(float multiplier)
