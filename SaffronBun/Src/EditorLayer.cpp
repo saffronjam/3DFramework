@@ -386,8 +386,8 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 				{
 					auto &submesh = submeshes[i];
 					Ray ray = {
-						glm::inverse(entity.Transform() * submesh.Transform) * Vector4f(origin, 1.0f),
-						glm::inverse(glm::mat3(entity.Transform()) * glm::mat3(submesh.Transform)) * direction
+						glm::inverse(entity.Transform() * submesh.Transform * mesh->GetLocalTransform()) * Vector4f(origin, 1.0f),
+						glm::inverse(Matrix3f(entity.Transform()) * Matrix3f(submesh.Transform) * Matrix3f(mesh->GetLocalTransform())) * direction
 					};
 
 					float t;

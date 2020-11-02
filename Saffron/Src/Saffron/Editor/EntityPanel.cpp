@@ -76,6 +76,7 @@ EntityPanel::EntityPanel(const Shared<Scene> &context)
 void EntityPanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 {
 	OnGuiRenderSceneHierarchy(scriptPanel);
+	OnGuiRenderProperties();
 	OnGuiRenderMaterial();
 	OnGuiRenderMeshDebug();
 }
@@ -223,82 +224,82 @@ void EntityPanel::OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPan
 
 			ImGui::EndPopup();
 		}
+	}
+	ImGui::End();
+}
 
-		ImGui::End();
+void EntityPanel::OnGuiRenderProperties()
+{
+	ImGui::Begin("Properties");
+	if ( m_SelectionContext )
+	{
+		DrawComponents(m_SelectionContext);
 
-		ImGui::Begin("Properties");
+		if ( ImGui::Button("Add Component") )
+			ImGui::OpenPopup("AddComponentPanel");
 
-		if ( m_SelectionContext )
+		if ( ImGui::BeginPopup("AddComponentPanel") )
 		{
-			DrawComponents(m_SelectionContext);
-
-			if ( ImGui::Button("Add Component") )
-				ImGui::OpenPopup("AddComponentPanel");
-
-			if ( ImGui::BeginPopup("AddComponentPanel") )
+			if ( !m_SelectionContext.HasComponent<CameraComponent>() )
 			{
-				if ( !m_SelectionContext.HasComponent<CameraComponent>() )
+				if ( ImGui::Button("Camera") )
 				{
-					if ( ImGui::Button("Camera") )
-					{
-						m_SelectionContext.AddComponent<CameraComponent>();
-						ImGui::CloseCurrentPopup();
-					}
+					m_SelectionContext.AddComponent<CameraComponent>();
+					ImGui::CloseCurrentPopup();
 				}
-				if ( !m_SelectionContext.HasComponent<MeshComponent>() )
-				{
-					if ( ImGui::Button("Mesh") )
-					{
-						const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
-						m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<ScriptComponent>() )
-				{
-					if ( ImGui::Button("Script") )
-					{
-						m_SelectionContext.AddComponent<ScriptComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<SpriteRendererComponent>() )
-				{
-					if ( ImGui::Button("Sprite Renderer") )
-					{
-						m_SelectionContext.AddComponent<SpriteRendererComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<RigidBody2DComponent>() )
-				{
-					if ( ImGui::Button("Rigidbody 2D") )
-					{
-						m_SelectionContext.AddComponent<RigidBody2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<BoxCollider2DComponent>() )
-				{
-					if ( ImGui::Button("Box Collider 2D") )
-					{
-						m_SelectionContext.AddComponent<BoxCollider2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<CircleCollider2DComponent>() )
-				{
-					if ( ImGui::Button("Circle Collider 2D") )
-					{
-						m_SelectionContext.AddComponent<CircleCollider2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				ImGui::EndPopup();
 			}
+			if ( !m_SelectionContext.HasComponent<MeshComponent>() )
+			{
+				if ( ImGui::Button("Mesh") )
+				{
+					const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+					m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<ScriptComponent>() )
+			{
+				if ( ImGui::Button("Script") )
+				{
+					m_SelectionContext.AddComponent<ScriptComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<SpriteRendererComponent>() )
+			{
+				if ( ImGui::Button("Sprite Renderer") )
+				{
+					m_SelectionContext.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<RigidBody2DComponent>() )
+			{
+				if ( ImGui::Button("Rigidbody 2D") )
+				{
+					m_SelectionContext.AddComponent<RigidBody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<BoxCollider2DComponent>() )
+			{
+				if ( ImGui::Button("Box Collider 2D") )
+				{
+					m_SelectionContext.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<CircleCollider2DComponent>() )
+			{
+				if ( ImGui::Button("Circle Collider 2D") )
+				{
+					m_SelectionContext.AddComponent<CircleCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			ImGui::EndPopup();
 		}
 	}
-
 	ImGui::End();
 }
 
@@ -666,6 +667,7 @@ void EntityPanel::DrawComponents(Entity entity)
 		auto &tc = entity.GetComponent<TransformComponent>();
 		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform") )
 		{
+			auto matrixCopy = tc.Transform;
 			auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(tc);
 			Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
@@ -685,15 +687,25 @@ void EntityPanel::DrawComponents(Entity entity)
 				if ( scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f )
 					updateTransform = true;
 			}
-			Gui::EndPropertyGrid();
 
-			if ( updateTransform )
+			bool resetTransform = false;
+			Gui::Property("Reset", [&matrixCopy, &resetTransform]
+						  {
+							  matrixCopy = Matrix4f(1);
+							  resetTransform = true;
+						  }, true);
+
+			Gui::EndPropertyGrid();
+			if ( resetTransform )
+			{
+				tc.Transform = matrixCopy;
+			}
+			else if ( updateTransform )
 			{
 				tc.Transform = glm::translate(translation) *
 					glm::toMat4(glm::quat(glm::radians(rotation))) *
 					glm::scale(scale);
 			}
-
 			ImGui::TreePop();
 		}
 		ImGui::Separator();
@@ -722,6 +734,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									 }
 
 									 const auto &transform = mc.Mesh->GetLocalTransform();
+									 auto matrixCopy = transform;
 									 auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(transform);
 									 Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
@@ -740,9 +753,19 @@ void EntityPanel::DrawComponents(Entity entity)
 											 updateTransform = true;
 									 }
 
-									 Gui::EndPropertyGrid();
+									 bool resetTransform = false;
+									 Gui::Property("Reset", [&matrixCopy, &resetTransform]
+												   {
+													   matrixCopy = Matrix4f(1);
+													   resetTransform = true;
+												   }, true);
 
-									 if ( updateTransform )
+									 Gui::EndPropertyGrid();
+									 if ( resetTransform )
+									 {
+										 mc.Mesh->SetLocalTransform(matrixCopy);
+									 }
+									 else if ( updateTransform )
 									 {
 										 const Matrix4f newTransform = glm::translate(translation) *
 											 glm::toMat4(glm::quat(glm::radians(rotation))) *

@@ -34,7 +34,10 @@ ModelSpaceScene::ModelSpaceScene(Entity entity)
 
 	if ( entity.HasComponent<MeshComponent>() )
 	{
-		m_Entity.AddComponent<MeshComponent>().Mesh = Shared<Mesh>::Create(entity.GetComponent<MeshComponent>().Mesh->GetFilepath());
+		auto &otherMesh = entity.GetComponent<MeshComponent>().Mesh;
+		m_Entity.AddComponent<MeshComponent>().Mesh = Shared<Mesh>::Create(otherMesh->GetFilepath());
+		auto &mesh = m_Entity.GetComponent<MeshComponent>().Mesh;
+		mesh->SetLocalTransform(otherMesh->GetLocalTransform());
 	}
 	CopyComponent<ScriptComponent>(m_Entity, entity);
 	CopyComponent<CameraComponent>(m_Entity, entity);

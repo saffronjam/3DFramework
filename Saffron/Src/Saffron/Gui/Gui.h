@@ -29,6 +29,7 @@ public:
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();
 
+	static void Property(const String &name, const Function<void()> &onClick, bool secondColumn = false);
 	static void Property(const String &name, const String &value);
 	static bool Property(const String &name, String &value);
 	static bool Property(const String &name, bool &value);

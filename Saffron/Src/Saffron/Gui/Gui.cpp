@@ -76,37 +76,24 @@ void Gui::EndPropertyGrid()
 	PopID();
 }
 
-void Gui::SetStyle(Style style)
+void Gui::Property(const String &name, const Function<void()> &onClick, bool secondColumn)
 {
-	ImGuiStyle &imguiStyle = ImGui::GetStyle();
-
-	if ( m_CurrentStyle != style )
+	if ( secondColumn )
 	{
-		for ( int i = 0; i <= ImGuiCol_COUNT; i++ )
-		{
-			ImVec4 &col = imguiStyle.Colors[i];
-			float H, S, V;
-			ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
-
-			if ( S < 0.1f )
-			{
-				V = 1.0f - V;
-			}
-			ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
-		}
-		m_CurrentStyle = style;
+		ImGui::NextColumn();
 	}
-}
 
-void Gui::PushID()
-{
-	ImGui::PushID(s_UIContextID++);
-}
+	const String id = name + "##" + name;
+	if ( ImGui::Button(id.c_str(), { ImGui::GetContentRegionAvailWidth(), 0 }) )
+	{
+		onClick();
+	}
 
-void Gui::PopID()
-{
-	ImGui::PopID();
-	s_UIContextID--;
+	if ( !secondColumn )
+	{
+		ImGui::NextColumn();
+	}
+	ImGui::NextColumn();
 }
 
 void Gui::Property(const String &name, const String &value)
@@ -338,6 +325,39 @@ void Gui::InfoModal(const char *title, const char *text, bool open)
 		}
 		ImGui::EndPopup();
 	}
+}
+
+void Gui::SetStyle(Style style)
+{
+	ImGuiStyle &imguiStyle = ImGui::GetStyle();
+
+	if ( m_CurrentStyle != style )
+	{
+		for ( int i = 0; i <= ImGuiCol_COUNT; i++ )
+		{
+			ImVec4 &col = imguiStyle.Colors[i];
+			float H, S, V;
+			ImGui::ColorConvertRGBtoHSV(col.x, col.y, col.z, H, S, V);
+
+			if ( S < 0.1f )
+			{
+				V = 1.0f - V;
+			}
+			ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
+		}
+		m_CurrentStyle = style;
+	}
+}
+
+void Gui::PushID()
+{
+	ImGui::PushID(s_UIContextID++);
+}
+
+void Gui::PopID()
+{
+	ImGui::PopID();
+	s_UIContextID--;
 }
 }
 

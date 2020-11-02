@@ -29,6 +29,7 @@ public:
 
 private:
 	void OnGuiRenderSceneHierarchy(const Shared<ScriptPanel> &scriptPanel);
+	void OnGuiRenderProperties();
 	void OnGuiRenderMaterial();
 	void OnGuiRenderMeshDebug();
 
