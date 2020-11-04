@@ -75,14 +75,12 @@ void Application::Run()
 														 ScriptEngine::DetachThread();
 													 });
 
-	Mutex &executionMutex = BatchLoader::GetPreloader()->GetExecutionMutex();
-
 	Thread preloaderWorker([&] {
 		ScriptEngine::AttachThread();
 		BatchLoader::GetPreloader()->Execute();
 						   });
 	SplashScreen splashScreen;
-	while ( m_ViewingSplashScreen )
+	while ( m_ViewingSplashScreen ? m_ViewingSplashScreen : !splashScreen.IsIdle() )
 	{
 		m_GuiLayer->Begin();
 		splashScreen.OnGuiRender();
@@ -91,10 +89,9 @@ void Application::Run()
 		m_GuiLayer->End();
 		Renderer::WaitAndRender();
 		GlobalTimer::Mark();
-		if ( splashScreen.IsIdle() )
-		{
-			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		}
+		const auto duration = m_ViewingSplashScreen ? std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms())) : 0ll;
+		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+		GlobalTimer::Sync();
 	}
 	preloaderWorker.join();
 	BatchLoader::InvalidatePreloader();

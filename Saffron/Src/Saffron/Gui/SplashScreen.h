@@ -9,18 +9,19 @@ namespace Se
 class SplashScreen
 {
 public:
-	explicit SplashScreen();
+	SplashScreen();
 
 	void OnGuiRender();
 
 	void Show();
 	void Hide();
-	bool IsIdle();
+	bool IsIdle() const;
 
 private:
 	const Unique<BatchLoader> &m_BatchLoader;
 	Shared<Texture2D> m_Texture;
 	bool m_Hidden = false;
+	String m_FinalizingStatus;
 
 	float m_GoalProgressView = 0.0f;
 	float m_CurrentProgressView = 0.0f;

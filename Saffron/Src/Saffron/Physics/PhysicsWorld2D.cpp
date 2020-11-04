@@ -153,9 +153,9 @@ void PhysicsWorld2D::OnUpdate()
 			const auto decomposition = Misc::GetTransformDecomposition(transform);
 			const Vector3f rotation = glm::eulerAngles(decomposition.Rotation);
 
-			transform = glm::translate(Matrix4f(1.0f), { position.x, position.y, transform[3].z }) *
-				glm::toMat4(glm::quat({ rotation.x, rotation.y, body->GetAngle() })) *
-				glm::scale(Matrix4f(1.0f), decomposition.Scale);
+			transform = glm::translate(Vector3f{ position.x, position.y, transform[3].z }) *
+				glm::toMat4(Quaternion({ rotation.x, rotation.y, body->GetAngle() })) *
+				glm::scale(decomposition.Scale);
 		}
 	}
 }

@@ -17,6 +17,7 @@ public:
 	Time Mark();
 	Time Peek() const;
 	Time PeekTotal() const;
+	void Sync();
 
 	const char *GetName();
 	TimePoint GetStart() const;

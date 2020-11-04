@@ -28,6 +28,11 @@ Time GlobalTimer::GetStep()
 	return m_Ts;
 }
 
+void GlobalTimer::Sync()
+{
+	s_Timer.Sync();
+}
+
 Timer::TimePoint GlobalTimer::GetStart()
 {
 	return s_Timer.GetStart();

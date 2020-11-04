@@ -63,6 +63,7 @@ using OutputStringStream = std::ostringstream;
 using InputStringStream = std::istringstream;
 using Thread = std::thread;
 using Mutex = std::mutex;
+using ConditionVariable = std::condition_variable;
 
 template<class MoveClass>
 constexpr auto &&Move(MoveClass &&moveClass)  noexcept

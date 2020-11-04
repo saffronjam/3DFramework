@@ -75,11 +75,11 @@ void RuntimeScene::OnUpdate()
 	const auto ts = GlobalTimer::GetStep();
 
 	auto view = m_EntityRegistry.view<ScriptComponent>();
-	for ( auto entity : view )
+	for ( auto entityHandle : view )
 	{
-		const UUID entityID = m_EntityRegistry.get<IDComponent>(entity).ID;
-		Entity e = { entity, this };
-		if ( ScriptEngine::ModuleExists(e.GetComponent<ScriptComponent>().ModuleName) )
+		const UUID entityID = m_EntityRegistry.get<IDComponent>(entityHandle).ID;
+		Entity entity = { entityHandle, this };
+		if ( ScriptEngine::ModuleExists(entity.GetComponent<ScriptComponent>().ModuleName) )
 			ScriptEngine::OnUpdateEntity(m_SceneID, entityID, ts);
 	}
 

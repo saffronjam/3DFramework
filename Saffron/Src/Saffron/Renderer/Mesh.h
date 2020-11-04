@@ -196,5 +196,6 @@ private:
 
 	friend class Renderer;
 	friend class EntityPanel;
+	friend class ScenePanel;
 };
 }

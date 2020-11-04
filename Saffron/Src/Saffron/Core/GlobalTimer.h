@@ -14,6 +14,7 @@ public:
 	static Time Peek();
 	static Time PeekTotal();
 	static Time GetStep();
+	static void Sync();
 
 	static TimePoint GetStart();
 	static TimePoint GetInitialStart();

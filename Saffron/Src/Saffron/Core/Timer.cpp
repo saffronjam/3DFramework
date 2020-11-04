@@ -32,6 +32,11 @@ Time Timer::PeekTotal() const
 	return Time(duration<float>(steady_clock::now() - m_InitialTimePoint).count());
 }
 
+void Timer::Sync()
+{
+	m_LastTimePoint = steady_clock::now();
+}
+
 const char *Timer::GetName()
 {
 	return m_Name;

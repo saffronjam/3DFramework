@@ -8,7 +8,8 @@ namespace Se
 {
 SplashScreen::SplashScreen()
 	: m_BatchLoader(BatchLoader::GetPreloader()),
-	m_Texture(Texture2D::Create(Filepath("Assets/Editor/Saffron.png"))) //TODO: Add proper texture
+	m_Texture(Texture2D::Create(Filepath("Assets/Editor/Saffron.png"))), //TODO: Add proper texture
+	m_FinalizingStatus("Finalizing")
 {
 }
 
@@ -54,7 +55,7 @@ void SplashScreen::OnGuiRender()
 	const ImVec2 loadingBarPosition = ImGui::GetCursorScreenPos();
 	ImGui::GetWindowDrawList()->AddRectFilled({ loadingBarPosition.x, loadingBarPosition.y }, { loadingBarPosition.x + loadingBarWidth, loadingBarPosition.y + loadingBarHeight }, IM_COL32(97, 51, 113, 255), 6.0f);
 
-	const String *status = m_BatchLoader->GetStatus();
+	const String *status = m_GoalProgressView < 100.0f ? m_BatchLoader->GetStatus() : &m_FinalizingStatus;
 	if ( status && !status->empty() )
 	{
 		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
@@ -75,8 +76,8 @@ void SplashScreen::Hide()
 	m_Hidden = true;
 }
 
-bool SplashScreen::IsIdle()
+bool SplashScreen::IsIdle() const
 {
-	return m_CurrentProgressView == m_GoalProgressView;
+	return  static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
 }
 }

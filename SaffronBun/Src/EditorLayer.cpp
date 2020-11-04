@@ -54,6 +54,7 @@ void EditorLayer::OnAttach()
 											m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
 											m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
 											m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
+											m_ScenePanel = Shared<ScenePanel>::Create(m_EditorScene);
 										}, "Initializing Editor Panels");
 
 	BatchLoader::GetPreloader()->Submit([this] {LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc"); }, "Loading Default Scene");
@@ -103,22 +104,22 @@ void EditorLayer::OnAttach()
 																							  }
 																						  }
 																					  });
-											m_EntityPanel->SetOnEntityOptionCallback([this](EntityPanel::Event option, Entity entity)
-																					 {
-																						 switch ( option )
-																						 {
-																						 case EntityPanel::Event::Delete:
-																							 OnEntityDeleted(entity);
-																							 break;
-																						 case EntityPanel::Event::NewSelection:
-																							 OnUnselected(m_SelectedEntity);
-																							 OnSelected(entity);
-																							 break;
-																						 case EntityPanel::Event::ViewInModelSpace:
-																							 OnNewModelSpaceView(entity);
-																							 break;
-																						 }
-																					 });
+											m_ScenePanel->SetOptionCallback([this](ScenePanel::CallbackAction option, Entity entity)
+																			{
+																				switch ( option )
+																				{
+																				case ScenePanel::CallbackAction::Delete:
+																					OnEntityDeleted(entity);
+																					break;
+																				case ScenePanel::CallbackAction::NewSelection:
+																					OnUnselected(m_SelectedEntity);
+																					OnSelected(entity);
+																					break;
+																				case ScenePanel::CallbackAction::ViewInModelSpace:
+																					OnNewModelSpaceView(entity);
+																					break;
+																				}
+																			});
 
 										}, "Setting Up System Callbacks");
 }
@@ -237,8 +238,9 @@ void EditorLayer::OnGuiRender()
 	Shader::OnGuiRender();
 	m_EditorTerminal.OnGuiRender();
 	m_AssetPanel->OnGuiRender();
-	m_EntityPanel->OnGuiRender(m_ScriptPanel);
+	m_EntityPanel->OnGuiRender();
 	m_ScriptPanel->OnGuiRender();
+	m_ScenePanel->OnGuiRender(m_ScriptPanel);
 	GetActiveScene()->OnGuiRender();
 	m_MainViewportPane->OnGuiRender();
 	m_MiniViewportPane->OnGuiRender();
@@ -447,7 +449,9 @@ void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 {
 	ScriptEngine::SetSceneContext(scene);
 	m_EntityPanel->SetContext(scene);
-	m_EntityPanel->SetSelected(selection ? selection : scene->GetSelectedEntity());
+	m_EntityPanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
+	m_ScenePanel->SetContext(scene);
+	m_ScenePanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
 	m_SelectedEntity = selection ? selection : scene->GetSelectedEntity();
 	m_CachedActiveScene = scene;
 	m_LastFocusedScene = scene;
@@ -820,7 +824,8 @@ void EditorLayer::OnSelected(Entity entity)
 	if ( activeScene == m_EditorScene || activeScene == m_RuntimeScene )
 	{
 		m_SelectedEntity = entity;
-		m_EntityPanel->SetSelected(entity);
+		m_EntityPanel->SetSelectedEntity(entity);
+		m_ScenePanel->SetSelectedEntity(entity);
 		activeScene->SetSelectedEntity(entity);
 	}
 }
@@ -831,7 +836,8 @@ void EditorLayer::OnUnselected(Entity entity)
 	if ( activeScene == m_EditorScene || activeScene == m_RuntimeScene )
 	{
 		m_SelectedEntity = {};
-		m_EntityPanel->SetSelected({});
+		m_EntityPanel->SetSelectedEntity({});
+		m_ScenePanel->SetSelectedEntity({});
 		activeScene->SetSelectedEntity({});
 	}
 }

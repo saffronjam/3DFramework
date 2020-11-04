@@ -5,9 +5,9 @@
 #include <string>
 
 #include "Saffron/Base.h"
-#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Editor/EditorTerminal.h"
 #include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/ScenePanel.h"
 #include "Saffron/Gui/GuiLayer.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Scene/ModelSpaceScene.h"
@@ -128,6 +128,7 @@ private:
 	Shared<AssetPanel> m_AssetPanel;
 	Shared<EntityPanel> m_EntityPanel;
 	Shared<ScriptPanel> m_ScriptPanel;
+	Shared<ScenePanel> m_ScenePanel;
 
 	SceneState m_SceneState = SceneState::Edit;
 
