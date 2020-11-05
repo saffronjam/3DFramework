@@ -5,6 +5,7 @@
 #include "Saffron/Core/BatchLoader.h"
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Core/Run.h"
 #include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Gui/Gui.h"
@@ -92,6 +93,7 @@ void Application::Run()
 		const auto duration = m_ViewingSplashScreen ? std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms())) : 0ll;
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 		GlobalTimer::Sync();
+		Run::Execute();
 	}
 	preloaderWorker.join();
 	BatchLoader::InvalidatePreloader();
@@ -114,6 +116,7 @@ void Application::Run()
 
 			Renderer::WaitAndRender();
 		}
+		Run::Execute();
 		GlobalTimer::Mark();
 	};
 

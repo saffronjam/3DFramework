@@ -45,6 +45,7 @@ public:
 private:
 	Filepath m_AssetFolderPath;
 	ArrayList<AssetStat> m_AssetStats;
+	Mutex m_FilepathMutex;
 };
 }
 

@@ -44,5 +44,6 @@ public:
 private:
 	Filepath m_ScriptFolderPath;
 	ArrayList<ScriptStat> m_ScriptStats;
+	Mutex m_FilepathMutex;
 };
 }

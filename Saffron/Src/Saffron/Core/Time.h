@@ -7,6 +7,7 @@ class Time
 public:
 	Time(float seconds = 0.0f);
 
+	Time &operator=(const Time &rhs);
 	Time operator+(const Time &rhs) const;
 	Time &operator+=(const Time &rhs);
 	Time &operator+=(float seconds);
@@ -15,6 +16,12 @@ public:
 	Time operator/(float multiplier) const;
 	Time &operator/=(float multiplier);
 	float operator()() const;
+
+	bool operator==(const Time &time) const;
+	bool operator>(const Time &time) const;
+	bool operator<(const Time &time) const;
+	bool operator>=(const Time &time) const;
+	bool operator<=(const Time &time) const;
 
 	float sec() const;
 	float ms() const;
