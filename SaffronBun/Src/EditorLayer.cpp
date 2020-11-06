@@ -3,8 +3,9 @@
 #include <filesystem>
 
 #include "Saffron/Core/BatchLoader.h"
-#include "Saffron/Core/Misc.h"
 #include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Core/Misc.h"
+#include "Saffron/Core/Run.h"
 #include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
@@ -58,6 +59,15 @@ void EditorLayer::OnAttach()
 										}, "Initializing Editor Panels");
 
 	BatchLoader::GetPreloader()->Submit([this] {LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc"); }, "Loading Default Scene");
+
+	BatchLoader::GetPreloader()->Submit([this]
+										{
+											Run::Periodically([this]
+															  {
+																  m_AssetPanel->SyncAssetPaths();
+																  m_ScriptPanel->SyncScriptPaths();
+															  }, Time(1.0f));
+										}, "Setting Up Periodic Callbacks ");
 
 	BatchLoader::GetPreloader()->Submit([this]
 										{

@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Editor/AssetPanel.h"
 #include "Saffron/Gui/Gui.h"
 
@@ -8,11 +9,11 @@ namespace Se
 AssetPanel::AssetPanel(Filepath path)
 	: m_AssetFolderPath(Move(path))
 {
-	SyncAssetPaths();
 }
 
 void AssetPanel::OnGuiRender()
 {
+	ScopedLock scopedLock(m_FilepathMutex);
 	ImGui::Begin("Assets");
 
 	const int noCollums = std::max(1, static_cast<int>(ImGui::GetContentRegionAvailWidth() / 100.0f));
@@ -41,16 +42,14 @@ void AssetPanel::OnGuiRender()
 
 void AssetPanel::SyncAssetPaths()
 {
+	ScopedLock scopedLock(m_FilepathMutex);
 	const size_t noAssets = FileIOManager::GetFileCount(m_AssetFolderPath, ".fbx");
 
-	if ( noAssets > m_AssetStats.size() )
-	{
-		m_AssetStats.clear();
-		auto rawPaths = FileIOManager::GetFiles(m_AssetFolderPath, ".fbx");
-		std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry &entry) mutable
-					  {
-						  m_AssetStats.emplace_back(entry.path().stem().string(), entry.path().extension().string(), entry.path());
-					  });
-	}
+	m_AssetStats.clear();
+	auto rawPaths = FileIOManager::GetFiles(m_AssetFolderPath, ".fbx");
+	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry &entry) mutable
+				  {
+					  m_AssetStats.emplace_back(entry.path().stem().string(), entry.path().extension().string(), entry.path());
+				  });
 }
 }
