@@ -80,7 +80,7 @@ void Application::Run()
 		BatchLoader::GetPreloader()->Execute();
 						   });
 	SplashScreen splashScreen;
-	while ( m_ViewingSplashScreen ? m_ViewingSplashScreen : !splashScreen.IsIdle() )
+	while ( m_ViewingSplashScreen ? m_ViewingSplashScreen : !splashScreen.IsFinished() )
 	{
 		m_GuiLayer->Begin();
 		splashScreen.OnGuiRender();

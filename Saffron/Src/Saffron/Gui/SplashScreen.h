@@ -16,6 +16,7 @@ public:
 	void Show();
 	void Hide();
 	bool IsIdle() const;
+	bool IsFinished() const;
 
 private:
 	const Unique<BatchLoader> &m_BatchLoader;

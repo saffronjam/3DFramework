@@ -80,4 +80,9 @@ bool SplashScreen::IsIdle() const
 {
 	return  static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
 }
+
+bool SplashScreen::IsFinished() const
+{
+	return m_CurrentProgressView >= 100.0f;
+}
 }
