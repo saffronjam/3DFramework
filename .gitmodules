@@ -49,4 +49,5 @@
 	ignore = dirty
 [submodule "Saffron/Vendors/reactphysics3d"]
 	path = Saffron/Vendors/reactphysics3d
-	url = https://github.com/saffronjam/reactphysics3d
+	url = https://github.com/saffronjam/reactphysics3d.git
+	ignore = dirty

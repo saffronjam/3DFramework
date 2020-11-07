@@ -2,7 +2,6 @@
 
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Physics/PhysicsWorld2D.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/SceneCamera.h"
 
@@ -11,11 +10,6 @@ namespace Se
 struct IDComponent
 {
 	UUID ID = 0;
-};
-
-struct SceneComponent
-{
-	UUID SceneID;
 };
 
 struct TagComponent
@@ -128,8 +122,7 @@ struct SpriteRendererComponent
 
 struct RigidBody2DComponent
 {
-	enum class Type { Static, Dynamic, Kinematic };
-	Type BodyType;
+	enum class Type { Static, Dynamic, Kinematic } BodyType;
 	bool FixedRotation = false;
 
 	// Storage for runtime
@@ -166,34 +159,44 @@ struct CircleCollider2DComponent : Collider2DComponent
 	CircleCollider2DComponent(const CircleCollider2DComponent &other) = default;
 };
 
-////////////////////////////////////////////////////////
-/// Components for Scenes
-////////////////////////////////////////////////////////
-
-struct PhysicsWorld2DComponent
+struct RigidBody3DComponent
 {
-	PhysicsWorld2D World;
+	enum class Type { Static, Dynamic, Kinematic } BodyType;
 
-	PhysicsWorld2DComponent(Scene &scene)
-		: World(scene)
-	{
-	}
+	// Storage for runtime
+	void *RuntimeBody = nullptr;
+
+	RigidBody3DComponent() = default;
+	RigidBody3DComponent(const RigidBody3DComponent &other) = default;
 };
 
-struct EditorCameraComponent
+
+struct Collider3DComponent
 {
-	Shared<EditorCamera> Camera;
+	Vector3f Offset = { 0.0f,0.0f, 0.0f };
 
-	EditorCameraComponent()
-		: Camera(Shared<EditorCamera>::Create())
-	{
-	}
-	EditorCameraComponent(Matrix4f projectionMatrix)
-		: Camera(Shared<EditorCamera>::Create(projectionMatrix))
-	{
-	}
-	EditorCameraComponent(const EditorCameraComponent &other) = default;
+	float Density = 1.0f;
+	float Friction = 1.0f;
 
-	operator Shared<EditorCamera>() const { return Camera; }
+	// Storage for runtime
+	void *RuntimeFixture = nullptr;
 };
+
+
+struct BoxCollider3DComponent : Collider3DComponent
+{
+	Vector3f Size = { 1.0f, 1.0f, 1.0f };
+
+	BoxCollider3DComponent() = default;
+	BoxCollider3DComponent(const BoxCollider3DComponent &other) = default;
+};
+
+struct SphereCollider3DComponent : Collider3DComponent
+{
+	float Radius = 0.5f;
+
+	SphereCollider3DComponent() = default;
+	SphereCollider3DComponent(const SphereCollider3DComponent &other) = default;
+};
+
 }

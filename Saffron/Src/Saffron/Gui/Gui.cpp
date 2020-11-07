@@ -193,7 +193,7 @@ bool Gui::Property(const String &name, int &value, int min, int max, float step,
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderInt(id.c_str(), &value, min, max);
 	else
-		changed = ImGui::DragInt(id.c_str(), &value, 1.0f, min, max);
+		changed = ImGui::DragInt(id.c_str(), &value, step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
@@ -211,7 +211,7 @@ bool Gui::Property(const String &name, float &value, float min, float max, float
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderFloat(id.c_str(), &value, min, max);
 	else
-		changed = ImGui::DragFloat(id.c_str(), &value, 1.0f, min, max);
+		changed = ImGui::DragFloat(id.c_str(), &value, step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
@@ -235,7 +235,7 @@ bool Gui::Property(const String &name, Vector2f &value, float min, float max, fl
 	if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderFloat2(id.c_str(), glm::value_ptr(value), min, max);
 	else
-		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+		changed = ImGui::DragFloat2(id.c_str(), glm::value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
@@ -286,7 +286,7 @@ bool Gui::Property(const String &name, Vector4f &value, float min, float max, fl
 	else if ( flags == PropertyFlag::Slider )
 		changed = ImGui::SliderFloat4(id.c_str(), glm::value_ptr(value), min, max);
 	else
-		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), 1.0f, min, max);
+		changed = ImGui::DragFloat4(id.c_str(), glm::value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();

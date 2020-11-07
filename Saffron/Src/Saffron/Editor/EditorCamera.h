@@ -22,6 +22,7 @@ public:
 	explicit EditorCamera(Matrix4f projectionMatrix);
 
 	void OnUpdate();
+	void OnGuiRender();
 	bool OnEvent(const Event &event);
 
 	void Reset();

@@ -1,13 +1,12 @@
 #pragma once
 
-#include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Base.h"
 
 class b2World;
 
 namespace Se
 {
 class Scene;
-
 class PhysicsWorld2D
 {
 public:

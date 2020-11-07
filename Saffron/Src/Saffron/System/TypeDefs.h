@@ -12,6 +12,7 @@
 #include <thread>
 #include <mutex>
 #include <atomic>
+#include <optional>
 
 namespace Se
 {
@@ -51,6 +52,8 @@ template<typename ClassType>
 using Atomic = std::atomic<ClassType>;
 template<typename FirstClass, typename SecondClass>
 using Pair = std::pair<FirstClass, SecondClass>;
+template<typename T>
+using Optional = std::optional<T>;
 
 using String = std::string;
 using WideString = std::wstring;

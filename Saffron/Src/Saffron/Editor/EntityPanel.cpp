@@ -166,6 +166,30 @@ void EntityPanel::OnGuiRenderProperties()
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			if ( !m_SelectionContext.HasComponent<RigidBody3DComponent>() )
+			{
+				if ( ImGui::Button("Rigidbody 3D") )
+				{
+					m_SelectionContext.AddComponent<RigidBody3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<BoxCollider3DComponent>() )
+			{
+				if ( ImGui::Button("Box Collider 3D") )
+				{
+					m_SelectionContext.AddComponent<BoxCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<SphereCollider3DComponent>() )
+			{
+				if ( ImGui::Button("Sphere Collider 3D") )
+				{
+					m_SelectionContext.AddComponent<SphereCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			ImGui::EndPopup();
 		}
 	}
@@ -762,24 +786,61 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](BoxCollider2DComponent &bc2dc)
 										  {
 											  Gui::BeginPropertyGrid();
-
 											  Gui::Property("Offset", bc2dc.Offset);
 											  Gui::Property("Size", bc2dc.Size);
 											  Gui::Property("Density", bc2dc.Density);
 											  Gui::Property("Friction", bc2dc.Friction);
-
 											  Gui::EndPropertyGrid();
 										  });
 
 	DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](CircleCollider2DComponent &cc2dc)
 											 {
 												 Gui::BeginPropertyGrid();
-
 												 Gui::Property("Offset", cc2dc.Offset);
 												 Gui::Property("Radius", cc2dc.Radius);
 												 Gui::Property("Density", cc2dc.Density);
 												 Gui::Property("Friction", cc2dc.Friction);
+												 Gui::EndPropertyGrid();
+											 });
+	DrawComponent<RigidBody3DComponent>("Rigidbody 3D", entity, [](RigidBody3DComponent &rb3dc)
+										{
+											// Rigidbody2D Type
+											const char *rb3dTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+											const char *currentType = rb3dTypeStrings[static_cast<int>(rb3dc.BodyType)];
+											if ( ImGui::BeginCombo("Type", currentType) )
+											{
+												for ( int type = 0; type < 3; type++ )
+												{
+													const bool is_selected = (currentType == rb3dTypeStrings[type]);
+													if ( ImGui::Selectable(rb3dTypeStrings[type], is_selected) )
+													{
+														currentType = rb3dTypeStrings[type];
+														rb3dc.BodyType = static_cast<RigidBody3DComponent::Type>(type);
+													}
+													if ( is_selected )
+														ImGui::SetItemDefaultFocus();
+												}
+												ImGui::EndCombo();
+											}
+										});
 
+	DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](BoxCollider3DComponent &bc2dc)
+										  {
+											  Gui::BeginPropertyGrid();
+											  Gui::Property("Offset", bc2dc.Offset);
+											  Gui::Property("Size", bc2dc.Size);
+											  Gui::Property("Density", bc2dc.Density);
+											  Gui::Property("Friction", bc2dc.Friction);
+											  Gui::EndPropertyGrid();
+										  });
+
+	DrawComponent<SphereCollider3DComponent>("Circle Collider 3D", entity, [](SphereCollider3DComponent &cc2dc)
+											 {
+												 Gui::BeginPropertyGrid();
+												 Gui::Property("Offset", cc2dc.Offset);
+												 Gui::Property("Radius", cc2dc.Radius);
+												 Gui::Property("Density", cc2dc.Density);
+												 Gui::Property("Friction", cc2dc.Friction);
 												 Gui::EndPropertyGrid();
 											 });
 }

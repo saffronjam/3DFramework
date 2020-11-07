@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
 #include <box2d/box2d.h>
+#include <reactphysics3d/reactphysics3d.h>
 #include <mono/jit/jit.h>
 
 #include "Saffron/Entity/Entity.h"
@@ -226,6 +227,106 @@ void Saffron_CircleCollider2DComponent_SetRadius(Uint64 entityID, float radius)
 {
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto &component = GetComponentWithCheck<CircleCollider2DComponent>(entity);
+	component.Radius = radius;
+}
+
+void Saffron_RigidBody3DComponent_ApplyLinearImpulse(Uint64 entityID, Vector3f *impulse, Vector3f *offset, bool wake)
+{
+	SE_CORE_ASSERT(impulse && offset);
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<RigidBody3DComponent>(entity);
+	auto *body = static_cast<reactphysics3d::RigidBody *>(component.RuntimeBody);
+	body->applyForceAtLocalPosition(*reinterpret_cast<const reactphysics3d::Vector3 *>(impulse), body->getLocalCenterOfMass() + *reinterpret_cast<const reactphysics3d::Vector3 *>(offset));
+}
+
+void Saffron_RigidBody3DComponent_GetLinearVelocity(Uint64 entityID, Vector3f *outVelocity)
+{
+	SE_CORE_ASSERT(outVelocity);
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<RigidBody3DComponent>(entity);
+	auto *body = static_cast<reactphysics3d::RigidBody *>(component.RuntimeBody);
+	const auto &velocity = body->getLinearVelocity();
+	*outVelocity = { velocity.x, velocity.y, velocity.z };
+}
+
+void Saffron_RigidBody3DComponent_SetLinearVelocity(Uint64 entityID, Vector3f *velocity)
+{
+	SE_CORE_ASSERT(velocity);
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<RigidBody3DComponent>(entity);
+	auto *body = static_cast<reactphysics3d::RigidBody *>(component.RuntimeBody);
+	body->setLinearVelocity({ velocity->x, velocity->y,velocity->z });
+}
+
+void Saffron_Collider3DComponent_GetOffset(Uint64 entityID, Vector3f *offset)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	*offset = component.Offset;
+}
+
+void Saffron_Collider3DComponent_SetOffset(Uint64 entityID, Vector3f *offset)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	*offset = component.Offset;
+}
+
+float Saffron_Collider3DComponent_GetDensity(Uint64 entityID)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	return component.Density;
+}
+
+void Saffron_Collider3DComponent_SetDensity(Uint64 entityID, float density)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	component.Density = density;
+}
+
+float Saffron_Collider3DComponent_GetFriction(Uint64 entityID)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	return component.Friction;
+}
+
+void Saffron_Collider3DComponent_SetFriction(Uint64 entityID, float friction)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<Collider3DComponent>(entity);
+	component.Friction = friction;
+}
+
+void Saffron_BoxCollider3DComponent_GetSize(Uint64 entityID, Vector3f *size)
+{
+	SE_CORE_ASSERT(size);
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<BoxCollider3DComponent>(entity);
+	*size = component.Size;
+}
+
+void Saffron_BoxCollider3DComponent_SetSize(Uint64 entityID, Vector3f *size)
+{
+	SE_CORE_ASSERT(size);
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<BoxCollider3DComponent>(entity);
+	component.Size = *size;
+}
+
+float Saffron_SphereCollider3DComponent_GetRadius(Uint64 entityID)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<SphereCollider3DComponent>(entity);
+	return component.Radius;
+}
+
+void Saffron_SphereCollider3DComponent_SetRadius(Uint64 entityID, float radius)
+{
+	const Entity entity = GetEntityFromActiveScene(entityID);
+	auto &component = GetComponentWithCheck<SphereCollider3DComponent>(entity);
 	component.Radius = radius;
 }
 

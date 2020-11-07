@@ -109,6 +109,8 @@ struct EntityScriptClass
 	// Physics
 	MonoMethod *OnCollision2DBeginMethod = nullptr;
 	MonoMethod *OnCollision2DEndMethod = nullptr;
+	MonoMethod *OnCollision3DBeginMethod = nullptr;
+	MonoMethod *OnCollision3DEndMethod = nullptr;
 
 	void SyncClassMethods(MonoImage *image)
 	{
@@ -118,6 +120,8 @@ struct EntityScriptClass
 		// Physics (Entity class)
 		OnCollision2DBeginMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DBegin(single)");
 		OnCollision2DEndMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DEnd(single)");
+		OnCollision3DBeginMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision3DBegin(single)");
+		OnCollision3DEndMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision3DEnd(single)");
 	}
 
 	void SetScript(String moduleName)
@@ -596,7 +600,9 @@ void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
 {
 	EntityInstance &entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
 	if ( entityInstance.ScriptClass->OnCreateMethod )
+	{
 		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCreateMethod);
+	}
 }
 
 void ScriptEngine::OnUpdateEntity(UUID sceneID, UUID entityID, Time ts)
@@ -638,6 +644,38 @@ void ScriptEngine::OnCollision2DEnd(UUID sceneID, UUID entityID)
 		float value = 5.0f;
 		void *args[] = { &value };
 		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DEndMethod, args);
+	}
+}
+
+void ScriptEngine::OnCollision3DBegin(Entity entity)
+{
+	OnCollision3DBegin(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+}
+
+void ScriptEngine::OnCollision3DBegin(UUID sceneID, UUID entityID)
+{
+	EntityInstance &entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	if ( entityInstance.ScriptClass->OnCollision3DBeginMethod )
+	{
+		float value = 5.0f;
+		void *args[] = { &value };
+		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DBeginMethod, args);
+	}
+}
+
+void ScriptEngine::OnCollision3DEnd(Entity entity)
+{
+	OnCollision3DEnd(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+}
+
+void ScriptEngine::OnCollision3DEnd(UUID sceneID, UUID entityID)
+{
+	EntityInstance &entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	if ( entityInstance.ScriptClass->OnCollision3DEndMethod )
+	{
+		float value = 5.0f;
+		void *args[] = { &value };
+		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DEndMethod, args);
 	}
 }
 

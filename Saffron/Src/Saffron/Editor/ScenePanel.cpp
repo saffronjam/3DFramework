@@ -57,7 +57,9 @@ void ScenePanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 			static bool rigidBody2DComponent = false;
 			static bool boxCollider2DComponent = false;
 			static bool circleCollider2DComponent = false;
-
+			static bool rigidBody3DComponent = false;
+			static bool boxCollider3DComponent = false;
+			static bool sphereCollider3DComponent = false;
 
 			Gui::BeginPropertyGrid();
 			Gui::Property("Name", entityName);
@@ -77,6 +79,9 @@ void ScenePanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 			Gui::Property("Rigid Body 2D", rigidBody2DComponent);
 			Gui::Property("Box Collider 2D", boxCollider2DComponent);
 			Gui::Property("Circle Collider 2D", circleCollider2DComponent);
+			Gui::Property("Rigid Body 3D", rigidBody3DComponent);
+			Gui::Property("Box Collider 3D", boxCollider3DComponent);
+			Gui::Property("Circle Collider 3D", sphereCollider3DComponent);
 
 			if ( ImGui::Button("Cancel") )
 			{
@@ -93,6 +98,17 @@ void ScenePanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 				else
 				{
 					Entity newEntity = m_Context->CreateEntity(entityName);
+
+					if ( m_Context->GetEntity().HasComponent<EditorCameraComponent>() )
+					{
+						// Put new Entity in front of editor camera
+						auto &editorCamera = m_Context->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+						auto &transform = newEntity.GetComponent<TransformComponent>().Transform;
+						auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
+						auto cameraFrontPosition = editorCamera->GetPosition() + editorCamera->GetForwardDirection() * 30.0f;
+						transform = glm::translate(cameraFrontPosition) * glm::toMat4(rotation) * glm::scale(scale);
+					}
+
 					if ( meshComponent )
 					{
 						const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
@@ -128,6 +144,21 @@ void ScenePanel::OnGuiRender(const Shared<ScriptPanel> &scriptPanel)
 					{
 						newEntity.AddComponent<CircleCollider2DComponent>();
 						circleCollider2DComponent = false;
+					}
+					if ( rigidBody3DComponent )
+					{
+						newEntity.AddComponent<RigidBody3DComponent>();
+						rigidBody3DComponent = false;
+					}
+					if ( boxCollider3DComponent )
+					{
+						newEntity.AddComponent<BoxCollider3DComponent>();
+						boxCollider3DComponent = false;
+					}
+					if ( sphereCollider3DComponent )
+					{
+						newEntity.AddComponent<SphereCollider3DComponent>();
+						sphereCollider3DComponent = false;
 					}
 					entityName.clear();
 					ImGui::CloseCurrentPopup();

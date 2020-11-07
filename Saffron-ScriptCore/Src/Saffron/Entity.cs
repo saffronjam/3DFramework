@@ -10,6 +10,8 @@ namespace Se
 
         private List<Action<float>> m_Collision2DBeginCallbacks = new List<Action<float>>();
         private List<Action<float>> m_Collision2DEndCallbacks = new List<Action<float>>();
+        private List<Action<float>> m_Collision3DBeginCallbacks = new List<Action<float>>();
+        private List<Action<float>> m_Collision3DEndCallbacks = new List<Action<float>>();
 
         protected Entity() { ID = 0; }
 
@@ -72,6 +74,15 @@ namespace Se
         {
             m_Collision2DEndCallbacks.Add(callback);
         }
+        public void AddCollision3DBeginCallback(Action<float> callback)
+        {
+            m_Collision3DBeginCallbacks.Add(callback);
+        }
+
+        public void AddCollision3DEndCallback(Action<float> callback)
+        {
+            m_Collision3DEndCallbacks.Add(callback);
+        }
 
         private void OnCollision2DBegin(float data)
         {
@@ -82,6 +93,17 @@ namespace Se
         private void OnCollision2DEnd(float data)
         {
             foreach (var callback in m_Collision2DEndCallbacks)
+                callback.Invoke(data);
+        }
+        private void OnCollision3DBegin(float data)
+        {
+            foreach (var callback in m_Collision3DBeginCallbacks)
+                callback.Invoke(data);
+        }
+
+        private void OnCollision3DEnd(float data)
+        {
+            foreach (var callback in m_Collision3DEndCallbacks)
                 callback.Invoke(data);
         }
 

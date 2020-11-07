@@ -6,6 +6,38 @@ Environment:
     Radiance: [1, 1, 1]
     Multiplier: 0.514999986
 Entities:
+  - Entity: 10809595927974057323
+    TagComponent:
+      Tag: 3D Entity 2
+    TransformComponent:
+      Position: [-24.9674606, 7.82850313, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Assets\Meshes\Sphere1m.fbx
+    RigidBody3DComponent:
+      BodyType: 0
+    SphereCollider3DComponent:
+      Offset: [0, 0, 0]
+      Radius: 1
+      Density: 1
+      Friction: 1
+  - Entity: 16307195546614413995
+    TagComponent:
+      Tag: Ground
+    TransformComponent:
+      Position: [-25.2891407, -0.002841115, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [10, 1, 10]
+    MeshComponent:
+      AssetPath: Assets/meshes/Cube1m.fbx
+    RigidBody3DComponent:
+      BodyType: 0
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [10, 1, 10]
+      Density: 1
+      Friction: 1
   - Entity: 2842299641876190180
     TagComponent:
       Tag: Box
@@ -63,7 +95,7 @@ Entities:
     TransformComponent:
       Position: [-29.6808929, 29.7597198, 0]
       Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [58.4133949, 4.47942829, 4.48000002]
+      Scale: [58.413372, 4.47942543, 4.48000002]
     MeshComponent:
       AssetPath: assets\meshes\Cube1m.fbx
     RigidBody2DComponent:
@@ -88,18 +120,17 @@ Entities:
           Type: 1
           Data: 0.5
         - Name: MaxSpeed
-          Type: 5
-          Data: [7, 10]
+          Type: 6
+          Data: [7, 10, -0.00181062799]
         - Name: JumpForce
           Type: 1
           Data: 3
     MeshComponent:
       AssetPath: assets\meshes\Sphere1m.fbx
-    RigidBody2DComponent:
+    RigidBody3DComponent:
       BodyType: 1
-      FixedRotation: false
-    CircleCollider2DComponent:
-      Offset: [0, 0]
+    SphereCollider3DComponent:
+      Offset: [0, 0, 0]
       Radius: 0.5
       Density: 1
       Friction: 1
@@ -111,7 +142,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [1200, 1, 5]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Assets\Meshes\Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -120,6 +151,13 @@ Entities:
       Size: [600, 0.5]
       Density: 1
       Friction: 2
+    RigidBody3DComponent:
+      BodyType: 0
+    SphereCollider3DComponent:
+      Offset: [0, 0, 0]
+      Radius: 1
+      Density: 1
+      Friction: 1
   - Entity: 5178862374589434728
     TagComponent:
       Tag: Camera
@@ -151,5 +189,21 @@ Entities:
     BoxCollider2DComponent:
       Offset: [0, 0]
       Size: [1.5, 0.150000006]
+      Density: 1
+      Friction: 1
+  - Entity: 633631737122447369
+    TagComponent:
+      Tag: 3D Entity
+    TransformComponent:
+      Position: [-25.5084381, 9.14689732, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      AssetPath: Assets/meshes/Cube1m.fbx
+    RigidBody3DComponent:
+      BodyType: 1
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [1, 1, 1]
       Density: 1
       Friction: 1

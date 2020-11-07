@@ -173,6 +173,43 @@ void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, Vector2f *size);
 float Saffron_CircleCollider2DComponent_GetRadius(Uint64 entityID);
 void Saffron_CircleCollider2DComponent_SetRadius(Uint64 entityID, float radius);
 
+
+///////////////////////////////////////////////////////////////
+/// RigidBody3D Component
+///////////////////////////////////////////////////////////////
+
+void Saffron_RigidBody3DComponent_ApplyLinearImpulse(Uint64 entityID, Vector3f *impulse, Vector3f *offset, bool wake);
+void Saffron_RigidBody3DComponent_GetLinearVelocity(Uint64 entityID, Vector3f *outVelocity);
+void Saffron_RigidBody3DComponent_SetLinearVelocity(Uint64 entityID, Vector3f *velocity);
+
+
+///////////////////////////////////////////////////////////////
+/// Collider3D Component
+///////////////////////////////////////////////////////////////
+
+void Saffron_Collider3DComponent_GetOffset(Uint64 entityID, Vector3f *offset);
+void Saffron_Collider3DComponent_SetOffset(Uint64 entityID, Vector3f *offset);
+float Saffron_Collider3DComponent_GetDensity(Uint64 entityID);
+void Saffron_Collider3DComponent_SetDensity(Uint64 entityID, float density);
+float Saffron_Collider3DComponent_GetFriction(Uint64 entityID);
+void Saffron_Collider3DComponent_SetFriction(Uint64 entityID, float friction);
+
+
+///////////////////////////////////////////////////////////////
+/// BoxCollider3D Component
+///////////////////////////////////////////////////////////////
+
+void Saffron_BoxCollider3DComponent_GetSize(Uint64 entityID, Vector3f *size);
+void Saffron_BoxCollider3DComponent_SetSize(Uint64 entityID, Vector3f *size);
+
+
+///////////////////////////////////////////////////////////////
+/// CircleCollider3D Component
+///////////////////////////////////////////////////////////////
+
+float Saffron_SphereCollider3DComponent_GetRadius(Uint64 entityID);
+void Saffron_SphereCollider3DComponent_SetRadius(Uint64 entityID, float radius);
+
 }
 }
 

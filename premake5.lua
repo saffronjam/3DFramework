@@ -40,6 +40,7 @@ IncludeDir["GLFW"] = "Saffron/Vendors/GLFW/include"
 IncludeDir["glm"] = "Saffron/Vendors/glm/include"
 IncludeDir["ImGui"] = "Saffron/Vendors/ImGui"
 IncludeDir["mono"] = "Saffron/Vendors/mono/include"
+IncludeDir["reactphysics3d"] = "Saffron/Vendors/reactphysics3d/include"
 IncludeDir["spdlog"] = "Saffron/Vendors/spdlog/include"
 IncludeDir["stb"] = "Saffron/Vendors/stb/include"
 IncludeDir["yamlcpp"] = "Saffron/Vendors/yaml-cpp/include"
@@ -59,6 +60,8 @@ group "Dependencies"
 	include "Saffron/Vendors/.Premake/glm"
 	include "Saffron/Vendors/.Premake/ImGui"
 	include "Saffron/Vendors/.Premake/mono"
+	include "Saffron/Vendors/.Premake/reactphysics3d"
+	include "Saffron/Vendors/.Premake/spdlog"
 	include "Saffron/Vendors/.Premake/stb"
 	include "Saffron/Vendors/.Premake/yaml-cpp"
 group ""
@@ -103,12 +106,13 @@ project "Saffron"
 		"%{IncludeDir.Box2D}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.FastNoise}",
-		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.Glad}",
-		"%{IncludeDir.mono}",
-		"%{IncludeDir.spdlog}",
-		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.GLFW}",
 		"%{IncludeDir.glm}",
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.mono}",
+		"%{IncludeDir.reactphysics3d}",
+		"%{IncludeDir.spdlog}",
 		"%{IncludeDir.stb}",
 		"%{IncludeDir.yamlcpp}"
 	}
@@ -116,11 +120,12 @@ project "Saffron"
 	links 
 	{ 
 		"Box2D",
+		"FastNoise",
 		"Glad",
         "GLFW",
-		"FastNoise",
 		"ImGui",
 		"opengl32.lib",
+		"reactphysics3d",
 		"yaml-cpp",
 		"%{LibraryDir.mono}"
 	}
@@ -278,16 +283,16 @@ group ""
 -- Sandbox Workspace
 -- --------------------------------------
 
--- workspace "Sandbox"
-	-- architecture "x64"
-	-- targetdir "build"
+workspace "Sandbox"
+	architecture "x64"
+	targetdir "build"
 	
-	-- configurations 
-	-- { 
-		-- "Debug", 
-		-- "Release",
-		-- "Dist"
-	-- }
+	configurations 
+	{ 
+		"Debug", 
+		"Release",
+		"Dist"
+	}
 
 
 -- --------------------------------------

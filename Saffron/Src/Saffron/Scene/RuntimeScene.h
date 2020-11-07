@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Scene/Scene.h"
 
 namespace Se
@@ -16,8 +15,15 @@ public:
 	void OnStart();
 	void OnStop();
 
+	void Escape();
+	void Return();
+
+	const Shared<EditorCamera> &GetDebugCamera() const { return m_DebugCamera; }
 	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
 
+private:
+	Shared<EditorCamera> m_DebugCamera;
+	bool m_DebugCameraActivated = false;
 };
 }
 

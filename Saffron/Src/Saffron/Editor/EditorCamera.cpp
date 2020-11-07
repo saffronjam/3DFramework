@@ -1,6 +1,7 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Editor/EditorCamera.h"
 
@@ -90,6 +91,15 @@ void EditorCamera::OnUpdate()
 
 		UpdateCameraView();
 	}
+}
+
+void EditorCamera::OnGuiRender()
+{
+	ImGui::Begin("Editor Camera");
+	Gui::BeginPropertyGrid();
+	Gui::Property("Exposure", GetExposure(), 0.0f, 100.0f, 0.1f, Gui::PropertyFlag::Drag);
+	Gui::EndPropertyGrid();
+	ImGui::End();
 }
 
 bool EditorCamera::OnEvent(const Event &event)

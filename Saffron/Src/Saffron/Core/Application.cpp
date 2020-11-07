@@ -118,7 +118,12 @@ void Application::Run()
 		}
 		Run::Execute();
 		GlobalTimer::Mark();
-	};
+	}
+
+	for ( auto &layer : m_LayerStack )
+	{
+		layer->OnDetach();
+	}
 
 	OnShutdown();
 }

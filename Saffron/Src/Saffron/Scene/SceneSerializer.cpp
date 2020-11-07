@@ -5,6 +5,7 @@
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/Entity.h"
+#include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Scene/SceneSerializer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -154,6 +155,13 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const glm::quat &v)
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
 
+#define BEGIN_YAML_COMPONENT_MAP(component) if(entity.HasComponent<component>()) {\
+out << YAML::Key << #component; \
+out << YAML::BeginMap
+
+#define END_YAML_COMPONENT_MAP() out << YAML::EndMap; \
+}
+
 static void SerializeEntity(YAML::Emitter &out, Entity entity)
 {
 	UUID uuid = entity.GetComponent<IDComponent>().ID;
@@ -161,160 +169,127 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 	out << YAML::Key << "Entity";
 	out << YAML::Value << uuid;
 
-	if ( entity.HasComponent<TagComponent>() )
+	BEGIN_YAML_COMPONENT_MAP(TagComponent);
+	auto &tag = entity.GetComponent<TagComponent>().Tag;
+	out << YAML::Key << "Tag" << YAML::Value << tag;
+	END_YAML_COMPONENT_MAP();
+
+	BEGIN_YAML_COMPONENT_MAP(TransformComponent);
+	auto &transform = entity.GetComponent<TransformComponent>().Transform;
+	const auto decomposition = Misc::GetTransformDecomposition(transform);
+	out << YAML::Key << "Position" << YAML::Value << decomposition.Translation;
+	out << YAML::Key << "Rotation" << YAML::Value << decomposition.Rotation;
+	out << YAML::Key << "Scale" << YAML::Value << decomposition.Scale;
+	END_YAML_COMPONENT_MAP();
+
+	BEGIN_YAML_COMPONENT_MAP(ScriptComponent);
+	auto &moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
+	out << YAML::Key << "ModuleName" << YAML::Value << moduleName;
+
+	EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(entity.GetSceneUUID(), uuid);
+	const auto &moduleFieldMap = data.ModuleFieldMap;
+	if ( moduleFieldMap.find(moduleName) != moduleFieldMap.end() )
 	{
-		out << YAML::Key << "TagComponent";
-		out << YAML::BeginMap; // TagComponent
-
-		auto &tag = entity.GetComponent<TagComponent>().Tag;
-		out << YAML::Key << "Tag" << YAML::Value << tag;
-
-		out << YAML::EndMap; // TagComponent
-	}
-
-	if ( entity.HasComponent<TransformComponent>() )
-	{
-		out << YAML::Key << "TransformComponent";
-		out << YAML::BeginMap; // TransformComponent
-
-		auto &transform = entity.GetComponent<TransformComponent>().Transform;
-		const auto decomposition = Misc::GetTransformDecomposition(transform);
-		out << YAML::Key << "Position" << YAML::Value << decomposition.Translation;
-		out << YAML::Key << "Rotation" << YAML::Value << decomposition.Rotation;
-		out << YAML::Key << "Scale" << YAML::Value << decomposition.Scale;
-
-		out << YAML::EndMap; // TransformComponent
-	}
-
-	if ( entity.HasComponent<ScriptComponent>() )
-	{
-		out << YAML::Key << "ScriptComponent";
-		out << YAML::BeginMap; // ScriptComponent
-
-		auto &moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
-		out << YAML::Key << "ModuleName" << YAML::Value << moduleName;
-
-		EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(entity.GetSceneUUID(), uuid);
-		const auto &moduleFieldMap = data.ModuleFieldMap;
-		if ( moduleFieldMap.find(moduleName) != moduleFieldMap.end() )
+		const auto &fields = moduleFieldMap.at(moduleName);
+		out << YAML::Key << "StoredFields" << YAML::Value;
+		out << YAML::BeginSeq;
+		for ( const auto &[name, field] : fields )
 		{
-			const auto &fields = moduleFieldMap.at(moduleName);
-			out << YAML::Key << "StoredFields" << YAML::Value;
-			out << YAML::BeginSeq;
-			for ( const auto &[name, field] : fields )
+			out << YAML::BeginMap; // Field
+			out << YAML::Key << "Name" << YAML::Value << name;
+			out << YAML::Key << "Type" << YAML::Value << static_cast<uint32_t>(field.Type);
+			out << YAML::Key << "Data" << YAML::Value;
+
+			switch ( field.Type )
 			{
-				out << YAML::BeginMap; // Field
-				out << YAML::Key << "Name" << YAML::Value << name;
-				out << YAML::Key << "Type" << YAML::Value << static_cast<uint32_t>(field.Type);
-				out << YAML::Key << "Data" << YAML::Value;
-
-				switch ( field.Type )
-				{
-				case FieldType::Int:
-					out << field.GetStoredValue<int>();
-					break;
-				case FieldType::UnsignedInt:
-					out << field.GetStoredValue<uint32_t>();
-					break;
-				case FieldType::Float:
-					out << field.GetStoredValue<float>();
-					break;
-				case FieldType::Vec2:
-					out << field.GetStoredValue<Vector2f>();
-					break;
-				case FieldType::Vec3:
-					out << field.GetStoredValue<Vector3f>();
-					break;
-				case FieldType::Vec4:
-					out << field.GetStoredValue<Vector4f>();
-					break;
-				default:
-					out << "Invalid value";
-				}
-				out << YAML::EndMap; // Field
+			case FieldType::Int:
+				out << field.GetStoredValue<int>();
+				break;
+			case FieldType::UnsignedInt:
+				out << field.GetStoredValue<uint32_t>();
+				break;
+			case FieldType::Float:
+				out << field.GetStoredValue<float>();
+				break;
+			case FieldType::Vec2:
+				out << field.GetStoredValue<Vector2f>();
+				break;
+			case FieldType::Vec3:
+				out << field.GetStoredValue<Vector3f>();
+				break;
+			case FieldType::Vec4:
+				out << field.GetStoredValue<Vector4f>();
+				break;
+			default:
+				out << "Invalid value";
 			}
-			out << YAML::EndSeq;
+			out << YAML::EndMap; // Field
 		}
-
-		out << YAML::EndMap; // ScriptComponent
+		out << YAML::EndSeq;
 	}
+	END_YAML_COMPONENT_MAP();
 
-	if ( entity.HasComponent<MeshComponent>() )
-	{
-		out << YAML::Key << "MeshComponent";
-		out << YAML::BeginMap; // MeshComponent
+	BEGIN_YAML_COMPONENT_MAP(MeshComponent);
+	auto mesh = entity.GetComponent<MeshComponent>().Mesh;
+	out << YAML::Key << "AssetPath" << YAML::Value << mesh->GetFilepath();
+	END_YAML_COMPONENT_MAP();
 
-		auto mesh = entity.GetComponent<MeshComponent>().Mesh;
-		out << YAML::Key << "AssetPath" << YAML::Value << mesh->GetFilepath();
+	BEGIN_YAML_COMPONENT_MAP(CameraComponent);
+	auto &cameraComponent = entity.GetComponent<CameraComponent>();
+	out << YAML::Key << "Camera" << YAML::Value << "some camera data...";
+	out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
+	END_YAML_COMPONENT_MAP();
 
-		out << YAML::EndMap; // MeshComponent
-	}
+	BEGIN_YAML_COMPONENT_MAP(SpriteRendererComponent);
+	auto &spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
+	out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
+	if ( spriteRendererComponent.Texture )
+		out << YAML::Key << "TextureAssetPath" << YAML::Value << "path/to/asset";
+	out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
+	END_YAML_COMPONENT_MAP();
 
-	if ( entity.HasComponent<CameraComponent>() )
-	{
-		out << YAML::Key << "CameraComponent";
-		out << YAML::BeginMap; // CameraComponent
+	BEGIN_YAML_COMPONENT_MAP(RigidBody2DComponent);
+	auto &rigidbody2DComponent = entity.GetComponent<RigidBody2DComponent>();
+	out << YAML::Key << "BodyType" << YAML::Value << static_cast<int>(rigidbody2DComponent.BodyType);
+	out << YAML::Key << "FixedRotation" << YAML::Value << rigidbody2DComponent.FixedRotation;
+	END_YAML_COMPONENT_MAP();
 
-		auto &cameraComponent = entity.GetComponent<CameraComponent>();
-		out << YAML::Key << "Camera" << YAML::Value << "some camera data...";
-		out << YAML::Key << "Primary" << YAML::Value << cameraComponent.Primary;
+	BEGIN_YAML_COMPONENT_MAP(BoxCollider2DComponent);
+	auto &boxCollider2DComponent = entity.GetComponent<BoxCollider2DComponent>();
+	out << YAML::Key << "Offset" << YAML::Value << boxCollider2DComponent.Offset;
+	out << YAML::Key << "Size" << YAML::Value << boxCollider2DComponent.Size;
+	out << YAML::Key << "Density" << YAML::Value << boxCollider2DComponent.Density;
+	out << YAML::Key << "Friction" << YAML::Value << boxCollider2DComponent.Friction;
+	END_YAML_COMPONENT_MAP();
 
-		out << YAML::EndMap; // CameraComponent
-	}
+	BEGIN_YAML_COMPONENT_MAP(CircleCollider2DComponent);
+	auto &circleCollider2DComponent = entity.GetComponent<CircleCollider2DComponent>();
+	out << YAML::Key << "Offset" << YAML::Value << circleCollider2DComponent.Offset;
+	out << YAML::Key << "Radius" << YAML::Value << circleCollider2DComponent.Radius;
+	out << YAML::Key << "Density" << YAML::Value << circleCollider2DComponent.Density;
+	out << YAML::Key << "Friction" << YAML::Value << circleCollider2DComponent.Friction;
+	END_YAML_COMPONENT_MAP();
 
-	if ( entity.HasComponent<SpriteRendererComponent>() )
-	{
-		out << YAML::Key << "SpriteRendererComponent";
-		out << YAML::BeginMap; // SpriteRendererComponent
+	BEGIN_YAML_COMPONENT_MAP(RigidBody3DComponent);
+	auto &rigidbody3DComponent = entity.GetComponent<RigidBody3DComponent>();
+	out << YAML::Key << "BodyType" << YAML::Value << static_cast<int>(rigidbody3DComponent.BodyType);
+	END_YAML_COMPONENT_MAP();
 
-		auto &spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
-		out << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
-		if ( spriteRendererComponent.Texture )
-			out << YAML::Key << "TextureAssetPath" << YAML::Value << "path/to/asset";
-		out << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
+	BEGIN_YAML_COMPONENT_MAP(BoxCollider3DComponent);
+	auto &boxCollider3DComponent = entity.GetComponent<BoxCollider3DComponent>();
+	out << YAML::Key << "Offset" << YAML::Value << boxCollider3DComponent.Offset;
+	out << YAML::Key << "Size" << YAML::Value << boxCollider3DComponent.Size;
+	out << YAML::Key << "Density" << YAML::Value << boxCollider3DComponent.Density;
+	out << YAML::Key << "Friction" << YAML::Value << boxCollider3DComponent.Friction;
+	END_YAML_COMPONENT_MAP();
 
-		out << YAML::EndMap; // SpriteRendererComponent
-	}
-
-	if ( entity.HasComponent<RigidBody2DComponent>() )
-	{
-		out << YAML::Key << "RigidBody2DComponent";
-		out << YAML::BeginMap; // RigidBody2DComponent
-
-		auto &rigidbody2DComponent = entity.GetComponent<RigidBody2DComponent>();
-		out << YAML::Key << "BodyType" << YAML::Value << static_cast<int>(rigidbody2DComponent.BodyType);
-		out << YAML::Key << "FixedRotation" << YAML::Value << rigidbody2DComponent.FixedRotation;
-
-		out << YAML::EndMap; // RigidBody2DComponent
-	}
-
-	if ( entity.HasComponent<BoxCollider2DComponent>() )
-	{
-		out << YAML::Key << "BoxCollider2DComponent";
-		out << YAML::BeginMap; // BoxCollider2DComponent
-
-		auto &boxCollider2DComponent = entity.GetComponent<BoxCollider2DComponent>();
-		out << YAML::Key << "Offset" << YAML::Value << boxCollider2DComponent.Offset;
-		out << YAML::Key << "Size" << YAML::Value << boxCollider2DComponent.Size;
-		out << YAML::Key << "Density" << YAML::Value << boxCollider2DComponent.Density;
-		out << YAML::Key << "Friction" << YAML::Value << boxCollider2DComponent.Friction;
-
-		out << YAML::EndMap; // BoxCollider2DComponent
-	}
-
-	if ( entity.HasComponent<CircleCollider2DComponent>() )
-	{
-		out << YAML::Key << "CircleCollider2DComponent";
-		out << YAML::BeginMap; // CircleCollider2DComponent
-
-		auto &circleCollider2DComponent = entity.GetComponent<CircleCollider2DComponent>();
-		out << YAML::Key << "Offset" << YAML::Value << circleCollider2DComponent.Offset;
-		out << YAML::Key << "Radius" << YAML::Value << circleCollider2DComponent.Radius;
-		out << YAML::Key << "Density" << YAML::Value << circleCollider2DComponent.Density;
-		out << YAML::Key << "Friction" << YAML::Value << circleCollider2DComponent.Friction;
-
-		out << YAML::EndMap; // CircleCollider2DComponent
-	}
+	BEGIN_YAML_COMPONENT_MAP(SphereCollider3DComponent);
+	auto &sphereCollider3DComponent = entity.GetComponent<SphereCollider3DComponent>();
+	out << YAML::Key << "Offset" << YAML::Value << sphereCollider3DComponent.Offset;
+	out << YAML::Key << "Radius" << YAML::Value << sphereCollider3DComponent.Radius;
+	out << YAML::Key << "Density" << YAML::Value << sphereCollider3DComponent.Density;
+	out << YAML::Key << "Friction" << YAML::Value << sphereCollider3DComponent.Friction;
+	END_YAML_COMPONENT_MAP();
 
 	out << YAML::EndMap; // Entity
 }
@@ -569,6 +544,33 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				component.Friction = circleCollider2DComponent["Friction"] ? circleCollider2DComponent["Friction"].as<float>() : 1.0f;
 			}
 
+			auto rigidBody3DComponent = entity["RigidBody3DComponent"];
+			if ( rigidBody3DComponent )
+			{
+				auto &component = deserializedEntity.AddComponent<RigidBody3DComponent>();
+				component.BodyType = static_cast<RigidBody3DComponent::Type>(rigidBody3DComponent["BodyType"].as<int>());
+			}
+
+			auto boxCollider3DComponent = entity["BoxCollider3DComponent"];
+			if ( boxCollider3DComponent )
+			{
+				auto &component = deserializedEntity.AddComponent<BoxCollider3DComponent>();
+				component.Offset = boxCollider3DComponent["Offset"].as<Vector3f>();
+				component.Size = boxCollider3DComponent["Size"].as<Vector3f>();
+				component.Density = boxCollider3DComponent["Density"] ? boxCollider3DComponent["Density"].as<float>() : 1.0f;
+				component.Friction = boxCollider3DComponent["Friction"] ? boxCollider3DComponent["Friction"].as<float>() : 1.0f;
+			}
+
+			auto sphereCollider3DComponent = entity["SphereCollider3DComponent"];
+			if ( sphereCollider3DComponent )
+			{
+				auto &component = deserializedEntity.AddComponent<SphereCollider3DComponent>();
+				component.Offset = sphereCollider3DComponent["Offset"].as<Vector3f>();
+				component.Radius = sphereCollider3DComponent["Radius"].as<float>();
+				component.Density = sphereCollider3DComponent["Density"] ? sphereCollider3DComponent["Density"].as<float>() : 1.0f;
+				component.Friction = sphereCollider3DComponent["Friction"] ? sphereCollider3DComponent["Friction"].as<float>() : 1.0f;
+			}
+
 		}
 	}
 	return true;
@@ -580,9 +582,4 @@ bool SceneSerializer::DeserializeRuntime(const Filepath &filepath)
 	SE_CORE_ASSERT(false);
 	return false;
 }
-
-
-
-
-
 }

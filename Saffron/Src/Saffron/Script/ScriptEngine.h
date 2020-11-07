@@ -136,6 +136,11 @@ public:
 	static void OnCollision2DEnd(Entity entity);
 	static void OnCollision2DEnd(UUID sceneID, UUID entityID);
 
+	static void OnCollision3DBegin(Entity entity);
+	static void OnCollision3DBegin(UUID sceneID, UUID entityID);
+	static void OnCollision3DEnd(Entity entity);
+	static void OnCollision3DEnd(UUID sceneID, UUID entityID);
+
 	static void OnScriptComponentDestroyed(UUID sceneID, UUID entityID);
 
 	static bool ModuleExists(const String &moduleName);

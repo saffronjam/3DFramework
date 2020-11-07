@@ -1,28 +1,12 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Scene/ModelSpaceScene.h"
 
 
 namespace Se
 {
-
-template<typename T>
-static void CopyComponent(Entity destination, Entity source)
-{
-	if ( source.HasComponent<T>() )
-	{
-		auto &srcComponent = source.GetComponent<T>();
-		if ( destination.HasComponent<T>() )
-		{
-			destination.GetComponent<T>() = srcComponent;
-		}
-		else
-		{
-			destination.AddComponent<T>(srcComponent);
-		}
-	}
-}
-
 ModelSpaceScene::ModelSpaceScene(Entity entity)
 	: Scene(entity.GetComponent<TagComponent>().Tag),
 	m_Target(SceneRenderer::Target::Create(100, 100)),
@@ -30,21 +14,10 @@ ModelSpaceScene::ModelSpaceScene(Entity entity)
 {
 	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
 
-	m_Entity = CreateEntity(entity.GetComponent<IDComponent>().ID, entity.GetComponent<TagComponent>().Tag);
+	m_Entity = entity.Copy(this);
+	m_Entity.GetComponent<IDComponent>().ID = entity.GetComponent<IDComponent>().ID;
+	m_Entity.GetComponent<TransformComponent>().Transform = Matrix4f(1);
 
-	if ( entity.HasComponent<MeshComponent>() )
-	{
-		auto &otherMesh = entity.GetComponent<MeshComponent>().Mesh;
-		m_Entity.AddComponent<MeshComponent>().Mesh = Shared<Mesh>::Create(otherMesh->GetFilepath());
-		auto &mesh = m_Entity.GetComponent<MeshComponent>().Mesh;
-		mesh->SetLocalTransform(otherMesh->GetLocalTransform());
-	}
-	CopyComponent<ScriptComponent>(m_Entity, entity);
-	CopyComponent<CameraComponent>(m_Entity, entity);
-	CopyComponent<SpriteRendererComponent>(m_Entity, entity);
-	CopyComponent<RigidBody2DComponent>(m_Entity, entity);
-	CopyComponent<BoxCollider2DComponent>(m_Entity, entity);
-	CopyComponent<CircleCollider2DComponent>(m_Entity, entity);
 	ModelSpaceScene::SetSelectedEntity(m_Entity);
 }
 
@@ -74,6 +47,33 @@ void ModelSpaceScene::OnRender()
 
 void ModelSpaceScene::OnGuiRender()
 {
+	ImGui::Begin("Scene");
+
+	Gui::BeginPropertyGrid();
+	Gui::Property("Load Environment Map", [this]
+				  {
+					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
+					  if ( !filepath.empty() )
+					  {
+						  SetEnvironment(Environment::Load(filepath.string()));
+					  }
+				  }, true);
+	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
+	auto &light = GetLight();
+	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
+	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
+	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
+	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
+	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
+	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+	{
+		ShowBoundingBoxes(m_UIShowBoundingBoxes);
+	}
+	Gui::EndPropertyGrid();
+
+	ImGui::End();
+
+	m_EditorCamera->OnGuiRender();
 }
 
 void ModelSpaceScene::SetViewportSize(Uint32 width, Uint32 height)

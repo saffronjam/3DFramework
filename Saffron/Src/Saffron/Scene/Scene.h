@@ -1,7 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-
 #include "Saffron/Editor/ViewportPane.h"
 
 #include "Saffron/Core/UUID.h"
@@ -10,6 +8,7 @@
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Scene/SceneComponents.h"
 
 namespace Se
 {
@@ -109,8 +108,8 @@ protected:
 	bool m_UIShowBoundingBoxes = false;
 
 private:
-	friend void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity);
-	friend void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity);
+	friend void OnScriptComponentConstruct(EntityRegistry &registry, EntityHandle entity);
+	friend void OnScriptComponentDestroy(EntityRegistry &registry, EntityHandle entity);
 };
 }
 

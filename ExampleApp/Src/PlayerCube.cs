@@ -10,32 +10,27 @@ namespace Script
 {
     class PlayerCube : Entity
     {
-        public float HorizontalForce = 10.0f;
-        public float JumpForce = 10.0f;
+        public float HorizontalForce = 50.0f;
+        public float JumpForce = 2000.0f;
 
-        private RigidBody2DComponent m_PhysicsBody;
+        private RigidBody3DComponent m_PhysicsBody;
         private MaterialInstance m_MeshMaterial;
-        private ScriptComponent m_ScriptComponent;
-        private CircleCollider2DComponent m_CircleCollider2DComponent;
 
-        int m_CollisionCounter = 0;
+        private int m_CollisionCounter = 0;
 
-        public Vector2 MaxSpeed = new Vector2();
+        public Vector3 MaxSpeed = new Vector3();
 
         private bool Colliding => m_CollisionCounter > 0;
 
         void OnCreate()
         {
-            m_ScriptComponent = GetComponent<ScriptComponent>();
-            m_CircleCollider2DComponent = GetComponent<CircleCollider2DComponent>();
+            m_PhysicsBody = GetComponent<RigidBody3DComponent>();
 
-            m_PhysicsBody = GetComponent<RigidBody2DComponent>();
-
-            MeshComponent meshComponent = GetComponent<MeshComponent>();
+            var meshComponent = GetComponent<MeshComponent>();
             m_MeshMaterial = meshComponent.Mesh.GetMaterial(0); ;
 
-            AddCollision2DBeginCallback(OnPlayerCollisionBegin);
-            AddCollision2DEndCallback(OnPlayerCollisionEnd);
+            AddCollision3DBeginCallback(OnPlayerCollisionBegin);
+            AddCollision3DEndCallback(OnPlayerCollisionEnd);
         }
 
         void OnPlayerCollisionBegin(float value)
@@ -49,31 +44,39 @@ namespace Script
         }
         void OnUpdate(float ts)
         {
-            if (Input.IsKeyPressed(KeyCode.B))
-                m_CircleCollider2DComponent.Radius = 0.0f;
-
             float movementForce = HorizontalForce;
 
-            if (!Colliding)
-            {
-                movementForce *= 0.4f;
-            }
+            //if (!Colliding)
+            //{
+            //    movementForce *= 0.4f;
+            //}
+
             if (Input.IsKeyPressed(KeyCode.D))
-                m_PhysicsBody.ApplyLinearImpulse(new Vector2(movementForce, 0), new Vector2(), true);
+            {
+                m_PhysicsBody.ApplyLinearImpulse(new Vector3(movementForce, 0, 0), new Vector3());
+            }
             else if (Input.IsKeyPressed(KeyCode.A))
-                m_PhysicsBody.ApplyLinearImpulse(new Vector2(-movementForce, 0), new Vector2(), true);
+            {
+                m_PhysicsBody.ApplyLinearImpulse(new Vector3(-movementForce, 0, 0), new Vector3());
+            }
 
 
             if (Colliding && Input.IsMouseButtonPressed(MouseButtonCode.Right))
-                m_PhysicsBody.ApplyLinearImpulse(new Vector2(0, JumpForce), new Vector2(0, 0), true);
+            {
+                m_PhysicsBody.ApplyLinearImpulse(new Vector3(0, JumpForce, 0), new Vector3());
+            }
 
             if (m_CollisionCounter > 0)
+            {
                 m_MeshMaterial.Set("u_AlbedoColor", new Vector3(1.0f, 0.0f, 0.0f));
+            }
             else
+            {
                 m_MeshMaterial.Set("u_AlbedoColor", new Vector3(0.8f, 0.8f, 0.8f));
+            }
 
-            Vector2 linearVelocity = m_PhysicsBody.LinearVelocity;
-            linearVelocity.Clamp(new Vector2(-MaxSpeed.X, -1000), MaxSpeed);
+            Vector3 linearVelocity = m_PhysicsBody.LinearVelocity;
+            linearVelocity.Clamp(-MaxSpeed, MaxSpeed);
             m_PhysicsBody.LinearVelocity = linearVelocity;
 
             if (Input.IsKeyPressed(KeyCode.R))

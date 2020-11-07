@@ -9,6 +9,7 @@
 
 namespace Se
 {
+class Scene;
 class Entity
 {
 public:
@@ -42,6 +43,7 @@ public:
 	const Scene *GetScene() const { return m_Scene; }
 	EntityHandle GetHandle() const { return m_Handle; }
 
+	Entity Copy(Optional<Scene *> separateScene);
 	static Entity Null() { return { entt::null, nullptr }; }
 
 private:

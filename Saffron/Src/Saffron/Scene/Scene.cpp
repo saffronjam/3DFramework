@@ -21,16 +21,16 @@ namespace Se
 /// Statics
 ///////////////////////////////////////////////////////////////////////////
 
-std::unordered_map<UUID, Scene *> s_ActiveScenes;
+UnorderedMap<UUID, Scene *> s_ActiveScenes;
 
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
 
-static void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity)
+void OnScriptComponentConstruct(EntityRegistry &registry, EntityHandle entity)
 {
-	const auto sceneView = registry.view<SceneComponent>();
-	const UUID sceneID = registry.get<SceneComponent>(sceneView.front()).SceneID;
+	const auto sceneView = registry.view<SceneIDComponent>();
+	const UUID sceneID = registry.get<SceneIDComponent>(sceneView.front()).SceneID;
 
 	Scene *scene = s_ActiveScenes[sceneID];
 
@@ -39,10 +39,10 @@ static void OnScriptComponentConstruct(entt::registry &registry, entt::entity en
 	ScriptEngine::InitScriptEntity(scene->m_EntityIDMap.at(entityID));
 }
 
-static void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity)
+void OnScriptComponentDestroy(EntityRegistry &registry, EntityHandle entity)
 {
-	const auto sceneView = registry.view<SceneComponent>();
-	const UUID sceneID = registry.get<SceneComponent>(sceneView.front()).SceneID;
+	const auto sceneView = registry.view<SceneIDComponent>();
+	const UUID sceneID = registry.get<SceneIDComponent>(sceneView.front()).SceneID;
 
 	[[maybe_unused]] Scene *scene = s_ActiveScenes[sceneID];
 
@@ -86,8 +86,9 @@ Scene::Scene(String name)
 	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
 	m_EntityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
 
-	m_EntityRegistry.emplace<SceneComponent>(m_SceneEntity, m_SceneID);
-	m_EntityRegistry.emplace<PhysicsWorld2DComponent>(m_SceneEntity, *this);
+	m_SceneEntity.AddComponent<SceneIDComponent>(m_SceneID);
+	m_SceneEntity.AddComponent<PhysicsWorld2DComponent>(*this);
+	m_SceneEntity.AddComponent<PhysicsWorld3DComponent>(*this);
 
 	s_ActiveScenes[m_SceneID] = this;
 
@@ -98,6 +99,15 @@ Scene::Scene(String name)
 
 Scene::~Scene()
 {
+	if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
+	{
+		m_SceneEntity.RemoveComponent<PhysicsWorld2DComponent>();
+	}
+	if ( m_SceneEntity.HasComponent<PhysicsWorld3DComponent>() )
+	{
+		m_SceneEntity.RemoveComponent<PhysicsWorld3DComponent>();
+	}
+
 	m_EntityRegistry.on_destroy<ScriptComponent>().disconnect();
 	m_EntityRegistry.clear();
 

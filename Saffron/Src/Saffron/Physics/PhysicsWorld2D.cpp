@@ -7,6 +7,7 @@
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Physics/PhysicsWorld2D.h"
+#include "Saffron/Scene/Scene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 namespace Se
@@ -15,7 +16,7 @@ namespace Se
 /// Contact Listener
 //////////////////////////////////////////////////////////////
 
-class ContactListener : public b2ContactListener
+class ContactListener2D : public b2ContactListener
 {
 public:
 	void BeginContact(b2Contact *contact) override
@@ -58,7 +59,7 @@ public:
 	}
 };
 
-static ContactListener s_Box2DContactListener;
+static ContactListener2D s_ContactListener2D;
 
 
 //////////////////////////////////////////////////////////////
@@ -70,7 +71,7 @@ PhysicsWorld2D::PhysicsWorld2D(Scene &scene)
 	m_Scene(&scene),
 	m_PhysicsBodyEntityBuffer(nullptr)
 {
-	m_NativeWorld->SetContactListener(&s_Box2DContactListener);
+	m_NativeWorld->SetContactListener(&s_ContactListener2D);
 }
 
 PhysicsWorld2D::~PhysicsWorld2D()
@@ -119,27 +120,27 @@ void PhysicsWorld2D::OnUpdate()
 
 	{
 		auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
-		for ( auto entity : view )
+		for ( auto entityHandle : view )
 		{
-			Entity e = { entity,m_Scene };
+			Entity entity = { entityHandle, m_Scene };
 
-			auto &transform = e.Transform();
-			auto &rb2d = e.GetComponent<RigidBody2DComponent>();
-			auto *body = static_cast<b2Body *>(rb2d.RuntimeBody);
+			auto &transform = entity.Transform();
+			auto &rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
+			auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
 
 
-			if ( e.HasComponent<BoxCollider2DComponent>() )
+			if ( entity.HasComponent<BoxCollider2DComponent>() )
 			{
-				auto &component = e.GetComponent<BoxCollider2DComponent>();
+				auto &component = entity.GetComponent<BoxCollider2DComponent>();
 				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
 				fixture->SetDensity(component.Density);
 				fixture->SetFriction(component.Friction);
 				auto *polygonShape = dynamic_cast<b2PolygonShape *>(fixture->GetShape());
 				polygonShape->SetAsBox(component.Size.x, component.Size.y);
 			}
-			if ( e.HasComponent<CircleCollider2DComponent>() )
+			if ( entity.HasComponent<CircleCollider2DComponent>() )
 			{
-				auto &component = e.GetComponent<CircleCollider2DComponent>();
+				auto &component = entity.GetComponent<CircleCollider2DComponent>();
 				auto *fixture = static_cast<b2Fixture *>(component.RuntimeFixture);
 				fixture->SetDensity(component.Density);
 				fixture->SetFriction(component.Friction);
@@ -175,114 +176,115 @@ void PhysicsWorld2D::OnGuiRender()
 
 void PhysicsWorld2D::OnStart()
 {
-	if ( m_FilledWorld )
-		return;
-
+	if ( !m_FilledWorld )
 	{
-		auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
-		m_PhysicsBodyEntityBuffer = new Entity[view.size()];
-		Uint32 physicsBodyEntityBufferIndex = 0;
-		for ( auto entity : view )
 		{
-			Entity e = { entity, m_Scene };
-			auto &transform = e.Transform();
-			auto &rigidBody2D = m_Scene->GetEntityRegistry().get<RigidBody2DComponent>(entity);
-
-			b2BodyDef bodyDef;
-			if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Static )
-				bodyDef.type = b2_staticBody;
-			else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Dynamic )
-				bodyDef.type = b2_dynamicBody;
-			else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Kinematic )
-				bodyDef.type = b2_kinematicBody;
-			bodyDef.position.Set(transform[3].x, transform[3].y);
-
-			const auto decomposition = Misc::GetTransformDecomposition(transform);
-			Vector3f rotation = glm::eulerAngles(decomposition.Rotation);
-			bodyDef.angle = rotation.z;
-
-			b2Body *body = m_NativeWorld->CreateBody(&bodyDef);
-			body->SetFixedRotation(rigidBody2D.FixedRotation);
-			Entity *entityStorage = &m_PhysicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
-			*entityStorage = e;
-			body->SetUserData(static_cast<void *>(entityStorage));
-			rigidBody2D.RuntimeBody = body;
-			int x = 10;
-		}
-	}
-
-	{
-		auto view = m_Scene->GetEntityRegistry().view<BoxCollider2DComponent>();
-		for ( auto entity : view )
-		{
-			Entity e = { entity, m_Scene };
-
-			auto &boxCollider2D = m_Scene->GetEntityRegistry().get<BoxCollider2DComponent>(entity);
-			if ( e.HasComponent<RigidBody2DComponent>() )
+			auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
+			m_PhysicsBodyEntityBuffer = new Entity[view.size()];
+			Uint32 physicsBodyEntityBufferIndex = 0;
+			for ( auto entityHandle : view )
 			{
-				auto &rigidBody2D = e.GetComponent<RigidBody2DComponent>();
-				SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
-				auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
+				Entity entity = { entityHandle, m_Scene };
+				auto &transform = entity.Transform();
+				auto &rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
 
-				b2PolygonShape polygonShape;
-				polygonShape.SetAsBox(boxCollider2D.Size.x, boxCollider2D.Size.y);
+				b2BodyDef bodyDef;
+				if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Static )
+					bodyDef.type = b2_staticBody;
+				else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Dynamic )
+					bodyDef.type = b2_dynamicBody;
+				else if ( rigidBody2D.BodyType == RigidBody2DComponent::Type::Kinematic )
+					bodyDef.type = b2_kinematicBody;
+				bodyDef.position.Set(transform[3].x, transform[3].y);
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &polygonShape;
-				fixtureDef.density = boxCollider2D.Density;
-				fixtureDef.friction = boxCollider2D.Friction;
-				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
-				boxCollider2D.RuntimeFixture = fixture;
+				const auto decomposition = Misc::GetTransformDecomposition(transform);
+				Vector3f rotation = glm::eulerAngles(decomposition.Rotation);
+				bodyDef.angle = rotation.z;
+
+				b2Body *body = m_NativeWorld->CreateBody(&bodyDef);
+				body->SetFixedRotation(rigidBody2D.FixedRotation);
+				Entity *entityStorage = &m_PhysicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
+				*entityStorage = entity;
+				body->SetUserData(static_cast<void *>(entityStorage));
+				rigidBody2D.RuntimeBody = body;
 			}
 		}
-	}
 
-	{
-		auto view = m_Scene->GetEntityRegistry().view<CircleCollider2DComponent>();
-		for ( auto entity : view )
 		{
-			Entity e = { entity, m_Scene };
-
-			auto &circleCollider2D = m_Scene->GetEntityRegistry().get<CircleCollider2DComponent>(entity);
-			if ( e.HasComponent<RigidBody2DComponent>() )
+			auto view = m_Scene->GetEntityRegistry().view<BoxCollider2DComponent>();
+			for ( auto entityHandle : view )
 			{
-				auto &rigidBody2D = e.GetComponent<RigidBody2DComponent>();
-				SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
-				auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
+				Entity entity = { entityHandle, m_Scene };
 
-				b2CircleShape circleShape;
-				circleShape.m_radius = circleCollider2D.Radius;
+				auto &boxCollider2D = entity.GetComponent<BoxCollider2DComponent>();
+				if ( entity.HasComponent<RigidBody2DComponent>() )
+				{
+					auto &rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
+					SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
+					auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
 
-				b2FixtureDef fixtureDef;
-				fixtureDef.shape = &circleShape;
-				fixtureDef.density = circleCollider2D.Density;
-				fixtureDef.friction = circleCollider2D.Friction;
-				b2Fixture *fixture = body->CreateFixture(&fixtureDef);
-				circleCollider2D.RuntimeFixture = fixture;
+					b2PolygonShape polygonShape;
+					polygonShape.SetAsBox(boxCollider2D.Size.x, boxCollider2D.Size.y);
+
+					b2FixtureDef fixtureDef;
+					fixtureDef.shape = &polygonShape;
+					fixtureDef.density = boxCollider2D.Density;
+					fixtureDef.friction = boxCollider2D.Friction;
+					b2Fixture *fixture = body->CreateFixture(&fixtureDef);
+					boxCollider2D.RuntimeFixture = fixture;
+				}
 			}
 		}
+
+		{
+			auto view = m_Scene->GetEntityRegistry().view<CircleCollider2DComponent>();
+			for ( auto entityHandle : view )
+			{
+				Entity entity = { entityHandle, m_Scene };
+
+				auto &circleCollider2D = entity.GetComponent<CircleCollider2DComponent>();
+				if ( entity.HasComponent<RigidBody2DComponent>() )
+				{
+					auto &rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
+					SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
+					auto *body = static_cast<b2Body *>(rigidBody2D.RuntimeBody);
+
+					b2CircleShape circleShape;
+					circleShape.m_radius = circleCollider2D.Radius;
+
+					b2FixtureDef fixtureDef;
+					fixtureDef.shape = &circleShape;
+					fixtureDef.density = circleCollider2D.Density;
+					fixtureDef.friction = circleCollider2D.Friction;
+					b2Fixture *fixture = body->CreateFixture(&fixtureDef);
+					circleCollider2D.RuntimeFixture = fixture;
+				}
+			}
+		}
+		m_FilledWorld = true;
 	}
 }
 
 void PhysicsWorld2D::OnStop()
 {
-	if ( !m_FilledWorld )
-		return;
-
-	b2Body *body = m_NativeWorld->GetBodyList();
-	while ( body )
+	if ( m_FilledWorld )
 	{
-		b2Body *nextBody = body->GetNext();
-		b2Fixture *fixture = body->GetFixtureList();
-		while ( fixture )
+		b2Body *body = m_NativeWorld->GetBodyList();
+		while ( body )
 		{
-			b2Fixture *nextFixture = fixture->GetNext();
-			body->DestroyFixture(fixture);
-			fixture = nextFixture;
-		}
+			b2Body *nextBody = body->GetNext();
+			b2Fixture *fixture = body->GetFixtureList();
+			while ( fixture )
+			{
+				b2Fixture *nextFixture = fixture->GetNext();
+				body->DestroyFixture(fixture);
+				fixture = nextFixture;
+			}
 
-		m_NativeWorld->DestroyBody(body);
-		body = nextBody;
+			m_NativeWorld->DestroyBody(body);
+			body = nextBody;
+		}
+		m_FilledWorld = false;
 	}
 }
 

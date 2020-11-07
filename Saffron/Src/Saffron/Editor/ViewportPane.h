@@ -10,7 +10,7 @@ class ViewportPane : public ReferenceCounted
 public:
 	explicit ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target);
 
-	void OnGuiRender();
+	void OnGuiRender(bool embedded = false);
 
 	bool InViewport(Vector2f positionNDC) const;
 
