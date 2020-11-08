@@ -112,6 +112,7 @@ void WindowsWindow::OnEvent(const Event &event)
 	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
 	dispatcher.Try<WindowNewTitleEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewTitle));
 	dispatcher.Try<WindowNewIconEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewIcon));
+	dispatcher.Try<WindowNewAntiAliasingEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewAntiAliasing));
 }
 
 void WindowsWindow::Close()
@@ -204,6 +205,43 @@ bool WindowsWindow::OnNewIcon(const WindowNewIconEvent &event)
 	}
 	glfwSetWindowIcon(m_NativeWindow, 1, images);
 	stbi_image_free(images[0].pixels);
+	return true;
+}
+
+bool WindowsWindow::OnNewAntiAliasing(const WindowNewAntiAliasingEvent &event)
+{
+	int level = 0;
+	switch ( event.GetAntiAliasing() )
+	{
+	case AntiAliasing::Off:
+		level = 0;
+		break;
+	case AntiAliasing::Sample2:
+		level = 2;
+		break;
+	case AntiAliasing::Sample4:
+		level = 4;
+		break;
+	case AntiAliasing::Sample8:
+		level = 8;
+		break;
+	case AntiAliasing::Sample16:
+		level = 16;
+		break;
+	}
+
+	Renderer::Submit([level]
+					 {
+						 if ( level )
+						 {
+							 glEnable(GL_MULTISAMPLE);
+						 }
+						 else
+						 {
+							 glDisable(GL_MULTISAMPLE);
+						 }
+						 glfwWindowHint(GLFW_SAMPLES, level);
+					 });
 	return true;
 }
 

@@ -64,8 +64,8 @@ Entity Entity::Copy(Optional<Scene *> separateScene)
 	Scene *copyTo = separateScene.value_or(m_Scene);
 
 	Entity newEntity = copyTo->CreateEntity(GetComponent<TagComponent>().Tag);
-	CopyComponent<MeshComponent>(newEntity, *this);
 	CopyComponent<ScriptComponent>(newEntity, *this);
+	CopyComponent<MeshComponent>(newEntity, *this);
 	CopyComponent<CameraComponent>(newEntity, *this);
 	CopyComponent<SpriteRendererComponent>(newEntity, *this);
 	CopyComponent<RigidBody2DComponent>(newEntity, *this);

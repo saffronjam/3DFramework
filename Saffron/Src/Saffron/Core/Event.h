@@ -33,7 +33,7 @@ public:
 	{
 		None = 0,
 		AppTick, AppUpdate, AppRender,
-		WindowResize, WindowMove, WindowGainFocus, WindowLostFocus, WindowClose, WindowDropFiles, WindowNewTitle, WindowNewIcon,
+		WindowResize, WindowMove, WindowGainFocus, WindowLostFocus, WindowClose, WindowDropFiles, WindowNewTitle, WindowNewIcon, WindowNewAntiAliasing,
 		KeyboardPress, KeyboardRelease, KeyboardRepeat, KeyboardType,
 		MousePress, MouseRelease, MouseScroll, MouseMove, MouseEnter, MouseLeave
 	};

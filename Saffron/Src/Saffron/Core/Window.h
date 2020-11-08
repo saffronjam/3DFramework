@@ -4,6 +4,7 @@
 #include <optional>
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/AntiAliasing.h"
 #include "Saffron/Core/Events/WindowEvent.h" 
 #include "Saffron/Core/Math/SaffronMath.h"
 
@@ -54,9 +55,12 @@ public:
 
 	// Window attributes
 	void SetTitle(String title);
+	const String &GetTitle() const;
 	void SetWindowIcon(Filepath filepath);
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
+	void SetAntiAliasing(AntiAliasing antiAliasing);
+	AntiAliasing GetAntiAliasing() const;
 	virtual bool IsMinimized() const = 0;
 
 	static Shared<Window> Create(const Properties &properties = Properties());
@@ -65,6 +69,7 @@ protected:
 	String m_Title;
 	Vector2f m_Position;
 	Uint32 m_Width, m_Height;
+	AntiAliasing m_AntiAliasing;
 
 private:
 	ArrayList<Shared<Event>> m_Events;

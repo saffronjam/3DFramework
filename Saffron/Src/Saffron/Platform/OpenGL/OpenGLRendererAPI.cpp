@@ -70,15 +70,9 @@ void RendererAPI::Init()
 	{
 		SE_CORE_ERROR("OpenGL Error: {0}", error);
 	}
-
-	LoadRequiredAssets();
 }
 
 void RendererAPI::Shutdown()
-{
-}
-
-void RendererAPI::LoadRequiredAssets()
 {
 }
 

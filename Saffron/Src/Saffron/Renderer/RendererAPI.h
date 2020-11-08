@@ -42,9 +42,6 @@ public:
 	static Type Current() { return m_sCurrentAPI; }
 
 private:
-	static void LoadRequiredAssets();
-
-private:
 	static Type m_sCurrentAPI;
 	static Capabilities m_sCapabilities;
 };

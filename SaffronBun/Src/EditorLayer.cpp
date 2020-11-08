@@ -23,11 +23,11 @@ EditorLayer::EditorLayer()
 	m_MainViewportPane(Shared<ViewportPane>::Create("Main Viewport", SceneRenderer::GetMainTarget())),
 	m_MiniViewportPane(Shared<ViewportPane>::Create("Mini Viewport", m_EditorScene->GetMiniTarget()))
 {
+	Application::Get().GetWindow().SetAntiAliasing(AntiAliasing::Sample16);
 }
 
 void EditorLayer::OnAttach()
 {
-
 	BatchLoader::GetPreloader()->Submit([this]
 										{
 											Gui::Init();
@@ -73,22 +73,26 @@ void EditorLayer::OnAttach()
 										{
 											m_MainViewportPane->SetPostRenderCallback([this]()
 																					  {
-																						  if ( m_SceneState == SceneState::Play )
-																							  return;
+																						  const auto &scene = m_EditorScene;
+																						  const auto &viewportPane = m_MainViewportPane;
+																						  Entity modelEntity = m_SelectedEntity;
 
-																						  if ( m_GizmoType != -1 && m_SelectedEntity )
+																						  if ( m_SceneState == SceneState::Edit &&
+																							  m_GizmoType != -1 &&
+																							  GetActiveScene() == scene &&
+																							  modelEntity )
 																						  {
-																							  const auto viewportSize = m_MainViewportPane->GetViewportSize();
-																							  ImGuizmo::SetDrawlist();
-																							  ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+																							  const auto viewportSize = viewportPane->GetViewportSize();
+																							  const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
 																							  const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-
-																							  auto &entityTransform = m_SelectedEntity.Transform();
+																							  auto &entityTransform = modelEntity.Transform();
 																							  const float snapValue = GetSnapValue();
 																							  float snapValues[3] = { snapValue, snapValue, snapValue };
 
-																							  const auto &editorCamera = m_EditorScene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+																							  ImGuizmo::SetDrawlist();
+																							  ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+
 																							  if ( m_SelectionMode == SelectionMode::Entity )
 																							  {
 																								  ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
@@ -101,7 +105,7 @@ void EditorLayer::OnAttach()
 																							  }
 																							  else
 																							  {
-																								  glm::mat4 transformBase = entityTransform * m_SelectedEntity.GetComponent<TransformComponent>().Transform;
+																								  glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
 																								  ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
 																													   glm::value_ptr(editorCamera->GetProjectionMatrix()),
 																													   static_cast<ImGuizmo::OPERATION>(m_GizmoType),
@@ -110,7 +114,7 @@ void EditorLayer::OnAttach()
 																													   nullptr,
 																													   snap ? snapValues : nullptr);
 
-																								  m_SelectedEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+																								  modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
 																							  }
 																						  }
 																					  });
@@ -256,44 +260,37 @@ void EditorLayer::OnGuiRender()
 	m_ScriptPanel->OnGuiRender();
 	m_ScenePanel->OnGuiRender(m_ScriptPanel);
 	GetActiveScene()->OnGuiRender();
+	m_MainViewportPane->OnGuiRender();
 
 	if ( m_SceneState == SceneState::Edit )
 	{
-		ImGui::Begin("Viewport Panes Container Window", nullptr, ImGuiWindowFlags_NoTitleBar);
-		if ( ImGui::BeginTabBar("Viewport Panes", ImGuiTabBarFlags_TabListPopupButton) )
+		for ( auto &[scene, viewportPane] : m_ModelSpaceSceneViews )
 		{
-			if ( ImGui::BeginTabItem("Main") )
+			OutputStringStream oss;
+			oss << scene->GetName() << "##" << scene->GetUUID();
+			bool wantOpen;
+			viewportPane->OnGuiRender(&wantOpen);
+			if ( !wantOpen )
 			{
-				ImGui::Text("Text");
-				m_MainViewportPane->OnGuiRender(true);
-				ImGui::EndTabItem();
-			}
-			for ( auto &[scene, viewportPane] : m_ModelSpaceSceneViews )
-			{
-				OutputStringStream oss;
-				oss << scene->GetName() << "##" << scene->GetUUID();
-				if ( ImGui::BeginTabItem(oss.str().c_str()) )
-				{
-					viewportPane->OnGuiRender(true);
-					ImGui::EndTabItem();
-				}
-			}
-			ImGui::EndTabBar();
-		}
-		ImGui::End();
-		auto *wnd = ImGui::FindWindowByName("Viewport Panes Container Window");
-		if ( wnd )
-		{
-			ImGuiDockNode *node = wnd->DockNode;
-			if ( node && !node->IsHiddenTabBar() )
-			{
-				node->WantHiddenTabBarToggle = true;
+				const UUID sceneUUID = scene->GetUUID();
+				Run::Later([sceneUUID, this]
+						   {
+							   const auto deleteIterator = std::find_if(m_ModelSpaceSceneViews.begin(), m_ModelSpaceSceneViews.end(), [sceneUUID, this](auto &pair)
+																		{
+																			return pair.first->GetUUID() == sceneUUID;
+																		});
+							   if ( deleteIterator == m_ModelSpaceSceneViews.begin() )
+							   {
+								   m_LastFocusedScene = Shared<Scene>::Cast(m_EditorScene);
+							   }
+							   else
+							   {
+								   m_LastFocusedScene = Shared<Scene>::Cast((deleteIterator - 1)->first);
+							   }
+							   m_ModelSpaceSceneViews.erase(deleteIterator);
+						   });
 			}
 		}
-	}
-	else
-	{
-		m_MainViewportPane->OnGuiRender();
 	}
 
 	ImGui::End();
@@ -902,27 +899,29 @@ void EditorLayer::OnNewModelSpaceView(Entity entity)
 	auto newViewportPane = Shared<ViewportPane>::Create(tag, newScene->GetTarget());
 	auto &emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
 
-	// TODO: Fix bug here with imguizo transforming and "emplaced pair" not even logically working....
-	emplacedPair.second->SetPostRenderCallback([this, &emplacedPair]
+	// TODO: Fix bug here with imguizo transforming
+	emplacedPair.second->SetPostRenderCallback([this, emplacedPair]
 											   {
-												   if ( m_SceneState == SceneState::Play )
-													   return;
+												   const auto &scene = emplacedPair.first;
+												   const auto &viewportPane = emplacedPair.second;
+												   Entity modelEntity = scene->GetModelEntity();
 
-												   Entity modelEntity = emplacedPair.first->GetModelEntity();
-
-												   if ( m_GizmoType != -1 )
+												   if ( m_SceneState == SceneState::Edit &&
+													   m_GizmoType != -1 &&
+													   GetActiveScene() == scene &&
+													   modelEntity )
 												   {
-													   const auto viewportSize = emplacedPair.second->GetViewportSize();
-													   ImGuizmo::SetDrawlist();
-													   ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+													   const auto viewportSize = viewportPane->GetViewportSize();
+													   const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
 													   const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-
 													   auto &entityTransform = modelEntity.Transform();
 													   const float snapValue = GetSnapValue();
 													   float snapValues[3] = { snapValue, snapValue, snapValue };
 
-													   const auto &editorCamera = emplacedPair.first->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+													   ImGuizmo::SetDrawlist();
+													   ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+
 													   if ( m_SelectionMode == SelectionMode::Entity )
 													   {
 														   ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),

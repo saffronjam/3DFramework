@@ -55,9 +55,24 @@ void Window::SetTitle(String title)
 	PushEvent<WindowNewTitleEvent>(Move(title));
 }
 
+const String &Window::GetTitle() const
+{
+	return m_Title;
+}
+
 void Window::SetWindowIcon(Filepath filepath)
 {
 	PushEvent<WindowNewIconEvent>(Move(filepath));
+}
+
+void Window::SetAntiAliasing(AntiAliasing antiAliasing)
+{
+	PushEvent<WindowNewAntiAliasingEvent>(antiAliasing);
+}
+
+AntiAliasing Window::GetAntiAliasing()const
+{
+	return m_AntiAliasing;
 }
 
 Shared<Window> Window::Create(const Properties &properties)

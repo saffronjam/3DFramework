@@ -19,7 +19,7 @@ ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> tar
 {
 }
 
-void ViewportPane::OnGuiRender(bool embedded)
+void ViewportPane::OnGuiRender(bool *open)
 {
 	if ( !m_Target->IsEnabled() )
 	{
@@ -32,20 +32,17 @@ void ViewportPane::OnGuiRender(bool embedded)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	if ( !embedded )
-	{
-		ImGui::Begin(m_WindowTitle.c_str(), nullptr, ImGuiWindowFlags_NoFocusOnAppearing);
+	ImGui::Begin(m_WindowTitle.c_str(), open, ImGuiWindowFlags_NoFocusOnAppearing);
 
-		if ( ImGui::IsWindowDocked() )
+	if ( ImGui::IsWindowDocked() )
+	{
+		auto *wnd = ImGui::FindWindowByName(m_WindowTitle.c_str());
+		if ( wnd )
 		{
-			auto *wnd = ImGui::FindWindowByName(m_WindowTitle.c_str());
-			if ( wnd )
+			ImGuiDockNode *node = wnd->DockNode;
+			if ( node && !node->IsHiddenTabBar() )
 			{
-				ImGuiDockNode *node = wnd->DockNode;
-				if ( node && !node->IsHiddenTabBar() )
-				{
-					node->WantHiddenTabBarToggle = true;
-				}
+				node->WantHiddenTabBarToggle = true;
 			}
 		}
 	}
@@ -69,10 +66,7 @@ void ViewportPane::OnGuiRender(bool embedded)
 
 	m_PostRenderFunction();
 
-	if ( !embedded )
-	{
-		ImGui::End();
-	}
+	ImGui::End();
 	ImGui::PopStyleVar();
 
 	m_Target->SetSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));

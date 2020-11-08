@@ -15,7 +15,6 @@ ModelSpaceScene::ModelSpaceScene(Entity entity)
 	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
 
 	m_Entity = entity.Copy(this);
-	m_Entity.GetComponent<IDComponent>().ID = entity.GetComponent<IDComponent>().ID;
 	m_Entity.GetComponent<TransformComponent>().Transform = Matrix4f(1);
 
 	ModelSpaceScene::SetSelectedEntity(m_Entity);

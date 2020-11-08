@@ -35,6 +35,7 @@ private:
 	bool OnClose(const WindowCloseEvent &event);
 	bool OnNewTitle(const WindowNewTitleEvent &event);
 	bool OnNewIcon(const WindowNewIconEvent &event);
+	bool OnNewAntiAliasing(const WindowNewAntiAliasingEvent &event);
 
 	void SetupGLFWCallbacks();
 

@@ -4,6 +4,7 @@
 #include <utility>
 #include <filesystem>
 
+#include "Saffron/Core/AntiAliasing.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Event.h"
 
@@ -152,5 +153,25 @@ private:
 	Filepath m_Filepath;
 };
 
+class WindowNewAntiAliasingEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowNewAntiAliasing);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowNewAntiAliasingEvent(AntiAliasing antiAliasing) : m_AntiAliasing(antiAliasing) {}
+
+	const AntiAliasing &GetAntiAliasing() const { return m_AntiAliasing; }
+	String ToString() const override
+	{
+		OutputStringStream oss;
+		oss << GetName() << " AntiAliasing: " << static_cast<int>(m_AntiAliasing);
+		return oss.str();
+	}
+
+private:
+	AntiAliasing m_AntiAliasing;
+};
 
 }
