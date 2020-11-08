@@ -47,3 +47,28 @@
 #include "Saffron/Scene/SceneCamera.h"
 #include "Saffron/Scene/SceneSerializer.h"
 #include "Saffron/Entity/EntityComponents.h"
+
+#include "Saffron/Base.h"
+#include "Saffron/Editor/EditorTerminal.h"
+#include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/ScenePanel.h"
+#include "Saffron/Editor/SplashScreenPane.h"
+#include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Scene/EditorScene.h"
+#include "Saffron/Scene/ModelSpaceScene.h"
+#include "Saffron/Scene/RuntimeScene.h"
+
+#include "Saffron/Core/BatchLoader.h"
+#include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Core/Misc.h"
+#include "Saffron/Core/Run.h"
+#include "Saffron/Editor/ViewportPane.h"
+#include "Saffron/Engine/Engine.h"
+#include "Saffron/Gui/Gui.h"
+#include "Saffron/Input/Input.h"
+#include "Saffron/Renderer/Renderer2D.h"
+#include "Saffron/Script/ScriptEngine.h"
+
+#ifdef SAFFRON_ENTRY_POINT
+#include <Saffron/EntryPoint.h>
+#endif

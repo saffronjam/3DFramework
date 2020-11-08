@@ -41,7 +41,7 @@ void GuiLayer::End()
 	}
 }
 
-void GuiLayer::OnAttach()
+void GuiLayer::OnAttach(Shared<BatchLoader> &loader)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();

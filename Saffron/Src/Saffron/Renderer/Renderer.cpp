@@ -147,7 +147,7 @@ void Renderer::ClearMagenta()
 	Clear(1, 0, 1);
 }
 
-void Renderer::WaitAndRender()
+void Renderer::Execute()
 {
 	s_Data.m_CommandQueue.Execute();
 }

@@ -7,9 +7,10 @@
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Core/Run.h"
 #include "Saffron/Core/ScopedLock.h"
-#include "Saffron/Input/Input.h"
+#include "Saffron/Editor/SplashScreenPane.h"
+#include "Saffron/Engine/EngineSerializer.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Gui/SplashScreen.h"
+#include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -18,6 +19,7 @@ namespace Se {
 Application *Application::s_Instance = nullptr;
 
 Application::Application(const Properties &properties)
+	: m_PreLoader(Shared<BatchLoader>::Create("Preloader"))
 {
 	SE_ASSERT(!s_Instance, "Application already exist");
 	s_Instance = this;
@@ -32,9 +34,10 @@ Application::Application(const Properties &properties)
 	PushOverlay(m_GuiLayer);
 
 	Renderer::Init();
-	Renderer::WaitAndRender();
+	Renderer::Execute();
 	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
 	FileIOManager::Init(*m_Window);
+	EngineSerializer::Deserialize("Engine/EngineProperties.sen");
 
 	ts = GlobalTimer::Mark();
 }
@@ -42,18 +45,19 @@ Application::Application(const Properties &properties)
 Application::~Application()
 {
 	ScriptEngine::Shutdown();
+	EngineSerializer::Serialize("Engine/EngineProperties.sen");
 }
 
 void Application::PushLayer(Layer *layer)
 {
 	m_LayerStack.PushLayer(layer);
-	layer->OnAttach();
+	layer->OnAttach(m_PreLoader);
 }
 
 void Application::PushOverlay(Layer *layer)
 {
 	m_LayerStack.PushOverlay(layer);
-	layer->OnAttach();
+	layer->OnAttach(m_PreLoader);
 }
 
 void Application::RenderGui()
@@ -69,34 +73,28 @@ void Application::RenderGui()
 void Application::Run()
 {
 	OnInit();
-	BatchLoader::GetPreloader()->Submit([] {}, "Finalizing");
-	BatchLoader::GetPreloader()->SetOnFinishCallback([&]
-													 {
-														 m_ViewingSplashScreen = false;
-														 ScriptEngine::DetachThread();
-													 });
 
-	Thread preloaderWorker([&] {
-		ScriptEngine::AttachThread();
-		BatchLoader::GetPreloader()->Execute();
-						   });
-	SplashScreen splashScreen;
-	while ( m_ViewingSplashScreen ? m_ViewingSplashScreen : !splashScreen.IsFinished() )
+	m_PreLoader->SetOnStartCallback([] {ScriptEngine::AttachThread(); });
+	m_PreLoader->SetOnFinishCallback([] {ScriptEngine::DetachThread(); });
+
+	m_PreLoader->Execute();
+
+	SplashScreenPane splashScreenPane(m_PreLoader);
+	while ( !splashScreenPane.IsFinished() )
 	{
 		m_GuiLayer->Begin();
-		splashScreen.OnGuiRender();
+		splashScreenPane.OnGuiRender();
 		m_Window->OnUpdate();
 		m_Window->HandleBufferedEvents();
 		m_GuiLayer->End();
-		Renderer::WaitAndRender();
+		Renderer::Execute();
+		Run::Execute();
 		GlobalTimer::Mark();
-		const auto duration = m_ViewingSplashScreen ? std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms())) : 0ll;
+		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished() ? 0ll : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms()));
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 		GlobalTimer::Sync();
-		Run::Execute();
+
 	}
-	preloaderWorker.join();
-	BatchLoader::InvalidatePreloader();
 
 	while ( m_Running )
 	{
@@ -114,7 +112,7 @@ void Application::Run()
 			Application *app = this;
 			Renderer::Submit([app]() { app->RenderGui(); });
 
-			Renderer::WaitAndRender();
+			Renderer::Execute();
 		}
 		Run::Execute();
 		GlobalTimer::Mark();

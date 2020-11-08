@@ -1,20 +1,9 @@
 #pragma once
 
-#include "Saffron.h"
+#include <Saffron.h>
 
-#include <string>
+using namespace Se;
 
-#include "Saffron/Base.h"
-#include "Saffron/Editor/EditorTerminal.h"
-#include "Saffron/Editor/EntityPanel.h"
-#include "Saffron/Editor/ScenePanel.h"
-#include "Saffron/Gui/GuiLayer.h"
-#include "Saffron/Scene/EditorScene.h"
-#include "Saffron/Scene/ModelSpaceScene.h"
-#include "Saffron/Scene/RuntimeScene.h"
-
-namespace Se
-{
 class EditorLayer : public Layer
 {
 public:
@@ -48,7 +37,7 @@ public:
 
 	enum class SceneState : int
 	{
-		Edit = 0, Play = 1, Pause = 3
+		Splash = 0, Edit = 1, Play = 2, Pause = 3
 	};
 
 	enum class SelectionMode
@@ -60,7 +49,7 @@ public:
 	EditorLayer();
 	virtual ~EditorLayer() = default;
 
-	void OnAttach() override;
+	void OnAttach(Shared<BatchLoader> &loader) override;
 	void OnDetach() override;
 	void OnUpdate() override;
 
@@ -130,10 +119,8 @@ private:
 	Shared<ScriptPanel> m_ScriptPanel;
 	Shared<ScenePanel> m_ScenePanel;
 
-	SceneState m_SceneState = SceneState::Edit;
+	SceneState m_SceneState;
 
 	SelectionMode m_SelectionMode = SelectionMode::Entity;
 	Entity m_SelectedEntity;
 };
-
-}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Saffron/Core/Event.h"
+#include "Saffron/Core/BatchLoader.h"
 
 namespace Se {
 
@@ -10,9 +11,7 @@ public:
 	Layer(const String &name = "Layer");
 	virtual ~Layer();
 
-	virtual void OnPreload() {}
-	virtual void OnFinishPreload() {}
-	virtual void OnAttach() {}
+	virtual void OnAttach(Shared<BatchLoader> &loader) {}
 	virtual void OnDetach() {}
 	virtual void OnUpdate() {}
 	virtual void OnGuiRender() {}

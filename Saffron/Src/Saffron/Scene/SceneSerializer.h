@@ -1,7 +1,6 @@
 #pragma once
 
-
-
+#include "Saffron/Base.h"
 #include "Saffron/Scene/Scene.h"
 
 namespace Se

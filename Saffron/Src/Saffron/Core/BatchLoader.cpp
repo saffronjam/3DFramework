@@ -5,11 +5,15 @@
 
 namespace Se
 {
-static Unique<BatchLoader> s_Preloader = Unique<BatchLoader>::Create("Preloader");
 
 BatchLoader::BatchLoader(String name)
 	: m_Name(Move(name))
 {
+}
+
+BatchLoader::~BatchLoader()
+{
+	ForceExit();
 }
 
 void BatchLoader::Submit(Function<void()> function, String shortDescription)
@@ -21,30 +25,47 @@ void BatchLoader::Submit(Function<void()> function, String shortDescription)
 void BatchLoader::Execute()
 {
 	ScopedLock queueLock(m_QueueMutex);
-	m_Progress = 0.0f;
-	for ( const auto &[function, shortDescription] : m_Queue )
+	if ( m_Worker.joinable() )
 	{
-		//ScopedLock scopedLock(m_ExecutionMutex);
-		if ( m_OnEachExecution )
-			m_OnEachExecution();
-		m_Status = &shortDescription;
-		function();
-		m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
+		m_Worker.join();
 	}
-	m_Progress = 100.0f;
-	if ( m_OnFinish )
-		m_OnFinish();
-	m_Queue.clear();
+	m_Worker = Thread([this]
+					  {
+						  ScopedLock queueLock(m_QueueMutex);
+
+						  m_Running = true;
+						  if ( m_OnStart )
+							  m_OnStart();
+
+						  m_Progress = 0.0f;
+						  for ( const auto &[function, shortDescription] : m_Queue )
+						  {
+							  if ( m_ShouldExit )
+							  {
+								  break;
+							  }
+							  ScopedLock scopedLock(m_ExecutionMutex);
+							  if ( m_OnEachExecution )
+								  m_OnEachExecution();
+							  m_Status = &shortDescription;
+							  function();
+							  m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
+						  }
+						  m_Progress = 100.0f;
+						  m_Queue.clear();
+
+						  if ( m_OnFinish )
+							  m_OnFinish();
+					  });
 }
 
-Unique<BatchLoader> &BatchLoader::GetPreloader()
+void BatchLoader::ForceExit()
 {
-	SE_CORE_ASSERT(s_Preloader, "Preloader is only valid prior to running an application (Used for the splash screen)");
-	return s_Preloader;
+	m_ShouldExit = true;
+	if ( m_Worker.joinable() )
+	{
+		m_Worker.join();
+	}
 }
 
-void BatchLoader::InvalidatePreloader()
-{
-	s_Preloader.Reset();
-}
 }

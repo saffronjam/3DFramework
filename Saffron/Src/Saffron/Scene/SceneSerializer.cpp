@@ -88,7 +88,7 @@ struct convert<Se::Vector4f>
 };
 
 template<>
-struct convert<glm::quat>
+struct convert<Se::Quaternion>
 {
 	static Node encode(const glm::quat &rhs)
 	{
@@ -100,7 +100,7 @@ struct convert<glm::quat>
 		return node;
 	}
 
-	static bool decode(const Node &node, glm::quat &rhs)
+	static bool decode(const Node &node, Se::Quaternion &rhs)
 	{
 		if ( !node.IsSequence() || node.size() != 4 )
 			return false;
@@ -143,7 +143,7 @@ YAML::Emitter &operator<<(YAML::Emitter &out, const Vector4f &v)
 	return out;
 }
 
-YAML::Emitter &operator<<(YAML::Emitter &out, const glm::quat &v)
+YAML::Emitter &operator<<(YAML::Emitter &out, const Quaternion &v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.w << v.x << v.y << v.z << YAML::EndSeq;

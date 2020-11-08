@@ -33,7 +33,7 @@ public:
 
 	template<typename FuncT>
 	static void Submit(FuncT &&func);
-	static void WaitAndRender();
+	static void Execute();
 
 	// ~Actual~ Renderer here... TODO: remove confusion later
 	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);

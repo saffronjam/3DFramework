@@ -1,9 +1,10 @@
+#define SAFFRON_ENTRY_POINT
 #include <Saffron.h>
-#include <Saffron/EntryPoint.h>
 
 #include "EditorLayer.h"
+#include "StartupLayer.h"
 
-class SaffronBunApplication : public Se::Application
+class SaffronBunApplication : public Application
 {
 public:
 	SaffronBunApplication(const Properties &props)
@@ -13,11 +14,11 @@ public:
 
 	void OnInit() override
 	{
-		PushLayer(new Se::EditorLayer());
+		PushLayer(new EditorLayer());
 	}
 };
 
-Se::Application *Se::CreateApplication()
+Application *Se::CreateApplication()
 {
 	return new SaffronBunApplication({ "Saffron Bun", 1600, 900 });
 }

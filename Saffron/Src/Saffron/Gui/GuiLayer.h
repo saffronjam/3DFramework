@@ -15,7 +15,7 @@ public:
 	void Begin();
 	void End();
 
-	void OnAttach() override;
+	void OnAttach(Shared<BatchLoader> &loader) override;
 	void OnDetach() override;
 	void OnGuiRender() override;
 };

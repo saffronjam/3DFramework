@@ -1,141 +1,136 @@
 #include "EditorLayer.h"
 
-#include <filesystem>
-
-#include "Saffron/Core/BatchLoader.h"
-#include "Saffron/Core/FileIOManager.h"
-#include "Saffron/Core/Misc.h"
-#include "Saffron/Core/Run.h"
-#include "Saffron/Editor/ViewportPane.h"
-#include "Saffron/Gui/Gui.h"
-#include "Saffron/Input/Input.h"
-#include "Saffron/Renderer/Renderer2D.h"
-#include "Saffron/Script/ScriptEngine.h"
-
-
-namespace Se
-{
 
 EditorLayer::EditorLayer()
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
 	m_EditorScene(Shared<EditorScene>::Create("Editor Scene")),
 	m_MainViewportPane(Shared<ViewportPane>::Create("Main Viewport", SceneRenderer::GetMainTarget())),
-	m_MiniViewportPane(Shared<ViewportPane>::Create("Mini Viewport", m_EditorScene->GetMiniTarget()))
+	m_MiniViewportPane(Shared<ViewportPane>::Create("Mini Viewport", m_EditorScene->GetMiniTarget())),
+	m_LastFocusedScene(m_EditorScene),
+	m_CachedActiveScene(m_EditorScene),
+	m_SceneState(SceneState::Edit)
 {
 	Application::Get().GetWindow().SetAntiAliasing(AntiAliasing::Sample16);
 }
 
-void EditorLayer::OnAttach()
+void EditorLayer::OnAttach(Shared<BatchLoader> &loader)
 {
-	BatchLoader::GetPreloader()->Submit([this]
-										{
-											Gui::Init();
-											Gui::SetStyle(static_cast<Gui::Style>(m_Style));
-										}, "Initializing GUI"
+	loader->Submit([this]
+				   {
+					   Gui::Init();
+					   Gui::SetStyle(static_cast<Gui::Style>(m_Style));
+				   }, "Initializing GUI"
 	);
 
-	BatchLoader::GetPreloader()->Submit([this]
-										{
-											m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
-											m_TexStore["Checkerboard2"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
-											m_TexStore["PlayButton"] = Texture2D::Create("Assets/Editor/PlayButton.png");
-											m_TexStore["PauseButton"] = Texture2D::Create("Assets/Editor/PauseButton.png");
-											m_TexStore["StopButton"] = Texture2D::Create("Assets/Editor/StopButton.png");
-											m_TexStore["TranslateButton"] = Texture2D::Create("Assets/Editor/Translate_w.png");
-											m_TexStore["RotateButton"] = Texture2D::Create("Assets/Editor/Rotate_w.png");
-											m_TexStore["ScaleButton"] = Texture2D::Create("Assets/Editor/Scale_w.png");
-											m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
-											m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
-										}, "Loading Editor Textures");
+	loader->Submit([this]
+				   {
+					   m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+					   m_TexStore["Checkerboard2"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+					   m_TexStore["PlayButton"] = Texture2D::Create("Assets/Editor/PlayButton.png");
+					   m_TexStore["PauseButton"] = Texture2D::Create("Assets/Editor/PauseButton.png");
+					   m_TexStore["StopButton"] = Texture2D::Create("Assets/Editor/StopButton.png");
+					   m_TexStore["TranslateButton"] = Texture2D::Create("Assets/Editor/Translate_w.png");
+					   m_TexStore["RotateButton"] = Texture2D::Create("Assets/Editor/Rotate_w.png");
+					   m_TexStore["ScaleButton"] = Texture2D::Create("Assets/Editor/Scale_w.png");
+					   m_TexStore["ControllerGameButton"] = Texture2D::Create("Assets/Editor/ControllerGame_w.png");
+					   m_TexStore["ControllerMayaButton"] = Texture2D::Create("Assets/Editor/ControllerMaya_w.png");
+				   }, "Loading Editor Textures");
 
 
-	BatchLoader::GetPreloader()->Submit([this]
-										{
-											m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
-											m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
-											m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
-											m_ScenePanel = Shared<ScenePanel>::Create(m_EditorScene);
-										}, "Initializing Editor Panels");
+	loader->Submit([this]
+				   {
+					   m_AssetPanel = Shared<AssetPanel>::Create("../ExampleApp/Assets/Meshes");
+					   m_EntityPanel = Shared<EntityPanel>::Create(m_EditorScene);
+					   m_ScriptPanel = Shared<ScriptPanel>::Create("../ExampleApp/Src");
+					   m_ScenePanel = Shared<ScenePanel>::Create(m_EditorScene);
+				   }, "Initializing Editor Panels");
 
-	BatchLoader::GetPreloader()->Submit([this] {LoadNewScene("Assets/Scenes/Levels/Physics2D-Game.ssc"); }, "Loading Default Scene");
+	loader->Submit([this]
+				   {
+					   const auto &startUpSceneFilepath = Engine::GetStartUpSceneFilepath();
+					   if ( startUpSceneFilepath.has_filename() && startUpSceneFilepath.extension() == ".ssc" )
+					   {
+						   LoadNewScene(startUpSceneFilepath);
+					   }
+				   }, "Loading Default Scene");
 
-	BatchLoader::GetPreloader()->Submit([this]
-										{
-											Run::Periodically([this]
-															  {
-																  m_AssetPanel->SyncAssetPaths();
-																  m_ScriptPanel->SyncScriptPaths();
-															  }, Time(1.0f));
-										}, "Setting Up Periodic Callbacks ");
+	loader->Submit([this]
+				   {
+					   Run::Periodically([this]
+										 {
+											 m_AssetPanel->SyncAssetPaths();
+											 m_ScriptPanel->SyncScriptPaths();
+										 }, Time(1.0f));
+				   }, "Setting Up Periodic Callbacks ");
 
-	BatchLoader::GetPreloader()->Submit([this]
-										{
-											m_MainViewportPane->SetPostRenderCallback([this]()
-																					  {
-																						  const auto &scene = m_EditorScene;
-																						  const auto &viewportPane = m_MainViewportPane;
-																						  Entity modelEntity = m_SelectedEntity;
+	loader->Submit([this]
+				   {
+					   m_MainViewportPane->SetPostRenderCallback([this]()
+																 {
+																	 const auto &scene = m_EditorScene;
+																	 const auto &viewportPane = m_MainViewportPane;
+																	 Entity modelEntity = m_SelectedEntity;
 
-																						  if ( m_SceneState == SceneState::Edit &&
-																							  m_GizmoType != -1 &&
-																							  GetActiveScene() == scene &&
-																							  modelEntity )
-																						  {
-																							  const auto viewportSize = viewportPane->GetViewportSize();
-																							  const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+																	 if ( m_SceneState == SceneState::Edit &&
+																		 m_GizmoType != -1 &&
+																		 GetActiveScene() == scene &&
+																		 modelEntity )
+																	 {
+																		 const auto viewportSize = viewportPane->GetViewportSize();
+																		 const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
-																							  const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-																							  auto &entityTransform = modelEntity.Transform();
-																							  const float snapValue = GetSnapValue();
-																							  float snapValues[3] = { snapValue, snapValue, snapValue };
+																		 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+																		 auto &entityTransform = modelEntity.Transform();
+																		 const float snapValue = GetSnapValue();
+																		 float snapValues[3] = { snapValue, snapValue, snapValue };
 
-																							  ImGuizmo::SetDrawlist();
-																							  ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+																		 ImGuizmo::SetDrawlist();
+																		 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
-																							  if ( m_SelectionMode == SelectionMode::Entity )
-																							  {
-																								  ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																													   glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																													   static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																													   ImGuizmo::LOCAL,
-																													   glm::value_ptr(entityTransform),
-																													   nullptr,
-																													   snap ? snapValues : nullptr);
-																							  }
-																							  else
-																							  {
-																								  glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
-																								  ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																													   glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																													   static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																													   ImGuizmo::LOCAL,
-																													   glm::value_ptr(transformBase),
-																													   nullptr,
-																													   snap ? snapValues : nullptr);
+																		 if ( m_SelectionMode == SelectionMode::Entity )
+																		 {
+																			 ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+																								  glm::value_ptr(editorCamera->GetProjectionMatrix()),
+																								  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																								  ImGuizmo::LOCAL,
+																								  glm::value_ptr(entityTransform),
+																								  nullptr,
+																								  snap ? snapValues : nullptr);
+																		 }
+																		 else
+																		 {
+																			 glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
+																			 ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+																								  glm::value_ptr(editorCamera->GetProjectionMatrix()),
+																								  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+																								  ImGuizmo::LOCAL,
+																								  glm::value_ptr(transformBase),
+																								  nullptr,
+																								  snap ? snapValues : nullptr);
 
-																								  modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
-																							  }
-																						  }
-																					  });
-											m_ScenePanel->SetOptionCallback([this](ScenePanel::CallbackAction option, Entity entity)
-																			{
-																				switch ( option )
-																				{
-																				case ScenePanel::CallbackAction::Delete:
-																					OnEntityDeleted(entity);
-																					break;
-																				case ScenePanel::CallbackAction::NewSelection:
-																					OnUnselected(m_SelectedEntity);
-																					OnSelected(entity);
-																					break;
-																				case ScenePanel::CallbackAction::ViewInModelSpace:
-																					OnNewModelSpaceView(entity);
-																					break;
-																				}
-																			});
+																			 modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+																		 }
+																	 }
+																 });
+					   m_ScenePanel->SetOptionCallback([this](ScenePanel::CallbackAction option, Entity entity)
+													   {
+														   switch ( option )
+														   {
+														   case ScenePanel::CallbackAction::Delete:
+															   OnEntityDeleted(entity);
+															   break;
+														   case ScenePanel::CallbackAction::NewSelection:
+															   OnUnselected(m_SelectedEntity);
+															   OnSelected(entity);
+															   break;
+														   case ScenePanel::CallbackAction::ViewInModelSpace:
+															   OnNewModelSpaceView(entity);
+															   break;
+														   }
+													   });
 
-										}, "Setting Up System Callbacks");
+				   }, "Setting Up System Callbacks");
 }
 
 void EditorLayer::OnDetach()
@@ -310,6 +305,7 @@ void EditorLayer::OnGuiRender()
 		const auto viewportSize = viewportPane->GetViewportSize();
 		scene->SetViewportSize(viewportSize.x, viewportSize.y);
 	}
+
 }
 
 void EditorLayer::OnEvent(const Event &event)
@@ -899,7 +895,6 @@ void EditorLayer::OnNewModelSpaceView(Entity entity)
 	auto newViewportPane = Shared<ViewportPane>::Create(tag, newScene->GetTarget());
 	auto &emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
 
-	// TODO: Fix bug here with imguizo transforming
 	emplacedPair.second->SetPostRenderCallback([this, emplacedPair]
 											   {
 												   const auto &scene = emplacedPair.first;
@@ -961,4 +956,3 @@ Ray EditorLayer::CastMouseRay() const
 	return Ray::Zero();
 }
 
-}

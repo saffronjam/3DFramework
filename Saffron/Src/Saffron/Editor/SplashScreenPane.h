@@ -6,12 +6,14 @@
 
 namespace Se
 {
-class SplashScreen
+class SplashScreenPane : public ReferenceCounted
 {
 public:
-	SplashScreen();
+	explicit SplashScreenPane(const Shared<BatchLoader> &batchLoader);
 
 	void OnGuiRender();
+
+	const Shared<BatchLoader> &GetBatchLoader() const { return m_BatchLoader; }
 
 	void Show();
 	void Hide();
@@ -19,7 +21,7 @@ public:
 	bool IsFinished() const;
 
 private:
-	const Unique<BatchLoader> &m_BatchLoader;
+	Shared<BatchLoader> m_BatchLoader;
 	Shared<Texture2D> m_Texture;
 	bool m_Hidden = false;
 	String m_FinalizingStatus;

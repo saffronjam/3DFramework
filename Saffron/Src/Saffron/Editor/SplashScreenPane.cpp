@@ -1,19 +1,19 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Editor/SplashScreenPane.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Gui/SplashScreen.h"
 
 namespace Se
 {
-SplashScreen::SplashScreen()
-	: m_BatchLoader(BatchLoader::GetPreloader()),
-	m_Texture(Texture2D::Create(Filepath("Assets/Editor/Saffron.png"))), //TODO: Add proper texture
+SplashScreenPane::SplashScreenPane(const Shared<BatchLoader> &batchLoader)
+	: m_BatchLoader(batchLoader),
+	m_Texture(Texture2D::Create(Filepath("Assets/Editor/Saffron.png"))),
 	m_FinalizingStatus("Finalizing")
 {
 }
 
-void SplashScreen::OnGuiRender()
+void SplashScreenPane::OnGuiRender()
 {
 	if ( m_Hidden )
 		return;
@@ -66,22 +66,22 @@ void SplashScreen::OnGuiRender()
 	ImGui::End();
 }
 
-void SplashScreen::Show()
+void SplashScreenPane::Show()
 {
 	m_Hidden = false;
 }
 
-void SplashScreen::Hide()
+void SplashScreenPane::Hide()
 {
 	m_Hidden = true;
 }
 
-bool SplashScreen::IsIdle() const
+bool SplashScreenPane::IsIdle() const
 {
 	return  static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
 }
 
-bool SplashScreen::IsFinished() const
+bool SplashScreenPane::IsFinished() const
 {
 	return m_CurrentProgressView >= 100.0f;
 }
