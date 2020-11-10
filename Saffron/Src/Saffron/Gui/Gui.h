@@ -9,6 +9,7 @@
 
 namespace Se
 {
+using Font = ImFont;
 class Gui
 {
 public:
@@ -48,6 +49,8 @@ public:
 
 	static void SetStyle(Style style);
 	static void SetFontSize(int size);
+
+	static Font *AddFont(const Filepath &path, int size);
 
 private:
 	static void PushID();

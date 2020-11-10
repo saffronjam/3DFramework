@@ -72,10 +72,6 @@ void Gui::Init()
 
 	AddFont(18);*/
 
-	auto *newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto-Medium.ttf", static_cast<float>(18));
-	m_Fonts.emplace(18, newFont);
-	ImGui::GetIO().FontDefault = m_Fonts[18];
-
 }
 
 void Gui::BeginPropertyGrid(float width)
@@ -380,6 +376,13 @@ void Gui::SetFontSize(int size)
 	{
 		ImGui::SetCurrentFont(candidate);
 	}
+}
+
+Font *Gui::AddFont(const Filepath &path, int size)
+{
+	auto *newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(path.string().c_str(), static_cast<float>(size));
+	m_Fonts.emplace(size, newFont);
+	return newFont;
 }
 
 void Gui::PushID()

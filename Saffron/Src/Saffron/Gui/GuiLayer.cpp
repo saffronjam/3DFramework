@@ -54,8 +54,16 @@ void GuiLayer::OnAttach(Shared<BatchLoader> &loader)
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-	[[maybe_unused]] ImFont *pFont = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\segoeui.ttf)", 18.0f);
-	io.FontDefault = io.Fonts->Fonts.back();
+	auto *newFont = Gui::AddFont("Assets/Fonts/segoeui.ttf", 18);
+	io.FontDefault = newFont;
+
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 8);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 12);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 14);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 24);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 32);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 56);
+	Gui::AddFont("Assets/Fonts/segoeui.ttf", 72);
 
 	// Setup Dear ImGui style
 	ImGui::StyleColorsDark();
