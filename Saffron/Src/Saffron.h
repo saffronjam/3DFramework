@@ -45,7 +45,7 @@
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Scene/SceneCamera.h"
-#include "Saffron/Scene/SceneSerializer.h"
+#include "Saffron/Serialize/SceneSerializer.h"
 #include "Saffron/Entity/EntityComponents.h"
 
 #include "Saffron/Base.h"
@@ -63,7 +63,6 @@
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Core/Run.h"
 #include "Saffron/Editor/ViewportPane.h"
-#include "Saffron/Engine/Engine.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer2D.h"

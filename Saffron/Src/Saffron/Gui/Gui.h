@@ -47,6 +47,7 @@ public:
 	static void InfoModal(const char *title, const char *text, bool open);
 
 	static void SetStyle(Style style);
+	static void SetFontSize(int size);
 
 private:
 	static void PushID();
@@ -54,6 +55,7 @@ private:
 
 private:
 	static Style m_CurrentStyle;
+	static Map<int, ImFont *> m_Fonts;
 
 };
 }

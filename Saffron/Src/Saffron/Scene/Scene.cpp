@@ -1,10 +1,6 @@
 #include "SaffronPCH.h"
 
-#include <assimp/scene.h>
-
-#include "Saffron/Core/Application.h"
 #include "Saffron/Core/FileIOManager.h"
-#include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Gui/Gui.h"

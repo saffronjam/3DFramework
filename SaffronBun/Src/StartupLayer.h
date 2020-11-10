@@ -16,4 +16,8 @@ public:
 	void OnEvent(const Event &event) override;
 
 private:
+	Map<String, Shared<Texture2D>> m_TextureStore;
+	Shared<Texture2D> m_CurrentPreviewTexture;
+	DateTime m_Today;
+
 };

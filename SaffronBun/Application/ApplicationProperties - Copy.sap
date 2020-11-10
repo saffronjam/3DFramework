@@ -1,0 +1,6 @@
+Application: Windows x64 Debug
+Projects:
+  - Project: MyProj
+    UUID: 16183183861790342329
+    Filepath: Assets/Scene/MyProj.ssc
+    LastOpened: [2020, 10, 9, 1, 21, 25, 19]

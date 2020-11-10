@@ -15,8 +15,10 @@ public:
 
 	bool Deserialize(const Filepath &filepath);
 	bool DeserializeRuntime(const Filepath &filepath);
+
 private:
 	Shared<Scene> m_Scene;
+
 };
 }
 

@@ -429,7 +429,7 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 
 
 ///////////////////////////////////////////////////////////////////////////
-/// Script Engine
+/// Script ProjectManager
 ///////////////////////////////////////////////////////////////////////////
 
 
@@ -456,7 +456,7 @@ void ScriptEngine::OnUpdate()
 
 void ScriptEngine::OnGuiRender()
 {
-	ImGui::Begin("Script Engine Debug");
+	ImGui::Begin("Script ProjectManager Debug");
 	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
 	{
 		bool opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(sceneID)), "Scene (%llx)", static_cast<Uint64>(sceneID));

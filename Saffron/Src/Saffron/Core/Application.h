@@ -2,19 +2,35 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Events/WindowEvent.h"
+#include "Saffron/Core/DateTime.h"
 #include "Saffron/Core/LayerStack.h"
 #include "Saffron/Core/Window.h"
 #include "Saffron/Gui/GuiLayer.h"
+#include "Saffron/Renderer/Texture.h"
 
 namespace Se
 {
 class Application
 {
+	friend class ApplicationSerializer;
+
 public:
 	struct Properties
 	{
 		String Name;
 		Uint32 WindowWidth, WindowHeight;
+	};
+
+	struct Project
+	{
+		UUID UUID;
+		String Name;
+		Filepath SceneFilepath;
+		Shared<Texture2D> PreviewTexture;
+		DateTime LastOpened;
+
+		bool operator==(const Project &rhs) const { return UUID == rhs.UUID; }
+		bool operator<(const Project &rhs) const { return LastOpened < rhs.LastOpened; }
 	};
 
 public:
@@ -26,7 +42,7 @@ public:
 
 	virtual void OnInit() {}
 	virtual void OnShutdown() {}
-	virtual void OnUpdate(Time ts) {}
+	virtual void OnUpdate() {}
 	virtual void OnEvent(const Event &event);
 
 	void PushLayer(Layer *layer);
@@ -34,10 +50,14 @@ public:
 	void RenderGui();
 
 	Window &GetWindow() { return *m_Window; }
+	const ArrayList<Project> &GetProjectList() const;
+	const Project &GetActiveProject() const;
+	void SetActiveProject(const Project &project);
+
 	static Application &Get() { return *s_Instance; }
 
-	static const char *GetConfigurationName();
-	static const char *GetPlatformName();
+	static String GetConfigurationName();
+	static String GetPlatformName();
 
 private:
 	bool OnWindowClose(const WindowCloseEvent &event);
@@ -49,6 +69,9 @@ private:
 	GuiLayer *m_GuiLayer;
 	Mutex m_FinalPreloaderMessageMutex;
 	Shared<BatchLoader> m_PreLoader;
+
+	mutable ArrayList<Project> m_ProjectList;
+	Project *m_ActiveProject = nullptr;
 
 	Time ts;
 

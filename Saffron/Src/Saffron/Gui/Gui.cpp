@@ -6,6 +6,7 @@ namespace Se
 {
 
 Gui::Style Gui::m_CurrentStyle = Style::Light;
+Map<int, ImFont *> Gui::m_Fonts;
 
 ///////////////////////////////////////////////////////////////////////////
 /// Statics
@@ -61,6 +62,20 @@ void Gui::Init()
 	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.06f, 0.53f, 0.98f, 0.60f);
 
 	SetStyle(Style::Dark);
+
+	/*auto AddFont([](Uint32 size)
+				 {
+					 auto &io = ImGui::GetIO();
+					 auto *newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto-Medium.ttf", static_cast<float>(size));
+					 m_Fonts.emplace(size, newFont);
+				 });
+
+	AddFont(18);*/
+
+	auto *newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF("Assets/Fonts/Roboto-Medium.ttf", static_cast<float>(18));
+	m_Fonts.emplace(18, newFont);
+	ImGui::GetIO().FontDefault = m_Fonts[18];
+
 }
 
 void Gui::BeginPropertyGrid(float width)
@@ -346,6 +361,24 @@ void Gui::SetStyle(Style style)
 			ImGui::ColorConvertHSVtoRGB(H, S, V, col.x, col.y, col.z);
 		}
 		m_CurrentStyle = style;
+	}
+}
+
+void Gui::SetFontSize(int size)
+{
+	ImFont *candidate = nullptr;
+	int bestDiff = std::numeric_limits<int>::infinity();
+	for ( auto &[fontSize, font] : m_Fonts )
+	{
+		if ( std::abs(fontSize - size) < bestDiff )
+		{
+			bestDiff = std::abs(fontSize - size);
+			candidate = font;
+		}
+	}
+	if ( candidate )
+	{
+		ImGui::SetCurrentFont(candidate);
 	}
 }
 

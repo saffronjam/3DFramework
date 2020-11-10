@@ -9,7 +9,7 @@ class EditorLayer : public Layer
 public:
 	struct AlbedoInput
 	{
-		Vector3f Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/Engine/Rendering/Materials/PhysicallyBased
+		Vector3f Color = { 0.972f, 0.96f, 0.915f }; // Silver, from https://docs.unrealengine.com/en-us/ProjectManager/Rendering/Materials/PhysicallyBased
 		Shared<Texture2D> TextureMap;
 		bool sRGB = true;
 		bool UseTexture = false;

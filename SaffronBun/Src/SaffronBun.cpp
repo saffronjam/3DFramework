@@ -14,7 +14,7 @@ public:
 
 	void OnInit() override
 	{
-		PushLayer(new EditorLayer());
+		PushLayer(new StartupLayer());
 	}
 };
 

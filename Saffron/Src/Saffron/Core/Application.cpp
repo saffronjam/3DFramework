@@ -8,15 +8,16 @@
 #include "Saffron/Core/Run.h"
 #include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Editor/SplashScreenPane.h"
-#include "Saffron/Engine/EngineSerializer.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
+#include "Saffron/Serialize/ApplicationSerializer.h"
 
 namespace Se {
 
 Application *Application::s_Instance = nullptr;
+
 
 Application::Application(const Properties &properties)
 	: m_PreLoader(Shared<BatchLoader>::Create("Preloader"))
@@ -37,7 +38,17 @@ Application::Application(const Properties &properties)
 	Renderer::Execute();
 	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
 	FileIOManager::Init(*m_Window);
-	EngineSerializer::Deserialize("Engine/EngineProperties.sen");
+	m_PreLoader->Submit([this]
+						{
+							ApplicationSerializer serializer(*this);
+							serializer.Deserialize("Application/ApplicationProperties.sap");
+						}, "Deserializing Engine Properties");
+
+	m_PreLoader->Submit([]
+						{
+							Gui::Init();
+							Gui::SetStyle(Gui::Style::Dark);
+						}, "Initializing GUI");
 
 	ts = GlobalTimer::Mark();
 }
@@ -45,7 +56,8 @@ Application::Application(const Properties &properties)
 Application::~Application()
 {
 	ScriptEngine::Shutdown();
-	EngineSerializer::Serialize("Engine/EngineProperties.sen");
+	const ApplicationSerializer serializer(*this);
+	serializer.Serialize("Application/ApplicationProperties.sap");
 }
 
 void Application::PushLayer(Layer *layer)
@@ -103,15 +115,10 @@ void Application::Run()
 		{
 			for ( Layer *layer : m_LayerStack )
 				layer->OnUpdate();
-
 			ScriptEngine::OnUpdate();
 			Input::OnUpdate();
 			m_Window->OnUpdate();
-
-			// Render ImGui on render thread
-			Application *app = this;
-			Renderer::Submit([app]() { app->RenderGui(); });
-
+			Renderer::Submit([this]() { RenderGui(); });
 			Renderer::Execute();
 		}
 		Run::Execute();
@@ -153,7 +160,27 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 	return true;
 }
 
-const char *Application::GetConfigurationName()
+const ArrayList<Application::Project> &Application::GetProjectList() const
+{
+	std::sort(m_ProjectList.begin(), m_ProjectList.end());
+	return m_ProjectList;
+}
+
+const Application::Project &Application::GetActiveProject() const
+{
+	SE_CORE_ASSERT(m_ActiveProject, "Tried to fetch active project when there was none");
+	return *m_ActiveProject;
+}
+
+void Application::SetActiveProject(const Project &project)
+{
+	const auto iter = std::find(m_ProjectList.begin(), m_ProjectList.end(), project);
+	SE_CORE_ASSERT(iter != m_ProjectList.end(), "Tried loading an invalid project");
+	m_ActiveProject = &*iter;
+	m_ActiveProject->LastOpened = DateTime();
+}
+
+String Application::GetConfigurationName()
 {
 #if defined(SE_DEBUG)
 	return "Debug";
@@ -166,7 +193,7 @@ const char *Application::GetConfigurationName()
 #endif
 }
 
-const char *Application::GetPlatformName()
+String Application::GetPlatformName()
 {
 #if defined(SE_PLATFORM_WINDOWS)
 	return "Windows x64";

@@ -6,7 +6,7 @@
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityComponents.h"
-#include "Saffron/Scene/SceneSerializer.h"
+#include "Saffron/Serialize/SceneSerializer.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 ///////////////////////////////////////////////////////////////////////////
