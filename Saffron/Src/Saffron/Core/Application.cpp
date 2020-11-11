@@ -160,7 +160,10 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 
 const ArrayList<Application::Project> &Application::GetProjectList() const
 {
-	std::sort(m_ProjectList.begin(), m_ProjectList.end());
+	std::sort(m_ProjectList.begin(), m_ProjectList.end(), [](const auto &first, const auto &second)
+			  {
+				  return first.LastOpened > second.LastOpened;
+			  });
 	return m_ProjectList;
 }
 

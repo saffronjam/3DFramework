@@ -98,7 +98,7 @@ DateTime::DateTime(TimePoint timePoint)
 {
 	time_t time = std::chrono::system_clock::to_time_t(timePoint);
 	const std::tm *tm = std::localtime(&time);
-	m_Date = { tm->tm_sec, tm->tm_min, tm->tm_hour, tm->tm_wday - 1,tm->tm_mday, tm->tm_mon, tm->tm_year + 1900 };
+	m_Date = { tm->tm_sec, tm->tm_min, tm->tm_hour, tm->tm_wday - 1,tm->tm_mday - 1, tm->tm_mon, tm->tm_year + 1900 };
 	Clamp();
 }
 
@@ -118,14 +118,24 @@ bool DateTime::operator<(const DateTime &rhs) const
 		std::make_tuple(rDate.Year, rDate.Month, rDate.Day, rDate.Weekday, rDate.Hour, rDate.Minutes, rDate.Seconds);
 }
 
+bool DateTime::operator>(const DateTime &rhs) const
+{
+	const auto &lDate = m_Date;
+	const auto &rDate = rhs.m_Date;
+
+	return
+		std::make_tuple(lDate.Year, lDate.Month, lDate.Day, lDate.Weekday, lDate.Hour, lDate.Minutes, lDate.Seconds) >
+		std::make_tuple(rDate.Year, rDate.Month, rDate.Day, rDate.Weekday, rDate.Hour, rDate.Minutes, rDate.Seconds);
+}
+
 String DateTime::WeekdayString(bool abbreviation) const
 {
-	return abbreviation ? ValueToMonthShortString(Month()) : ValueToMonthString(Month());
+	return abbreviation ? ValueToWeekdayShortString(Weekday()) : ValueToWeekdayString(Weekday());
 }
 
 String DateTime::MonthString(bool abbreviation) const
 {
-	return abbreviation ? ValueToWeekdayShortString(Weekday()) : ValueToWeekdayString(Weekday());
+	return abbreviation ? ValueToMonthShortString(Month()) : ValueToMonthString(Month());
 }
 
 void DateTime::Clamp()

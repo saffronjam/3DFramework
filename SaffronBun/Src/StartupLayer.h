@@ -17,7 +17,7 @@ public:
 
 private:
 	Map<String, Shared<Texture2D>> m_TextureStore;
-	Shared<Texture2D> m_CurrentPreviewTexture;
+	const Application::Project *m_ChosenProject = nullptr;
 	DateTime m_Today;
 
 };

@@ -29,7 +29,6 @@ public:
 		DateTime LastOpened;
 
 		bool operator==(const Project &rhs) const { return UUID == rhs.UUID; }
-		bool operator<(const Project &rhs) const { return LastOpened < rhs.LastOpened; }
 	};
 
 public:

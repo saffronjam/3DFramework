@@ -55,9 +55,12 @@ public:
 
 	static Font *AddFont(const Filepath &path, int size);
 
+	static void ForceHideBarTab();
+
 private:
 	static void PushID();
 	static void PopID();
+	static Font *GetAppropriateFont(int size);
 
 private:
 	static Style m_CurrentStyle;

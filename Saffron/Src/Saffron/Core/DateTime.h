@@ -28,6 +28,7 @@ public:
 	DateTime(int year, int month, int day, int weekday, int hour, int minutes, int seconds);
 
 	bool operator<(const DateTime &rhs) const;
+	bool operator>(const DateTime &rhs) const;
 
 	int Seconds() const { return m_Date.Seconds; }
 	int Minutes() const { return m_Date.Minutes; }

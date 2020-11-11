@@ -12,10 +12,6 @@ namespace Se
 Gui::Style Gui::m_CurrentStyle = Style::Light;
 Map<int, ImFont *> Gui::m_Fonts;
 
-///////////////////////////////////////////////////////////////////////////
-/// Statics
-///////////////////////////////////////////////////////////////////////////
-
 static int s_UIContextID = 0;
 
 void Gui::Init()
@@ -31,7 +27,7 @@ void Gui::Init()
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoTaskBarIcons;
 	//io.ConfigFlags |= ImGuiConfigFlags_ViewportsNoMerge;
 
-	auto *newFont = Gui::AddFont("Assets/Fonts/segoeui.ttf", 18);
+	auto *newFont = AddFont("Assets/Fonts/segoeui.ttf", 18);
 	io.FontDefault = newFont;
 
 	AddFont("Assets/Fonts/segoeui.ttf", 8);
@@ -422,20 +418,9 @@ void Gui::SetStyle(Style style)
 
 void Gui::SetFontSize(int size)
 {
-	ImFont *candidate = nullptr;
-	int bestDiff = std::numeric_limits<int>::infinity();
-	for ( auto &[fontSize, font] : m_Fonts )
-	{
-		if ( std::abs(fontSize - size) < bestDiff )
-		{
-			bestDiff = std::abs(fontSize - size);
-			candidate = font;
-		}
-	}
-	if ( candidate )
-	{
-		ImGui::SetCurrentFont(candidate);
-	}
+	ImFont *candidate = GetAppropriateFont(size);
+	SE_CORE_ASSERT(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");
+	ImGui::SetCurrentFont(candidate);
 }
 
 Font *Gui::AddFont(const Filepath &path, int size)
@@ -443,6 +428,21 @@ Font *Gui::AddFont(const Filepath &path, int size)
 	auto *newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(path.string().c_str(), static_cast<float>(size));
 	m_Fonts.emplace(size, newFont);
 	return newFont;
+}
+
+void Gui::ForceHideBarTab()
+{
+	if ( ImGui::IsWindowDocked() )
+	{
+		auto *node = ImGui::GetWindowDockNode();
+		if ( node )
+		{
+			if ( node && !node->IsHiddenTabBar() )
+			{
+				node->WantHiddenTabBarToggle = true;
+			}
+		}
+	}
 }
 
 void Gui::PushID()
@@ -454,6 +454,22 @@ void Gui::PopID()
 {
 	ImGui::PopID();
 	s_UIContextID--;
+}
+
+Font *Gui::GetAppropriateFont(int size)
+{
+	ImFont *candidate = nullptr;
+	int bestDiff = std::numeric_limits<int>::max();
+	for ( auto &[fontSize, font] : m_Fonts )
+	{
+		if ( std::abs(fontSize - size) > bestDiff )
+		{
+			break;
+		}
+		bestDiff = std::abs(fontSize - size);
+		candidate = font;
+	}
+	return candidate;
 }
 }
 
