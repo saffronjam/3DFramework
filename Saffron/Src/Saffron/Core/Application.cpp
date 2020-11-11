@@ -31,13 +31,11 @@ Application::Application(const Properties &properties)
 	m_Window->SetWindowIcon("Assets/Editor/Saffron_windowIcon.png");
 	m_Window->HandleBufferedEvents();
 
-	m_GuiLayer = new GuiLayer("Gui");
-	PushOverlay(m_GuiLayer);
-
 	Renderer::Init();
 	Renderer::Execute();
 	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
 	FileIOManager::Init(*m_Window);
+	Gui::Init();
 	m_PreLoader->Submit([this]
 						{
 							ApplicationSerializer serializer(*this);
@@ -46,7 +44,6 @@ Application::Application(const Properties &properties)
 
 	m_PreLoader->Submit([]
 						{
-							Gui::Init();
 							Gui::SetStyle(Gui::Style::Dark);
 						}, "Initializing GUI");
 
@@ -56,6 +53,7 @@ Application::Application(const Properties &properties)
 Application::~Application()
 {
 	ScriptEngine::Shutdown();
+	Gui::Shutdown();
 	const ApplicationSerializer serializer(*this);
 	serializer.Serialize("Application/ApplicationProperties.sap");
 }
@@ -74,12 +72,12 @@ void Application::PushOverlay(Layer *layer)
 
 void Application::RenderGui()
 {
-	m_GuiLayer->Begin();
+	Gui::Begin();
 
 	for ( Layer *layer : m_LayerStack )
 		layer->OnGuiRender();
 
-	m_GuiLayer->End();
+	Gui::End();
 }
 
 void Application::Run()
@@ -94,11 +92,11 @@ void Application::Run()
 	SplashScreenPane splashScreenPane(m_PreLoader);
 	while ( !splashScreenPane.IsFinished() )
 	{
-		m_GuiLayer->Begin();
+		Gui::Begin();
 		splashScreenPane.OnGuiRender();
 		m_Window->OnUpdate();
 		m_Window->HandleBufferedEvents();
-		m_GuiLayer->End();
+		Gui::End();
 		Renderer::Execute();
 		Run::Execute();
 		GlobalTimer::Mark();

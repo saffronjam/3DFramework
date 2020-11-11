@@ -53,7 +53,6 @@
 #include "Saffron/Editor/EntityPanel.h"
 #include "Saffron/Editor/ScenePanel.h"
 #include "Saffron/Editor/SplashScreenPane.h"
-#include "Saffron/Gui/GuiLayer.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Scene/ModelSpaceScene.h"
 #include "Saffron/Scene/RuntimeScene.h"

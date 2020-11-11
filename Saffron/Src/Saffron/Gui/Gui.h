@@ -25,7 +25,10 @@ public:
 
 public:
 	static void Init();
+	static void Shutdown();
 
+	static void Begin();
+	static void End();
 
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();

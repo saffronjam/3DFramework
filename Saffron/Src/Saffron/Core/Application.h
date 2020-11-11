@@ -5,7 +5,6 @@
 #include "Saffron/Core/DateTime.h"
 #include "Saffron/Core/LayerStack.h"
 #include "Saffron/Core/Window.h"
-#include "Saffron/Gui/GuiLayer.h"
 #include "Saffron/Renderer/Texture.h"
 
 namespace Se
@@ -66,7 +65,6 @@ private:
 	Shared<Window> m_Window;
 	bool m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
-	GuiLayer *m_GuiLayer;
 	Mutex m_FinalPreloaderMessageMutex;
 	Shared<BatchLoader> m_PreLoader;
 
