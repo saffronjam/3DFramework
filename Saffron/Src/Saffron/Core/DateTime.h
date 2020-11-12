@@ -40,6 +40,9 @@ public:
 
 	String WeekdayString(bool abbreviation = false) const;
 	String MonthString(bool abbreviation = false) const;
+	String TimeString() const;
+	String ANSIDateString() const;
+
 
 private:
 	void Clamp();

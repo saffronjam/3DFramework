@@ -34,6 +34,7 @@ void Gui::Init()
 	AddFont("Assets/Fonts/segoeui.ttf", 12);
 	AddFont("Assets/Fonts/segoeui.ttf", 14);
 	AddFont("Assets/Fonts/segoeui.ttf", 24);
+	AddFont("Assets/Fonts/segoeui.ttf", 28);
 	AddFont("Assets/Fonts/segoeui.ttf", 32);
 	AddFont("Assets/Fonts/segoeui.ttf", 56);
 	AddFont("Assets/Fonts/segoeui.ttf", 72);

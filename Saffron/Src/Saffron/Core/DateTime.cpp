@@ -138,6 +138,22 @@ String DateTime::MonthString(bool abbreviation) const
 	return abbreviation ? ValueToMonthShortString(Month()) : ValueToMonthString(Month());
 }
 
+String DateTime::TimeString() const
+{
+	OutputStringStream oss;
+	oss << std::setw(2) << std::setfill('0') << Hour() << ":" << std::setw(2) << std::setfill('0') << Minutes();
+	return oss.str();
+}
+
+String DateTime::ANSIDateString() const
+{
+	OutputStringStream oss;
+	oss << Year() << "-" <<
+		std::setw(2) << std::setfill('0') << Month() << "-" <<
+		std::setw(2) << std::setfill('0') << Day();
+	return oss.str();
+}
+
 void DateTime::Clamp()
 {
 	Misc::Clamp(m_Date.Seconds, 0, 59);

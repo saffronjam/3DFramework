@@ -14,7 +14,12 @@ public:
 
 	void OnInit() override
 	{
-		PushLayer(new StartupLayer());
+		auto *startupLayer = new StartupLayer();
+		startupLayer->SetOnProjectSelectCallback([](const Project &project)
+												 {
+													 // PopLayer
+												 });
+		PushLayer(startupLayer);
 	}
 };
 
