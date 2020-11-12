@@ -39,27 +39,43 @@ void SplashScreenPane::OnGuiRender()
 
 	const auto windowSize = ImGui::GetWindowSize();
 
-	const auto logoWidth = 332;
-	const auto logoHeight = 250;
+	const auto logoWidth = 200;
+	const auto logoHeight = 200;
 	ImGui::SetCursorPos({ windowSize.x / 2.0f - logoWidth / 2.0f, windowSize.y / 2.0f - logoHeight / 2.0f });
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_Texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0), ImVec2(1, 1));
 
-	const auto loadingBarFullWidth = windowSize.x / 1.5f;
-	const auto loadingBarWidth = windowSize.x / 1.5f / 100.0f * m_CurrentProgressView;
-	const auto loadingBarHeight = windowSize.y / 20.0f;
-	ImGui::SetCursorPos({ windowSize.x / 2.0f - loadingBarFullWidth / 2.0f, windowSize.y / 2.0f + logoHeight / 2.0f + 20.0f });
-	const ImVec2 loadingBarFullPosition = ImGui::GetCursorScreenPos();
-	ImGui::GetWindowDrawList()->AddRectFilled({ loadingBarFullPosition.x, loadingBarFullPosition.y }, { loadingBarFullPosition.x + loadingBarFullWidth, loadingBarFullPosition.y + loadingBarHeight }, ImGui::GetColorU32(ImGuiCol_TextDisabled), 6.0f);
 
-	ImGui::SetCursorPos({ windowSize.x / 2.0f - loadingBarWidth / 2.0f, windowSize.y / 2.0f + logoHeight / 2.0f + 20.0f });
-	const ImVec2 loadingBarPosition = ImGui::GetCursorScreenPos();
-	ImGui::GetWindowDrawList()->AddRectFilled({ loadingBarPosition.x, loadingBarPosition.y }, { loadingBarPosition.x + loadingBarWidth, loadingBarPosition.y + loadingBarHeight }, IM_COL32(97, 51, 113, 255), 6.0f);
+	Gui::SetFontSize(48);
+
+	const char *title = "Saffron Engine";
+	const float titleTextWidth = ImGui::CalcTextSize(title).x;
+	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - titleTextWidth / 2.0f);
+	ImGui::Text(title);
+
+	/*IM_COL32(106, 58, 206, 255),
+	IM_COL32(106, 58, 206, 255),
+	IM_COL32(176, 121, 220, 255),
+	IM_COL32(176, 121, 220, 255));*/
+	Gui::SetFontSize(24);
+
+	oss.str("");
+	oss.clear();
+
+	oss << std::setprecision(0) << std::fixed << m_CurrentProgressView << "%";
+
+	ImGui::NewLine();
+	const float currentProgressTextWidth = ImGui::CalcTextSize(oss.str().c_str()).x;
+	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - currentProgressTextWidth / 2.0f);
+	ImGui::Text("%s", oss.str().c_str());
+
+	Gui::SetFontSize(18);
 
 	const String *status = m_GoalProgressView < 100.0f ? m_BatchLoader->GetStatus() : &m_FinalizingStatus;
 	if ( status && !status->empty() )
 	{
 		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
-		ImGui::SetCursorPos({ windowSize.x / 2.0f - infoTextWidth / 2.0f, loadingBarPosition.y + loadingBarHeight * 1.2f });
+		ImGui::NewLine();
+		ImGui::SetCursorPosX(windowSize.x / 2.0f - infoTextWidth / 2.0f);
 		ImGui::Text("%s", status->c_str());
 	}
 
