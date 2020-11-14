@@ -41,10 +41,12 @@ void SplashScreenPane::OnGuiRender()
 
 	const auto logoWidth = 200;
 	const auto logoHeight = 200;
-	ImGui::SetCursorPos({ windowSize.x / 2.0f - logoWidth / 2.0f, windowSize.y / 2.0f - logoHeight / 2.0f });
+	ImGui::SetCursorPos({ windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f });
 	ImGui::Image(reinterpret_cast<ImTextureID>(m_Texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0), ImVec2(1, 1));
 
 
+	Gui::SetFontSize(36);
+	ImGui::NewLine();
 	Gui::SetFontSize(48);
 
 	const char *title = "Saffron Engine";

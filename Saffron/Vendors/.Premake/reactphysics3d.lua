@@ -24,6 +24,17 @@ project "reactphysics3d"
         srcDirectory .. "include",
         srcDirectory .. "src"
     }
+	
+	disablewarnings 
+	{ 
+		"4018",
+		"4099",
+		"4244",
+		"4267",
+		"4305",
+		"4715",
+		"4996"
+	}
     
     filter "system:windows"
         systemversion "latest"
