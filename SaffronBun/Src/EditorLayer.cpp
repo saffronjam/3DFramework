@@ -1,7 +1,7 @@
 #include "EditorLayer.h"
 
 
-EditorLayer::EditorLayer()
+EditorLayer::EditorLayer(Filepath initialSceneFilepath)
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
 	m_EditorScene(Shared<EditorScene>::Create("Editor Scene")),
@@ -9,6 +9,7 @@ EditorLayer::EditorLayer()
 	m_MiniViewportPane(Shared<ViewportPane>::Create("Mini Viewport", m_EditorScene->GetMiniTarget())),
 	m_LastFocusedScene(m_EditorScene),
 	m_CachedActiveScene(m_EditorScene),
+	m_SceneFilePath(Move(initialSceneFilepath)),
 	m_SceneState(SceneState::Edit)
 {
 	Application::Get().GetWindow().SetAntiAliasing(AntiAliasing::Sample16);
@@ -65,69 +66,63 @@ void EditorLayer::OnAttach(Shared<BatchLoader> &loader)
 
 	loader->Submit([this]
 				   {
-					   m_MainViewportPane->SetPostRenderCallback([this]()
-																 {
-																	 const auto &scene = m_EditorScene;
-																	 const auto &viewportPane = m_MainViewportPane;
-																	 Entity modelEntity = m_SelectedEntity;
+					   const auto &postRenderFn = [this]()
+					   {
+						   const auto &scene = m_EditorScene;
+						   const auto &viewportPane = m_MainViewportPane;
+						   Entity modelEntity = m_SelectedEntity;
 
-																	 if ( m_SceneState == SceneState::Edit &&
-																		 m_GizmoType != -1 &&
-																		 GetActiveScene() == scene &&
-																		 modelEntity )
-																	 {
-																		 const auto viewportSize = viewportPane->GetViewportSize();
-																		 const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+						   if ( m_SceneState == SceneState::Edit &&
+							   m_GizmoType != -1 &&
+							   GetActiveScene() == scene &&
+							   modelEntity )
+						   {
+							   const auto viewportSize = viewportPane->GetViewportSize();
+							   const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
-																		 const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-																		 auto &entityTransform = modelEntity.Transform();
-																		 const float snapValue = GetSnapValue();
-																		 float snapValues[3] = { snapValue, snapValue, snapValue };
+							   const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+							   auto &entityTransform = modelEntity.Transform();
+							   const float snapValue = GetSnapValue();
+							   float snapValues[3] = { snapValue, snapValue, snapValue };
 
-																		 ImGuizmo::SetDrawlist();
-																		 ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+							   ImGuizmo::SetDrawlist();
+							   ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
-																		 if ( m_SelectionMode == SelectionMode::Entity )
-																		 {
-																			 ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																								  glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																								  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																								  ImGuizmo::LOCAL,
-																								  glm::value_ptr(entityTransform),
-																								  nullptr,
-																								  snap ? snapValues : nullptr);
-																		 }
-																		 else
-																		 {
-																			 glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
-																			 ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																								  glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																								  static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																								  ImGuizmo::LOCAL,
-																								  glm::value_ptr(transformBase),
-																								  nullptr,
-																								  snap ? snapValues : nullptr);
+							   if ( m_SelectionMode == SelectionMode::Entity )
+							   {
+								   ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+														glm::value_ptr(editorCamera->GetProjectionMatrix()),
+														static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+														ImGuizmo::LOCAL,
+														glm::value_ptr(entityTransform),
+														nullptr,
+														snap ? snapValues : nullptr);
+							   }
+							   else
+							   {
+								   glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
+								   ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+														glm::value_ptr(editorCamera->GetProjectionMatrix()),
+														static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+														ImGuizmo::LOCAL,
+														glm::value_ptr(transformBase),
+														nullptr,
+														snap ? snapValues : nullptr);
 
-																			 modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
-																		 }
-																	 }
-																 });
-					   m_ScenePanel->SetOptionCallback([this](ScenePanel::CallbackAction option, Entity entity)
-													   {
-														   switch ( option )
-														   {
-														   case ScenePanel::CallbackAction::Delete:
-															   OnEntityDeleted(entity);
-															   break;
-														   case ScenePanel::CallbackAction::NewSelection:
-															   OnUnselected(m_SelectedEntity);
-															   OnSelected(entity);
-															   break;
-														   case ScenePanel::CallbackAction::ViewInModelSpace:
-															   OnNewModelSpaceView(entity);
-															   break;
-														   }
-													   });
+								   modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+							   }
+						   }
+					   };
+
+					   m_MainViewportPane->GetSignal(ViewportPane::Signals::OnPostRender).Connect(postRenderFn);
+
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnDelete).Connect([this](Entity entity) {OnEntityDeleted(entity); });
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnViewInModelSpace).Connect([this](Entity entity) {OnNewModelSpaceView(entity); });
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnNewSelection).Connect([this](Entity entity)
+																							{
+																								OnUnselected(m_SelectedEntity);
+																								OnSelected(entity);
+																							});
 
 				   }, "Setting Up System Callbacks");
 }
@@ -873,53 +868,55 @@ void EditorLayer::OnNewModelSpaceView(Entity entity)
 	auto newViewportPane = Shared<ViewportPane>::Create(tag, newScene->GetTarget());
 	auto &emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
 
-	emplacedPair.second->SetPostRenderCallback([this, emplacedPair]
-											   {
-												   const auto &scene = emplacedPair.first;
-												   const auto &viewportPane = emplacedPair.second;
-												   Entity modelEntity = scene->GetModelEntity();
+	const auto &postRenderFn = [this, emplacedPair]
+	{
+		const auto &scene = emplacedPair.first;
+		const auto &viewportPane = emplacedPair.second;
+		Entity modelEntity = scene->GetModelEntity();
 
-												   if ( m_SceneState == SceneState::Edit &&
-													   m_GizmoType != -1 &&
-													   GetActiveScene() == scene &&
-													   modelEntity )
-												   {
-													   const auto viewportSize = viewportPane->GetViewportSize();
-													   const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+		if ( m_SceneState == SceneState::Edit &&
+			m_GizmoType != -1 &&
+			GetActiveScene() == scene &&
+			modelEntity )
+		{
+			const auto viewportSize = viewportPane->GetViewportSize();
+			const auto &editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
-													   const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
-													   auto &entityTransform = modelEntity.Transform();
-													   const float snapValue = GetSnapValue();
-													   float snapValues[3] = { snapValue, snapValue, snapValue };
+			const bool snap = Input::IsKeyPressed(SE_KEY_LEFT_CONTROL);
+			auto &entityTransform = modelEntity.Transform();
+			const float snapValue = GetSnapValue();
+			float snapValues[3] = { snapValue, snapValue, snapValue };
 
-													   ImGuizmo::SetDrawlist();
-													   ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
+			ImGuizmo::SetDrawlist();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
 
-													   if ( m_SelectionMode == SelectionMode::Entity )
-													   {
-														   ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																				glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																				static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																				ImGuizmo::LOCAL,
-																				glm::value_ptr(entityTransform),
-																				nullptr,
-																				snap ? snapValues : nullptr);
-													   }
-													   else
-													   {
-														   glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
-														   ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-																				glm::value_ptr(editorCamera->GetProjectionMatrix()),
-																				static_cast<ImGuizmo::OPERATION>(m_GizmoType),
-																				ImGuizmo::LOCAL,
-																				glm::value_ptr(transformBase),
-																				nullptr,
-																				snap ? snapValues : nullptr);
+			if ( m_SelectionMode == SelectionMode::Entity )
+			{
+				ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+									 glm::value_ptr(editorCamera->GetProjectionMatrix()),
+									 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+									 ImGuizmo::LOCAL,
+									 glm::value_ptr(entityTransform),
+									 nullptr,
+									 snap ? snapValues : nullptr);
+			}
+			else
+			{
+				glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
+				ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
+									 glm::value_ptr(editorCamera->GetProjectionMatrix()),
+									 static_cast<ImGuizmo::OPERATION>(m_GizmoType),
+									 ImGuizmo::LOCAL,
+									 glm::value_ptr(transformBase),
+									 nullptr,
+									 snap ? snapValues : nullptr);
 
-														   modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
-													   }
-												   }
-											   });
+				modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) * transformBase;
+			}
+		}
+	};
+
+	emplacedPair.second->GetSignal(ViewportPane::Signals::OnPostRender).Connect(postRenderFn);
 }
 
 Ray EditorLayer::CastMouseRay() const

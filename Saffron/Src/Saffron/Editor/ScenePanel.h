@@ -6,14 +6,14 @@
 
 namespace Se
 {
-class ScenePanel : public ReferenceCounted
+class ScenePanel : public ReferenceCounted, public Signaller
 {
 public:
-	enum class CallbackAction
+	struct Signals
 	{
-		Delete,
-		NewSelection,
-		ViewInModelSpace
+		static SignalAggregate<Entity> OnDelete;
+		static SignalAggregate<Entity> OnNewSelection;
+		static SignalAggregate<Entity> OnViewInModelSpace;
 	};
 
 public:
@@ -23,7 +23,6 @@ public:
 
 	void SetContext(const Shared<Scene> &scene) { m_Context = scene; }
 	void SetSelectedEntity(Entity entity) { m_SelectionContext = entity; }
-	void SetOptionCallback(const Function<void(CallbackAction, Entity)> &optionCallback) { m_OptionCallback = optionCallback; }
 
 private:
 	void DrawEntityNode(Entity entity);
@@ -33,8 +32,5 @@ private:
 private:
 	Shared<Scene> m_Context;
 	Entity m_SelectionContext;
-
-	Function<void(CallbackAction, Entity)> m_OptionCallback;
-
 };
 }

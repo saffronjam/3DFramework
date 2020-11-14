@@ -5,8 +5,14 @@
 
 namespace Se
 {
-class ViewportPane : public ReferenceCounted
+class ViewportPane : public ReferenceCounted, public Signaller
 {
+public:
+	struct Signals
+	{
+		static SignalAggregate<void> OnPostRender;
+	};
+
 public:
 	explicit ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target);
 
@@ -21,7 +27,6 @@ public:
 	bool IsHovered() const { return m_Hovered; }
 	bool IsFocused() const { return m_Focused; }
 
-	void SetPostRenderCallback(Function<void()> fn) { m_PostRenderFunction = fn; }
 	void SetTarget(Shared<SceneRenderer::Target> target) { m_Target = Move(target); }
 
 private:
@@ -32,7 +37,6 @@ private:
 	Vector2f m_BottomRight;
 	bool m_Hovered;
 	bool m_Focused;
-	Function<void()> m_PostRenderFunction;
 
 };
 

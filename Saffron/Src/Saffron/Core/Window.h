@@ -1,8 +1,5 @@
 #pragma once
 
-#include <utility>
-#include <optional>
-
 #include "Saffron/Base.h"
 #include "Saffron/Core/AntiAliasing.h"
 #include "Saffron/Core/Events/WindowEvent.h" 
@@ -11,26 +8,32 @@
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public ReferenceCounted
+class Window : public ReferenceCounted, public Signaller
 {
 public:
-	using EventCallback = Function<void(const Event &)>;
+	struct Signals
+	{
+		static SignalAggregate<const Event &> OnEvent;
+	};
 
 public:
 	struct Properties
 	{
+		explicit Properties(String title = "Saffron Engine",
+							Uint32 width = 1280,
+							Uint32 height = 720,
+							const Vector2f position = { 100.0f, 100.0f },
+							AntiAliasing antiAliasing = AntiAliasing::Sample8)
+			: Title(Move(title)), Width(width), Height(height), Position(position), AntiAliasing(antiAliasing)
+		{
+		}
+
 		String Title;
 		Uint32 Width;
 		Uint32 Height;
 		Vector2f Position;
+		AntiAliasing AntiAliasing;
 
-		explicit Properties(String title = "Saffron Engine",
-							Uint32 width = 1280,
-							Uint32 height = 720,
-							const Vector2f position = { 100.0f, 100.0f })
-			: Title(Move(title)), Width(width), Height(height), Position(position)
-		{
-		}
 	};
 
 public:
@@ -46,7 +49,6 @@ public:
 	template<typename T, typename...Params>
 	void PushEvent(Params &&...params);
 	void HandleBufferedEvents();
-	void SetEventCallback(const EventCallback &callback);
 
 	virtual Uint32 GetWidth() const;
 	virtual Uint32 GetHeight() const;
@@ -73,7 +75,6 @@ protected:
 
 private:
 	ArrayList<Shared<Event>> m_Events;
-	std::optional<EventCallback> m_EventCallback;
 };
 
 template<typename T, typename...Params>

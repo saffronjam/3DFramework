@@ -26,7 +26,7 @@ Application::Application(const Properties &properties)
 	s_Instance = this;
 
 	m_Window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
-	m_Window->SetEventCallback(SE_BIND_EVENT_FN(OnEvent));
+	m_Window->GetSignal(Window::Signals::OnEvent).Connect(SE_BIND_EVENT_FN(OnEvent));
 	m_Window->SetVSync(true);
 	m_Window->SetWindowIcon("Assets/Editor/Saffron_windowIcon.png");
 	m_Window->HandleBufferedEvents();
@@ -36,6 +36,7 @@ Application::Application(const Properties &properties)
 	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
 	FileIOManager::Init(*m_Window);
 	Gui::Init();
+
 	m_PreLoader->Submit([this]
 						{
 							ApplicationSerializer serializer(*this);
@@ -60,14 +61,32 @@ Application::~Application()
 
 void Application::PushLayer(Layer *layer)
 {
-	m_LayerStack.PushLayer(layer);
-	layer->OnAttach(m_PreLoader);
+	m_LayerStack.PushLayer(layer, m_PreLoader);
 }
 
-void Application::PushOverlay(Layer *layer)
+void Application::PushOverlay(Layer *overlay)
 {
-	m_LayerStack.PushOverlay(layer);
-	layer->OnAttach(m_PreLoader);
+	m_LayerStack.PushOverlay(overlay, m_PreLoader);
+}
+
+void Application::PopLayer(int count)
+{
+	m_LayerStack.PopLayer(count);
+}
+
+void Application::PopOverlay(int count)
+{
+	m_LayerStack.PopOverlay(count);
+}
+
+void Application::EraseLayer(Layer *layer)
+{
+	m_LayerStack.EraseLayer(layer);
+}
+
+void Application::EraseOverlay(Layer *overlay)
+{
+	m_LayerStack.EraseOverlay(overlay);
 }
 
 void Application::RenderGui()
@@ -84,8 +103,8 @@ void Application::Run()
 {
 	OnInit();
 
-	m_PreLoader->SetOnStartCallback([] {ScriptEngine::AttachThread(); });
-	m_PreLoader->SetOnFinishCallback([] {ScriptEngine::DetachThread(); });
+	m_PreLoader->GetSignal(BatchLoader::Signals::OnStart).Connect([] {ScriptEngine::AttachThread(); });
+	m_PreLoader->GetSignal(BatchLoader::Signals::OnStart).Connect([] {ScriptEngine::DetachThread(); });
 
 	m_PreLoader->Execute();
 
@@ -123,10 +142,7 @@ void Application::Run()
 		GlobalTimer::Mark();
 	}
 
-	for ( auto &layer : m_LayerStack )
-	{
-		layer->OnDetach();
-	}
+	m_LayerStack.Clear();
 
 	OnShutdown();
 }

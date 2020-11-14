@@ -5,6 +5,8 @@
 
 namespace Se
 {
+SignalAggregate<void> BatchLoader::Signals::OnStart;
+SignalAggregate<void> BatchLoader::Signals::OnFinish;
 
 BatchLoader::BatchLoader(String name)
 	: m_Name(Move(name))
@@ -29,34 +31,33 @@ void BatchLoader::Execute()
 	{
 		m_Worker.join();
 	}
-	m_Worker = Thread([this]
-					  {
-						  ScopedLock queueLock(m_QueueMutex);
 
-						  m_Running = true;
-						  if ( m_OnStart )
-							  m_OnStart();
+	const auto &workerFn = [this]
+	{
+		ScopedLock queueLock(m_QueueMutex);
 
-						  m_Progress = 0.0f;
-						  for ( const auto &[function, shortDescription] : m_Queue )
-						  {
-							  if ( m_ShouldExit )
-							  {
-								  break;
-							  }
-							  ScopedLock scopedLock(m_ExecutionMutex);
-							  if ( m_OnEachExecution )
-								  m_OnEachExecution();
-							  m_Status = &shortDescription;
-							  function();
-							  m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
-						  }
-						  m_Progress = 100.0f;
-						  m_Queue.clear();
+		m_Running = true;
+		GetSignals().Emit(Signals::OnStart);
 
-						  if ( m_OnFinish )
-							  m_OnFinish();
-					  });
+		m_Progress = 0.0f;
+		for ( const auto &[function, shortDescription] : m_Queue )
+		{
+			if ( m_ShouldExit )
+			{
+				break;
+			}
+			ScopedLock scopedLock(m_ExecutionMutex);
+			m_Status = &shortDescription;
+			function();
+			m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
+		}
+		m_Progress = 100.0f;
+		m_Queue.clear();
+
+		GetSignals().Emit(Signals::OnFinish);
+	};
+
+	m_Worker = Thread(workerFn);
 }
 
 void BatchLoader::ForceExit()

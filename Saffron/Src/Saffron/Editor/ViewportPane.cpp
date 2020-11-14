@@ -7,6 +7,7 @@
 
 namespace Se
 {
+SignalAggregate<void> ViewportPane::Signals::OnPostRender;
 
 ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target)
 	: m_WindowTitle(Move(windowTitle)),
@@ -14,8 +15,7 @@ ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> tar
 	m_TopLeft(0.0f, 0.0f),
 	m_BottomRight(100.0f, 100.0f),
 	m_Hovered(false),
-	m_Focused(false),
-	m_PostRenderFunction([]() {})
+	m_Focused(false)
 {
 }
 
@@ -64,7 +64,7 @@ void ViewportPane::OnGuiRender(bool *open)
 	ImGui::Image(reinterpret_cast<void *>(m_Target->GetFinalColorBufferRendererID()), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
 	ImGui::GetWindowDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y), m_Focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f, ImDrawCornerFlags_All, 4);
 
-	m_PostRenderFunction();
+	GetSignals().Emit(Signals::OnPostRender);
 
 	ImGui::End();
 	ImGui::PopStyleVar();

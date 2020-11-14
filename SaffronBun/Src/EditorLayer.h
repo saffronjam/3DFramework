@@ -46,7 +46,7 @@ public:
 	};
 
 public:
-	EditorLayer();
+	EditorLayer(Filepath initialSceneFilepath);
 	virtual ~EditorLayer() = default;
 
 	void OnAttach(Shared<BatchLoader> &loader) override;

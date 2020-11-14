@@ -12,9 +12,14 @@
 
 namespace Se
 {
-class Shader : public Resource
+class Shader : public Resource, public Signaller
 {
 public:
+	struct Signals
+	{
+		static SignalAggregate<void> OnReload;
+	};
+
 	struct Uniform
 	{
 		enum class Type
@@ -114,9 +119,6 @@ public:
 	//////////////////////////////////////////
 
 public:
-	using ShaderReloadedCallback = Function<void()>;
-
-public:
 	virtual ~Shader() = default;
 
 	static void OnGuiRender();
@@ -148,8 +150,6 @@ public:
 	virtual const ShaderUniformBufferDeclaration &GetPSMaterialUniformBuffer() const = 0;
 
 	virtual const ShaderResourceDeclaration::List &GetResources() const = 0;
-
-	virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
 
 	static Shared<Shader> Create(const Filepath &filepath);
 	static Shared<Shader> Create(const String &source);

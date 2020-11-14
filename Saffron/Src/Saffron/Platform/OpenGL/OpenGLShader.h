@@ -17,7 +17,6 @@ public:
 	void Bind() override;
 
 	void Reload() override;
-	void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) override;
 
 	void UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer) override;
 
@@ -92,9 +91,7 @@ private:
 
 	String m_Name;
 	Filepath m_Filepath;
-	std::unordered_map<GLenum, String> m_ShaderSource;
-
-	ArrayList<ShaderReloadedCallback> m_ShaderReloadedCallbacks;
+	UnorderedMap<GLenum, String> m_ShaderSource;
 
 	ShaderUniformBufferDeclaration::List m_VSRendererUniformBuffers;
 	ShaderUniformBufferDeclaration::List m_PSRendererUniformBuffers;

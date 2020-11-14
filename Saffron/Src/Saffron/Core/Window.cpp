@@ -9,30 +9,25 @@
 
 namespace Se
 {
+SignalAggregate<const Event &> Window::Signals::OnEvent;
+
 Window::Window(const Properties &properties)
 	:
 	m_Title(properties.Title),
 	m_Position(properties.Position),
 	m_Width(properties.Width),
-	m_Height(properties.Height)
+	m_Height(properties.Height),
+	m_AntiAliasing(properties.AntiAliasing)
 {
 }
 
 void Window::HandleBufferedEvents()
 {
-	if ( m_EventCallback.has_value() )
+	for ( const auto &event : m_Events )
 	{
-		for ( const auto &event : m_Events )
-		{
-			(*m_EventCallback)(*event);
-		}
+		GetSignals().Emit<const Event &>(Signals::OnEvent, *event);
 	}
 	m_Events.clear();
-}
-
-void Window::SetEventCallback(const EventCallback &callback)
-{
-	m_EventCallback = callback;
 }
 
 Uint32 Window::GetWidth() const

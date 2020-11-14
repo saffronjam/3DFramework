@@ -6,6 +6,8 @@
 #include "Saffron/Config.h"
 #include "Saffron/Core/Assert.h"
 #include "Saffron/Core/Log.h"
+#include "Saffron/Core/Signal.h"
+#include "Saffron/Core/Signaller.h"
 #include "Saffron/Core/SmartPointers.h"
 #include "Saffron/Core/Time.h"
 #include "Saffron/Core/UUID.h"

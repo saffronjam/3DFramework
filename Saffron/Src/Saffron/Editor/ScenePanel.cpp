@@ -12,6 +12,10 @@ namespace Se
 {
 Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
 
+SignalAggregate<Entity> ScenePanel::Signals::OnDelete;
+SignalAggregate<Entity> ScenePanel::Signals::OnNewSelection;
+SignalAggregate<Entity> ScenePanel::Signals::OnViewInModelSpace;
+
 ScenePanel::ScenePanel(const Shared<Scene> &context)
 	: m_Context(context)
 {
@@ -188,8 +192,7 @@ void ScenePanel::DrawEntityNode(Entity entity)
 	if ( ImGui::IsItemClicked() )
 	{
 		m_SelectionContext = entity;
-		if ( m_OptionCallback )
-			m_OptionCallback(CallbackAction::NewSelection, m_SelectionContext);
+		GetSignals().Emit(Signals::OnNewSelection, m_SelectionContext);
 	}
 
 	bool entityDeleted = false;
@@ -222,14 +225,12 @@ void ScenePanel::DrawEntityNode(Entity entity)
 		if ( entity == m_SelectionContext )
 			m_SelectionContext = {};
 
-		if ( m_OptionCallback )
-			m_OptionCallback(CallbackAction::Delete, entity);
+		GetSignals().Emit(Signals::OnDelete, entity);
 	}
 
 	if ( entityViewInModelSpace )
 	{
-		if ( m_OptionCallback )
-			m_OptionCallback(CallbackAction::ViewInModelSpace, entity);
+		GetSignals().Emit(Signals::OnViewInModelSpace, entity);
 	}
 
 

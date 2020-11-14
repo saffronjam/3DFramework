@@ -4,8 +4,15 @@
 
 namespace Se
 {
-class BatchLoader : public ReferenceCounted
+class BatchLoader : public ReferenceCounted, public Signaller
 {
+public:
+	struct Signals
+	{
+		static SignalAggregate<void> OnStart;
+		static SignalAggregate<void> OnFinish;
+	};
+
 public:
 	explicit BatchLoader(String name);
 	~BatchLoader();
@@ -20,10 +27,6 @@ public:
 
 	Mutex &GetExecutionMutex() { return m_ExecutionMutex; }
 
-	void SetOnEachExecutionCallback(const Function<void()> &onEachExecution) { m_OnEachExecution = onEachExecution; }
-	void SetOnStartCallback(const Function<void()> &onStart) { m_OnStart = onStart; }
-	void SetOnFinishCallback(const Function<void()> &onFinish) { m_OnFinish = onFinish; }
-
 private:
 	String m_Name;
 
@@ -33,8 +36,6 @@ private:
 	Atomic<bool> m_Running = false, m_ShouldExit = false;
 	Mutex m_QueueMutex, m_ExecutionMutex;
 	Thread m_Worker;
-
-	Function<void()> m_OnEachExecution, m_OnStart, m_OnFinish;
 };
 }
 

@@ -9,6 +9,8 @@
 namespace Se
 {
 
+SignalAggregate<void> Shader::Signals::OnReload;
+
 void Shader::OnGuiRender()
 {
 	ImGui::Begin("Shaders");

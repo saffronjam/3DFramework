@@ -148,11 +148,6 @@ void OpenGLShader::Reload()
 	Load(ReadFromFile(m_Filepath));
 }
 
-void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback &callback)
-{
-	m_ShaderReloadedCallbacks.push_back(callback);
-}
-
 void OpenGLShader::UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer)
 {
 	for ( unsigned int i = 0; i < uniformBuffer.GetUniformCount(); i++ )
@@ -280,8 +275,7 @@ void OpenGLShader::Load(const String &source)
 
 						 if ( m_Loaded )
 						 {
-							 for ( auto &callback : m_ShaderReloadedCallbacks )
-								 callback();
+							 GetSignals().Emit(Signals::OnReload);
 						 }
 
 						 m_Loaded = true;

@@ -11,7 +11,8 @@ namespace Se {
 Material::Material(const Shared<Shader> &shader)
 	: m_Shader(shader)
 {
-	m_Shader->AddShaderReloadedCallback([this] { OnShaderReloaded(); });
+	m_Shader->GetSignal(Shader::Signals::OnReload).Connect([this] { OnShaderReloaded(); });
+
 	AllocateStorage();
 
 	m_MaterialFlags |= static_cast<Uint32>(Flag::DepthTest);

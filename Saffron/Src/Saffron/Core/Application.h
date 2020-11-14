@@ -44,7 +44,12 @@ public:
 	virtual void OnEvent(const Event &event);
 
 	void PushLayer(Layer *layer);
-	void PushOverlay(Layer *layer);
+	void PushOverlay(Layer *overlay);
+	void PopLayer(int count);
+	void PopOverlay(int count);
+	void EraseLayer(Layer *layer);
+	void EraseOverlay(Layer *overlay);
+
 	void RenderGui();
 
 	Window &GetWindow() { return *m_Window; }
