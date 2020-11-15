@@ -4,9 +4,9 @@
 #include <utility>
 #include <filesystem>
 
-#include "Saffron/Core/AntiAliasing.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Core/Event.h"
+#include "Saffron/Renderer/AntiAliasing.h"
 
 namespace Se
 {
@@ -95,7 +95,7 @@ public:
 public:
 	explicit WindowDropFilesEvent(ArrayList<Filepath> filepaths) : m_Filepaths(Move(filepaths)) {}
 
-	const ArrayList<Filepath> &GetPaths() const { return m_Filepaths; }
+	const ArrayList<Filepath> &GetFilepaths() const { return m_Filepaths; }
 	String ToString() const override
 	{
 		OutputStringStream oss;

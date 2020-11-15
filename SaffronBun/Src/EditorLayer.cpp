@@ -1,15 +1,17 @@
 #include "EditorLayer.h"
 
 
-EditorLayer::EditorLayer(Filepath initialSceneFilepath)
+SignalAggregate<void> EditorLayer::Signals::OnWantProjectSelector;
+
+EditorLayer::EditorLayer(const Shared<Project> &project)
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
-	m_EditorScene(Shared<EditorScene>::Create("Editor Scene")),
+	m_Project(Move(project)),
+	m_EditorScene(Shared<EditorScene>::Create("")),
 	m_MainViewportPane(Shared<ViewportPane>::Create("Main Viewport", SceneRenderer::GetMainTarget())),
 	m_MiniViewportPane(Shared<ViewportPane>::Create("Mini Viewport", m_EditorScene->GetMiniTarget())),
 	m_LastFocusedScene(m_EditorScene),
 	m_CachedActiveScene(m_EditorScene),
-	m_SceneFilePath(Move(initialSceneFilepath)),
 	m_SceneState(SceneState::Edit)
 {
 	Application::Get().GetWindow().SetAntiAliasing(AntiAliasing::Sample16);
@@ -48,20 +50,16 @@ void EditorLayer::OnAttach(Shared<BatchLoader> &loader)
 
 	loader->Submit([this]
 				   {
-					   const auto &startUpSceneFilepath = Filepath("");
-					   if ( startUpSceneFilepath.has_filename() && startUpSceneFilepath.extension() == ".ssc" )
-					   {
-						   LoadNewScene(startUpSceneFilepath);
-					   }
+					   LoadProjectScene(m_Project->GetSceneFilepaths().front());
 				   }, "Loading Default Scene");
 
 	loader->Submit([this]
 				   {
-					   Run::Periodically([this]
-										 {
-											 m_AssetPanel->SyncAssetPaths();
-											 m_ScriptPanel->SyncScriptPaths();
-										 }, Time(1.0f));
+					   m_AssetScriptRunHandle = Run::Periodically([this]
+																  {
+																	  m_AssetPanel->SyncAssetPaths();
+																	  m_ScriptPanel->SyncScriptPaths();
+																  }, Time(1.0f));
 				   }, "Setting Up Periodic Callbacks ");
 
 	loader->Submit([this]
@@ -120,8 +118,8 @@ void EditorLayer::OnAttach(Shared<BatchLoader> &loader)
 					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnViewInModelSpace).Connect([this](Entity entity) {OnNewModelSpaceView(entity); });
 					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnNewSelection).Connect([this](Entity entity)
 																							{
-																								OnUnselected(m_SelectedEntity);
-																								OnSelected(entity);
+																								OnEntityUnselected(m_SelectedEntity);
+																								OnEntitySelected(entity);
 																							});
 
 				   }, "Setting Up System Callbacks");
@@ -133,6 +131,7 @@ void EditorLayer::OnDetach()
 	{
 		OnStop();
 	}
+	Run::Remove(m_AssetScriptRunHandle);
 }
 
 void EditorLayer::OnUpdate()
@@ -307,7 +306,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 		case KeyCode::Delete:
 			if ( m_SelectedEntity )
 			{
-				OnUnselected(m_SelectedEntity);
+				OnEntityUnselected(m_SelectedEntity);
 				m_EditorScene->DestroyEntity(m_SelectedEntity);
 			}
 			break;
@@ -330,7 +329,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 				SceneRenderer::GetOptions().ShowGrid = !SceneRenderer::GetOptions().ShowGrid;
 				break;
 			case KeyCode::O:
-				OpenScenePrompt();
+				PromptImportScene();
 				break;
 			case KeyCode::S:
 				SaveActiveScene();
@@ -344,7 +343,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 				switch ( event.GetKey() )
 				{
 				case KeyCode::S:
-					SaveSceneAsPrompt();
+					SaveActiveProject();
 					break;
 				default:
 					break;
@@ -375,7 +374,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 
 			if ( m_SelectedEntity )
 			{
-				OnUnselected(m_SelectedEntity);
+				OnEntityUnselected(m_SelectedEntity);
 			}
 
 			struct Selection
@@ -422,7 +421,7 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 			std::sort(selections.begin(), selections.end(), [](auto &a, auto &b) { return a.Distance < b.Distance; });
 			if ( !selections.empty() )
 			{
-				OnSelected(selections.front().Entity);
+				OnEntitySelected(selections.front().Entity);
 			}
 			selections.clear();
 
@@ -434,26 +433,129 @@ bool EditorLayer::OnMouseButtonPressed(const MousePressEvent &event)
 
 bool EditorLayer::OnWindowDropFiles(const WindowDropFilesEvent &event)
 {
-	const auto &paths = event.GetPaths();
-
-	// If user dropped a scene in window
-	if ( m_SceneState == SceneState::Edit && paths.size() == 1 )
+	if ( m_SceneState == SceneState::Edit )
 	{
-		const auto &scenePath = paths.front();
-		if ( scenePath.extension() == ".ssc" )
+		for ( const auto &filepath : event.GetFilepaths() )
 		{
-			if ( scenePath != m_SceneFilePath )
+			if ( Scene::IsValidFilepath(filepath) )
 			{
-				SaveActiveScene();
-				LoadNewScene(scenePath.string());
-			}
-			else
-			{
-				SE_INFO("Tried to load a scene that was already active");
+				Run::Later([filepath, this]
+						   {
+							   m_Project->AddScene(filepath);
+							   LoadProjectScene(filepath);
+						   });
 			}
 		}
 	}
 	return false;
+}
+
+void EditorLayer::PromptNewScene()
+{
+	const Filepath filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
+
+	if ( !filepath.empty() )
+	{
+		String sceneName = filepath.stem().string();
+		Shared<EditorScene> newScene = Shared<EditorScene>::Create(sceneName);
+
+		// Default construct environment and light
+		// TODO: Prompt user with templates instead?
+		newScene->SetEnvironment(Scene::Environment::Load("Assets/Env/birchwood_4k.hdr"));
+		const Scene::Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
+		newScene->SetLight(light);
+
+		m_EditorScene = newScene;
+		m_LastFocusedScene = Shared<Scene>::Cast(m_EditorScene);
+
+		UpdateWindowTitle(sceneName);
+		m_EntityPanel->SetContext(m_EditorScene);
+		ScriptEngine::SetSceneContext(m_EditorScene);
+
+		SaveActiveScene();
+		OnSceneChange(m_EditorScene, {});
+
+		m_Project->AddScene(filepath);
+		m_Project->AddCachedScene(newScene);
+	}
+}
+
+void EditorLayer::PromptNewProject()
+{
+	const Filepath filepath = FileIOManager::SaveFile({ "Saffron Scene (*.spr)", {"*.spr"} });
+}
+
+void EditorLayer::PromptImportScene()
+{
+	const Filepath filepath = FileIOManager::OpenFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
+	if ( Scene::IsValidFilepath(filepath) )
+	{
+		const auto &retFilepath = m_Project->AddScene(Move(filepath));
+		LoadProjectScene(filepath);
+	}
+}
+
+void EditorLayer::PromptOpenProject()
+{
+	const Filepath filepath = FileIOManager::OpenFile({ "Saffron Scene (*.spr)", {"*.spr"} });
+	if ( Project::IsValidFilepath(filepath) )
+	{
+		auto newProject = Shared<Project>::Create(filepath);
+		if ( newProject->IsValid() )
+		{
+			OnProjectChange(newProject);
+		}
+		else
+		{
+			SE_CORE_WARN("Failed to deserialize project");
+		}
+	}
+}
+
+void EditorLayer::SaveActiveProject() const
+{
+	for ( const auto &cachedScene : m_Project->GetSceneCache() )
+	{
+		cachedScene->Save();
+	}
+}
+
+void EditorLayer::SaveActiveScene() const
+{
+	m_EditorScene->Save();
+}
+
+void EditorLayer::LoadProjectScene(const Filepath &filepath)
+{
+	const auto &sceneFilepaths = m_Project->GetSceneFilepaths();
+	SE_CORE_ASSERT(std::find(sceneFilepaths.begin(), sceneFilepaths.end(), filepath) != sceneFilepaths.end());
+	if ( !FileIOManager::FileExists(filepath) )
+	{
+		return;
+	}
+
+	Shared<EditorScene> newScene(nullptr);
+
+	for ( const auto &cachedScene : m_Project->GetSceneCache() )
+	{
+		if ( cachedScene->GetFilepath() == filepath )
+		{
+			newScene = cachedScene;
+		}
+	}
+
+	if ( !newScene )
+	{
+		newScene = Shared<EditorScene>::Create(filepath);
+		m_Project->AddCachedScene(newScene);
+	}
+
+	m_EditorScene = newScene;
+	m_MiniViewportPane->SetTarget(m_EditorScene->GetMiniTarget());
+	m_LastFocusedScene = Shared<Scene>::Cast(m_EditorScene);
+
+	OnEntityUnselected(m_SelectedEntity);
+	OnSceneChange(m_EditorScene, {});
 }
 
 void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
@@ -468,6 +570,18 @@ void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 	m_LastFocusedScene = scene;
 }
 
+void EditorLayer::OnProjectChange(const Shared<Project> &project)
+{
+	SE_CORE_ASSERT(project->IsValid());
+	m_Project = project;
+	LoadProjectScene(m_Project->GetSceneFilepaths().front());
+}
+
+void EditorLayer::OnWantProjectSelector()
+{
+	GetSignals().Emit(Signals::OnWantProjectSelector);
+}
+
 void EditorLayer::OnPlay()
 {
 	m_SceneState = SceneState::Play;
@@ -476,7 +590,7 @@ void EditorLayer::OnPlay()
 	{
 		ScriptEngine::ReloadAssembly("Assets/Scripts/ExampleApp.dll");
 	}
-	m_RuntimeScene = Shared<RuntimeScene>::Create(m_EditorScene->GetName(), m_EditorScene);
+	m_RuntimeScene = Shared<RuntimeScene>::Create(m_EditorScene);
 	m_RuntimeScene->OnStart();
 	m_GizmoType = -1;
 
@@ -579,90 +693,6 @@ Shared<Scene> EditorLayer::GetActiveScene() const
 	return m_LastFocusedScene;
 }
 
-void EditorLayer::NewScenePrompt()
-{
-	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
-
-	if ( !filepath.empty() )
-	{
-		String sceneName = filepath.stem().string();
-		Shared<EditorScene> newScene = Shared<EditorScene>::Create(sceneName);
-
-		// Default construct environment and light
-		// TODO: Prompt user with templates instead?
-		newScene->SetEnvironment(Scene::Environment::Load("Assets/Env/birchwood_4k.hdr"));
-		const Scene::Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
-		newScene->SetLight(light);
-
-		m_EditorScene = newScene;
-		m_LastFocusedScene = Shared<Scene>::Cast(m_EditorScene);
-
-		UpdateWindowTitle(sceneName);
-		m_EntityPanel->SetContext(m_EditorScene);
-		ScriptEngine::SetSceneContext(m_EditorScene);
-
-		m_SceneFilePath = filepath;
-
-		SaveActiveScene();
-		OnSceneChange(m_EditorScene, {});
-	}
-}
-
-void EditorLayer::OpenScenePrompt()
-{
-	const std::filesystem::path filepath = FileIOManager::OpenFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
-	if ( !filepath.empty() )
-	{
-		LoadNewScene(filepath.string());
-	}
-}
-
-void EditorLayer::SaveSceneAsPrompt()
-{
-	const std::filesystem::path filepath = FileIOManager::SaveFile({ "Saffron Scene (*.ssc)", {"*.ssc"} });
-	if ( !filepath.empty() )
-	{
-		m_SceneFilePath = filepath;
-		SaveActiveScene();
-		UpdateWindowTitle(m_EditorScene->GetName());
-	}
-}
-
-void EditorLayer::SaveActiveScene() const
-{
-	SceneSerializer serializer(m_EditorScene);
-	serializer.Serialize(m_SceneFilePath);
-}
-
-void EditorLayer::LoadNewScene(const Filepath &filepath)
-{
-	if ( filepath != m_SceneFilePath.string() )
-	{
-		const Shared<EditorScene> newScene = Shared<EditorScene>::Create(filepath.stem().string());
-		SceneSerializer serializer(newScene);
-		if ( !serializer.Deserialize(filepath) )
-		{
-			SE_WARN("Failed to load scene! Filepath: {0}", filepath.string());
-			return;
-		}
-
-		m_EditorScene = newScene;
-		m_MiniViewportPane->SetTarget(m_EditorScene->GetMiniTarget());
-		m_LastFocusedScene = Shared<Scene>::Cast(m_EditorScene);
-
-		UpdateWindowTitle(m_EditorScene->GetName());
-
-		OnUnselected(m_SelectedEntity);
-		SaveActiveScene();
-		OnSceneChange(m_EditorScene, {});
-
-		m_SceneFilePath = filepath;
-	}
-	else
-	{
-		SE_INFO("Tried to load a scene that was already active");
-	}
-}
 
 Pair<Vector3f, Vector3f> EditorLayer::CastRay(float mx, float my) const
 {
@@ -692,14 +722,28 @@ void EditorLayer::OnGuiRenderMenuBar()
 		if ( ImGui::BeginMenu("File") )
 		{
 			if ( ImGui::MenuItem("New Scene", "Ctrl-N") )
-				NewScenePrompt();
-			if ( ImGui::MenuItem("Open Scene...", "Ctrl+O") )
-				OpenScenePrompt();
+				PromptNewScene();
+			if ( ImGui::MenuItem("New Project", "Ctrl-N") )
+				PromptNewProject();
+
 			ImGui::Separator();
+
+			if ( ImGui::MenuItem("Import Scene...", "Ctrl+I") )
+				PromptImportScene();
+			if ( ImGui::MenuItem("Open Project...", "Ctrl+O") )
+				PromptOpenProject();
+
+			ImGui::Separator();
+
 			if ( ImGui::MenuItem("Save Scene", "Ctrl+S") )
 				SaveActiveScene();
-			if ( ImGui::MenuItem("Save Scene As...", "Ctrl+Shift+S") )
-				SaveSceneAsPrompt();
+			if ( ImGui::MenuItem("Save Project", "Ctrl+Shift+S") )
+				SaveActiveProject();
+
+			ImGui::Separator();
+
+			if ( ImGui::MenuItem("Open Project Selector") )
+				OnWantProjectSelector();
 
 			ImGui::Separator();
 			if ( ImGui::MenuItem("Exit") )
@@ -829,7 +873,7 @@ void EditorLayer::OnGuiRenderToolbar()
 	ImGui::PopStyleVar(3);
 }
 
-void EditorLayer::OnSelected(Entity entity)
+void EditorLayer::OnEntitySelected(Entity entity)
 {
 	auto activeScene = GetActiveScene();
 	if ( activeScene == m_EditorScene || activeScene == m_RuntimeScene )
@@ -841,7 +885,7 @@ void EditorLayer::OnSelected(Entity entity)
 	}
 }
 
-void EditorLayer::OnUnselected(Entity entity)
+void EditorLayer::OnEntityUnselected(Entity entity)
 {
 	auto activeScene = GetActiveScene();
 	if ( activeScene == m_EditorScene || activeScene == m_RuntimeScene )

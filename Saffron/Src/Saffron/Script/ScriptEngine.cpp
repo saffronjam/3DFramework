@@ -246,7 +246,7 @@ static MonoClass *GetClass(MonoImage *image, const EntityScriptClass &scriptClas
 
 static MonoClass *GetClass(MonoImage *image, const String &namespaceName, const String &className)
 {
-	const String fullName = namespaceName.size() ? namespaceName + "." + className : className;
+	const String fullName = namespaceName.empty() ?  className : namespaceName + "." + className ;
 	if ( s_ClassCacheMap.find(fullName) == s_ClassCacheMap.end() )
 	{
 		MonoClass *monoClass = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
@@ -689,8 +689,6 @@ void ScriptEngine::OnScriptComponentDestroyed(UUID sceneID, UUID entityID)
 
 bool ScriptEngine::ModuleExists(const String &moduleName)
 {
-
-
 	MonoClass *monoClass = GetClass(s_AppAssemblyImage, moduleName);
 	return monoClass != nullptr;
 }

@@ -46,6 +46,7 @@
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Scene/SceneCamera.h"
 #include "Saffron/Serialize/SceneSerializer.h"
+#include "Saffron/Serialize/ProjectSerializer.h"
 #include "Saffron/Entity/EntityComponents.h"
 
 #include "Saffron/Base.h"

@@ -13,6 +13,7 @@
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Serialize/ApplicationSerializer.h"
+#include "Saffron/Scene/EditorScene.h"
 
 namespace Se {
 
@@ -37,6 +38,9 @@ Application::Application(const Properties &properties)
 	FileIOManager::Init(*m_Window);
 	Gui::Init();
 
+	m_PreLoader->GetSignal(BatchLoader::Signals::OnStart).Connect([] {ScriptEngine::AttachThread(); });
+	m_PreLoader->GetSignal(BatchLoader::Signals::OnFinish).Connect([] {ScriptEngine::DetachThread(); });
+
 	m_PreLoader->Submit([this]
 						{
 							ApplicationSerializer serializer(*this);
@@ -59,12 +63,12 @@ Application::~Application()
 	serializer.Serialize("Application/ApplicationProperties.sap");
 }
 
-void Application::PushLayer(Layer *layer)
+void Application::PushLayer(Shared<Layer> layer)
 {
 	m_LayerStack.PushLayer(layer, m_PreLoader);
 }
 
-void Application::PushOverlay(Layer *overlay)
+void Application::PushOverlay(Shared<Layer> overlay)
 {
 	m_LayerStack.PushOverlay(overlay, m_PreLoader);
 }
@@ -79,12 +83,12 @@ void Application::PopOverlay(int count)
 	m_LayerStack.PopOverlay(count);
 }
 
-void Application::EraseLayer(Layer *layer)
+void Application::EraseLayer(Shared<Layer> layer)
 {
 	m_LayerStack.EraseLayer(layer);
 }
 
-void Application::EraseOverlay(Layer *overlay)
+void Application::EraseOverlay(Shared<Layer> overlay)
 {
 	m_LayerStack.EraseOverlay(overlay);
 }
@@ -93,7 +97,7 @@ void Application::RenderGui()
 {
 	Gui::Begin();
 
-	for ( Layer *layer : m_LayerStack )
+	for ( Shared<Layer> layer : m_LayerStack )
 		layer->OnGuiRender();
 
 	Gui::End();
@@ -103,34 +107,17 @@ void Application::Run()
 {
 	OnInit();
 
-	m_PreLoader->GetSignal(BatchLoader::Signals::OnStart).Connect([] {ScriptEngine::AttachThread(); });
-	m_PreLoader->GetSignal(BatchLoader::Signals::OnStart).Connect([] {ScriptEngine::DetachThread(); });
-
-	m_PreLoader->Execute();
-
-	SplashScreenPane splashScreenPane(m_PreLoader);
-	while ( !splashScreenPane.IsFinished() )
-	{
-		Gui::Begin();
-		splashScreenPane.OnGuiRender();
-		m_Window->OnUpdate();
-		m_Window->HandleBufferedEvents();
-		Gui::End();
-		Renderer::Execute();
-		Run::Execute();
-		GlobalTimer::Mark();
-		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished() ? 0ll : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms()));
-		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
-		GlobalTimer::Sync();
-
-	}
-
 	while ( m_Running )
 	{
+		if ( !m_PreLoader->IsFinished() )
+		{
+			RunSplashScreen();
+		}
+
 		m_Window->HandleBufferedEvents();
 		if ( !m_Minimized )
 		{
-			for ( Layer *layer : m_LayerStack )
+			for ( Shared<Layer> layer : m_LayerStack )
 				layer->OnUpdate();
 			ScriptEngine::OnUpdate();
 			Input::OnUpdate();
@@ -138,6 +125,7 @@ void Application::Run()
 			Renderer::Submit([this]() { RenderGui(); });
 			Renderer::Execute();
 		}
+		OnUpdate();
 		Run::Execute();
 		GlobalTimer::Mark();
 	}
@@ -149,6 +137,7 @@ void Application::Run()
 
 void Application::Exit()
 {
+	m_PreLoader->ForceExit();
 	m_Running = false;
 }
 
@@ -174,27 +163,40 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 	return true;
 }
 
-const ArrayList<Application::Project> &Application::GetProjectList() const
+void Application::AddProject(const Shared<Project> &project)
 {
-	std::sort(m_ProjectList.begin(), m_ProjectList.end(), [](const auto &first, const auto &second)
-			  {
-				  return first.LastOpened > second.LastOpened;
-			  });
-	return m_ProjectList;
+	if ( std::find(m_RecentProjectList.begin(), m_RecentProjectList.end(), project) == m_RecentProjectList.end() )
+	{
+		m_RecentProjectList.push_back(project);
+	}
 }
 
-const Application::Project &Application::GetActiveProject() const
+void Application::RemoveProject(const Shared<Project> &project)
+{
+	m_RecentProjectList.erase(std::remove(m_RecentProjectList.begin(), m_RecentProjectList.end(), project), m_RecentProjectList.end());
+}
+
+const ArrayList<Shared<Project> > &Application::GetRecentProjectList() const
+{
+	std::sort(m_RecentProjectList.begin(), m_RecentProjectList.end(), [](const auto &first, const auto &second)
+			  {
+				  return first->LastOpened() > second->LastOpened();
+			  });
+	return m_RecentProjectList;
+}
+
+const Shared<Project> &Application::GetActiveProject() const
 {
 	SE_CORE_ASSERT(m_ActiveProject, "Tried to fetch active project when there was none");
-	return *m_ActiveProject;
+	return m_ActiveProject;
 }
 
-void Application::SetActiveProject(const Project &project)
+void Application::SetActiveProject(const Shared<Project> &project)
 {
-	const auto iter = std::find(m_ProjectList.begin(), m_ProjectList.end(), project);
-	SE_CORE_ASSERT(iter != m_ProjectList.end(), "Tried loading an invalid project");
-	m_ActiveProject = &*iter;
-	m_ActiveProject->LastOpened = DateTime();
+	const auto iter = std::find(m_RecentProjectList.begin(), m_RecentProjectList.end(), project);
+	SE_CORE_ASSERT(iter != m_RecentProjectList.end(), "Tried loading an invalid project");
+	m_ActiveProject = *iter;
+	m_ActiveProject->SyncLastOpened();
 }
 
 String Application::GetConfigurationName()
@@ -219,4 +221,24 @@ String Application::GetPlatformName()
 #endif
 }
 
+void Application::RunSplashScreen()
+{
+	m_PreLoader->Execute();
+
+	SplashScreenPane splashScreenPane(m_PreLoader);
+	while ( !splashScreenPane.IsFinished() )
+	{
+		Gui::Begin();
+		splashScreenPane.OnGuiRender();
+		m_Window->OnUpdate();
+		m_Window->HandleBufferedEvents();
+		Gui::End();
+		Renderer::Execute();
+		Run::Execute();
+		GlobalTimer::Mark();
+		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished() ? 0ll : std::max(0ll, static_cast<long long>(1000.0 / 60.0 - GlobalTimer::GetStep().ms()));
+		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
+		GlobalTimer::Sync();
+	}
+}
 }

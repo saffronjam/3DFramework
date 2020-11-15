@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Core/AntiAliasing.h"
 #include "Saffron/Core/Events/WindowEvent.h" 
 #include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Renderer/AntiAliasing.h"
 
 namespace Se
 {

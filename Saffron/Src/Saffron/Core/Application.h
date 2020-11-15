@@ -1,11 +1,10 @@
 #pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/Project.h"
 #include "Saffron/Core/Events/WindowEvent.h"
-#include "Saffron/Core/DateTime.h"
 #include "Saffron/Core/LayerStack.h"
 #include "Saffron/Core/Window.h"
-#include "Saffron/Renderer/Texture.h"
 
 namespace Se
 {
@@ -20,17 +19,6 @@ public:
 		Uint32 WindowWidth, WindowHeight;
 	};
 
-	struct Project
-	{
-		UUID UUID;
-		String Name;
-		Filepath SceneFilepath;
-		Shared<Texture2D> PreviewTexture;
-		DateTime LastOpened;
-
-		bool operator==(const Project &rhs) const { return UUID == rhs.UUID; }
-	};
-
 public:
 	Application(const Properties &properties = { "Saffron Engine", 1280, 720 });
 	virtual ~Application();
@@ -43,19 +31,23 @@ public:
 	virtual void OnUpdate() {}
 	virtual void OnEvent(const Event &event);
 
-	void PushLayer(Layer *layer);
-	void PushOverlay(Layer *overlay);
-	void PopLayer(int count);
-	void PopOverlay(int count);
-	void EraseLayer(Layer *layer);
-	void EraseOverlay(Layer *overlay);
+	void PushLayer(Shared<Layer> layer);
+	void PushOverlay(Shared<Layer> overlay);
+	void PopLayer(int count = 1);
+	void PopOverlay(int count = 1);
+	void EraseLayer(Shared<Layer> layer);
+	void EraseOverlay(Shared<Layer> overlay);
 
 	void RenderGui();
 
 	Window &GetWindow() { return *m_Window; }
-	const ArrayList<Project> &GetProjectList() const;
-	const Project &GetActiveProject() const;
-	void SetActiveProject(const Project &project);
+
+	void AddProject(const Shared<Project> &project);
+	void RemoveProject(const Shared<Project> &project);
+
+	const ArrayList<Shared<Project>> &GetRecentProjectList() const;
+	const Shared<Project> &GetActiveProject() const;
+	void SetActiveProject(const Shared<Project> &project);
 
 	static Application &Get() { return *s_Instance; }
 
@@ -63,17 +55,21 @@ public:
 	static String GetPlatformName();
 
 private:
+	void RunSplashScreen();
+
 	bool OnWindowClose(const WindowCloseEvent &event);
+
+protected:
+	Shared<BatchLoader> m_PreLoader;
 
 private:
 	Shared<Window> m_Window;
 	bool m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
 	Mutex m_FinalPreloaderMessageMutex;
-	Shared<BatchLoader> m_PreLoader;
 
-	mutable ArrayList<Project> m_ProjectList;
-	Project *m_ActiveProject = nullptr;
+	mutable ArrayList<Shared<Project>> m_RecentProjectList;
+	Shared<Project> m_ActiveProject = nullptr;
 
 	Time ts;
 

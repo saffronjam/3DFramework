@@ -42,6 +42,8 @@ public:
 	static size_t Write(const Uint8 *data, size_t size, const Filepath &filepath, bool overwrite = true);
 	static size_t Write(const Buffer buffer, const Filepath &filepath, bool overwrite = true);
 
+	static bool CreateDirectories(const Filepath &filepath);
+
 	static bool FileExists(const Filepath &filepath);
 
 	static bool Copy(const Filepath &source, const Filepath &destination);

@@ -11,6 +11,7 @@ namespace Se
 
 Gui::Style Gui::m_CurrentStyle = Style::Light;
 Map<int, ImFont *> Gui::m_Fonts;
+Pair<int, ImFont *> Gui::m_CurrentFont;
 
 static int s_UIContextID = 0;
 
@@ -29,10 +30,12 @@ void Gui::Init()
 
 	auto *newFont = AddFont("Assets/Fonts/segoeui.ttf", 18);
 	io.FontDefault = newFont;
+	m_CurrentFont = { 18, newFont };
 
 	AddFont("Assets/Fonts/segoeui.ttf", 8);
 	AddFont("Assets/Fonts/segoeui.ttf", 12);
 	AddFont("Assets/Fonts/segoeui.ttf", 14);
+	AddFont("Assets/Fonts/segoeui.ttf", 20);
 	AddFont("Assets/Fonts/segoeui.ttf", 22);
 	AddFont("Assets/Fonts/segoeui.ttf", 24);
 	AddFont("Assets/Fonts/segoeui.ttf", 28);
@@ -53,10 +56,6 @@ void Gui::Init()
 	{
 		style.WindowRounding = 0.0f;
 	}
-
-	const ImVec4 vibrant = { 0.89f, 0.46f, 0.16f, 1.0f };
-	const ImVec4 vibrantFaded1 = { 0.85f, 0.42f, 0.12f, 1.0f };
-	const ImVec4 vibrantFaded2 = { 0.81f, 0.38f, 0.08f, 1.0f };
 
 	// Main Blue
 	//const Vector3f mainVibrant = { 0.26f, 0.59f, 0.98f };
@@ -82,7 +81,6 @@ void Gui::Init()
 	const Vector4f coMain = { 1.00f, 0.43f, 0.35f, 1.00f }; //10	2ndMain no tint
 	const Vector4f coMainDark = { 0.90f, 0.70f, 0.00f, 1.00f }; //11	3rdMain no tint
 	const Vector4f coMainRed = { 1.00f, 0.60f, 0.00f, 1.00f }; //12	Co3rdMain 
-
 
 	const auto ToImVec4 = [](const Vector4f &vector)
 	{
@@ -410,24 +408,33 @@ void Gui::HelpMarker(const String &desc)
 	}
 }
 
-void Gui::InfoModal(const char *title, const char *text, bool open)
+void Gui::InfoModal(const char *title, const char *text, bool &open)
 {
+	const auto prevFontSize = GetFontSize();
+	SetFontSize(20);
 	if ( open && !ImGui::IsPopupOpen(title) )
 	{
-		ImGui::OpenPopup("Bad Entity Name");
+		ImGui::OpenPopup(title);
 	}
 
 	ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 
-	if ( ImGui::BeginPopupModal("Bad Entity Name", nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize) )
+	if ( ImGui::BeginPopupModal(title, nullptr, ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize) )
 	{
-		ImGui::Text("Bad Entity Name");
+		ImGui::Text(text);
 		if ( ImGui::Button("Dismiss") )
 		{
 			ImGui::CloseCurrentPopup();
 		}
+		open = false;
 		ImGui::EndPopup();
 	}
+	SetFontSize(prevFontSize);
+}
+
+int Gui::GetFontSize()
+{
+	return m_CurrentFont.first;
 }
 
 void Gui::SetStyle(Style style)

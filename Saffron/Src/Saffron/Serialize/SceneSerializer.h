@@ -8,7 +8,7 @@ namespace Se
 class SceneSerializer
 {
 public:
-	SceneSerializer(const Shared<Scene> &scene);
+	explicit SceneSerializer(Scene &scene);
 
 	void Serialize(const Filepath &filepath);
 	void SerializeRuntime(const Filepath &filepath);
@@ -17,8 +17,7 @@ public:
 	bool DeserializeRuntime(const Filepath &filepath);
 
 private:
-	Shared<Scene> m_Scene;
-
+	Scene &m_Scene;
 };
 }
 

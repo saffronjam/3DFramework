@@ -7,7 +7,7 @@ namespace Se
 class RuntimeScene : public Scene
 {
 public:
-	explicit RuntimeScene(String name, Shared<Scene> copyFrom);
+	explicit RuntimeScene(Shared<Scene> copyFrom);
 
 	void OnUpdate() override;
 	void OnRender() override;

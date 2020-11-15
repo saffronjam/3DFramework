@@ -69,4 +69,13 @@ void BatchLoader::ForceExit()
 	}
 }
 
+void BatchLoader::Reset()
+{
+	ScopedLock queueLock(m_QueueMutex);
+	ScopedLock scopedLock(m_ExecutionMutex);
+	ForceExit();
+	m_Queue.clear();
+	m_Progress = 0.0f;
+	m_ShouldExit = false;
+}
 }

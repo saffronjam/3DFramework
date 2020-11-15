@@ -1,29 +1,49 @@
 #define SAFFRON_ENTRY_POINT
 #include <Saffron.h>
 
-#include "EditorLayer.h"
-#include "StartupLayer.h"
+#include "SaffronBun.h"
 
-class SaffronBunApplication : public Application
-{
-public:
-	SaffronBunApplication(const Properties &props)
-		: Application(props)
-	{
-	}
-
-	void OnInit() override
-	{
-		auto *startupLayer = new StartupLayer();
-		startupLayer->SetOnProjectSelectCallback([](const Project &project)
-												 {
-													 // PopLayer
-												 });
-		PushLayer(startupLayer);
-	}
-};
 
 Application *Se::CreateApplication()
 {
 	return new SaffronBunApplication({ "Saffron Bun", 1600, 900 });
+}
+
+SaffronBunApplication::SaffronBunApplication(const Properties &props)
+	:
+	Application(props),
+	m_StartupLayer(Shared<StartupLayer>::Create())
+{
+	const auto wantProjectSelectorFn = [this]
+	{
+		Run::Later([=]
+				   {
+					   PopLayer();
+					   m_PreLoader->Reset();
+					   m_EditorLayer.Reset();
+					   PushLayer(m_StartupLayer);
+				   });
+	};
+	const auto projectSelectFn = [wantProjectSelectorFn, this](const Shared<Project> &project)
+	{
+		Run::Later([=]
+				   {
+					   PopLayer();
+					   m_PreLoader->Reset();
+					   m_EditorLayer = Shared<EditorLayer>::Create(project);
+					   m_EditorLayer->GetSignal(EditorLayer::Signals::OnWantProjectSelector).Connect(wantProjectSelectorFn);
+					   PushLayer(m_EditorLayer);
+				   });
+	};
+
+	m_StartupLayer->GetSignal(StartupLayer::Signals::OnProjectSelect).Connect(projectSelectFn);
+}
+
+void SaffronBunApplication::OnInit()
+{
+	PushLayer(m_StartupLayer);
+}
+
+void SaffronBunApplication::OnUpdate()
+{
 }

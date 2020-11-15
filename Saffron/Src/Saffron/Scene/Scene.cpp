@@ -73,8 +73,8 @@ Scene::Environment Scene::Environment::Load(const String &filepath)
 /// Scene
 ///////////////////////////////////////////////////////////////////////////
 
-Scene::Scene(String name)
-	: m_Name(Move(name)),
+Scene::Scene()
+	:
 	m_SceneEntity(m_EntityRegistry.create(), this),
 	m_ViewportWidth(100),
 	m_ViewportHeight(100)
@@ -240,5 +240,10 @@ void Scene::SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture)
 void Scene::ShowBoundingBoxes(bool show)
 {
 	SceneRenderer::GetOptions().ShowBoundingBoxes = show;
+}
+
+bool Scene::IsValidFilepath(const Filepath &filepath)
+{
+	return !filepath.empty() && filepath.extension() == ".ssc" && FileIOManager::FileExists(filepath);
 }
 }

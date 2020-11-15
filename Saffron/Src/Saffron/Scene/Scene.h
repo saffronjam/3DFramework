@@ -43,7 +43,7 @@ public:
 	};
 
 public:
-	explicit Scene(String name);
+	explicit Scene();
 	~Scene();
 
 	virtual void OnUpdate() = 0;
@@ -84,6 +84,8 @@ public:
 	void SetEnvironment(const Environment &environment);
 	void SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture);
 	void ShowBoundingBoxes(bool show);
+
+	static bool IsValidFilepath(const Filepath &filepath);
 
 protected:
 	UUID m_SceneID;

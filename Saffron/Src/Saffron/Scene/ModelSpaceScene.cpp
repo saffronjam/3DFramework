@@ -8,7 +8,7 @@
 namespace Se
 {
 ModelSpaceScene::ModelSpaceScene(Entity entity)
-	: Scene(entity.GetComponent<TagComponent>().Tag),
+	:
 	m_Target(SceneRenderer::Target::Create(100, 100)),
 	m_SavedTransform(entity.GetComponent<TransformComponent>().Transform)
 {

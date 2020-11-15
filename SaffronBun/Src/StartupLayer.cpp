@@ -1,5 +1,7 @@
 ﻿#include "StartupLayer.h"
 
+SignalAggregate<const Shared<Project> &> StartupLayer::Signals::OnProjectSelect;
+
 StartupLayer::StartupLayer()
 {
 }
@@ -35,9 +37,10 @@ void StartupLayer::OnGuiRender()
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
 	if ( ImGui::Begin("ProjectSelector##BackgroundPreview", nullptr, windowFlags) )
 	{
+		ImGui::PopStyleVar(3);
+
 		const auto winSize = ImGui::GetWindowSize();
 		const Vector2f textureSize = { static_cast<float>(m_TextureStore["SelectorBG"]->GetWidth()),static_cast<float>(m_TextureStore["SelectorBG"]->GetHeight()) };
 		const ImVec2 imgageSize = { winSize.y * (textureSize.x / textureSize.y), winSize.y };
@@ -61,17 +64,21 @@ void StartupLayer::OnGuiRender()
 			ImGui::SetNextWindowSize({ ImGui::GetWindowWidth() / 2.0f, height });
 			ImGui::SetNextWindowPos({ ImGui::GetWindowPos().x + ImGui::GetWindowWidth() * 0.07f, posY });
 
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 			ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
 			if ( ImGui::Begin("ProjectSelector##Selector", nullptr,
 							  ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNavFocus |
 							  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
 							  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove) )
 			{
+				ImGui::PopStyleVar(3);
 				ImGui::PopStyleColor(1);
-				const auto &projectList = Application::Get().GetProjectList();
+				const auto &projectList = Application::Get().GetRecentProjectList();
 				const DateTime currentDate;
 
-				auto PutProjectItem = [this](const Application::Project &project)
+				auto PutProjectItem = [this](const Shared<Project> &project)
 				{
 					OutputStringStream oss;
 
@@ -79,23 +86,35 @@ void StartupLayer::OnGuiRender()
 					Gui::SetFontSize(28);
 					const auto textHeight = ImGui::CalcTextSize("\n\n").y;
 
-					oss << "\n\n##" << project.UUID;
-					if ( ImGui::Selectable(oss.str().c_str(), &project == m_SelectedProject) )
+					oss << "\n\n##" << project->GetUUID();
+					bool badProject = false;
+					if ( ImGui::Selectable(oss.str().c_str(), project == m_SelectedProject) )
 					{
-						m_OnProjectSelect(project);
-						m_SelectedProject = &project;
+						if ( project->IsValid() )
+						{
+							GetSignals().Emit(Signals::OnProjectSelect, project);
+							m_SelectedProject = project;
+						}
+						else
+						{
+							badProject = true;
+							Run::Later([project]
+									   {
+										   Application::Get().RemoveProject(project);
+									   });
+						}
 					}
-
+					Gui::InfoModal("Bad Project", "Project could not be loaded", badProject);
 
 					oss.str("");
 					oss.clear();
 
-					const auto &date = project.LastOpened;
+					const auto &date = project->LastOpened();
 					ImGui::Text("");
 					Gui::SetFontSize(24);
 					ImGui::SameLine();
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() - textHeight);
-					ImGui::Text("%s", project.Name.c_str());
+					ImGui::Text("%s", project->GetName().c_str());
 					oss << date.WeekdayString(true) << " " << date.ANSIDateString() << " " << date.TimeString();
 					const float dateWidth = ImGui::CalcTextSize(oss.str().c_str()).x;
 					ImGui::SameLine();
@@ -106,29 +125,29 @@ void StartupLayer::OnGuiRender()
 
 					Gui::SetFontSize(18);
 					ImGui::SameLine();
-					ImGui::TextColored({ 0.5f, 0.5f, 0.5f,1.0f }, "%s", project.SceneFilepath.string().c_str());
+					ImGui::TextColored({ 0.5f, 0.5f, 0.5f,1.0f }, "%s", project->GetProjectFilepath().string().c_str());
 
 				};
 
-				auto RecentOperator = [&currentDate](const Application::Project &project)
+				auto RecentOperator = [&currentDate](const Shared<Project> &project)
 				{
-					return	project.LastOpened.Year() == currentDate.Year() && project.LastOpened.Month() == currentDate.Month();
+					return	project->LastOpened().Year() == currentDate.Year() && project->LastOpened().Month() == currentDate.Month();
 				};
-				auto LastMonthOperator = [&currentDate](const Application::Project &project)
+				auto LastMonthOperator = [&currentDate](const Shared<Project> &project)
 				{
 					return
-						(project.LastOpened.Year() == currentDate.Year() && project.LastOpened.Month() == currentDate.Month() - 1) ||
+						(project->LastOpened().Year() == currentDate.Year() && project->LastOpened().Month() == currentDate.Month() - 1) ||
 						// Take December-January into account
-						(project.LastOpened.Year() == currentDate.Year() - 1 && project.LastOpened.Month() == 12 && currentDate.Month() == 1);
+						(project->LastOpened().Year() == currentDate.Year() - 1 && project->LastOpened().Month() == 12 && currentDate.Month() == 1);
 				};
-				auto OlderOperator = [&currentDate, &RecentOperator, &LastMonthOperator](const Application::Project &project)
+				auto OlderOperator = [&currentDate, &RecentOperator, &LastMonthOperator](const Shared<Project> &project)
 				{
-					return !RecentOperator(project) && !LastMonthOperator(project) && project.LastOpened < currentDate;
+					return !RecentOperator(project) && !LastMonthOperator(project) && project->LastOpened() < currentDate;
 				};
 
-				const auto numRecent = std::count_if(projectList.begin(), projectList.end(), RecentOperator);
-				const auto numLastMonth = std::count_if(projectList.begin(), projectList.end(), LastMonthOperator);
-				const auto numOlder = std::count_if(projectList.begin(), projectList.end(), OlderOperator);
+				const auto numRecent = static_cast<int>(std::count_if(projectList.begin(), projectList.end(), RecentOperator));
+				const auto numLastMonth = static_cast<int>(std::count_if(projectList.begin(), projectList.end(), LastMonthOperator));
+				const auto numOlder = static_cast<int>(std::count_if(projectList.begin(), projectList.end(), OlderOperator));
 
 				const auto firstRecent = std::find_if(projectList.begin(), projectList.end(), RecentOperator);
 				const auto firstLastMonth = std::find_if(projectList.begin(), projectList.end(), LastMonthOperator);
@@ -170,6 +189,7 @@ void StartupLayer::OnGuiRender()
 			}
 			else
 			{
+				ImGui::PopStyleVar(3);
 				ImGui::PopStyleColor(1);
 			}
 			ImGui::End();
@@ -177,18 +197,96 @@ void StartupLayer::OnGuiRender()
 
 		Gui::SetFontSize(22);
 		ImGui::SetCursorPos({ ImGui::GetWindowWidth() * 0.09f, 4.0f * ImGui::GetWindowHeight() / 5.0f - buttonSize.y });
-		ImGui::Button("Create New", buttonSize);
+		if ( ImGui::Button("Create New", buttonSize) )
+		{
+			ImGui::OpenPopup("##NewProjectModal");
+		}
+
+		ImGui::SetCursorPos({ ImGui::GetWindowWidth() * 0.10f + buttonSize.x, 4.0f * ImGui::GetWindowHeight() / 5.0f - buttonSize.y });
+		if ( ImGui::Button("Browse", buttonSize) )
+		{
+			auto filepath = FileIOManager::OpenFile({ "Saffron Project (*.spr)", {"*.spr"} });
+			if ( filepath.has_filename() && filepath.extension() == ".spr" )
+			{
+				auto importedProject = Shared<Project>::Create(filepath);
+				if ( importedProject->IsValid() )
+				{
+					Application::Get().AddProject(importedProject);
+					Application::Get().SetActiveProject(importedProject);
+					GetSignals().Emit(Signals::OnProjectSelect, importedProject);
+				}
+			}
+		}
+
+		Gui::SetFontSize(28);
+		if ( ImGui::BeginPopupModal("##NewProjectModal", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize) )
+		{
+			static String projectName;
+			char buffer[256];
+			strcpy(buffer, projectName.c_str());
+
+			if ( ImGui::InputTextWithHint("##NewProjectInputName", "Project name", buffer, 256) )
+			{
+				projectName = buffer;
+			}
+
+			ImGui::Columns(3, "ProjectTemplateSelector", false);
+			const Filepath templateScenesDirectory = "Templates/Scenes";
+			const auto templateSceneFilepaths = FileIOManager::GetFiles(templateScenesDirectory, ".ssc");
+			static Filepath templateSceneChoice;
+			for ( int i = 0; i < 3 && i < templateSceneFilepaths.size(); i++ )
+			{
+				if ( ImGui::Button(templateSceneFilepaths[i].path().stem().string().c_str()) )
+				{
+					templateSceneChoice = templateSceneFilepaths[i].path();
+				}
+			}
+			ImGui::Columns(1);
+
+			Gui::SetFontSize(22);
+			if ( ImGui::Button("Create") && !projectName.empty() )
+			{
+				const auto projectFolder = "Projects/" + projectName;
+				const auto projectFilepath = projectFolder + "/" + projectName + ".spr";
+				const auto projectScenesFolder = projectFolder + "/Scenes";
+				const auto projectStartupSceneFilepath = projectFolder + "/Scenes/" + projectName + ".ssc";
+
+				FileIOManager::CreateDirectories(projectScenesFolder);
+				FileIOManager::Copy(templateSceneChoice, projectStartupSceneFilepath);
+
+				m_NewProject = Shared<Project>::Create(projectName, DateTime{}, projectFilepath, ArrayList<Filepath>{ projectStartupSceneFilepath });
+
+				ProjectSerializer serializer(*m_NewProject.value());
+				serializer.Serialize(projectFilepath);
+
+				Application::Get().AddProject(m_NewProject.value());
+				Application::Get().SetActiveProject(m_NewProject.value());
+
+				GetSignals().Emit(Signals::OnProjectSelect, m_NewProject.value());
+
+				ImGui::CloseCurrentPopup();
+				projectName = "";
+				templateSceneChoice = "";
+			}
+			ImGui::SameLine();
+			if ( ImGui::Button("Cancel") )
+			{
+				ImGui::CloseCurrentPopup();
+				projectName = "";
+				templateSceneChoice = "";
+			}
+
+			ImGui::EndPopup();
+		}
+
 		Gui::SetFontSize(18);
 
-		//const auto size = std::min(ImGui::GetWindowSize().x / 5.0f, ImGui::GetWindowSize().y / 5.0f);
-		//const ImVec2 imagePos = { 3.0f * ImGui::GetWindowSize().x / 4.0f - size / 2.0f, ImGui::GetWindowSize().y / 2.0f - size / 2.0f };
-		//ImGui::SetCursorPos(imagePos);
-		//const auto &texture = m_HoveredProject ? m_HoveredProject->PreviewTexture : m_TextureStore["Checkerboard"];
-		//ImGui::Image(reinterpret_cast<ImTextureID>(texture->GetRendererID()), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f });
-
+	}
+	else
+	{
+		ImGui::PopStyleVar(3);
 	}
 	ImGui::End();
-	ImGui::PopStyleVar(3);
 }
 
 void StartupLayer::OnEvent(const Event &event)

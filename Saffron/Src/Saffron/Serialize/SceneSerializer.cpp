@@ -294,13 +294,13 @@ static void SerializeEntity(YAML::Emitter &out, Entity entity)
 	out << YAML::EndMap; // Entity
 }
 
-static void SerializeEnvironment(YAML::Emitter &out, const Shared<Scene> &scene)
+static void SerializeEnvironment(YAML::Emitter &out, const Scene &scene)
 {
 	out << YAML::Key << "Environment";
 	out << YAML::Value;
 	out << YAML::BeginMap; // Environment
-	out << YAML::Key << "AssetPath" << YAML::Value << scene->GetEnvironment().FilePath;
-	const auto &light = scene->GetLight();
+	out << YAML::Key << "AssetPath" << YAML::Value << scene.GetEnvironment().FilePath;
+	const auto &light = scene.GetLight();
 	out << YAML::Key << "Light" << YAML::Value;
 	out << YAML::BeginMap; // Light
 	out << YAML::Key << "Direction" << YAML::Value << light.Direction;
@@ -315,7 +315,7 @@ static void SerializeEnvironment(YAML::Emitter &out, const Shared<Scene> &scene)
 /// Scene Serializer
 ///////////////////////////////////////////////////////////////////////////
 
-SceneSerializer::SceneSerializer(const Shared<Scene> &scene)
+SceneSerializer::SceneSerializer(Scene &scene)
 	: m_Scene(scene)
 {
 }
@@ -325,19 +325,19 @@ void SceneSerializer::Serialize(const Filepath &filepath)
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "Scene";
-	out << YAML::Value << m_Scene->GetName();
+	out << YAML::Value << m_Scene.GetName();
 	SerializeEnvironment(out, m_Scene);
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
-	m_Scene->GetEntityRegistry().each([&](auto entityID)
-									  {
-										  Entity entity = { entityID, m_Scene.Raw() };
-										  if ( !entity || !entity.HasComponent<IDComponent>() )
-											  return;
+	m_Scene.GetEntityRegistry().each([&](auto entityID)
+									 {
+										 Entity entity = { entityID, &m_Scene };
+										 if ( !entity || !entity.HasComponent<IDComponent>() )
+											 return;
 
-										  SerializeEntity(out, entity);
+										 SerializeEntity(out, entity);
 
-									  });
+									 });
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
@@ -363,18 +363,18 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 
 	auto sceneName = data["Scene"].as<String>();
 	SE_CORE_INFO("Deserializing scene '{0}'", sceneName);
-	m_Scene->SetName(sceneName);
+	m_Scene.SetName(sceneName);
 
 	auto environment = data["Environment"];
 	if ( environment )
 	{
 		auto envPath = environment["AssetPath"].as<String>();
-		m_Scene->SetEnvironment(Scene::Environment::Load(envPath));
+		m_Scene.SetEnvironment(Scene::Environment::Load(envPath));
 
 		auto lightNode = environment["Light"];
 		if ( lightNode )
 		{
-			auto &light = m_Scene->GetLight();
+			auto &light = m_Scene.GetLight();
 			light.Direction = lightNode["Direction"].as<Vector3f>();
 			light.Radiance = lightNode["Radiance"].as<Vector3f>();
 			light.Multiplier = lightNode["Multiplier"].as<float>();
@@ -395,7 +395,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 
 			SE_CORE_INFO("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-			Entity deserializedEntity = m_Scene->CreateEntity(uuid, name);
+			Entity deserializedEntity = m_Scene.CreateEntity(uuid, name);
 
 			auto transformComponent = entity["TransformComponent"];
 			if ( transformComponent )
@@ -433,7 +433,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 							// TODO: Look over overwritten variables
 							auto name = field["Name"].as<String>();
 							FieldType type = static_cast<FieldType>(field["Type"].as<uint32_t>());
-							EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(m_Scene->GetUUID(), uuid);
+							EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(m_Scene.GetUUID(), uuid);
 							auto &moduleFieldMap = data.ModuleFieldMap;
 							auto &publicFields = moduleFieldMap[moduleName];
 							if ( publicFields.find(name) == publicFields.end() )

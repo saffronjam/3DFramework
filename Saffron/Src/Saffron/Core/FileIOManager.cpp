@@ -18,7 +18,7 @@ void FileIOManager::Init(const Window &window)
 }
 
 ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath &directoryPath,
-											   const String &extension)
+												  const String &extension)
 {
 	ArrayList<DirectoryEntry> output;
 	std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const DirectoryEntry &entry)
@@ -63,6 +63,12 @@ size_t FileIOManager::Write(const Uint8 *data, size_t size, const Filepath &file
 size_t FileIOManager::Write(const Buffer buffer, const Filepath &filepath, bool overwrite)
 {
 	return Write(buffer.Data(), buffer.Size(), filepath, overwrite);
+}
+
+bool FileIOManager::CreateDirectories(const Filepath &filepath)
+{
+	std::error_code errorCode;
+	return fs::create_directories(filepath, errorCode);
 }
 
 bool FileIOManager::FileExists(const Filepath &filepath)

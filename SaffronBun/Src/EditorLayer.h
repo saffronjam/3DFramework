@@ -4,8 +4,14 @@
 
 using namespace Se;
 
-class EditorLayer : public Layer
+class EditorLayer : public Layer, public Signaller
 {
+public:
+	struct Signals
+	{
+		static SignalAggregate<void> OnWantProjectSelector;
+	};
+
 public:
 	struct AlbedoInput
 	{
@@ -46,8 +52,8 @@ public:
 	};
 
 public:
-	EditorLayer(Filepath initialSceneFilepath);
-	virtual ~EditorLayer() = default;
+	explicit EditorLayer(const Shared<Project> &project);
+	~EditorLayer() override = default;
 
 	void OnAttach(Shared<BatchLoader> &loader) override;
 	void OnDetach() override;
@@ -59,24 +65,29 @@ public:
 	bool OnMouseButtonPressed(const MousePressEvent &event);
 	bool OnWindowDropFiles(const WindowDropFilesEvent &event);
 
-	void NewScenePrompt();
-	void OpenScenePrompt();
-	void SaveSceneAsPrompt();
+	void PromptNewScene();
+	void PromptNewProject();
+	void PromptImportScene();
+	void PromptOpenProject();
 
+	void SaveActiveProject() const;
 	void SaveActiveScene() const;
-	void LoadNewScene(const Filepath &filepath);
+	void LoadProjectScene(const Filepath &filepath);
 private:
 	Pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
+	Ray CastMouseRay() const;
 
 	void OnGuiRenderMenuBar();
 	void OnGuiRenderToolbar();
-	void OnSelected(Entity entity);
-	void OnUnselected(Entity entity);
+	void OnEntitySelected(Entity entity);
+	void OnEntityUnselected(Entity entity);
 	void OnEntityDeleted(Entity entity);
-	void OnNewModelSpaceView(Entity entity);
-	Ray CastMouseRay() const;
 
+	void OnNewModelSpaceView(Entity entity);
 	void OnSceneChange(Shared<Scene> scene, Entity selection);
+	void OnProjectChange(const Shared<Project> &project);
+	void OnWantProjectSelector();
+
 	void OnPlay();
 	void OnStop();
 
@@ -90,7 +101,8 @@ private:
 private:
 	int m_Style;
 	int m_GizmoType = -1;
-	bool m_ModelSpaceEditor = false;
+
+	Shared<Project> m_Project;
 
 	Shared<EditorScene> m_EditorScene;
 	Shared<RuntimeScene> m_RuntimeScene;
@@ -100,7 +112,6 @@ private:
 	mutable Shared<Scene> m_LastFocusedScene;
 	Shared<Scene> m_CachedActiveScene;
 
-	Filepath m_SceneFilePath;
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorTerminal m_EditorTerminal;
@@ -118,6 +129,7 @@ private:
 	Shared<EntityPanel> m_EntityPanel;
 	Shared<ScriptPanel> m_ScriptPanel;
 	Shared<ScenePanel> m_ScenePanel;
+	Run::Handle m_AssetScriptRunHandle;
 
 	SceneState m_SceneState;
 

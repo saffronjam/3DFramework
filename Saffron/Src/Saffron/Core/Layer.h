@@ -5,11 +5,11 @@
 
 namespace Se {
 
-class Layer
+class Layer : public ReferenceCounted
 {
 public:
 	Layer(const String &name = "Layer");
-	virtual ~Layer();
+	virtual ~Layer() = default;
 
 	virtual void OnAttach(Shared<BatchLoader> &loader) {}
 	virtual void OnDetach() {}

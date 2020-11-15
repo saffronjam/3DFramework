@@ -23,8 +23,7 @@ static void CopyComponent(EntityRegistry &dstRegistry, EntityRegistry &srcRegist
 	}
 }
 
-RuntimeScene::RuntimeScene(String name, Shared<Scene> copyFrom)
-	: Scene(Move(name))
+RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 {
 	SE_CORE_ASSERT(copyFrom, "Runtime Scene must have a scene to copy from");
 

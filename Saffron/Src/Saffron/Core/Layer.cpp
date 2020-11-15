@@ -1,13 +1,10 @@
 #include "SaffronPCH.h"
 #include "Layer.h"
 
-namespace Se {
-
+namespace Se
+{
 Layer::Layer(const String &name)
 	: m_DebugName(name)
 {
 }
-
-Layer::~Layer()
-= default;
 }

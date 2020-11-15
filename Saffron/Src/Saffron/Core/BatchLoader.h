@@ -20,6 +20,7 @@ public:
 	void Submit(Function<void()> function, String shortDescription);
 	void Execute();
 	void ForceExit();
+	void Reset();
 
 	float GetProgress() const { return m_Progress; }
 	const String *GetStatus() const { return m_Status; }

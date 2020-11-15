@@ -3,15 +3,28 @@
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Scene/EditorScene.h"
+#include "Saffron/Serialize/SceneSerializer.h"
 
 namespace Se
 {
-EditorScene::EditorScene(String name)
-	: Scene(Move(name)),
-	m_MiniTarget(SceneRenderer::Target::Create(100, 100))
+EditorScene::EditorScene(Filepath filepath)
+	:
+	Scene(),
+	m_MiniTarget(SceneRenderer::Target::Create(100, 100)),
+	m_Filepath(Move(filepath))
 {
 	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
 	m_MiniTarget->Disable();
+
+	if ( !m_Filepath.empty() && m_Filepath.extension() == ".ssc" )
+	{
+		SceneSerializer serializer(*this);
+		if ( !serializer.Deserialize(m_Filepath) )
+		{
+			SE_WARN("Failed to load scene! Filepath: {0}", m_Filepath.string());
+			return;
+		}
+	}
 }
 
 void EditorScene::OnUpdate()
@@ -134,5 +147,15 @@ void EditorScene::SetViewportSize(Uint32 width, Uint32 height)
 	m_EditorCamera->SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), static_cast<float>(width), static_cast<float>(height), 0.1f, 10000.0f));
 	m_EditorCamera->SetViewportSize(width, height);
 	Scene::SetViewportSize(width, height);
+}
+
+void EditorScene::Save() const
+{
+	if ( !m_Filepath.empty() && m_Filepath.extension() == ".ssc" )
+	{
+		auto &thisNonConst = const_cast<EditorScene &>(*this);
+		SceneSerializer serializer(thisNonConst);
+		serializer.Serialize(m_Filepath);
+	}
 }
 }

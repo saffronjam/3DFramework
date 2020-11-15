@@ -23,7 +23,7 @@ public:
 
 	Uint32 GetReferenceCount() const { return m_ReferenceCount; }
 private:
-	mutable std::atomic<Uint32> m_ReferenceCount = 0;
+	mutable Atomic<Uint32> m_ReferenceCount = 0;
 };
 
 template<typename SharedType>

@@ -10,31 +10,31 @@ class LayerStack : public Signaller
 public:
 	struct Signals
 	{
-		static SignalAggregate<Layer *> OnPushLayer;
-		static SignalAggregate<Layer *> OnPushOverlay;
-		static SignalAggregate<Layer *> OnPopLayer;
-		static SignalAggregate<Layer *> OnPopOverlay;
+		static SignalAggregate<Shared<Layer>> OnPushLayer;
+		static SignalAggregate<Shared<Layer>> OnPushOverlay;
+		static SignalAggregate<Shared<Layer>> OnPopLayer;
+		static SignalAggregate<Shared<Layer>> OnPopOverlay;
 	};
 
 public:
 	LayerStack() = default;
 	~LayerStack();
 
-	void PushLayer(Layer *layer, Shared<BatchLoader> &batchLoader);
-	void PushOverlay(Layer *overlay, Shared<BatchLoader> &batchLoader);
+	void PushLayer(Shared<Layer>, Shared<BatchLoader> &batchLoader);
+	void PushOverlay(Shared<Layer>, Shared<BatchLoader> &batchLoader);
 	void PopLayer(int count);
 	void PopOverlay(int count);
-	void EraseLayer(Layer *layer);
-	void EraseOverlay(Layer *overlay);
+	void EraseLayer(Shared<Layer> layer);
+	void EraseOverlay(Shared<Layer> overlay);
 
 	void Clear();
-	Layer *Front();
-	Layer *Back();
-	ArrayList<Layer *>::iterator begin() { return m_Layers.begin(); }
-	ArrayList<Layer *>::iterator end() { return m_Layers.end(); }
+	Shared<Layer> Front();
+	Shared<Layer> Back();
+	ArrayList<Shared<Layer>>::iterator begin() { return m_Layers.begin(); }
+	ArrayList<Shared<Layer>>::iterator end() { return m_Layers.end(); }
 
 private:
-	ArrayList<Layer *> m_Layers;
+	ArrayList<Shared<Layer>> m_Layers;
 	unsigned int m_LayerInsertIndex = 0;
 };
 

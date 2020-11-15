@@ -48,8 +48,9 @@ public:
 	static bool Property(const String &name, Vector4f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
 
 	static void HelpMarker(const String &desc);
-	static void InfoModal(const char *title, const char *text, bool open);
+	static void InfoModal(const char *title, const char *text, bool &open);
 
+	static int GetFontSize();
 	static void SetStyle(Style style);
 	static void SetFontSize(int size);
 
@@ -65,6 +66,7 @@ private:
 private:
 	static Style m_CurrentStyle;
 	static Map<int, ImFont *> m_Fonts;
+	static Pair<int, ImFont *> m_CurrentFont;
 
 };
 }
