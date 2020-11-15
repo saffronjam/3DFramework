@@ -19,7 +19,7 @@ public:
 
 private:
 	Map<String, Shared<Texture2D>> m_TextureStore;
-	const Application::Project *m_HoveredProject = nullptr;
+	const Application::Project *m_SelectedProject = nullptr;
 	DateTime m_Today;
 	Function<void(const Application::Project &)> m_OnProjectSelect;
 

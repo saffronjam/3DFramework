@@ -33,6 +33,7 @@ void Gui::Init()
 	AddFont("Assets/Fonts/segoeui.ttf", 8);
 	AddFont("Assets/Fonts/segoeui.ttf", 12);
 	AddFont("Assets/Fonts/segoeui.ttf", 14);
+	AddFont("Assets/Fonts/segoeui.ttf", 22);
 	AddFont("Assets/Fonts/segoeui.ttf", 24);
 	AddFont("Assets/Fonts/segoeui.ttf", 28);
 	AddFont("Assets/Fonts/segoeui.ttf", 32);
@@ -52,6 +53,42 @@ void Gui::Init()
 	{
 		style.WindowRounding = 0.0f;
 	}
+
+	const ImVec4 vibrant = { 0.89f, 0.46f, 0.16f, 1.0f };
+	const ImVec4 vibrantFaded1 = { 0.85f, 0.42f, 0.12f, 1.0f };
+	const ImVec4 vibrantFaded2 = { 0.81f, 0.38f, 0.08f, 1.0f };
+
+	// Main Blue
+	//const Vector3f mainVibrant = { 0.26f, 0.59f, 0.98f };
+	//const Vector3f mainVibrantDark = { 0.24f, 0.52f, 0.88f };
+	//const Vector3f mainLessVibrant = { 0.06f, 0.53f, 0.98f 
+	// Main Orange
+	const Vector3f mainVibrant = { 0.89f, 0.46f, 0.16f };
+	const Vector3f mainVibrantDark = { 0.79f, 0.38f, 0.14f };
+	const Vector3f mainLessVibrant = { 0.89f, 0.39f, 0.02f };
+
+	const Vector4f mainNoTint = { mainVibrant, 1.00f }; //3	Main no tint
+	const Vector4f mainTint1 = { mainVibrant, 0.95f }; //9	Main tinted1
+	const Vector4f mainTint2 = { mainVibrant, 0.80f }; //8	Main tinted2
+	const Vector4f mainTint3 = { mainVibrant, 0.67f }; //2	Main tinted3
+	const Vector4f mainTint4 = { mainVibrant, 0.40f }; //1	Main tinted4
+	const Vector4f mainTint5 = { mainVibrant, 0.35f }; //13	Main tinted5
+
+	const Vector4f mainDark = { mainVibrantDark ,1.00f }; //4	Main dark1 no tint
+
+	const Vector4f mainLessVibrantNoTint = { mainLessVibrant, 1.00f }; //6	Less blue no tint
+	const Vector4f mainLessVibrantTint1 = { mainLessVibrant, 0.60f }; //14 Less blue tinted1
+
+	const Vector4f coMain = { 1.00f, 0.43f, 0.35f, 1.00f }; //10	2ndMain no tint
+	const Vector4f coMainDark = { 0.90f, 0.70f, 0.00f, 1.00f }; //11	3rdMain no tint
+	const Vector4f coMainRed = { 1.00f, 0.60f, 0.00f, 1.00f }; //12	Co3rdMain 
+
+
+	const auto ToImVec4 = [](const Vector4f &vector)
+	{
+		return ImVec4{ vector.x, vector.y, vector.z, vector.w };
+	};
+
 	style.Alpha = 1.0f;
 	style.FrameRounding = 3.0f;
 	style.Colors[ImGuiCol_Text] = ImVec4(0.00f, 0.00f, 0.00f, 1.00f);
@@ -61,8 +98,8 @@ void Gui::Init()
 	style.Colors[ImGuiCol_Border] = ImVec4(0.00f, 0.00f, 0.00f, 0.39f);
 	style.Colors[ImGuiCol_BorderShadow] = ImVec4(1.00f, 1.00f, 1.00f, 0.10f);
 	style.Colors[ImGuiCol_FrameBg] = ImVec4(1.00f, 1.00f, 1.00f, 0.94f);
-	style.Colors[ImGuiCol_FrameBgHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	style.Colors[ImGuiCol_FrameBgActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
+	style.Colors[ImGuiCol_FrameBgHovered] = ToImVec4(mainTint4);									//1
+	style.Colors[ImGuiCol_FrameBgActive] = ToImVec4(mainTint3);										//2
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
 	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
 	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
@@ -71,31 +108,29 @@ void Gui::Init()
 	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.59f, 0.59f, 0.59f, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.49f, 0.49f, 0.49f, 1.00f);
-	style.Colors[ImGuiCol_CheckMark] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_SliderGrab] = ImVec4(0.24f, 0.52f, 0.88f, 1.00f);
-	style.Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_Button] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	style.Colors[ImGuiCol_ButtonHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_ButtonActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_Header] = ImVec4(0.26f, 0.59f, 0.98f, 0.31f);
-	style.Colors[ImGuiCol_HeaderHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.80f);
-	style.Colors[ImGuiCol_HeaderActive] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
+	style.Colors[ImGuiCol_CheckMark] = ToImVec4(mainNoTint);										//3
+	style.Colors[ImGuiCol_SliderGrab] = ToImVec4(mainDark);											//4
+	style.Colors[ImGuiCol_SliderGrabActive] = ToImVec4(mainDark);									//4
+	style.Colors[ImGuiCol_Button] = ToImVec4(mainTint2);											//1
+	style.Colors[ImGuiCol_ButtonHovered] = ToImVec4(mainNoTint);									//3
+	style.Colors[ImGuiCol_ButtonActive] = ToImVec4(mainLessVibrantNoTint);							//6
+	style.Colors[ImGuiCol_Header] = ToImVec4(mainTint4);											//7
+	style.Colors[ImGuiCol_HeaderHovered] = ToImVec4(mainTint2);										//8
+	style.Colors[ImGuiCol_HeaderActive] = ToImVec4(mainNoTint);										//3
 	style.Colors[ImGuiCol_ResizeGrip] = ImVec4(1.00f, 1.00f, 1.00f, 0.50f);
-	style.Colors[ImGuiCol_ResizeGripHovered] = ImVec4(0.26f, 0.59f, 0.98f, 0.67f);
-	style.Colors[ImGuiCol_ResizeGripActive] = ImVec4(0.26f, 0.59f, 0.98f, 0.95f);
+	style.Colors[ImGuiCol_ResizeGripHovered] = ToImVec4(mainTint3);									//2
+	style.Colors[ImGuiCol_ResizeGripActive] = ToImVec4(mainTint1);									//9
 	style.Colors[ImGuiCol_PlotLines] = ImVec4(0.39f, 0.39f, 0.39f, 1.00f);
-	style.Colors[ImGuiCol_PlotLinesHovered] = ImVec4(1.00f, 0.43f, 0.35f, 1.00f);
-	style.Colors[ImGuiCol_PlotHistogram] = ImVec4(0.90f, 0.70f, 0.00f, 1.00f);
-	style.Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(1.00f, 0.60f, 0.00f, 1.00f);
-	style.Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+	style.Colors[ImGuiCol_PlotLinesHovered] = ToImVec4(coMain);										//10
+	style.Colors[ImGuiCol_PlotHistogram] = ToImVec4(coMainDark);									//11
+	style.Colors[ImGuiCol_PlotHistogramHovered] = ToImVec4(coMainRed);								//12
+	style.Colors[ImGuiCol_TextSelectedBg] = ToImVec4(mainTint5);									//13
 	style.Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(0.20f, 0.20f, 0.20f, 0.35f);
-	style.Colors[ImGuiCol_Tab] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	style.Colors[ImGuiCol_TabHovered] = ImVec4(0.26f, 0.59f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_TabActive] = ImVec4(0.06f, 0.53f, 0.98f, 1.00f);
-	style.Colors[ImGuiCol_TabUnfocused] = ImVec4(0.26f, 0.59f, 0.98f, 0.40f);
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ImVec4(0.06f, 0.53f, 0.98f, 0.60f);
-
-	SetStyle(Style::Dark);
+	style.Colors[ImGuiCol_Tab] = ToImVec4(mainTint4);												//1
+	style.Colors[ImGuiCol_TabHovered] = ToImVec4(mainNoTint);										//3
+	style.Colors[ImGuiCol_TabActive] = ToImVec4(mainLessVibrantNoTint);								//6
+	style.Colors[ImGuiCol_TabUnfocused] = ToImVec4(mainTint4);										//1
+	style.Colors[ImGuiCol_TabUnfocusedActive] = ToImVec4(mainLessVibrantTint1);						//14
 }
 
 void Gui::Shutdown()

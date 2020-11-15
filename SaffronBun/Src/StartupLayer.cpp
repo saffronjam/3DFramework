@@ -7,6 +7,7 @@ StartupLayer::StartupLayer()
 void StartupLayer::OnAttach(Shared<BatchLoader> &loader)
 {
 	m_TextureStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
+	m_TextureStore["SelectorBG"] = Texture2D::Create("Assets/Editor/SelectorBG.png");
 }
 
 void StartupLayer::OnDetach()
@@ -37,6 +38,13 @@ void StartupLayer::OnGuiRender()
 
 	if ( ImGui::Begin("ProjectSelector##BackgroundPreview", nullptr, windowFlags) )
 	{
+		const auto winSize = ImGui::GetWindowSize();
+		const Vector2f textureSize = { static_cast<float>(m_TextureStore["SelectorBG"]->GetWidth()),static_cast<float>(m_TextureStore["SelectorBG"]->GetHeight()) };
+		const ImVec2 imgageSize = { winSize.y * (textureSize.x / textureSize.y), winSize.y };
+		ImGui::SetCursorPos({ winSize.x - imgageSize.x, 0.0f });
+		ImGui::Image(reinterpret_cast<ImTextureID>(m_TextureStore["SelectorBG"]->GetRendererID()), imgageSize, { 0.0f, 0.0f }, { 1.0f, 1.0f }, { 0.6f,0.6f ,0.6f, 1.0f });
+
+		ImGui::SetCursorPos({ 0.0f, 0.0f });
 		Gui::SetFontSize(36);
 		ImGui::Text("");
 		Gui::SetFontSize(72);
@@ -45,17 +53,21 @@ void StartupLayer::OnGuiRender()
 		ImGui::Text("");
 		Gui::SetFontSize(18);
 
+		const ImVec2 buttonSize = { 180.0f, 50.0f };
 		const float posY = ImGui::GetWindowPos().y + 140.0f;
-		const float height = ImGui::GetWindowSize().y - 200.0f;
+		const float height = 4.0f * ImGui::GetWindowHeight() / 5.0f - buttonSize.y - 180.0f;
 		if ( height > 0 )
 		{
 			ImGui::SetNextWindowSize({ ImGui::GetWindowWidth() / 2.0f, height });
 			ImGui::SetNextWindowPos({ ImGui::GetWindowPos().x + ImGui::GetWindowWidth() * 0.07f, posY });
+
+			ImGui::PushStyleColor(ImGuiCol_WindowBg, IM_COL32(0, 0, 0, 0));
 			if ( ImGui::Begin("ProjectSelector##Selector", nullptr,
 							  ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoNavFocus |
 							  ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse |
 							  ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove) )
 			{
+				ImGui::PopStyleColor(1);
 				const auto &projectList = Application::Get().GetProjectList();
 				const DateTime currentDate;
 
@@ -68,13 +80,10 @@ void StartupLayer::OnGuiRender()
 					const auto textHeight = ImGui::CalcTextSize("\n\n").y;
 
 					oss << "\n\n##" << project.UUID;
-					if ( ImGui::Selectable(oss.str().c_str(), &project == m_HoveredProject) )
+					if ( ImGui::Selectable(oss.str().c_str(), &project == m_SelectedProject) )
 					{
 						m_OnProjectSelect(project);
-					}
-					if ( ImGui::IsItemHovered() )
-					{
-						m_HoveredProject = &project;
+						m_SelectedProject = &project;
 					}
 
 
@@ -159,14 +168,23 @@ void StartupLayer::OnGuiRender()
 
 				ImGui::Columns(1);
 			}
+			else
+			{
+				ImGui::PopStyleColor(1);
+			}
 			ImGui::End();
 		}
 
-		const auto size = std::min(ImGui::GetWindowSize().x / 5.0f, ImGui::GetWindowSize().y / 5.0f);
-		const ImVec2 imagePos = { 3.0f * ImGui::GetWindowSize().x / 4.0f - size / 2.0f, ImGui::GetWindowSize().y / 2.0f - size / 2.0f };
-		ImGui::SetCursorPos(imagePos);
-		const auto &texture = m_HoveredProject ? m_HoveredProject->PreviewTexture : m_TextureStore["Checkerboard"];
-		ImGui::Image(reinterpret_cast<ImTextureID>(texture->GetRendererID()), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f });
+		Gui::SetFontSize(22);
+		ImGui::SetCursorPos({ ImGui::GetWindowWidth() * 0.09f, 4.0f * ImGui::GetWindowHeight() / 5.0f - buttonSize.y });
+		ImGui::Button("Create New", buttonSize);
+		Gui::SetFontSize(18);
+
+		//const auto size = std::min(ImGui::GetWindowSize().x / 5.0f, ImGui::GetWindowSize().y / 5.0f);
+		//const ImVec2 imagePos = { 3.0f * ImGui::GetWindowSize().x / 4.0f - size / 2.0f, ImGui::GetWindowSize().y / 2.0f - size / 2.0f };
+		//ImGui::SetCursorPos(imagePos);
+		//const auto &texture = m_HoveredProject ? m_HoveredProject->PreviewTexture : m_TextureStore["Checkerboard"];
+		//ImGui::Image(reinterpret_cast<ImTextureID>(texture->GetRendererID()), { size, size }, { 0.0f, 0.0f }, { 1.0f, 1.0f });
 
 	}
 	ImGui::End();
