@@ -61,10 +61,16 @@ void Gui::Init()
 	//const Vector3f mainVibrant = { 0.26f, 0.59f, 0.98f };
 	//const Vector3f mainVibrantDark = { 0.24f, 0.52f, 0.88f };
 	//const Vector3f mainLessVibrant = { 0.06f, 0.53f, 0.98f 
+
 	// Main Orange
-	const Vector3f mainVibrant = { 0.89f, 0.46f, 0.16f };
-	const Vector3f mainVibrantDark = { 0.79f, 0.38f, 0.14f };
-	const Vector3f mainLessVibrant = { 0.89f, 0.39f, 0.02f };
+	//const Vector3f mainVibrant = { 0.89f, 0.46f, 0.16f };
+	//const Vector3f mainVibrantDark = { 0.79f, 0.38f, 0.14f };
+	//const Vector3f mainLessVibrant = { 0.89f, 0.39f, 0.02f };
+
+	// Main Purple
+	const Vector3f mainVibrant = { 0.29f, 0.13f, 0.42f };
+	const Vector3f mainVibrantDark = { 0.19f, 0.15f, 0.23f };
+	const Vector3f mainLessVibrant = { 0.33f, 0.18f, 0.48f };
 
 	const Vector4f mainNoTint = { mainVibrant, 1.00f }; //3	Main no tint
 	const Vector4f mainTint1 = { mainVibrant, 0.95f }; //9	Main tinted1
