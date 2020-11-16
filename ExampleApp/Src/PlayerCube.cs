@@ -51,14 +51,25 @@ namespace Script
             //    movementForce *= 0.4f;
             //}
 
+            Vector3 movementSpeed = new Vector3(0, 0, 0);
+
             if (Input.IsKeyPressed(KeyCode.D))
             {
-                m_PhysicsBody.ApplyLinearImpulse(new Vector3(movementForce, 0, 0), new Vector3());
+                movementSpeed.X += movementForce;
             }
-            else if (Input.IsKeyPressed(KeyCode.A))
+            if (Input.IsKeyPressed(KeyCode.A))
             {
-                m_PhysicsBody.ApplyLinearImpulse(new Vector3(-movementForce, 0, 0), new Vector3());
+                movementSpeed.X -= movementForce;
             }
+            if (Input.IsKeyPressed(KeyCode.W))
+            {
+                movementSpeed.Z -= movementForce;
+            }
+            if (Input.IsKeyPressed(KeyCode.S))
+            {
+                movementSpeed.Z += movementForce;
+            }
+            m_PhysicsBody.ApplyLinearImpulse(movementSpeed, new Vector3());
 
 
             if (Colliding && Input.IsMouseButtonPressed(MouseButtonCode.Right))

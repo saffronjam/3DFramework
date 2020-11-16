@@ -12,7 +12,8 @@ namespace Se
 {
 Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
 
-SignalAggregate<Entity> ScenePanel::Signals::OnDelete;
+SignalAggregate<Entity> ScenePanel::Signals::OnEntityDeleted;
+SignalAggregate<Entity> ScenePanel::Signals::OnEntityCopied;
 SignalAggregate<Entity> ScenePanel::Signals::OnNewSelection;
 SignalAggregate<Entity> ScenePanel::Signals::OnViewInModelSpace;
 
@@ -196,11 +197,14 @@ void ScenePanel::DrawEntityNode(Entity entity)
 	}
 
 	bool entityDeleted = false;
+	bool entityCopied = false;
 	bool entityViewInModelSpace = false;
 	if ( ImGui::BeginPopupContextItem() )
 	{
 		if ( ImGui::MenuItem("Delete") )
 			entityDeleted = true;
+		if ( ImGui::MenuItem("Copy") )
+			entityCopied = true;
 		if ( ImGui::MenuItem("View in model space") )
 			entityViewInModelSpace = true;
 
@@ -220,14 +224,12 @@ void ScenePanel::DrawEntityNode(Entity entity)
 	// Defer deletion until end of node UI
 	if ( entityDeleted )
 	{
-		// TODO: Entity panel shouldn't do this?!
-		m_Context->DestroyEntity(entity);
-		if ( entity == m_SelectionContext )
-			m_SelectionContext = {};
-
-		GetSignals().Emit(Signals::OnDelete, entity);
+		GetSignals().Emit(Signals::OnEntityDeleted, entity);
 	}
-
+	if ( entityCopied )
+	{
+		GetSignals().Emit(Signals::OnEntityCopied, entity);
+	}
 	if ( entityViewInModelSpace )
 	{
 		GetSignals().Emit(Signals::OnViewInModelSpace, entity);

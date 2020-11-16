@@ -64,9 +64,13 @@ void ModelSpaceScene::OnGuiRender()
 	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
-	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+	if ( Gui::Property("Mesh Bounding Boxes", m_UIShowMeshBoundingBoxes) )
 	{
-		ShowBoundingBoxes(m_UIShowBoundingBoxes);
+		ShowMeshBoundingBoxes(m_UIShowMeshBoundingBoxes);
+	}
+	if ( Gui::Property("Physics Bounding Boxes", m_UIShowPhysicsBodyBoundingBoxes) )
+	{
+		ShowPhysicsBodyBoundingBoxes(m_UIShowPhysicsBodyBoundingBoxes);
 	}
 	Gui::EndPropertyGrid();
 

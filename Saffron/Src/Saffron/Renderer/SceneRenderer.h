@@ -14,7 +14,8 @@ public:
 	struct Options
 	{
 		bool ShowGrid = true;
-		bool ShowBoundingBoxes = false;
+		bool ShowMeshBoundingBoxes = false;
+		bool ShowPhysicsBodyBoundingBoxes = false;
 	};
 	struct CameraData
 	{
@@ -61,6 +62,9 @@ public:
 	static void SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f), const Shared<MaterialInstance>
 						   &overrideMaterial = nullptr);
 	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitLine(const Vector3f &first, const Vector3f &second, const Vector4f &color);
+	static void SubmitAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
+	static void SubmitAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
 
 	static Pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const String &filepath);
 

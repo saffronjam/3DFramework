@@ -44,6 +44,7 @@ public:
 private:
 	static Type m_sCurrentAPI;
 	static Capabilities m_sCapabilities;
+	static float m_LineThickness;
 };
 
 //RendererAPI::Capabilities RendererAPI::m_sCapabilities = {};

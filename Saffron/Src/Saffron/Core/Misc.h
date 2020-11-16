@@ -43,6 +43,11 @@ public:
 			value = upper;
 		}
 	}
+	template<typename t_DestVector3, typename t_SourceVector3>
+	constexpr static const t_DestVector3 &ConvertTo(const t_SourceVector3 &source)
+	{
+		return *reinterpret_cast<const t_DestVector3 *>(&source);
+	}
 };
 
 }

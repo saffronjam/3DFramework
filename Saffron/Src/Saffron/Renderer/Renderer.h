@@ -4,6 +4,7 @@
 #include "Saffron/Renderer/PrimitiveType.h"
 #include "Saffron/Renderer/RenderCommandQueue.h"
 #include "Saffron/Renderer/RenderPass.h"
+#include "Saffron/Renderer/Shader.h"
 
 namespace Se
 {
@@ -11,6 +12,12 @@ class Material;
 class Mesh;
 class MaterialInstance;
 class ShaderLibrary;
+
+struct LineVertex
+{
+	Vector3f Position;
+	Vector4f Color;
+};
 
 class Renderer
 {
@@ -29,8 +36,6 @@ public:
 	// For OpenGL
 	static void ClearMagenta();
 
-	static Shared<ShaderLibrary> GetShaderLibrary();
-
 	template<typename FuncT>
 	static void Submit(FuncT &&func);
 	static void Execute();
@@ -40,10 +45,8 @@ public:
 	static void EndRenderPass();
 
 	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader);
 	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
-
-	static void DrawAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
-	static void DrawAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();

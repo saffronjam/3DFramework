@@ -114,8 +114,9 @@ void EditorLayer::OnAttach(Shared<BatchLoader> &loader)
 
 					   m_MainViewportPane->GetSignal(ViewportPane::Signals::OnPostRender).Connect(postRenderFn);
 
-					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnDelete).Connect([this](Entity entity) {OnEntityDeleted(entity); });
-					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnViewInModelSpace).Connect([this](Entity entity) {OnNewModelSpaceView(entity); });
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnEntityDeleted).Connect([this](Entity entity) { OnEntityDeleted(entity); });
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnEntityCopied).Connect([this](Entity entity) { OnEntityCopied(entity); });
+					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnViewInModelSpace).Connect([this](Entity entity) { OnNewModelSpaceView(entity); });
 					   m_ScenePanel->GetSignal(ScenePanel::Signals::OnNewSelection).Connect([this](Entity entity)
 																							{
 																								OnEntityUnselected(m_SelectedEntity);
@@ -306,8 +307,7 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 		case KeyCode::Delete:
 			if ( m_SelectedEntity )
 			{
-				OnEntityUnselected(m_SelectedEntity);
-				m_EditorScene->DestroyEntity(m_SelectedEntity);
+				OnEntityDeleted(m_SelectedEntity);
 			}
 			break;
 		default:
@@ -318,10 +318,10 @@ bool EditorLayer::OnKeyboardPressEvent(const KeyboardPressEvent &event)
 		{
 			switch ( event.GetKey() )
 			{
-			case KeyCode::D:
+			case KeyCode::C:
 				if ( m_SelectedEntity )
 				{
-					m_EditorScene->DuplicateEntity(m_SelectedEntity);
+					OnEntityCopied(m_SelectedEntity);
 				}
 				break;
 			case KeyCode::G:
@@ -901,7 +901,17 @@ void EditorLayer::OnEntityDeleted(Entity entity)
 {
 	if ( m_SelectedEntity == entity )
 	{
-		m_EditorScene->SetSelectedEntity({});
+		m_EditorScene->DestroyEntity(m_SelectedEntity);
+		OnEntityUnselected(m_SelectedEntity);
+	}
+}
+
+void EditorLayer::OnEntityCopied(Entity entity)
+{
+	if ( m_SelectedEntity == entity )
+	{
+		const Entity copy = m_SelectedEntity.Copy();
+		OnEntitySelected(copy);
 	}
 }
 

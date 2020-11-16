@@ -47,7 +47,16 @@ struct SceneRendererData
 
 	SceneRenderer::Options Options;
 
+	// Lines
+	static constexpr Uint32 MaxLines = 10000;
+	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
+	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
 
+	Uint32 LineIndexCount = 0;
+	LineVertex *LineVertexBufferBase = nullptr;
+	LineVertex *LineVertexBufferPtr = nullptr;
+
+	Shared<Shader> LineShader;
 };
 
 static SceneRendererData s_Data;
@@ -140,6 +149,13 @@ void SceneRenderer::Init()
 
 	// Outline
 	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
+
+	// Lines
+	{
+		s_Data.LineShader = Shader::Create(Filepath{ "Assets/Shaders/Renderer2D_Line.glsl" });
+		s_Data.LineVertexBufferBase = new LineVertex[SceneRendererData::MaxLineVertices];
+	}
+
 }
 
 void SceneRenderer::BeginScene(const Scene *scene, ArrayList<Shared<Target>> targets)
@@ -151,6 +167,8 @@ void SceneRenderer::BeginScene(const Scene *scene, ArrayList<Shared<Target>> tar
 	s_Data.SceneData.SkyboxMaterial = scene->GetSkybox().Material;
 	s_Data.SceneData.SceneEnvironment = scene->GetEnvironment();
 	s_Data.SceneData.ActiveLight = scene->GetLight();
+	s_Data.LineIndexCount = 0;
+	s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
 }
 
 void SceneRenderer::EndScene()
@@ -172,6 +190,59 @@ void SceneRenderer::SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transfo
 void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform)
 {
 	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
+}
+
+void SceneRenderer::SubmitLine(const Vector3f &first, const Vector3f &second, const Vector4f &color)
+{
+	if ( s_Data.LineIndexCount >= SceneRendererData::MaxLineIndices )
+	{
+		return;
+	}
+
+	s_Data.LineVertexBufferPtr->Position = first;
+	s_Data.LineVertexBufferPtr->Color = color;
+	s_Data.LineVertexBufferPtr++;
+
+	s_Data.LineVertexBufferPtr->Position = second;
+	s_Data.LineVertexBufferPtr->Color = color;
+	s_Data.LineVertexBufferPtr++;
+
+	s_Data.LineIndexCount += 2;
+}
+
+void SceneRenderer::SubmitAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color)
+{
+	for ( const auto &submesh : mesh->GetSubmeshes() )
+	{
+		const auto &aabb = submesh.BoundingBox;
+		auto aabbTransform = transform * submesh.Transform;
+		SubmitAABB(aabb, aabbTransform);
+	}
+}
+
+void SceneRenderer::SubmitAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color)
+{
+	Vector4f corners[8] =
+	{
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
+
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
+	};
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i], corners[(i + 1) % 4], color);
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i], corners[i + 4], color);
 }
 
 Pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const String &filepath)
@@ -348,12 +419,12 @@ void SceneRenderer::GeometryPass(const Shared<Target> &target)
 
 	if ( outline )
 	{
+		Renderer::SetLineThickness(10.0f);
 		Renderer::Submit([]()
 						 {
 							 glStencilFunc(GL_NOTEQUAL, 1, 0xff);
 							 glStencilMask(0);
 
-							 glLineWidth(10);
 							 glEnable(GL_LINE_SMOOTH);
 							 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 							 glDisable(GL_DEPTH_TEST);
@@ -391,14 +462,16 @@ void SceneRenderer::GeometryPass(const Shared<Target> &target)
 		s_Data.GridMaterial->Set("u_ViewProjection", viewProjection);
 		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(Matrix4f(1.0f), glm::radians(90.0f), Vector3f(1.0f, 0.0f, 0.0f)) * glm::scale(Matrix4f(1.0f), Vector3f(16.0f)));
 	}
-
-	if ( GetOptions().ShowBoundingBoxes )
+	if ( GetOptions().ShowMeshBoundingBoxes )
 	{
-		Renderer2D::BeginScene(viewProjection);
 		for ( auto &dc : s_Data.DrawList )
-			Renderer::DrawAABB(dc.Mesh, dc.Transform);
-		Renderer2D::EndScene();
+		{
+			SubmitAABB(dc.Mesh, dc.Transform);
+		}
 	}
+
+	s_Data.LineShader->SetMat4("u_ViewProjection", viewProjection);
+	Renderer::SubmitLines(s_Data.LineVertexBufferBase, s_Data.LineIndexCount, s_Data.LineShader);
 
 	Renderer::EndRenderPass();
 }

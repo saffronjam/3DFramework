@@ -82,6 +82,7 @@ private:
 	void OnEntitySelected(Entity entity);
 	void OnEntityUnselected(Entity entity);
 	void OnEntityDeleted(Entity entity);
+	void OnEntityCopied(Entity entity);
 
 	void OnNewModelSpaceView(Entity entity);
 	void OnSceneChange(Shared<Scene> scene, Entity selection);

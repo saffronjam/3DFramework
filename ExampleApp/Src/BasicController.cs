@@ -27,6 +27,7 @@ namespace Script
 
             Vector3 translation = transform.Translation;
             translation.XY = m_PlayerEntity.GetTransform().Translation.XY;
+            translation.Z = m_PlayerEntity.GetTransform().Translation.Z + 20.0f;
             translation.Y = Math.Max(translation.Y, 4.5f);
             transform.Translation = translation;
             SetTransform(transform);

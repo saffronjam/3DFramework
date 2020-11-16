@@ -56,8 +56,6 @@ public:
 	void DestroyEntity(Entity entity);
 	Entity GetEntity(const String &tag);
 
-	void DuplicateEntity(Entity entity);
-
 	const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
@@ -83,7 +81,8 @@ public:
 	void SetLight(const Light &light);
 	void SetEnvironment(const Environment &environment);
 	void SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture);
-	void ShowBoundingBoxes(bool show);
+	void ShowMeshBoundingBoxes(bool show);
+	void ShowPhysicsBodyBoundingBoxes(bool show);
 
 	static bool IsValidFilepath(const Filepath &filepath);
 
@@ -107,7 +106,8 @@ protected:
 	bool m_RadiancePrefilter = false;
 	float m_EnvMapRotation = 0.0f;
 	float m_SkyboxLod = 1.0f;
-	bool m_UIShowBoundingBoxes = false;
+	bool m_UIShowMeshBoundingBoxes = false;
+	bool m_UIShowPhysicsBodyBoundingBoxes = false;
 
 private:
 	friend void OnScriptComponentConstruct(EntityRegistry &registry, EntityHandle entity);

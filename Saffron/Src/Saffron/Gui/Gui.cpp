@@ -1,4 +1,4 @@
-#include "SaffronPCH.h"
+﻿#include "SaffronPCH.h"
 
 #include <GLFW/glfw3.h>
 
@@ -355,11 +355,20 @@ bool Gui::Property(const String &name, Vector3f &value, PropertyFlag flags)
 	return Property(name, value, -1.0f, 1.0f, 1.0f, flags);
 }
 
-bool Gui::Property(const String &name, Vector3f &value, float min, float max, float step, PropertyFlag flags)
+bool Gui::Property(const String &name, Vector3f &value, float min, float max, float step, PropertyFlag flags, Optional<Function<void()>> fn)
 {
 	ImGui::Text(name.c_str());
 	ImGui::NextColumn();
-	ImGui::PushItemWidth(-1);
+
+	if ( fn.has_value() )
+	{
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() * 0.75f);
+	}
+	else
+	{
+		ImGui::PushItemWidth(-1);
+	}
+
 	const String id = "##" + name;
 	bool changed;
 	if ( static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color) )
@@ -368,6 +377,17 @@ bool Gui::Property(const String &name, Vector3f &value, float min, float max, fl
 		changed = ImGui::SliderFloat3(id.c_str(), glm::value_ptr(value), min, max);
 	else
 		changed = ImGui::DragFloat3(id.c_str(), glm::value_ptr(value), step, min, max);
+
+	if ( fn.has_value() )
+	{
+		const String buttonID = id + "##fn";
+		ImGui::SameLine();
+		if ( ImGui::Button("<", { ImGui::GetContentRegionAvailWidth(), 0.0f }) )
+		{
+			fn.value()();
+			changed = false;
+		}
+	}
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();

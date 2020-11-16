@@ -128,9 +128,6 @@ void PhysicsWorld3D::OnUpdate()
 			auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 			auto &rigidBody = entity.GetComponent<RigidBody3DComponent>();
 			auto *body = static_cast<reactphysics3d::RigidBody *>(rigidBody.RuntimeBody);
-			body->setIsActive(true);
-			body->setIsAllowedToSleep(false);
-			body->enableGravity(true);
 
 			if ( entity.HasComponent<BoxCollider3DComponent>() )
 			{
@@ -188,7 +185,7 @@ void PhysicsWorld3D::OnStart()
 				auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 				auto &rigidBody3DComponent = entity.GetComponent<RigidBody3DComponent>();
 
-				auto *newRigidBody3D = m_NativeWorld->createRigidBody(reactphysics3d::Transform({ position.x, position.y, position.z }, { rotation.x, rotation.y, rotation.z, rotation.w }));
+				auto *newRigidBody3D = m_NativeWorld->createRigidBody(reactphysics3d::Transform({ position.x, position.y, position.z }, { rotation.z, rotation.y, -rotation.x, rotation.w }));
 				switch ( rigidBody3DComponent.BodyType )
 				{
 				case RigidBody3DComponent::Type::Dynamic:
@@ -219,6 +216,9 @@ void PhysicsWorld3D::OnStart()
 				{
 					auto &rigidBody3DComponent = entity.GetComponent<RigidBody3DComponent>();
 					auto &boxCollider3DComponent = entity.GetComponent<BoxCollider3DComponent>();
+					auto &transformComponent = entity.GetComponent<TransformComponent>();
+
+					auto rot = Misc::GetTransformDecomposition(transformComponent.Transform).Rotation;
 
 					SE_CORE_ASSERT(rigidBody3DComponent.RuntimeBody);
 					auto *body = static_cast<reactphysics3d::RigidBody *>(rigidBody3DComponent.RuntimeBody);
@@ -228,7 +228,7 @@ void PhysicsWorld3D::OnStart()
 
 					const auto &boxOffset = boxCollider3DComponent.Offset;
 
-					auto *newFixture = body->addCollider(boxShape, reactphysics3d::Transform({ boxOffset.x, boxOffset.y, boxOffset.z }, reactphysics3d::Quaternion::fromEulerAngles({ 0.0f, 0.0f, 0.0f })));
+					auto *newFixture = body->addCollider(boxShape, reactphysics3d::Transform({ boxOffset.x, boxOffset.y, boxOffset.z }, reactphysics3d::Quaternion(rot.x, rot.y, rot.z, rot.w)));
 					newFixture->getMaterial().setMassDensity(boxCollider3DComponent.Density);
 					newFixture->getMaterial().setFrictionCoefficient(boxCollider3DComponent.Friction);
 

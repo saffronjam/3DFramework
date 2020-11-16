@@ -1,6 +1,9 @@
 #include "SaffronPCH.h"
 
+#include <reactphysics3d/reactphysics3d.h>
+
 #include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
@@ -146,25 +149,30 @@ void RuntimeScene::OnRender()
 			SceneRenderer::SubmitMesh(meshComponent, transformComponent, nullptr);
 		}
 	}
-	SceneRenderer::EndScene();
 
-#if 0
-	// Render all sprites
-	Renderer2D::BeginScene(*camera);
+	if ( SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes )
 	{
-		auto group = m_EntityRegistry.group<TransformComponent>(entt::get<SpriteRenderer>);
-		for ( auto entity : group )
+		if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
 		{
-			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRenderer>(entity);
-			if ( spriteRendererComponent.Texture )
-				Renderer2D::DrawQuad(transformComponent.Transform, spriteRendererComponent.Texture, spriteRendererComponent.TilingFactor);
-			else
-				Renderer2D::DrawQuad(transformComponent.Transform, spriteRendererComponent.Color);
+
+		}
+		if ( m_SceneEntity.HasComponent<PhysicsWorld3DComponent>() )
+		{
+			auto view = m_EntityRegistry.view<TransformComponent, BoxCollider3DComponent>();
+			for ( auto entityHandle : view )
+			{
+				Entity entity = { entityHandle, this };
+				const auto &boxComponent = entity.GetComponent<BoxCollider3DComponent>();
+
+				const auto &[translation, rotation, scale] = Misc::GetTransformDecomposition(entity.GetComponent<TransformComponent>().Transform);
+				const auto &boxSize = boxComponent.Size;
+				const auto &boxOffset = boxComponent.Offset;
+				Matrix4f transformation = glm::translate(translation + boxOffset) * glm::toMat4(rotation) * glm::scale(boxSize / 2.0f);
+				SceneRenderer::SubmitAABB(AABB{ Vector3f{-1.0f}, Vector3f{1.0f} }, transformation, { 0.89f, 0.46f, 0.16f, 1.0f });
+			}
 		}
 	}
-
-	Renderer2D::EndScene();
-#endif
+	SceneRenderer::EndScene();
 }
 
 void RuntimeScene::OnGuiRender()
@@ -188,9 +196,13 @@ void RuntimeScene::OnGuiRender()
 	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
-	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+	if ( Gui::Property("Mesh Bounding Boxes", m_UIShowMeshBoundingBoxes) )
 	{
-		ShowBoundingBoxes(m_UIShowBoundingBoxes);
+		ShowMeshBoundingBoxes(m_UIShowMeshBoundingBoxes);
+	}
+	if ( Gui::Property("Physics Bounding Boxes", m_UIShowPhysicsBodyBoundingBoxes) )
+	{
+		ShowPhysicsBodyBoundingBoxes(m_UIShowPhysicsBodyBoundingBoxes);
 	}
 	Gui::EndPropertyGrid();
 

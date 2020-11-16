@@ -11,7 +11,8 @@ class ScenePanel : public ReferenceCounted, public Signaller
 public:
 	struct Signals
 	{
-		static SignalAggregate<Entity> OnDelete;
+		static SignalAggregate<Entity> OnEntityDeleted;
+		static SignalAggregate<Entity> OnEntityCopied;
 		static SignalAggregate<Entity> OnNewSelection;
 		static SignalAggregate<Entity> OnViewInModelSpace;
 	};

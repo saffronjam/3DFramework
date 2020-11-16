@@ -457,44 +457,34 @@ void EntityPanel::DrawComponents(Entity entity)
 		auto &tc = entity.GetComponent<TransformComponent>();
 		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform") )
 		{
-			auto matrixCopy = tc.Transform;
-			auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(tc);
-			Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
 			Gui::BeginPropertyGrid();
 
+			auto dc = Misc::GetTransformDecomposition(tc);
+			Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
+
 			bool updateTransform = false;
-			if ( Gui::Property("Translation", translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
+			if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
 			{
 				updateTransform = true;
 			}
-			if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag) )
+			if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
 			{
 				updateTransform = true;
 			}
-			if ( Gui::Property("Scale", scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag) )
+			if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f, 1.0f, 1.0f); updateTransform = true; }) )
 			{
-				if ( scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f )
+				if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
 					updateTransform = true;
 			}
 
-			bool resetTransform = false;
-			Gui::Property("Reset", [&matrixCopy, &resetTransform]
-						  {
-							  matrixCopy = Matrix4f(1);
-							  resetTransform = true;
-						  }, true);
-
 			Gui::EndPropertyGrid();
-			if ( resetTransform )
+
+			if ( updateTransform )
 			{
-				tc.Transform = matrixCopy;
-			}
-			else if ( updateTransform )
-			{
-				tc.Transform = glm::translate(translation) *
+				tc.Transform = glm::translate(dc.Translation) *
 					glm::toMat4(glm::quat(glm::radians(rotation))) *
-					glm::scale(scale);
+					glm::scale(dc.Scale);
 			}
 			ImGui::TreePop();
 		}
@@ -524,42 +514,30 @@ void EntityPanel::DrawComponents(Entity entity)
 									 }
 
 									 const auto &transform = mc.Mesh->GetLocalTransform();
-									 auto matrixCopy = transform;
-									 auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(transform);
-									 Vector3f rotation = glm::degrees(glm::eulerAngles(rotationQuat));
+									 auto dc = Misc::GetTransformDecomposition(transform);
+									 Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
 
 									 bool updateTransform = false;
-									 if ( Gui::Property("Translation", translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
+									 if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
 									 {
 										 updateTransform = true;
 									 }
-									 if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag) )
+									 if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
 									 {
 										 updateTransform = true;
 									 }
-									 if ( Gui::Property("Scale", scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag) )
+									 if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f); updateTransform = true; }) )
 									 {
-										 if ( scale.x > 0.0f && scale.y > 0.0f && scale.z > 0.0f )
+										 if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
 											 updateTransform = true;
 									 }
 
-									 bool resetTransform = false;
-									 Gui::Property("Reset", [&matrixCopy, &resetTransform]
-												   {
-													   matrixCopy = Matrix4f(1);
-													   resetTransform = true;
-												   }, true);
-
 									 Gui::EndPropertyGrid();
-									 if ( resetTransform )
+									 if ( updateTransform )
 									 {
-										 mc.Mesh->SetLocalTransform(matrixCopy);
-									 }
-									 else if ( updateTransform )
-									 {
-										 const Matrix4f newTransform = glm::translate(translation) *
+										 const Matrix4f newTransform = glm::translate(dc.Translation) *
 											 glm::toMat4(glm::quat(glm::radians(rotation))) *
-											 glm::scale(scale);
+											 glm::scale(dc.Scale);
 										 mc.Mesh->SetLocalTransform(newTransform);
 									 }
 								 });
@@ -687,7 +665,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Int:
 												   {
 													   int value = isRuntime ? field.GetRuntimeValue<int>() : field.GetStoredValue<int>();
-													   if ( Gui::Property(field.Name, value) )
+													   if ( Gui::Property(field.Name, value, 0, 0, 1, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -699,7 +677,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Float:
 												   {
 													   float value = isRuntime ? field.GetRuntimeValue<float>() : field.GetStoredValue<float>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -711,7 +689,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Vec2:
 												   {
 													   Vector2f value = isRuntime ? field.GetRuntimeValue<Vector2f>() : field.GetStoredValue<Vector2f>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -723,7 +701,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Vec3:
 												   {
 													   Vector3f value = isRuntime ? field.GetRuntimeValue<Vector3f>() : field.GetStoredValue<Vector3f>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -735,7 +713,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Vec4:
 												   {
 													   Vector4f value = isRuntime ? field.GetRuntimeValue<Vector4f>() : field.GetStoredValue<Vector4f>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -786,20 +764,21 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](BoxCollider2DComponent &bc2dc)
 										  {
 											  Gui::BeginPropertyGrid();
-											  Gui::Property("Offset", bc2dc.Offset);
-											  Gui::Property("Size", bc2dc.Size);
-											  Gui::Property("Density", bc2dc.Density);
-											  Gui::Property("Friction", bc2dc.Friction);
+											  Gui::Property("Translation", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Offset", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Size", bc2dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Density", bc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Friction", bc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 											  Gui::EndPropertyGrid();
 										  });
 
 	DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](CircleCollider2DComponent &cc2dc)
 											 {
 												 Gui::BeginPropertyGrid();
-												 Gui::Property("Offset", cc2dc.Offset);
-												 Gui::Property("Radius", cc2dc.Radius);
-												 Gui::Property("Density", cc2dc.Density);
-												 Gui::Property("Friction", cc2dc.Friction);
+												 Gui::Property("Offset", cc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Radius", cc2dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Density", cc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Friction", cc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 												 Gui::EndPropertyGrid();
 											 });
 	DrawComponent<RigidBody3DComponent>("Rigidbody 3D", entity, [](RigidBody3DComponent &rb3dc)
@@ -827,20 +806,20 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](BoxCollider3DComponent &bc2dc)
 										  {
 											  Gui::BeginPropertyGrid();
-											  Gui::Property("Offset", bc2dc.Offset);
-											  Gui::Property("Size", bc2dc.Size);
-											  Gui::Property("Density", bc2dc.Density);
-											  Gui::Property("Friction", bc2dc.Friction);
+											  Gui::Property("Offset", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Size", bc2dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Density", bc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Friction", bc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 											  Gui::EndPropertyGrid();
 										  });
 
 	DrawComponent<SphereCollider3DComponent>("Circle Collider 3D", entity, [](SphereCollider3DComponent &cc2dc)
 											 {
 												 Gui::BeginPropertyGrid();
-												 Gui::Property("Offset", cc2dc.Offset);
-												 Gui::Property("Radius", cc2dc.Radius);
-												 Gui::Property("Density", cc2dc.Density);
-												 Gui::Property("Friction", cc2dc.Friction);
+												 Gui::Property("Offset", cc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Radius", cc2dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Density", cc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Friction", cc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 												 Gui::EndPropertyGrid();
 											 });
 }

@@ -24,6 +24,13 @@ struct RendererData
 	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
 	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
 	Shared<Pipeline> m_FullscreenQuadPipeline;
+
+	static constexpr Uint32 MaxLines = 10000;
+	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
+	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
+	Shared<Pipeline> LinePipeline;
+	Shared<VertexBuffer> LineVertexBuffer;
+	Shared<IndexBuffer> LineIndexBuffer;
 };
 
 
@@ -40,37 +47,57 @@ void Renderer::Init()
 	SceneRenderer::Init();
 
 	// Create fullscreen quad
-	const float x = -1, y = -1, width = 2, height = 2;
-	struct QuadVertex
 	{
-		Vector3f Position;
-		Vector2f TexCoord;
-	};
+		const float x = -1, y = -1, width = 2, height = 2;
+		struct QuadVertex
+		{
+			Vector3f Position;
+			Vector2f TexCoord;
+		};
 
-	auto *data = new QuadVertex[4];
+		auto *data = new QuadVertex[4];
 
-	data[0].Position = Vector3f(x, y, 0.1f);
-	data[0].TexCoord = Vector2f(0, 0);
+		data[0].Position = Vector3f(x, y, 0.1f);
+		data[0].TexCoord = Vector2f(0, 0);
 
-	data[1].Position = Vector3f(x + width, y, 0.1f);
-	data[1].TexCoord = Vector2f(1, 0);
+		data[1].Position = Vector3f(x + width, y, 0.1f);
+		data[1].TexCoord = Vector2f(1, 0);
 
-	data[2].Position = Vector3f(x + width, y + height, 0.1f);
-	data[2].TexCoord = Vector2f(1, 1);
+		data[2].Position = Vector3f(x + width, y + height, 0.1f);
+		data[2].TexCoord = Vector2f(1, 1);
 
-	data[3].Position = Vector3f(x, y + height, 0.1f);
-	data[3].TexCoord = Vector2f(0, 1);
+		data[3].Position = Vector3f(x, y + height, 0.1f);
+		data[3].TexCoord = Vector2f(0, 1);
 
-	Pipeline::Specification Specification;
-	Specification.Layout = {
-		{ ShaderDataType::Float3, "a_Position" },
-		{ ShaderDataType::Float2, "a_TexCoord" }
-	};
-	s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
+		Pipeline::Specification Specification;
+		Specification.Layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+		};
+		s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
 
-	s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
-	Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
-	s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+		s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+		Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+		s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+
+	}
+
+	// Lines
+	{
+		Pipeline::Specification Specification;
+		Specification.Layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color" }
+		};
+		s_Data.LinePipeline = Pipeline::Create(Specification);
+
+		s_Data.LineVertexBuffer = VertexBuffer::Create(RendererData::MaxLineVertices * sizeof(LineVertex));
+		auto *lineIndices = new Uint32[RendererData::MaxLineIndices];
+		for ( Uint32 i = 0; i < RendererData::MaxLineIndices; i++ )
+			lineIndices[i] = i;
+		s_Data.LineIndexBuffer = IndexBuffer::Create(lineIndices, RendererData::MaxLineIndices);
+		delete[] lineIndices;
+	}
 
 	Renderer2D::Init();
 }
@@ -192,6 +219,25 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &tra
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
+void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader)
+{
+	const auto dataSize = static_cast<Uint32>(sizeof(LineVertex) * count);
+	if ( dataSize )
+	{
+		SetLineThickness(3.0f);
+
+		shader->Bind();
+
+		s_Data.LineVertexBuffer->SetData(vertices, dataSize);
+
+		s_Data.LineVertexBuffer->Bind();
+		s_Data.LinePipeline->Bind();
+		s_Data.LineIndexBuffer->Bind();
+
+		DrawIndexed(count, PrimitiveType::Lines, true);
+	}
+}
+
 void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
@@ -226,44 +272,6 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<M
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });
 	}
-}
-
-void Renderer::DrawAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color)
-{
-	for ( Submesh &submesh : mesh->m_Submeshes )
-	{
-		auto &aabb = submesh.BoundingBox;
-		auto aabbTransform = transform * submesh.Transform;
-		DrawAABB(aabb, aabbTransform);
-	}
-}
-
-void Renderer::DrawAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color)
-{
-	Vector4f min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
-	Vector4f max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
-
-	Vector4f corners[8] =
-	{
-		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
-		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
-
-		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
-		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
-	};
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 
 RenderCommandQueue &Renderer::GetRenderCommandQueue()

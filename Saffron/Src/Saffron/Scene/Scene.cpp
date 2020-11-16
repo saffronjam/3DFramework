@@ -162,23 +162,6 @@ Entity Scene::GetEntity(const String &tag)
 	return Entity::Null();
 }
 
-void Scene::DuplicateEntity(Entity entity)
-{
-	const Entity newEntity = entity.HasComponent<TagComponent>() ? CreateEntity(entity.GetComponent<TagComponent>().Tag) : CreateEntity("Unnamed");
-
-	const auto otherEntityHandle = entity.GetHandle();
-	const auto newEntityHandle = newEntity.GetHandle();
-
-	CopyComponentIfExists<TransformComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<MeshComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<ScriptComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<CameraComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<SpriteRendererComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<RigidBody2DComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<BoxCollider2DComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-	CopyComponentIfExists<CircleCollider2DComponent>(newEntityHandle, otherEntityHandle, m_EntityRegistry);
-}
-
 void Scene::SetSelectedEntity(Entity entity)
 {
 	m_SelectedEntity = entity;
@@ -237,9 +220,14 @@ void Scene::SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture)
 	m_Skybox.Material->Set("u_Texture", skyboxTexture);
 }
 
-void Scene::ShowBoundingBoxes(bool show)
+void Scene::ShowMeshBoundingBoxes(bool show)
 {
-	SceneRenderer::GetOptions().ShowBoundingBoxes = show;
+	SceneRenderer::GetOptions().ShowMeshBoundingBoxes = show;
+}
+
+void Scene::ShowPhysicsBodyBoundingBoxes(bool show)
+{
+	SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes = show;
 }
 
 bool Scene::IsValidFilepath(const Filepath &filepath)

@@ -37,11 +37,18 @@ SaffronBunApplication::SaffronBunApplication(const Properties &props)
 	};
 
 	m_StartupLayer->GetSignal(StartupLayer::Signals::OnProjectSelect).Connect(projectSelectFn);
+
+
+	// TEMP
+	auto project = Shared<Project>::Create("Projects/2DGameProject/2DGameProject.spr");
+	m_EditorLayer = Shared<EditorLayer>::Create(project);
+	// ----
 }
 
 void SaffronBunApplication::OnInit()
 {
-	PushLayer(m_StartupLayer);
+
+	PushLayer(m_EditorLayer);
 }
 
 void SaffronBunApplication::OnUpdate()

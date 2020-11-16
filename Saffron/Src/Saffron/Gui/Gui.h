@@ -43,7 +43,7 @@ public:
 	static bool Property(const String &name, Vector2f &value, PropertyFlag flags);
 	static bool Property(const String &name, Vector2f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String &name, Vector3f &value, PropertyFlag flags);
-	static bool Property(const String &name, Vector3f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
+	static bool Property(const String &name, Vector3f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None, Optional<Function<void()>> fn = {});
 	static bool Property(const String &name, Vector4f &value, PropertyFlag flags);
 	static bool Property(const String &name, Vector4f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
 

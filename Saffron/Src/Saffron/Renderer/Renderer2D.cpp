@@ -23,11 +23,6 @@ struct QuadVertex
 	float TilingFactor;
 };
 
-struct LineVertex
-{
-	Vector3f Position;
-	Vector4f Color;
-};
 
 struct Renderer2DData
 {
@@ -38,7 +33,7 @@ struct Renderer2DData
 
 	static const Uint32 MaxLines = 10000;
 	static const Uint32 MaxLineVertices = MaxLines * 2;
-	static const Uint32 MaxLineIndices = MaxLines * 6;
+	static const Uint32 MaxLineIndices = MaxLines * 2;
 
 	Shared<Pipeline> QuadPipeline;
 	Shared<VertexBuffer> QuadVertexBuffer;
@@ -204,7 +199,6 @@ void Renderer2D::EndScene()
 
 		s_Data.LinePipeline->Bind();
 		s_Data.LineIndexBuffer->Bind();
-		Renderer::SetLineThickness(20.0f);
 		Renderer::DrawIndexed(s_Data.LineIndexCount, PrimitiveType::Lines, s_Data.DepthTest);
 		s_Data.Stats.DrawCalls++;
 	}

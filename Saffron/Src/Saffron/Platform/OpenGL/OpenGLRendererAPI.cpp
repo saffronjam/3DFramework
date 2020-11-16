@@ -114,7 +114,11 @@ void RendererAPI::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
 
 void RendererAPI::SetLineThickness(float thickness)
 {
-	glLineWidth(thickness);
+	if ( thickness != m_LineThickness )
+	{
+		glLineWidth(thickness);
+		m_LineThickness = thickness;
+	}
 }
 
 }

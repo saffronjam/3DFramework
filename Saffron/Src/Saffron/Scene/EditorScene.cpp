@@ -1,6 +1,10 @@
 #include "SaffronPCH.h"
 
+#include <reactphysics3d/body/RigidBody.h>
+#include <reactphysics3d/collision/shapes/BoxShape.h>
+
 #include "Saffron/Core/FileIOManager.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Serialize/SceneSerializer.h"
@@ -67,32 +71,34 @@ void EditorScene::OnRender()
 			meshComponent.Mesh->OnUpdate();
 
 			// TODO: Should we render (logically)
-
-			if ( m_SelectedEntity == entity )
-				SceneRenderer::SubmitSelectedMesh(meshComponent, transformComponent);
-			else
-				SceneRenderer::SubmitMesh(meshComponent, transformComponent);
+			m_SelectedEntity == entity ? SceneRenderer::SubmitSelectedMesh(meshComponent, transformComponent) : SceneRenderer::SubmitMesh(meshComponent, transformComponent);
 		}
 	}
-	SceneRenderer::EndScene();
 
-#if 0
-	// Render all sprites
-	Renderer2D::BeginScene(*camera);
+
+	if ( SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes )
 	{
-		auto group = m_EntityRegistry.group<TransformComponent>(entt::get<SpriteRenderer>);
-		for ( auto entity : group )
+		if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
 		{
-			auto [transformComponent, spriteRendererComponent] = group.get<TransformComponent, SpriteRenderer>(entity);
-			if ( spriteRendererComponent.Texture )
-				Renderer2D::DrawQuad(transformComponent.Transform, spriteRendererComponent.Texture, spriteRendererComponent.TilingFactor);
-			else
-				Renderer2D::DrawQuad(transformComponent.Transform, spriteRendererComponent.Color);
+
+		}
+		if ( m_SceneEntity.HasComponent<PhysicsWorld3DComponent>() )
+		{
+			auto view = m_EntityRegistry.view<TransformComponent, BoxCollider3DComponent>();
+			for ( auto entityHandle : view )
+			{
+				Entity entity = { entityHandle, this };
+				const auto &boxComponent = entity.GetComponent<BoxCollider3DComponent>();
+
+				const auto &translation = Misc::GetTransformDecomposition(entity.GetComponent<TransformComponent>().Transform).Translation;
+				const auto &boxSize = boxComponent.Size;
+				const auto &boxOffset = boxComponent.Offset;
+				SceneRenderer::SubmitAABB(AABB{ translation - boxSize * 0.5f + boxOffset, translation + boxSize * 0.5f + boxOffset }, Matrix4f(1), { 0.89f, 0.46f, 0.16f, 1.0f });
+			}
 		}
 	}
 
-	Renderer2D::EndScene();
-#endif
+	SceneRenderer::EndScene();
 }
 
 void EditorScene::OnGuiRender()
@@ -115,9 +121,13 @@ void EditorScene::OnGuiRender()
 	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
 	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
 	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
-	if ( Gui::Property("Show Bounding Boxes", m_UIShowBoundingBoxes) )
+	if ( Gui::Property("Mesh Bounding Boxes", m_UIShowMeshBoundingBoxes) )
 	{
-		ShowBoundingBoxes(m_UIShowBoundingBoxes);
+		ShowMeshBoundingBoxes(m_UIShowMeshBoundingBoxes);
+	}
+	if ( Gui::Property("Physics Bounding Boxes", m_UIShowPhysicsBodyBoundingBoxes) )
+	{
+		ShowPhysicsBodyBoundingBoxes(m_UIShowPhysicsBodyBoundingBoxes);
 	}
 	Gui::EndPropertyGrid();
 

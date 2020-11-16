@@ -5,4 +5,5 @@
 namespace Se
 {
 RendererAPI::Capabilities RendererAPI::m_sCapabilities = {};
+float RendererAPI::m_LineThickness = 1.0f;
 }
