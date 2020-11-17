@@ -380,9 +380,9 @@ bool Gui::Property(const String &name, Vector3f &value, float min, float max, fl
 
 	if ( fn.has_value() )
 	{
-		const String buttonID = id + "##fn";
+		const String buttonID = "<" + id + "##fn";
 		ImGui::SameLine();
-		if ( ImGui::Button("<", { ImGui::GetContentRegionAvailWidth(), 0.0f }) )
+		if ( ImGui::Button(buttonID.c_str(), { ImGui::GetContentRegionAvailWidth(), 0.0f }) )
 		{
 			fn.value()();
 			changed = false;
