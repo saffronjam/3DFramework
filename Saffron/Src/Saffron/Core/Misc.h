@@ -43,6 +43,26 @@ public:
 			value = upper;
 		}
 	}
+
+	template<typename T>
+	static void LowClamp(T &value, const T &lower)
+	{
+		if ( value < lower )
+		{
+			value = lower;
+		}
+	}
+
+	template<typename T>
+	static void HighClamp(T &value, const T &upper)
+	{
+		if ( value > upper )
+		{
+			value = upper;
+		}
+	}
+
+
 	template<typename t_DestVector3, typename t_SourceVector3>
 	constexpr static const t_DestVector3 &ConvertTo(const t_SourceVector3 &source)
 	{

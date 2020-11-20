@@ -215,7 +215,7 @@ void SceneRenderer::SubmitAABB(Shared<Mesh> mesh, const Matrix4f &transform, con
 	for ( const auto &submesh : mesh->GetSubmeshes() )
 	{
 		const auto &aabb = submesh.BoundingBox;
-		auto aabbTransform = transform * submesh.Transform;
+		auto aabbTransform = transform * mesh->GetLocalTransform() * submesh.Transform;
 		SubmitAABB(aabb, aabbTransform);
 	}
 }
@@ -465,6 +465,10 @@ void SceneRenderer::GeometryPass(const Shared<Target> &target)
 	if ( GetOptions().ShowMeshBoundingBoxes )
 	{
 		for ( auto &dc : s_Data.DrawList )
+		{
+			SubmitAABB(dc.Mesh, dc.Transform);
+		}
+		for ( auto &dc : s_Data.SelectedMeshDrawList )
 		{
 			SubmitAABB(dc.Mesh, dc.Transform);
 		}

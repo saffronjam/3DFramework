@@ -58,6 +58,9 @@ public:
 
 	static void ForceHideBarTab();
 
+	static Vector4f GetSaffronOrange(float opacity = 1.0f);
+	static Vector4f GetSaffronPurple(float opacity = 1.0f);
+
 private:
 	static void PushID();
 	static void PopID();

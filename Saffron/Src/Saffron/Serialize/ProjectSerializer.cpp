@@ -67,12 +67,12 @@ void ProjectSerializer::Serialize(const Filepath &filepath) const
 	out << YAML::Key << "LastOpened" << YAML::Value << m_Project.LastOpened();
 
 	out << YAML::Key << "ProjectFilepath" << YAML::Value << m_Project.GetProjectFilepath().string();
+	out << YAML::Key << "ProjectFolderpath" << YAML::Value << m_Project.GetProjectFolderpath().string();
 	out << YAML::Key << "Scenes";
 	out << YAML::Value << YAML::BeginSeq;
 	for ( const auto &scene : m_Project.GetSceneFilepaths() )
 	{
 		out << YAML::BeginMap;
-		out << YAML::Key << "Scene" << scene.string();
 		out << YAML::Key << "SceneFilepath" << YAML::Value << scene.string();
 		out << YAML::EndMap;
 	}
@@ -96,7 +96,7 @@ bool ProjectSerializer::Deserialize(const Filepath &filepath)
 
 	SE_CORE_INFO("Deserializing Project {}", project["Project"].as<String>());
 
-	std::array<YAML::Node, 5> nodes{ project["Project"], project["UUID"],project["ProjectFilepath"], project["Scenes"], project["LastOpened"] };
+	std::array<YAML::Node, 6> nodes{ project["Project"], project["UUID"],project["ProjectFolderpath"],project["ProjectFilepath"], project["Scenes"], project["LastOpened"] };
 	bool badNode = false;
 	for ( auto &node : nodes )
 	{
@@ -124,6 +124,7 @@ bool ProjectSerializer::Deserialize(const Filepath &filepath)
 	m_Project.m_UUID = project["UUID"].as<Uint64>();
 	m_Project.m_Name = project["Project"].as<String>();
 	m_Project.m_LastOpened = project["LastOpened"].as<DateTime>();
+	m_Project.m_ProjectFolderpath = project["ProjectFolderpath"].as<String>();
 	m_Project.m_ProjectFilepath = project["ProjectFilepath"].as<String>();
 	m_Project.m_SceneFilepaths = Move(sceneFilepaths);
 	m_Project.m_SceneCache.clear();

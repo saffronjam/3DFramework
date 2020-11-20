@@ -11,7 +11,6 @@
 
 workspace "Saffron"
 	architecture "x64"
-	targetdir "build"
 	
 	configurations 
 	{ 
@@ -25,7 +24,7 @@ workspace "Saffron"
 		"MultiProcessorCompile"
 	}
 
-	startproject "SaffronBun"
+	startproject "Editor"
 	
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
@@ -68,10 +67,10 @@ group ""
 
 
 -- --------------------------------------
--- Core
+-- Engine
 -- --------------------------------------
 
-group "Core"
+group "Engine"
 
 
 -- --------------------------------------
@@ -136,8 +135,7 @@ project "Saffron"
 		defines 
 		{ 
 			"_CRT_SECURE_NO_WARNINGS",
-			"SE_PLATFORM_WINDOWS",
-			"SE_BUILD_DLL"
+			"SE_PLATFORM_WINDOWS"
 		}
 
 	filter "configurations:Debug"
@@ -154,11 +152,11 @@ project "Saffron"
 
 
 -- --------------------------------------
--- Saffron ScriptCore
+-- ScriptCore
 -- --------------------------------------
 
-project "Saffron-ScriptCore"
-	location "Saffron-ScriptCore"
+project "ScriptCore"
+	location "ScriptCore"
 	kind "SharedLib"
 	language "C#"
 
@@ -180,11 +178,11 @@ group "Tools"
 
 
 -- --------------------------------------
--- SaffronBun
+-- Editor
 -- --------------------------------------
 
-project "SaffronBun"
-	location "SaffronBun"
+project "Editor"
+	location "Editor"
 	kind "ConsoleApp"
 	language "C++"
 	cppdialect "C++17"
@@ -220,7 +218,7 @@ project "SaffronBun"
 
 	postbuildcommands 
 	{
-		'{COPY} "../SaffronBun/Assets" "%{cfg.targetdir}/Assets"'
+		'{COPY} "../Editor/Assets" "%{cfg.targetdir}/Assets"'
 	}
 	
 	filter "system:windows"
@@ -280,126 +278,63 @@ group ""
 
 
 -- --------------------------------------
--- Sandbox Workspace
+-- Games
 -- --------------------------------------
 
-workspace "Sandbox"
-	architecture "x64"
-	targetdir "build"
+
+-- Later on this does not need to be in a separate editor (since the engine editor will not be run for Visual Studios debugger)
+-- workspace "Games"
+	-- architecture "x64"
+	-- targetdir "build"
 	
-	configurations 
-	{ 
-		"Debug", 
-		"Release",
-		"Dist"
-	}
+	-- configurations 
+	-- { 
+		-- "Debug", 
+		-- "Release",
+		-- "Dist"
+	-- }
+------------------------------------------------------------------------------------------------------------------------------
 
+group "Games"
 
--- --------------------------------------
--- Saffron-ScriptCore
--- --------------------------------------
+-- This should be an updating list so that every project active in the editor is visible
+-- Like:
+-- project "Game1"
+-- ...
+-- project "Game2"
+-- ...
 
-project "Saffron-ScriptCore"
-	location "Saffron-ScriptCore"
+project "2DGameProject"
+	location "Games/2DGameProject"
 	kind "SharedLib"
 	language "C#"
-
-	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+	
+	targetdir ("Editor/Assets/Scripts")
 	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
 	files 
 	{
-		"%{prj.name}/Src/**.cs", 
+		"Games/%{prj.name}/Src/**.cs", 
 	}
-
-
--- --------------------------------------
--- ExampleApp
--- --------------------------------------
-
-project "ExampleApp"
-	location "ExampleApp"
-	kind "SharedLib"
-	language "C#"
-
-	targetdir ("SaffronBun/Assets/Scripts")
-	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
-
-	files 
-	{
-		"%{prj.name}/Src/**.cs", 
-	}
-
 	links
 	{
-		"Saffron-ScriptCore"
+		"ScriptCore"
 	}
-
-		
---[[project "Sandbox"
-	location "Sandbox"
-	kind "ConsoleApp"
-	language "C++"
-	cppdialect "C++17"
-	staticruntime "On"
 	
-	targetdir ("Bin/" .. outputdir .. "/%{prj.name}")
+project "EmptyWorldProject"
+	location "Games/EmptyWorldProject"
+	kind "SharedLib"
+	language "C#"
+	
+	targetdir ("Editor/Assets/Scripts")
 	objdir ("Bin-Int/" .. outputdir .. "/%{prj.name}")
 
-	links 
-	{ 
-		"Saffron"
-	}
-	
 	files 
-	{ 
-		"%{prj.name}/Src/**.h", 
-		"%{prj.name}/Src/**.c", 
-		"%{prj.name}/Src/**.hpp", 
-		"%{prj.name}/Src/**.cpp" 
-	}
-	
-	includedirs 
 	{
-		"%{prj.name}/Src",
-		"Saffron/Src",
-		"Saffron/Vendors",
-		"%{IncludeDir.glm}"
+		"Games/%{prj.name}/Src/**.cs", 
 	}
-	
-	filter "system:windows"
-		systemversion "latest"
-				
-		defines 
-		{ 
-			"SE_PLATFORM_WINDOWS"
-		}
-	
-	filter "configurations:Debug"
-		defines "SE_DEBUG"
-		symbols "On"
-
-		links
-		{
-			"Saffron/Vendors/assimp/bin/Debug/assimp-vc141-mtd.lib"
-		}
-				
-	filter "configurations:Release"
-		defines "SE_RELEASE"
-		optimize "On"
-
-		links
-		{
-			"Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.lib"
-		}
-
-	filter "configurations:Dist"
-		defines "SE_DIST"
-		optimize "On"
-
-		links
-		{
-			"Saffron/Vendors/assimp/bin/Release/assimp-vc141-mt.lib"
-		}
---]]
+	links
+	{
+		"ScriptCore"
+	}
 group ""

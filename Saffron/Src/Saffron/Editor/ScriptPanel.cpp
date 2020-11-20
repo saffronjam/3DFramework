@@ -44,7 +44,10 @@ void ScriptPanel::OnGuiRender()
 void ScriptPanel::SyncScriptPaths()
 {
 	ScopedLock scopedLock(m_FilepathMutex);
-	const size_t noScripts = FileIOManager::GetFileCount(m_ScriptFolderPath, ".cs");
+	if ( m_ScriptFolderPath.empty() )
+	{
+		return;
+	}
 
 	m_ScriptStats.clear();
 	auto rawPaths = FileIOManager::GetFiles(m_ScriptFolderPath, ".cs");

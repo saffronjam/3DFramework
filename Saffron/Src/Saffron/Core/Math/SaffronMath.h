@@ -9,20 +9,11 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/matrix_decompose.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 
 namespace Se
 {
-class Math
-{
-public:
-	static constexpr float PI = 3.141592653589793238462643383279f;
-	static constexpr double PI_D = static_cast<double>(PI);
 
-	static constexpr float E = 2.71828182845904523536f;
-	static constexpr double E_D = static_cast<double>(E);
-
-
-};
 
 constexpr glm::precision DefaultVectorPrecision = glm::defaultp;
 constexpr glm::precision DefaultMatrixPrecision = glm::defaultp;
@@ -85,7 +76,21 @@ using Matrix2b = Matrix2<bool>;
 using Matrix3b = Matrix3<bool>;
 using Matrix4b = Matrix4<bool>;
 
-
 using Quaternion = glm::quat;
+
+class Math
+{
+public:
+	static constexpr float PI = 3.141592653589793238462643383279f;
+	static constexpr double PI_D = static_cast<double>(PI);
+
+	static constexpr float E = 2.71828182845904523536f;
+	static constexpr double E_D = static_cast<double>(E);
+
+	static Matrix4f ComposeMatrix(const Vector3f &translation, const Quaternion &rotation, const Vector3f &scale)
+	{
+		return glm::translate(translation) * glm::toMat4(rotation) * glm::scale(scale);
+	}
+};
 
 }

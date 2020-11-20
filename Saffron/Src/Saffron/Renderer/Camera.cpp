@@ -9,6 +9,7 @@ Camera::Camera(Matrix4f projectionMatrix)
 {
 }
 
+
 void Camera::SetViewportSize(Uint32 width, Uint32 height)
 {
 	m_ViewportWidth = width;

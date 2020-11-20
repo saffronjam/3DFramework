@@ -75,7 +75,7 @@ const char *FieldTypeToString(FieldType type)
 ///////////////////////////////////////////////////////////////////////////
 
 static MonoDomain *s_MonoDomain = nullptr;
-static String s_AssemblyPath;
+static Filepath s_AssemblyFilepath;
 static Shared<Scene> s_SceneContext;
 
 // Assembly images
@@ -202,8 +202,8 @@ static void InitMono()
 	// mono_jit_set_trace_options("--verbose");
 	auto *domain = mono_jit_init("Saffron");
 
-	char *name = static_cast<char *>("SaffronRuntime");
-	s_MonoDomain = mono_domain_create_appdomain(name, nullptr);
+	char friendlyAppDomainName[] = "SaffronRuntime";
+	s_MonoDomain = mono_domain_create_appdomain(friendlyAppDomainName, nullptr);
 }
 
 static void ShutdownMono()
@@ -211,14 +211,14 @@ static void ShutdownMono()
 	mono_jit_cleanup(s_MonoDomain);
 }
 
-static MonoAssembly *LoadAssembly(const String &path)
+static MonoAssembly *LoadAssembly(const Filepath &path)
 {
-	MonoAssembly *assembly = LoadAssemblyFromFile(path.c_str());
+	MonoAssembly *assembly = LoadAssemblyFromFile(path.string().c_str());
 
 	if ( !assembly )
-		SE_CORE_WARN("Could not load assembly: {0}", path);
+		SE_CORE_WARN("Could not load assembly: {0}", path.string());
 	else
-		SE_CORE_INFO("Successfully loaded assembly: {0}", path);
+		SE_CORE_INFO("Successfully loaded assembly: {0}", path.string());
 
 	return assembly;
 }
@@ -246,7 +246,7 @@ static MonoClass *GetClass(MonoImage *image, const EntityScriptClass &scriptClas
 
 static MonoClass *GetClass(MonoImage *image, const String &namespaceName, const String &className)
 {
-	const String fullName = namespaceName.empty() ?  className : namespaceName + "." + className ;
+	const String fullName = namespaceName.empty() ? className : namespaceName + "." + className;
 	if ( s_ClassCacheMap.find(fullName) == s_ClassCacheMap.end() )
 	{
 		MonoClass *monoClass = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
@@ -433,13 +433,9 @@ void PublicField::SetRuntimeValue_Internal(void *value) const
 ///////////////////////////////////////////////////////////////////////////
 
 
-void ScriptEngine::Init(String assemblyPath)
+void ScriptEngine::Init()
 {
-	s_AssemblyPath = Move(assemblyPath);
-
 	InitMono();
-
-	LoadSaffronRuntimeAssembly(s_AssemblyPath);
 }
 
 void ScriptEngine::Shutdown()
@@ -508,21 +504,22 @@ void ScriptEngine::OnSceneDestruct(UUID sceneID)
 	}
 }
 
-void ScriptEngine::LoadSaffronRuntimeAssembly(const String &path)
+void ScriptEngine::LoadSaffronRuntimeAssembly(const Filepath &assemblyFilepath)
 {
 	MonoDomain *domain = nullptr;
 	bool cleanup = false;
 	if ( s_MonoDomain )
 	{
-		domain = mono_domain_create_appdomain("Saffron Runtime", nullptr);
+		char friendlyDomainName[] = "Saffron Runtime";
+		domain = mono_domain_create_appdomain(friendlyDomainName, nullptr);
 		mono_domain_set(domain, false);
 		cleanup = true;
 	}
 
-	s_CoreAssembly = LoadAssembly("Assets/Scripts/Saffron-ScriptCore.dll");
+	s_CoreAssembly = LoadAssembly("Assets/Scripts/ScriptCore.dll");
 	s_CoreAssemblyImage = GetAssemblyImage(s_CoreAssembly);
 
-	auto *appAssembly = LoadAssembly(path);
+	auto *appAssembly = LoadAssembly(assemblyFilepath);
 	auto *appAssemblyImage = GetAssemblyImage(appAssembly);
 	ScriptEngineRegistry::RegisterAll();
 
@@ -536,9 +533,10 @@ void ScriptEngine::LoadSaffronRuntimeAssembly(const String &path)
 	s_AppAssemblyImage = appAssemblyImage;
 }
 
-void ScriptEngine::ReloadAssembly(const String &path)
+void ScriptEngine::ReloadAssembly(const Filepath &assemblyFilepath)
 {
-	LoadSaffronRuntimeAssembly(path);
+	s_AssemblyFilepath = assemblyFilepath;
+	LoadSaffronRuntimeAssembly(s_AssemblyFilepath);
 	s_ClassCacheMap.clear();
 	if ( !s_EntityInstanceMap.empty() )
 	{

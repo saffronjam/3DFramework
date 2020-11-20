@@ -1,0 +1,7 @@
+Project: EmptyWorldProject
+UUID: 3948206383772800841
+LastOpened: [2020, 10, 14, 0, 19, 21, 14]
+ProjectFolderpath: ../Games/EmptyWorldProject
+ProjectFilepath: ../Games/EmptyWorldProject/EmptyWorldProject.spr
+Scenes:
+  - SceneFilepath: ../Games/EmptyWorldProject/Scenes/EmptyWorldProject.ssc

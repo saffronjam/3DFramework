@@ -112,15 +112,15 @@ using EntityInstanceMap = UnorderedMap<UUID, UnorderedMap<UUID, EntityInstanceDa
 class ScriptEngine
 {
 public:
-	static void Init(String assemblyPath);
+	static void Init();
 	static void Shutdown();
 
 	static void OnUpdate();
 	static void OnGuiRender();
 	static void OnSceneDestruct(UUID sceneID);
 
-	static void LoadSaffronRuntimeAssembly(const String &path);
-	static void ReloadAssembly(const String &path);
+	static void LoadSaffronRuntimeAssembly(const Filepath &assemblyFilepath);
+	static void ReloadAssembly(const Filepath &assemblyFilepath);
 
 	static void SetSceneContext(const Shared<Scene> &scene);
 	static const Shared<Scene> &GetCurrentSceneContext();

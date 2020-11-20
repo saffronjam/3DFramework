@@ -264,7 +264,7 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<M
 			}
 		}
 
-		shader->SetMat4("u_Transform", transform * submesh.Transform * mesh->GetLocalTransform());
+		shader->SetMat4("u_Transform", transform * mesh->GetLocalTransform() * submesh.Transform);
 
 		Submit([submesh, material]() {
 			material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);

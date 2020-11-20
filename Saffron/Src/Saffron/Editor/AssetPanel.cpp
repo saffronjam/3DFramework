@@ -43,7 +43,10 @@ void AssetPanel::OnGuiRender()
 void AssetPanel::SyncAssetPaths()
 {
 	ScopedLock scopedLock(m_FilepathMutex);
-	const size_t noAssets = FileIOManager::GetFileCount(m_AssetFolderPath, ".fbx");
+	if ( m_AssetFolderPath.empty() )
+	{
+		return;
+	}
 
 	m_AssetStats.clear();
 	auto rawPaths = FileIOManager::GetFiles(m_AssetFolderPath, ".fbx");

@@ -34,7 +34,7 @@ Application::Application(const Properties &properties)
 
 	Renderer::Init();
 	Renderer::Execute();
-	ScriptEngine::Init("Assets/Scripts/ExampleApp.dll");
+	ScriptEngine::Init();
 	FileIOManager::Init(*m_Window);
 	Gui::Init();
 

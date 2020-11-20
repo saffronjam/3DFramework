@@ -101,9 +101,15 @@ struct CameraComponent
 	Shared<SceneCamera> Camera;
 	bool Primary = true;
 
+	Shared<Mesh> CameraMesh;
+	bool DrawMesh = true;
+	bool DrawFrustum = false;
+
 	CameraComponent()
-		: Camera(Shared<SceneCamera>::Create())
+		: Camera(Shared<SceneCamera>::Create()),
+		CameraMesh(Shared<Mesh>::Create("Assets/Meshes/Camera.fbx"))
 	{
+		CameraMesh->GetMaterial()->Set<Vector3f>("u_AlbedoColor", { 0.0f, 0.0f,0.45 });
 	}
 	CameraComponent(const CameraComponent &other) = default;
 
@@ -138,6 +144,7 @@ struct Collider2DComponent
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
+	bool DrawBounding = false;
 
 	// Storage for runtime
 	void *RuntimeFixture = nullptr;
@@ -177,6 +184,7 @@ struct Collider3DComponent
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
+	bool DrawBounding = false;
 
 	// Storage for runtime
 	void *RuntimeFixture = nullptr;

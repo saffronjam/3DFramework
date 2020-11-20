@@ -34,11 +34,13 @@ public:
 	};
 
 public:
+	ScriptPanel() = default;
 	ScriptPanel(Filepath path);
 
 	void OnGuiRender();
 	void SyncScriptPaths();
 
+	void SetAssetFolderpath(Filepath folderpath) { m_ScriptFolderPath = Move(folderpath); }
 	const ArrayList<ScriptStat> &GetScriptStats() const { return m_ScriptStats; }
 
 private:

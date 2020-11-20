@@ -137,38 +137,86 @@ void RuntimeScene::OnRender()
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
 	SceneRenderer::BeginScene(this, { SceneRenderer::GetMainTarget() });
-	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
-	for ( auto entity : group )
+	auto meshGroup = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
+	for ( const auto &entityHandle : meshGroup )
 	{
-		auto [transformComponent, meshComponent] = group.get<TransformComponent, MeshComponent>(entity);
+		auto [meshComponent, transformComponent] = meshGroup.get<MeshComponent, TransformComponent>(entityHandle);
 		if ( meshComponent.Mesh )
 		{
 			meshComponent.Mesh->OnUpdate();
 
 			// TODO: Should we render (logically)
-			SceneRenderer::SubmitMesh(meshComponent, transformComponent, nullptr);
+			SceneRenderer::SubmitMesh(meshComponent, transformComponent);
 		}
 	}
+	auto cameraGroup = m_EntityRegistry.group<CameraComponent>(entt::get<TransformComponent>);
+	for ( const auto &entityHandle : cameraGroup )
+	{
+		auto [cameraComponent, transformComponent] = cameraGroup.get<CameraComponent, TransformComponent>(entityHandle);
+		if ( cameraComponent.DrawMesh && cameraComponent.CameraMesh )
+		{
+			m_SelectedEntity == entityHandle ? SceneRenderer::SubmitSelectedMesh(cameraComponent.CameraMesh, transformComponent) : SceneRenderer::SubmitMesh(cameraComponent.CameraMesh, transformComponent);
+		}
+		if ( cameraComponent.DrawFrustum )
+		{
+			cameraComponent.Camera->RenderFrustum(transformComponent.Transform);
+		}
+	}
+
+	static auto render2DPhysicsBoundingBox = [this](Entity entity)
+	{
+		// TODO: Implement
+	};
+
+	static auto constexpr render3DPhysicsBoundingBox = [](Entity entity)
+	{
+		const auto &boxComponent = entity.GetComponent<BoxCollider3DComponent>();
+		const auto &[translation, rotation, scale] = Misc::GetTransformDecomposition(entity.GetComponent<TransformComponent>().Transform);
+		const auto &boxSize = boxComponent.Size;
+		const auto &boxOffset = boxComponent.Offset;
+		const Matrix4f transformation = Math::ComposeMatrix(translation + boxOffset, rotation, boxSize / 2.0f);
+		SceneRenderer::SubmitAABB(AABB{ Vector3f{-1.0f}, Vector3f{1.0f} }, transformation, { 0.89f, 0.46f, 0.16f, 1.0f });
+	};
 
 	if ( SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes )
 	{
 		if ( m_SceneEntity.HasComponent<PhysicsWorld2DComponent>() )
 		{
-
+			auto view = m_EntityRegistry.view<TransformComponent, BoxCollider2DComponent>();
+			for ( auto entityHandle : view )
+			{
+				const Entity entity = { entityHandle, this };
+				render2DPhysicsBoundingBox(entity);
+			}
 		}
 		if ( m_SceneEntity.HasComponent<PhysicsWorld3DComponent>() )
 		{
 			auto view = m_EntityRegistry.view<TransformComponent, BoxCollider3DComponent>();
 			for ( auto entityHandle : view )
 			{
-				Entity entity = { entityHandle, this };
-				const auto &boxComponent = entity.GetComponent<BoxCollider3DComponent>();
-
-				const auto &[translation, rotation, scale] = Misc::GetTransformDecomposition(entity.GetComponent<TransformComponent>().Transform);
-				const auto &boxSize = boxComponent.Size;
-				const auto &boxOffset = boxComponent.Offset;
-				Matrix4f transformation = glm::translate(translation + boxOffset) * glm::toMat4(rotation) * glm::scale(boxSize / 2.0f);
-				SceneRenderer::SubmitAABB(AABB{ Vector3f{-1.0f}, Vector3f{1.0f} }, transformation, { 0.89f, 0.46f, 0.16f, 1.0f });
+				const Entity entity = { entityHandle, this };
+				render3DPhysicsBoundingBox(entity);
+			}
+		}
+	}
+	else
+	{
+		auto boxCollider2DView = m_EntityRegistry.view<BoxCollider2DComponent>();
+		for ( const auto &entityHandle : boxCollider2DView )
+		{
+			if ( boxCollider2DView.get<BoxCollider2DComponent>(entityHandle).DrawBounding )
+			{
+				const Entity entity = { entityHandle, this };
+				render2DPhysicsBoundingBox(entity);
+			}
+		}
+		auto boxCollider3DView = m_EntityRegistry.view<BoxCollider3DComponent>();
+		for ( const auto &entityHandle : boxCollider3DView )
+		{
+			if ( boxCollider3DView.get<BoxCollider3DComponent>(entityHandle).DrawBounding )
+			{
+				const Entity entity = { entityHandle, this };
+				render3DPhysicsBoundingBox(entity);
 			}
 		}
 	}

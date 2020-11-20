@@ -12,8 +12,14 @@ public:
 public:
 	SceneCamera(Uint32 width = 1280, Uint32 height = 720, ProjectionMode projectionType = ProjectionMode::Perspective);
 
-	void SetPerspective(float verticalFOV, float nearClip = 0.01f, float farClip = 10000.0f);
+	void RenderFrustum(const Matrix4f &transform) const;
+
+	void SetPerspective(float verticalFOV, float nearClip = 0.1f, float farClip = 2000.0f);
 	void SetOrthographic(float size, float nearClip = -1.0f, float farClip = 1.0f);
+
+	Pair<Uint32, Uint32> GetViewportSize() const { return { m_ViewportWidth, m_ViewportHeight }; }
+	Uint32 GetViewportWidth() const { return m_ViewportWidth; }
+	Uint32 GetViewportHeith() const { return m_ViewportHeight; }
 	void SetViewportSize(Uint32 width, Uint32 height) override;
 
 	void SetPerspectiveVerticalFOV(float verticalFov) { m_PerspectiveFOV = glm::radians(verticalFov); }
@@ -36,7 +42,7 @@ private:
 	ProjectionMode m_ProjectionMode = ProjectionMode::Perspective;
 
 	float m_PerspectiveFOV = glm::radians(45.0f);
-	float m_PerspectiveNear = 0.01f, m_PerspectiveFar = 10000.0f;
+	float m_PerspectiveNear = 0.1f, m_PerspectiveFar = 2000.0f;
 
 	float m_OrthographicSize = 10.0f;
 	float m_OrthographicNear = -1.0f, m_OrthographicFar = 1.0f;

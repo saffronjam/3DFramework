@@ -53,13 +53,15 @@ const Shared<EditorScene> &Project::AddCachedScene(const Shared<EditorScene> &ed
 	return m_SceneCache.back();
 }
 
-Project::Project(UUID mUuid, String mName, DateTime mLastOpened, Filepath mProjectFilepath, ArrayList<Filepath> mSceneFilepaths)
+Project::Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFolderpath, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths)
 	:
-	m_UUID(mUuid),
-	m_Name(std::move(mName)),
-	m_LastOpened(mLastOpened),
-	m_ProjectFilepath(std::move(mProjectFilepath)),
-	m_SceneFilepaths(std::move(mSceneFilepaths))
+	m_UUID(uuid),
+	m_Name(Move(name)),
+	m_LastOpened(lastOpened),
+	m_ProjectFolderpath(Move(projectFolderpath)),
+	m_ProjectFilepath(Move(projectFolderpath)),
+	m_SceneFilepaths(Move(sceneFilepaths))
+
 {
 }
 
@@ -70,8 +72,8 @@ const ArrayList<Shared<EditorScene>> &Project::GetSceneCache() const
 
 bool Project::IsValid() const
 {
-	const bool correctData = !m_Name.empty() && !m_ProjectFilepath.empty() && !m_SceneFilepaths.empty() && !m_SceneFilepaths.front().empty(); // Correct on data level
-	bool correctOnDisk = FileIOManager::FileExists(m_ProjectFilepath);
+	const bool correctData = !m_Name.empty() && !m_ProjectFolderpath.empty() && !m_ProjectFilepath.empty() && !m_SceneFilepaths.empty() && !m_SceneFilepaths.front().empty(); // Correct on data level
+	bool correctOnDisk = FileIOManager::FileExists(m_ProjectFolderpath) && FileIOManager::FileExists(m_ProjectFilepath);
 	for ( const auto &sceneFilepath : m_SceneFilepaths )
 	{
 		if ( !FileIOManager::FileExists(sceneFilepath) )

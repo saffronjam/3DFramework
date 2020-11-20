@@ -30,16 +30,22 @@ public:
 	void Disable() { m_Enabled = false; }
 	bool IsEnabled() const { return m_Enabled; }
 
-	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 	const Matrix4f &GetViewMatrix() const { return m_ViewMatrix; }
 	Matrix4f GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
+
 	const Vector3f &GetPosition() const { return m_Position; }
 	float GetPitch() const { return m_Pitch; }
 	float GetYaw() const { return m_Yaw; }
+	float GetRoll() const { return 0.0f; }
+
+	void SetPosition(const Vector3f &position);
+	void SetRotation(const Vector3f &rotation);
+
 	Vector3f GetUpDirection() const;
 	Vector3f GetRightDirection() const;
 	Vector3f GetForwardDirection() const;
 
+	ControllerStyle GetControllerStyle()const { return m_ControllerStyle; }
 	void SetControllerStyle(ControllerStyle style) { m_ControllerStyle = style; }
 
 private:

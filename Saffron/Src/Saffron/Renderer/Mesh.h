@@ -133,6 +133,7 @@ public:
 	const Matrix4f &GetLocalTransform() const { return m_LocalTransform; }
 	void SetLocalTransform(Matrix4f localTransform) { m_LocalTransform = Move(localTransform); }
 
+	ArrayList<AABB> GetBoundingBoxes(const Matrix4f &transform = Matrix4f(1));
 	Shared<Shader> GetMeshShader() const { return m_MeshShader; }
 	Shared<Material> GetMaterial() const { return m_BaseMaterial; }
 	ArrayList<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }

@@ -514,6 +514,16 @@ void Gui::ForceHideBarTab()
 	}
 }
 
+Vector4f Gui::GetSaffronOrange(float opacity)
+{
+	return { 0.89f, 0.46f, 0.16f, opacity };
+}
+
+Vector4f Gui::GetSaffronPurple(float opacity)
+{
+	return { 0.29f, 0.13f, 0.42f , opacity };
+}
+
 void Gui::PushID()
 {
 	ImGui::PushID(s_UIContextID++);

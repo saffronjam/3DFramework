@@ -468,14 +468,18 @@ void EntityPanel::DrawComponents(Entity entity)
 			{
 				updateTransform = true;
 			}
+
 			if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
 			{
 				updateTransform = true;
 			}
-			if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f, 1.0f, 1.0f); updateTransform = true; }) )
+
+			if ( Gui::Property("Scale", dc.Scale, 0.15f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f, 1.0f, 1.0f); updateTransform = true; }) )
 			{
-				if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
-					updateTransform = true;
+				Misc::LowClamp(dc.Scale.x, 0.15f);
+				Misc::LowClamp(dc.Scale.y, 0.15f);
+				Misc::LowClamp(dc.Scale.z, 0.15f);
+				updateTransform = true;
 			}
 
 			Gui::EndPropertyGrid();
@@ -533,6 +537,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									 }
 
 									 Gui::EndPropertyGrid();
+
 									 if ( updateTransform )
 									 {
 										 const Matrix4f newTransform = glm::translate(dc.Translation) *
@@ -564,6 +569,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									   }
 
 									   Gui::BeginPropertyGrid();
+
 									   // Perspective parameters
 									   if ( cc.Camera->GetProjectionMode() == SceneCamera::ProjectionMode::Perspective )
 									   {
@@ -596,7 +602,37 @@ void EntityPanel::DrawComponents(Entity entity)
 											   cc.Camera->SetOrthographicFarClip(farClip);
 									   }
 
+									   Gui::Property("Mesh", cc.DrawMesh);
+									   Gui::Property("Frustum", cc.DrawFrustum);
+
+									   const auto &transform = cc.CameraMesh->GetLocalTransform();
+									   auto dc = Misc::GetTransformDecomposition(transform);
+									   Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
+
+									   bool updateTransform = false;
+									   if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
+									   {
+										   updateTransform = true;
+									   }
+									   if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
+									   {
+										   updateTransform = true;
+									   }
+									   if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f); updateTransform = true; }) )
+									   {
+										   if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
+											   updateTransform = true;
+									   }
+
 									   Gui::EndPropertyGrid();
+
+									   if ( updateTransform )
+									   {
+										   const Matrix4f newTransform = glm::translate(dc.Translation) *
+											   glm::toMat4(glm::quat(glm::radians(rotation))) *
+											   glm::scale(dc.Scale);
+										   cc.CameraMesh->SetLocalTransform(newTransform);
+									   }
 								   });
 
 	DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](SpriteRendererComponent &mc)
@@ -769,6 +805,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											  Gui::Property("Size", bc2dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 											  Gui::Property("Density", bc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 											  Gui::Property("Friction", bc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Bounding", bc2dc.DrawBounding);
 											  Gui::EndPropertyGrid();
 										  });
 
@@ -779,6 +816,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												 Gui::Property("Radius", cc2dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 												 Gui::Property("Density", cc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
 												 Gui::Property("Friction", cc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Bounding", cc2dc.DrawBounding);
 												 Gui::EndPropertyGrid();
 											 });
 	DrawComponent<RigidBody3DComponent>("Rigidbody 3D", entity, [](RigidBody3DComponent &rb3dc)
@@ -803,23 +841,25 @@ void EntityPanel::DrawComponents(Entity entity)
 											}
 										});
 
-	DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](BoxCollider3DComponent &bc2dc)
+	DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](BoxCollider3DComponent &bc3dc)
 										  {
 											  Gui::BeginPropertyGrid();
-											  Gui::Property("Offset", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-											  Gui::Property("Size", bc2dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-											  Gui::Property("Density", bc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-											  Gui::Property("Friction", bc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Offset", bc3dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Size", bc3dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Density", bc3dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Friction", bc3dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Bounding", bc3dc.DrawBounding);
 											  Gui::EndPropertyGrid();
 										  });
 
-	DrawComponent<SphereCollider3DComponent>("Circle Collider 3D", entity, [](SphereCollider3DComponent &cc2dc)
+	DrawComponent<SphereCollider3DComponent>("Circle Collider 3D", entity, [](SphereCollider3DComponent &cc3dc)
 											 {
 												 Gui::BeginPropertyGrid();
-												 Gui::Property("Offset", cc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-												 Gui::Property("Radius", cc2dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-												 Gui::Property("Density", cc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
-												 Gui::Property("Friction", cc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Offset", cc3dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Radius", cc3dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Density", cc3dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Friction", cc3dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Bounding", cc3dc.DrawBounding);
 												 Gui::EndPropertyGrid();
 											 });
 }

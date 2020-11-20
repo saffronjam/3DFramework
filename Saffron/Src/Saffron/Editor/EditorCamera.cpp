@@ -121,6 +121,20 @@ void EditorCamera::Reset()
 }
 
 
+void EditorCamera::SetPosition(const Vector3f &position)
+{
+	m_Position = position;
+	UpdateCameraView();
+}
+
+void EditorCamera::SetRotation(const Vector3f &rotation)
+{
+	m_Pitch = rotation.x;
+	m_Yaw = rotation.y;
+	m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
+	UpdateCameraView();
+}
+
 Vector3f EditorCamera::GetUpDirection() const
 {
 	return m_Up;

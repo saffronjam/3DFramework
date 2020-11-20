@@ -35,11 +35,13 @@ public:
 	};
 
 public:
+	AssetPanel() = default;
 	AssetPanel(Filepath path);
 
 	void OnGuiRender();
 	void SyncAssetPaths();
 
+	void SetAssetFolderpath(Filepath folderpath) { m_AssetFolderPath = Move(folderpath); }
 	const ArrayList<AssetStat> &GetAssetStats() const { return m_AssetStats; }
 
 private:

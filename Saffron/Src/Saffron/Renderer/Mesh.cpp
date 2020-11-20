@@ -625,6 +625,18 @@ void Mesh::DumpVertexBuffer()
 	SE_MESH_LOG("------------------------------------------------------");
 }
 
+ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f &transform)
+{
+	ArrayList<AABB> ret;
+	for ( const auto &submesh : GetSubmeshes() )
+	{
+		const auto &aabb = submesh.BoundingBox;
+		auto aabbTransform = transform * GetLocalTransform() * submesh.Transform;
+		ret.push_back(aabb);
+	}
+	return ret;
+}
+
 void Mesh::BoneTransform(float time)
 {
 	ReadNodeHierarchy(time, m_Scene->mRootNode, Matrix4f(1.0f));

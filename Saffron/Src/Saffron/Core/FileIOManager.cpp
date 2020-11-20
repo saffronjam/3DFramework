@@ -21,25 +21,42 @@ ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath &directoryPath,
 												  const String &extension)
 {
 	ArrayList<DirectoryEntry> output;
-	std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const DirectoryEntry &entry)
-				 {
-					 return entry.path().extension() == extension;
-				 });
+
+	try
+	{
+		std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const DirectoryEntry &entry)
+					 {
+						 return entry.path().extension() == extension;
+					 });
+	}
+	catch ( fs::filesystem_error &fe )
+	{
+		SE_CORE_WARN("Failed to get files from directory: {} with file extension: {}. What: ", directoryPath.string(), extension, fe.what());
+	}
+
 	return output;
 }
 
 size_t FileIOManager::GetFileCount(const Filepath &directoryPath, const String &extension)
 {
-	// Try to return early if no extension is given
+	// Return early if no extension is given
 	if ( extension.empty() )
 	{
 		return std::distance(fs::directory_iterator(directoryPath), fs::directory_iterator{});
 	}
 
-	return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const DirectoryEntry &entry)
-						 {
-							 return entry.path().extension() == extension;
-						 });
+	try
+	{
+		return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const DirectoryEntry &entry)
+							 {
+								 return entry.path().extension() == extension;
+							 });
+	}
+	catch ( fs::filesystem_error &fe )
+	{
+		SE_CORE_WARN("Failed to get file count from directory: {} with file extension: {}. What: ", directoryPath.string(), extension, fe.what());
+	}
+	return 0;
 }
 
 size_t FileIOManager::Write(const Uint8 *data, size_t size, const Filepath &filepath, bool overwrite)
