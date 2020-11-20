@@ -1,8 +1,7 @@
 #pragma once
 
-
-
 #include "Saffron/Base.h"
+#include "Saffron/Core/Project.h"
 #include "Saffron/Core/Time.h"
 #include "Saffron/Scene/Scene.h"
 
@@ -106,7 +105,7 @@ using EntityInstanceMap = UnorderedMap<UUID, UnorderedMap<UUID, EntityInstanceDa
 
 
 ///////////////////////////////////////////////////////////////////////////
-/// Script ProjectManager
+/// Script Engine
 ///////////////////////////////////////////////////////////////////////////
 
 class ScriptEngine
@@ -117,9 +116,10 @@ public:
 
 	static void OnUpdate();
 	static void OnGuiRender();
-	static void OnSceneDestruct(UUID sceneID);
+	static void OnProjectChange(const Shared<Project> &project);
+	static void OnSceneChange(const Shared<Scene> &scene);
 
-	static void LoadSaffronRuntimeAssembly(const Filepath &assemblyFilepath);
+	static void LoadRuntimeAssembly(const Filepath &assemblyFilepath);
 	static void ReloadAssembly(const Filepath &assemblyFilepath);
 
 	static void SetSceneContext(const Shared<Scene> &scene);

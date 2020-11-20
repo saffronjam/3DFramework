@@ -108,7 +108,6 @@ Scene::~Scene()
 	m_EntityRegistry.clear();
 
 	s_ActiveScenes.erase(m_SceneID);
-	ScriptEngine::OnSceneDestruct(m_SceneID);
 }
 
 Entity Scene::CreateEntity(String name)

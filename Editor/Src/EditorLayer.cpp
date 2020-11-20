@@ -600,7 +600,7 @@ void EditorLayer::LoadProjectScene(const Filepath &filepath)
 
 void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 {
-	ScriptEngine::SetSceneContext(scene);
+	ScriptEngine::OnSceneChange(scene);
 	m_EntityPanel->SetContext(scene);
 	m_EntityPanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
 	m_ScenePanel->SetContext(scene);
@@ -613,8 +613,8 @@ void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 void EditorLayer::OnProjectChange(const Shared<Project> &project)
 {
 	SE_CORE_ASSERT(project->IsValid());
+	ScriptEngine::OnProjectChange(project);
 	m_Project = project;
-	ScriptEngine::LoadSaffronRuntimeAssembly("Assets/Scripts/" + m_Project->GetName() + ".dll");
 	m_AssetPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "/Assets/Meshes");
 	m_ScriptPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "/Src");
 	LoadProjectScene(m_Project->GetSceneFilepaths().front());

@@ -8,6 +8,7 @@
 
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
 
@@ -76,6 +77,7 @@ const char *FieldTypeToString(FieldType type)
 
 static MonoDomain *s_MonoDomain = nullptr;
 static Filepath s_AssemblyFilepath;
+static Shared<Project> s_ProjectContext;
 static Shared<Scene> s_SceneContext;
 
 // Assembly images
@@ -145,7 +147,7 @@ struct EntityScriptClass
 /// Mono functions / Setup procedures
 ///////////////////////////////////////////////////////////////////////////
 
-static std::unordered_map<String, EntityScriptClass> s_EntityClassMap;
+static UnorderedMap<String, EntityScriptClass> s_EntityClassMap;
 
 MonoAssembly *LoadAssemblyFromFile(const char *filepath)
 {
@@ -495,16 +497,35 @@ void ScriptEngine::OnGuiRender()
 	ImGui::End();
 }
 
-void ScriptEngine::OnSceneDestruct(UUID sceneID)
+void ScriptEngine::OnProjectChange(const Shared<Project> &project)
 {
-	if ( s_EntityInstanceMap.find(sceneID) != s_EntityInstanceMap.end() )
+	if ( s_ProjectContext )
 	{
-		s_EntityInstanceMap.at(sceneID).clear();
-		s_EntityInstanceMap.erase(sceneID);
+		for ( const auto &scene : s_ProjectContext->GetSceneCache() )
+		{
+			auto uuid = scene->GetUUID();
+			if ( s_EntityInstanceMap.find(uuid) != s_EntityInstanceMap.end() )
+			{
+				s_EntityClassMap.clear();
+				s_EntityInstanceMap.at(uuid).clear();
+				s_EntityInstanceMap.erase(uuid);
+			}
+		}
+		s_ClassCacheMap.clear();
+	}
+	s_ProjectContext = project;
+	if ( project )
+	{
+		LoadRuntimeAssembly("Assets/Scripts/" + s_ProjectContext->GetName() + ".dll");
 	}
 }
 
-void ScriptEngine::LoadSaffronRuntimeAssembly(const Filepath &assemblyFilepath)
+void ScriptEngine::OnSceneChange(const Shared<Scene> &scene)
+{
+	s_SceneContext = scene;
+}
+
+void ScriptEngine::LoadRuntimeAssembly(const Filepath &assemblyFilepath)
 {
 	MonoDomain *domain = nullptr;
 	bool cleanup = false;
@@ -536,7 +557,7 @@ void ScriptEngine::LoadSaffronRuntimeAssembly(const Filepath &assemblyFilepath)
 void ScriptEngine::ReloadAssembly(const Filepath &assemblyFilepath)
 {
 	s_AssemblyFilepath = assemblyFilepath;
-	LoadSaffronRuntimeAssembly(s_AssemblyFilepath);
+	LoadRuntimeAssembly(s_AssemblyFilepath);
 	s_ClassCacheMap.clear();
 	if ( !s_EntityInstanceMap.empty() )
 	{
