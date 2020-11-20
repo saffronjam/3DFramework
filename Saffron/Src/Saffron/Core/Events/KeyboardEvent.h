@@ -15,9 +15,9 @@ public:
 	explicit KeyboardPressEvent(KeyCode key) : m_Key(key) {}
 
 	KeyCode GetKey() const { return m_Key; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Key: " << m_Key;
 		return oss.str();
 	}
@@ -36,9 +36,9 @@ public:
 	explicit KeyboardReleaseEvent(KeyCode key) : m_Key(key) {}
 
 	KeyCode GetKey() const { return m_Key; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Key: " << m_Key;
 		return oss.str();
 	}
@@ -57,9 +57,9 @@ public:
 	explicit KeyboardRepeatEvent(KeyCode key) : m_Key(key) {}
 
 	KeyCode GetKey() const { return m_Key; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::ostringstream oss;
+		OutputStringStream oss;
 		oss << GetName() << " Key: " << m_Key;
 		return oss.str();
 	}
@@ -78,9 +78,9 @@ public:
 	KeyboardTypeEvent(KeyCode key) : m_Key(key) {}
 
 	KeyCode GetKey() const { return m_Key; }
-	std::string ToString() const override
+	String ToString() const override
 	{
-		std::stringstream ss;
+		StringStream ss;
 		ss << GetName() << m_Key;
 		return ss.str();
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
-#include <vector>
+
+
 
 #include "Saffron/Base.h"
 
@@ -21,7 +21,7 @@ enum class ShaderDomain
 class ShaderUniformDeclaration
 {
 public:
-	using List = std::vector<ShaderUniformDeclaration *>;
+	using List = ArrayList<ShaderUniformDeclaration *>;
 
 private:
 	friend class Shader;
@@ -31,7 +31,7 @@ private:
 public:
 	virtual ~ShaderUniformDeclaration() = default;
 
-	virtual const std::string &GetName() const = 0;
+	virtual const String &GetName() const = 0;
 	virtual Uint32 GetSize() const = 0;
 	virtual Uint32 GetCount() const = 0;
 	virtual Uint32 GetOffset() const = 0;
@@ -44,18 +44,18 @@ protected:
 /////////////////////////////////////////
 /// Shader Uniform Buffer Declaration ///
 /////////////////////////////////////////
-class ShaderUniformBufferDeclaration : public RefCounted
+class ShaderUniformBufferDeclaration : public ReferenceCounted
 {
 public:
-	using List = std::vector<ShaderUniformBufferDeclaration *>;
+	using List = ArrayList<ShaderUniformBufferDeclaration *>;
 
 public:
-	virtual const std::string &GetName() const = 0;
+	virtual const String &GetName() const = 0;
 	virtual Uint32 GetRegister() const = 0;
 	virtual Uint32 GetSize() const = 0;
 	virtual const ShaderUniformDeclaration::List &GetUniformDeclarations() const = 0;
 
-	virtual ShaderUniformDeclaration *FindUniform(const std::string &name) = 0;
+	virtual ShaderUniformDeclaration *FindUniform(const String &name) = 0;
 };
 
 
@@ -65,26 +65,26 @@ public:
 class ShaderStruct
 {
 public:
-	using List = std::vector<ShaderStruct *>;
+	using List = ArrayList<ShaderStruct *>;
 
 private:
 	friend class Shader;
 
 private:
-	std::string m_Name;
-	std::vector<ShaderUniformDeclaration *> m_Fields;
+	String m_Name;
+	ArrayList<ShaderUniformDeclaration *> m_Fields;
 	Uint32 m_Size;
 	Uint32 m_Offset;
 
 public:
-	explicit ShaderStruct(std::string name);
+	explicit ShaderStruct(String name);
 
 	void AddField(ShaderUniformDeclaration *field);
 
-	const std::string &GetName() const { return m_Name; }
+	const String &GetName() const { return m_Name; }
 	Uint32 GetSize() const { return m_Size; }
 	Uint32 GetOffset() const { return m_Offset; }
-	const std::vector<ShaderUniformDeclaration *> &GetFields() const { return m_Fields; }
+	const ArrayList<ShaderUniformDeclaration *> &GetFields() const { return m_Fields; }
 
 	void SetOffset(Uint32 offset) { m_Offset = offset; }
 };
@@ -95,12 +95,12 @@ public:
 class ShaderResourceDeclaration
 {
 public:
-	using List = std::vector<ShaderResourceDeclaration *>;
+	using List = ArrayList<ShaderResourceDeclaration *>;
 
 public:
 	virtual ~ShaderResourceDeclaration() = default;
 
-	virtual const std::string &GetName() const = 0;
+	virtual const String &GetName() const = 0;
 	virtual Uint32 GetRegister() const = 0;
 	virtual Uint32 GetCount() const = 0;
 };

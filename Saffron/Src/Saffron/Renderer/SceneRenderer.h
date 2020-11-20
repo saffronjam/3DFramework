@@ -4,54 +4,76 @@
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/RenderPass.h"
 #include "Saffron/Renderer/Texture.h"
-#include "Saffron/Scene/Scene.h"
 
 namespace Se
 {
-struct SceneRendererCameraData
-{
-	const Camera *Camera = nullptr;
-	glm::mat4 ViewMatrix{};
-};
-
+class Scene;
 class SceneRenderer
 {
 public:
 	struct Options
 	{
 		bool ShowGrid = true;
-		bool ShowBoundingBoxes = false;
+		bool ShowMeshBoundingBoxes = false;
+		bool ShowPhysicsBodyBoundingBoxes = false;
+	};
+	struct CameraData
+	{
+		Shared<Camera> Camera;
+		Matrix4f ViewMatrix{};
+	};
+
+	class Target : public ReferenceCounted
+	{
+	public:
+		Target() = default;
+		~Target();
+
+		void Enable() { m_Enabled = true; }
+		void Disable() { m_Enabled = false; }
+		bool IsEnabled() const { return m_Enabled; }
+
+		const CameraData &GetCameraData() const { return m_CameraData; }
+		void SetCameraData(const CameraData &cameraData) { m_CameraData = cameraData; };
+
+		Vector2u GetSize();
+		void SetSize(Uint32 width, Uint32 height);
+
+		const Shared<RenderPass> &GetGeoPass()const { return m_GeoPass; }
+		const Shared<RenderPass> &GetCompositePass() const { return m_CompositePass; }
+		const Shared<Texture2D> &GetFinalColorBuffer() const; // TODO: Implement
+		RendererID GetFinalColorBufferRendererID() const;
+
+		static Shared<Target> Create(Uint32 width, Uint32 height);
+
+	private:
+		bool m_Enabled = true;
+		CameraData m_CameraData;
+		Shared<RenderPass> m_GeoPass;
+		Shared<RenderPass> m_CompositePass;
 	};
 
 public:
 	static void Init();
 
-	static void AddRenderTarget(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height);
-	static void SetRenderTargetSize(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height);
-	static void SetCameraData(const std::string &renderTargetIdentifier, const SceneRendererCameraData &cameraData);
-
-	static void EnableRenderTarget(const std::string &renderTargetIdentifier);
-	static void DisableRenderTarget(const std::string &renderTargetIdentifier);
-	static bool IsRenderTargetEnabled(const std::string &renderTargetIdentifier);
-
-	static void BeginScene(const Scene *scene);
+	static void BeginScene(const Scene *scene, ArrayList<Shared<Target>> targets);
 	static void EndScene();
 
-	static void SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f), const Ref<MaterialInstance>
+	static void SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f), const Shared<MaterialInstance>
 						   &overrideMaterial = nullptr);
-	static void SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform = glm::mat4(1.0f));
+	static void SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitLine(const Vector3f &first, const Vector3f &second, const Vector4f &color);
+	static void SubmitAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
+	static void SubmitAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color = Vector4f(1.0f));
 
-	static std::pair<Ref<TextureCube>, Ref<TextureCube>> CreateEnvironmentMap(const std::string &filepath);
+	static Pair<Shared<TextureCube>, Shared<TextureCube>> CreateEnvironmentMap(const String &filepath);
 
-	static Ref<RenderPass> GetFinalRenderPass(const std::string &renderTargetIdentifier);
-	static Ref<Texture2D> GetFinalColorBuffer(const std::string &renderTargetIdentifier);
-	// TODO: Temp
-	static Uint32 GetFinalColorBufferRendererID(const std::string &renderTargetIdentifier);
+	static Shared<Target> &GetMainTarget();
 	static Options &GetOptions();
 private:
 	static void FlushDrawList();
-	static void GeometryPass(const std::string &renderTargetIdentifier);
-	static void CompositePass(const std::string &renderTargetIdentifier);
+	static void GeometryPass(const Shared<Target> &target);
+	static void CompositePass(const Shared<Target> &target);
 };
 
 }

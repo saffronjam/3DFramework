@@ -1,0 +1,13 @@
+Scene: Scene Name
+Environment:
+  AssetPath: assets\env\pink_sunrise_4k.hdr
+  Light:
+    Direction: [-0.787, -0.73299998, 1]
+    Radiance: [1, 1, 1]
+    Multiplier: 0.514999986
+EditorCamera:
+  Position: [-27.9522781, 25.1890335, 15.5091619]
+  Rotation: [-0.706608474, 5.68092632, 0]
+  PerspectiveMatrix: [1.75288618, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00001991, -1, 0, 0, -0.200001985, 0]
+Entities:
+  []

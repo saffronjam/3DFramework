@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class Framebuffer : public RefCounted
+class Framebuffer : public ReferenceCounted
 {
 public:
 	enum class Format
@@ -19,7 +19,7 @@ public:
 	{
 		Uint32 Width = 1280;
 		Uint32 Height = 720;
-		glm::vec4 ClearColor;
+		Vector4f ClearColor;
 		Format Format;
 		Uint32 Samples = 1; // multisampling
 
@@ -42,21 +42,21 @@ public:
 
 	virtual const Specification &GetSpecification() const = 0;
 
-	static Ref<Framebuffer> Create(const Specification &spec);
+	static Shared<Framebuffer> Create(const Specification &spec);
 };
 
 class FramebufferPool final
 {
 public:
 	std::weak_ptr<Framebuffer> AllocateBuffer();
-	void Add(const Ref<Framebuffer> &framebuffer);
+	void Add(const Shared<Framebuffer> &framebuffer);
 
-	std::vector<Ref<Framebuffer>> &GetAll() { return m_Pool; }
-	const std::vector<Ref<Framebuffer>> &GetAll() const { return m_Pool; }
+	ArrayList<Shared<Framebuffer>> &GetAll() { return m_Pool; }
+	const ArrayList<Shared<Framebuffer>> &GetAll() const { return m_Pool; }
 
 	static FramebufferPool *GetGlobal() { return sInstance; }
 private:
-	std::vector<Ref<Framebuffer>> m_Pool;
+	ArrayList<Shared<Framebuffer>> m_Pool;
 
 	static FramebufferPool *sInstance;
 };

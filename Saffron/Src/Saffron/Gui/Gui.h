@@ -5,9 +5,11 @@
 #include "ImGuizmo.h"
 
 #include "Saffron/Base.h"
+#include "Saffron/Core/Math/SaffronMath.h"
 
 namespace Se
 {
+using Font = ImFont;
 class Gui
 {
 public:
@@ -23,34 +25,51 @@ public:
 
 public:
 	static void Init();
+	static void Shutdown();
 
+	static void Begin();
+	static void End();
 
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();
 
-	static void Property(const char *label, const char *value);
-	static bool Property(const char *label, std::string &value, bool error = false);
-	static bool Property(const std::string &name, bool &value);
-	static bool Property(const std::string &name, int &value, int min = -1, int max = 1, PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const std::string &name, float &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const std::string &name, glm::vec2 &value, PropertyFlag flags);
-	static bool Property(const std::string &name, glm::vec2 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const std::string &name, glm::vec3 &value, PropertyFlag flags);
-	static bool Property(const std::string &name, glm::vec3 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const std::string &name, glm::vec4 &value, PropertyFlag flags);
-	static bool Property(const std::string &name, glm::vec4 &value, float min = -1.0f, float max = 1.0f, PropertyFlag flags = PropertyFlag::None);
+	static void Property(const String &name, const Function<void()> &onClick, bool secondColumn = false);
+	static void Property(const String &name, const String &value);
+	static bool Property(const String &name, String &value);
+	static bool Property(const String &name, bool &value);
+	static bool Property(const String &name, const String &text, const String &buttonName, const Function<void()> &onButtonPress);
+	static bool Property(const String &name, int &value, int min = -1, int max = 1, float step = 1, PropertyFlag flags = PropertyFlag::None);
+	static bool Property(const String &name, float &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
+	static bool Property(const String &name, Vector2f &value, PropertyFlag flags);
+	static bool Property(const String &name, Vector2f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
+	static bool Property(const String &name, Vector3f &value, PropertyFlag flags);
+	static bool Property(const String &name, Vector3f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None, Optional<Function<void()>> fn = {});
+	static bool Property(const String &name, Vector4f &value, PropertyFlag flags);
+	static bool Property(const String &name, Vector4f &value, float min = -1.0f, float max = 1.0f, float step = 1.0f, PropertyFlag flags = PropertyFlag::None);
 
-	static void HelpMarker(const std::string &desc);
-	static void InfoModal(const char *title, const char *text, bool open);
+	static void HelpMarker(const String &desc);
+	static void InfoModal(const char *title, const char *text, bool &open);
 
+	static int GetFontSize();
 	static void SetStyle(Style style);
+	static void SetFontSize(int size);
+
+	static Font *AddFont(const Filepath &path, int size);
+
+	static void ForceHideBarTab();
+
+	static Vector4f GetSaffronOrange(float opacity = 1.0f);
+	static Vector4f GetSaffronPurple(float opacity = 1.0f);
 
 private:
 	static void PushID();
 	static void PopID();
+	static Font *GetAppropriateFont(int size);
 
 private:
 	static Style m_CurrentStyle;
+	static Map<int, ImFont *> m_Fonts;
+	static Pair<int, ImFont *> m_CurrentFont;
 
 };
 }

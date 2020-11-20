@@ -5,12 +5,12 @@
 
 namespace Se
 {
-class RenderPass : public RefCounted
+class RenderPass : public ReferenceCounted
 {
 public:
 	struct Specification
 	{
-		Ref<Framebuffer> TargetFramebuffer;
+		Shared<Framebuffer> TargetFramebuffer;
 	};
 
 public:
@@ -19,7 +19,7 @@ public:
 	virtual Specification &GetSpecification() = 0;
 	virtual const Specification &GetSpecification() const = 0;
 
-	static Ref<RenderPass> Create(const Specification &specification);
+	static Shared<RenderPass> Create(const Specification &specification);
 
 };
 }

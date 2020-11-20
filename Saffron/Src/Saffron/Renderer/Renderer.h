@@ -4,6 +4,7 @@
 #include "Saffron/Renderer/PrimitiveType.h"
 #include "Saffron/Renderer/RenderCommandQueue.h"
 #include "Saffron/Renderer/RenderPass.h"
+#include "Saffron/Renderer/Shader.h"
 
 namespace Se
 {
@@ -11,6 +12,12 @@ class Material;
 class Mesh;
 class MaterialInstance;
 class ShaderLibrary;
+
+struct LineVertex
+{
+	Vector3f Position;
+	Vector4f Color;
+};
 
 class Renderer
 {
@@ -29,21 +36,17 @@ public:
 	// For OpenGL
 	static void ClearMagenta();
 
-	static Ref<ShaderLibrary> GetShaderLibrary();
-
 	template<typename FuncT>
 	static void Submit(FuncT &&func);
-	static void WaitAndRender();
+	static void Execute();
 
 	// ~Actual~ Renderer here... TODO: remove confusion later
-	static void BeginRenderPass(Ref<RenderPass> renderPass, bool clear = true);
+	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);
 	static void EndRenderPass();
 
-	static void SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform = glm::mat4(1.0f));
-	static void SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial = nullptr);
-
-	static void DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
-	static void DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color = glm::vec4(1.0f));
+	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader);
+	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
@@ -59,7 +62,7 @@ void Renderer::Submit(FuncT &&func)
 		pFunc();
 
 		// NOTE: Instead of destroying we could try and enforce all items to be trivially destructible
-		// however some items like uniforms which contain std::strings still exist for now
+		// however some items like uniforms which contain Strings still exist for now
 		// static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
 		pFunc.~FuncT();
 	};

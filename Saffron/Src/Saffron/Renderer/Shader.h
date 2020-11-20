@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+
 #include <unordered_map>
 
 #include "Saffron/Base.h"
@@ -8,12 +8,18 @@
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/ShaderUniform.h"
+#include "Saffron/Resource/Resource.h"
 
 namespace Se
 {
-class Shader : public RefCounted
+class Shader : public Resource, public Signaller
 {
 public:
+	struct Signals
+	{
+		static SignalAggregate<void> OnReload;
+	};
+
 	struct Uniform
 	{
 		enum class Type
@@ -33,13 +39,13 @@ public:
 		{
 			Type DeclType;
 			std::ptrdiff_t Offset;
-			std::string Name;
+			String Name;
 		};
 
 		struct Buffer
 		{
 			Uint8 *Data;
-			std::vector<Decl> Uniforms;
+			ArrayList<Decl> Uniforms;
 		};
 
 		struct BufferBase
@@ -64,10 +70,10 @@ public:
 			unsigned int GetUniformCount() const override { return U; }
 
 			template<typename T>
-			void Push(const std::string &name, const T &data) {}
+			void Push(const String &name, const T &data) {}
 
 			template<>
-			void Push(const std::string &name, const float &data)
+			void Push(const String &name, const float &data)
 			{
 				Uniforms[Index++] = { Type::Float, Cursor, name };
 				memcpy(Buffer + Cursor, &data, sizeof(float));
@@ -75,27 +81,27 @@ public:
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::vec3 &data)
+			void Push(const String &name, const Vector3f &data)
 			{
 				Uniforms[Index++] = { Type::Float3, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec3));
-				Cursor += sizeof(glm::vec3);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Vector3f));
+				Cursor += sizeof(Vector3f);
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::vec4 &data)
+			void Push(const String &name, const Vector4f &data)
 			{
 				Uniforms[Index++] = { Type::Float4, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec4));
-				Cursor += sizeof(glm::vec4);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Vector4f));
+				Cursor += sizeof(Vector4f);
 			}
 
 			template<>
-			void Push(const std::string &name, const glm::mat4 &data)
+			void Push(const String &name, const Matrix4f &data)
 			{
 				Uniforms[Index++] = { Type::Matrix4x4, Cursor, name };
-				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::mat4));
-				Cursor += sizeof(glm::mat4);
+				memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(Matrix4f));
+				Cursor += sizeof(Matrix4f);
 			}
 
 			~BufferDeclaration() override = default;
@@ -113,9 +119,6 @@ public:
 	//////////////////////////////////////////
 
 public:
-	using ShaderReloadedCallback = std::function<void()>;
-
-public:
 	virtual ~Shader() = default;
 
 	static void OnGuiRender();
@@ -127,14 +130,14 @@ public:
 	virtual void UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer) = 0;
 
 	// TODO: Implement materials and remove these
-	virtual void SetFloat(const std::string &name, float value) = 0;
-	virtual void SetInt(const std::string &name, int value) = 0;
-	virtual void SetFloat3(const std::string &name, const glm::vec3 &value) = 0;
-	virtual void SetMat4(const std::string &name, const glm::mat4 &value) = 0;
-	virtual void SetMat4FromRenderThread(const std::string &name, const glm::mat4 &value, bool bind = true) = 0;
-	virtual void SetIntArray(const std::string &name, int *values, Uint32 size) = 0;
+	virtual void SetFloat(const String &name, float value) = 0;
+	virtual void SetInt(const String &name, int value) = 0;
+	virtual void SetFloat3(const String &name, const Vector3f &value) = 0;
+	virtual void SetMat4(const String &name, const Matrix4f &value) = 0;
+	virtual void SetMat4FromRenderThread(const String &name, const Matrix4f &value, bool bind = true) = 0;
+	virtual void SetIntArray(const String &name, int *values, Uint32 size) = 0;
 
-	virtual const std::string &GetName() const = 0;
+	virtual const String &GetName() const = 0;
 
 	virtual void SetVSMaterialUniformBuffer(const Buffer &buffer) = 0;
 	virtual void SetPSMaterialUniformBuffer(const Buffer &buffer) = 0;
@@ -148,25 +151,9 @@ public:
 
 	virtual const ShaderResourceDeclaration::List &GetResources() const = 0;
 
-	virtual void AddShaderReloadedCallback(const ShaderReloadedCallback &callback) = 0;
+	static Shared<Shader> Create(const Filepath &filepath);
+	static Shared<Shader> Create(const String &source);
 
-	static Ref<Shader> Create(const std::string &filepath);
-	static Ref<Shader> CreateFromString(const std::string &source);
-
-	// TODO: Create Asset manager and remove this
-	static std::vector<Ref<Shader>> m_sAllShaders;
-};
-
-class ShaderLibrary : public RefCounted
-{
-public:
-	void Add(const Ref<Shader> &shader);
-	void Load(const std::string &path);
-	void Load(const std::string &name, const std::string &path);
-
-	const Ref<Shader> &Get(const std::string &name) const;
-private:
-	std::unordered_map<std::string, Ref<Shader>> m_Shaders;
 };
 
 }

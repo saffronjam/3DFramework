@@ -2,37 +2,23 @@
 
 #include <assimp/scene.h>
 
-#include "Saffron/Editor/ScriptPanel.h"
-#include "Saffron/Core/Application.h"
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Core/Math/SaffronMath.h"
 #include "Saffron/Editor/EntityPanel.h"
-#include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Scene/RuntimeScene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 
 namespace Se
 {
 
-glm::mat4 Mat4FromAssimpMat4(const aiMatrix4x4 &matrix);
-
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
 ///////////////////////////////////////////////////////////////////////////
 
-static std::tuple<glm::vec3, glm::quat, glm::vec3> GetTransformDecomposition(const glm::mat4 &transform)
-{
-	glm::vec3 scale, translation, skew;
-	glm::vec4 perspective;
-	glm::quat orientation;
-	glm::decompose(transform, scale, orientation, translation, skew, perspective);
-
-	return { translation, orientation, scale };
-}
-
-
 template<typename T, typename UIFunction>
-static void DrawComponent(const std::string &name, Entity entity, UIFunction uiFunction)
+static void DrawComponent(const String &name, Entity entity, UIFunction uiFunction)
 {
 	if ( entity.HasComponent<T>() )
 	{
@@ -77,22 +63,22 @@ static void DrawComponent(const std::string &name, Entity entity, UIFunction uiF
 /// Entity Panel
 ///////////////////////////////////////////////////////////////////////////
 
-EntityPanel::EntityPanel(const Ref<Scene> &context)
+EntityPanel::EntityPanel(const Shared<Scene> &context)
 	:
 	m_Context(context)
 {
 	m_TexStore["Checkerboard"] = Texture2D::Create("Assets/Editor/Checkerboard.tga");
 }
 
-void EntityPanel::OnGuiRender(const Ref<ScriptPanel> &scriptPanel)
+void EntityPanel::OnGuiRender()
 {
-	OnGuiRenderSceneHierarchy(scriptPanel);
+	OnGuiRenderProperties();
 	OnGuiRenderMaterial();
 	OnGuiRenderMeshDebug();
 }
 
 
-void EntityPanel::SetContext(const Ref<Scene> &context)
+void EntityPanel::SetContext(const Shared<Scene> &context)
 {
 	m_Context = context;
 	if ( m_SelectionContext )
@@ -106,210 +92,107 @@ void EntityPanel::SetContext(const Ref<Scene> &context)
 
 }
 
-void EntityPanel::SetSelected(Entity entity)
+void EntityPanel::SetSelectedEntity(Entity entity)
 {
 	m_SelectionContext = entity;
 }
 
-void EntityPanel::OnGuiRenderSceneHierarchy(const Ref<ScriptPanel> &scriptPanel)
+void EntityPanel::OnGuiRenderProperties()
 {
-	ImGui::Begin("Scene Hierarchy");
-	if ( m_Context )
+	ImGui::Begin("Properties");
+	if ( m_SelectionContext )
 	{
-		m_Context->GetEntityRegistry().each([&](auto entity)
-											{
-												Entity e(entity, m_Context.Raw());
-												if ( e.HasComponent<IDComponent>() )
-													DrawEntityNode(e);
-											});
+		DrawComponents(m_SelectionContext);
 
-		bool createNewEntity = false;
-		if ( ImGui::BeginPopupContextWindow("Create Entity Context", 1, false) )
+		if ( ImGui::Button("Add Component") )
+			ImGui::OpenPopup("AddComponentPanel");
+
+		if ( ImGui::BeginPopup("AddComponentPanel") )
 		{
-			if ( ImGui::MenuItem("Create Entity") )
+			if ( !m_SelectionContext.HasComponent<CameraComponent>() )
 			{
-				createNewEntity = true;
-			}
-			ImGui::EndPopup();
-		}
-		if ( createNewEntity )
-		{
-			ImGui::SetNextWindowPos(ImGui::GetMainViewport()->GetCenter(), ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
-			ImGui::OpenPopup("Create new Entity");
-		}
-
-		ImGui::SetNextWindowContentSize(ImVec2(400, 0.0f));
-		if ( ImGui::BeginPopupModal("Create new Entity", nullptr, ImGuiWindowFlags_AlwaysAutoResize) )
-		{
-			static std::string entityName;
-			static bool meshComponent = false;
-			static bool scriptComponent = false;
-			static int scriptChosen = 0;
-			static bool cameraComponent = false;
-			static bool spriteRendererComponent = false;
-			static bool rigidBody2DComponent = false;
-			static bool boxCollider2DComponent = false;
-			static bool circleCollider2DComponent = false;
-
-			bool badEntityName = false;
-
-			Gui::BeginPropertyGrid();
-			Gui::Property("Name", entityName);
-			Gui::Property("Mesh", meshComponent);
-			Gui::Property("Script", scriptComponent);
-			if ( scriptComponent )
-			{
-				ImGui::NextColumn();
-				std::ostringstream oss;
-				for ( const auto &scriptName : scriptPanel->GetScriptStats() ) { oss << scriptName.Class << '\0'; }
-				oss << '\0';
-				ImGui::Combo("##EntityCreateScriptComboOption", &scriptChosen, oss.str().c_str());
-				ImGui::NextColumn();
-			}
-			Gui::Property("Camera", cameraComponent);
-			Gui::Property("Sprite", spriteRendererComponent);
-			Gui::Property("Rigid Body 2D", rigidBody2DComponent);
-			Gui::Property("Box Collider 2D", boxCollider2DComponent);
-			Gui::Property("Circle Collider 2D", circleCollider2DComponent);
-
-			if ( ImGui::Button("Cancel") )
-			{
-				scriptChosen = 0;
-				ImGui::CloseCurrentPopup();
-			}
-			ImGui::SameLine(0, 5);
-			if ( ImGui::Button("Create") )
-			{
-				if ( entityName.empty() )
+				if ( ImGui::Button("Camera") )
 				{
-					badEntityName = true;
-				}
-				else
-				{
-					Entity newEntity = m_Context->CreateEntity(entityName);
-					if ( meshComponent )
-					{
-						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
-						newEntity.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
-						meshComponent = false;
-					}
-					if ( scriptComponent )
-					{
-						newEntity.AddComponent<ScriptComponent>(scriptPanel->GetScriptStats().at(scriptChosen).Full);
-						scriptComponent = false;
-					}
-					if ( cameraComponent )
-					{
-						newEntity.AddComponent<CameraComponent>();
-						cameraComponent = false;
-					}
-					if ( spriteRendererComponent )
-					{
-						newEntity.AddComponent<SpriteRendererComponent>();
-						spriteRendererComponent = false;
-					}
-					if ( rigidBody2DComponent )
-					{
-						newEntity.AddComponent<RigidBody2DComponent>();
-						rigidBody2DComponent = false;
-					}
-					if ( boxCollider2DComponent )
-					{
-						newEntity.AddComponent<BoxCollider2DComponent>();
-						boxCollider2DComponent = false;
-					}
-					if ( circleCollider2DComponent )
-					{
-						newEntity.AddComponent<CircleCollider2DComponent>();
-						circleCollider2DComponent = false;
-					}
-					entityName.clear();
+					m_SelectionContext.AddComponent<CameraComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-
-			Gui::InfoModal("Bad Entity Name", "Entity must have a name", badEntityName);
-
-			Gui::EndPropertyGrid();
-
+			if ( !m_SelectionContext.HasComponent<MeshComponent>() )
+			{
+				if ( ImGui::Button("Mesh") )
+				{
+					const String defaultMeshPath = "Assets/meshes/Cube1m.fbx";
+					m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<ScriptComponent>() )
+			{
+				if ( ImGui::Button("Script") )
+				{
+					m_SelectionContext.AddComponent<ScriptComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<SpriteRendererComponent>() )
+			{
+				if ( ImGui::Button("Sprite Renderer") )
+				{
+					m_SelectionContext.AddComponent<SpriteRendererComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<RigidBody2DComponent>() )
+			{
+				if ( ImGui::Button("Rigidbody 2D") )
+				{
+					m_SelectionContext.AddComponent<RigidBody2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<BoxCollider2DComponent>() )
+			{
+				if ( ImGui::Button("Box Collider 2D") )
+				{
+					m_SelectionContext.AddComponent<BoxCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<CircleCollider2DComponent>() )
+			{
+				if ( ImGui::Button("Circle Collider 2D") )
+				{
+					m_SelectionContext.AddComponent<CircleCollider2DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<RigidBody3DComponent>() )
+			{
+				if ( ImGui::Button("Rigidbody 3D") )
+				{
+					m_SelectionContext.AddComponent<RigidBody3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<BoxCollider3DComponent>() )
+			{
+				if ( ImGui::Button("Box Collider 3D") )
+				{
+					m_SelectionContext.AddComponent<BoxCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<SphereCollider3DComponent>() )
+			{
+				if ( ImGui::Button("Sphere Collider 3D") )
+				{
+					m_SelectionContext.AddComponent<SphereCollider3DComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			ImGui::EndPopup();
 		}
-
-		ImGui::End();
-
-		ImGui::Begin("Properties");
-
-		if ( m_SelectionContext )
-		{
-			DrawComponents(m_SelectionContext);
-
-			if ( ImGui::Button("Add Component") )
-				ImGui::OpenPopup("AddComponentPanel");
-
-			if ( ImGui::BeginPopup("AddComponentPanel") )
-			{
-				if ( !m_SelectionContext.HasComponent<CameraComponent>() )
-				{
-					if ( ImGui::Button("Camera") )
-					{
-						m_SelectionContext.AddComponent<CameraComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<MeshComponent>() )
-				{
-					if ( ImGui::Button("Mesh") )
-					{
-						const std::string defaultMeshPath = "Assets/meshes/Cube1m.fbx";
-						m_SelectionContext.AddComponent<MeshComponent>(Ref<Mesh>::Create(defaultMeshPath));
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<ScriptComponent>() )
-				{
-					if ( ImGui::Button("Script") )
-					{
-						m_SelectionContext.AddComponent<ScriptComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<SpriteRendererComponent>() )
-				{
-					if ( ImGui::Button("Sprite Renderer") )
-					{
-						m_SelectionContext.AddComponent<SpriteRendererComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<RigidBody2DComponent>() )
-				{
-					if ( ImGui::Button("Rigidbody 2D") )
-					{
-						m_SelectionContext.AddComponent<RigidBody2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<BoxCollider2DComponent>() )
-				{
-					if ( ImGui::Button("Box Collider 2D") )
-					{
-						m_SelectionContext.AddComponent<BoxCollider2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				if ( !m_SelectionContext.HasComponent<CircleCollider2DComponent>() )
-				{
-					if ( ImGui::Button("Circle Collider 2D") )
-					{
-						m_SelectionContext.AddComponent<CircleCollider2DComponent>();
-						ImGui::CloseCurrentPopup();
-					}
-				}
-				ImGui::EndPopup();
-			}
-		}
 	}
-
 	ImGui::End();
 }
 
@@ -322,7 +205,7 @@ void EntityPanel::OnGuiRenderMaterial()
 		Entity selectedEntity = m_SelectionContext;
 		if ( selectedEntity.HasComponent<MeshComponent>() )
 		{
-			Ref<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
+			Shared<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
 			if ( mesh )
 			{
 				auto materials = mesh->GetMaterials();
@@ -356,9 +239,9 @@ void EntityPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
-							auto &albedoColor = materialInstance->Get<glm::vec3>("u_AlbedoColor");
+							auto &albedoColor = materialInstance->Get<Vector3f>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
-							Ref<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
+							Shared<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -367,14 +250,14 @@ void EntityPanel::OnGuiRenderMaterial()
 								{
 									ImGui::BeginTooltip();
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(albedoMap->GetPath().c_str());
+									ImGui::TextUnformatted(albedoMap->GetFilepath().string().c_str());
 									ImGui::PopTextWrapPos();
 									ImGui::Image(reinterpret_cast<void *>(albedoMap->GetRendererID()), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
@@ -403,7 +286,7 @@ void EntityPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
-							Ref<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
+							Shared<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
 							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -412,14 +295,14 @@ void EntityPanel::OnGuiRenderMaterial()
 								{
 									ImGui::BeginTooltip();
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(normalMap->GetPath().c_str());
+									ImGui::TextUnformatted(normalMap->GetFilepath().string().c_str());
 									ImGui::PopTextWrapPos();
 									ImGui::Image(reinterpret_cast<void *>(normalMap->GetRendererID()), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										normalMap = Texture2D::Create(filepath.string());
@@ -439,7 +322,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
-							Ref<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
+							Shared<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
 							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -448,14 +331,14 @@ void EntityPanel::OnGuiRenderMaterial()
 								{
 									ImGui::BeginTooltip();
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(metalnessMap->GetPath().c_str());
+									ImGui::TextUnformatted(metalnessMap->GetFilepath().string().c_str());
 									ImGui::PopTextWrapPos();
 									ImGui::Image(reinterpret_cast<void *>(metalnessMap->GetRendererID()), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										metalnessMap = Texture2D::Create(filepath.string());
@@ -477,7 +360,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
-							Ref<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
+							Shared<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
 							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -486,14 +369,14 @@ void EntityPanel::OnGuiRenderMaterial()
 								{
 									ImGui::BeginTooltip();
 									ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
-									ImGui::TextUnformatted(roughnessMap->GetPath().c_str());
+									ImGui::TextUnformatted(roughnessMap->GetFilepath().string().c_str());
 									ImGui::PopTextWrapPos();
 									ImGui::Image(reinterpret_cast<void *>(roughnessMap->GetRendererID()), ImVec2(384, 384));
 									ImGui::EndTooltip();
 								}
 								if ( ImGui::IsItemClicked() )
 								{
-									const std::filesystem::path filepath = FileIOManager::OpenFile();
+									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
 										roughnessMap = Texture2D::Create(filepath.string());
@@ -526,7 +409,7 @@ void EntityPanel::OnGuiRenderMeshDebug()
 	}
 	else if ( m_SelectionContext.HasComponent<MeshComponent>() )
 	{
-		Ref<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
+		Shared<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
 		ImGui::TextWrapped("File: %s", mesh->GetFilepath().c_str());
 
 		if ( mesh->m_IsAnimated )
@@ -548,96 +431,6 @@ void EntityPanel::OnGuiRenderMeshDebug()
 	ImGui::End();
 }
 
-void EntityPanel::DrawEntityNode(Entity entity)
-{
-	std::string name = "Unnamed";
-	if ( entity.HasComponent<TagComponent>() )
-		name = entity.GetComponent<TagComponent>().Tag;
-
-	const ImGuiTreeNodeFlags node_flags = (entity == m_SelectionContext ? ImGuiTreeNodeFlags_Selected : 0) | ImGuiTreeNodeFlags_OpenOnArrow;
-
-	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void *>(&entity.GetComponent<IDComponent>().ID), node_flags, name.c_str());
-	if ( ImGui::IsItemClicked() )
-	{
-		m_SelectionContext = entity;
-		if ( m_SelectionChangedCallback )
-			m_SelectionChangedCallback(m_SelectionContext);
-	}
-
-	bool entityDeleted = false;
-	if ( ImGui::BeginPopupContextItem() )
-	{
-		if ( ImGui::MenuItem("Delete") )
-			entityDeleted = true;
-
-		ImGui::EndPopup();
-	}
-	if ( opened )
-	{
-		if ( entity.HasComponent<MeshComponent>() )
-		{
-			const auto mesh = entity.GetComponent<MeshComponent>().Mesh;
-			if ( mesh )
-				DrawMeshNode(mesh, entity.GetComponent<IDComponent>().ID);
-		}
-		ImGui::TreePop();
-	}
-
-	// Defer deletion until end of node UI
-	if ( entityDeleted )
-	{
-		m_Context->DestroyEntity(entity);
-		if ( entity == m_SelectionContext )
-			m_SelectionContext = {};
-
-		m_EntityDeletedCallback(entity);
-	}
-}
-
-void EntityPanel::DrawMeshNode(const Ref<Mesh> &mesh, UUID &entityUUID) const
-{
-	std::ostringstream oss;
-	oss << "Mesh##" << entityUUID;
-
-	// Mesh Hierarchy
-	if ( ImGui::TreeNode(oss.str().c_str()) )
-	{
-		auto *rootNode = mesh->m_Scene->mRootNode;
-		MeshNodeHierarchy(mesh, rootNode);
-		ImGui::TreePop();
-	}
-}
-
-void EntityPanel::MeshNodeHierarchy(const Ref<Mesh> &mesh,
-									aiNode *node,
-									const glm::mat4 &parentTransform,
-									Uint32 level) const
-{
-	const glm::mat4 localTransform = Mat4FromAssimpMat4(node->mTransformation);
-	const glm::mat4 transform = parentTransform * localTransform;
-
-	if ( ImGui::TreeNode(node->mName.C_Str()) )
-	{
-		{
-			auto [translation, rotation, scale] = GetTransformDecomposition(transform);
-			ImGui::Text("World Transform");
-			ImGui::Text("  Translation: %.2f, %.2f, %.2f", translation.x, translation.y, translation.z);
-			ImGui::Text("  Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
-		}
-		{
-			auto [translation, rotation, scale] = GetTransformDecomposition(localTransform);
-			ImGui::Text("Local Transform");
-			ImGui::Text("  Translation: %.2f, %.2f, %.2f", translation.x, translation.y, translation.z);
-			ImGui::Text("  Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
-		}
-
-		for ( Uint32 i = 0; i < node->mNumChildren; i++ )
-			MeshNodeHierarchy(mesh, node->mChildren[i], transform, level + 1);
-
-		ImGui::TreePop();
-	}
-}
-
 void EntityPanel::DrawComponents(Entity entity)
 {
 	ImGui::AlignTextToFramePadding();
@@ -646,80 +439,57 @@ void EntityPanel::DrawComponents(Entity entity)
 
 	if ( entity.HasComponent<TagComponent>() )
 	{
-		auto &tag = entity.GetComponent<TagComponent>().Tag;
-		char buffer[256];
-		memset(buffer, 0, 256);
-		memcpy(buffer, tag.c_str(), tag.length());
-		if ( ImGui::InputText("##Tag", buffer, 256) )
+		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TagComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Identifiers") )
 		{
-			tag = std::string(buffer);
+			auto &tag = entity.GetComponent<TagComponent>().Tag;
+			Gui::BeginPropertyGrid();
+			// ID
+			Gui::Property("ID", std::to_string(static_cast<Uint64>(id)));
+			Gui::Property("Tag", tag);
+			Gui::EndPropertyGrid();
+			ImGui::TreePop();
 		}
+		ImGui::Separator();
 	}
-
-	// ID
-	ImGui::SameLine();
-	ImGui::TextDisabled("%llx", static_cast<Uint64>(id));
-
-	ImGui::Separator();
 
 	if ( entity.HasComponent<TransformComponent>() )
 	{
 		auto &tc = entity.GetComponent<TransformComponent>();
 		if ( ImGui::TreeNodeEx(reinterpret_cast<void *>(static_cast<Uint32>(entity) | typeid(TransformComponent).hash_code()), ImGuiTreeNodeFlags_DefaultOpen, "Transform") )
 		{
-			auto [translation, rotationQuat, scale] = GetTransformDecomposition(tc);
-			glm::vec3 rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 
-			ImGui::Columns(2);
-			ImGui::Text("Translation");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
+			Gui::BeginPropertyGrid();
+
+			auto dc = Misc::GetTransformDecomposition(tc);
+			Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
 
 			bool updateTransform = false;
-
-			if ( ImGui::DragFloat3("##translation", glm::value_ptr(translation), 0.25f) )
-			{
-				//tc.Transform[3] = glm::vec4(translation, 1.0f);
-				updateTransform = true;
-			}
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-
-			ImGui::Text("Rotation");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			if ( ImGui::DragFloat3("##rotation", glm::value_ptr(rotation), 0.25f) )
-			{
-				updateTransform = true;
-				// tc.Transform[3] = glm::vec4(translation, 1.0f);
-			}
-
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
-
-			ImGui::Text("Scale");
-			ImGui::NextColumn();
-			ImGui::PushItemWidth(-1);
-
-			if ( ImGui::DragFloat3("##scale", glm::value_ptr(scale), 0.25f) )
+			if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
 			{
 				updateTransform = true;
 			}
 
-			ImGui::PopItemWidth();
-			ImGui::NextColumn();
+			if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
+			{
+				updateTransform = true;
+			}
 
-			ImGui::Columns(1);
+			if ( Gui::Property("Scale", dc.Scale, 0.15f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f, 1.0f, 1.0f); updateTransform = true; }) )
+			{
+				Misc::LowClamp(dc.Scale.x, 0.15f);
+				Misc::LowClamp(dc.Scale.y, 0.15f);
+				Misc::LowClamp(dc.Scale.z, 0.15f);
+				updateTransform = true;
+			}
+
+			Gui::EndPropertyGrid();
 
 			if ( updateTransform )
 			{
-				tc.Transform = glm::translate(glm::mat4(1.0f), translation) *
+				tc.Transform = glm::translate(dc.Translation) *
 					glm::toMat4(glm::quat(glm::radians(rotation))) *
-					glm::scale(glm::mat4(1.0f), scale);
+					glm::scale(dc.Scale);
 			}
-
 			ImGui::TreePop();
 		}
 		ImGui::Separator();
@@ -728,7 +498,12 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<MeshComponent>("Mesh", entity, [](MeshComponent &mc)
 								 {
 									 Gui::BeginPropertyGrid();
-									 Gui::Property("Name", mc.Mesh->GetFilepath().c_str());
+									 Gui::Property("Name", mc.Mesh->GetFilepath(), "Open...", [&]
+												   {
+													   const Filepath filepath = FileIOManager::OpenFile();
+													   if ( !filepath.empty() )
+														   mc.Mesh = Shared<Mesh>::Create(filepath.string());
+												   });
 
 									 if ( ImGui::BeginDragDropTarget() )
 									 {
@@ -736,21 +511,40 @@ void EntityPanel::DrawComponents(Entity entity)
 										 {
 											 SE_CORE_ASSERT(payload->DataSize == sizeof(ScriptPanel::Drop));
 											 const auto drop = *static_cast<ScriptPanel::Drop *>(payload->Data);
-											 mc.Mesh = Ref<Mesh>::Create(drop.Stat->Path.string());
+											 mc.Mesh = Shared<Mesh>::Create(drop.Stat->Path.string());
 											 delete drop.Stat;
 										 }
 										 ImGui::EndDragDropTarget();
 									 }
 
-									 ImGui::NextColumn();
-									 if ( ImGui::Button("Open...##openmesh") )
+									 const auto &transform = mc.Mesh->GetLocalTransform();
+									 auto dc = Misc::GetTransformDecomposition(transform);
+									 Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
+
+									 bool updateTransform = false;
+									 if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
 									 {
-										 const fs::path filepath = FileIOManager::OpenFile();
-										 if ( !filepath.empty() )
-											 mc.Mesh = Ref<Mesh>::Create(filepath.string());
+										 updateTransform = true;
+									 }
+									 if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
+									 {
+										 updateTransform = true;
+									 }
+									 if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f); updateTransform = true; }) )
+									 {
+										 if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
+											 updateTransform = true;
 									 }
 
 									 Gui::EndPropertyGrid();
+
+									 if ( updateTransform )
+									 {
+										 const Matrix4f newTransform = glm::translate(dc.Translation) *
+											 glm::toMat4(glm::quat(glm::radians(rotation))) *
+											 glm::scale(dc.Scale);
+										 mc.Mesh->SetLocalTransform(newTransform);
+									 }
 								 });
 
 	DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent &cc)
@@ -775,6 +569,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									   }
 
 									   Gui::BeginPropertyGrid();
+
 									   // Perspective parameters
 									   if ( cc.Camera->GetProjectionMode() == SceneCamera::ProjectionMode::Perspective )
 									   {
@@ -807,7 +602,37 @@ void EntityPanel::DrawComponents(Entity entity)
 											   cc.Camera->SetOrthographicFarClip(farClip);
 									   }
 
+									   Gui::Property("Mesh", cc.DrawMesh);
+									   Gui::Property("Frustum", cc.DrawFrustum);
+
+									   const auto &transform = cc.CameraMesh->GetLocalTransform();
+									   auto dc = Misc::GetTransformDecomposition(transform);
+									   Vector3f rotation = glm::degrees(glm::eulerAngles(dc.Rotation));
+
+									   bool updateTransform = false;
+									   if ( Gui::Property("Translation", dc.Translation, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Translation = Vector3f(0.0f); updateTransform = true; }) )
+									   {
+										   updateTransform = true;
+									   }
+									   if ( Gui::Property("Rotation", rotation, 0.0f, 0.0f, 0.5f, Gui::PropertyFlag::Drag, [&rotation, &updateTransform] {rotation = Vector3f(0.0f); updateTransform = true; }) )
+									   {
+										   updateTransform = true;
+									   }
+									   if ( Gui::Property("Scale", dc.Scale, 0.0f, 0.0f, 0.15f, Gui::PropertyFlag::Drag, [&dc, &updateTransform] {dc.Scale = Vector3f(1.0f); updateTransform = true; }) )
+									   {
+										   if ( dc.Scale.x > 0.0f && dc.Scale.y > 0.0f && dc.Scale.z > 0.0f )
+											   updateTransform = true;
+									   }
+
 									   Gui::EndPropertyGrid();
+
+									   if ( updateTransform )
+									   {
+										   const Matrix4f newTransform = glm::translate(dc.Translation) *
+											   glm::toMat4(glm::quat(glm::radians(rotation))) *
+											   glm::scale(dc.Scale);
+										   cc.CameraMesh->SetLocalTransform(newTransform);
+									   }
 								   });
 
 	DrawComponent<SpriteRendererComponent>("Sprite Renderer", entity, [](SpriteRendererComponent &mc)
@@ -817,7 +642,7 @@ void EntityPanel::DrawComponents(Entity entity)
 
 	DrawComponent<ScriptComponent>("Script", entity, [=](ScriptComponent &sc) mutable
 								   {
-									   static std::string cachedNewModuleName;
+									   static String cachedNewModuleName;
 
 									   Gui::BeginPropertyGrid();
 									   Gui::Property("Module Name", sc.ModuleName.c_str());
@@ -839,7 +664,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   // Shutdown old script
 												   if ( ScriptEngine::ModuleExists(sc.ModuleName) )
 													   ScriptEngine::ShutdownScriptEntity(entity, sc.ModuleName);
-												   sc.ChangeModule(std::move(cachedNewModuleName));
+												   sc.ChangeModule(Move(cachedNewModuleName));
 												   // Startup new script
 												   if ( ScriptEngine::ModuleExists(sc.ModuleName) )
 													   ScriptEngine::InitScriptEntity(entity);
@@ -870,13 +695,13 @@ void EntityPanel::DrawComponents(Entity entity)
 											   auto &publicFields = moduleFieldMap.at(sc.ModuleName);
 											   for ( auto &[name, field] : publicFields )
 											   {
-												   const bool isRuntime = m_Context->IsPlaying() && field.IsRuntimeAvailable();
+												   const bool isRuntime = Shared<RuntimeScene>::Cast(m_Context) && field.IsRuntimeAvailable();
 												   switch ( field.Type )
 												   {
 												   case FieldType::Int:
 												   {
 													   int value = isRuntime ? field.GetRuntimeValue<int>() : field.GetStoredValue<int>();
-													   if ( Gui::Property(field.Name, value) )
+													   if ( Gui::Property(field.Name, value, 0, 0, 1, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -888,7 +713,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   case FieldType::Float:
 												   {
 													   float value = isRuntime ? field.GetRuntimeValue<float>() : field.GetStoredValue<float>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -899,8 +724,8 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec2:
 												   {
-													   glm::vec2 value = isRuntime ? field.GetRuntimeValue<glm::vec2>() : field.GetStoredValue<glm::vec2>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   Vector2f value = isRuntime ? field.GetRuntimeValue<Vector2f>() : field.GetStoredValue<Vector2f>();
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -911,8 +736,8 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec3:
 												   {
-													   glm::vec3 value = isRuntime ? field.GetRuntimeValue<glm::vec3>() : field.GetStoredValue<glm::vec3>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   Vector3f value = isRuntime ? field.GetRuntimeValue<Vector3f>() : field.GetStoredValue<Vector3f>();
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -923,8 +748,8 @@ void EntityPanel::DrawComponents(Entity entity)
 												   }
 												   case FieldType::Vec4:
 												   {
-													   glm::vec4 value = isRuntime ? field.GetRuntimeValue<glm::vec4>() : field.GetStoredValue<glm::vec4>();
-													   if ( Gui::Property(field.Name, value, 0.2f) )
+													   Vector4f value = isRuntime ? field.GetRuntimeValue<Vector4f>() : field.GetStoredValue<Vector4f>();
+													   if ( Gui::Property(field.Name, value, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag) )
 													   {
 														   if ( isRuntime )
 															   field.SetRuntimeValue(value);
@@ -975,24 +800,66 @@ void EntityPanel::DrawComponents(Entity entity)
 	DrawComponent<BoxCollider2DComponent>("Box Collider 2D", entity, [](BoxCollider2DComponent &bc2dc)
 										  {
 											  Gui::BeginPropertyGrid();
-
-											  Gui::Property("Offset", bc2dc.Offset);
-											  Gui::Property("Size", bc2dc.Size);
-											  Gui::Property("Density", bc2dc.Density);
-											  Gui::Property("Friction", bc2dc.Friction);
-
+											  Gui::Property("Translation", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Offset", bc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Size", bc2dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Density", bc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Friction", bc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Bounding", bc2dc.DrawBounding);
 											  Gui::EndPropertyGrid();
 										  });
 
 	DrawComponent<CircleCollider2DComponent>("Circle Collider 2D", entity, [](CircleCollider2DComponent &cc2dc)
 											 {
 												 Gui::BeginPropertyGrid();
+												 Gui::Property("Offset", cc2dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Radius", cc2dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Density", cc2dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Friction", cc2dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Bounding", cc2dc.DrawBounding);
+												 Gui::EndPropertyGrid();
+											 });
+	DrawComponent<RigidBody3DComponent>("Rigidbody 3D", entity, [](RigidBody3DComponent &rb3dc)
+										{
+											// Rigidbody2D Type
+											const char *rb3dTypeStrings[] = { "Static", "Dynamic", "Kinematic" };
+											const char *currentType = rb3dTypeStrings[static_cast<int>(rb3dc.BodyType)];
+											if ( ImGui::BeginCombo("Type", currentType) )
+											{
+												for ( int type = 0; type < 3; type++ )
+												{
+													const bool is_selected = (currentType == rb3dTypeStrings[type]);
+													if ( ImGui::Selectable(rb3dTypeStrings[type], is_selected) )
+													{
+														currentType = rb3dTypeStrings[type];
+														rb3dc.BodyType = static_cast<RigidBody3DComponent::Type>(type);
+													}
+													if ( is_selected )
+														ImGui::SetItemDefaultFocus();
+												}
+												ImGui::EndCombo();
+											}
+										});
 
-												 Gui::Property("Offset", cc2dc.Offset);
-												 Gui::Property("Radius", cc2dc.Radius);
-												 Gui::Property("Density", cc2dc.Density);
-												 Gui::Property("Friction", cc2dc.Friction);
+	DrawComponent<BoxCollider3DComponent>("Box Collider 3D", entity, [](BoxCollider3DComponent &bc3dc)
+										  {
+											  Gui::BeginPropertyGrid();
+											  Gui::Property("Offset", bc3dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Size", bc3dc.Size, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Density", bc3dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Friction", bc3dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+											  Gui::Property("Bounding", bc3dc.DrawBounding);
+											  Gui::EndPropertyGrid();
+										  });
 
+	DrawComponent<SphereCollider3DComponent>("Circle Collider 3D", entity, [](SphereCollider3DComponent &cc3dc)
+											 {
+												 Gui::BeginPropertyGrid();
+												 Gui::Property("Offset", cc3dc.Offset, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Radius", cc3dc.Radius, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Density", cc3dc.Density, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Friction", cc3dc.Friction, 0.0f, 0.0f, 0.05f, Gui::PropertyFlag::Drag);
+												 Gui::Property("Bounding", cc3dc.DrawBounding);
 												 Gui::EndPropertyGrid();
 											 });
 }

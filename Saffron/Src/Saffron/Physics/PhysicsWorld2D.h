@@ -1,11 +1,12 @@
 #pragma once
 
+#include "Saffron/Base.h"
+
 class b2World;
 
 namespace Se
 {
 class Scene;
-
 class PhysicsWorld2D
 {
 public:
@@ -18,14 +19,16 @@ public:
 	void OnUpdate();
 	void OnGuiRender();
 	void OnStart();
+	void OnStop();
 
-	glm::vec2 GetGravity() const;
-	void SetGravity(const glm::vec2 &gravity);
+	Vector2f GetGravity() const;
+	void SetGravity(const Vector2f &gravity);
 
 private:
 	b2World *m_NativeWorld;
 	Scene *m_Scene;
 	class Entity *m_PhysicsBodyEntityBuffer;
+	bool m_FilledWorld = false;
 };
 }
 

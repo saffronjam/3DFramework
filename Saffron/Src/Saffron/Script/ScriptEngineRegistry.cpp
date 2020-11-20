@@ -16,8 +16,8 @@ namespace Se
 	RegisterFunctionBuffer.str("");\
 	RegisterFunctionBuffer.clear();
 
-std::unordered_map<MonoType *, std::function<bool(Entity &)>> s_HasComponentFuncs;
-std::unordered_map<MonoType *, std::function<void(Entity &)>> s_CreateComponentFuncs;
+UnorderedMap<MonoType *, Function<bool(Entity &)>> s_HasComponentFuncs;
+UnorderedMap<MonoType *, Function<void(Entity &)>> s_CreateComponentFuncs;
 
 extern MonoImage *s_CoreAssemblyImage;
 
@@ -44,26 +44,25 @@ static void InitComponentTypes()
 	ComponentRegisterType(RigidBody2DComponent);
 	ComponentRegisterType(BoxCollider2DComponent);
 	ComponentRegisterType(CircleCollider2DComponent);
+	ComponentRegisterType(RigidBody3DComponent);
+	ComponentRegisterType(BoxCollider3DComponent);
+	ComponentRegisterType(SphereCollider3DComponent);
 }
 
 void ScriptEngineRegistry::RegisterAll()
 {
 	InitComponentTypes();
 
-	std::ostringstream RegisterFunctionBuffer;
+	OutputStringStream RegisterFunctionBuffer;
 
 	ADD_INTERNAL_CALL_MONO(Entity, GetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, CreateComponent);
 	ADD_INTERNAL_CALL_MONO(Entity, HasComponent);
-	ADD_INTERNAL_CALL_MONO(Entity, FindEntityByTag);
+	ADD_INTERNAL_CALL_MONO(Entity, GetEntity);
 
 	ADD_INTERNAL_CALL_MONO(MeshComponent, GetMesh);
 	ADD_INTERNAL_CALL_MONO(MeshComponent, SetMesh);
-
-	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, ApplyLinearImpulse);
-	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, GetLinearVelocity);
-	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, SetLinearVelocity);
 
 	ADD_INTERNAL_CALL_MONO(Input, IsKeyPressed);
 	ADD_INTERNAL_CALL_MONO(Input, IsMouseButtonPressed);
@@ -101,6 +100,10 @@ void ScriptEngineRegistry::RegisterAll()
 	ADD_INTERNAL_CALL_MONO(ScriptComponent, GetModuleName);
 	ADD_INTERNAL_CALL_MONO(ScriptComponent, SetModuleName);
 
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, ApplyLinearImpulse);
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, GetLinearVelocity);
+	ADD_INTERNAL_CALL_MONO(RigidBody2DComponent, SetLinearVelocity);
+
 	ADD_INTERNAL_CALL_MONO(Collider2DComponent, GetOffset);
 	ADD_INTERNAL_CALL_MONO(Collider2DComponent, SetOffset);
 	ADD_INTERNAL_CALL_MONO(Collider2DComponent, GetDensity);
@@ -113,6 +116,23 @@ void ScriptEngineRegistry::RegisterAll()
 
 	ADD_INTERNAL_CALL_MONO(CircleCollider2DComponent, GetRadius);
 	ADD_INTERNAL_CALL_MONO(CircleCollider2DComponent, SetRadius);
+
+	ADD_INTERNAL_CALL_MONO(RigidBody3DComponent, ApplyLinearImpulse);
+	ADD_INTERNAL_CALL_MONO(RigidBody3DComponent, GetLinearVelocity);
+	ADD_INTERNAL_CALL_MONO(RigidBody3DComponent, SetLinearVelocity);
+
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, GetOffset);
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, SetOffset);
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, GetDensity);
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, SetDensity);
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, GetFriction);
+	ADD_INTERNAL_CALL_MONO(Collider3DComponent, SetFriction);
+
+	ADD_INTERNAL_CALL_MONO(BoxCollider3DComponent, GetSize);
+	ADD_INTERNAL_CALL_MONO(BoxCollider3DComponent, SetSize);
+
+	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, GetRadius);
+	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, SetRadius);
 
 }
 }

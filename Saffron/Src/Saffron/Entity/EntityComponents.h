@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Saffron/Core/UUID.h"
-#include "Saffron/Physics/PhysicsWorld2D.h"
+#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Scene/SceneCamera.h"
 
@@ -12,67 +12,65 @@ struct IDComponent
 	UUID ID = 0;
 };
 
-struct SceneComponent
-{
-	UUID SceneID;
-};
-
 struct TagComponent
 {
-	std::string Tag;
+	String Tag;
 
 	TagComponent() = default;
 	TagComponent(const TagComponent &other) = default;
-	explicit TagComponent(std::string tag)
-		: Tag(std::move(tag))
+	explicit TagComponent(String tag)
+		: Tag(Move(tag))
 	{
 	}
 
-	operator std::string &() { return Tag; }
-	operator const std::string &() const { return Tag; }
+	operator String &() { return Tag; }
+	operator const String &() const { return Tag; }
 };
 
 struct TransformComponent
 {
-	glm::mat4 Transform;
+	Matrix4f Transform;
 
-	TransformComponent() = default;
-	TransformComponent(const TransformComponent &other) = default;
-	explicit TransformComponent(const glm::mat4 &transform)
-		: Transform(transform)
+	TransformComponent()
+		: Transform(1)
 	{
 	}
+	TransformComponent(Matrix4f transform)
+		: Transform(Move(transform))
+	{
+	}
+	TransformComponent(const TransformComponent &other) = default;
 
-	operator glm::mat4 &() { return Transform; }
-	operator const glm::mat4 &() const { return Transform; }
+	operator Matrix4f &() { return Transform; }
+	operator const Matrix4f &() const { return Transform; }
 };
 
 struct MeshComponent
 {
-	Ref<Mesh> Mesh;
+	Shared<Mesh> Mesh;
 
 	MeshComponent() = default;
 	MeshComponent(const MeshComponent &other) = default;
-	explicit MeshComponent(const Ref<Se::Mesh> &mesh)
+	explicit MeshComponent(const Shared<Se::Mesh> &mesh)
 		: Mesh(mesh)
 	{
 	}
 
-	operator Ref<Se::Mesh>() const { return Mesh; }
+	operator Shared<Se::Mesh>() const { return Mesh; }
 };
 
 struct ScriptComponent
 {
-	std::string ModuleName;
-	std::string NamespaceName;
-	std::string ClassName;
+	String ModuleName;
+	String NamespaceName;
+	String ClassName;
 
 	ScriptComponent() = default;
 	ScriptComponent(const ScriptComponent &other) = default;
-	explicit ScriptComponent(std::string moduleName)
-		: ModuleName(std::move(moduleName))
+	explicit ScriptComponent(String moduleName)
+		: ModuleName(Move(moduleName))
 	{
-		if ( ModuleName.find('.') != std::string::npos )
+		if ( ModuleName.find('.') != String::npos )
 		{
 			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
 			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
@@ -83,10 +81,10 @@ struct ScriptComponent
 		}
 	}
 
-	void ChangeModule(std::string moduleName)
+	void ChangeModule(String moduleName)
 	{
-		ModuleName = std::move(moduleName);
-		if ( ModuleName.find('.') != std::string::npos )
+		ModuleName = Move(moduleName);
+		if ( ModuleName.find('.') != String::npos )
 		{
 			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
 			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
@@ -100,19 +98,28 @@ struct ScriptComponent
 
 struct CameraComponent
 {
-	Ref<SceneCamera> Camera;
+	Shared<SceneCamera> Camera;
 	bool Primary = true;
 
-	CameraComponent() = default;
+	Shared<Mesh> CameraMesh;
+	bool DrawMesh = true;
+	bool DrawFrustum = false;
+
+	CameraComponent()
+		: Camera(Shared<SceneCamera>::Create()),
+		CameraMesh(Shared<Mesh>::Create("Assets/Meshes/Camera.fbx"))
+	{
+		CameraMesh->GetMaterial()->Set<Vector3f>("u_AlbedoColor", { 0.0f, 0.0f,0.45 });
+	}
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator Ref<SceneCamera>() { return Camera; }
+	operator Shared<SceneCamera>() const { return Camera; }
 };
 
 struct SpriteRendererComponent
 {
-	glm::vec4 Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Ref<Texture2D> Texture;
+	Vector4f Color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	Shared<Texture2D> Texture;
 	float TilingFactor = 1.0f;
 
 	SpriteRendererComponent() = default;
@@ -121,8 +128,7 @@ struct SpriteRendererComponent
 
 struct RigidBody2DComponent
 {
-	enum class Type { Static, Dynamic, Kinematic };
-	Type BodyType;
+	enum class Type { Static, Dynamic, Kinematic } BodyType;
 	bool FixedRotation = false;
 
 	// Storage for runtime
@@ -134,10 +140,11 @@ struct RigidBody2DComponent
 
 struct Collider2DComponent
 {
-	glm::vec2 Offset = { 0.0f,0.0f };
+	Vector2f Offset = { 0.0f,0.0f };
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
+	bool DrawBounding = false;
 
 	// Storage for runtime
 	void *RuntimeFixture = nullptr;
@@ -145,7 +152,7 @@ struct Collider2DComponent
 
 struct BoxCollider2DComponent : Collider2DComponent
 {
-	glm::vec2 Size = { 1.0f, 1.0f };
+	Vector2f Size = { 1.0f, 1.0f };
 
 	BoxCollider2DComponent() = default;
 	BoxCollider2DComponent(const BoxCollider2DComponent &other) = default;
@@ -159,14 +166,45 @@ struct CircleCollider2DComponent : Collider2DComponent
 	CircleCollider2DComponent(const CircleCollider2DComponent &other) = default;
 };
 
-struct PhysicsWorld2DComponent
+struct RigidBody3DComponent
 {
-	PhysicsWorld2D World;
+	enum class Type { Static, Dynamic, Kinematic } BodyType;
 
-	PhysicsWorld2DComponent(Scene &scene)
-		: World(scene)
-	{
-	}
+	// Storage for runtime
+	void *RuntimeBody = nullptr;
+
+	RigidBody3DComponent() = default;
+	RigidBody3DComponent(const RigidBody3DComponent &other) = default;
 };
-}
 
+
+struct Collider3DComponent
+{
+	Vector3f Offset = { 0.0f,0.0f, 0.0f };
+
+	float Density = 1.0f;
+	float Friction = 1.0f;
+	bool DrawBounding = false;
+
+	// Storage for runtime
+	void *RuntimeFixture = nullptr;
+};
+
+
+struct BoxCollider3DComponent : Collider3DComponent
+{
+	Vector3f Size = { 1.0f, 1.0f, 1.0f };
+
+	BoxCollider3DComponent() = default;
+	BoxCollider3DComponent(const BoxCollider3DComponent &other) = default;
+};
+
+struct SphereCollider3DComponent : Collider3DComponent
+{
+	float Radius = 0.5f;
+
+	SphereCollider3DComponent() = default;
+	SphereCollider3DComponent(const SphereCollider3DComponent &other) = default;
+};
+
+}

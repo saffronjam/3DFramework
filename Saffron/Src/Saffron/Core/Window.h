@@ -1,35 +1,39 @@
 #pragma once
 
-#include <utility>
-#include <optional>
-
 #include "Saffron/Base.h"
 #include "Saffron/Core/Events/WindowEvent.h" 
 #include "Saffron/Core/Math/SaffronMath.h"
+#include "Saffron/Renderer/AntiAliasing.h"
 
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public RefCounted
+class Window : public ReferenceCounted, public Signaller
 {
 public:
-	using EventCallback = std::function<void(const Event &)>;
+	struct Signals
+	{
+		static SignalAggregate<const Event &> OnEvent;
+	};
 
 public:
 	struct Properties
 	{
-		std::string Title;
-		Uint32 Width;
-		Uint32 Height;
-		glm::vec2 Position;
-
-		explicit Properties(std::string title = "Saffron Engine",
+		explicit Properties(String title = "Saffron Engine",
 							Uint32 width = 1280,
 							Uint32 height = 720,
-							const glm::vec2 position = { 100.0f, 100.0f })
-			: Title(std::move(title)), Width(width), Height(height), Position(position)
+							const Vector2f position = { 100.0f, 100.0f },
+							AntiAliasing antiAliasing = AntiAliasing::Sample8)
+			: Title(Move(title)), Width(width), Height(height), Position(position), AntiAliasing(antiAliasing)
 		{
 		}
+
+		String Title;
+		Uint32 Width;
+		Uint32 Height;
+		Vector2f Position;
+		AntiAliasing AntiAliasing;
+
 	};
 
 public:
@@ -45,35 +49,38 @@ public:
 	template<typename T, typename...Params>
 	void PushEvent(Params &&...params);
 	void HandleBufferedEvents();
-	void SetEventCallback(const EventCallback &callback);
 
 	virtual Uint32 GetWidth() const;
 	virtual Uint32 GetHeight() const;
-	virtual const glm::vec2 &GetPosition() const;
+	virtual const Vector2f &GetPosition() const;
 	virtual void *GetNativeWindow() const = 0;
 
 	// Window attributes
-	virtual void SetTitle(std::string title) = 0;
+	void SetTitle(String title);
+	const String &GetTitle() const;
+	void SetWindowIcon(Filepath filepath);
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
+	void SetAntiAliasing(AntiAliasing antiAliasing);
+	AntiAliasing GetAntiAliasing() const;
 	virtual bool IsMinimized() const = 0;
 
-	static Ref<Window> Create(const Properties &properties = Properties());
+	static Shared<Window> Create(const Properties &properties = Properties());
 
 protected:
-	std::string m_Title;
-	glm::vec2 m_Position;
+	String m_Title;
+	Vector2f m_Position;
 	Uint32 m_Width, m_Height;
+	AntiAliasing m_AntiAliasing;
 
 private:
-	std::vector<Ref<Event>> m_Events;
-	std::optional<EventCallback> m_EventCallback;
+	ArrayList<Shared<Event>> m_Events;
 };
 
 template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
-	m_Events.emplace_back(Ref<T>::Create(std::forward<Params>(params)...));
+	m_Events.emplace_back(Shared<T>::Create(std::forward<Params>(params)...));
 	//SE_INFO("{0}", m_Events.back()->ToString());
 }
 

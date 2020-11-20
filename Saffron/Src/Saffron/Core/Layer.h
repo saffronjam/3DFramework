@@ -1,25 +1,25 @@
 #pragma once
 
-#include "Saffron/Core/Time.h"
 #include "Saffron/Core/Event.h"
+#include "Saffron/Core/BatchLoader.h"
 
 namespace Se {
 
-class Layer
+class Layer : public ReferenceCounted
 {
 public:
-	Layer(const std::string &name = "Layer");
-	virtual ~Layer();
+	Layer(const String &name = "Layer");
+	virtual ~Layer() = default;
 
-	virtual void OnAttach() {}
+	virtual void OnAttach(Shared<BatchLoader> &loader) {}
 	virtual void OnDetach() {}
 	virtual void OnUpdate() {}
 	virtual void OnGuiRender() {}
 	virtual void OnEvent(const Event &event) {}
 
-	const std::string &GetName() const { return m_DebugName; }
+	const String &GetName() const { return m_DebugName; }
 protected:
-	std::string m_DebugName;
+	String m_DebugName;
 };
 
 }

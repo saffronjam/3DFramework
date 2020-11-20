@@ -29,7 +29,7 @@ static GLenum ConvertToOpenGLTextureFormat(Texture::Format format)
 OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wrap wrap)
 	: m_RendererID(0), m_Format(format), m_Wrap(wrap), m_Width(width), m_Height(height)
 {
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance]() mutable
 					 {
 						 glGenTextures(1, &instance->m_RendererID);
@@ -55,23 +55,23 @@ OpenGLTexture2D::OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wra
 	m_ImageData.Allocate(width * height * GetBPP(m_Format));
 }
 
-OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
-	: m_Width(0), m_Height(0), m_FilePath(path)
+OpenGLTexture2D::OpenGLTexture2D(const Filepath &filepath, bool sRGB)
+	: m_Width(0), m_Height(0), m_Filepath(filepath)
 {
 	int width, height, channels;
-	if ( stbi_is_hdr(path.c_str()) )
+	if ( stbi_is_hdr(m_Filepath.string().c_str()) )
 	{
-		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", path, sRGB);
+		SE_CORE_INFO("Loading HDR texture {0}, sRGB={1}", m_Filepath.string(), sRGB);
 
-		m_ImageData = Buffer::Encapsulate(reinterpret_cast<Uint8 *>(stbi_loadf(path.c_str(), &width, &height, &channels, 0)));
+		m_ImageData = Buffer::Encapsulate(reinterpret_cast<Uint8 *>(stbi_loadf(m_Filepath.string().c_str(), &width, &height, &channels, 0)));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_IsHDR = true;
 		m_Format = Format::Float16;
 	}
 	else
 	{
-		SE_CORE_INFO("Loading texture {0}, sRGB={1}", path, sRGB);
-		m_ImageData = Buffer::Encapsulate(stbi_load(path.c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha));
+		SE_CORE_INFO("Loading texture {0}, sRGB={1}", m_Filepath.string(), sRGB);
+		m_ImageData = Buffer::Encapsulate(stbi_load(m_Filepath.string().c_str(), &width, &height, &channels, sRGB ? STBI_rgb : STBI_rgb_alpha));
 		SE_CORE_ASSERT(m_ImageData.Data(), "Could not read image!");
 		m_Format = Format::RGBA;
 	}
@@ -84,7 +84,7 @@ OpenGLTexture2D::OpenGLTexture2D(const std::string &path, bool sRGB)
 	m_Width = width;
 	m_Height = height;
 
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, sRGB]() mutable
 					 {
 						 // TODO: Consolidate properly
@@ -130,8 +130,17 @@ OpenGLTexture2D::~OpenGLTexture2D()
 
 void OpenGLTexture2D::Bind(Uint32 slot) const
 {
-	Ref<const OpenGLTexture2D> instance = this;
+	Shared<const OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, slot]() { glBindTextureUnit(slot, instance->m_RendererID); });
+}
+
+size_t OpenGLTexture2D::GetIdentifier()
+{
+	if ( !m_Filepath.empty() )
+	{
+		return Misc::HashFilepath(m_Filepath);
+	}
+	return UUID();
 }
 
 Uint32 OpenGLTexture2D::GetMipLevelCount() const
@@ -147,7 +156,7 @@ void OpenGLTexture2D::Lock()
 void OpenGLTexture2D::Unlock()
 {
 	m_Locked = false;
-	Ref<OpenGLTexture2D> instance = this;
+	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance]() { glTextureSubImage2D(
 		instance->m_RendererID,
 		0, 0, 0,
@@ -191,7 +200,7 @@ OpenGLTextureCube::OpenGLTextureCube(Format format, Uint32 width, Uint32 height)
 	: m_RendererID(0), m_Format(format), m_Width(width), m_Height(height)
 {
 	Uint32 levels = CalculateMipMapCount(width, height);
-	Ref<OpenGLTextureCube> instance = this;
+	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, levels]() mutable
 					 {
 						 glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &instance->m_RendererID);
@@ -207,12 +216,12 @@ OpenGLTextureCube::OpenGLTextureCube(Format format, Uint32 width, Uint32 height)
 
 // TODO: Revisit this, as currently env maps are being loaded as equirectangular 2D images
 //       so this is an old path
-OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
-	: m_Format(Format::None), m_Width(0), m_Height(0), m_FilePath(path)
+OpenGLTextureCube::OpenGLTextureCube(const Filepath &filepath)
+	: m_Format(Format::None), m_Width(0), m_Height(0), m_Filepath(filepath)
 {
 	int width, height, channels;
 	stbi_set_flip_vertically_on_load(false);
-	auto *stbiResult = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb);
+	auto *stbiResult = stbi_load(m_Filepath.string().c_str(), &width, &height, &channels, STBI_rgb);
 	m_ImageData = Buffer::Copy(stbiResult, width * height);
 	stbi_image_free(stbiResult);
 
@@ -266,7 +275,7 @@ OpenGLTextureCube::OpenGLTextureCube(const std::string &path)
 		faceIndex++;
 	}
 
-	Ref<OpenGLTextureCube> instance = this;
+	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, faceWidth, faceHeight, faces]() mutable
 					 {
 						 glGenTextures(1, &instance->m_RendererID);
@@ -306,7 +315,7 @@ OpenGLTextureCube::~OpenGLTextureCube()
 
 void OpenGLTextureCube::Bind(Uint32 slot) const
 {
-	Ref<const OpenGLTextureCube> instance = this;
+	Shared<const OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, slot]() { glBindTextureUnit(slot, instance->m_RendererID); });
 }
 

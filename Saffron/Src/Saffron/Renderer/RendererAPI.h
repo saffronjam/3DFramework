@@ -17,9 +17,9 @@ public:
 
 	struct Capabilities
 	{
-		std::string Vendor;
-		std::string Renderer;
-		std::string Version;
+		String Vendor;
+		String Renderer;
+		String Version;
 
 		int MaxSamples = 0;
 		float MaxAnisotropy = 0.0f;
@@ -42,11 +42,9 @@ public:
 	static Type Current() { return m_sCurrentAPI; }
 
 private:
-	static void LoadRequiredAssets();
-
-private:
 	static Type m_sCurrentAPI;
 	static Capabilities m_sCapabilities;
+	static float m_LineThickness;
 };
 
 //RendererAPI::Capabilities RendererAPI::m_sCapabilities = {};

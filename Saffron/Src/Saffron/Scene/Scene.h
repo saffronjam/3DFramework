@@ -1,14 +1,14 @@
 #pragma once
 
-#include <unordered_map>
+#include "Saffron/Editor/ViewportPane.h"
 
-#include "Saffron/Core/Time.h"
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Entity/Entity.h"
-#include "Saffron/Editor/EditorCamera.h"
 #include "Saffron/Entity/EntityRegistry.h"
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/Material.h"
+#include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Scene/SceneComponents.h"
 
 namespace Se
 {
@@ -16,88 +16,79 @@ namespace Se
 class Entity;
 using EntityMap = std::unordered_map<UUID, Entity>;
 
-class Scene : public RefCounted
+class Scene : public ReferenceCounted
 {
 public:
 	struct Environment
 	{
-		std::string FilePath;
-		Ref<TextureCube> RadianceMap;
-		Ref<TextureCube> IrradianceMap;
+		String FilePath;
+		Shared<TextureCube> RadianceMap;
+		Shared<TextureCube> IrradianceMap;
 
-		static Environment Load(const std::string &filepath);
+		static Environment Load(const String &filepath);
 	};
 
 	struct Light
 	{
-		glm::vec3 Direction = { 0.0f, 0.0f, 0.0f };
-		glm::vec3 Radiance = { 0.0f, 0.0f, 0.0f };
+		Vector3f Direction = { 0.0f, 0.0f, 0.0f };
+		Vector3f Radiance = { 0.0f, 0.0f, 0.0f };
 
 		float Multiplier = 1.0f;
 	};
 
 	struct Skybox
 	{
-		Ref<TextureCube> Texture;
-		Ref<MaterialInstance> Material;
+		Shared<TextureCube> Texture;
+		Shared<MaterialInstance> Material;
 	};
 
 public:
-	explicit Scene(std::string name = "Scene");
+	explicit Scene();
 	~Scene();
 
-	void OnUpdate(Time ts);
-	void OnRenderRuntime(Time ts);
-	void OnRenderEditor(Time ts, const EditorCamera &editorCamera);
-	void OnEvent(const Event &event);
-	void OnGuiRender();
-	void OnRuntimeStart();
-	void OnRuntimeStop();
+	virtual void OnUpdate() = 0;
+	virtual void OnRender() = 0;
+	virtual void OnEvent(const Event &event) {}
+	virtual void OnGuiRender() {}
 
-	Entity CreateEntity(std::string name = "");
-	Entity CreateEntityWithID(UUID uuid, const std::string &name = "", bool runtimeMap = false);
+	Entity CreateEntity(String name);
+	Entity CreateEntity(UUID uuid, const String &name);
 	void DestroyEntity(Entity entity);
+	Entity GetEntity(const String &tag);
 
-	template<typename T>
-	auto GetAllEntitiesWith();
-	void DuplicateEntity(Entity entity);
-	Entity FindEntityByTag(const std::string &tag);
 	const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
 
-	void CopyTo(Ref<Scene> &target);
+	virtual const Shared<SceneRenderer::Target> &GetTarget() const = 0;
 
-	entt::entity GetEntity() const { return m_SceneEntity; }
+	virtual Entity GetSelectedEntity();
+	virtual	void SetSelectedEntity(Entity entity);
+	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
-	bool IsPlaying() const { return m_IsPlaying; }
-
-	const std::string &GetName() const { return m_Name; }
+	Entity GetEntity() const { return m_SceneEntity; }
+	const String &GetName() const { return m_Name; }
 	Light &GetLight() { return m_Light; }
 	const Light &GetLight() const { return m_Light; }
 	Entity GetMainCameraEntity();
 	float &GetSkyboxLod() { return m_SkyboxLod; }
 	UUID GetUUID() const { return m_SceneID; }
-	static Ref<Scene> GetScene(UUID uuid);
+	static Shared<Scene> GetScene(UUID uuid);
 	Skybox GetSkybox() const { return m_Skybox; }
-
-	void SetName(std::string name);
-	void SetLight(const Light &light);
-	void SetViewportSize(Uint32 width, Uint32 height);
-	void SetEnvironment(const Environment &environment);
 	const Environment &GetEnvironment() const { return m_Environment; }
-	void SetSkyboxTexture(const Ref<TextureCube> &skyboxTexture);
 
-	// Editor-specific
-	void SetSelectedEntity(Entity entity);
+	void SetName(String name);
+	void SetLight(const Light &light);
+	void SetEnvironment(const Environment &environment);
+	void SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture);
+	void ShowMeshBoundingBoxes(bool show);
+	void ShowPhysicsBodyBoundingBoxes(bool show);
 
-	void ShowBoundingBoxes(bool show);
+	static bool IsValidFilepath(const Filepath &filepath);
 
-private:
+protected:
 	UUID m_SceneID;
-	std::string m_Name;
-
-	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
+	String m_Name;
 
 	Light m_Light;
 	float m_LightMultiplier = 0.3f;
@@ -105,7 +96,9 @@ private:
 	EntityRegistry m_EntityRegistry;
 	EntityMap m_EntityIDMap;
 	Entity m_SceneEntity;
-	Entity m_SelectedEntity{};
+	Entity m_SelectedEntity;
+
+	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
 	Environment m_Environment;
 	Skybox m_Skybox;
@@ -113,17 +106,12 @@ private:
 	bool m_RadiancePrefilter = false;
 	float m_EnvMapRotation = 0.0f;
 	float m_SkyboxLod = 1.0f;
-	bool m_IsPlaying = false;
-	bool m_UIShowBoundingBoxes = false;
+	bool m_UIShowMeshBoundingBoxes = false;
+	bool m_UIShowPhysicsBodyBoundingBoxes = false;
 
-	friend void OnScriptComponentConstruct(entt::registry &registry, entt::entity entity);
-	friend void OnScriptComponentDestroy(entt::registry &registry, entt::entity entity);
+private:
+	friend void OnScriptComponentConstruct(EntityRegistry &registry, EntityHandle entity);
+	friend void OnScriptComponentDestroy(EntityRegistry &registry, EntityHandle entity);
 };
-
-template <typename T>
-auto Scene::GetAllEntitiesWith()
-{
-	return m_EntityRegistry.view<T>();
-}
 }
 

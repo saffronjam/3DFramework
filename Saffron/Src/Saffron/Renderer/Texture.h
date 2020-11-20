@@ -1,15 +1,16 @@
 ﻿#pragma once
 
-#include <string>
+
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
+#include "Saffron/Resource/Resource.h"
 #include "Saffron/Renderer/RendererAPI.h"
 
 namespace Se
 {
 
-class Texture : public RefCounted
+class Texture : public Resource
 {
 public:
 	enum class Format
@@ -49,8 +50,8 @@ public:
 class Texture2D : public Texture
 {
 public:
-	static Ref<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
-	static Ref<Texture2D> Create(const std::string &path, bool sRGB = false);
+	static Shared<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
+	static Shared<Texture2D> Create(const Filepath &path, bool sRGB = false);
 
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
@@ -60,15 +61,15 @@ public:
 
 	virtual bool Loaded() const = 0;
 
-	virtual const std::string &GetPath() const = 0;
+	virtual const Filepath &GetFilepath() const = 0;
 };
 
 class TextureCube : public Texture
 {
 public:
-	static Ref<TextureCube> Create(Format format, Uint32 width, Uint32 height);
-	static Ref<TextureCube> Create(const std::string &path);
+	static Shared<TextureCube> Create(Format format, Uint32 width, Uint32 height);
+	static Shared<TextureCube> Create(const Filepath &path);
 
-	virtual const std::string &GetPath() const = 0;
+	virtual const Filepath &GetFilepath() const = 0;
 };
 }

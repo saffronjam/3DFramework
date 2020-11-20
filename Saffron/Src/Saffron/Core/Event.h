@@ -1,13 +1,13 @@
 #pragma once
 
-#include <string>
+
 
 #include "Saffron/Base.h"
 
 namespace Se
 {
 
-class Event : public RefCounted
+class Event : public ReferenceCounted
 {
 	friend class EventDispather;
 public:
@@ -21,7 +21,7 @@ public:
 	virtual Type GetType() const = 0;
 	virtual const char *GetName() const = 0;
 	virtual unsigned int GetCategoryFlags() const = 0;
-	virtual std::string ToString() const;
+	virtual String ToString() const;
 
 	bool InCategory(Category category) const;
 
@@ -33,7 +33,7 @@ public:
 	{
 		None = 0,
 		AppTick, AppUpdate, AppRender,
-		WindowResize, WindowMove, WindowGainFocus, WindowLostFocus, WindowClose, WindowDropFiles,
+		WindowResize, WindowMove, WindowGainFocus, WindowLostFocus, WindowClose, WindowDropFiles, WindowNewTitle, WindowNewIcon, WindowNewAntiAliasing,
 		KeyboardPress, KeyboardRelease, KeyboardRepeat, KeyboardType,
 		MousePress, MouseRelease, MouseScroll, MouseMove, MouseEnter, MouseLeave
 	};

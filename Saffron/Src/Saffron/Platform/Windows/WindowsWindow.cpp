@@ -2,14 +2,14 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
-#include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Core/Events/KeyboardEvent.h"
 #include "Saffron/Core/Events/MouseEvent.h"
+#include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
 #include "Saffron/Renderer/Renderer.h"
-#include "Saffron/System/ScopedLock.h"
 
 namespace Se
 {
@@ -27,8 +27,7 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	m_NativeWindow(nullptr),
 	m_VSync(false)
 {
-
-	static std::mutex mutex;
+	static Mutex mutex;
 	ScopedLock lock(mutex);
 
 	// Initialize GLFW
@@ -65,7 +64,7 @@ WindowsWindow::WindowsWindow(const Properties &props)
 	{
 		double x, y;
 		glfwGetCursorPos(m_NativeWindow, &x, &y);
-		PushEvent<MouseMoveEvent>(glm::vec2(x, y));
+		PushEvent<MouseMoveEvent>(Vector2f(x, y));
 	}
 	{
 		glfwSetWindowPos(m_NativeWindow, static_cast<int>(m_Position.x), static_cast<int>(m_Position.y));
@@ -111,6 +110,9 @@ void WindowsWindow::OnEvent(const Event &event)
 	dispatcher.Try<WindowGainFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnGainFocus));
 	dispatcher.Try<WindowLostFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnLostFocus));
 	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
+	dispatcher.Try<WindowNewTitleEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewTitle));
+	dispatcher.Try<WindowNewIconEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewIcon));
+	dispatcher.Try<WindowNewAntiAliasingEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewAntiAliasing));
 }
 
 void WindowsWindow::Close()
@@ -130,14 +132,6 @@ void WindowsWindow::Focus()
 void *WindowsWindow::GetNativeWindow() const
 {
 	return m_NativeWindow;
-}
-
-void WindowsWindow::SetTitle(std::string title)
-{
-	SE_PROFILE_FUNCTION();
-
-	m_Title = std::move(title);
-	glfwSetWindowTitle(m_NativeWindow, m_Title.c_str());
 }
 
 void WindowsWindow::SetVSync(bool enabled)
@@ -192,6 +186,65 @@ bool WindowsWindow::OnClose(const WindowCloseEvent &event)
 	return false;
 }
 
+bool WindowsWindow::OnNewTitle(const WindowNewTitleEvent &event)
+{
+	glfwSetWindowTitle(m_NativeWindow, event.GetTitle().c_str());
+	m_Title = event.GetTitle();
+	return true;
+}
+
+bool WindowsWindow::OnNewIcon(const WindowNewIconEvent &event)
+{
+	GLFWimage images[1];
+	images[0].pixels = stbi_load(event.GetFilepath().string().c_str(), &images[0].width, &images[0].height, nullptr, 4); //rgba channels
+	if ( !images[0].pixels )
+	{
+		SE_CORE_WARN("Failed to load window icon. Filepath: {0}", event.GetFilepath().string());
+		stbi_image_free(images[0].pixels);
+		return false;
+	}
+	glfwSetWindowIcon(m_NativeWindow, 1, images);
+	stbi_image_free(images[0].pixels);
+	return true;
+}
+
+bool WindowsWindow::OnNewAntiAliasing(const WindowNewAntiAliasingEvent &event)
+{
+	int level = 0;
+	switch ( event.GetAntiAliasing() )
+	{
+	case AntiAliasing::Off:
+		level = 0;
+		break;
+	case AntiAliasing::Sample2:
+		level = 2;
+		break;
+	case AntiAliasing::Sample4:
+		level = 4;
+		break;
+	case AntiAliasing::Sample8:
+		level = 8;
+		break;
+	case AntiAliasing::Sample16:
+		level = 16;
+		break;
+	}
+
+	Renderer::Submit([level]
+					 {
+						 if ( level )
+						 {
+							 glEnable(GL_MULTISAMPLE);
+						 }
+						 else
+						 {
+							 glDisable(GL_MULTISAMPLE);
+						 }
+						 glfwWindowHint(GLFW_SAMPLES, level);
+					 });
+	return true;
+}
+
 void WindowsWindow::SetupGLFWCallbacks()
 {
 	SE_PROFILE_FUNCTION();
@@ -227,7 +280,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetCursorPosCallback(m_NativeWindow, [](GLFWwindow *window, double xpos, double ypos)
 							 {
 								 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-								 pWnd->PushEvent<MouseMoveEvent>(glm::vec2(xpos, ypos));
+								 pWnd->PushEvent<MouseMoveEvent>(Vector2f(xpos, ypos));
 							 });
 	glfwSetCursorEnterCallback(m_NativeWindow, [](GLFWwindow *window, int enter)
 							   {
@@ -247,7 +300,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetWindowPosCallback(m_NativeWindow, [](GLFWwindow *window, int xpos, int ypos)
 							 {
 								 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-								 pWnd->PushEvent<WindowMoveEvent>(glm::vec2(xpos, ypos));
+								 pWnd->PushEvent<WindowMoveEvent>(Vector2f(xpos, ypos));
 							 });
 	glfwSetWindowFocusCallback(m_NativeWindow, [](GLFWwindow *window, int focus)
 							   {
@@ -265,7 +318,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetDropCallback(m_NativeWindow, [](GLFWwindow *window, int count, const char **paths)
 						{
 							auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
-							std::vector<std::filesystem::path> filepaths(count);
+							ArrayList<Filepath> filepaths(count);
 							for ( int i = 0; i < count; i++ )
 							{
 								filepaths[i] = paths[i];

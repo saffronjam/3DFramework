@@ -25,7 +25,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, Uint32 size, Usage usage)
 {
 	m_LocalData = Buffer::Copy(data, size);
 
-	Ref<OpenGLVertexBuffer> instance = this;
+	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 					 {
 						 glCreateBuffers(1, &instance->m_RendererID);
@@ -36,7 +36,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, Uint32 size, Usage usage)
 OpenGLVertexBuffer::OpenGLVertexBuffer(Uint32 size, Usage usage)
 	: m_Size(size), m_Usage(usage)
 {
-	Ref<OpenGLVertexBuffer> instance = this;
+	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 					 {
 						 glCreateBuffers(1, &instance->m_RendererID);
@@ -54,7 +54,7 @@ OpenGLVertexBuffer::~OpenGLVertexBuffer()
 
 void OpenGLVertexBuffer::Bind() const
 {
-	Ref<const OpenGLVertexBuffer> instance = this;
+	Shared<const OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]() {
 		glBindBuffer(GL_ARRAY_BUFFER, instance->m_RendererID);
 					 });
@@ -64,7 +64,7 @@ void OpenGLVertexBuffer::SetData(void *buffer, Uint32 size, Uint32 offset)
 {
 	m_LocalData = Buffer::Copy(buffer, size);
 	m_Size = size;
-	Ref<OpenGLVertexBuffer> instance = this;
+	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance, offset]() {
 		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
 					 });
@@ -74,7 +74,7 @@ void OpenGLVertexBuffer::SetData(const Buffer &buffer, Uint32 offset)
 {
 	m_LocalData = Buffer::Copy(buffer);
 	m_Size = buffer.Size();
-	Ref<OpenGLVertexBuffer> instance = this;
+	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance, offset]() {
 		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
 					 });

@@ -6,6 +6,8 @@
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/LogStream.hpp>
 
+#include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
 
@@ -28,9 +30,9 @@ namespace Se
 /// Helper functions
 ////////////////////////////////////////////////////////////////////////
 
-glm::mat4 Mat4FromAssimpMat4(const aiMatrix4x4 &matrix)
+Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4 &matrix)
 {
-	glm::mat4 result;
+	Matrix4f result;
 	//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
 	result[0][0] = matrix.a1; result[1][0] = matrix.a2; result[2][0] = matrix.a3; result[3][0] = matrix.a4;
 	result[0][1] = matrix.b1; result[1][1] = matrix.b2; result[2][1] = matrix.b3; result[3][1] = matrix.b4;
@@ -40,9 +42,9 @@ glm::mat4 Mat4FromAssimpMat4(const aiMatrix4x4 &matrix)
 }
 
 // TODO: Remove this unused function
-static std::string LevelToSpaces(Uint32 level)
+static String LevelToSpaces(Uint32 level)
 {
-	std::string result;
+	String result;
 	for ( Uint32 i = 0; i < level; i++ )
 		result += "--";
 	return result;
@@ -132,8 +134,9 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 /// Mesh
 ////////////////////////////////////////////////////////////////////////
 
-Mesh::Mesh(std::string filename)
-	: m_Filepath(std::move(filename))
+Mesh::Mesh(String filename)
+	: m_LocalTransform(1),
+	m_Filepath(Move(filename))
 {
 	LogStream::Initialize();
 
@@ -148,10 +151,12 @@ Mesh::Mesh(std::string filename)
 	m_Scene = scene;
 
 	m_IsAnimated = scene->mAnimations != nullptr;
-	m_MeshShader = m_IsAnimated ? Renderer::GetShaderLibrary()->Get("SaffronPBR_Anim") : Renderer::GetShaderLibrary()->Get("SaffronPBR_Static");
-	m_BaseMaterial = Ref<Material>::Create(m_MeshShader);
-	// m_MaterialInstance = Ref<MaterialInstance>::Create(m_BaseMaterial);
-	m_InverseTransform = glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
+
+	Filepath meshShaderPath = m_IsAnimated ? "Assets/Shaders/SaffronPBR_Anim.glsl" : "Assets/Shaders/SaffronPBR_Static.glsl";
+	m_MeshShader = Shared<Shader>(Shader::Create(meshShaderPath));
+	m_BaseMaterial = Shared<Material>::Create(m_MeshShader);
+	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
+	//m_InverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
 	Uint32 vertexCount = 0;
 	Uint32 indexCount = 0;
@@ -256,7 +261,7 @@ Mesh::Mesh(std::string filename)
 			for ( size_t i = 0; i < mesh->mNumBones; i++ )
 			{
 				aiBone *bone = mesh->mBones[i];
-				std::string boneName(bone->mName.data);
+				String boneName(bone->mName.data);
 				int boneIndex = 0;
 
 				if ( m_BoneMapping.find(boneName) == m_BoneMapping.end() )
@@ -297,7 +302,7 @@ Mesh::Mesh(std::string filename)
 			auto *aiMaterial = scene->mMaterials[i];
 			auto aiMaterialName = aiMaterial->GetName();
 
-			auto mi = Ref<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
+			auto mi = Shared<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
 			m_Materials[i] = mi;
 
 			SE_MESH_LOG("  {0} (Index = {1})", aiMaterialName.data, i);
@@ -322,10 +327,10 @@ Mesh::Mesh(std::string filename)
 			if ( hasAlbedoMap )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = m_Filepath;
+				Filepath path = m_Filepath;
 				auto parentPath = path.parent_path();
-				parentPath /= std::string(aiTexPath.data);
-				std::string texturePath = parentPath.string();
+				parentPath /= String(aiTexPath.data);
+				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Albedo map path = {0}", texturePath);
 				auto texture = Texture2D::Create(texturePath, true);
 				if ( texture->Loaded() )
@@ -338,12 +343,12 @@ Mesh::Mesh(std::string filename)
 				{
 					SE_CORE_ERROR("Could not load texture: {0}", texturePath);
 					// Fallback to albedo color
-					mi->Set("u_AlbedoColor", glm::vec3{ aiColor.r, aiColor.g, aiColor.b });
+					mi->Set("u_AlbedoColor", Vector3f{ aiColor.r, aiColor.g, aiColor.b });
 				}
 			}
 			else
 			{
-				mi->Set("u_AlbedoColor", glm::vec3{ aiColor.r, aiColor.g, aiColor.b });
+				mi->Set("u_AlbedoColor", Vector3f{ aiColor.r, aiColor.g, aiColor.b });
 				SE_MESH_LOG("    No albedo map");
 			}
 
@@ -352,10 +357,10 @@ Mesh::Mesh(std::string filename)
 			if ( aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = m_Filepath;
+				Filepath path = m_Filepath;
 				auto parentPath = path.parent_path();
-				parentPath /= std::string(aiTexPath.data);
-				std::string texturePath = parentPath.string();
+				parentPath /= String(aiTexPath.data);
+				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Normal map path = {0}", texturePath);
 				auto texture = Texture2D::Create(texturePath);
 				if ( texture->Loaded() )
@@ -379,10 +384,10 @@ Mesh::Mesh(std::string filename)
 			if ( aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = m_Filepath;
+				Filepath path = m_Filepath;
 				auto parentPath = path.parent_path();
-				parentPath /= std::string(aiTexPath.data);
-				std::string texturePath = parentPath.string();
+				parentPath /= String(aiTexPath.data);
+				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Roughness map path = {0}", texturePath);
 				auto texture = Texture2D::Create(texturePath);
 				if ( texture->Loaded() )
@@ -406,10 +411,10 @@ Mesh::Mesh(std::string filename)
 			if ( aiMaterial->Get("$raw.ReflectionFactor|file", aiPTI_String, 0, aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				std::filesystem::path path = m_Filepath;
+				Filepath path = m_Filepath;
 				auto parentPath = path.parent_path();
-				parentPath /= std::string(aiTexPath.data);
-				std::string texturePath = parentPath.string();
+				parentPath /= String(aiTexPath.data);
+				String texturePath = parentPath.string();
 
 				auto texture = Texture2D::Create(texturePath);
 				if ( texture->Loaded() )
@@ -490,18 +495,18 @@ Mesh::Mesh(std::string filename)
 				if ( prop->mType == aiPTI_String )
 				{
 					Uint32 strLength = *reinterpret_cast<Uint32 *>(prop->mData);
-					std::string str(prop->mData + 4, strLength);
+					String str(prop->mData + 4, strLength);
 
-					std::string key = prop->mKey.data;
+					String key = prop->mKey.data;
 					if ( key == "$raw.ReflectionFactor|file" )
 					{
 						metalnessTextureFound = true;
 
 						// TODO: Temp - this should be handled by Saffron's filesystem
-						std::filesystem::path path = m_Filepath;
+						Filepath path = m_Filepath;
 						auto parentPath = path.parent_path();
 						parentPath /= str;
-						std::string texturePath = parentPath.string();
+						String texturePath = parentPath.string();
 						SE_MESH_LOG("    Metalness map path = {0}", texturePath);
 						auto texture = Texture2D::Create(texturePath);
 						if ( texture->Loaded() )
@@ -564,10 +569,9 @@ Mesh::Mesh(std::string filename)
 	m_Pipeline = Pipeline::Create(pipelineSpecification);
 }
 
-Mesh::~Mesh() = default;
-
-void Mesh::OnUpdate(Time ts)
+void Mesh::OnUpdate()
 {
+	const auto ts = GlobalTimer::GetStep();
 	if ( m_IsAnimated )
 	{
 		if ( m_AnimationPlaying )
@@ -587,7 +591,6 @@ void Mesh::OnUpdate(Time ts)
 
 void Mesh::DumpVertexBuffer()
 {
-	// TODO: Convert to ImGui
 	SE_MESH_LOG("------------------------------------------------------");
 	SE_MESH_LOG("Vertex Buffer Dump");
 	SE_MESH_LOG("Mesh: {0}", m_FilePath);
@@ -622,37 +625,48 @@ void Mesh::DumpVertexBuffer()
 	SE_MESH_LOG("------------------------------------------------------");
 }
 
+ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f &transform)
+{
+	ArrayList<AABB> ret;
+	for ( const auto &submesh : GetSubmeshes() )
+	{
+		const auto &aabb = submesh.BoundingBox;
+		auto aabbTransform = transform * GetLocalTransform() * submesh.Transform;
+		ret.push_back(aabb);
+	}
+	return ret;
+}
 
 void Mesh::BoneTransform(float time)
 {
-	ReadNodeHierarchy(time, m_Scene->mRootNode, glm::mat4(1.0f));
+	ReadNodeHierarchy(time, m_Scene->mRootNode, Matrix4f(1.0f));
 	m_BoneTransforms.resize(m_BoneCount);
 	for ( size_t i = 0; i < m_BoneCount; i++ )
 		m_BoneTransforms[i] = m_BoneInfo[i].FinalTransformation;
 }
 
-void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const glm::mat4 &parentTransform)
+void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const Matrix4f &parentTransform)
 {
-	const std::string name(pNode->mName.data);
+	const String name(pNode->mName.data);
 	const aiAnimation *animation = m_Scene->mAnimations[0];
-	glm::mat4 nodeTransform(Mat4FromAssimpMat4(pNode->mTransformation));
+	Matrix4f nodeTransform(Mat4FromAssimpMat4(pNode->mTransformation));
 	const aiNodeAnim *nodeAnim = FindNodeAnim(animation, name);
 
 	if ( nodeAnim )
 	{
-		const glm::vec3 translation = InterpolateTranslation(AnimationTime, nodeAnim);
-		const glm::mat4 translationMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(translation.x, translation.y, translation.z));
+		const Vector3f translation = InterpolateTranslation(AnimationTime, nodeAnim);
+		const Matrix4f translationMatrix = glm::translate(Matrix4f(1.0f), Vector3f(translation.x, translation.y, translation.z));
 
 		const glm::quat rotation = InterpolateRotation(AnimationTime, nodeAnim);
-		const glm::mat4 rotationMatrix = glm::toMat4(rotation);
+		const Matrix4f rotationMatrix = glm::toMat4(rotation);
 
-		const glm::vec3 scale = InterpolateScale(AnimationTime, nodeAnim);
-		const glm::mat4 scaleMatrix = glm::scale(glm::mat4(1.0f), glm::vec3(scale.x, scale.y, scale.z));
+		const Vector3f scale = InterpolateScale(AnimationTime, nodeAnim);
+		const Matrix4f scaleMatrix = glm::scale(Matrix4f(1.0f), Vector3f(scale.x, scale.y, scale.z));
 
 		nodeTransform = translationMatrix * rotationMatrix * scaleMatrix;
 	}
 
-	const glm::mat4 transform = parentTransform * nodeTransform;
+	const Matrix4f transform = parentTransform * nodeTransform;
 
 	if ( m_BoneMapping.find(name) != m_BoneMapping.end() )
 	{
@@ -664,9 +678,9 @@ void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode *pNode, const glm
 		ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], transform);
 }
 
-void Mesh::TraverseNodes(aiNode *node, const glm::mat4 &parentTransform, Uint32 level)
+void Mesh::TraverseNodes(aiNode *node, const Matrix4f &parentTransform, Uint32 level)
 {
-	const glm::mat4 transform = parentTransform * Mat4FromAssimpMat4(node->mTransformation);
+	const Matrix4f transform = parentTransform * Mat4FromAssimpMat4(node->mTransformation);
 	for ( Uint32 i = 0; i < node->mNumMeshes; i++ )
 	{
 		const Uint32 mesh = node->mMeshes[i];
@@ -705,12 +719,12 @@ Uint32 Mesh::FindRotation(float AnimationTime, const aiNodeAnim *pNodeAnim)
 	return 0;
 }
 
-const aiNodeAnim *Mesh::FindNodeAnim(const aiAnimation *animation, const std::string &nodeName)
+const aiNodeAnim *Mesh::FindNodeAnim(const aiAnimation *animation, const String &nodeName)
 {
 	for ( Uint32 i = 0; i < animation->mNumChannels; i++ )
 	{
 		const aiNodeAnim *nodeAnim = animation->mChannels[i];
-		if ( std::string(nodeAnim->mNodeName.data) == nodeName )
+		if ( String(nodeAnim->mNodeName.data) == nodeName )
 			return nodeAnim;
 	}
 	return nullptr;
@@ -729,7 +743,7 @@ Uint32 Mesh::FindScaling(float AnimationTime, const aiNodeAnim *pNodeAnim)
 	return 0;
 }
 
-glm::vec3 Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim *nodeAnim)
+Vector3f Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim *nodeAnim)
 {
 	if ( nodeAnim->mNumPositionKeys == 1 )
 	{
@@ -778,7 +792,7 @@ glm::quat Mesh::InterpolateRotation(float animationTime, const aiNodeAnim *nodeA
 }
 
 
-glm::vec3 Mesh::InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim)
+Vector3f Mesh::InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim)
 {
 	if ( nodeAnim->mNumScalingKeys == 1 )
 	{

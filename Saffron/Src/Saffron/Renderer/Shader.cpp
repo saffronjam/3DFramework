@@ -1,89 +1,71 @@
 ﻿#include "SaffronPCH.h"
 
+#include "Saffron/Core/Misc.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Renderer/Shader.h"
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Platform/OpenGL/OpenGLShader.h"
 
 namespace Se
 {
 
-std::vector<Ref<Shader>> Shader::m_sAllShaders;
+SignalAggregate<void> Shader::Signals::OnReload;
 
 void Shader::OnGuiRender()
 {
 	ImGui::Begin("Shaders");
 
-	auto &shaders = Shader::m_sAllShaders;
-	for ( auto &shader : shaders )
-	{
-		if ( ImGui::TreeNode(shader->GetName().c_str()) )
-		{
-			std::string buttonName = "Reload##" + shader->GetName();
-			if ( ImGui::Button(buttonName.c_str()) )
-				shader->Reload();
-			ImGui::TreePop();
-		}
-	}
+	ResourceManager::ForEach<Shader>([](auto &shader)
+									 {
+										 if ( ImGui::TreeNode(shader.GetName().c_str()) )
+										 {
+											 const String buttonName = "Reload##" + shader.GetName();
+											 if ( ImGui::Button(buttonName.c_str()) )
+												 shader.Reload();
+											 ImGui::TreePop();
+										 }
+									 }
+	);
 
 	ImGui::End();
 }
 
-Ref<Shader> Shader::Create(const std::string &filepath)
+Shared<Shader> Shader::Create(const Filepath &filepath)
 {
-	Ref<Shader> result = nullptr;
+	Shared<Shader> result;
+
+	const size_t filepathHash = Misc::HashFilepath(filepath);
+	if ( ResourceManager::Exists(filepathHash) )
+	{
+		return ResourceManager::Get(filepathHash);
+	}
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = Ref<OpenGLShader>::Create(filepath); break;
+	case RendererAPI::Type::OpenGL: result = Shared<OpenGLShader>::Create(filepath); break;
 	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
-	m_sAllShaders.push_back(result);
+	if ( result )
+	{
+		ResourceManager::Emplace(result);
+	}
 
 	return result;
 }
 
-Ref<Shader> Shader::CreateFromString(const std::string &source)
+Shared<Shader> Shader::Create(const String &source)
 {
-	Ref<Shader> result = nullptr;
+	Shared<Shader> result;
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = OpenGLShader::CreateFromString(source); break;
+	case RendererAPI::Type::OpenGL: result = Shared<OpenGLShader>::Create(source); break;
 	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
-	m_sAllShaders.push_back(result);
-
 	return result;
-}
-
-void ShaderLibrary::Add(const Ref<Shader> &shader)
-{
-	const auto &name = shader->GetName();
-	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
-	m_Shaders[name] = shader;
-}
-
-void ShaderLibrary::Load(const std::string &path)
-{
-	const auto shader = Ref<Shader>(Shader::Create(path));
-	const auto &name = shader->GetName();
-	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
-	m_Shaders[name] = shader;
-}
-
-void ShaderLibrary::Load(const std::string &name, const std::string &path)
-{
-	SE_CORE_ASSERT(m_Shaders.find(name) == m_Shaders.end());
-	m_Shaders[name] = Ref<Shader>(Shader::Create(path));
-}
-
-const Ref<Shader> &ShaderLibrary::Get(const std::string &name) const
-{
-	SE_CORE_ASSERT(m_Shaders.find(name) != m_Shaders.end());
-	return m_Shaders.at(name);
 }
 }

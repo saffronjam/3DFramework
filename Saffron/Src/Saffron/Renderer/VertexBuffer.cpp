@@ -31,7 +31,7 @@ Uint32 ShaderDataTypeSize(ShaderDataType type)
 /// Vertex Buffer Element
 ///////////////////////////////////////////////////////////////
 
-VertexBuffer::Element::Element(ShaderDataType type, std::string name, bool normalized) : Name(std::move(name)),
+VertexBuffer::Element::Element(ShaderDataType type, String name, bool normalized) : Name(Move(name)),
 Type(type),
 Size(ShaderDataTypeSize(
 	type)),
@@ -87,24 +87,24 @@ void VertexBuffer::Layout::CalculateOffsetsAndStride()
 	}
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
+Shared<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
-	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(data, size, usage);
+	case RendererAPI::Type::OpenGL:  return Shared<OpenGLVertexBuffer>::Create(data, size, usage);
 	default:
 		SE_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;
 	}
 }
 
-Ref<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
+Shared<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
-	case RendererAPI::Type::OpenGL:  return Ref<OpenGLVertexBuffer>::Create(size, usage);
+	case RendererAPI::Type::OpenGL:  return Shared<OpenGLVertexBuffer>::Create(size, usage);
 	default:
 		SE_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;

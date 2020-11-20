@@ -17,10 +17,8 @@ protected:
 	void Flush() override;
 
 private:
-	static ImGuiTextBuffer m_Buf;
-	static ImGuiTextFilter m_Filter;
-	static ImVector<int> m_LineOffsets;
-	static bool m_AutoScroll;
+	ImGuiTextBuffer m_TextBuffer;
+	ArrayList<int> m_LineOffsets;
 
 };
 }

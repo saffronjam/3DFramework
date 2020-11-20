@@ -17,41 +17,58 @@ void FileIOManager::Init(const Window &window)
 	m_Window = &window;
 }
 
-std::vector<fs::directory_entry> FileIOManager::GetFiles(const fs::path &directoryPath,
-														 const std::string &extension)
+ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath &directoryPath,
+												  const String &extension)
 {
-	std::vector<fs::directory_entry> output;
-	std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const fs::directory_entry &entry)
-				 {
-					 return entry.path().extension() == extension;
-				 });
+	ArrayList<DirectoryEntry> output;
+
+	try
+	{
+		std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output), [&](const DirectoryEntry &entry)
+					 {
+						 return entry.path().extension() == extension;
+					 });
+	}
+	catch ( fs::filesystem_error &fe )
+	{
+		SE_CORE_WARN("Failed to get files from directory: {} with file extension: {}. What: ", directoryPath.string(), extension, fe.what());
+	}
+
 	return output;
 }
 
-size_t FileIOManager::GetFileCount(const fs::path &directoryPath, const std::string &extension)
+size_t FileIOManager::GetFileCount(const Filepath &directoryPath, const String &extension)
 {
-	// Try to return early if no extension is given
+	// Return early if no extension is given
 	if ( extension.empty() )
 	{
 		return std::distance(fs::directory_iterator(directoryPath), fs::directory_iterator{});
 	}
 
-	return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const fs::directory_entry &entry)
-						 {
-							 return entry.path().extension() == extension;
-						 });
+	try
+	{
+		return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, [&](const DirectoryEntry &entry)
+							 {
+								 return entry.path().extension() == extension;
+							 });
+	}
+	catch ( fs::filesystem_error &fe )
+	{
+		SE_CORE_WARN("Failed to get file count from directory: {} with file extension: {}. What: ", directoryPath.string(), extension, fe.what());
+	}
+	return 0;
 }
 
-size_t FileIOManager::Write(const Uint8 *data, size_t size, const fs::path &filepath, bool overwrite)
+size_t FileIOManager::Write(const Uint8 *data, size_t size, const Filepath &filepath, bool overwrite)
 {
 	const bool fileExists = FileExists(filepath);
 	if ( !fileExists || fileExists && overwrite )
 	{
-		std::ofstream ofstream;
+		OutputStream ofstream;
 		ofstream.open(filepath);
 		if ( ofstream.good() )
 		{
-			auto start = ofstream.tellp();
+			const auto start = ofstream.tellp();
 			ofstream.write(reinterpret_cast<const Int8 *>(data), size);
 			return ofstream.tellp() - start;
 		}
@@ -60,18 +77,24 @@ size_t FileIOManager::Write(const Uint8 *data, size_t size, const fs::path &file
 	return 0;
 }
 
-size_t FileIOManager::Write(const Buffer buffer, const fs::path &filepath, bool overwrite)
+size_t FileIOManager::Write(const Buffer buffer, const Filepath &filepath, bool overwrite)
 {
 	return Write(buffer.Data(), buffer.Size(), filepath, overwrite);
 }
 
-bool FileIOManager::FileExists(const fs::path &filepath)
+bool FileIOManager::CreateDirectories(const Filepath &filepath)
+{
+	std::error_code errorCode;
+	return fs::create_directories(filepath, errorCode);
+}
+
+bool FileIOManager::FileExists(const Filepath &filepath)
 {
 	std::error_code errorCode;
 	return fs::exists(filepath, errorCode);
 }
 
-bool FileIOManager::Copy(const fs::path &source, const fs::path &destination)
+bool FileIOManager::Copy(const Filepath &source, const Filepath &destination)
 {
 	std::error_code errorCode;
 	fs::copy_file(source, destination, errorCode);

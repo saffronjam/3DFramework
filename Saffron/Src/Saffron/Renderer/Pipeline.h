@@ -6,12 +6,12 @@
 
 namespace Se
 {
-class Pipeline : public RefCounted
+class Pipeline : public ReferenceCounted
 {
 public:
 	struct Specification
 	{
-		Ref<Shader> Shader;
+		Shared<Shader> Shader;
 		VertexBuffer::Layout Layout;
 	};
 
@@ -26,6 +26,6 @@ public:
 	// TEMP: remove this when render command buffers are a thing
 	virtual void Bind() = 0;
 
-	static Ref<Pipeline> Create(const Specification &spec);
+	static Shared<Pipeline> Create(const Specification &spec);
 };
 }

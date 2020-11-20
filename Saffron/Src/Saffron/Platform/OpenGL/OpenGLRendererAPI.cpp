@@ -70,15 +70,9 @@ void RendererAPI::Init()
 	{
 		SE_CORE_ERROR("OpenGL Error: {0}", error);
 	}
-
-	LoadRequiredAssets();
 }
 
 void RendererAPI::Shutdown()
-{
-}
-
-void RendererAPI::LoadRequiredAssets()
 {
 }
 
@@ -120,7 +114,11 @@ void RendererAPI::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
 
 void RendererAPI::SetLineThickness(float thickness)
 {
-	glLineWidth(thickness);
+	if ( thickness != m_LineThickness )
+	{
+		glLineWidth(thickness);
+		m_LineThickness = thickness;
+	}
 }
 
 }

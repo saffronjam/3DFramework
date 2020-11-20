@@ -15,9 +15,9 @@ public:
 	static bool IsMouseButtonPressed(MouseButtonCode button);
 	static float GetMouseX();
 	static float GetMouseY();
-	static glm::vec2 GetMousePosition();
-	static glm::vec2 GetMousePositionNDC();
-	static glm::vec2 GetMouseSwipe();
+	static Vector2f GetMousePosition();
+	static Vector2f GetMousePositionNDC();
+	static Vector2f GetMouseSwipe();
 
 	static void OnUpdate();
 	static void OnEvent(const Event &event);
@@ -26,8 +26,8 @@ private:
 	static bool OnMouseMove(const MouseMoveEvent &event);
 
 private:
-	static glm::vec2 m_MousePosition;
-	static glm::vec2 m_LastMousePosition;
+	static Vector2f m_MousePosition;
+	static Vector2f m_LastMousePosition;
 
 };
 }

@@ -2,6 +2,7 @@
 
 #include <glad/glad.h>
 
+#include "Saffron/Scene/Scene.h"
 #include "Saffron/Renderer/Renderer.h"
 #include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/SceneRenderer.h"
@@ -20,69 +21,83 @@ struct SceneRendererData
 	struct SceneInfo
 	{
 		// Resources
-		Ref<MaterialInstance> SkyboxMaterial;
+		Shared<MaterialInstance> SkyboxMaterial;
 		Scene::Environment SceneEnvironment;
 		Scene::Light ActiveLight;
 	} SceneData;
 
-	Ref<Texture2D> BRDFLUT;
-	Ref<Shader> CompositeShader;
+	Shared<Texture2D> BRDFLUT;
+	Shared<Shader> CompositeShader;
 
-	struct RenderTarget
-	{
-		bool Enabled;
-		SceneRendererCameraData CameraData;
-		Ref<RenderPass> GeoPass;
-		Ref<RenderPass> CompositePass;
-	};
-	std::map<std::string, RenderTarget> RenderTargets;
+	Shared<SceneRenderer::Target> MainRenderTarget;
+	ArrayList<Shared<SceneRenderer::Target>> RenderTargets;
 
 	struct DrawCommand
 	{
-		Ref<Mesh> Mesh;
-		Ref<MaterialInstance> Material;
-		glm::mat4 Transform;
+		Shared<Mesh> Mesh;
+		Shared<MaterialInstance> Material;
+		Matrix4f Transform;
 	};
-	std::vector<DrawCommand> DrawList;
-	std::vector<DrawCommand> SelectedMeshDrawList;
+	ArrayList<DrawCommand> DrawList;
+	ArrayList<DrawCommand> SelectedMeshDrawList;
 
 	// Grid
-	Ref<MaterialInstance> GridMaterial;
-	Ref<MaterialInstance> OutlineMaterial;
+	Shared<MaterialInstance> GridMaterial;
+	Shared<MaterialInstance> OutlineMaterial;
 
 	SceneRenderer::Options Options;
 
+	// Lines
+	static constexpr Uint32 MaxLines = 10000;
+	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
+	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
+
+	Uint32 LineIndexCount = 0;
+	LineVertex *LineVertexBufferBase = nullptr;
+	LineVertex *LineVertexBufferPtr = nullptr;
+
+	Shared<Shader> LineShader;
 };
 
 static SceneRendererData s_Data;
-static Ref<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
+static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
 
 ///////////////////////////////////////////////////////////////////////////
-/// Scene Renderer
+/// Scene Renderer Target
 ///////////////////////////////////////////////////////////////////////////
 
-void SceneRenderer::Init()
+SceneRenderer::Target::~Target()
 {
-	AddRenderTarget("MainRenderTarget", 1280, 720);
-
-	s_Data.CompositeShader = Shader::Create("Assets/Shaders/SceneComposite.glsl");
-	const auto outlineShader = Shader::Create("Assets/Shaders/Outline.glsl");
-	s_Data.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
-	s_Data.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
-
-	// Grid
-	const auto gridShader = Shader::Create("Assets/Shaders/Grid.glsl");
-	s_Data.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
-	const float gridScale = 16.025f, gridSize = 0.025f;
-	s_Data.GridMaterial->Set("u_Scale", gridScale);
-	s_Data.GridMaterial->Set("u_Res", gridSize);
-
-	// Outline
-	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
 }
 
-void SceneRenderer::AddRenderTarget(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height)
+Vector2u SceneRenderer::Target::GetSize()
 {
+	SE_CORE_ASSERT(m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Width == m_CompositePass->GetSpecification().TargetFramebuffer->GetSpecification().Width &&
+				   m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Height == m_CompositePass->GetSpecification().TargetFramebuffer->GetSpecification().Height);
+	return { m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Width, m_GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Height };
+}
+
+void SceneRenderer::Target::SetSize(Uint32 width, Uint32 height)
+{
+	m_GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	m_CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+}
+
+const Shared<Texture2D> &SceneRenderer::Target::GetFinalColorBuffer() const
+{
+	SE_CORE_ASSERT(false, "Not implemented");
+	return nullptr;
+}
+
+RendererID SceneRenderer::Target::GetFinalColorBufferRendererID() const
+{
+	return m_CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
+}
+
+Shared<SceneRenderer::Target> SceneRenderer::Target::Create(Uint32 width, Uint32 height)
+{
+	Shared<Target> target = Shared<Target>::Create();
+
 	Framebuffer::Specification geoFramebufferSpec;
 	geoFramebufferSpec.Width = width;
 	geoFramebufferSpec.Height = height;
@@ -92,7 +107,7 @@ void SceneRenderer::AddRenderTarget(const std::string &renderTargetIdentifier, U
 
 	RenderPass::Specification geoRenderPassSpec;
 	geoRenderPassSpec.TargetFramebuffer = Framebuffer::Create(geoFramebufferSpec);
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass = RenderPass::Create(geoRenderPassSpec);
+	target->m_GeoPass = RenderPass::Create(geoRenderPassSpec);
 
 	Framebuffer::Specification compFramebufferSpec;
 	compFramebufferSpec.Width = 1280;
@@ -102,45 +117,58 @@ void SceneRenderer::AddRenderTarget(const std::string &renderTargetIdentifier, U
 
 	RenderPass::Specification compRenderPassSpec;
 	compRenderPassSpec.TargetFramebuffer = Framebuffer::Create(compFramebufferSpec);
-	s_Data.RenderTargets[renderTargetIdentifier].CompositePass = RenderPass::Create(compRenderPassSpec);
+	target->m_CompositePass = RenderPass::Create(compRenderPassSpec);
 
-	EnableRenderTarget(renderTargetIdentifier);
+	s_Data.RenderTargets.push_back(target);
+
+	target->Enable();
+
+	return target;
 }
 
-void SceneRenderer::SetRenderTargetSize(const std::string &renderTargetIdentifier, Uint32 width, Uint32 height)
+
+///////////////////////////////////////////////////////////////////////////
+/// Scene Renderer
+///////////////////////////////////////////////////////////////////////////
+
+void SceneRenderer::Init()
 {
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
-	s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	s_Data.MainRenderTarget = Target::Create(1280, 720);
+
+	s_Data.CompositeShader = Shader::Create(Filepath{ "Assets/Shaders/SceneComposite.glsl" });
+	const auto outlineShader = Shader::Create(Filepath{ "Assets/Shaders/Outline.glsl" });
+	s_Data.OutlineMaterial = MaterialInstance::Create(Material::Create(outlineShader));
+	s_Data.BRDFLUT = Texture2D::Create("Assets/Textures/BRDF_LUT.tga");
+
+	// Grid
+	const auto gridShader = Shader::Create(Filepath{ "Assets/Shaders/Grid.glsl" });
+	s_Data.GridMaterial = MaterialInstance::Create(Material::Create(gridShader));
+	const float gridScale = 16.025f, gridSize = 0.025f;
+	s_Data.GridMaterial->Set("u_Scale", gridScale);
+	s_Data.GridMaterial->Set("u_Res", gridSize);
+
+	// Outline
+	s_Data.OutlineMaterial->SetFlag(Material::Flag::DepthTest, false);
+
+	// Lines
+	{
+		s_Data.LineShader = Shader::Create(Filepath{ "Assets/Shaders/Renderer2D_Line.glsl" });
+		s_Data.LineVertexBufferBase = new LineVertex[SceneRendererData::MaxLineVertices];
+	}
+
 }
 
-void SceneRenderer::SetCameraData(const std::string &renderTargetIdentifier, const SceneRendererCameraData &cameraData)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].CameraData = cameraData;
-}
-
-void SceneRenderer::EnableRenderTarget(const std::string &renderTargetIdentifier)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].Enabled = true;
-}
-
-void SceneRenderer::DisableRenderTarget(const std::string &renderTargetIdentifier)
-{
-	s_Data.RenderTargets[renderTargetIdentifier].Enabled = false;
-}
-
-bool SceneRenderer::IsRenderTargetEnabled(const std::string &renderTargetIdentifier)
-{
-	return s_Data.RenderTargets[renderTargetIdentifier].Enabled;
-}
-
-void SceneRenderer::BeginScene(const Scene *scene)
+void SceneRenderer::BeginScene(const Scene *scene, ArrayList<Shared<Target>> targets)
 {
 	SE_CORE_ASSERT(!s_Data.ActiveScene, "Already an active scene");
 
 	s_Data.ActiveScene = scene;
+	s_Data.RenderTargets = Move(targets);
 	s_Data.SceneData.SkyboxMaterial = scene->GetSkybox().Material;
 	s_Data.SceneData.SceneEnvironment = scene->GetEnvironment();
 	s_Data.SceneData.ActiveLight = scene->GetLight();
+	s_Data.LineIndexCount = 0;
+	s_Data.LineVertexBufferPtr = s_Data.LineVertexBufferBase;
 }
 
 void SceneRenderer::EndScene()
@@ -152,27 +180,80 @@ void SceneRenderer::EndScene()
 	FlushDrawList();
 }
 
-void SceneRenderer::SubmitMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform,
-							   const Ref<MaterialInstance> &overrideMaterial)
+void SceneRenderer::SubmitMesh(const Shared<Mesh> &mesh, const Matrix4f &transform,
+							   const Shared<MaterialInstance> &overrideMaterial)
 {
 	// TODO: Culling, sorting, etc.
 	s_Data.DrawList.push_back({ mesh, overrideMaterial, transform });
 }
 
-void SceneRenderer::SubmitSelectedMesh(const Ref<Mesh> &mesh, const glm::mat4 &transform)
+void SceneRenderer::SubmitSelectedMesh(const Shared<Mesh> &mesh, const Matrix4f &transform)
 {
 	s_Data.SelectedMeshDrawList.push_back({ mesh, nullptr, transform });
 }
 
-std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMap(const std::string &filepath)
+void SceneRenderer::SubmitLine(const Vector3f &first, const Vector3f &second, const Vector4f &color)
+{
+	if ( s_Data.LineIndexCount >= SceneRendererData::MaxLineIndices )
+	{
+		return;
+	}
+
+	s_Data.LineVertexBufferPtr->Position = first;
+	s_Data.LineVertexBufferPtr->Color = color;
+	s_Data.LineVertexBufferPtr++;
+
+	s_Data.LineVertexBufferPtr->Position = second;
+	s_Data.LineVertexBufferPtr->Color = color;
+	s_Data.LineVertexBufferPtr++;
+
+	s_Data.LineIndexCount += 2;
+}
+
+void SceneRenderer::SubmitAABB(Shared<Mesh> mesh, const Matrix4f &transform, const Vector4f &color)
+{
+	for ( const auto &submesh : mesh->GetSubmeshes() )
+	{
+		const auto &aabb = submesh.BoundingBox;
+		auto aabbTransform = transform * mesh->GetLocalTransform() * submesh.Transform;
+		SubmitAABB(aabb, aabbTransform);
+	}
+}
+
+void SceneRenderer::SubmitAABB(const AABB &aabb, const Matrix4f &transform, const Vector4f &color)
+{
+	Vector4f corners[8] =
+	{
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
+
+		transform * Vector4f { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
+		transform * Vector4f { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
+	};
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i], corners[(i + 1) % 4], color);
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
+
+	for ( Uint32 i = 0; i < 4; i++ )
+		SubmitLine(corners[i], corners[i + 4], color);
+}
+
+Pair<Shared<TextureCube>, Shared<TextureCube>> SceneRenderer::CreateEnvironmentMap(const String &filepath)
 {
 	const Uint32 cubemapSize = 2048;
 	const Uint32 irradianceMapSize = 32;
 
-	Ref<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
+	Shared<TextureCube> envUnfiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 	if ( !equirectangularConversionShader )
-		equirectangularConversionShader = Shader::Create("Assets/Shaders/EquirectangularToCubeMap.glsl");
-	Ref<Texture2D> envEquirect = Texture2D::Create(filepath);
+		equirectangularConversionShader = Shader::Create(Filepath{ "Assets/Shaders/EquirectangularToCubeMap.glsl" });
+	Shared<Texture2D> envEquirect = Texture2D::Create(filepath);
 	SE_CORE_ASSERT(envEquirect->GetFormat() == Texture::Format::Float16, "Texture is not HDR!");
 
 	equirectangularConversionShader->Bind();
@@ -186,9 +267,9 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 
 
 	if ( !envFilteringShader )
-		envFilteringShader = Shader::Create("Assets/Shaders/EnvironmentMipFilter.glsl");
+		envFilteringShader = Shader::Create(Filepath{ "Assets/Shaders/EnvironmentMipFilter.glsl" });
 
-	Ref<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
+	Shared<TextureCube> envFiltered = TextureCube::Create(Texture::Format::Float16, cubemapSize, cubemapSize);
 
 	Renderer::Submit([envUnfiltered, envFiltered]()
 					 {
@@ -212,9 +293,9 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 					 });
 
 	if ( !envIrradianceShader )
-		envIrradianceShader = Shader::Create("Assets/Shaders/EnvironmentIrradiance.glsl");
+		envIrradianceShader = Shader::Create(Filepath{ "Assets/Shaders/EnvironmentIrradiance.glsl" });
 
-	Ref<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
+	Shared<TextureCube> irradianceMap = TextureCube::Create(Texture::Format::Float16, irradianceMapSize, irradianceMapSize);
 	envIrradianceShader->Bind();
 	envFiltered->Bind();
 	Renderer::Submit([irradianceMap]()
@@ -227,24 +308,9 @@ std::pair<Ref<TextureCube>, Ref<TextureCube>> SceneRenderer::CreateEnvironmentMa
 	return { envFiltered, irradianceMap };
 }
 
-Ref<RenderPass> SceneRenderer::GetFinalRenderPass(const std::string &renderTargetIdentifier)
+Shared<SceneRenderer::Target> &SceneRenderer::GetMainTarget()
 {
-	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass;
-}
-
-Ref<Texture2D> SceneRenderer::GetFinalColorBuffer(const std::string &renderTargetIdentifier)
-{
-	SE_CORE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	// return s_Data.CompositePass->GetSpecification().TargetFramebuffer;
-	SE_CORE_ASSERT(false, "Not implemented");
-	return nullptr;
-}
-
-Uint32 SceneRenderer::GetFinalColorBufferRendererID(const std::string &renderTargetIdentifier)
-{
-	SE_ASSERT(s_Data.RenderTargets.find(renderTargetIdentifier) != s_Data.RenderTargets.end());
-	return s_Data.RenderTargets[renderTargetIdentifier].CompositePass->GetSpecification().TargetFramebuffer->GetColorAttachmentRendererID();
+	return s_Data.MainRenderTarget;
 }
 
 SceneRenderer::Options &SceneRenderer::GetOptions()
@@ -256,12 +322,12 @@ void SceneRenderer::FlushDrawList()
 {
 	SE_CORE_ASSERT(!s_Data.ActiveScene, "");
 
-	for ( auto &[renderTargetIdentifier, rendererPass] : s_Data.RenderTargets )
+	for ( auto &target : s_Data.RenderTargets )
 	{
-		if ( s_Data.RenderTargets[renderTargetIdentifier].Enabled )
+		if ( target->IsEnabled() )
 		{
-			GeometryPass(renderTargetIdentifier);
-			CompositePass(renderTargetIdentifier);
+			GeometryPass(target);
+			CompositePass(target);
 		}
 	}
 	s_Data.DrawList.clear();
@@ -269,9 +335,9 @@ void SceneRenderer::FlushDrawList()
 	s_Data.SceneData = {};
 }
 
-void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
+void SceneRenderer::GeometryPass(const Shared<Target> &target)
 {
-	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
+	const CameraData &camData = target->GetCameraData();
 	if ( !camData.Camera )
 	{
 		return;
@@ -287,7 +353,7 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 						 });
 	}
 
-	Renderer::BeginRenderPass(s_Data.RenderTargets[renderTargetIdentifier].GeoPass);
+	Renderer::BeginRenderPass(target->GetGeoPass());
 
 
 	if ( outline )
@@ -298,7 +364,7 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 						 });
 	}
 	const auto viewProjection = camData.Camera->GetProjectionMatrix() * camData.ViewMatrix;
-	const glm::vec3 cameraPosition = glm::inverse(camData.ViewMatrix)[3];
+	const Vector3f cameraPosition = glm::inverse(camData.ViewMatrix)[3];
 
 	// Skybox
 	auto skyboxShader = s_Data.SceneData.SkyboxMaterial->GetShader();
@@ -353,12 +419,12 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 
 	if ( outline )
 	{
+		Renderer::SetLineThickness(10.0f);
 		Renderer::Submit([]()
 						 {
 							 glStencilFunc(GL_NOTEQUAL, 1, 0xff);
 							 glStencilMask(0);
 
-							 glLineWidth(10);
 							 glEnable(GL_LINE_SMOOTH);
 							 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 							 glDisable(GL_DEPTH_TEST);
@@ -394,33 +460,39 @@ void SceneRenderer::GeometryPass(const std::string &renderTargetIdentifier)
 	if ( GetOptions().ShowGrid )
 	{
 		s_Data.GridMaterial->Set("u_ViewProjection", viewProjection);
-		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * glm::scale(glm::mat4(1.0f), glm::vec3(16.0f)));
+		Renderer::SubmitQuad(s_Data.GridMaterial, glm::rotate(Matrix4f(1.0f), glm::radians(90.0f), Vector3f(1.0f, 0.0f, 0.0f)) * glm::scale(Matrix4f(1.0f), Vector3f(16.0f)));
+	}
+	if ( GetOptions().ShowMeshBoundingBoxes )
+	{
+		for ( auto &dc : s_Data.DrawList )
+		{
+			SubmitAABB(dc.Mesh, dc.Transform);
+		}
+		for ( auto &dc : s_Data.SelectedMeshDrawList )
+		{
+			SubmitAABB(dc.Mesh, dc.Transform);
+		}
 	}
 
-	if ( GetOptions().ShowBoundingBoxes )
-	{
-		Renderer2D::BeginScene(viewProjection);
-		for ( auto &dc : s_Data.DrawList )
-			Renderer::DrawAABB(dc.Mesh, dc.Transform);
-		Renderer2D::EndScene();
-	}
+	s_Data.LineShader->SetMat4("u_ViewProjection", viewProjection);
+	Renderer::SubmitLines(s_Data.LineVertexBufferBase, s_Data.LineIndexCount, s_Data.LineShader);
 
 	Renderer::EndRenderPass();
 }
 
-void SceneRenderer::CompositePass(const std::string &renderTargetIdentifier)
+void SceneRenderer::CompositePass(const Shared<Target> &target)
 {
-	const SceneRendererCameraData &camData = s_Data.RenderTargets[renderTargetIdentifier].CameraData;
-	if ( !camData.Camera )
+	const CameraData &cameraData = target->GetCameraData();
+	if ( !cameraData.Camera )
 	{
 		return;
 	}
-	Renderer::BeginRenderPass(s_Data.RenderTargets[renderTargetIdentifier].CompositePass);
+	Renderer::BeginRenderPass(target->GetCompositePass());
 	s_Data.CompositeShader->Bind();
-	s_Data.CompositeShader->SetFloat("u_Exposure", camData.Camera->GetExposure());
-	s_Data.CompositeShader->SetInt("u_TextureSamples", s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
+	s_Data.CompositeShader->SetFloat("u_Exposure", cameraData.Camera->GetExposure());
+	s_Data.CompositeShader->SetInt("u_TextureSamples", target->GetGeoPass()->GetSpecification().TargetFramebuffer->GetSpecification().Samples);
 
-	s_Data.RenderTargets[renderTargetIdentifier].GeoPass->GetSpecification().TargetFramebuffer->BindTexture();
+	target->GetGeoPass()->GetSpecification().TargetFramebuffer->BindTexture();
 	Renderer::SubmitQuad(nullptr);
 	Renderer::EndRenderPass();
 }

@@ -1,32 +1,34 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/GlobalTimer.h"
+#include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Editor/EditorCamera.h"
 
 namespace Se
 {
-EditorCamera::EditorCamera(const ViewportPane &mainViewport)
-	: m_EditorViewport(mainViewport)
+EditorCamera::EditorCamera()
 {
 	Reset();
 }
 
-EditorCamera::EditorCamera(const ViewportPane &mainViewport, const glm::mat4 &projectionMatrix)
-	: Camera(projectionMatrix),
-	m_EditorViewport(mainViewport)
+EditorCamera::EditorCamera(Matrix4f projectionMatrix)
+	: Camera(Move(projectionMatrix))
 {
 	Reset();
 }
 
-void EditorCamera::OnUpdate(Time ts)
+void EditorCamera::OnUpdate()
 {
-	if ( m_EditorViewport.IsFocused() )
+	const auto ts = GlobalTimer::GetStep();
+
+	if ( m_Enabled )
 	{
 		if ( m_ControllerStyle == ControllerStyle::Maya )
 		{
 			if ( Input::IsKeyPressed(KeyCode::LeftAlt) )
 			{
-				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
+				const Vector2f swipe = Input::GetMouseSwipe() * ts.sec() * 0.7f;
 
 				//if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
 				//	MousePan(swipe);
@@ -79,7 +81,7 @@ void EditorCamera::OnUpdate(Time ts)
 
 			if ( Input::IsMouseButtonPressed(SE_BUTTON_RIGHT) )
 			{
-				const glm::vec2 swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
+				const Vector2f swipe = Input::GetMouseSwipe() * ts.sec() * 0.3f;
 
 				m_Yaw += swipe.x;
 				m_Pitch -= swipe.y;
@@ -87,14 +89,26 @@ void EditorCamera::OnUpdate(Time ts)
 			}
 		}
 
+		UpdateCameraView();
 	}
-	UpdateCameraView();
+}
+
+void EditorCamera::OnGuiRender()
+{
+	ImGui::Begin("Editor Camera");
+	Gui::BeginPropertyGrid();
+	Gui::Property("Exposure", GetExposure(), 0.0f, 100.0f, 0.1f, Gui::PropertyFlag::Drag);
+	Gui::EndPropertyGrid();
+	ImGui::End();
 }
 
 bool EditorCamera::OnEvent(const Event &event)
 {
-	const EventDispatcher dispatcher(event);
-	dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+	if ( m_Enabled )
+	{
+		const EventDispatcher dispatcher(event);
+		dispatcher.Try<MouseScrollEvent>(SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+	}
 	return false;
 }
 
@@ -107,17 +121,31 @@ void EditorCamera::Reset()
 }
 
 
-glm::vec3 EditorCamera::GetUpDirection() const
+void EditorCamera::SetPosition(const Vector3f &position)
+{
+	m_Position = position;
+	UpdateCameraView();
+}
+
+void EditorCamera::SetRotation(const Vector3f &rotation)
+{
+	m_Pitch = rotation.x;
+	m_Yaw = rotation.y;
+	m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
+	UpdateCameraView();
+}
+
+Vector3f EditorCamera::GetUpDirection() const
 {
 	return m_Up;
 }
 
-glm::vec3 EditorCamera::GetRightDirection() const
+Vector3f EditorCamera::GetRightDirection() const
 {
 	return m_Right;
 }
 
-glm::vec3 EditorCamera::GetForwardDirection() const
+Vector3f EditorCamera::GetForwardDirection() const
 {
 	return m_Forward;
 }
@@ -132,7 +160,7 @@ bool EditorCamera::OnMouseScroll(const MouseScrollEvent &event)
 
 void EditorCamera::UpdateCameraView()
 {
-	glm::vec3 front;
+	Vector3f front;
 	front.x = std::cos(m_Yaw) * std::cos(m_Pitch);
 	front.y = std::sin(m_Pitch);
 	front.z = std::sin(m_Yaw) * std::cos(m_Pitch);

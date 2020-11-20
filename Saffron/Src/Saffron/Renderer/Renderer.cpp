@@ -4,6 +4,7 @@
 
 #include "Saffron/Core/GlobalTimer.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
@@ -17,13 +18,19 @@ namespace Se
 
 struct RendererData
 {
-	Ref<RenderPass> m_ActiveRenderPass;
+	Shared<RenderPass> m_ActiveRenderPass;
 	RenderCommandQueue m_CommandQueue;
-	Ref<ShaderLibrary> m_ShaderLibrary;
 
-	Ref<VertexBuffer> m_FullscreenQuadVertexBuffer;
-	Ref<IndexBuffer> m_FullscreenQuadIndexBuffer;
-	Ref<Pipeline> m_FullscreenQuadPipeline;
+	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
+	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
+	Shared<Pipeline> m_FullscreenQuadPipeline;
+
+	static constexpr Uint32 MaxLines = 10000;
+	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
+	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
+	Shared<Pipeline> LinePipeline;
+	Shared<VertexBuffer> LineVertexBuffer;
+	Shared<IndexBuffer> LineIndexBuffer;
 };
 
 
@@ -32,46 +39,65 @@ RendererData Renderer::s_Data;
 
 void Renderer::Init()
 {
-	s_Data.m_ShaderLibrary = Ref<ShaderLibrary>::Create();
 	Submit([]() { RendererAPI::Init(); });
 
-	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Static.glsl");
-	GetShaderLibrary()->Load("Assets/Shaders/SaffronPBR_Anim.glsl");
+	Shader::Create(Filepath{ "Assets/Shaders/SaffronPBR_Static.glsl" });
+	Shader::Create(Filepath{ "Assets/Shaders/SaffronPBR_Anim.glsl" });
 
 	SceneRenderer::Init();
 
 	// Create fullscreen quad
-	const float x = -1, y = -1, width = 2, height = 2;
-	struct QuadVertex
 	{
-		glm::vec3 Position;
-		glm::vec2 TexCoord;
-	};
+		const float x = -1, y = -1, width = 2, height = 2;
+		struct QuadVertex
+		{
+			Vector3f Position;
+			Vector2f TexCoord;
+		};
 
-	auto *data = new QuadVertex[4];
+		auto *data = new QuadVertex[4];
 
-	data[0].Position = glm::vec3(x, y, 0.1f);
-	data[0].TexCoord = glm::vec2(0, 0);
+		data[0].Position = Vector3f(x, y, 0.1f);
+		data[0].TexCoord = Vector2f(0, 0);
 
-	data[1].Position = glm::vec3(x + width, y, 0.1f);
-	data[1].TexCoord = glm::vec2(1, 0);
+		data[1].Position = Vector3f(x + width, y, 0.1f);
+		data[1].TexCoord = Vector2f(1, 0);
 
-	data[2].Position = glm::vec3(x + width, y + height, 0.1f);
-	data[2].TexCoord = glm::vec2(1, 1);
+		data[2].Position = Vector3f(x + width, y + height, 0.1f);
+		data[2].TexCoord = Vector2f(1, 1);
 
-	data[3].Position = glm::vec3(x, y + height, 0.1f);
-	data[3].TexCoord = glm::vec2(0, 1);
+		data[3].Position = Vector3f(x, y + height, 0.1f);
+		data[3].TexCoord = Vector2f(0, 1);
 
-	Pipeline::Specification Specification;
-	Specification.Layout = {
-		{ ShaderDataType::Float3, "a_Position" },
-		{ ShaderDataType::Float2, "a_TexCoord" }
-	};
-	s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
+		Pipeline::Specification Specification;
+		Specification.Layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float2, "a_TexCoord" }
+		};
+		s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
 
-	s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
-	Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
-	s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+		s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+		Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
+		s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+
+	}
+
+	// Lines
+	{
+		Pipeline::Specification Specification;
+		Specification.Layout = {
+			{ ShaderDataType::Float3, "a_Position" },
+			{ ShaderDataType::Float4, "a_Color" }
+		};
+		s_Data.LinePipeline = Pipeline::Create(Specification);
+
+		s_Data.LineVertexBuffer = VertexBuffer::Create(RendererData::MaxLineVertices * sizeof(LineVertex));
+		auto *lineIndices = new Uint32[RendererData::MaxLineIndices];
+		for ( Uint32 i = 0; i < RendererData::MaxLineIndices; i++ )
+			lineIndices[i] = i;
+		s_Data.LineIndexBuffer = IndexBuffer::Create(lineIndices, RendererData::MaxLineIndices);
+		delete[] lineIndices;
+	}
 
 	Renderer2D::Init();
 }
@@ -148,17 +174,12 @@ void Renderer::ClearMagenta()
 	Clear(1, 0, 1);
 }
 
-Ref<ShaderLibrary> Renderer::GetShaderLibrary()
-{
-	return s_Data.m_ShaderLibrary;
-}
-
-void Renderer::WaitAndRender()
+void Renderer::Execute()
 {
 	s_Data.m_CommandQueue.Execute();
 }
 
-void Renderer::BeginRenderPass(Ref<RenderPass> renderPass, bool clear)
+void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 {
 	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
 
@@ -168,7 +189,7 @@ void Renderer::BeginRenderPass(Ref<RenderPass> renderPass, bool clear)
 	renderPass->GetSpecification().TargetFramebuffer->Bind();
 	if ( clear )
 	{
-		const glm::vec4 &clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
+		const Vector4f &clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
 		Submit([=]() { RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a); });
 	}
 }
@@ -180,7 +201,7 @@ void Renderer::EndRenderPass()
 	s_Data.m_ActiveRenderPass = nullptr;
 }
 
-void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &transform)
+void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform)
 {
 	bool depthTest = true;
 	if ( material )
@@ -198,7 +219,26 @@ void Renderer::SubmitQuad(Ref<MaterialInstance> material, const glm::mat4 &trans
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<MaterialInstance> overrideMaterial)
+void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader)
+{
+	const auto dataSize = static_cast<Uint32>(sizeof(LineVertex) * count);
+	if ( dataSize )
+	{
+		SetLineThickness(3.0f);
+
+		shader->Bind();
+
+		s_Data.LineVertexBuffer->SetData(vertices, dataSize);
+
+		s_Data.LineVertexBuffer->Bind();
+		s_Data.LinePipeline->Bind();
+		s_Data.LineIndexBuffer->Bind();
+
+		DrawIndexed(count, PrimitiveType::Lines, true);
+	}
+}
+
+void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -219,59 +259,19 @@ void Renderer::SubmitMesh(Ref<Mesh> mesh, const glm::mat4 &transform, Ref<Materi
 		{
 			for ( size_t i = 0; i < mesh->m_BoneTransforms.size(); i++ )
 			{
-				std::string uniformName = std::string("u_BoneTransforms[") + std::to_string(i) + std::string("]");
+				String uniformName = String("u_BoneTransforms[") + std::to_string(i) + String("]");
 				mesh->m_MeshShader->SetMat4(uniformName, mesh->m_BoneTransforms[i]);
 			}
 		}
-		shader->SetMat4("u_Transform", transform * submesh.Transform);
+
+		shader->SetMat4("u_Transform", transform * mesh->GetLocalTransform() * submesh.Transform);
 
 		Submit([submesh, material]() {
-			if ( material->GetFlag(Material::Flag::DepthTest) )
-				glEnable(GL_DEPTH_TEST);
-			else
-				glDisable(GL_DEPTH_TEST);
+			material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });
 	}
-}
-
-void Renderer::DrawAABB(Ref<Mesh> mesh, const glm::mat4 &transform, const glm::vec4 &color)
-{
-	for ( Submesh &submesh : mesh->m_Submeshes )
-	{
-		auto &aabb = submesh.BoundingBox;
-		auto aabbTransform = transform * submesh.Transform;
-		DrawAABB(aabb, aabbTransform);
-	}
-}
-
-void Renderer::DrawAABB(const AABB &aabb, const glm::mat4 &transform, const glm::vec4 &color)
-{
-	glm::vec4 min = { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f };
-	glm::vec4 max = { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f };
-
-	glm::vec4 corners[8] =
-	{
-		transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f },
-
-		transform * glm::vec4 { aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f },
-		transform * glm::vec4 { aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f }
-	};
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i + 4], corners[((i + 1) % 4) + 4], color);
-
-	for ( Uint32 i = 0; i < 4; i++ )
-		Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 
 RenderCommandQueue &Renderer::GetRenderCommandQueue()

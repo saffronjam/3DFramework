@@ -4,10 +4,11 @@
 
 namespace Se
 {
-Camera::Camera(const glm::mat4 &projectionMatrix)
-	: m_ProjectionMatrix(projectionMatrix)
+Camera::Camera(Matrix4f projectionMatrix)
+	: m_ProjectionMatrix(Move(projectionMatrix))
 {
 }
+
 
 void Camera::SetViewportSize(Uint32 width, Uint32 height)
 {

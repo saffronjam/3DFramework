@@ -1,18 +1,20 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Gui/Gui.h"
 
 namespace Se
 {
-ScriptPanel::ScriptPanel(fs::path path)
-	: m_ScriptFolderPath(std::move(path))
+ScriptPanel::ScriptPanel(Filepath path)
+	: m_ScriptFolderPath(Move(path))
 {
 	SyncScriptPaths();
 }
 
 void ScriptPanel::OnGuiRender()
 {
+	ScopedLock scopedLock(m_FilepathMutex);
 	ImGui::Begin("Scripts");
 
 	const int noCollums = std::max(1, static_cast<int>(ImGui::GetContentRegionAvailWidth() / 100.0f));
@@ -41,17 +43,18 @@ void ScriptPanel::OnGuiRender()
 
 void ScriptPanel::SyncScriptPaths()
 {
-	const size_t noScripts = FileIOManager::GetFileCount(m_ScriptFolderPath, ".cs");
-
-	if ( noScripts > m_ScriptStats.size() )
+	ScopedLock scopedLock(m_FilepathMutex);
+	if ( m_ScriptFolderPath.empty() )
 	{
-		m_ScriptStats.clear();
-		auto rawPaths = FileIOManager::GetFiles(m_ScriptFolderPath, ".cs");
-		std::for_each(rawPaths.begin(), rawPaths.end(), [&](const fs::directory_entry &entry) mutable
-					  {
-						  m_ScriptStats.emplace_back("Script", entry.path().stem().string(), entry.path());
-					  });
+		return;
 	}
+
+	m_ScriptStats.clear();
+	auto rawPaths = FileIOManager::GetFiles(m_ScriptFolderPath, ".cs");
+	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry &entry) mutable
+				  {
+					  m_ScriptStats.emplace_back("Script", entry.path().stem().string(), entry.path());
+				  });
 }
 }
 

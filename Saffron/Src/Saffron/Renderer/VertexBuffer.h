@@ -13,7 +13,7 @@ enum class ShaderDataType
 
 static Uint32 ShaderDataTypeSize(ShaderDataType type);
 
-class VertexBuffer : public RefCounted
+class VertexBuffer : public ReferenceCounted
 {
 public:
 	///////////////////////////////////////////////////////////////
@@ -22,14 +22,14 @@ public:
 
 	struct Element
 	{
-		std::string Name;
+		String Name;
 		ShaderDataType Type;
 		Uint32 Size{};
 		Uint32 Offset{};
 		bool Normalized{};
 
 		Element() = default;
-		Element(ShaderDataType type, std::string name, bool normalized = false);
+		Element(ShaderDataType type, String name, bool normalized = false);
 
 		Uint32 GetComponentCount() const;
 	};
@@ -45,18 +45,18 @@ public:
 		Layout(const std::initializer_list<Element> &elements);
 
 		Uint32 GetStride() const { return m_Stride; }
-		const std::vector<Element> &GetElements() const { return m_Elements; }
+		const ArrayList<Element> &GetElements() const { return m_Elements; }
 
-		std::vector<Element>::iterator begin() { return m_Elements.begin(); }
-		std::vector<Element>::iterator end() { return m_Elements.end(); }
-		std::vector<Element>::const_iterator begin() const { return m_Elements.begin(); }
-		std::vector<Element>::const_iterator end() const { return m_Elements.end(); }
+		ArrayList<Element>::iterator begin() { return m_Elements.begin(); }
+		ArrayList<Element>::iterator end() { return m_Elements.end(); }
+		ArrayList<Element>::const_iterator begin() const { return m_Elements.begin(); }
+		ArrayList<Element>::const_iterator end() const { return m_Elements.end(); }
 
 	private:
 		void CalculateOffsetsAndStride();
 
 	private:
-		std::vector<Element> m_Elements;
+		ArrayList<Element> m_Elements;
 		Uint32 m_Stride = 0;
 	};
 
@@ -83,8 +83,8 @@ public:
 	virtual void SetData(void *buffer, Uint32 size, Uint32 offset = 0) = 0;
 	virtual void SetData(const Buffer &buffer, Uint32 offset = 0) = 0;
 
-	static Ref<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
-	static Ref<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
+	static Shared<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
+	static Shared<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
 };
 
 
