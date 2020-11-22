@@ -6,7 +6,7 @@
 
 Application *Se::CreateApplication()
 {
-	return new EditorApplication({ "Saffron Bun", 1600, 900 });
+	return new EditorApplication({ "Saffron Engine", 1700, 900 });
 }
 
 EditorApplication::EditorApplication(const Properties &props)

@@ -966,6 +966,7 @@ void EditorLayer::OnNewModelSpaceView(Entity entity)
 	auto newScene = Shared<ModelSpaceScene>::Create(entity);
 	auto newViewportPane = Shared<ViewportPane>::Create(tag, newScene->GetTarget());
 	auto &emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
+	m_DockedModelSpaceScene.push_back(false);
 
 	const auto &postRenderFn = [this, emplacedPair]
 	{

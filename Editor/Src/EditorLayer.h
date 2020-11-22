@@ -110,6 +110,7 @@ private:
 	Shared<ViewportPane> m_MainViewportPane;
 	Shared<ViewportPane> m_MiniViewportPane;
 	ArrayList<Pair<Shared<ModelSpaceScene>, Shared<ViewportPane>>> m_ModelSpaceSceneViews;
+	ArrayList<bool> m_DockedModelSpaceScene;
 	mutable Shared<Scene> m_LastFocusedScene;
 	Shared<Scene> m_CachedActiveScene;
 

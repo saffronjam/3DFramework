@@ -30,14 +30,9 @@ public:
 			Int32, Uint32
 		};
 
-		struct Collection
+		struct Declaration
 		{
-
-		};
-
-		struct Decl
-		{
-			Type DeclType;
+			Type DeclarationType;
 			std::ptrdiff_t Offset;
 			String Name;
 		};
@@ -45,28 +40,27 @@ public:
 		struct Buffer
 		{
 			Uint8 *Data;
-			ArrayList<Decl> Uniforms;
+			ArrayList<Declaration> Uniforms;
 		};
 
 		struct BufferBase
 		{
 			virtual ~BufferBase() = default;
 			virtual const Uint8 *GetBuffer() const = 0;
-			virtual const Decl *GetUniforms() const = 0;
+			virtual const Declaration *GetUniforms() const = 0;
 			virtual unsigned int GetUniformCount() const = 0;
 		};
-
 
 		template<unsigned int N, unsigned int U>
 		struct BufferDeclaration : BufferBase
 		{
 			Uint8 Buffer[N]{};
-			Decl Uniforms[U];
+			Declaration Uniforms[U];
 			std::ptrdiff_t Cursor = 0;
 			int Index = 0;
 
 			const Uint8 *GetBuffer() const override { return Buffer; }
-			const Decl *GetUniforms() const override { return Uniforms; }
+			const Declaration *GetUniforms() const override { return Uniforms; }
 			unsigned int GetUniformCount() const override { return U; }
 
 			template<typename T>
@@ -106,12 +100,6 @@ public:
 
 			~BufferDeclaration() override = default;
 		};
-
-		class Declaration
-		{
-
-		};
-
 	};
 
 	//////////////////////////////////////////

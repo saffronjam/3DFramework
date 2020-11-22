@@ -152,31 +152,31 @@ void OpenGLShader::UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer)
 {
 	for ( unsigned int i = 0; i < uniformBuffer.GetUniformCount(); i++ )
 	{
-		const Uniform::Decl &decl = uniformBuffer.GetUniforms()[i];
-		switch ( decl.DeclType )
+		const Uniform::Declaration &declaration = uniformBuffer.GetUniforms()[i];
+		switch ( declaration.DeclarationType )
 		{
 		case Uniform::Type::Float:
 		{
-			const float value = *reinterpret_cast<const float *>(uniformBuffer.GetBuffer() + decl.Offset);
-			Renderer::Submit([=]() { UploadUniformFloat(decl.Name, value); });
+			const float value = *reinterpret_cast<const float *>(uniformBuffer.GetBuffer() + declaration.Offset);
+			Renderer::Submit([=]() { UploadUniformFloat(declaration.Name, value); });
 			break;
 		}
 		case Uniform::Type::Float3:
 		{
-			const auto &values = *reinterpret_cast<const Vector3f *>(uniformBuffer.GetBuffer() + decl.Offset);
-			Renderer::Submit([=]() { UploadUniformFloat3(decl.Name, values);	 });
+			const auto &values = *reinterpret_cast<const Vector3f *>(uniformBuffer.GetBuffer() + declaration.Offset);
+			Renderer::Submit([=]() { UploadUniformFloat3(declaration.Name, values);	 });
 			break;
 		}
 		case Uniform::Type::Float4:
 		{
-			const auto &values = *reinterpret_cast<const Vector4f *>(uniformBuffer.GetBuffer() + decl.Offset);
-			Renderer::Submit([=]() { UploadUniformFloat4(decl.Name, values); });
+			const auto &values = *reinterpret_cast<const Vector4f *>(uniformBuffer.GetBuffer() + declaration.Offset);
+			Renderer::Submit([=]() { UploadUniformFloat4(declaration.Name, values); });
 			break;
 		}
 		case Uniform::Type::Matrix4x4:
 		{
-			const auto &values = *reinterpret_cast<const Matrix4f *>(uniformBuffer.GetBuffer() + decl.Offset);
-			Renderer::Submit([=]() { UploadUniformMat4(decl.Name, values); });
+			const auto &values = *reinterpret_cast<const Matrix4f *>(uniformBuffer.GetBuffer() + declaration.Offset);
+			Renderer::Submit([=]() { UploadUniformMat4(declaration.Name, values); });
 			break;
 		}
 		default:

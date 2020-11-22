@@ -13,6 +13,7 @@
 #include <mutex>
 #include <atomic>
 #include <optional>
+#include <bitset>
 
 namespace Se
 {
@@ -54,6 +55,8 @@ template<typename FirstClass, typename SecondClass>
 using Pair = std::pair<FirstClass, SecondClass>;
 template<typename T>
 using Optional = std::optional<T>;
+template <size_t t_NumBits>
+using Bitset = std::bitset<t_NumBits>;
 
 using String = std::string;
 using WideString = std::wstring;
