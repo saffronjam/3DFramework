@@ -6,15 +6,166 @@ Environment:
     Radiance: [1, 1, 1]
     Multiplier: 0.514999986
 EditorCamera:
-  Position: [-40.8545456, 19.851162, 41.9355202]
-  Rotation: [0.255344301, 30.4107494, 0]
-  PerspectiveMatrix: [1.49759936, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00001991, -1, 0, 0, -0.200001985, 0]
+  Position: [-30.081419, 20.5179348, 30.3756866]
+  Rotation: [-0.478790164, 30.3286247, 0]
+  PerspectiveMatrix: [1.43278813, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00001991, -1, 0, 0, -0.200001985, 0]
 Entities:
-  - Entity: 18033671978519834564
+  - Entity: 633631737122447369
+    TagComponent:
+      Tag: 3D Entity
+    TransformComponent:
+      Position: [-25.5084381, 9.14689732, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    MeshComponent:
+      AssetPath: Assets/Meshes/Cube1m.fbx
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    RigidBody3DComponent:
+      BodyType: 1
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [1, 1, 1]
+      Density: 1
+      Friction: 1
+      DrawBounding: false
+  - Entity: 5178862374589434728
+    TagComponent:
+      Tag: Camera
+    TransformComponent:
+      Position: [-23.3163185, 8.6553421, 15]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    ScriptComponent:
+      ModuleName: Script.BasicController
+      StoredFields:
+        - Name: Speed
+          Type: 1
+          Data: 12
+    CameraComponent:
+      Primary: true
+      DrawMesh: true
+      DrawFrustum: false
+      Position: [0, -0.25, 0.801349998]
+      Rotation: [0.707228839, 0, 0.706984699, 0]
+      Scale: [0.0999988243, 0.100000001, 0.0999988243]
+  - Entity: 1289165777996378215
+    TagComponent:
+      Tag: Cube
+    TransformComponent:
+      Position: [500, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1200, 1, 5]
+    MeshComponent:
+      AssetPath: Assets\Meshes\Cube1m.fbx
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    RigidBody2DComponent:
+      BodyType: 0
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [600, 0.5]
+      Density: 1
+      Friction: 2
+      DrawBounding: false
+    RigidBody3DComponent:
+      BodyType: 0
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [1200, 1, 5]
+      Density: 1
+      Friction: 1
+      DrawBounding: false
+  - Entity: 14057422478420564497
+    TagComponent:
+      Tag: Player
+    TransformComponent:
+      Position: [-23.8299007, 7.18697882, 0.383646429]
+      Rotation: [1, 0, 0, 0]
+      Scale: [0.999966919, 0.999997139, 0.999997795]
+    ScriptComponent:
+      ModuleName: Script.PlayerCube
+      StoredFields:
+        - Name: HorizontalForce
+          Type: 1
+          Data: 100
+        - Name: MaxSpeed
+          Type: 6
+          Data: [7, 10, -0.00181062799]
+        - Name: JumpForce
+          Type: 1
+          Data: 1000
+    MeshComponent:
+      AssetPath: Assets\Meshes\Sphere1m.fbx
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    RigidBody3DComponent:
+      BodyType: 1
+    SphereCollider3DComponent:
+      Offset: [0, 0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 0.100000001
+      DrawBounding: false
+  - Entity: 1352995477042327524
     TagComponent:
       Tag: Box
     TransformComponent:
-      Position: [-12.523778, 8.85473919, 0]
+      Position: [-29.6808929, 29.7597198, 0]
+      Rotation: [0.707106769, 0, 0, 0.707106769]
+      Scale: [58.4132462, 4.47940969, 4.48000002]
+    MeshComponent:
+      AssetPath: Assets\Meshes\Cube1m.fbx
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    RigidBody2DComponent:
+      BodyType: 0
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [29.7000008, 2.24000001]
+      Density: 1
+      Friction: 1
+      DrawBounding: false
+    RigidBody3DComponent:
+      BodyType: 0
+    BoxCollider3DComponent:
+      Offset: [0, 0, 0]
+      Size: [4.3499999, 59.75, 4.3499999]
+      Density: 1
+      Friction: 1
+      DrawBounding: false
+  - Entity: 15223077898852293773
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Position: [6.12674046, 45.5617676, 0]
+      Rotation: [0.977883637, 0, 0, -0.209149569]
+      Scale: [4.4799962, 4.47999668, 4.48000002]
+    MeshComponent:
+      AssetPath: Assets\Meshes\Cube1m.fbx
+      Position: [0, 0, 0]
+      Rotation: [1, 0, 0, 0]
+      Scale: [1, 1, 1]
+    RigidBody2DComponent:
+      BodyType: 1
+      FixedRotation: false
+    BoxCollider2DComponent:
+      Offset: [0, 0]
+      Size: [2.24000001, 2.24000001]
+      Density: 1
+      Friction: 1
+      DrawBounding: false
+  - Entity: 5421735812495444456
+    TagComponent:
+      Tag: Box
+    TransformComponent:
+      Position: [-20.766222, 2.29431438, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
@@ -39,40 +190,31 @@ Entities:
       Density: 1
       Friction: 1
       DrawBounding: false
-  - Entity: 16699165663076300577
+  - Entity: 10809595927974057323
     TagComponent:
-      Tag: Box
+      Tag: 3D Entity 2
     TransformComponent:
-      Position: [-18.5729809, 6.95410347, 0]
+      Position: [-21.9158707, 9.06726646, 0]
       Rotation: [1, 0, 0, 0]
-      Scale: [3.00000024, 0.300000012, 1]
+      Scale: [1, 1, 1]
     MeshComponent:
-      AssetPath: Assets\Meshes\Cube1m.fbx
+      AssetPath: Assets\Meshes\Sphere1m.fbx
       Position: [0, 0, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
-    RigidBody2DComponent:
-      BodyType: 0
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [1.5, 0.150000006]
-      Density: 1
-      Friction: 1
-      DrawBounding: false
     RigidBody3DComponent:
       BodyType: 0
-    BoxCollider3DComponent:
+    SphereCollider3DComponent:
       Offset: [0, 0, 0]
-      Size: [3, 0.300000012, 1]
+      Radius: 1
       Density: 1
       Friction: 1
       DrawBounding: false
-  - Entity: 612986674442924209
+  - Entity: 5519702817201467686
     TagComponent:
       Tag: Box
     TransformComponent:
-      Position: [-7.95200109, 3.80383062, 0]
+      Position: [-16.3671112, 3.70324898, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
@@ -126,11 +268,11 @@ Entities:
       Density: 1
       Friction: 1
       DrawBounding: false
-  - Entity: 5519702817201467686
+  - Entity: 612986674442924209
     TagComponent:
       Tag: Box
     TransformComponent:
-      Position: [-16.3671112, 3.70324898, 0]
+      Position: [-7.95200109, 3.80383062, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
@@ -155,31 +297,11 @@ Entities:
       Density: 1
       Friction: 1
       DrawBounding: false
-  - Entity: 10809595927974057323
-    TagComponent:
-      Tag: 3D Entity 2
-    TransformComponent:
-      Position: [-21.9158707, 9.06726646, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      AssetPath: Assets\Meshes\Sphere1m.fbx
-      Position: [0, 0, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    RigidBody3DComponent:
-      BodyType: 0
-    SphereCollider3DComponent:
-      Offset: [0, 0, 0]
-      Radius: 1
-      Density: 1
-      Friction: 1
-      DrawBounding: false
-  - Entity: 5421735812495444456
+  - Entity: 16699165663076300577
     TagComponent:
       Tag: Box
     TransformComponent:
-      Position: [-20.766222, 2.29431438, 0]
+      Position: [-18.5729809, 6.95410347, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
@@ -204,34 +326,13 @@ Entities:
       Density: 1
       Friction: 1
       DrawBounding: false
-  - Entity: 15223077898852293773
+  - Entity: 18033671978519834564
     TagComponent:
       Tag: Box
     TransformComponent:
-      Position: [6.12674046, 45.5617676, 0]
-      Rotation: [0.977883637, 0, 0, -0.209149569]
-      Scale: [4.4799962, 4.47999668, 4.48000002]
-    MeshComponent:
-      AssetPath: Assets\Meshes\Cube1m.fbx
-      Position: [0, 0, 0]
+      Position: [-12.523778, 8.85473919, 0]
       Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    RigidBody2DComponent:
-      BodyType: 1
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [2.24000001, 2.24000001]
-      Density: 1
-      Friction: 1
-      DrawBounding: false
-  - Entity: 1352995477042327524
-    TagComponent:
-      Tag: Box
-    TransformComponent:
-      Position: [-29.6808929, 29.7597198, 0]
-      Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [58.41325, 4.47941017, 4.48000002]
+      Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
       AssetPath: Assets\Meshes\Cube1m.fbx
       Position: [0, 0, 0]
@@ -242,7 +343,7 @@ Entities:
       FixedRotation: false
     BoxCollider2DComponent:
       Offset: [0, 0]
-      Size: [29.7000008, 2.24000001]
+      Size: [1.5, 0.150000006]
       Density: 1
       Friction: 1
       DrawBounding: false
@@ -250,108 +351,7 @@ Entities:
       BodyType: 0
     BoxCollider3DComponent:
       Offset: [0, 0, 0]
-      Size: [4.3499999, 59.75, 4.3499999]
-      Density: 1
-      Friction: 1
-      DrawBounding: false
-  - Entity: 14057422478420564497
-    TagComponent:
-      Tag: Player
-    TransformComponent:
-      Position: [-23.8299007, 7.18697882, 0.383646429]
-      Rotation: [1, 0, 0, 0]
-      Scale: [0.999966919, 0.999997139, 0.999997795]
-    ScriptComponent:
-      ModuleName: Script.PlayerCube
-      StoredFields:
-        - Name: HorizontalForce
-          Type: 1
-          Data: 100
-        - Name: MaxSpeed
-          Type: 6
-          Data: [7, 10, -0.00181062799]
-        - Name: JumpForce
-          Type: 1
-          Data: 1000
-    MeshComponent:
-      AssetPath: Assets\Meshes\Sphere1m.fbx
-      Position: [0, 0, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    RigidBody3DComponent:
-      BodyType: 1
-    SphereCollider3DComponent:
-      Offset: [0, 0, 0]
-      Radius: 0.5
-      Density: 1
-      Friction: 0.100000001
-      DrawBounding: false
-  - Entity: 1289165777996378215
-    TagComponent:
-      Tag: Cube
-    TransformComponent:
-      Position: [500, 0, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1200, 1, 5]
-    MeshComponent:
-      AssetPath: Assets\Meshes\Cube1m.fbx
-      Position: [0, 0, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    RigidBody2DComponent:
-      BodyType: 0
-      FixedRotation: false
-    BoxCollider2DComponent:
-      Offset: [0, 0]
-      Size: [600, 0.5]
-      Density: 1
-      Friction: 2
-      DrawBounding: false
-    RigidBody3DComponent:
-      BodyType: 0
-    BoxCollider3DComponent:
-      Offset: [0, 0, 0]
-      Size: [1200, 1, 5]
-      Density: 1
-      Friction: 1
-      DrawBounding: false
-  - Entity: 5178862374589434728
-    TagComponent:
-      Tag: Camera
-    TransformComponent:
-      Position: [-23.3163185, 8.6553421, 15]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    ScriptComponent:
-      ModuleName: Script.BasicController
-      StoredFields:
-        - Name: Speed
-          Type: 1
-          Data: 12
-    CameraComponent:
-      Primary: true
-      DrawMesh: true
-      DrawFrustum: true
-      Position: [0, -0.25, 0.801349998]
-      Rotation: [0.707228839, 0, 0.706984699, 0]
-      Scale: [0.0999988243, 0.100000001, 0.0999988243]
-  - Entity: 633631737122447369
-    TagComponent:
-      Tag: 3D Entity
-    TransformComponent:
-      Position: [-25.5084381, 9.14689732, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    MeshComponent:
-      AssetPath: Assets/Meshes/Cube1m.fbx
-      Position: [0, 0, 0]
-      Rotation: [1, 0, 0, 0]
-      Scale: [1, 1, 1]
-    RigidBody3DComponent:
-      BodyType: 1
-    BoxCollider3DComponent:
-      Offset: [0, 0, 0]
-      Size: [1, 1, 1]
+      Size: [3, 0.300000012, 1]
       Density: 1
       Friction: 1
       DrawBounding: false

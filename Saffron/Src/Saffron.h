@@ -65,7 +65,6 @@
 #include "Saffron/Editor/ViewportPane.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
-#include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 #ifdef SAFFRON_ENTRY_POINT

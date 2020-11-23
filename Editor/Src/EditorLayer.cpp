@@ -178,24 +178,6 @@ void EditorLayer::OnUpdate()
 		m_EditorScene->OnUpdate();
 		m_EditorScene->OnRender();
 
-		if ( m_SelectedEntity )
-		{
-			if ( m_SelectedEntity.HasComponent<BoxCollider2DComponent>() )
-			{
-				const auto &size = m_SelectedEntity.GetComponent<BoxCollider2DComponent>().Size;
-				auto [translation, rotationQuat, scale] = Misc::GetTransformDecomposition(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
-				const Vector3f rotation = glm::eulerAngles(rotationQuat);
-
-				const auto &scene = GetActiveScene();
-				Renderer::BeginRenderPass(scene->GetTarget()->GetCompositePass(), false);
-				const auto viewProj = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->GetViewProjection();
-				Renderer2D::BeginScene(viewProj, false);
-				Renderer2D::DrawRotatedQuad({ translation.x, translation.y }, size * 2.0f, glm::degrees(rotation.z), { 1.0f, 0.0f, 1.0f, 1.0f });
-				Renderer2D::EndScene();
-				Renderer::EndRenderPass();
-			}
-		}
-
 		for ( auto &[scene, viewportPane] : m_ModelSpaceSceneViews )
 		{
 			viewportPane->IsFocused() ? scene->EnableCamera() : scene->DisableCamera();
@@ -258,12 +240,18 @@ void EditorLayer::OnGuiRender()
 
 	if ( m_SceneState == SceneState::Edit )
 	{
-		for ( auto &[scene, viewportPane] : m_ModelSpaceSceneViews )
+		for ( size_t i = 0; i < m_ModelSpaceSceneViews.size(); i++ )
 		{
-			OutputStringStream oss;
-			oss << scene->GetName() << "##" << scene->GetUUID();
+			auto &[scene, viewportPane] = m_ModelSpaceSceneViews[i];
+
+			if ( !m_InitDockedModelSpaceScenes[i] )
+			{
+				ImGui::SetNextWindowDockID(m_MainViewportPane->GetDockID());
+				m_InitDockedModelSpaceScenes[i] = true;
+			}
+
 			bool wantOpen;
-			viewportPane->OnGuiRender(&wantOpen);
+			viewportPane->OnGuiRender(&wantOpen, scene->GetUUID());
 			if ( !wantOpen )
 			{
 				const UUID sceneUUID = scene->GetUUID();
@@ -966,7 +954,7 @@ void EditorLayer::OnNewModelSpaceView(Entity entity)
 	auto newScene = Shared<ModelSpaceScene>::Create(entity);
 	auto newViewportPane = Shared<ViewportPane>::Create(tag, newScene->GetTarget());
 	auto &emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
-	m_DockedModelSpaceScene.push_back(false);
+	m_InitDockedModelSpaceScenes.push_back(false);
 
 	const auto &postRenderFn = [this, emplacedPair]
 	{

@@ -43,7 +43,7 @@ public:
 
 	enum class SceneState : int
 	{
-		Splash = 0, Edit = 1, Play = 2, Pause = 3
+		Edit = 0, Play = 1, Pause = 2
 	};
 
 	enum class SelectionMode
@@ -110,7 +110,7 @@ private:
 	Shared<ViewportPane> m_MainViewportPane;
 	Shared<ViewportPane> m_MiniViewportPane;
 	ArrayList<Pair<Shared<ModelSpaceScene>, Shared<ViewportPane>>> m_ModelSpaceSceneViews;
-	ArrayList<bool> m_DockedModelSpaceScene;
+	ArrayList<bool> m_InitDockedModelSpaceScenes;
 	mutable Shared<Scene> m_LastFocusedScene;
 	Shared<Scene> m_CachedActiveScene;
 

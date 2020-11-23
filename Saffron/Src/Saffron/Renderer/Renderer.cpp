@@ -8,7 +8,6 @@
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/Mesh.h"
 #include "Saffron/Renderer/Renderer.h"
-#include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/RendererAPI.h"
 #include "Saffron/Renderer/SceneRenderer.h"
 #include "Saffron/Renderer/Shader.h"
@@ -98,8 +97,6 @@ void Renderer::Init()
 		s_Data.LineIndexBuffer = IndexBuffer::Create(lineIndices, RendererData::MaxLineIndices);
 		delete[] lineIndices;
 	}
-
-	Renderer2D::Init();
 }
 
 void Renderer::OnGuiRender()
@@ -126,7 +123,6 @@ void Renderer::OnGuiRender()
 	}
 
 	const auto &caps = RendererAPI::GetCapabilities();
-	const auto &stats = Renderer2D::GetStats();
 
 	ImGui::Begin("Renderer");
 	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
@@ -135,13 +131,6 @@ void Renderer::OnGuiRender()
 	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", SavedTS.ms(), 1.0f / SavedTS.sec());
 	ImGui::Text("Average: ");
 	ImGui::Text("Frame Time: %.2f ms  (%.0f FPS)\n", CachedFrametime.ms(), 1.0f / CachedFrametime.sec());
-	ImGui::Text("\n");
-	ImGui::Text("2D Renderering Statistics: ");
-	ImGui::Text("Draw Calls: %u", stats.DrawCalls);
-	ImGui::Text("Line Calls: %u", stats.LineCount);
-	ImGui::Text("Quad Count: %u", stats.QuadCount);
-	ImGui::Text("Total Index Count: %u", stats.GetTotalIndexCount());
-	ImGui::Text("Total Vertex Count: %u", stats.GetTotalVertexCount());
 	ImGui::End();
 }
 
@@ -224,7 +213,7 @@ void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> sh
 	const auto dataSize = static_cast<Uint32>(sizeof(LineVertex) * count);
 	if ( dataSize )
 	{
-		SetLineThickness(3.0f);
+		SetLineThickness(2.0f);
 
 		shader->Bind();
 

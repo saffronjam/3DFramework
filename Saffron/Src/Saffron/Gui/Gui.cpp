@@ -105,8 +105,8 @@ void Gui::Init()
 	style.Colors[ImGuiCol_FrameBgHovered] = ToImVec4(mainTint4);									//1
 	style.Colors[ImGuiCol_FrameBgActive] = ToImVec4(mainTint3);										//2
 	style.Colors[ImGuiCol_TitleBg] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
-	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(1.00f, 1.00f, 1.00f, 0.51f);
-	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.82f, 0.82f, 0.82f, 1.00f);
+	style.Colors[ImGuiCol_TitleBgCollapsed] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
+	style.Colors[ImGuiCol_TitleBgActive] = ImVec4(0.96f, 0.96f, 0.96f, 1.00f);
 	style.Colors[ImGuiCol_MenuBarBg] = ImVec4(0.86f, 0.86f, 0.86f, 1.00f);
 	style.Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.98f, 0.98f, 0.98f, 0.53f);
 	style.Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.69f, 0.69f, 0.69f, 1.00f);
@@ -134,7 +134,7 @@ void Gui::Init()
 	style.Colors[ImGuiCol_TabHovered] = ToImVec4(mainNoTint);										//3
 	style.Colors[ImGuiCol_TabActive] = ToImVec4(mainLessVibrantNoTint);								//6
 	style.Colors[ImGuiCol_TabUnfocused] = ToImVec4(mainTint4);										//1
-	style.Colors[ImGuiCol_TabUnfocusedActive] = ToImVec4(mainLessVibrantTint1);						//14
+	style.Colors[ImGuiCol_TabUnfocusedActive] = ToImVec4(mainLessVibrantNoTint);						//14
 }
 
 void Gui::Shutdown()
