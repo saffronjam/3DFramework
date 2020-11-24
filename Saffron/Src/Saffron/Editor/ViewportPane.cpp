@@ -12,6 +12,7 @@ SignalAggregate<void> ViewportPane::Signals::OnPostRender;
 ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target)
 	: m_WindowTitle(Move(windowTitle)),
 	m_Target(Move(target)),
+	m_FallbackTexture(Texture2D::Create("Assets/Editor/FallbackViewportPaneTexture.png")),
 	m_TopLeft(0.0f, 0.0f),
 	m_BottomRight(100.0f, 100.0f),
 	m_Hovered(false),
@@ -19,20 +20,19 @@ ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> tar
 {
 }
 
-void ViewportPane::OnGuiRender(bool *open)
+void ViewportPane::OnGuiRender(bool *open, UUID uuid)
 {
-	if ( !m_Target->IsEnabled() )
-	{
-		return;
-	}
-
 	const auto &tl = GetTopLeft();
 	const auto &br = GetBottomRight();
 
-
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	ImGui::Begin(m_WindowTitle.c_str(), open, ImGuiWindowFlags_NoFocusOnAppearing);
+	OutputStringStream oss;
+	oss << m_WindowTitle << "##" << uuid;
+
+	ImGui::Begin(oss.str().c_str(), open, ImGuiWindowFlags_NoFocusOnAppearing);
+
+	m_DockID = ImGui::GetWindowDockID();
 
 	if ( ImGui::IsWindowDocked() )
 	{
@@ -56,12 +56,13 @@ void ViewportPane::OnGuiRender(bool *open)
 	minBound.y += viewportOffset.y;
 
 	const auto windowSize = ImGui::GetWindowSize();
-	const ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+	const ImVec2 maxBound = { minBound.x + windowSize.x - viewportOffset.x, minBound.y + windowSize.y - viewportOffset.y };
 	m_TopLeft = { minBound.x, minBound.y };
 	m_BottomRight = { maxBound.x, maxBound.y };
 
 	const auto viewportSize = GetViewportSize();
-	ImGui::Image(reinterpret_cast<void *>(m_Target->GetFinalColorBufferRendererID()), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
+	const auto imageRendererID = m_Target->IsEnabled() ? m_Target->GetFinalColorBufferRendererID() : m_FallbackTexture->GetRendererID();
+	ImGui::Image(reinterpret_cast<void *>(imageRendererID), { viewportSize.x, viewportSize.y }, { 0, 1 }, { 1, 0 });
 	ImGui::GetWindowDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y), m_Focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f, ImDrawCornerFlags_All, 4);
 
 	GetSignals().Emit(Signals::OnPostRender);

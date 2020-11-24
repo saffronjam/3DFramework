@@ -4,7 +4,6 @@
 
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Renderer/Renderer.h"
-#include "Saffron/Renderer/Renderer2D.h"
 #include "Saffron/Renderer/SceneRenderer.h"
 
 
