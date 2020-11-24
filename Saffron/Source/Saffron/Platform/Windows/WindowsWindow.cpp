@@ -6,6 +6,7 @@
 
 #include "Saffron/Core/Events/KeyboardEvent.h"
 #include "Saffron/Core/Events/MouseEvent.h"
+#include "Saffron/Core/Run.h"
 #include "Saffron/Core/ScopedLock.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
@@ -146,9 +147,59 @@ bool WindowsWindow::IsVSync() const
 	return m_VSync;
 }
 
+void WindowsWindow::Minimize()
+{
+	Run::Later([this]
+			   {
+				   if ( m_Maximized )
+				   {
+					   Restore();
+					   glfwIconifyWindow(m_NativeWindow);
+					   m_Minimized = true;
+				   }
+				   else if ( m_Minimized )
+				   {
+					   Restore();
+				   }
+				   else
+				   {
+					   glfwIconifyWindow(m_NativeWindow);
+					   m_Minimized = true;
+				   }
+			   });
+}
+
+void WindowsWindow::Maximize()
+{
+	Run::Later([this]
+			   {
+				   if ( m_Minimized )
+				   {
+					   Restore();
+					   glfwMaximizeWindow(m_NativeWindow);
+					   m_Maximized = true;
+				   }
+				   else if ( m_Maximized )
+				   {
+					   Restore();
+				   }
+				   else
+				   {
+					   glfwMaximizeWindow(m_NativeWindow);
+					   m_Maximized = true;
+				   }
+			   });
+
+}
+
 bool WindowsWindow::IsMinimized() const
 {
-	return m_Width == 0 || m_Height == 0;
+	return m_Minimized;
+}
+
+bool WindowsWindow::IsMaximized() const
+{
+	return m_Maximized;
 }
 
 bool WindowsWindow::OnResize(const WindowResizeEvent &event)
@@ -325,5 +376,22 @@ void WindowsWindow::SetupGLFWCallbacks()
 							}
 							pWnd->PushEvent<WindowDropFilesEvent>(filepaths);
 						});
+	glfwSetWindowIconifyCallback(m_NativeWindow, [](GLFWwindow *window, int restored)
+								 {
+									 auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
+									 pWnd->PushEvent<WindowMinimizeEvent>(static_cast<bool>(restored));
+								 });
+	glfwSetWindowMaximizeCallback(m_NativeWindow, [](GLFWwindow *window, int restored)
+								  {
+									  auto *pWnd = static_cast<WindowsWindow *>(glfwGetWindowUserPointer(window));
+									  pWnd->PushEvent<WindowMaximizeEvent>(static_cast<bool>(restored));
+								  });
+}
+
+void WindowsWindow::Restore()
+{
+	glfwRestoreWindow(m_NativeWindow);
+	m_Minimized = false;
+	m_Maximized = false;
 }
 }

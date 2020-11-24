@@ -25,7 +25,11 @@ public:
 	// Window attributes
 	void SetVSync(bool enabled) override;
 	bool IsVSync() const override;
+
+	void Minimize() override;
+	void Maximize() override;
 	bool IsMinimized() const override;
+	bool IsMaximized() const override;
 
 private:
 	bool OnResize(const WindowResizeEvent &event);
@@ -39,10 +43,12 @@ private:
 
 	void SetupGLFWCallbacks();
 
+	void Restore();
+
 private:
 	GLFWwindow *m_NativeWindow;
 	GLFWcursor *m_ImGuiMouseCursors[9] = { nullptr };
 
-	bool m_VSync;
+	bool m_VSync, m_Minimized, m_Maximized;
 };
 }

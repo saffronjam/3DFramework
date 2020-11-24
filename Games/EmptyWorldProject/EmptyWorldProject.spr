@@ -1,7 +1,7 @@
 Project: 2DGameProject
 UUID: 3948206383772800841
 LastOpened: [2020, 10, 14, 0, 19, 21, 14]
-ProjectFolderpath: C:/Users/ownem/source/repos/SaffronCmake/Games/EmptyWorldProject/
+ProjectFolderpath: C:/Users/ownem/source/repos/SaffronEngine/Games/EmptyWorldProject/
 ProjectFilepath: EmptyWorldProject.spr
 Scenes:
-  - SceneFilepath: res/Scenes/EmptyWorldProject.ssc
+  - SceneFilepath: Resources/Scenes/EmptyWorldProject.ssc

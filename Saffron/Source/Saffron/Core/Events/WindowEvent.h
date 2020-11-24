@@ -174,4 +174,48 @@ private:
 	AntiAliasing m_AntiAliasing;
 };
 
+class WindowMinimizeEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowMinimize);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowMinimizeEvent(bool restored) : m_Restored(restored) {}
+
+	bool Restored() const { return m_Restored; }
+	String ToString() const override
+	{
+		OutputStringStream oss;
+		oss << GetName() << " Minimize Restored: " << m_Restored;
+		return oss.str();
+	}
+
+private:
+	bool m_Restored;
+};
+
+
+class WindowMaximizeEvent : public Event
+{
+public:
+	EVENT_CLASS_TYPE(WindowMaximize);
+	EVENT_CLASS_CATEGORY(CategoryWindow);
+
+public:
+	explicit WindowMaximizeEvent(bool restored) : m_Restored(restored) {}
+
+	bool Restored() const { return m_Restored; }
+	String ToString() const override
+	{
+		OutputStringStream oss;
+		oss << GetName() << " Maximize Restored: " << m_Restored;
+		return oss.str();
+	}
+
+private:
+	bool m_Restored;
+};
+
+
 }

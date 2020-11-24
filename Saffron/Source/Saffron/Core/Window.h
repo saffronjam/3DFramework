@@ -61,9 +61,14 @@ public:
 	void SetWindowIcon(Filepath filepath);
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
+
 	void SetAntiAliasing(AntiAliasing antiAliasing);
 	AntiAliasing GetAntiAliasing() const;
+
+	virtual void Minimize() = 0;
+	virtual void Maximize() = 0;
 	virtual bool IsMinimized() const = 0;
+	virtual bool IsMaximized() const = 0;
 
 	static Shared<Window> Create(const Properties &properties = Properties());
 

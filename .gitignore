@@ -42,7 +42,7 @@ RelWithDebInfo
 
 # Executables
 *.exe
-!Vendors/*/Bin/*.exe
+!Dependencies/*/Bin/*.exe
 *.out
 *.app
 
@@ -52,5 +52,5 @@ Saffron/bin/
 # Folders
 .vs/
 Bin/
-!Vendors/*/Bin/
 Bin-Int/
+!Dependencies/*/Bin/

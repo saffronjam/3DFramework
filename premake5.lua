@@ -55,7 +55,17 @@ SharedLibraryDir["assimp_rel"] = "Dependencies/assimp/bin/Release/assimp-vc141-m
 RuntimeLibararyDir = {}
 RuntimeLibararyDir["mono"] = "Dependencies/mono/bin/Runtime"
 
-group "Dependencies"
+outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+
+
+
+-- --------------------------------------
+-- Engine
+-- --------------------------------------
+
+group "Engine"
+
+group "Engine/Dependencies"
 	include "Saffron/Dependencies/assimp/premake5"
 	include "Saffron/Dependencies/Box2D/premake5"
 	include "Saffron/Dependencies/entt/premake5"
@@ -69,15 +79,6 @@ group "Dependencies"
 	include "Saffron/Dependencies/spdlog/premake5"
 	include "Saffron/Dependencies/stb/premake5"
 	include "Saffron/Dependencies/yaml-cpp/premake5"
-group ""
-
-outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
-
-
-
--- --------------------------------------
--- Engine
--- --------------------------------------
 
 group "Engine"
 
@@ -164,7 +165,7 @@ project "Saffron"
 
 		postbuildcommands 
 		{
-			'{COPY} "%{SharedLibraryDir.assimp_deb} "%{cfg.targetdir}"'
+			'{COPY} "%{SharedLibraryDir.assimp_deb}" "%{cfg.targetdir}"'
 		}
 			
 	filter "configurations:Release"
@@ -178,7 +179,7 @@ project "Saffron"
 
 		postbuildcommands 
 		{
-			'{COPY} "%{SharedLibraryDir.assimp_rel} "%{cfg.targetdir}"'
+			'{COPY} "%{SharedLibraryDir.assimp_rel}" "%{cfg.targetdir}"'
 		}
 
 	filter "configurations:Dist"
@@ -192,7 +193,7 @@ project "Saffron"
 
 		postbuildcommands
 		{		
-			'{COPY} "%{SharedLibraryDir.assimp_rel} "%{cfg.targetdir}"'
+			'{COPY} "%{SharedLibraryDir.assimp_rel}" "%{cfg.targetdir}"'
 		}
 
 
