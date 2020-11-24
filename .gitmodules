@@ -35,3 +35,6 @@
 [submodule "Saffron/Dependencies/glfw"]
 	path = Saffron/Dependencies/glfw
 	url = https://github.com/saffronjam/glfw.git
+[submodule "Saffron/Dependencies/mono"]
+	path = Saffron/Dependencies/mono
+	url = https://github.com/saffronjam/mono.git
