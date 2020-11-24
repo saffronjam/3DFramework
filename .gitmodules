@@ -35,6 +35,3 @@
 [submodule "Saffron/Dependencies/glfw"]
 	path = Saffron/Dependencies/glfw
 	url = https://github.com/saffronjam/glfw.git
-[submodule "Saffron/Dependencies/--force"]
-	path = Saffron/Dependencies/--force
-	url = https://github.com/saffronjam/glfw.git
