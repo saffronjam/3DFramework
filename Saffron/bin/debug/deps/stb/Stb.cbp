@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Stb"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="msvc8"/>
+		<Option virtualFolders="CMake Files\;CMake Files\deps\;CMake Files\deps\assimp\;CMake Files\deps\Box2D\;CMake Files\deps\entt\;CMake Files\deps\FastNoise\;CMake Files\deps\glfw\;CMake Files\deps\glm\;CMake Files\deps\Glad\;CMake Files\deps\imgui\;CMake Files\deps\mono\;CMake Files\deps\reactphysics3d\;CMake Files\deps\spdlog\;CMake Files\deps\stb\;CMake Files\deps\yaml-cpp\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/stb"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\stb\Makefile VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\stb\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\stb\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\stb\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Box2D\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/entt/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\entt\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\FastNoise\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Glad\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\imgui\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/mono/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\mono\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\reactphysics3d\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/spdlog/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\spdlog\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/stb/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\stb\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\yaml-cpp\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

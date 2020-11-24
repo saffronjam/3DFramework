@@ -1,8 +1,0 @@
-Project: "Empty Project"
-UUID: 16133183861890342329
-ProjectDirectory: Projects/MyProj3
-Scenes:
-	- Filepath: MyScene1.ssc
-	- Filepath: MyScene2.ssc
-	- Filepath: MyScene3.ssc
-LastOpened: [2020, 10, 5, 3, 21, 48, 20]

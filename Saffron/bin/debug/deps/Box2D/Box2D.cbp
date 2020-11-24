@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Box2D"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="msvc8"/>
+		<Option virtualFolders="CMake Files\;CMake Files\deps\;CMake Files\deps\assimp\;CMake Files\deps\Box2D\;CMake Files\deps\entt\;CMake Files\deps\FastNoise\;CMake Files\deps\glfw\;CMake Files\deps\glm\;CMake Files\deps\Glad\;CMake Files\deps\imgui\;CMake Files\deps\mono\;CMake Files\deps\reactphysics3d\;CMake Files\deps\spdlog\;CMake Files\deps\stb\;CMake Files\deps\yaml-cpp\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Box2D">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D/Box2D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 Box2D"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Box2D/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D/Box2D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 Box2D/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_broad_phase.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_chain_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_circle_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_circle.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_edge.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_polygon.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collision.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_distance.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_dynamic_tree.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_edge_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_polygon_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_time_of_impact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_block_allocator.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_draw.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_math.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_settings.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_stack_allocator.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_timer.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_body.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_manager.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_solver.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_solver.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_distance_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_fixture.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_friction_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_gear_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_island.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_island.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_motor_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_mouse_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_prismatic_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_pulley_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_revolute_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_rope_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_weld_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_wheel_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_world.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_world_callbacks.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/rope/b2_rope.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Box2D\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/entt/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\entt\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\FastNoise\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Glad\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\imgui\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/mono/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\mono\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\reactphysics3d\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/spdlog/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\spdlog\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/stb/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\stb\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\yaml-cpp\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

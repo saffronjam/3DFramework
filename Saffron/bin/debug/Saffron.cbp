@@ -1,0 +1,1713 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="Saffron"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="msvc8"/>
+		<Option virtualFolders="CMake Files\;CMake Files\deps\;CMake Files\deps\assimp\;CMake Files\deps\Box2D\;CMake Files\deps\entt\;CMake Files\deps\FastNoise\;CMake Files\deps\glfw\;CMake Files\deps\glm\;CMake Files\deps\Glad\;CMake Files\deps\imgui\;CMake Files\deps\mono\;CMake Files\deps\reactphysics3d\;CMake Files\deps\spdlog\;CMake Files\deps\stb\;CMake Files\deps\yaml-cpp\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 all"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Saffron">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/Saffron.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/assimp/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/entt/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glm/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/mono/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/spdlog/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/stb/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 Saffron"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Saffron/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/Saffron.exe" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/assimp/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/entt/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glm/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/mono/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/spdlog/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/stb/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 Saffron/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 edit_cache"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Box2D">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D/Box2D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 Box2D"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Box2D/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D/Box2D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Box2D"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/include"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 Box2D/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Box2D\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="FastNoise">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/FastNoise/FastNoise.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/FastNoise"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 FastNoise"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="FastNoise/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/FastNoise/FastNoise.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/FastNoise"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 FastNoise/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\FastNoise\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Glad">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Glad/Glad.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 Glad"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Glad/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Glad/Glad.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/Glad"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 Glad/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\Glad\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GLFW">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/glfw/GLFW.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/glfw"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add option="-D_GLFW_WIN32"/>
+					<Add option="-D_CRT_SECURE_NO_WARNINGS"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 GLFW"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="GLFW/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/glfw/GLFW.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/glfw"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add option="-D_GLFW_WIN32"/>
+					<Add option="-D_CRT_SECURE_NO_WARNINGS"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 GLFW/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\glfw\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ImGui">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/imgui/ImGui.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/imgui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 ImGui"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ImGui/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/imgui/ImGui.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/imgui"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 ImGui/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\imgui\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ReactPhysics3D">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/reactphysics3d/ReactPhysics3D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/reactphysics3d"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 ReactPhysics3D"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="ReactPhysics3D/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/reactphysics3d/ReactPhysics3D.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/reactphysics3d"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 ReactPhysics3D/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\reactphysics3d\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="YAMLCPP">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/yaml-cpp/YAMLCPP.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/yaml-cpp"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 YAMLCPP"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="YAMLCPP/fast">
+				<Option output="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/yaml-cpp/YAMLCPP.lib" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/deps/yaml-cpp"/>
+				<Option object_output="./"/>
+				<Option type="2"/>
+				<Option compiler="msvc8"/>
+				<Compiler>
+					<Add option="-DSE_PLATFORM_WINDOWS"/>
+					<Add option="-DSE_DEBUG"/>
+					<Add directory="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\ATLMFC\include"/>
+					<Add directory="C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.27.29110\include"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\NETFXSDK\4.8\include\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\ucrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\shared"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\um"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\winrt"/>
+					<Add directory="C:\Program Files (x86)\Windows Kits\10\include\10.0.19041.0\cppwinrt"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 YAMLCPP/fast"/>
+					<CompileFile command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 clean"/>
+					<DistClean command="nmake /NOLOGO /f C:\Users\ownem\source\repos\SaffronCmake\Saffron\bin\debug\deps\yaml-cpp\Makefile VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/CMakeFiles/Saffron.dir/cmake_pch.cxx">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/bin/debug/CMakeFiles/Saffron.dir/cmake_pch.hxx">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_broad_phase.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_chain_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_circle_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_circle.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_edge.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collide_polygon.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_collision.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_distance.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_dynamic_tree.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_edge_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_polygon_shape.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/collision/b2_time_of_impact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_block_allocator.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_draw.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_math.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_settings.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_stack_allocator.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/common/b2_timer.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_body.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_chain_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_manager.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_solver.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_contact_solver.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_distance_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_edge_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_fixture.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_friction_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_gear_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_island.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_island.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_motor_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_mouse_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_circle_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_circle_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_contact.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_polygon_contact.h">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_prismatic_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_pulley_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_revolute_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_rope_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_weld_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_wheel_joint.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_world.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/dynamics/b2_world_callbacks.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/src/rope/b2_rope.cpp">
+			<Option target="Box2D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/src/FastNoise.cpp">
+			<Option target="FastNoise"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/src/glad.c">
+			<Option target="Glad"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/include/GLFW/glfw3.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/include/GLFW/glfw3native.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/context.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/egl_context.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/egl_context.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/init.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/input.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/monitor.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/osmesa_context.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/osmesa_context.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/vulkan.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/wgl_context.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/wgl_context.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_init.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_joystick.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_joystick.h">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_monitor.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_thread.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_time.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/win32_window.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/src/window.c">
+			<Option target="GLFW"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imconfig.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui.cpp">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui_demo.cpp">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui_draw.cpp">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui_internal.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imgui_widgets.cpp">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imstb_rectpack.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imstb_textedit.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/imstb_truetype.h">
+			<Option target="ImGui"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/body/CollisionBody.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/body/RigidBody.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/Collider.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/CollisionCallback.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/ContactManifold.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/HalfEdgeStructure.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/OverlapCallback.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/PolygonVertexArray.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/PolyhedronMesh.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/RaycastInfo.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/TriangleMesh.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/TriangleVertexArray.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/broadphase/DynamicAABBTree.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/CapsuleVsCapsuleAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/CapsuleVsCapsuleNarrowPhaseInfoBatch.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/CapsuleVsConvexPolyhedronAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/CollisionDispatch.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/ConvexPolyhedronVsConvexPolyhedronAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/GJK/GJKAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/GJK/VoronoiSimplex.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/NarrowPhaseInfoBatch.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/NarrowPhaseInput.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SAT/SATAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SphereVsCapsuleAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SphereVsCapsuleNarrowPhaseInfoBatch.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SphereVsConvexPolyhedronAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SphereVsSphereAlgorithm.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/narrowphase/SphereVsSphereNarrowPhaseInfoBatch.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/AABB.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/BoxShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/CapsuleShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/CollisionShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/ConcaveMeshShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/ConcaveShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/ConvexMeshShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/ConvexPolyhedronShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/ConvexShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/HeightFieldShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/SphereShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/collision/shapes/TriangleShape.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/BallAndSocketJointComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/ColliderComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/CollisionBodyComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/Components.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/FixedJointComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/HingeJointComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/JointComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/RigidBodyComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/SliderJointComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/components/TransformComponents.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/BallAndSocketJoint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/ContactPoint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/FixedJoint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/HingeJoint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/Joint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/constraint/SliderJoint.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/Entity.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/EntityManager.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/Island.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/Material.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/OverlappingPairs.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/PhysicsCommon.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/PhysicsWorld.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/engine/Timer.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Matrix2x2.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Matrix3x3.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Quaternion.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Transform.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Vector2.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/Vector3.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/mathematics/mathematics_functions.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/memory/HeapAllocator.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/memory/MemoryManager.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/memory/PoolAllocator.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/memory/SingleFrameAllocator.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/BroadPhaseSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/CollisionDetectionSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/ConstraintSolverSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/ContactSolverSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/DynamicsSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/SolveBallAndSocketJointSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/SolveFixedJointSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/SolveHingeJointSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/systems/SolveSliderJointSystem.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/utils/DebugRenderer.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/utils/DefaultLogger.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/src/utils/Profiler.cpp">
+			<Option target="ReactPhysics3D"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/binary.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/contrib/graphbuilder.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/contrib/graphbuilderadapter.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/contrib/graphbuilderadapter.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/convert.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/depthguard.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/directives.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/directives.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emit.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitfromevents.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitter.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitterstate.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitterstate.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitterutils.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/emitterutils.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/exceptions.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/exp.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/exp.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/memory.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/node.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/node_data.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/nodebuilder.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/nodebuilder.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/nodeevents.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/nodeevents.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/null.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/ostream_wrapper.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/parse.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/parser.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/regex_yaml.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/regex_yaml.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scanner.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scanner.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scanscalar.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scanscalar.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scantag.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scantag.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/scantoken.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/simplekey.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/singledocparser.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/singledocparser.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/stream.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/stream.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/tag.cpp">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/src/tag.h">
+			<Option target="YAMLCPP"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/EditorApplication.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/EditorApplication.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/EditorLayer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/EditorLayer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/StartupLayer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Implementation/StartupLayer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Application.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Application.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/BatchLoader.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/BatchLoader.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Buffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Buffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Core.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Core.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/DateTime.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/DateTime.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Event.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Event.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/FileIOManager.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/FileIOManager.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/GlobalTimer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/GlobalTimer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Layer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Layer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/LayerStack.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/LayerStack.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Log.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Log.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/LogSink.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/LogSink.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Mat4.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Mat4.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Noise.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Noise.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Ray.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Math/Ray.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Misc.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Misc.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Project.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Project.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Run.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Run.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Signal.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Signal.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Signaller.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Signaller.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/TerminalSink.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/TerminalSink.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Time.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Time.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Timer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Timer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/UUID.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/UUID.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Window.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Core/Window.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Debug/Instrumentor.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Debug/Instrumentor.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/AssetPanel.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/AssetPanel.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EditorCamera.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EditorCamera.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EditorTerminal.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EditorTerminal.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EntityPanel.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/EntityPanel.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ScenePanel.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ScenePanel.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ScriptPanel.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ScriptPanel.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/SplashScreenPane.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/SplashScreenPane.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ViewportPane.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Editor/ViewportPane.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Entity/Entity.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Entity/Entity.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Entity/EntityRegistry.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Entity/EntityRegistry.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/EntryPoint.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Gui/Gui.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Gui/Gui.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Gui/ImGuiBuild.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Gui/ImGuizmo.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Gui/ImGuizmo.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Physics/PhysicsWorld2D.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Physics/PhysicsWorld2D.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Physics/PhysicsWorld3D.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Physics/PhysicsWorld3D.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLFramebuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLFramebuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLIndexBuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLIndexBuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLPipeline.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLPipeline.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLRenderPass.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLRenderPass.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLRendererAPI.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLShader.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLShader.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLShaderUniform.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLShaderUniform.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLTexture.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLTexture.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLVertexBuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/OpenGL/OpenGLVertexBuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/Windows/WindowsFileIOManager.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/Windows/WindowsInput.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/Windows/WindowsWindow.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Platform/Windows/WindowsWindow.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Camera.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Camera.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Framebuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Framebuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/IndexBuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/IndexBuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Material.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Material.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Mesh.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Mesh.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Pipeline.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Pipeline.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RenderCommandQueue.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RenderCommandQueue.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RenderPass.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RenderPass.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Renderer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Renderer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Renderer2D.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Renderer2D.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RendererAPI.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/RendererAPI.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/SceneRenderer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/SceneRenderer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Shader.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Shader.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/ShaderUniform.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/ShaderUniform.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Texture.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/Texture.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/VertexBuffer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Renderer/VertexBuffer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Resource/ResourceManager.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Resource/ResourceManager.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/EditorScene.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/EditorScene.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/Environment.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/Environment.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/ModelSpaceScene.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/ModelSpaceScene.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/RuntimeScene.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/RuntimeScene.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/Scene.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/Scene.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/SceneCamera.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Scene/SceneCamera.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptEngine.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptEngine.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptEngineRegistry.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptEngineRegistry.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptWrappers.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Script/ScriptWrappers.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/ApplicationSerializer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/ApplicationSerializer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/EditorSerializer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/EditorSerializer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/ProjectSerializer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/ProjectSerializer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/SceneSerializer.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/Saffron/Serialize/SceneSerializer.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/SaffronPCH.cpp">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/src/SaffronPCH.h">
+			<Option target="Saffron"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/assimp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\assimp\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Box2D/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Box2D\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/entt/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\entt\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/FastNoise/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\FastNoise\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glfw/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glfw\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/glm/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\glm\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/Glad/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\Glad\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/imgui/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\imgui\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/mono/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\mono\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/reactphysics3d/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\reactphysics3d\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/spdlog/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\spdlog\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/stb/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\stb\"/>
+		</Unit>
+		<Unit filename="C:/Users/ownem/source/repos/SaffronCmake/Saffron/deps/yaml-cpp/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\deps\yaml-cpp\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
