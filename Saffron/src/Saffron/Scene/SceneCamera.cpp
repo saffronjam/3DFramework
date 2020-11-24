@@ -48,8 +48,8 @@ void SceneCamera::RenderFrustum(const Matrix4f &transform) const
 	Vector3f topLeftFar = middleFarPlane + up * Hfar / 2.0f - right * Wfar / 2.0f;
 
 	auto orange = Gui::GetSaffronOrange();
-	auto orangeFade1 = Gui::GetSaffronOrange(0.7f);
-	auto orangeFade2 = Gui::GetSaffronOrange(0.4f);
+	auto orangeFade1 = Gui::GetSaffronOrange(0.5f);
+	auto orangeFade2 = Gui::GetSaffronOrange(0.2f);
 
 	// Square near
 	SceneRenderer::SubmitLine(topRightNear, botRightNear, orange);
