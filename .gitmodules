@@ -1,0 +1,40 @@
+[submodule "Saffron/Dependencies/assimp"]
+	path = Saffron/Dependencies/assimp
+	url = https://github.com/saffronjam/assimp.git
+[submodule "Saffron/Dependencies/entt"]
+	path = Saffron/Dependencies/entt
+	url = https://github.com/saffronjam/entt.git
+[submodule "Saffron/Dependencies/Box2D"]
+	path = Saffron/Dependencies/Box2D
+	url = https://github.com/saffronjam/Box2D.git
+[submodule "Saffron/Dependencies/FastNoise"]
+	path = Saffron/Dependencies/FastNoise
+	url = https://github.com/saffronjam/FastNoise.git
+[submodule "Saffron/Dependencies/Glad"]
+	path = Saffron/Dependencies/Glad
+	url = https://github.com/saffronjam/Glad.git
+[submodule "Saffron/Dependencies/spdlog"]
+	path = Saffron/Dependencies/spdlog
+	url = https://github.com/saffronjam/spdlog.git
+[submodule "Saffron/Dependencies/reactphysics3d"]
+	path = Saffron/Dependencies/reactphysics3d
+	url = https://github.com/saffronjam/reactphysics3d.git
+[submodule "Saffron/Dependencies/stb"]
+	path = Saffron/Dependencies/stb
+	url = https://github.com/saffronjam/stb.git
+[submodule "Saffron/Dependencies/yaml-cpp"]
+	path = Saffron/Dependencies/yaml-cpp
+	url = https://github.com/saffronjam/yaml-cpp.git
+[submodule "Saffron/Dependencies/imgui"]
+	path = Saffron/Dependencies/imgui
+	url = https://github.com/saffronjam/imgui.git
+	branch = docking
+[submodule "Saffron/Dependencies/glm"]
+	path = Saffron/Dependencies/glm
+	url = https://github.com/saffronjam/glm.git
+[submodule "Saffron/Dependencies/glfw"]
+	path = Saffron/Dependencies/glfw
+	url = https://github.com/saffronjam/glfw.git
+[submodule "Saffron/Dependencies/--force"]
+	path = Saffron/Dependencies/--force
+	url = https://github.com/saffronjam/glfw.git
