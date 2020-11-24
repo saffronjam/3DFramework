@@ -46,8 +46,10 @@ RelWithDebInfo
 *.out
 *.app
 
+# Build directory
+Saffron/bin/
+
 # Folders
-.idea/
 .vs/
 Bin/
 !Vendors/*/Bin/
