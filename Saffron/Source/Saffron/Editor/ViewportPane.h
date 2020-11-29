@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class ViewportPane : public ReferenceCounted, public Signaller
+class ViewportPane : public MemManaged<ViewportPane>, public Signaller
 {
 public:
 	struct Signals
@@ -14,7 +14,7 @@ public:
 	};
 
 public:
-	explicit ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target);
+	explicit ViewportPane(String windowTitle, std::shared_ptr<SceneRenderer::Target> target);
 
 	void OnGuiRender(bool *open = nullptr, UUID uuid = 0);
 
@@ -30,12 +30,12 @@ public:
 	bool IsHovered() const { return m_Hovered; }
 	bool IsFocused() const { return m_Focused; }
 
-	void SetTarget(Shared<SceneRenderer::Target> target) { m_Target = Move(target); }
+	void SetTarget(std::shared_ptr<SceneRenderer::Target> target) { m_Target = Move(target); }
 
 private:
 	String m_WindowTitle;
-	Shared<SceneRenderer::Target> m_Target;
-	Shared<Texture> m_FallbackTexture;
+	std::shared_ptr<SceneRenderer::Target> m_Target;
+	std::shared_ptr<Texture> m_FallbackTexture;
 	Uint32 m_DockID = 0;
 
 	Vector2f m_TopLeft;

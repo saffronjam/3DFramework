@@ -16,7 +16,7 @@ public:
     void OnUpdate() override;
 
 private:
-    Shared<StartupLayer> m_StartupLayer;
-    Shared<EditorLayer> m_EditorLayer;
+    std::shared_ptr<StartupLayer> m_StartupLayer;
+    std::shared_ptr<EditorLayer> m_EditorLayer;
 };
 }

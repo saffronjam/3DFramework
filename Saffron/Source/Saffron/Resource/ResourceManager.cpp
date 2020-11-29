@@ -3,17 +3,17 @@
 
 namespace Se
 {
-Shared<Resource> &ResourceManager::Get(Shared<Resource> resource)
+std::shared_ptr<Resource> &ResourceManager::Get(std::shared_ptr<Resource> resource)
 {
 	return Get(resource->GetIdentifier());
 }
 
-Shared<Resource> &ResourceManager::Get(size_t identifer)
+std::shared_ptr<Resource> &ResourceManager::Get(size_t identifer)
 {
 	return GetInstance()->m_Memory.at(identifer);
 }
 
-bool ResourceManager::Exists(Shared<Resource> resource)
+bool ResourceManager::Exists(std::shared_ptr<Resource> resource)
 {
 	return Exists(resource->GetIdentifier());
 }
@@ -24,13 +24,19 @@ bool ResourceManager::Exists(size_t identifier)
 	return instance->m_Memory.find(identifier) != instance->m_Memory.end();
 }
 
-void ResourceManager::Emplace(Shared<Resource> resource)
+void ResourceManager::Emplace(std::shared_ptr<Resource> resource)
 {
 	auto &instance = GetInstance();
 	instance->m_Memory.emplace(resource->GetIdentifier(), resource);
 }
 
-const ArrayList<Shared<Resource>> &ResourceManager::GetAll()
+void ResourceManager::Emplace(std::shared_ptr<Resource> resource, size_t identifier)
+{
+	auto &instance = GetInstance();
+	instance->m_Memory.emplace(identifier, resource);
+}
+
+const ArrayList<std::shared_ptr<Resource>> &ResourceManager::GetAll()
 {
 	auto &instance = GetInstance();
 	if ( instance->m_NeedCacheSync )
@@ -40,9 +46,16 @@ const ArrayList<Shared<Resource>> &ResourceManager::GetAll()
 	return GetInstance()->m_ReturnCache;
 }
 
-Shared<ResourceManager> &ResourceManager::GetInstance()
+void ResourceManager::Clear()
 {
-	static Shared<ResourceManager> s_ResourceManager = Shared<ResourceManager>::Create();
+	GetInstance()->m_Memory.clear();
+	GetInstance()->m_ReturnCache.clear();
+	GetInstance()->m_NeedCacheSync = false;
+}
+
+std::shared_ptr<ResourceManager> &ResourceManager::GetInstance()
+{
+	static std::shared_ptr<ResourceManager> s_ResourceManager = CreateShared<ResourceManager>();
 	return s_ResourceManager;
 }
 

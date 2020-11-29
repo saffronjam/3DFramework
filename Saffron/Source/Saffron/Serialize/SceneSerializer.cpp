@@ -86,7 +86,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 	if ( environment )
 	{
 		auto envPath = environment["AssetPath"].as<String>();
-		m_Scene.SetEnvironment(Scene::Environment::Load(envPath));
+		m_Scene.SetEnvironment(SceneEnvironment::Load(envPath));
 
 		auto lightNode = environment["Light"];
 		if ( lightNode )
@@ -231,7 +231,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				auto translation = meshComponent["Position"].as<Vector3f>();
 				auto rotation = meshComponent["Rotation"].as<glm::quat>();
 				auto scale = meshComponent["Scale"].as<Vector3f>();
-				component.Mesh = Shared<Mesh>::Create(meshPath);
+				component.Mesh = CreateShared<Mesh>(meshPath);
 				component.Mesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
 
 			}
@@ -243,7 +243,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				auto translation = cameraComponent["Position"].as<Vector3f>();
 				auto rotation = cameraComponent["Rotation"].as<glm::quat>();
 				auto scale = cameraComponent["Scale"].as<Vector3f>();
-				component.Camera = Shared<SceneCamera>::Create();
+				component.Camera = CreateShared<SceneCamera>();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 				component.DrawMesh = cameraComponent["DrawMesh"].as<bool>();
 				component.DrawFrustum = cameraComponent["DrawFrustum"].as<bool>();
@@ -479,7 +479,7 @@ void SceneSerializer::SerializeEnvironment(YAML::Emitter &emitter) const
 	emitter << YAML::Key << "Environment";
 	emitter << YAML::Value;
 	emitter << YAML::BeginMap; // Environment
-	emitter << YAML::Key << "AssetPath" << YAML::Value << m_Scene.GetEnvironment().FilePath;
+	emitter << YAML::Key << "AssetPath" << YAML::Value << m_Scene.GetEnvironment()->GetFilepath().string();
 	const auto &light = m_Scene.GetLight();
 	emitter << YAML::Key << "Light" << YAML::Value;
 	emitter << YAML::BeginMap; // Light

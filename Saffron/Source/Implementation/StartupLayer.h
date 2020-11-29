@@ -24,10 +24,10 @@ public:
     void OnEvent(const Event &event) override;
 
 private:
-    Map <String, Shared<Texture2D>> m_TextureStore;
+    Map <String, std::shared_ptr<Texture2D>> m_TextureStore;
     Shared <Project> m_SelectedProject = nullptr;
     DateTime m_Today;
-    Optional <Shared<Project>> m_NewProject;
+    Optional <std::shared_ptr<Project>> m_NewProject;
 
 };
 

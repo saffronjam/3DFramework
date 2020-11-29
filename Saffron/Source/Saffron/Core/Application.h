@@ -31,23 +31,23 @@ public:
 	virtual void OnUpdate() {}
 	virtual void OnEvent(const Event &event);
 
-	void PushLayer(Shared<Layer> layer);
-	void PushOverlay(Shared<Layer> overlay);
+	void PushLayer(std::shared_ptr<Layer> layer);
+	void PushOverlay(std::shared_ptr<Layer> overlay);
 	void PopLayer(int count = 1);
 	void PopOverlay(int count = 1);
-	void EraseLayer(Shared<Layer> layer);
-	void EraseOverlay(Shared<Layer> overlay);
+	void EraseLayer(std::shared_ptr<Layer> layer);
+	void EraseOverlay(std::shared_ptr<Layer> overlay);
 
 	void RenderGui();
 
 	Window &GetWindow() { return *m_Window; }
 
-	void AddProject(const Shared<Project> &project);
-	void RemoveProject(const Shared<Project> &project);
+	void AddProject(const std::shared_ptr<Project> &project);
+	void RemoveProject(const std::shared_ptr<Project> &project);
 
-	const ArrayList<Shared<Project>> &GetRecentProjectList() const;
-	const Shared<Project> &GetActiveProject() const;
-	void SetActiveProject(const Shared<Project> &project);
+	const ArrayList<std::shared_ptr<Project>> &GetRecentProjectList() const;
+	const std::shared_ptr<Project> &GetActiveProject() const;
+	void SetActiveProject(const std::shared_ptr<Project> &project);
 
 	static Application &Get() { return *s_Instance; }
 
@@ -60,16 +60,16 @@ private:
 	bool OnWindowClose(const WindowCloseEvent &event);
 
 protected:
-	Shared<BatchLoader> m_PreLoader;
+	std::shared_ptr<BatchLoader> m_PreLoader;
 
 private:
-	Shared<Window> m_Window;
+	std::shared_ptr<Window> m_Window;
 	bool m_Running = true, m_Minimized = false;
 	LayerStack m_LayerStack;
 	Mutex m_FinalPreloaderMessageMutex;
 
-	mutable ArrayList<Shared<Project>> m_RecentProjectList;
-	Shared<Project> m_ActiveProject = nullptr;
+	mutable ArrayList<std::shared_ptr<Project>> m_RecentProjectList;
+	std::shared_ptr<Project> m_ActiveProject = nullptr;
 
 	Time ts;
 

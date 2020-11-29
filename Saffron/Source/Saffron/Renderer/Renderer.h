@@ -41,12 +41,13 @@ public:
 	static void Execute();
 
 	// ~Actual~ Renderer here... TODO: remove confusion later
-	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);
+	static void BeginRenderPass(std::shared_ptr<RenderPass> renderPass, bool clear = true);
 	static void EndRenderPass();
 
-	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform = Matrix4f(1.0f));
-	static void SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader);
-	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial = nullptr);
+	static void SubmitQuad(std::shared_ptr<MaterialInstance> material, const Matrix4f &transform = Matrix4f(1.0f));
+	static void SubmitLines(LineVertex *vertices, Uint32 count, std::shared_ptr<Shader> shader);
+	static void SubmitMesh(std::shared_ptr<Mesh> mesh, const Matrix4f &transform, std::shared_ptr<MaterialInstance> overrideMaterial = nullptr);
+	static void SubmitMesh(std::shared_ptr<Mesh> mesh, const Matrix4f &transform, std::shared_ptr<Shader> shader);
 
 private:
 	static RenderCommandQueue &GetRenderCommandQueue();
@@ -66,7 +67,7 @@ void Renderer::Submit(FuncT &&func)
 		// static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
 		pFunc.~FuncT();
 	};
-	auto storageBuffer = GetRenderCommandQueue().Allocate(renderCmd, sizeof(func));
+	auto storageBuffer = GetRenderCommandQueue().Allocate(renderCmd, sizeof func);
 	new(storageBuffer) FuncT(std::forward<FuncT>(func));
 }
 }

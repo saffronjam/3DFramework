@@ -19,6 +19,8 @@ public:
 	Uint32 GetSize() const override { return m_Size; }
 	RendererID GetRendererID() const override { return m_RendererID; }
 
+private:
+	void Create();
 
 private:
 	RendererID m_RendererID = 0;

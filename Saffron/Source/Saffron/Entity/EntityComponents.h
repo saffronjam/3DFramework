@@ -2,7 +2,9 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Editor/EditorCamera.h"
+#include "Saffron/Renderer/LightType.h"
 #include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Scene/SceneEnvironment.h"
 #include "Saffron/Scene/SceneCamera.h"
 
 namespace Se
@@ -47,16 +49,16 @@ struct TransformComponent
 
 struct MeshComponent
 {
-	Shared<Mesh> Mesh;
+	std::shared_ptr<Mesh> Mesh;
 
 	MeshComponent() = default;
 	MeshComponent(const MeshComponent &other) = default;
-	explicit MeshComponent(const Shared<Se::Mesh> &mesh)
+	explicit MeshComponent(const std::shared_ptr<Se::Mesh> &mesh)
 		: Mesh(mesh)
 	{
 	}
 
-	operator Shared<Se::Mesh>() const { return Mesh; }
+	operator std::shared_ptr<Se::Mesh>() const { return Mesh; }
 };
 
 struct ScriptComponent
@@ -98,28 +100,28 @@ struct ScriptComponent
 
 struct CameraComponent
 {
-	Shared<SceneCamera> Camera;
+	std::shared_ptr<SceneCamera> Camera;
 	bool Primary = true;
 
-	Shared<Mesh> CameraMesh;
+	std::shared_ptr<Mesh> CameraMesh;
 	bool DrawMesh = true;
 	bool DrawFrustum = false;
 
 	CameraComponent()
-		: Camera(Shared<SceneCamera>::Create()),
-		CameraMesh(Shared<Mesh>::Create("Resources/Assets/Meshes/Camera.fbx"))
+		: Camera(CreateShared<SceneCamera>()),
+		CameraMesh(CreateShared<Mesh>("Resources/Assets/Meshes/Camera.fbx"))
 	{
 		CameraMesh->GetMaterial()->Set<Vector3f>("u_AlbedoColor", { 0.0f, 0.0f,0.45 });
 	}
 	CameraComponent(const CameraComponent &other) = default;
 
-	operator Shared<SceneCamera>() const { return Camera; }
+	operator std::shared_ptr<SceneCamera>() const { return Camera; }
 };
 
 struct SpriteRendererComponent
 {
 	Vector4f Color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	Shared<Texture2D> Texture;
+	std::shared_ptr<Texture2D> Texture;
 	float TilingFactor = 1.0f;
 
 	SpriteRendererComponent() = default;
@@ -205,6 +207,28 @@ struct SphereCollider3DComponent : Collider3DComponent
 
 	SphereCollider3DComponent() = default;
 	SphereCollider3DComponent(const SphereCollider3DComponent &other) = default;
+};
+
+/////////////////////////////////////////////////////////
+/// Lights 
+/////////////////////////////////////////////////////////
+
+struct DirectionalLightComponent
+{
+	Vector3f Radiance = { 1.0f, 1.0f, 1.0f };
+	float Intensity = 1.0f;
+	bool CastShadows = true;
+	bool SoftShadows = true;
+	float LightSize = 0.5f; // For PCSS
+};
+
+struct SkylightComponent
+{
+	std::shared_ptr<SceneEnvironment> SceneEnvironment;
+	float Intensity = 1.0f;
+	float Angle = 0.0f;
+
+	explicit SkylightComponent(std::shared_ptr<Se::SceneEnvironment> &sceneEnvironment) : SceneEnvironment(sceneEnvironment) {}
 };
 
 }

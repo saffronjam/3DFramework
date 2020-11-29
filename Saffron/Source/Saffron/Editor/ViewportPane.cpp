@@ -9,10 +9,10 @@ namespace Se
 {
 SignalAggregate<void> ViewportPane::Signals::OnPostRender;
 
-ViewportPane::ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target)
+ViewportPane::ViewportPane(String windowTitle, std::shared_ptr<SceneRenderer::Target> target)
 	: m_WindowTitle(Move(windowTitle)),
 	m_Target(Move(target)),
-	m_FallbackTexture(Texture2D::Create("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
+	//m_FallbackTexture(Factory::Create<Texture2D>("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
 	m_TopLeft(0.0f, 0.0f),
 	m_BottomRight(100.0f, 100.0f),
 	m_Hovered(false),
@@ -88,7 +88,7 @@ Vector2f ViewportPane::GetMousePosition() const
 	const auto viewportWidth = m_BottomRight.x - m_TopLeft.x;
 	const auto viewportHeight = m_BottomRight.y - m_TopLeft.y;
 
-	return { (position.x / viewportWidth) * 2.0f - 1.0f, ((position.y / viewportHeight) * 2.0f - 1.0f) * -1.0f };
+	return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
 }
 
 Vector2f ViewportPane::GetViewportSize() const

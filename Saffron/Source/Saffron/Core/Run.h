@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/Base.h"
+#include "Saffron/Core/UUID.h"
 #include "Saffron/Core/Time.h"
 
 namespace Se

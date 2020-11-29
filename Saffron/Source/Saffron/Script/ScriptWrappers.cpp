@@ -36,7 +36,7 @@ enum class ComponentID
 
 Entity GetEntityFromActiveScene(UUID entityID)
 {
-	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	std::shared_ptr<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
 	const auto &entityMap = scene->GetEntityMap();
 	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
@@ -51,9 +51,9 @@ T &GetComponentWithCheck(Entity entity)
 	return entity.GetComponent<T>();
 }
 
-Shared<Scene> GetSceneWithCheck()
+std::shared_ptr<Scene> GetSceneWithCheck()
 {
-	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
+	std::shared_ptr<Scene> scene = ScriptEngine::GetCurrentSceneContext();
 	SE_CORE_ASSERT(scene, "No active scene!");
 	return scene;
 }
@@ -109,7 +109,7 @@ bool Saffron_Entity_HasComponent(Uint64 entityID, void *type)
 
 Uint64 Saffron_Entity_GetEntity(MonoString *tag)
 {
-	Shared<Scene> scene = GetSceneWithCheck();
+	std::shared_ptr<Scene> scene = GetSceneWithCheck();
 	Entity entity = scene->GetEntity(mono_string_to_utf8(tag));
 	return entity ? entity.GetComponent<IDComponent>().ID : UUID(0);
 }
@@ -118,10 +118,10 @@ void *Saffron_MeshComponent_GetMesh(Uint64 entityID)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &meshComponent = entity.GetComponent<MeshComponent>();
-	return new Shared<Mesh>(meshComponent.Mesh);
+	return new std::shared_ptr<Mesh>(meshComponent.Mesh);
 }
 
-void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh)
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, std::shared_ptr<Mesh> *inMesh)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &meshComponent = entity.GetComponent<MeshComponent>();
@@ -330,51 +330,51 @@ void Saffron_SphereCollider3DComponent_SetRadius(Uint64 entityID, float radius)
 	component.Radius = radius;
 }
 
-Shared<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath)
+std::shared_ptr<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath)
 {
 	auto *result = new Mesh(mono_string_to_utf8(filepath));
-	return new Shared<Mesh>(result);
+	return new std::shared_ptr<Mesh>(result);
 }
 
-void Saffron_Mesh_Destructor(Shared<Mesh> *mesh)
+void Saffron_Mesh_Destructor(std::shared_ptr<Mesh> *mesh)
 {
 	delete mesh;
 }
 
-Shared<Material> *Saffron_Mesh_GetMaterial(Shared<Mesh> *mesh)
+std::shared_ptr<Material> *Saffron_Mesh_GetMaterial(std::shared_ptr<Mesh> *mesh)
 {
-	return new Shared<Material>((*mesh)->GetMaterial());
+	return new std::shared_ptr<Material>((*mesh)->GetMaterial());
 }
 
-Shared<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Shared<Mesh> *mesh, int index)
+std::shared_ptr<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(std::shared_ptr<Mesh> *mesh, int index)
 {
 	const auto &materials = (*mesh)->GetMaterials();
 	SE_CORE_ASSERT(index < materials.size());
-	return new Shared<MaterialInstance>(materials[index]);
+	return new std::shared_ptr<MaterialInstance>(materials[index]);
 }
 
-size_t Saffron_Mesh_GetMaterialCount(Shared<Mesh> *mesh)
+size_t Saffron_Mesh_GetMaterialCount(std::shared_ptr<Mesh> *mesh)
 {
 	const auto &materials = (*mesh)->GetMaterials();
 	return materials.size();
 }
 
-Shared<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height)
+std::shared_ptr<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height)
 {
-	const auto result = Texture2D::Create(Texture::Format::RGBA, width, height);
-	return new Shared<Texture2D>(result);
+	const auto result = Factory::Create<Texture2D>(Texture::Format::RGBA, width, height);
+	return new std::shared_ptr<Texture2D>(result);
 }
 
-void Saffron_Texture2D_Destructor(Shared<Texture2D> *texture)
+void Saffron_Texture2D_Destructor(std::shared_ptr<Texture2D> *texture)
 {
 	delete texture;
 }
 
-void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int32 count)
+void Saffron_Texture2D_SetData(std::shared_ptr<Texture2D> *texture, MonoArray *data, Int32 count)
 {
 	SE_ASSERT(data);
 
-	Shared<Texture2D> &instance = *texture;
+	std::shared_ptr<Texture2D> &instance = *texture;
 
 	instance->Lock();
 	Buffer buffer = instance->GetWriteableBuffer();
@@ -393,76 +393,76 @@ void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int3
 	instance->Unlock();
 }
 
-void Saffron_Material_Destructor(Shared<Material> *material)
+void Saffron_Material_Destructor(std::shared_ptr<Material> *material)
 {
 	delete material;
 }
 
-void Saffron_Material_SetFloat(Shared<Material> *material, MonoString *uniform, float value)
+void Saffron_Material_SetFloat(std::shared_ptr<Material> *material, MonoString *uniform, float value)
 {
 	SE_ASSERT(uniform);
-	Shared<Material> &instance = *static_cast<Shared<Material> *>(material);
+	std::shared_ptr<Material> &instance = *static_cast<std::shared_ptr<Material> *>(material);
 	instance->Set(mono_string_to_utf8(uniform), value);
 }
 
-void Saffron_Material_SetTexture(Shared<Material> *material, MonoString *uniform, Shared<Texture2D> *texture)
+void Saffron_Material_SetTexture(std::shared_ptr<Material> *material, MonoString *uniform, std::shared_ptr<Texture2D> *texture)
 {
 	SE_ASSERT(uniform && texture);
-	Shared<Material> &instance = *static_cast<Shared<Material> *>(material);
+	std::shared_ptr<Material> &instance = *static_cast<std::shared_ptr<Material> *>(material);
 	instance->Set(mono_string_to_utf8(uniform), *texture);
 }
 
-void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance> *instance)
+void Saffron_MaterialInstance_Destructor(std::shared_ptr<MaterialInstance> *instance)
 {
 	delete instance;
 }
 
-void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoString *uniform, float value)
+void Saffron_MaterialInstance_SetFloat(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, float value)
 {
 	SE_ASSERT(uniform);
 	(*instance)->Set(mono_string_to_utf8(uniform), value);
 }
 
-void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, Vector3f *value)
+void Saffron_MaterialInstance_SetVector3(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, Vector3f *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
-void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, Vector4f *value)
+void Saffron_MaterialInstance_SetVector4(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, Vector4f *value)
 {
 	SE_ASSERT(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
-void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance> *instance, MonoString *uniform, Shared<Texture2D> *texture)
+void Saffron_MaterialInstance_SetTexture(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, std::shared_ptr<Texture2D> *texture)
 {
 	SE_ASSERT(uniform && texture);
 	(*instance)->Set(mono_string_to_utf8(uniform), *texture);
 }
 
-Shared<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height)
+std::shared_ptr<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height)
 {
 	// TODO: Implement properly with MeshFactory class!
-	return new Shared<Mesh>(new Mesh("Resources/Assets/models/Plane1m.obj"));
+	return new std::shared_ptr<Mesh>(new Mesh("Resources/Assets/models/Plane1m.obj"));
 }
 
-Shared<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height)
+std::shared_ptr<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height)
 {
-	return new Shared<SceneCamera>(new SceneCamera(width, height));
+	return new std::shared_ptr<SceneCamera>(new SceneCamera(width, height));
 }
 
-void Saffron_Camera_Destructor(Shared<SceneCamera> *camera)
+void Saffron_Camera_Destructor(std::shared_ptr<SceneCamera> *camera)
 {
 	delete camera;
 }
 
-Uint32 Saffron_Camera_GetProjectionMode(Shared<SceneCamera> *camera)
+Uint32 Saffron_Camera_GetProjectionMode(std::shared_ptr<SceneCamera> *camera)
 {
 	return static_cast<Uint32>((*camera)->GetProjectionMode());
 }
 
-void Saffron_Camera_SetProjectionMode(Shared<SceneCamera> *camera, Uint32 mode)
+void Saffron_Camera_SetProjectionMode(std::shared_ptr<SceneCamera> *camera, Uint32 mode)
 {
 	(*camera)->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(mode));
 }
@@ -471,10 +471,10 @@ void *Saffron_CameraComponent_GetCamera(Uint64 entityID)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto &cameraComponent = entity.GetComponent<CameraComponent>();
-	return new Shared<SceneCamera>(cameraComponent.Camera);
+	return new std::shared_ptr<SceneCamera>(cameraComponent.Camera);
 }
 
-void Saffron_CameraComponent_SetCamera(Uint64 entityID, Shared<SceneCamera> *camera)
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, std::shared_ptr<SceneCamera> *camera)
 {
 	SE_ASSERT(camera);
 	Entity entity = GetEntityFromActiveScene(entityID);

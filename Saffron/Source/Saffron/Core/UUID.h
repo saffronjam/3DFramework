@@ -4,7 +4,7 @@
 
 #include <xhash>
 
-#include "Saffron/System/TypeDefs.h"
+#include "Saffron/Core/TypeDefs.h"
 
 namespace Se
 {

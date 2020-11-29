@@ -6,33 +6,33 @@
 namespace Se
 {
 
-Shared<IndexBuffer> IndexBuffer::Create(Uint32 size)
+std::shared_ptr<IndexBuffer> IndexBuffer::Create(Uint32 size)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL:	return Shared<OpenGLIndexBuffer>::Create(size);
+	case RendererAPI::Type::OpenGL:	return CreateShared<OpenGLIndexBuffer>(size);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 }
 
-Shared<IndexBuffer> IndexBuffer::Create(void *data, Uint32 size)
+std::shared_ptr<IndexBuffer> IndexBuffer::Create(void *data, Uint32 size)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL:	return Shared<OpenGLIndexBuffer>::Create(data, size);
+	case RendererAPI::Type::OpenGL:	return CreateShared<OpenGLIndexBuffer>(data, size);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 	}
 
 }
 
-Shared<IndexBuffer> IndexBuffer::Create(const Buffer &buffer)
+std::shared_ptr<IndexBuffer> IndexBuffer::Create(const Buffer &buffer)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL:	return Shared<OpenGLIndexBuffer>::Create(buffer);
+	case RendererAPI::Type::OpenGL:	return CreateShared<OpenGLIndexBuffer>(buffer);
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI!"); return nullptr;
 	}
 }

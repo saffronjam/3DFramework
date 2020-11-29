@@ -30,20 +30,20 @@ void Shader::OnGuiRender()
 	ImGui::End();
 }
 
-Shared<Shader> Shader::Create(const Filepath &filepath)
+std::shared_ptr<Shader> Shader::Create(const Filepath &filepath)
 {
-	Shared<Shader> result;
+	std::shared_ptr<Shader> result;
 
 	const size_t filepathHash = Misc::HashFilepath(filepath);
 	if ( ResourceManager::Exists(filepathHash) )
 	{
-		return ResourceManager::Get(filepathHash);
+		return ResourceManager::Get(filepathHash)->GetDynShared<Shader>();
 	}
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = Shared<OpenGLShader>::Create(filepath); break;
+	case RendererAPI::Type::OpenGL: result = CreateShared<OpenGLShader>(filepath); break;
 	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 
@@ -55,14 +55,14 @@ Shared<Shader> Shader::Create(const Filepath &filepath)
 	return result;
 }
 
-Shared<Shader> Shader::Create(const String &source)
+std::shared_ptr<Shader> Shader::Create(const String &source)
 {
-	Shared<Shader> result;
+	std::shared_ptr<Shader> result;
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-	case RendererAPI::Type::OpenGL: result = Shared<OpenGLShader>::Create(source); break;
+	case RendererAPI::Type::OpenGL: result = CreateShared<OpenGLShader>(source); break;
 	default:						SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
 	}
 

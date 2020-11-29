@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Core/Timer.h"
-#include "Saffron/System/TypeDefs.h"
+#include "Saffron/Core/TypeDefs.h"
 
 namespace Se
 {

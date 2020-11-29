@@ -5,21 +5,21 @@
 namespace Se
 {
 
-SignalAggregate<Shared<Layer>> LayerStack::Signals::OnPushLayer;
-SignalAggregate<Shared<Layer>> LayerStack::Signals::OnPushOverlay;
-SignalAggregate<Shared<Layer>> LayerStack::Signals::OnPopLayer;
-SignalAggregate<Shared<Layer>> LayerStack::Signals::OnPopOverlay;
+SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPushLayer;
+SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPushOverlay;
+SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPopLayer;
+SignalAggregate<std::shared_ptr<Layer>> LayerStack::Signals::OnPopOverlay;
 
 LayerStack::~LayerStack()
 {
-	for ( Shared<Layer> layer : m_Layers )
+	for ( std::shared_ptr<Layer> layer : m_Layers )
 	{
 		layer->OnDetach();
 	}
 	m_Layers.clear();
 }
 
-void LayerStack::PushLayer(Shared<Layer> layer, Shared<BatchLoader> &batchLoader)
+void LayerStack::PushLayer(std::shared_ptr<Layer> layer, std::shared_ptr<BatchLoader> &batchLoader)
 {
 	auto newLayer = *m_Layers.emplace(m_Layers.begin() + m_LayerInsertIndex, layer);
 	m_LayerInsertIndex++;
@@ -27,7 +27,7 @@ void LayerStack::PushLayer(Shared<Layer> layer, Shared<BatchLoader> &batchLoader
 	newLayer->OnAttach(batchLoader);
 }
 
-void LayerStack::PushOverlay(Shared<Layer> overlay, Shared<BatchLoader> &batchLoader)
+void LayerStack::PushOverlay(std::shared_ptr<Layer> overlay, std::shared_ptr<BatchLoader> &batchLoader)
 {
 	// TODO: Implement
 	SE_CORE_ASSERT("NOT IMPLEMETED");
@@ -58,7 +58,7 @@ void LayerStack::PopOverlay(int count)
 	}
 }
 
-void LayerStack::EraseLayer(Shared<Layer> layer)
+void LayerStack::EraseLayer(std::shared_ptr<Layer> layer)
 {
 	const auto it = std::find(m_Layers.begin(), m_Layers.end(), layer);
 	if ( it != m_Layers.end() )
@@ -70,7 +70,7 @@ void LayerStack::EraseLayer(Shared<Layer> layer)
 	}
 }
 
-void LayerStack::EraseOverlay(Shared<Layer> overlay)
+void LayerStack::EraseOverlay(std::shared_ptr<Layer> overlay)
 {
 	// TODO: Implement
 	SE_CORE_ASSERT("NOT IMPLEMETED");
@@ -90,12 +90,12 @@ void LayerStack::Clear()
 	m_Layers.clear();
 }
 
-Shared<Layer> LayerStack::Front()
+std::shared_ptr<Layer> LayerStack::Front()
 {
 	return m_Layers.front();
 }
 
-Shared<Layer> LayerStack::Back()
+std::shared_ptr<Layer> LayerStack::Back()
 {
 	return m_Layers.back();
 }

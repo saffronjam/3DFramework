@@ -50,9 +50,6 @@ public:
 class Texture2D : public Texture
 {
 public:
-	static Shared<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
-	static Shared<Texture2D> Create(const Filepath &path, bool sRGB = false);
-
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
 
@@ -62,14 +59,18 @@ public:
 	virtual bool Loaded() const = 0;
 
 	virtual const Filepath &GetFilepath() const = 0;
+
+	static std::shared_ptr<Texture2D> Create(Format format, Uint32 width, Uint32 height, Wrap wrap = Wrap::Clamp);
+	static std::shared_ptr<Texture2D> Create(const Filepath &path, bool sRGB = false);
+
 };
 
 class TextureCube : public Texture
 {
 public:
-	static Shared<TextureCube> Create(Format format, Uint32 width, Uint32 height);
-	static Shared<TextureCube> Create(const Filepath &path);
-
 	virtual const Filepath &GetFilepath() const = 0;
+
+	static std::shared_ptr<TextureCube> Create(Format format, Uint32 width, Uint32 height);
+	static std::shared_ptr<TextureCube> Create(const Filepath &path);
 };
 }

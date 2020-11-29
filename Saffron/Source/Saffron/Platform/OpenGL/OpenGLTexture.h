@@ -10,7 +10,7 @@ class OpenGLTexture2D : public Texture2D
 {
 public:
 	OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wrap wrap);
-	OpenGLTexture2D(const Filepath &path, bool sRGB);
+	OpenGLTexture2D(Filepath filepath, bool sRGB);
 	virtual ~OpenGLTexture2D();
 
 	void Bind(Uint32 slot = 0) const override;
@@ -38,8 +38,8 @@ public:
 private:
 	RendererID m_RendererID{};
 	Format m_Format;
-	Wrap m_Wrap = Wrap::Clamp;
 	Uint32 m_Width, m_Height;
+	Wrap m_Wrap = Wrap::Clamp;
 
 	Buffer m_ImageData;
 	bool m_IsHDR = false;
@@ -54,7 +54,7 @@ class OpenGLTextureCube : public TextureCube
 {
 public:
 	OpenGLTextureCube(Format format, Uint32 width, Uint32 height);
-	OpenGLTextureCube(const Filepath &path);
+	OpenGLTextureCube(Filepath filepath);
 	virtual ~OpenGLTextureCube();
 
 	void Bind(Uint32 slot = 0) const override;
@@ -73,6 +73,7 @@ public:
 	RendererID GetRendererID() const override { return m_RendererID; }
 
 	bool operator==(const Texture &other) const override;
+
 private:
 	RendererID m_RendererID{};
 	Format m_Format;

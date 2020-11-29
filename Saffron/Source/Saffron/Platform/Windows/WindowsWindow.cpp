@@ -211,7 +211,11 @@ bool WindowsWindow::OnResize(const WindowResizeEvent &event)
 	Renderer::Submit([=]() { glViewport(0, 0, instance->m_Width, instance->m_Height); });
 	auto &fbs = FramebufferPool::GetGlobal()->GetAll();
 	for ( auto &fb : fbs )
-		fb->Resize(instance->m_Width, instance->m_Height);
+	{
+		if ( !fb->GetSpecification().NoResize )
+			fb->Resize(instance->m_Width, instance->m_Height);
+	}
+
 
 	return false;
 }

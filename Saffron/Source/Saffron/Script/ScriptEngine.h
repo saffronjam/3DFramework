@@ -72,7 +72,7 @@ struct PublicField
 	void SetStoredValue(T value) const;
 	template<typename T>
 	void SetRuntimeValue(T value) const;
-	void SetStoredValueRaw(void *src) const;
+	void SetStoredValue(void *src) const;
 
 private:
 	EntityInstance *m_EntityInstance{};
@@ -116,14 +116,14 @@ public:
 
 	static void OnUpdate();
 	static void OnGuiRender();
-	static void OnProjectChange(const Shared<Project> &project);
-	static void OnSceneChange(const Shared<Scene> &scene);
+	static void OnProjectChange(const std::shared_ptr<Project> &project);
+	static void OnSceneChange(const std::shared_ptr<Scene> &scene);
 
 	static void LoadRuntimeAssembly(const Filepath &assemblyFilepath);
 	static void ReloadAssembly(const Filepath &assemblyFilepath);
 
-	static void SetSceneContext(const Shared<Scene> &scene);
-	static const Shared<Scene> &GetCurrentSceneContext();
+	static void SetSceneContext(const std::shared_ptr<Scene> &scene);
+	static const std::shared_ptr<Scene> &GetCurrentSceneContext();
 
 	static void CopyEntityScriptData(UUID dst, UUID src);
 

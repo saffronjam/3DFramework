@@ -1,6 +1,5 @@
 #include "SaffronPCH.h"
 
-
 #include "Saffron/Core/Application.h"
 #include "Saffron/Core/BatchLoader.h"
 #include "Saffron/Core/FileIOManager.h"
@@ -11,23 +10,24 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Input.h"
 #include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Resource/ResourceManager.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Serialize/ApplicationSerializer.h"
 #include "Saffron/Scene/EditorScene.h"
-
 namespace Se {
 
 Application *Application::s_Instance = nullptr;
 
 
 Application::Application(const Properties &properties)
-	: m_PreLoader(Shared<BatchLoader>::Create("Preloader"))
+	: m_PreLoader(CreateShared<BatchLoader>("Preloader"))
 {
 	SE_ASSERT(!s_Instance, "Application already exist");
 	s_Instance = this;
 
 	m_Window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 	m_Window->GetSignal(Window::Signals::OnEvent).Connect(SE_BIND_EVENT_FN(OnEvent));
+	m_Window->Maximize();
 	m_Window->SetVSync(true);
 	m_Window->SetWindowIcon("Resources/Assets/Editor/Saffron_windowIcon.png");
 	m_Window->HandleBufferedEvents();
@@ -61,14 +61,16 @@ Application::~Application()
 	Gui::Shutdown();
 	const ApplicationSerializer serializer(*this);
 	serializer.Serialize("Application/ApplicationProperties.sap");
+	ResourceManager::Clear();
+	FramebufferPool::GetGlobal()->Clear();
 }
 
-void Application::PushLayer(Shared<Layer> layer)
+void Application::PushLayer(std::shared_ptr<Layer> layer)
 {
 	m_LayerStack.PushLayer(layer, m_PreLoader);
 }
 
-void Application::PushOverlay(Shared<Layer> overlay)
+void Application::PushOverlay(std::shared_ptr<Layer> overlay)
 {
 	m_LayerStack.PushOverlay(overlay, m_PreLoader);
 }
@@ -83,12 +85,12 @@ void Application::PopOverlay(int count)
 	m_LayerStack.PopOverlay(count);
 }
 
-void Application::EraseLayer(Shared<Layer> layer)
+void Application::EraseLayer(std::shared_ptr<Layer> layer)
 {
 	m_LayerStack.EraseLayer(layer);
 }
 
-void Application::EraseOverlay(Shared<Layer> overlay)
+void Application::EraseOverlay(std::shared_ptr<Layer> overlay)
 {
 	m_LayerStack.EraseOverlay(overlay);
 }
@@ -97,7 +99,7 @@ void Application::RenderGui()
 {
 	Gui::Begin();
 
-	for ( Shared<Layer> layer : m_LayerStack )
+	for ( std::shared_ptr<Layer> layer : m_LayerStack )
 		layer->OnGuiRender();
 
 	Gui::End();
@@ -117,7 +119,7 @@ void Application::Run()
 		m_Window->HandleBufferedEvents();
 		if ( !m_Minimized )
 		{
-			for ( Shared<Layer> layer : m_LayerStack )
+			for ( std::shared_ptr<Layer> layer : m_LayerStack )
 				layer->OnUpdate();
 			ScriptEngine::OnUpdate();
 			Input::OnUpdate();
@@ -163,7 +165,7 @@ bool Application::OnWindowClose(const WindowCloseEvent &event)
 	return true;
 }
 
-void Application::AddProject(const Shared<Project> &project)
+void Application::AddProject(const std::shared_ptr<Project> &project)
 {
 	if ( std::find(m_RecentProjectList.begin(), m_RecentProjectList.end(), project) == m_RecentProjectList.end() )
 	{
@@ -171,12 +173,12 @@ void Application::AddProject(const Shared<Project> &project)
 	}
 }
 
-void Application::RemoveProject(const Shared<Project> &project)
+void Application::RemoveProject(const std::shared_ptr<Project> &project)
 {
 	m_RecentProjectList.erase(std::remove(m_RecentProjectList.begin(), m_RecentProjectList.end(), project), m_RecentProjectList.end());
 }
 
-const ArrayList<Shared<Project> > &Application::GetRecentProjectList() const
+const ArrayList<std::shared_ptr<Project> > &Application::GetRecentProjectList() const
 {
 	std::sort(m_RecentProjectList.begin(), m_RecentProjectList.end(), [](const auto &first, const auto &second)
 			  {
@@ -185,13 +187,13 @@ const ArrayList<Shared<Project> > &Application::GetRecentProjectList() const
 	return m_RecentProjectList;
 }
 
-const Shared<Project> &Application::GetActiveProject() const
+const std::shared_ptr<Project> &Application::GetActiveProject() const
 {
 	SE_CORE_ASSERT(m_ActiveProject, "Tried to fetch active project when there was none");
 	return m_ActiveProject;
 }
 
-void Application::SetActiveProject(const Shared<Project> &project)
+void Application::SetActiveProject(const std::shared_ptr<Project> &project)
 {
 	const auto iter = std::find(m_RecentProjectList.begin(), m_RecentProjectList.end(), project);
 	SE_CORE_ASSERT(iter != m_RecentProjectList.end(), "Tried loading an invalid project");

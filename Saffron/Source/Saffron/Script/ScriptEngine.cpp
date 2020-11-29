@@ -78,8 +78,8 @@ const char *FieldTypeToString(FieldType type)
 
 static MonoDomain *s_MonoDomain = nullptr;
 static Filepath s_AssemblyFilepath;
-static Shared<Project> s_ProjectContext;
-static Shared<Scene> s_SceneContext;
+static std::shared_ptr<Project> s_ProjectContext;
+static std::shared_ptr<Scene> s_SceneContext;
 
 // Assembly images
 MonoImage *s_AppAssemblyImage = nullptr;
@@ -390,7 +390,7 @@ bool PublicField::IsRuntimeAvailable() const
 	return m_EntityInstance->Handle != 0;
 }
 
-void PublicField::SetStoredValueRaw(void *src) const
+void PublicField::SetStoredValue(void *src) const
 {
 	const Uint32 size = GetFieldSize(Type);
 	memcpy(m_StoredValueBuffer, src, size);
@@ -454,13 +454,13 @@ void ScriptEngine::OnUpdate()
 
 void ScriptEngine::OnGuiRender()
 {
-	ImGui::Begin("Script ProjectManager Debug");
+	ImGui::Begin("Script Engine Debug");
 	for ( auto &[sceneID, entityMap] : s_EntityInstanceMap )
 	{
 		bool opened = ImGui::TreeNode(reinterpret_cast<void *>(static_cast<Uint64>(sceneID)), "Scene (%llx)", static_cast<Uint64>(sceneID));
 		if ( opened )
 		{
-			Shared<Scene> scene = Scene::GetScene(sceneID);
+			std::shared_ptr<Scene> scene = Scene::GetScene(sceneID);
 			for ( auto &[entityID, entityInstanceData] : entityMap )
 			{
 				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
@@ -497,7 +497,7 @@ void ScriptEngine::OnGuiRender()
 	ImGui::End();
 }
 
-void ScriptEngine::OnProjectChange(const Shared<Project> &project)
+void ScriptEngine::OnProjectChange(const std::shared_ptr<Project> &project)
 {
 	if ( s_ProjectContext )
 	{
@@ -520,7 +520,7 @@ void ScriptEngine::OnProjectChange(const Shared<Project> &project)
 	}
 }
 
-void ScriptEngine::OnSceneChange(const Shared<Scene> &scene)
+void ScriptEngine::OnSceneChange(const std::shared_ptr<Scene> &scene)
 {
 	s_SceneContext = scene;
 }
@@ -561,7 +561,7 @@ void ScriptEngine::ReloadAssembly(const Filepath &assemblyFilepath)
 	s_ClassCacheMap.clear();
 	if ( !s_EntityInstanceMap.empty() )
 	{
-		Shared<Scene> scene = GetCurrentSceneContext();
+		std::shared_ptr<Scene> scene = GetCurrentSceneContext();
 		SE_CORE_ASSERT(scene, "No active scene!");
 		if ( s_EntityInstanceMap.find(scene->GetUUID()) != s_EntityInstanceMap.end() )
 		{
@@ -576,12 +576,12 @@ void ScriptEngine::ReloadAssembly(const Filepath &assemblyFilepath)
 	}
 }
 
-void ScriptEngine::SetSceneContext(const Shared<Scene> &scene)
+void ScriptEngine::SetSceneContext(const std::shared_ptr<Scene> &scene)
 {
 	s_SceneContext = scene;
 }
 
-const Shared<Scene> &ScriptEngine::GetCurrentSceneContext()
+const std::shared_ptr<Scene> &ScriptEngine::GetCurrentSceneContext()
 {
 	return s_SceneContext;
 }
@@ -604,7 +604,7 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 				SE_CORE_ASSERT(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
 				auto &fieldMap = dstModuleFieldMap.at(moduleName);
 				SE_CORE_ASSERT(fieldMap.find(fieldName) != fieldMap.end());
-				fieldMap.at(fieldName).SetStoredValueRaw(field.m_StoredValueBuffer);
+				fieldMap.at(fieldName).SetStoredValue(field.m_StoredValueBuffer);
 			}
 		}
 	}

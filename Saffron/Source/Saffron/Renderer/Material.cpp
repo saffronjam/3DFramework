@@ -8,7 +8,7 @@ namespace Se {
 //////////////////////////////////////////////////////////////////////////////////
 
 
-Material::Material(const Shared<Shader> &shader)
+Material::Material(const std::shared_ptr<Shader> &shader)
 	: m_Shader(shader)
 {
 	m_Shader->GetSignal(Shader::Signals::OnReload).Connect([this] { OnShaderReloaded(); });
@@ -32,7 +32,7 @@ void Material::Bind()
 	BindTextures();
 }
 
-void Material::Set(const String &name, const Shared<Texture> &texture)
+void Material::Set(const String &name, const std::shared_ptr<Texture> &texture)
 {
 	ShaderResourceDeclaration *decl = FindResourceDeclaration(name);
 	const Uint32 slot = decl->GetRegister();
@@ -41,19 +41,30 @@ void Material::Set(const String &name, const Shared<Texture> &texture)
 	m_Textures[slot] = texture;
 }
 
-void Material::Set(const String &name, const Shared<Texture2D> &texture)
+void Material::Set(const String &name, const std::shared_ptr<Texture2D> &texture)
 {
-	Set(name, static_cast<const Shared<Texture> &>(texture));
+	Set(name, static_cast<const std::shared_ptr<Texture> &>(texture));
 }
 
-void Material::Set(const String &name, const Shared<TextureCube> &texture)
+void Material::Set(const String &name, const std::shared_ptr<TextureCube> &texture)
 {
-	Set(name, static_cast<const Shared<Texture> &>(texture));
+	Set(name, static_cast<const std::shared_ptr<Texture> &>(texture));
 }
 
-Shared<Material> Material::Create(const Shared<Shader> &shader)
+ShaderResourceDeclaration *Material::FindResourceDeclaration(const String &name)
 {
-	return Shared<Material>::Create(shader);
+	const auto &resources = m_Shader->GetResources();
+	for ( ShaderResourceDeclaration *resource : resources )
+	{
+		if ( resource->GetName() == name )
+			return resource;
+	}
+	return nullptr;
+}
+
+std::shared_ptr<Material> Material::Create(const std::shared_ptr<Shader> &shader)
+{
+	return CreateShared<Material>(shader);
 }
 
 void Material::AllocateStorage()
@@ -118,17 +129,6 @@ ShaderUniformDeclaration *Material::FindUniformDeclaration(const String &name)
 	return nullptr;
 }
 
-ShaderResourceDeclaration *Material::FindResourceDeclaration(const String &name)
-{
-	const auto &resources = m_Shader->GetResources();
-	for ( ShaderResourceDeclaration *resource : resources )
-	{
-		if ( resource->GetName() == name )
-			return resource;
-	}
-	return nullptr;
-}
-
 Buffer &Material::GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclaration)
 {
 	switch ( uniformDeclaration->GetDomain() )
@@ -148,7 +148,7 @@ Buffer &Material::GetUniformBufferTarget(ShaderUniformDeclaration *uniformDeclar
 /// Material Instance
 ////////////////////////////////////////////////////////////////
 
-MaterialInstance::MaterialInstance(const Shared<Material> &material, String name)
+MaterialInstance::MaterialInstance(const std::shared_ptr<Material> &material, String name)
 	: m_Material(material), m_Name(Move(name))
 {
 	m_Material->m_MaterialInstances.insert(this);
@@ -182,7 +182,7 @@ void MaterialInstance::Bind()
 	}
 }
 
-void MaterialInstance::Set(const String &name, const Shared<Texture> &texture)
+void MaterialInstance::Set(const String &name, const std::shared_ptr<Texture> &texture)
 {
 	const auto *decl = m_Material->FindResourceDeclaration(name);
 	if ( !decl )
@@ -196,19 +196,19 @@ void MaterialInstance::Set(const String &name, const Shared<Texture> &texture)
 	m_Textures[slot] = texture;
 }
 
-void MaterialInstance::Set(const String &name, const Shared<Texture2D> &texture)
+void MaterialInstance::Set(const String &name, const std::shared_ptr<Texture2D> &texture)
 {
-	Set(name, static_cast<const Shared<Texture> &>(texture));
+	Set(name, static_cast<const std::shared_ptr<Texture> &>(texture));
 }
 
-void MaterialInstance::Set(const String &name, const Shared<TextureCube> &texture)
+void MaterialInstance::Set(const String &name, const std::shared_ptr<TextureCube> &texture)
 {
-	Set(name, static_cast<const Shared<Texture> &>(texture));
+	Set(name, static_cast<const std::shared_ptr<Texture> &>(texture));
 }
 
-Shared<MaterialInstance> MaterialInstance::Create(const Shared<Material> &material)
+std::shared_ptr<MaterialInstance> MaterialInstance::Create(const std::shared_ptr<Material> &material)
 {
-	return Shared<MaterialInstance>::Create(material);
+	return CreateShared<MaterialInstance>(material);
 }
 
 void MaterialInstance::AllocateStorage()

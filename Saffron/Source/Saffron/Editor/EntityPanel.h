@@ -7,14 +7,14 @@
 
 namespace Se
 {
-class EntityPanel : public ReferenceCounted
+class EntityPanel : public MemManaged<EntityPanel>
 {
 public:
-	explicit EntityPanel(const Shared<Scene> &context);
+	explicit EntityPanel(const std::shared_ptr<Scene> &context);
 
 	void OnGuiRender();
 
-	void SetContext(const Shared<Scene> &context);
+	void SetContext(const std::shared_ptr<Scene> &context);
 	void SetSelectedEntity(Entity entity);
 
 private:
@@ -25,9 +25,9 @@ private:
 	void DrawComponents(Entity entity);
 
 private:
-	Shared<Scene> m_Context;
+	std::shared_ptr<Scene> m_Context;
 	Entity m_SelectionContext;
 
-	Map<String, Shared<Texture2D>> m_TexStore;
+	Map<String, std::shared_ptr<Texture2D>> m_TexStore;
 };
 }

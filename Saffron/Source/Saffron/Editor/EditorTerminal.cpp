@@ -66,7 +66,7 @@ void EditorTerminal::OnGuiRender()
 		for ( int line_no = 0; line_no < m_Sink->m_LineOffsets.size(); line_no++ )
 		{
 			const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
-			const char *line_end = (line_no + 1 < m_Sink->m_LineOffsets.size()) ? (buf + m_Sink->m_LineOffsets[line_no + 1] - 1) : buf_end;
+			const char *line_end = line_no + 1 < m_Sink->m_LineOffsets.size() ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1 : buf_end;
 			if ( m_Filter.PassFilter(line_start, line_end) )
 				ImGui::TextUnformatted(line_start, line_end);
 		}
@@ -80,8 +80,8 @@ void EditorTerminal::OnGuiRender()
 			for ( int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++ )
 			{
 				const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
-				const char *line_end = (line_no + 1 < m_Sink->m_LineOffsets.size())
-					? (buf + m_Sink->m_LineOffsets[line_no + 1] - 1)
+				const char *line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
+					? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
 					: buf_end;
 				ImGui::TextUnformatted(line_start, line_end);
 			}

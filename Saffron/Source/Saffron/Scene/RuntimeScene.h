@@ -7,7 +7,7 @@ namespace Se
 class RuntimeScene : public Scene
 {
 public:
-	explicit RuntimeScene(Shared<Scene> copyFrom);
+	explicit RuntimeScene(std::shared_ptr<Scene> copyFrom);
 
 	void OnUpdate() override;
 	void OnRender() override;
@@ -18,11 +18,11 @@ public:
 	void Escape();
 	void Return();
 
-	const Shared<EditorCamera> &GetDebugCamera() const { return m_DebugCamera; }
-	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
+	const std::shared_ptr<EditorCamera> &GetDebugCamera() const { return m_DebugCamera; }
+	const std::shared_ptr<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
 
 private:
-	Shared<EditorCamera> m_DebugCamera;
+	std::shared_ptr<EditorCamera> m_DebugCamera;
 	bool m_DebugCameraActivated = false;
 };
 }

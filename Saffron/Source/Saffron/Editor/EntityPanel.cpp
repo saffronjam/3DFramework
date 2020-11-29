@@ -63,11 +63,11 @@ static void DrawComponent(const String &name, Entity entity, UIFunction uiFuncti
 /// Entity Panel
 ///////////////////////////////////////////////////////////////////////////
 
-EntityPanel::EntityPanel(const Shared<Scene> &context)
+EntityPanel::EntityPanel(const std::shared_ptr<Scene> &context)
 	:
 	m_Context(context)
 {
-	m_TexStore["Checkerboard"] = Texture2D::Create("Resources/Assets/Editor/Checkerboard.tga");
+	m_TexStore["Checkerboard"] = Factory::Create<Texture2D>("Resources/Assets/Editor/Checkerboard.tga");
 }
 
 void EntityPanel::OnGuiRender()
@@ -78,7 +78,7 @@ void EntityPanel::OnGuiRender()
 }
 
 
-void EntityPanel::SetContext(const Shared<Scene> &context)
+void EntityPanel::SetContext(const std::shared_ptr<Scene> &context)
 {
 	m_Context = context;
 	if ( m_SelectionContext )
@@ -122,7 +122,23 @@ void EntityPanel::OnGuiRenderProperties()
 				if ( ImGui::Button("Mesh") )
 				{
 					const String defaultMeshPath = "Resources/Assets/meshes/Cube1m.fbx";
-					m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
+					m_SelectionContext.AddComponent<MeshComponent>(CreateShared<Mesh>(defaultMeshPath));
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<DirectionalLightComponent>() )
+			{
+				if ( ImGui::Button("Directional Light") )
+				{
+					m_SelectionContext.AddComponent<DirectionalLightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
+			if ( !m_SelectionContext.HasComponent<SkylightComponent>() )
+			{
+				if ( ImGui::Button("Skylight") )
+				{
+					m_SelectionContext.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/birchwood_4k.hdr"));
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -205,7 +221,7 @@ void EntityPanel::OnGuiRenderMaterial()
 		Entity selectedEntity = m_SelectionContext;
 		if ( selectedEntity.HasComponent<MeshComponent>() )
 		{
-			Shared<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
+			std::shared_ptr<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
 			if ( mesh )
 			{
 				auto materials = mesh->GetMaterials();
@@ -241,7 +257,7 @@ void EntityPanel::OnGuiRenderMaterial()
 
 							auto &albedoColor = materialInstance->Get<Vector3f>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
-							Shared<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
+							std::shared_ptr<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(albedoMap ? reinterpret_cast<void *>(albedoMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -260,7 +276,7 @@ void EntityPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
-										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
+										albedoMap = Factory::Create<Texture2D>(filepath.string(), true/*m_AlbedoInput.sRGB*/);
 										materialInstance->Set("u_AlbedoTexture", albedoMap);
 									}
 								}
@@ -273,7 +289,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.sRGB))
 							{
 								if (m_AlbedoInput.TextureMap)
-									m_AlbedoInput.TextureMap = Texture2D::Create(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.sRGB);
+									m_AlbedoInput.TextureMap = Factory::Create<Texture2D>(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.sRGB);
 							}*/
 							ImGui::EndGroup();
 							ImGui::SameLine();
@@ -286,7 +302,7 @@ void EntityPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
-							Shared<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
+							std::shared_ptr<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
 							ImGui::Image(normalMap ? reinterpret_cast<void *>(normalMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -305,7 +321,7 @@ void EntityPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
-										normalMap = Texture2D::Create(filepath.string());
+										normalMap = Factory::Create<Texture2D>(filepath.string());
 										materialInstance->Set("u_NormalTexture", normalMap);
 									}
 								}
@@ -322,7 +338,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
-							Shared<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
+							std::shared_ptr<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
 							ImGui::Image(metalnessMap ? reinterpret_cast<void *>(metalnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -341,7 +357,7 @@ void EntityPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
-										metalnessMap = Texture2D::Create(filepath.string());
+										metalnessMap = Factory::Create<Texture2D>(filepath.string());
 										materialInstance->Set("u_MetalnessTexture", metalnessMap);
 									}
 								}
@@ -360,7 +376,7 @@ void EntityPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto &roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
-							Shared<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
+							std::shared_ptr<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
 							ImGui::Image(roughnessMap ? reinterpret_cast<void *>(roughnessMap->GetRendererID()) : reinterpret_cast<void *>(m_TexStore["Checkerboard"]->GetRendererID()), ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if ( ImGui::IsItemHovered() )
@@ -379,7 +395,7 @@ void EntityPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if ( !filepath.empty() )
 									{
-										roughnessMap = Texture2D::Create(filepath.string());
+										roughnessMap = Factory::Create<Texture2D>(filepath.string());
 										materialInstance->Set("u_RoughnessTexture", roughnessMap);
 									}
 								}
@@ -409,7 +425,7 @@ void EntityPanel::OnGuiRenderMeshDebug()
 	}
 	else if ( m_SelectionContext.HasComponent<MeshComponent>() )
 	{
-		Shared<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
+		std::shared_ptr<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
 		ImGui::TextWrapped("File: %s", mesh->GetFilepath().c_str());
 
 		if ( mesh->m_IsAnimated )
@@ -502,7 +518,7 @@ void EntityPanel::DrawComponents(Entity entity)
 												   {
 													   const Filepath filepath = FileIOManager::OpenFile();
 													   if ( !filepath.empty() )
-														   mc.Mesh = Shared<Mesh>::Create(filepath.string());
+														   mc.Mesh = CreateShared<Mesh>(filepath.string());
 												   });
 
 									 if ( ImGui::BeginDragDropTarget() )
@@ -511,7 +527,7 @@ void EntityPanel::DrawComponents(Entity entity)
 										 {
 											 SE_CORE_ASSERT(payload->DataSize == sizeof(ScriptPanel::Drop));
 											 const auto drop = *static_cast<ScriptPanel::Drop *>(payload->Data);
-											 mc.Mesh = Shared<Mesh>::Create(drop.Stat->Path.string());
+											 mc.Mesh = CreateShared<Mesh>(drop.Stat->Path.string());
 											 delete drop.Stat;
 										 }
 										 ImGui::EndDragDropTarget();
@@ -556,7 +572,7 @@ void EntityPanel::DrawComponents(Entity entity)
 									   {
 										   for ( int type = 0; type < 2; type++ )
 										   {
-											   const bool is_selected = (currentProj == projTypeStrings[type]);
+											   const bool is_selected = currentProj == projTypeStrings[type];
 											   if ( ImGui::Selectable(projTypeStrings[type], is_selected) )
 											   {
 												   currentProj = projTypeStrings[type];
@@ -639,6 +655,52 @@ void EntityPanel::DrawComponents(Entity entity)
 										   {
 										   });
 
+	DrawComponent<DirectionalLightComponent>("Directional Light", entity, [](DirectionalLightComponent &dlc)
+											 {
+												 Gui::BeginPropertyGrid();
+												 Gui::Property("Radiance", dlc.Radiance, Gui::PropertyFlag::Color);
+												 Gui::Property("Intensity", dlc.Intensity);
+												 Gui::Property("Cast Shadows", dlc.CastShadows);
+												 Gui::Property("Soft Shadows", dlc.SoftShadows);
+												 Gui::Property("Source Size", dlc.LightSize);
+												 Gui::EndPropertyGrid();
+											 });
+
+	DrawComponent<SkylightComponent>("Skylight", entity, [](SkylightComponent &slc)
+									 {
+										 ImGui::Columns(3);
+										 ImGui::SetColumnWidth(0, 100);
+										 ImGui::SetColumnWidth(1, 300);
+										 ImGui::SetColumnWidth(2, 40);
+										 ImGui::Text("File Path");
+										 ImGui::NextColumn();
+										 ImGui::PushItemWidth(-1);
+										 if ( !slc.SceneEnvironment->GetFilepath().empty() )
+										 {
+											 ImGui::InputText("##envfilepath", (char *)slc.SceneEnvironment->GetFilepath().c_str(), 256, ImGuiInputTextFlags_ReadOnly);
+										 }
+										 else
+										 {
+											 ImGui::InputText("##envfilepath", (char *)"Empty", 256, ImGuiInputTextFlags_ReadOnly);
+										 }
+										 ImGui::PopItemWidth();
+										 ImGui::NextColumn();
+										 if ( ImGui::Button("...##openenv") )
+										 {
+											 const Filepath filepath = FileIOManager::OpenFile({ "*.hdr", { "*.hdr" } });
+											 if ( !filepath.empty() )
+											 {
+												 slc.SceneEnvironment = SceneEnvironment::Load(filepath);
+											 }
+										 }
+										 ImGui::Columns(1);
+
+										 Gui::BeginPropertyGrid();
+										 Gui::Property("Intensity", slc.Intensity, 0.01f, 0.0f, 5.0f);
+										 Gui::EndPropertyGrid();
+									 });
+
+
 
 	DrawComponent<ScriptComponent>("Script", entity, [=](ScriptComponent &sc) mutable
 								   {
@@ -695,7 +757,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											   auto &publicFields = moduleFieldMap.at(sc.ModuleName);
 											   for ( auto &[name, field] : publicFields )
 											   {
-												   const bool isRuntime = Shared<RuntimeScene>::Cast(m_Context) && field.IsRuntimeAvailable();
+												   const bool isRuntime = std::dynamic_pointer_cast<RuntimeScene>(m_Context) && field.IsRuntimeAvailable();
 												   switch ( field.Type )
 												   {
 												   case FieldType::Int:
@@ -777,7 +839,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											{
 												for ( int type = 0; type < 3; type++ )
 												{
-													const bool is_selected = (currentType == rb2dTypeStrings[type]);
+													const bool is_selected = currentType == rb2dTypeStrings[type];
 													if ( ImGui::Selectable(rb2dTypeStrings[type], is_selected) )
 													{
 														currentType = rb2dTypeStrings[type];
@@ -828,7 +890,7 @@ void EntityPanel::DrawComponents(Entity entity)
 											{
 												for ( int type = 0; type < 3; type++ )
 												{
-													const bool is_selected = (currentType == rb3dTypeStrings[type]);
+													const bool is_selected = currentType == rb3dTypeStrings[type];
 													if ( ImGui::Selectable(rb3dTypeStrings[type], is_selected) )
 													{
 														currentType = rb3dTypeStrings[type];

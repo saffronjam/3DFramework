@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class BatchLoader : public ReferenceCounted, public Signaller
+class BatchLoader : public MemManaged<BatchLoader>, public Signaller
 {
 public:
 	struct Signals

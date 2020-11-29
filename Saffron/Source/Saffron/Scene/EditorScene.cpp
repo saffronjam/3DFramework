@@ -14,11 +14,11 @@ namespace Se
 EditorScene::EditorScene(Filepath filepath)
 	:
 	Scene(),
-	m_MiniTarget(SceneRenderer::Target::Create(100, 100)),
+	//m_MiniTarget(SceneRenderer::Target::Create("Mini target", 100, 100)),
 	m_Filepath(Move(filepath))
 {
 	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
-	m_MiniTarget->Disable();
+	//m_MiniTarget->Disable();
 
 	if ( IsValidFilepath(m_Filepath) )
 	{
@@ -38,13 +38,13 @@ void EditorScene::OnUpdate()
 	{
 		if ( m_SelectedEntity.HasComponent<CameraComponent>() && m_SelectedEntity.HasComponent<TransformComponent>() )
 		{
-			Shared<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
+			std::shared_ptr<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
 
 			camera->SetViewportSize(static_cast<Uint32>(m_ViewportWidth), static_cast<Uint32>(m_ViewportHeight));
 			const glm::mat4 cameraViewMatrix = glm::inverse(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
 
-			m_MiniTarget->SetCameraData({ camera.Raw(), cameraViewMatrix });
-			m_MiniTarget->Enable();
+			//m_MiniTarget->SetCameraData({ camera.get(), cameraViewMatrix });
+			//m_MiniTarget->Enable();
 		}
 	}
 }
@@ -53,12 +53,12 @@ void EditorScene::OnRender()
 {
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
-	SceneRenderer::GetMainTarget()->SetCameraData({ Shared<Camera>::Cast(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
+	SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
 
-	ArrayList<Shared<SceneRenderer::Target>> targets = { SceneRenderer::GetMainTarget() };
+	ArrayList<std::shared_ptr<SceneRenderer::Target>> targets = { SceneRenderer::GetMainTarget() };
 	if ( m_SceneEntity && m_SelectedEntity.HasComponent<CameraComponent>() )
 	{
-		targets.push_back(m_MiniTarget);
+		//targets.push_back(m_MiniTarget);
 	}
 
 	SceneRenderer::BeginScene(this, targets);
@@ -159,7 +159,7 @@ void EditorScene::OnGuiRender()
 					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
 					  if ( !filepath.empty() )
 					  {
-						  SetEnvironment(Environment::Load(filepath.string()));
+						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
 					  }
 				  }, true);
 	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
@@ -200,7 +200,7 @@ void EditorScene::OnEvent(const Event &event)
 
 void EditorScene::SetSelectedEntity(Entity entity)
 {
-	m_MiniTarget->Disable();
+	//m_MiniTarget->Disable();
 	Scene::SetSelectedEntity(entity);
 }
 

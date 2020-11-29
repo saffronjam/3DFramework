@@ -7,7 +7,7 @@ namespace Se
 {
 class EditorScene;
 
-class Project : public ReferenceCounted
+class Project : public MemManaged<Project>
 {
 	friend class ProjectSerializer;
 public:
@@ -17,7 +17,7 @@ public:
 	bool operator==(const Project &rhs) const { return m_UUID == rhs.m_UUID; }
 
 	const Filepath &AddScene(Filepath filepath);
-	const Shared<EditorScene> &AddCachedScene(const Shared<EditorScene> &editorScene);
+	const std::shared_ptr<EditorScene> &AddCachedScene(const std::shared_ptr<EditorScene> &editorScene);
 
 	const DateTime &LastOpened()const { return m_LastOpened; }
 	void SyncLastOpened() { m_LastOpened = DateTime(); }
@@ -27,9 +27,9 @@ public:
 	const Filepath &GetProjectFolderpath() const { return m_ProjectFolderpath; }
 	const Filepath &GetProjectFilepath() const { return m_ProjectFilepath; }
 	const ArrayList<Filepath> &GetSceneFilepaths() const { return m_SceneFilepaths; }
-	const ArrayList<Shared<EditorScene>> &GetSceneCache() const;
+	const ArrayList<std::shared_ptr<EditorScene>> &GetSceneCache() const;
 	const Filepath GetFullSceneFilepath(const Filepath &relativeFilepath);
-	Optional<Shared<EditorScene>> GetCachedScene(const Filepath &filepath);
+	Optional<std::shared_ptr<EditorScene>> GetCachedScene(const Filepath &filepath);
 
 	bool IsValid() const;
 	bool IsValidSceneFilepath(const Filepath &filepath);
@@ -46,6 +46,6 @@ private:
 	Filepath m_ProjectFolderpath;
 	Filepath m_ProjectFilepath;
 	ArrayList<Filepath> m_SceneFilepaths;
-	ArrayList<Shared<EditorScene>> m_SceneCache;
+	ArrayList<std::shared_ptr<EditorScene>> m_SceneCache;
 };
 }

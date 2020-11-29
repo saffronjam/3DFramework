@@ -87,24 +87,24 @@ void VertexBuffer::Layout::CalculateOffsetsAndStride()
 	}
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
+std::shared_ptr<VertexBuffer> VertexBuffer::Create(void *data, Uint32 size, Usage usage)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
-	case RendererAPI::Type::OpenGL:  return Shared<OpenGLVertexBuffer>::Create(data, size, usage);
+	case RendererAPI::Type::OpenGL:  return CreateShared<OpenGLVertexBuffer>(data, size, usage);
 	default:
 		SE_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;
 	}
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
+std::shared_ptr<VertexBuffer> VertexBuffer::Create(Uint32 size, Usage usage)
 {
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:    return nullptr;
-	case RendererAPI::Type::OpenGL:  return Shared<OpenGLVertexBuffer>::Create(size, usage);
+	case RendererAPI::Type::OpenGL:  return CreateShared<OpenGLVertexBuffer>(size, usage);
 	default:
 		SE_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;

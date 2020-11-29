@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class ScenePanel : public ReferenceCounted, public Signaller
+class ScenePanel : public MemManaged<ScenePanel>, public Signaller
 {
 public:
 	struct Signals
@@ -18,20 +18,25 @@ public:
 	};
 
 public:
-	explicit ScenePanel(const Shared<Scene> &context);
+	explicit ScenePanel(const std::shared_ptr<Scene> &context);
 
-	void OnGuiRender(const Shared<ScriptPanel> &scriptPanel);
+	void OnGuiRender(const std::shared_ptr<ScriptPanel> &scriptPanel);
 
-	void SetContext(const Shared<Scene> &scene) { m_Context = scene; }
+	void SetContext(const std::shared_ptr<Scene> &scene) { m_Context = scene; }
 	void SetSelectedEntity(Entity entity) { m_SelectionContext = entity; }
 
 private:
+	void OnCreateEntity(bool viewModal, const std::shared_ptr<ScriptPanel> &scriptPanel);
+	void OnCreateMesh();
+	void OnCreateDirectionalLight();
+	void OnCreateSkylight();
+
 	void DrawEntityNode(Entity entity);
-	void DrawMeshNode(const Shared<Mesh> &mesh, UUID &entityUUID) const;
-	void MeshNodeHierarchy(const Shared<Mesh> &mesh, aiNode *node, const Matrix4f &parentTransform = Matrix4f(1.0f), Uint32 level = 0) const;
+	void DrawMeshNode(const std::shared_ptr<Mesh> &mesh, UUID &entityUUID) const;
+	void MeshNodeHierarchy(const std::shared_ptr<Mesh> &mesh, aiNode *node, const Matrix4f &parentTransform = Matrix4f(1.0f), Uint32 level = 0) const;
 
 private:
-	Shared<Scene> m_Context;
+	std::shared_ptr<Scene> m_Context;
 	Entity m_SelectionContext;
 };
 }

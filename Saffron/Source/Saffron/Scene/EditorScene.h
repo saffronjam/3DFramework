@@ -18,9 +18,9 @@ public:
 	void EnableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Enable(); }
 	void DisableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
 
-	const Shared<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
-	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
-	const Shared<SceneRenderer::Target> &GetMiniTarget() const { return m_MiniTarget; };
+	const std::shared_ptr<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
+	const std::shared_ptr<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
+	const std::shared_ptr<SceneRenderer::Target> &GetMiniTarget() const { return m_MiniTarget; };
 	const Filepath &GetFilepath() const { return m_Filepath; }
 
 	void SetSelectedEntity(Entity entity) override;
@@ -29,8 +29,8 @@ public:
 	void Save() const;
 
 private:
-	Shared<SceneRenderer::Target> m_MiniTarget;
-	Shared<EditorCamera> m_EditorCamera;
+	std::shared_ptr<SceneRenderer::Target> m_MiniTarget;
+	std::shared_ptr<EditorCamera> m_EditorCamera;
 	Filepath m_Filepath;
 };
 }

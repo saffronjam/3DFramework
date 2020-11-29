@@ -26,7 +26,7 @@ static void CopyComponent(EntityRegistry &dstRegistry, EntityRegistry &srcRegist
 	}
 }
 
-RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
+RuntimeScene::RuntimeScene(std::shared_ptr<Scene> copyFrom)
 {
 	SE_CORE_ASSERT(copyFrom, "Runtime Scene must have a scene to copy from");
 
@@ -52,8 +52,10 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	CopyComponent<TagComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<TransformComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<MeshComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<ScriptComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<CameraComponent>(m_EntityRegistry, otherRegistry, entityMap);
+	CopyComponent<DirectionalLightComponent>(m_EntityRegistry, otherRegistry, entityMap);
+	CopyComponent<SkylightComponent>(m_EntityRegistry, otherRegistry, entityMap);
+	CopyComponent<ScriptComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<SpriteRendererComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<RigidBody2DComponent>(m_EntityRegistry, otherRegistry, entityMap);
 	CopyComponent<BoxCollider2DComponent>(m_EntityRegistry, otherRegistry, entityMap);
@@ -118,7 +120,7 @@ void RuntimeScene::OnRender()
 	if ( m_DebugCameraActivated )
 	{
 		m_DebugCamera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-		SceneRenderer::GetMainTarget()->SetCameraData({ Shared<Camera>::Cast(m_DebugCamera) , m_DebugCamera->GetViewMatrix() });
+		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_DebugCamera) , m_DebugCamera->GetViewMatrix() });
 	}
 	else
 	{
@@ -128,10 +130,10 @@ void RuntimeScene::OnRender()
 			SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
 			return;
 		}
-		Shared<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
+		std::shared_ptr<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
 		camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 		const Matrix4f cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
-		SceneRenderer::GetMainTarget()->SetCameraData({ Shared<Camera>::Cast(camera) , cameraViewMatrix });
+		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(camera) , cameraViewMatrix });
 	}
 
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
@@ -234,7 +236,7 @@ void RuntimeScene::OnGuiRender()
 					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
 					  if ( !filepath.empty() )
 					  {
-						  SetEnvironment(Environment::Load(filepath.string()));
+						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
 					  }
 				  }, true);
 	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
@@ -270,7 +272,7 @@ void RuntimeScene::OnGuiRender()
 
 void RuntimeScene::OnStart()
 {
-	ScriptEngine::SetSceneContext(this);
+	ScriptEngine::SetSceneContext(GetShared());
 
 	{
 		auto view = m_EntityRegistry.view<ScriptComponent>();

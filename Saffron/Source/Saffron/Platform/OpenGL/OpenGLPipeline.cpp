@@ -32,7 +32,7 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 OpenGLPipeline::OpenGLPipeline(Specification spec)
 	: m_Specification(Move(spec))
 {
-	OpenGLPipeline::Invalidate();
+	Run::Later([this] { OpenGLPipeline::Invalidate(); });
 }
 
 OpenGLPipeline::~OpenGLPipeline()
@@ -43,7 +43,7 @@ OpenGLPipeline::~OpenGLPipeline()
 
 void OpenGLPipeline::Bind()
 {
-	Shared<OpenGLPipeline> instance = this;
+	auto instance = GetDynShared<OpenGLPipeline>();
 	Renderer::Submit([instance]()
 					 {
 						 glBindVertexArray(instance->m_VertexArrayRendererID);
@@ -80,7 +80,7 @@ void OpenGLPipeline::Invalidate()
 {
 	SE_CORE_ASSERT(m_Specification.Layout.GetElements().size(), "Layout is empty!");
 
-	Shared<OpenGLPipeline> instance = this;
+	auto instance = GetDynShared<OpenGLPipeline>();
 	Renderer::Submit([instance]() mutable
 					 {
 						 auto &vertexArrayRendererID = instance->m_VertexArrayRendererID;

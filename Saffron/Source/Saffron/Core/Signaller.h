@@ -8,7 +8,7 @@ class Signaller
 {
 public:
 	Signaller() = default;
-	virtual ~Signaller() = default;
+	virtual ~Signaller();
 
 	Signaller(Signaller &&) = default;
 	Signaller &operator=(Signaller &&) = default;

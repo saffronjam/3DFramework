@@ -44,7 +44,7 @@ protected:
 /////////////////////////////////////////
 /// Shader Uniform Buffer Declaration ///
 /////////////////////////////////////////
-class ShaderUniformBufferDeclaration : public ReferenceCounted
+class ShaderUniformBufferDeclaration : public MemManaged<ShaderUniformBufferDeclaration>
 {
 public:
 	using List = ArrayList<ShaderUniformBufferDeclaration *>;

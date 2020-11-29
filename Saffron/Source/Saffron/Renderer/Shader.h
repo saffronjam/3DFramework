@@ -120,6 +120,8 @@ public:
 	// TODO: Implement materials and remove these
 	virtual void SetFloat(const String &name, float value) = 0;
 	virtual void SetInt(const String &name, int value) = 0;
+	virtual void SetBool(const String &name, bool value) = 0;
+	virtual void SetFloat2(const String &name, const Vector2f &value) = 0;
 	virtual void SetFloat3(const String &name, const Vector3f &value) = 0;
 	virtual void SetMat4(const String &name, const Matrix4f &value) = 0;
 	virtual void SetMat4FromRenderThread(const String &name, const Matrix4f &value, bool bind = true) = 0;
@@ -139,8 +141,8 @@ public:
 
 	virtual const ShaderResourceDeclaration::List &GetResources() const = 0;
 
-	static Shared<Shader> Create(const Filepath &filepath);
-	static Shared<Shader> Create(const String &source);
+	static std::shared_ptr<Shader> Create(const Filepath &filepath);
+	static std::shared_ptr<Shader> Create(const String &source);
 
 };
 

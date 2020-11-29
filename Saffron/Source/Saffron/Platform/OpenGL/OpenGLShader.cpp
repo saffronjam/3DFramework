@@ -7,9 +7,9 @@
 
 namespace Se {
 
-/////////////////////
-/// HELPER MACROS ///
-/////////////////////
+////////////////////////////////////////////////
+/// Helper Macros
+////////////////////////////////////////////////
 
 #define UNIFORM_LOGGING 0
 
@@ -19,9 +19,9 @@ namespace Se {
 #define SE_LOG_UNIFORM(...)
 #endif
 
-////////////////////////
-/// HELPER FUNCTIONS ///
-////////////////////////
+////////////////////////////////////////////////
+/// Helper Functions
+////////////////////////////////////////////////
 
 const char *FindToken(const char *str, const String &token)
 {
@@ -73,7 +73,7 @@ ArrayList<String> SplitString(const String &string, const char delimiter)
 
 ArrayList<String> Tokenize(const String &string)
 {
-	return SplitString(string, " \t\n");
+	return SplitString(string, " \t\n\r");
 }
 
 ArrayList<String> GetLines(const String &string)
@@ -89,7 +89,7 @@ String GetBlock(const char *str, const char **outPosition)
 
 	if ( outPosition )
 		*outPosition = end;
-	const auto length = static_cast<Int32>(end - str + 1);
+	const auto length = static_cast<Uint32>(end - str + 1);
 	return String(str, length);
 }
 
@@ -101,7 +101,7 @@ String GetStatement(const char *str, const char **outPosition)
 
 	if ( outPosition )
 		*outPosition = end;
-	const auto length = static_cast<Int32>(end - str + 1);
+	const auto length = static_cast<Uint32>(end - str + 1);
 	return String(str, length);
 }
 
@@ -112,6 +112,7 @@ bool StartsWith(const String &string, const String &start)
 
 static bool IsTypeStringResource(const String &type)
 {
+	if ( type == "sampler1D" )		return true;
 	if ( type == "sampler2D" )		return true;
 	if ( type == "sampler2DMS" )		return true;
 	if ( type == "samplerCube" )		return true;
@@ -202,18 +203,30 @@ size_t OpenGLShader::GetIdentifier()
 
 void OpenGLShader::SetVSMaterialUniformBuffer(const Buffer &buffer)
 {
-	Renderer::Submit([this, buffer]() {
-		glUseProgram(m_RendererID);
-		ResolveAndSetUniforms(m_VSMaterialUniformBuffer, buffer);
+	Renderer::Submit([this, buffer]()
+					 {
+						 glUseProgram(m_RendererID);
+						 ResolveAndSetUniforms(m_VSMaterialUniformBuffer, buffer);
 					 });
 }
 
 void OpenGLShader::SetPSMaterialUniformBuffer(const Buffer &buffer)
 {
-	Renderer::Submit([this, buffer]() {
-		glUseProgram(m_RendererID);
-		ResolveAndSetUniforms(m_PSMaterialUniformBuffer, buffer);
+	Renderer::Submit([this, buffer]()
+					 {
+						 glUseProgram(m_RendererID);
+						 ResolveAndSetUniforms(m_PSMaterialUniformBuffer, buffer);
 					 });
+}
+
+void OpenGLShader::SetInt(const String &name, int value)
+{
+	Renderer::Submit([=]() { UploadUniformInt(name, value); });
+}
+
+void OpenGLShader::SetBool(const String &name, bool value)
+{
+	Renderer::Submit([=] {UploadUniformInt(name, value); });
 }
 
 void OpenGLShader::SetFloat(const String &name, float value)
@@ -221,9 +234,9 @@ void OpenGLShader::SetFloat(const String &name, float value)
 	Renderer::Submit([=]() { UploadUniformFloat(name, value); });
 }
 
-void OpenGLShader::SetInt(const String &name, int value)
+void OpenGLShader::SetFloat2(const String &name, const Vector2f &value)
 {
-	Renderer::Submit([=]() { UploadUniformInt(name, value); });
+	Renderer::Submit([=]() { UploadUniformFloat2(name, value); });
 }
 
 void OpenGLShader::SetFloat3(const String &name, const Vector3f &value)
@@ -301,9 +314,9 @@ String OpenGLShader::ReadFromFile(const Filepath &filepath) const
 	return result;
 }
 
-std::unordered_map<GLenum, String> OpenGLShader::PreProcess(const String &source)
+UnorderedMap<GLenum, String> OpenGLShader::PreProcess(const String &source)
 {
-	std::unordered_map<GLenum, String> shaderSources;
+	UnorderedMap<GLenum, String> shaderSources;
 
 	const char *typeToken = "#type";
 	const size_t typeTokenLength = strlen(typeToken);
@@ -341,8 +354,8 @@ void OpenGLShader::Parse()
 
 	m_Resources.clear();
 	m_Structs.clear();
-	m_VSMaterialUniformBuffer.Reset();
-	m_PSMaterialUniformBuffer.Reset();
+	m_VSMaterialUniformBuffer.reset();
+	m_PSMaterialUniformBuffer.reset();
 
 	auto &vertexSource = m_ShaderSource[GL_VERTEX_SHADER];
 	auto &fragmentSource = m_ShaderSource[GL_FRAGMENT_SHADER];
@@ -425,14 +438,14 @@ void OpenGLShader::ParseUniform(const String &statement, ShaderDomain domain)
 			if ( domain == ShaderDomain::Vertex )
 			{
 				if ( !m_VSMaterialUniformBuffer )
-					m_VSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
+					m_VSMaterialUniformBuffer.reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
 				m_VSMaterialUniformBuffer->PushUniform(declaration);
 			}
 			else if ( domain == ShaderDomain::Pixel )
 			{
 				if ( !m_PSMaterialUniformBuffer )
-					m_PSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
+					m_PSMaterialUniformBuffer.reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
 				m_PSMaterialUniformBuffer->PushUniform(declaration);
 			}
@@ -714,7 +727,7 @@ GLenum OpenGLShader::ShaderTypeFromString(const String &type)
 	return GL_NONE;
 }
 
-void OpenGLShader::ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer)
+void OpenGLShader::ResolveAndSetUniforms(const std::shared_ptr<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer)
 {
 	const auto &uniforms = decl->GetUniformDeclarations();
 	for ( auto *uniform : uniforms )
@@ -737,6 +750,9 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration *uniform,
 	const Uint32 offset = uniform->GetOffset();
 	switch ( uniform->GetType() )
 	{
+	case OpenGLShaderUniformDeclaration::Type::Bool:
+		UploadUniformInt(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
+		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const float *>(&buffer.Data()[offset]));
 		break;
@@ -773,6 +789,9 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration *uni
 	Uint32 offset = uniform->GetOffset();
 	switch ( uniform->GetType() )
 	{
+	case OpenGLShaderUniformDeclaration::Type::Bool:
+		UploadUniformInt(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
+		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const float *>(&buffer.Data()[offset]));
 		break;
@@ -806,6 +825,9 @@ void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaratio
 {
 	switch ( field.GetType() )
 	{
+	case OpenGLShaderUniformDeclaration::Type::Bool:
+		UploadUniformInt(field.GetLocation(), *reinterpret_cast<const bool *>(&data[offset]));
+		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(field.GetLocation(), *reinterpret_cast<const float *>(&data[offset]));
 		break;

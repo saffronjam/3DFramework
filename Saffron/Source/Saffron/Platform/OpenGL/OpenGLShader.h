@@ -13,9 +13,9 @@ public:
 	OpenGLShader() = default;
 	OpenGLShader(const Filepath &filepath);
 	OpenGLShader(const String &source);
+	~OpenGLShader() = default;
 
 	void Bind() override;
-
 	void Reload() override;
 
 	void UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer) override;
@@ -26,9 +26,13 @@ public:
 
 	void SetVSMaterialUniformBuffer(const Buffer &buffer) override;
 	void SetPSMaterialUniformBuffer(const Buffer &buffer) override;
-	void SetFloat(const String &name, float value) override;
+
 	void SetInt(const String &name, int value) override;
+	void SetBool(const String &name, bool value) override;
+	void SetFloat(const String &name, float value) override;
+	void SetFloat2(const String &name, const Vector2f &value) override;
 	void SetFloat3(const String &name, const Vector3f &value) override;
+
 	void SetMat4(const String &name, const Matrix4f &value) override;
 	void SetMat4FromRenderThread(const String &name, const Matrix4f &value, bool bind = true) override;
 	void SetIntArray(const String &name, int *values, Uint32 size) override;
@@ -37,7 +41,7 @@ private:
 	void Load(const String &source);
 
 	String ReadFromFile(const Filepath &filepath) const;
-	std::unordered_map<GLenum, String> PreProcess(const String &source);
+	UnorderedMap<GLenum, String> PreProcess(const String &source);
 	void Parse();
 	void ParseUniform(const String &statement, ShaderDomain domain);
 	void ParseUniformStruct(const String &block, ShaderDomain domain);
@@ -50,7 +54,7 @@ private:
 	void CompileAndUploadShader();
 	static GLenum ShaderTypeFromString(const String &type);
 
-	void ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer);
+	void ResolveAndSetUniforms(const std::shared_ptr<OpenGLShaderUniformBufferDeclaration> &decl, const Buffer &buffer);
 	void ResolveAndSetUniform(OpenGLShaderUniformDeclaration *uniform, const Buffer &buffer);
 	void ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration *uniform, const Buffer &buffer);
 	void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration &field, const Uint8 *data, Int32 offset);
@@ -95,8 +99,8 @@ private:
 
 	ShaderUniformBufferDeclaration::List m_VSRendererUniformBuffers;
 	ShaderUniformBufferDeclaration::List m_PSRendererUniformBuffers;
-	Shared<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
-	Shared<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
+	std::shared_ptr<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
+	std::shared_ptr<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
 	ShaderResourceDeclaration::List m_Resources;
 	ShaderStruct::List m_Structs;
 

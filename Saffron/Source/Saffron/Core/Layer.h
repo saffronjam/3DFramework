@@ -5,13 +5,13 @@
 
 namespace Se {
 
-class Layer : public ReferenceCounted
+class Layer : public MemManaged<Layer>
 {
 public:
 	Layer(const String &name = "Layer");
 	virtual ~Layer() = default;
 
-	virtual void OnAttach(Shared<BatchLoader> &loader) {}
+	virtual void OnAttach(std::shared_ptr<BatchLoader> &loader) {}
 	virtual void OnDetach() {}
 	virtual void OnUpdate() {}
 	virtual void OnGuiRender() {}

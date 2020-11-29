@@ -70,7 +70,8 @@ Uint32 OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 {
 	switch ( type )
 	{
-	case Type::Int32:
+	case Type::Bool:		return 1;
+	case Type::Int32:		return 4;
 	case Type::Float32:		return 4;
 	case Type::Vec2:		return 4 * 2;
 	case Type::Vec3:		return 4 * 3;
@@ -83,6 +84,7 @@ Uint32 OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 
 OpenGLShaderUniformDeclaration::Type OpenGLShaderUniformDeclaration::StringToType(const String &type)
 {
+	if ( type == "bool" )      return Type::Bool;
 	if ( type == "int" )      return Type::Int32;
 	if ( type == "float" )    return Type::Float32;
 	if ( type == "vec2" )     return Type::Vec2;
@@ -98,6 +100,7 @@ String OpenGLShaderUniformDeclaration::TypeToString(Type type)
 {
 	switch ( type )
 	{
+	case Type::Bool:		return "bool";
 	case Type::Int32:		return "int32";
 	case Type::Float32:		return "float";
 	case Type::Vec2:		return "vec2";

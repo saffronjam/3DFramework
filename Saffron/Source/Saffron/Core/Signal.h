@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Core/UUID.h"
-#include "Saffron/Core/SmartPointers.h"
+#include "Saffron/Core/TypeDefs.h"
 
 namespace Se
 {
@@ -251,6 +251,8 @@ public:
 			(*dyncastSignal)();
 		}
 	}
+
+	void Clear();
 
 private:
 	typedef Map<BasicSignal::TypeID, BasicSignal *> SignalMap;

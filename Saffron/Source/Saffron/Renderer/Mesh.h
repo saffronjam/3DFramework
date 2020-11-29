@@ -118,11 +118,11 @@ public:
 	String NodeName, MeshName;
 };
 
-class Mesh : public ReferenceCounted
+class Mesh : public MemManaged<Mesh>
 {
 public:
 	Mesh(String filename);
-	~Mesh() = default;
+	~Mesh();
 
 	void OnUpdate();
 	void DumpVertexBuffer();
@@ -134,10 +134,10 @@ public:
 	void SetLocalTransform(Matrix4f localTransform) { m_LocalTransform = Move(localTransform); }
 
 	ArrayList<AABB> GetBoundingBoxes(const Matrix4f &transform = Matrix4f(1));
-	Shared<Shader> GetMeshShader() const { return m_MeshShader; }
-	Shared<Material> GetMaterial() const { return m_BaseMaterial; }
-	ArrayList<Shared<MaterialInstance>> GetMaterials() const { return m_Materials; }
-	const ArrayList<Shared<Texture2D>> &GetTextures() const { return m_Textures; }
+	std::shared_ptr<Shader> GetMeshShader() const { return m_MeshShader; }
+	std::shared_ptr<Material> GetMaterial() const { return m_BaseMaterial; }
+	ArrayList<std::shared_ptr<MaterialInstance>> GetMaterials() const { return m_Materials; }
+	const ArrayList<std::shared_ptr<Texture2D>> &GetTextures() const { return m_Textures; }
 	const String &GetFilepath() const { return m_Filepath; }
 
 	ArrayList<Triangle> GetTriangleCache(Uint32 index) const { return m_TriangleCache.at(index); }
@@ -165,9 +165,9 @@ private:
 	Uint32 m_BoneCount = 0;
 	ArrayList<BoneInfo> m_BoneInfo;
 
-	Shared<Pipeline> m_Pipeline;
-	Shared<VertexBuffer> m_VertexBuffer;
-	Shared<IndexBuffer> m_IndexBuffer;
+	std::shared_ptr<Pipeline> m_Pipeline;
+	std::shared_ptr<VertexBuffer> m_VertexBuffer;
+	std::shared_ptr<IndexBuffer> m_IndexBuffer;
 
 	ArrayList<Vertex> m_StaticVertices;
 	ArrayList<AnimatedVertex> m_AnimatedVertices;
@@ -177,11 +177,11 @@ private:
 	const aiScene *m_Scene;
 
 	// Materials
-	Shared<Shader> m_MeshShader;
-	Shared<Material> m_BaseMaterial;
-	ArrayList<Shared<Texture2D>> m_Textures;
-	ArrayList<Shared<Texture2D>> m_NormalMaps;
-	ArrayList<Shared<MaterialInstance>> m_Materials;
+	std::shared_ptr<Shader> m_MeshShader;
+	std::shared_ptr<Material> m_BaseMaterial;
+	ArrayList<std::shared_ptr<Texture2D>> m_Textures;
+	ArrayList<std::shared_ptr<Texture2D>> m_NormalMaps;
+	ArrayList<std::shared_ptr<MaterialInstance>> m_Materials;
 	Matrix4f m_LocalTransform;
 
 	UnorderedMap<Uint32, ArrayList<Triangle>> m_TriangleCache;

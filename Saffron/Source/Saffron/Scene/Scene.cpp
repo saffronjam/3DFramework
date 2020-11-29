@@ -57,18 +57,6 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////
-/// Environment
-///////////////////////////////////////////////////////////////////////////
-
-Scene::Environment Scene::Environment::Load(const String &filepath)
-{
-	auto [radiance, irradiance] = SceneRenderer::CreateEnvironmentMap(filepath);
-	return { filepath, radiance, irradiance };
-}
-
-
 ///////////////////////////////////////////////////////////////////////////
 /// Scene
 ///////////////////////////////////////////////////////////////////////////
@@ -88,8 +76,8 @@ Scene::Scene()
 
 	s_ActiveScenes[m_SceneID] = this;
 
-	const auto skyboxShader = Shader::Create(Filepath{ "Resources/Assets/shaders/Skybox.glsl" });
-	m_Skybox.Material = MaterialInstance::Create(Material::Create(skyboxShader));
+	const auto skyboxShader = Factory::Create<Shader>(Filepath{ "Resources/Assets/shaders/Skybox.glsl" });
+	m_Skybox.Material = MaterialInstance::Create(Factory::Create<Material>(skyboxShader));
 	m_Skybox.Material->SetFlag(Material::Flag::DepthTest, false);
 }
 
@@ -189,10 +177,10 @@ Entity Scene::GetMainCameraEntity()
 	return Entity::Null();
 }
 
-Shared<Scene> Scene::GetScene(UUID uuid)
+std::shared_ptr<Scene> Scene::GetScene(UUID uuid)
 {
 	if ( s_ActiveScenes.find(uuid) != s_ActiveScenes.end() )
-		return s_ActiveScenes.at(uuid);
+		return s_ActiveScenes.at(uuid)->GetShared();
 
 	return nullptr;
 }
@@ -207,13 +195,13 @@ void Scene::SetLight(const Light &light)
 	m_Light = light;
 }
 
-void Scene::SetEnvironment(const Environment &environment)
+void Scene::SetEnvironment(const std::shared_ptr<SceneEnvironment> &environment)
 {
 	m_Environment = environment;
-	SetSkyboxTexture(environment.RadianceMap);
+	SetSkyboxTexture(environment->GetRadianceMap());
 }
 
-void Scene::SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture)
+void Scene::SetSkyboxTexture(const std::shared_ptr<TextureCube> &skyboxTexture)
 {
 	m_Skybox.Texture = skyboxTexture;
 	m_Skybox.Material->Set("u_Texture", skyboxTexture);

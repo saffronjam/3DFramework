@@ -6,14 +6,14 @@
 
 namespace Se
 {
-class SplashScreenPane : public ReferenceCounted
+class SplashScreenPane : public MemManaged<SplashScreenPane>
 {
 public:
-	explicit SplashScreenPane(const Shared<BatchLoader> &batchLoader);
+	explicit SplashScreenPane(const std::shared_ptr<BatchLoader> &batchLoader);
 
 	void OnGuiRender();
 
-	const Shared<BatchLoader> &GetBatchLoader() const { return m_BatchLoader; }
+	const std::shared_ptr<BatchLoader> &GetBatchLoader() const { return m_BatchLoader; }
 
 	void Show();
 	void Hide();
@@ -21,8 +21,8 @@ public:
 	bool IsFinished() const;
 
 private:
-	Shared<BatchLoader> m_BatchLoader;
-	Shared<Texture2D> m_Texture;
+	std::shared_ptr<BatchLoader> m_BatchLoader;
+	std::shared_ptr<Texture2D> m_Texture;
 	bool m_Hidden = false;
 	String m_FinalizingStatus;
 

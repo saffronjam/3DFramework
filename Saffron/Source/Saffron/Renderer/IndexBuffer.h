@@ -3,10 +3,11 @@
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
 #include "Saffron/Renderer/RendererAPI.h"
+#include "Saffron/Resource/Resource.h"
 
 namespace Se {
 
-class IndexBuffer : public ReferenceCounted
+class IndexBuffer : public Resource
 {
 public:
 	virtual ~IndexBuffer() = default;
@@ -20,9 +21,9 @@ public:
 	virtual Uint32 GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	static Shared<IndexBuffer> Create(Uint32 size);
-	static Shared<IndexBuffer> Create(void *data, Uint32 size = 0);
-	static Shared<IndexBuffer> Create(const Buffer &buffer);
+	static std::shared_ptr<IndexBuffer> Create(Uint32 size);
+	static std::shared_ptr<IndexBuffer> Create(void *data, Uint32 size = 0);
+	static std::shared_ptr<IndexBuffer> Create(const Buffer &buffer);
 };
 
 }

@@ -8,7 +8,7 @@
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public ReferenceCounted, public Signaller
+class Window : public MemManaged<Window>, public Signaller
 {
 public:
 	struct Signals
@@ -70,7 +70,7 @@ public:
 	virtual bool IsMinimized() const = 0;
 	virtual bool IsMaximized() const = 0;
 
-	static Shared<Window> Create(const Properties &properties = Properties());
+	static std::shared_ptr<Window> Create(const Properties &properties = Properties());
 
 protected:
 	String m_Title;
@@ -79,13 +79,13 @@ protected:
 	AntiAliasing m_AntiAliasing;
 
 private:
-	ArrayList<Shared<Event>> m_Events;
+	ArrayList<std::shared_ptr<Event>> m_Events;
 };
 
 template<typename T, typename...Params>
 void Window::PushEvent(Params &&...params)
 {
-	m_Events.emplace_back(Shared<T>::Create(std::forward<Params>(params)...));
+	m_Events.emplace_back(CreateShared<T>(std::forward<Params>(params)...));
 	//SE_INFO("{0}", m_Events.back()->ToString());
 }
 

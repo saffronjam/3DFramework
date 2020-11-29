@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Saffron/System/Macros.h"
+#include "Saffron/Core/Macros.h"
 
 #ifdef SE_DEBUG
 #define SE_ENABLE_ASSERTS

@@ -5,9 +5,11 @@
 
 namespace Se
 {
-//////////////////////////////////////////
-/// OpenGL Shader Resource Declaration ///
-//////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////
+/// OpenGL Shader Resource Declaration
+//////////////////////////////////////////////////////////////
+
 class OpenGLShaderResourceDeclaration : public ShaderResourceDeclaration
 {
 public:
@@ -27,6 +29,10 @@ private:
 
 public:
 	OpenGLShaderResourceDeclaration(Type type, String name, Uint32 count);
+	~OpenGLShaderResourceDeclaration()
+	{
+
+	}
 
 	const String &GetName() const override { return m_Name; }
 	Uint32 GetRegister() const override { return m_Register; }
@@ -38,9 +44,11 @@ public:
 	static String TypeToString(Type type);
 };
 
-/////////////////////////////////////////
-/// OpenGL Shader Uniform Declaration ///
-/////////////////////////////////////////
+
+////////////////////////////////////////////////////////
+/// OpenGL Shader Uniform Declaration
+////////////////////////////////////////////////////////
+
 class OpenGLShaderUniformDeclaration : public ShaderUniformDeclaration
 {
 private:
@@ -50,7 +58,7 @@ private:
 public:
 	enum class Type
 	{
-		None, Float32, Vec2, Vec3, Vec4, Mat3, Mat4, Int32, Struct
+		None, Float32, Vec2, Vec3, Vec4, Mat3, Mat4, Int32, Bool, Struct
 	};
 
 private:
@@ -68,6 +76,10 @@ private:
 public:
 	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, String name, Uint32 count = 1);
 	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct *uniformStruct, String name, Uint32 count = 1);
+	~OpenGLShaderUniformDeclaration()
+	{
+
+	}
 
 	const String &GetName() const override { return m_Name; }
 	Uint32 GetSize() const override { return m_Size; }
@@ -115,6 +127,7 @@ private:
 	ShaderDomain m_Domain;
 public:
 	OpenGLShaderUniformBufferDeclaration(String name, ShaderDomain domain);
+	~OpenGLShaderUniformBufferDeclaration() = default;
 
 	void PushUniform(OpenGLShaderUniformDeclaration *uniform);
 

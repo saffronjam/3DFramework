@@ -70,11 +70,11 @@ AntiAliasing Window::GetAntiAliasing()const
 	return m_AntiAliasing;
 }
 
-Shared<Window> Window::Create(const Properties &properties)
+std::shared_ptr<Window> Window::Create(const Properties &properties)
 {
 	// TODO: Use RendererAPI::Current()
 #ifdef SE_PLATFORM_WINDOWS
-	return Shared<WindowsWindow>::Create(properties);
+	return CreateShared<WindowsWindow>(properties);
 #else
 	SE_CORE_ASSERT(false, "Unknown platform!");
 	return nullptr;

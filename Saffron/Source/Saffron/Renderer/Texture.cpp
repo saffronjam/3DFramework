@@ -27,40 +27,65 @@ Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
 	return levels;
 }
 
-Shared<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wrap wrap)
+std::shared_ptr<Texture2D> Texture2D::Create(Format format, Uint32 width, Uint32 height, Wrap wrap)
 {
-	Shared<OpenGLTexture2D> result;
+	std::shared_ptr<Texture2D> result;
 
 	switch ( RendererAPI::Current() )
 	{
-	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); result = nullptr;
-	case RendererAPI::Type::OpenGL:	result = Shared<OpenGLTexture2D>::Create(format, width, height, wrap); break;
+	case RendererAPI::Type::None:
+		SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!");
+		result = nullptr;
+	case RendererAPI::Type::OpenGL:
+		result = CreateShared<OpenGLTexture2D>(format, width, height, wrap);
+		result->Initialize();
+		break;
+	default:
+		SE_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+
+	if ( result )
+	{
+		ResourceManager::Emplace(result);
+	}
+
+	return result;
+}
+
+std::shared_ptr<Texture2D> Texture2D::Create(const Filepath &path, bool sRGB)
+{
+	std::shared_ptr<Texture2D> result;
+
+	//const size_t identifier = Misc::HashFilepath(path);
+	//if ( ResourceManager::Exists(identifier) )
+	//{
+	//	return ResourceManager::Get(identifier)->GetStaticShared<Texture2D>();
+	//}
+
+	switch ( RendererAPI::Current() )
+	{
+	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+	case RendererAPI::Type::OpenGL:	result = CreateShared<OpenGLTexture2D>(path, sRGB); break;
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr;
 	}
 
-	if ( result )
-	{
-		ResourceManager::Emplace(result);
-	}
+	//if ( result )
+	//{
+	//	ResourceManager::Emplace(result);
+	//}
 
 	return result;
 }
 
-Shared<Texture2D> Texture2D::Create(const Filepath &path, bool sRGB)
+std::shared_ptr<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
 {
-	Shared<OpenGLTexture2D> result;
-
-	const size_t identifier = Misc::HashFilepath(path);
-	if ( ResourceManager::Exists(identifier) )
-	{
-		SE_CORE_INFO("Reusing texture 2D: {}", path.string());
-		return ResourceManager::Get(identifier);
-	}
+	std::shared_ptr<OpenGLTextureCube> result;
 
 	switch ( RendererAPI::Current() )
 	{
-	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); result = nullptr; break;
-	case RendererAPI::Type::OpenGL:	result = Shared<OpenGLTexture2D>::Create(path, sRGB); break;
+	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
+	case RendererAPI::Type::OpenGL: result = CreateShared<OpenGLTextureCube>(format, width, height); break;
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr; break;
 	}
 
@@ -72,40 +97,21 @@ Shared<Texture2D> Texture2D::Create(const Filepath &path, bool sRGB)
 	return result;
 }
 
-Shared<TextureCube> TextureCube::Create(Format format, Uint32 width, Uint32 height)
+std::shared_ptr<TextureCube> TextureCube::Create(const Filepath &path)
 {
-	Shared<OpenGLTextureCube> result;
-
-	switch ( RendererAPI::Current() )
-	{
-	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); result = nullptr; break;
-	case RendererAPI::Type::OpenGL: result = Shared<OpenGLTextureCube>::Create(format, width, height); break;
-	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); return nullptr; break;
-	}
-
-	if ( result )
-	{
-		ResourceManager::Emplace(result);
-	}
-
-	return result;
-}
-
-Shared<TextureCube> TextureCube::Create(const Filepath &path)
-{
-	Shared<OpenGLTextureCube> result;
+	std::shared_ptr<OpenGLTextureCube> result;
 
 	const size_t identifier = Misc::HashFilepath(path);
 	if ( ResourceManager::Exists(identifier) )
 	{
 		SE_CORE_INFO("Reusing texture CUBE: {}", path.string());
-		return ResourceManager::Get(identifier);
+		return ResourceManager::Get(identifier)->GetDynShared<TextureCube>();
 	}
 
 	switch ( RendererAPI::Current() )
 	{
 	case RendererAPI::Type::None:	SE_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); result = nullptr; break;
-	case RendererAPI::Type::OpenGL: result = Shared<OpenGLTextureCube>::Create(path); break;
+	case RendererAPI::Type::OpenGL: result = CreateShared<OpenGLTextureCube>(path); break;
 	default:						SE_CORE_ASSERT(false, "Unknown RendererAPI"); result = nullptr; break;
 	}
 

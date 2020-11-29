@@ -3,6 +3,7 @@
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
 #include "Saffron/Renderer/RendererAPI.h"
+#include "Saffron/Resource/Resource.h"
 
 namespace Se {
 
@@ -13,7 +14,7 @@ enum class ShaderDataType
 
 static Uint32 ShaderDataTypeSize(ShaderDataType type);
 
-class VertexBuffer : public ReferenceCounted
+class VertexBuffer : public Resource
 {
 public:
 	///////////////////////////////////////////////////////////////
@@ -83,8 +84,8 @@ public:
 	virtual void SetData(void *buffer, Uint32 size, Uint32 offset = 0) = 0;
 	virtual void SetData(const Buffer &buffer, Uint32 offset = 0) = 0;
 
-	static Shared<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
-	static Shared<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
+	static std::shared_ptr<VertexBuffer> Create(void *data, Uint32 size, Usage usage = Usage::Static);
+	static std::shared_ptr<VertexBuffer> Create(Uint32 size, Usage usage = Usage::Dynamic);
 };
 
 

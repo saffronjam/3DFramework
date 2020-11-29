@@ -39,18 +39,18 @@ struct PhysicsWorld3DComponent
 
 struct EditorCameraComponent
 {
-	Shared<EditorCamera> Camera;
+	std::shared_ptr<EditorCamera> Camera;
 
 	EditorCameraComponent()
-		: Camera(Shared<EditorCamera>::Create())
+		: Camera(CreateShared<EditorCamera>())
 	{
 	}
 	EditorCameraComponent(Matrix4f projectionMatrix)
-		: Camera(Shared<EditorCamera>::Create(projectionMatrix))
+		: Camera(CreateShared<EditorCamera>(projectionMatrix))
 	{
 	}
 	EditorCameraComponent(const EditorCameraComponent &other) = default;
 
-	operator Shared<EditorCamera>() const { return Camera; }
+	operator std::shared_ptr<EditorCamera>() const { return Camera; }
 };
 }

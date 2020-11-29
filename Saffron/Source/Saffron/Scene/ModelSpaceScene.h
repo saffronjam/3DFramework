@@ -18,16 +18,16 @@ public:
 	void DisableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
 
 	Entity GetModelEntity() const { return m_Entity; }
-	const Shared<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
-	const Shared<SceneRenderer::Target> &GetTarget() const override { return m_Target; }
+	const std::shared_ptr<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
+	const std::shared_ptr<SceneRenderer::Target> &GetTarget() const override { return m_Target; }
 
 	void SetViewportSize(Uint32 width, Uint32 height) override;
 	void SetSelectedEntity(Entity entity) override;
 
 private:
 	Entity m_Entity;
-	Shared<SceneRenderer::Target> m_Target;
-	Shared<EditorCamera> m_EditorCamera;
+	std::shared_ptr<SceneRenderer::Target> m_Target;
+	std::shared_ptr<EditorCamera> m_EditorCamera;
 
 	Matrix4f m_SavedTransform;
 

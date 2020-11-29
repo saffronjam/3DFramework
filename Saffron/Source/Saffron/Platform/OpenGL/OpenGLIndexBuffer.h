@@ -23,6 +23,10 @@ public:
 	void SetData(const Buffer &buffer, Uint32 offset = 0) override;
 
 private:
+	void CreateDynamic();
+	void CreateStatic();
+
+private:
 	Uint32 m_RendererID = 0;
 	Uint32 m_Size{};
 

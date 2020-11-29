@@ -6,8 +6,7 @@
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/sinks/base_sink.h>
 
-#include "Saffron/System/Macros.h"
-
+#include "Saffron/Core/Math/SaffronMath.h"
 
 namespace Se {
 
@@ -40,6 +39,18 @@ private:
 	static std::shared_ptr<spdlog::logger> s_CoreLogger;
 	static std::shared_ptr<spdlog::logger> s_ClientLogger;
 };
+}
+
+template<typename OStream, typename t_Number>
+OStream &operator<<(OStream &os, const Se::Vector<3, t_Number> &vec)
+{
+	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ')';
+}
+
+template<typename OStream, typename t_Number>
+OStream &operator<<(OStream &os, const Se::Vector<4, t_Number> &vec)
+{
+	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ')';
 }
 
 // Core Logging Macros

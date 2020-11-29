@@ -54,7 +54,7 @@ const Filepath &Project::AddScene(Filepath filepath)
 	return m_SceneFilepaths.back();
 }
 
-const Shared<EditorScene> &Project::AddCachedScene(const Shared<EditorScene> &editorScene)
+const std::shared_ptr<EditorScene> &Project::AddCachedScene(const std::shared_ptr<EditorScene> &editorScene)
 {
 	m_SceneCache.push_back(editorScene);
 	return m_SceneCache.back();
@@ -72,7 +72,7 @@ Project::Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFo
 {
 }
 
-const ArrayList<Shared<EditorScene>> &Project::GetSceneCache() const
+const ArrayList<std::shared_ptr<EditorScene>> &Project::GetSceneCache() const
 {
 	return m_SceneCache;
 }
@@ -82,7 +82,7 @@ const Filepath Project::GetFullSceneFilepath(const Filepath &relativeFilepath)
 	return m_ProjectFolderpath.string() + relativeFilepath.string();
 }
 
-Optional<Shared<EditorScene>> Project::GetCachedScene(const Filepath &filepath)
+Optional<std::shared_ptr<EditorScene>> Project::GetCachedScene(const Filepath &filepath)
 {
 	return std::nullopt;
 }

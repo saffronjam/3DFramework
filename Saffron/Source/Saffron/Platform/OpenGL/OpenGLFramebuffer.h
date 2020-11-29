@@ -15,17 +15,27 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
-	void BindTexture(Uint32 slot = 0) const override;
+	void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const override;
+
+	Uint32 GetWidth() const override { return m_Width; }
+	Uint32 GetHeight() const override { return m_Height; }
 
 	RendererID GetRendererID() const override { return m_RendererID; }
-	RendererID GetColorAttachmentRendererID() const override { return m_ColorAttachment; }
+	RendererID GetColorAttachmentRendererID(int index = 0) const override { return m_ColorAttachments[index]; }
 	RendererID GetDepthAttachmentRendererID() const override { return m_DepthAttachment; }
 
 	const Specification &GetSpecification() const override { return m_Specification; }
 private:
 	Specification m_Specification;
 	RendererID m_RendererID = 0;
-	RendererID m_ColorAttachment = 0, m_DepthAttachment = 0;
+
+	ArrayList<RendererID> m_ColorAttachments;
+	RendererID m_DepthAttachment;
+
+	ArrayList<TextureFormat> m_ColorAttachmentFormats;
+	TextureFormat m_DepthAttachmentFormat = TextureFormat::None;
+
+	Uint32 m_Width = 0, m_Height = 0;
 };
 }
 

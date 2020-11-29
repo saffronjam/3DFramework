@@ -1,13 +1,19 @@
 #pragma once
 
-#include "Saffron/Base.h"
+#include "Saffron/Core/MemManaged.h"
 
 namespace Se
 {
-class Resource : public ReferenceCounted
+class Resource : public MemManaged<Resource>
 {
 public:
-	virtual	size_t GetIdentifier() = 0;
+	virtual	size_t GetIdentifier() { return 0; }
 	virtual ~Resource() = default;
+
+	void Initialize() { if ( m_Initializer.has_value() ) m_Initializer.value()(); };
+
+protected:
+	Optional<Function<void()>> m_Initializer;
+
 };
 }

@@ -11,31 +11,19 @@ namespace Se
 OpenGLIndexBuffer::OpenGLIndexBuffer(Uint32 size)
 	: m_RendererID(0), m_Size(size)
 {
-	auto instance = Shared<OpenGLIndexBuffer>(this);
-	Renderer::Submit([instance]() mutable {
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, nullptr, GL_DYNAMIC_DRAW);
-					 });
+	Run::Later([this] { CreateDynamic(); });
 }
 
 OpenGLIndexBuffer::OpenGLIndexBuffer(void *data, Uint32 size)
 	: m_Size(size), m_LocalData(Buffer::Copy(data, size))
 {
-	auto instance = Shared<OpenGLIndexBuffer>(this);
-	Renderer::Submit([instance]() mutable {
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(), GL_STATIC_DRAW);
-					 });
+	Run::Later([this] { CreateStatic(); });
 }
 
 OpenGLIndexBuffer::OpenGLIndexBuffer(const Buffer &buffer)
 	: m_LocalData(Buffer::Copy(buffer))
 {
-	auto instance = Shared<OpenGLIndexBuffer>(this);
-	Renderer::Submit([instance]() mutable {
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(), GL_STATIC_DRAW);
-					 });
+	Run::Later([this] { CreateStatic(); });
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -46,7 +34,7 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer()
 
 void OpenGLIndexBuffer::Bind() const
 {
-	Shared<const OpenGLIndexBuffer> instance = this;
+	auto instance = GetDynShared<OpenGLIndexBuffer>();
 	Renderer::Submit([instance]() {	 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, instance->m_RendererID); });
 }
 
@@ -54,7 +42,7 @@ void OpenGLIndexBuffer::SetData(void *buffer, Uint32 size, Uint32 offset)
 {
 	m_LocalData = Buffer::Copy(buffer, size);
 	m_Size = size;
-	Shared<OpenGLIndexBuffer> instance = this;
+	auto instance = GetDynShared<OpenGLIndexBuffer>();
 	Renderer::Submit([instance, offset]() {
 		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
 					 });
@@ -64,9 +52,27 @@ void OpenGLIndexBuffer::SetData(const Buffer &buffer, Uint32 offset)
 {
 	m_LocalData = Buffer::Copy(buffer);
 	m_Size = buffer.Size();
-	Shared<OpenGLIndexBuffer> instance = this;
+	auto instance = GetDynShared<OpenGLIndexBuffer>();
 	Renderer::Submit([instance, offset]() {
 		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
+					 });
+}
+
+void OpenGLIndexBuffer::CreateDynamic()
+{
+	auto instance = GetDynShared<OpenGLIndexBuffer>();
+	Renderer::Submit([instance]() mutable {
+		glCreateBuffers(1, &instance->m_RendererID);
+		glNamedBufferData(instance->m_RendererID, instance->m_Size, nullptr, GL_DYNAMIC_DRAW);
+					 });
+}
+
+void OpenGLIndexBuffer::CreateStatic()
+{
+	auto instance = GetDynShared<OpenGLIndexBuffer>();
+	Renderer::Submit([instance]() mutable {
+		glCreateBuffers(1, &instance->m_RendererID);
+		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(), GL_STATIC_DRAW);
 					 });
 }
 }

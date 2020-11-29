@@ -17,19 +17,19 @@ namespace Se
 
 struct RendererData
 {
-	Shared<RenderPass> m_ActiveRenderPass;
+	std::shared_ptr<RenderPass> m_ActiveRenderPass;
 	RenderCommandQueue m_CommandQueue;
 
-	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
-	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
-	Shared<Pipeline> m_FullscreenQuadPipeline;
+	std::shared_ptr<VertexBuffer> m_FullscreenQuadVertexBuffer;
+	std::shared_ptr<IndexBuffer> m_FullscreenQuadIndexBuffer;
+	std::shared_ptr<Pipeline> m_FullscreenQuadPipeline;
 
 	static constexpr Uint32 MaxLines = 10000;
 	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
 	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
-	Shared<Pipeline> LinePipeline;
-	Shared<VertexBuffer> LineVertexBuffer;
-	Shared<IndexBuffer> LineIndexBuffer;
+	std::shared_ptr<Pipeline> LinePipeline;
+	std::shared_ptr<VertexBuffer> LineVertexBuffer;
+	std::shared_ptr<IndexBuffer> LineIndexBuffer;
 };
 
 
@@ -40,8 +40,8 @@ void Renderer::Init()
 {
 	Submit([]() { RendererAPI::Init(); });
 
-	Shader::Create(Filepath{ "Resources/Assets/Shaders/SaffronPBR_Static.glsl" });
-	Shader::Create(Filepath{ "Resources/Assets/Shaders/SaffronPBR_Anim.glsl" });
+	Factory::Create<Shader>(Filepath{ "Resources/Assets/Shaders/SaffronPBR_Static.glsl" });
+	Factory::Create<Shader>(Filepath{ "Resources/Assets/Shaders/SaffronPBR_Anim.glsl" });
 
 	SceneRenderer::Init();
 
@@ -73,11 +73,11 @@ void Renderer::Init()
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float2, "a_TexCoord" }
 		};
-		s_Data.m_FullscreenQuadPipeline = Pipeline::Create(Specification);
+		s_Data.m_FullscreenQuadPipeline = Factory::Create<Pipeline>(Specification);
 
-		s_Data.m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+		s_Data.m_FullscreenQuadVertexBuffer = Factory::Create<VertexBuffer>(data, 4 * sizeof(QuadVertex));
 		Uint32 indices[6] = { 0, 1, 2, 2, 3, 0, };
-		s_Data.m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(Uint32));
+		s_Data.m_FullscreenQuadIndexBuffer = Factory::Create<IndexBuffer>(indices, 6 * sizeof(Uint32));
 
 	}
 
@@ -88,13 +88,13 @@ void Renderer::Init()
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float4, "a_Color" }
 		};
-		s_Data.LinePipeline = Pipeline::Create(Specification);
+		s_Data.LinePipeline = Factory::Create<Pipeline>(Specification);
 
-		s_Data.LineVertexBuffer = VertexBuffer::Create(RendererData::MaxLineVertices * sizeof(LineVertex));
+		s_Data.LineVertexBuffer = Factory::Create<VertexBuffer>(RendererData::MaxLineVertices * sizeof(LineVertex));
 		auto *lineIndices = new Uint32[RendererData::MaxLineIndices];
 		for ( Uint32 i = 0; i < RendererData::MaxLineIndices; i++ )
 			lineIndices[i] = i;
-		s_Data.LineIndexBuffer = IndexBuffer::Create(lineIndices, RendererData::MaxLineIndices);
+		s_Data.LineIndexBuffer = Factory::Create<IndexBuffer>(lineIndices, RendererData::MaxLineIndices);
 		delete[] lineIndices;
 	}
 }
@@ -168,7 +168,7 @@ void Renderer::Execute()
 	s_Data.m_CommandQueue.Execute();
 }
 
-void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
+void Renderer::BeginRenderPass(std::shared_ptr<RenderPass> renderPass, bool clear)
 {
 	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
 
@@ -190,7 +190,7 @@ void Renderer::EndRenderPass()
 	s_Data.m_ActiveRenderPass = nullptr;
 }
 
-void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &transform)
+void Renderer::SubmitQuad(std::shared_ptr<MaterialInstance> material, const Matrix4f &transform)
 {
 	bool depthTest = true;
 	if ( material )
@@ -208,7 +208,7 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f &tra
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> shader)
+void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, std::shared_ptr<Shader> shader)
 {
 	const auto dataSize = static_cast<Uint32>(sizeof(LineVertex) * count);
 	if ( dataSize )
@@ -227,7 +227,7 @@ void Renderer::SubmitLines(LineVertex *vertices, Uint32 count, Shared<Shader> sh
 	}
 }
 
-void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<MaterialInstance> overrideMaterial)
+void Renderer::SubmitMesh(std::shared_ptr<Mesh> mesh, const Matrix4f &transform, std::shared_ptr<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -255,10 +255,27 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f &transform, Shared<M
 
 		shader->SetMat4("u_Transform", transform * mesh->GetLocalTransform() * submesh.Transform);
 
-		Submit([submesh, material]() {
-			material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+		Submit([submesh, material]()
+			   {
+				   material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+				   glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
+			   });
+	}
+}
 
-			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
+void Renderer::SubmitMesh(std::shared_ptr<Mesh> mesh, const Matrix4f &transform, std::shared_ptr<Shader> shader)
+{
+	mesh->m_VertexBuffer->Bind();
+	mesh->m_Pipeline->Bind();
+	mesh->m_IndexBuffer->Bind();
+
+	for ( Submesh &submesh : mesh->m_Submeshes )
+	{
+		shader->SetMat4("u_Transform", transform * submesh.Transform);
+
+		Submit([submesh]()
+			   {
+				   glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });
 	}
 }

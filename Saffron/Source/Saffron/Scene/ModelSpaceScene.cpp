@@ -9,7 +9,7 @@ namespace Se
 {
 ModelSpaceScene::ModelSpaceScene(Entity entity)
 	:
-	m_Target(SceneRenderer::Target::Create(100, 100)),
+	m_Target(SceneRenderer::Target::Create("Model Space (" + entity.GetComponent<TagComponent>().Tag + ")", 100, 100)),
 	m_SavedTransform(entity.GetComponent<TransformComponent>().Transform)
 {
 	m_EditorCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
@@ -29,7 +29,7 @@ void ModelSpaceScene::OnRender()
 {
 	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
 
-	m_Target->SetCameraData({ Shared<Camera>::Cast(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
+	m_Target->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
 	SceneRenderer::BeginScene(this, { m_Target });
 	if ( m_Entity.HasComponent<MeshComponent>() )
 	{
@@ -54,7 +54,7 @@ void ModelSpaceScene::OnGuiRender()
 					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
 					  if ( !filepath.empty() )
 					  {
-						  SetEnvironment(Environment::Load(filepath.string()));
+						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
 					  }
 				  }, true);
 	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);

@@ -39,72 +39,72 @@ Uint64 Saffron_Entity_GetEntity(MonoString *tag);
 /// Texture2D
 ///////////////////////////////////////////////////////////////
 
-Shared<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
-void Saffron_Texture2D_Destructor(Shared<Texture2D> *texture);
-void Saffron_Texture2D_SetData(Shared<Texture2D> *texture, MonoArray *data, Int32 count);
+std::shared_ptr<Texture2D> *Saffron_Texture2D_Constructor(Uint32 width, Uint32 height);
+void Saffron_Texture2D_Destructor(std::shared_ptr<Texture2D> *texture);
+void Saffron_Texture2D_SetData(std::shared_ptr<Texture2D> *texture, MonoArray *data, Int32 count);
 
 
 ///////////////////////////////////////////////////////////////
 /// Material
 ///////////////////////////////////////////////////////////////
 
-void Saffron_Material_Destructor(Shared<Material> *material);
-void Saffron_Material_SetFloat(Shared<Material> *material, MonoString *uniform, float value);
-void Saffron_Material_SetTexture(Shared<Material> *material, MonoString *uniform, Shared<Texture2D> *texture);
+void Saffron_Material_Destructor(std::shared_ptr<Material> *material);
+void Saffron_Material_SetFloat(std::shared_ptr<Material> *material, MonoString *uniform, float value);
+void Saffron_Material_SetTexture(std::shared_ptr<Material> *material, MonoString *uniform, std::shared_ptr<Texture2D> *texture);
 
 
 ///////////////////////////////////////////////////////////////
 /// Material Instance
 ///////////////////////////////////////////////////////////////
 
-void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance> *instance);
-void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance> *instance, MonoString *uniform, float value);
-void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance> *instance, MonoString *uniform, Vector3f *value);
-void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance> *instance, MonoString *uniform, Vector4f *value);
-void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance> *instance, MonoString *uniform, Shared<Texture2D> *texture);
+void Saffron_MaterialInstance_Destructor(std::shared_ptr<MaterialInstance> *instance);
+void Saffron_MaterialInstance_SetFloat(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, float value);
+void Saffron_MaterialInstance_SetVector3(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, Vector3f *value);
+void Saffron_MaterialInstance_SetVector4(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, Vector4f *value);
+void Saffron_MaterialInstance_SetTexture(std::shared_ptr<MaterialInstance> *instance, MonoString *uniform, std::shared_ptr<Texture2D> *texture);
 
 
 ///////////////////////////////////////////////////////////////
 /// Mesh
 ///////////////////////////////////////////////////////////////
 
-Shared<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath);
-void Saffron_Mesh_Destructor(Shared<Mesh> *mesh);
-Shared<Material> *Saffron_Mesh_GetMaterial(Shared<Mesh> *mesh);
-Shared<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(Shared<Mesh> *mesh, int index);
-size_t Saffron_Mesh_GetMaterialCount(Shared<Mesh> *mesh);
+std::shared_ptr<Mesh> *Saffron_Mesh_Constructor(MonoString *filepath);
+void Saffron_Mesh_Destructor(std::shared_ptr<Mesh> *mesh);
+std::shared_ptr<Material> *Saffron_Mesh_GetMaterial(std::shared_ptr<Mesh> *mesh);
+std::shared_ptr<MaterialInstance> *Saffron_Mesh_GetMaterialByIndex(std::shared_ptr<Mesh> *mesh, int index);
+size_t Saffron_Mesh_GetMaterialCount(std::shared_ptr<Mesh> *mesh);
 
 
 ///////////////////////////////////////////////////////////////
 /// Mesh Factory
 ///////////////////////////////////////////////////////////////
 
-Shared<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height);
+std::shared_ptr<Mesh> *Saffron_MeshFactory_CreatePlane(float width, float height);
 
 
 ///////////////////////////////////////////////////////////////
 /// Scene Camera
 ///////////////////////////////////////////////////////////////
 
-Shared<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
-void Saffron_Camera_Destructor(Shared<SceneCamera> *camera);
+std::shared_ptr<SceneCamera> *Saffron_Camera_Constructor(Uint32 width, Uint32 height);
+void Saffron_Camera_Destructor(std::shared_ptr<SceneCamera> *camera);
 
-Uint32 Saffron_Camera_GetProjectionMode(Shared<SceneCamera> *camera);
-void Saffron_Camera_SetProjectionMode(Shared<SceneCamera> *camera, Uint32 mode);
+Uint32 Saffron_Camera_GetProjectionMode(std::shared_ptr<SceneCamera> *camera);
+void Saffron_Camera_SetProjectionMode(std::shared_ptr<SceneCamera> *camera, Uint32 mode);
 
-//void Saffron_SceneCamera_SetPerspectiveVerticalFOV(Shared<SceneCamera> *_this, float verticalFov);
-//float Saffron_SceneCamera_GetPerspectiveVerticalFOV(Shared<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetPerspectiveNearClip(Shared<SceneCamera> *_this, float nearClip);
-//float Saffron_SceneCamera_GetPerspectiveNearClip(Shared<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetPerspectiveFarClip(Shared<SceneCamera> *_this, float farClip);
-//float Saffron_SceneCamera_GetPerspectiveFarClip(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveVerticalFOV(std::shared_ptr<SceneCamera> *_this, float verticalFov);
+//float Saffron_SceneCamera_GetPerspectiveVerticalFOV(std::shared_ptr<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveNearClip(std::shared_ptr<SceneCamera> *_this, float nearClip);
+//float Saffron_SceneCamera_GetPerspectiveNearClip(std::shared_ptr<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetPerspectiveFarClip(std::shared_ptr<SceneCamera> *_this, float farClip);
+//float Saffron_SceneCamera_GetPerspectiveFarClip(std::shared_ptr<SceneCamera> *_this);
 //
-//void Saffron_SceneCamera_SetOrthographicSize(Shared<SceneCamera> *_this, float size);
-//float Saffron_SceneCamera_GetOrthographicSize(Shared<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetOrthographicNearClip(Shared<SceneCamera> *_this, float nearClip);
-//float Saffron_SceneCamera_GetOrthographicNearClip(Shared<SceneCamera> *_this);
-//void Saffron_SceneCamera_SetOrthographicFarClip(Shared<SceneCamera> *_this, float farClip);
-//float Saffron_SceneCamera_GetOrthographicFarClip(Shared<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicSize(std::shared_ptr<SceneCamera> *_this, float size);
+//float Saffron_SceneCamera_GetOrthographicSize(std::shared_ptr<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicNearClip(std::shared_ptr<SceneCamera> *_this, float nearClip);
+//float Saffron_SceneCamera_GetOrthographicNearClip(std::shared_ptr<SceneCamera> *_this);
+//void Saffron_SceneCamera_SetOrthographicFarClip(std::shared_ptr<SceneCamera> *_this, float farClip);
+//float Saffron_SceneCamera_GetOrthographicFarClip(std::shared_ptr<SceneCamera> *_this);
 
 
 ///////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ void Saffron_Camera_SetProjectionMode(Shared<SceneCamera> *camera, Uint32 mode);
 ///////////////////////////////////////////////////////////////
 
 void *Saffron_CameraComponent_GetCamera(Uint64 entityID);
-void Saffron_CameraComponent_SetCamera(Uint64 entityID, Shared<SceneCamera> *inCamera);
+void Saffron_CameraComponent_SetCamera(Uint64 entityID, std::shared_ptr<SceneCamera> *inCamera);
 
 ///////////////////////////////////////////////////////////////
 /// Script Component
@@ -134,7 +134,7 @@ void Saffron_ScriptComponent_SetModuleName(Uint64 entityID, MonoString *moduleNa
 ///////////////////////////////////////////////////////////////
 
 void *Saffron_MeshComponent_GetMesh(Uint64 entityID);
-void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh> *inMesh);
+void Saffron_MeshComponent_SetMesh(Uint64 entityID, std::shared_ptr<Mesh> *inMesh);
 
 
 ///////////////////////////////////////////////////////////////

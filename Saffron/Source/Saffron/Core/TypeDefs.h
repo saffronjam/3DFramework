@@ -14,6 +14,7 @@
 #include <atomic>
 #include <optional>
 #include <bitset>
+#include <initializer_list>
 
 namespace Se
 {
@@ -57,6 +58,16 @@ template<typename T>
 using Optional = std::optional<T>;
 template <size_t t_NumBits>
 using Bitset = std::bitset<t_NumBits>;
+template <class t_ElemType>
+using InitializerList = std::initializer_list<t_ElemType>;
+
+// Memory
+template<typename T>
+using Unique = std::unique_ptr<T>;
+template<typename T>
+using Shared = std::shared_ptr<T>;
+template<typename T>
+using Weak = std::weak_ptr<T>;
 
 using String = std::string;
 using WideString = std::wstring;
@@ -71,6 +82,7 @@ using Thread = std::thread;
 using Mutex = std::mutex;
 using ConditionVariable = std::condition_variable;
 
+
 template<class MoveClass>
 constexpr auto &&Move(MoveClass &&moveClass)  noexcept
 {
@@ -81,6 +93,21 @@ template<class FirstClass, class SecondClass>
 constexpr auto CreatePair(FirstClass &&first, SecondClass &second)  noexcept
 {
 	return std::make_pair(first, second);
+}
+
+
+// Memory
+
+template<typename T, typename ... Args>
+constexpr Unique<T> CreateUnique(Args && ... args)
+{
+	return std::make_unique<T>(std::forward<Args>(args)...);
+}
+
+template<typename T, typename ... Args>
+constexpr std::shared_ptr<T> CreateShared(Args && ... args)
+{
+	return std::make_shared<T>(std::forward<Args>(args)...);
 }
 
 }

@@ -109,8 +109,8 @@ void AnimatedVertex::AddBoneData(Uint32 BoneID, float Weight)
 
 VertexBoneData::VertexBoneData()
 {
-	memset(IDs, 0, sizeof(IDs));
-	memset(Weights, 0, sizeof(Weights));
+	memset(IDs, 0, sizeof IDs);
+	memset(Weights, 0, sizeof Weights);
 }
 
 void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
@@ -153,9 +153,9 @@ Mesh::Mesh(String filename)
 	m_IsAnimated = scene->mAnimations != nullptr;
 
 	Filepath meshShaderPath = m_IsAnimated ? "Resources/Assets/Shaders/SaffronPBR_Anim.glsl" : "Resources/Assets/Shaders/SaffronPBR_Static.glsl";
-	m_MeshShader = Shared<Shader>(Shader::Create(meshShaderPath));
-	m_BaseMaterial = Shared<Material>::Create(m_MeshShader);
-	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
+	m_MeshShader = std::shared_ptr<Shader>(Factory::Create<Shader>(meshShaderPath));
+	m_BaseMaterial = CreateShared<Material>(m_MeshShader);
+	// m_MaterialInstance = CreateShared<MaterialInstance>(m_BaseMaterial);
 	//m_InverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
 	Uint32 vertexCount = 0;
@@ -302,7 +302,7 @@ Mesh::Mesh(String filename)
 			auto *aiMaterial = scene->mMaterials[i];
 			auto aiMaterialName = aiMaterial->GetName();
 
-			auto mi = Shared<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
+			auto mi = CreateShared<MaterialInstance>(m_BaseMaterial, aiMaterialName.data);
 			m_Materials[i] = mi;
 
 			SE_MESH_LOG("  {0} (Index = {1})", aiMaterialName.data, i);
@@ -332,7 +332,7 @@ Mesh::Mesh(String filename)
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Albedo map path = {0}", texturePath);
-				auto texture = Texture2D::Create(texturePath, true);
+				auto texture = Factory::Create<Texture2D>(texturePath, true);
 				if ( texture->Loaded() )
 				{
 					m_Textures[i] = texture;
@@ -362,7 +362,7 @@ Mesh::Mesh(String filename)
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Normal map path = {0}", texturePath);
-				auto texture = Texture2D::Create(texturePath);
+				auto texture = Factory::Create<Texture2D>(texturePath);
 				if ( texture->Loaded() )
 				{
 					mi->Set("u_NormalTexture", texture);
@@ -389,7 +389,7 @@ Mesh::Mesh(String filename)
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
 				SE_MESH_LOG("    Roughness map path = {0}", texturePath);
-				auto texture = Texture2D::Create(texturePath);
+				auto texture = Factory::Create<Texture2D>(texturePath);
 				if ( texture->Loaded() )
 				{
 					mi->Set("u_RoughnessTexture", texture);
@@ -416,7 +416,7 @@ Mesh::Mesh(String filename)
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
 
-				auto texture = Texture2D::Create(texturePath);
+				auto texture = Factory::Create<Texture2D>(texturePath);
 				if ( texture->Loaded() )
 				{
 					SE_MESH_LOG("    Metalness map path = {0}", texturePath);
@@ -508,7 +508,7 @@ Mesh::Mesh(String filename)
 						parentPath /= str;
 						String texturePath = parentPath.string();
 						SE_MESH_LOG("    Metalness map path = {0}", texturePath);
-						auto texture = Texture2D::Create(texturePath);
+						auto texture = Factory::Create<Texture2D>(texturePath);
 						if ( texture->Loaded() )
 						{
 							mi->Set("u_MetalnessTexture", texture);
@@ -539,7 +539,7 @@ Mesh::Mesh(String filename)
 	VertexBuffer::Layout vertexLayout;
 	if ( m_IsAnimated )
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(), static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
+		m_VertexBuffer = Factory::Create<VertexBuffer>(m_AnimatedVertices.data(), static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float3, "a_Normal" },
@@ -552,7 +552,7 @@ Mesh::Mesh(String filename)
 	}
 	else
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(), static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
+		m_VertexBuffer = Factory::Create<VertexBuffer>(m_StaticVertices.data(), static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ ShaderDataType::Float3, "a_Position" },
 			{ ShaderDataType::Float3, "a_Normal" },
@@ -562,11 +562,16 @@ Mesh::Mesh(String filename)
 		};
 	}
 
-	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
+	m_IndexBuffer = Factory::Create<IndexBuffer>(m_Indices.data(), static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
 
 	Pipeline::Specification pipelineSpecification;
 	pipelineSpecification.Layout = vertexLayout;
-	m_Pipeline = Pipeline::Create(pipelineSpecification);
+	m_Pipeline = Factory::Create<Pipeline>(pipelineSpecification);
+}
+
+Mesh::~Mesh()
+{
+
 }
 
 void Mesh::OnUpdate()
@@ -753,7 +758,7 @@ Vector3f Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim *nod
 	}
 
 	const Uint32 PositionIndex = FindPosition(animationTime, nodeAnim);
-	const Uint32 NextPositionIndex = (PositionIndex + 1);
+	const Uint32 NextPositionIndex = PositionIndex + 1;
 	SE_CORE_ASSERT(NextPositionIndex < nodeAnim->mNumPositionKeys);
 	const float DeltaTime = static_cast<float>(nodeAnim->mPositionKeys[NextPositionIndex].mTime - nodeAnim->mPositionKeys[PositionIndex].mTime);
 	float Factor = (animationTime - static_cast<float>(nodeAnim->mPositionKeys[PositionIndex].mTime)) / DeltaTime;
@@ -777,7 +782,7 @@ glm::quat Mesh::InterpolateRotation(float animationTime, const aiNodeAnim *nodeA
 	}
 
 	const Uint32 RotationIndex = FindRotation(animationTime, nodeAnim);
-	const Uint32 NextRotationIndex = (RotationIndex + 1);
+	const Uint32 NextRotationIndex = RotationIndex + 1;
 	SE_CORE_ASSERT(NextRotationIndex < nodeAnim->mNumRotationKeys);
 	const float DeltaTime = static_cast<float>(nodeAnim->mRotationKeys[NextRotationIndex].mTime - nodeAnim->mRotationKeys[RotationIndex].mTime);
 	float Factor = (animationTime - static_cast<float>(nodeAnim->mRotationKeys[RotationIndex].mTime)) / DeltaTime;
@@ -802,7 +807,7 @@ Vector3f Mesh::InterpolateScale(float animationTime, const aiNodeAnim *nodeAnim)
 	}
 
 	const Uint32 index = FindScaling(animationTime, nodeAnim);
-	const Uint32 nextIndex = (index + 1);
+	const Uint32 nextIndex = index + 1;
 	SE_CORE_ASSERT(nextIndex < nodeAnim->mNumScalingKeys);
 	const float deltaTime = static_cast<float>(nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].mTime);
 	float factor = (animationTime - static_cast<float>(nodeAnim->mScalingKeys[index].mTime)) / deltaTime;

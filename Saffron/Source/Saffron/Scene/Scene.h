@@ -8,6 +8,7 @@
 #include "Saffron/Renderer/Texture.h"
 #include "Saffron/Renderer/Material.h"
 #include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Scene/SceneEnvironment.h"
 #include "Saffron/Scene/SceneComponents.h"
 
 namespace Se
@@ -16,18 +17,9 @@ namespace Se
 class Entity;
 using EntityMap = std::unordered_map<UUID, Entity>;
 
-class Scene : public ReferenceCounted
+class Scene : public MemManaged<Scene>
 {
 public:
-	struct Environment
-	{
-		String FilePath;
-		Shared<TextureCube> RadianceMap;
-		Shared<TextureCube> IrradianceMap;
-
-		static Environment Load(const String &filepath);
-	};
-
 	struct Light
 	{
 		Vector3f Direction = { 0.0f, 0.0f, 0.0f };
@@ -36,10 +28,25 @@ public:
 		float Multiplier = 1.0f;
 	};
 
+	struct DirectionalLight
+	{
+		Vector3f Direction = { 0.0f, 0.0f, 0.0f };
+		Vector3f Radiance = { 0.0f, 0.0f, 0.0f };
+		float Multiplier = 0.0f;
+
+		// C++ only
+		bool CastShadows = true;
+	};
+
+	struct LightEnvironment
+	{
+		DirectionalLight DirectionalLights[4];
+	};
+
 	struct Skybox
 	{
-		Shared<TextureCube> Texture;
-		Shared<MaterialInstance> Material;
+		std::shared_ptr<TextureCube> Texture;
+		std::shared_ptr<MaterialInstance> Material;
 	};
 
 public:
@@ -60,27 +67,31 @@ public:
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
 
-	virtual const Shared<SceneRenderer::Target> &GetTarget() const = 0;
+	virtual const std::shared_ptr<SceneRenderer::Target> &GetTarget() const = 0;
 
 	virtual Entity GetSelectedEntity();
 	virtual	void SetSelectedEntity(Entity entity);
 	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
-	Entity GetEntity() const { return m_SceneEntity; }
+	UUID GetUUID() const { return m_SceneID; }
 	const String &GetName() const { return m_Name; }
+
+	Entity GetEntity() const { return m_SceneEntity; }
+
 	Light &GetLight() { return m_Light; }
 	const Light &GetLight() const { return m_Light; }
+	const LightEnvironment &GetLightEnvironment() const { return m_LightEnvironment; }
+
 	Entity GetMainCameraEntity();
 	float &GetSkyboxLod() { return m_SkyboxLod; }
-	UUID GetUUID() const { return m_SceneID; }
-	static Shared<Scene> GetScene(UUID uuid);
+	static std::shared_ptr<Scene> GetScene(UUID uuid);
 	Skybox GetSkybox() const { return m_Skybox; }
-	const Environment &GetEnvironment() const { return m_Environment; }
+	const std::shared_ptr<SceneEnvironment> &GetEnvironment() const { return m_Environment; }
 
 	void SetName(String name);
 	void SetLight(const Light &light);
-	void SetEnvironment(const Environment &environment);
-	void SetSkyboxTexture(const Shared<TextureCube> &skyboxTexture);
+	void SetEnvironment(const std::shared_ptr<SceneEnvironment> &environment);
+	void SetSkyboxTexture(const std::shared_ptr<TextureCube> &skyboxTexture);
 	void ShowMeshBoundingBoxes(bool show);
 	void ShowPhysicsBodyBoundingBoxes(bool show);
 
@@ -92,6 +103,7 @@ protected:
 
 	Light m_Light;
 	float m_LightMultiplier = 0.3f;
+	LightEnvironment m_LightEnvironment;
 
 	EntityRegistry m_EntityRegistry;
 	EntityMap m_EntityIDMap;
@@ -100,7 +112,7 @@ protected:
 
 	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
-	Environment m_Environment;
+	std::shared_ptr<SceneEnvironment> m_Environment;
 	Skybox m_Skybox;
 
 	bool m_RadiancePrefilter = false;

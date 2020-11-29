@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class Camera : public ReferenceCounted
+class Camera : public MemManaged<Camera>
 {
 public:
 	Camera() = default;

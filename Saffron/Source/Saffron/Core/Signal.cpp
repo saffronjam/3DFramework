@@ -16,4 +16,12 @@ BasicSignal::TypeID BasicSignal::GenerateTypeID()
 	return {};
 }
 
+void SignalContainer::Clear()
+{
+	if ( m_Signals )
+	{
+		m_Signals->clear();
+		m_Signals.reset();
+	}
+}
 }

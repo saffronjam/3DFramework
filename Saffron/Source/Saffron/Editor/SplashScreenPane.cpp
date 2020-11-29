@@ -6,9 +6,9 @@
 
 namespace Se
 {
-SplashScreenPane::SplashScreenPane(const Shared<BatchLoader> &batchLoader)
+SplashScreenPane::SplashScreenPane(const std::shared_ptr<BatchLoader> &batchLoader)
 	: m_BatchLoader(batchLoader),
-	m_Texture(Texture2D::Create(Filepath("Resources/Assets/Editor/Saffron.png"))),
+	m_Texture(Factory::Create<Texture2D>(Filepath("Resources/Assets/Editor/Saffron.png"))),
 	m_FinalizingStatus("Finalizing")
 {
 }

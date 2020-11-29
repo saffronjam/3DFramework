@@ -65,9 +65,11 @@ Entity Entity::Copy(Optional<Scene *> separateScene)
 
 	Entity newEntity = copyTo->CreateEntity(GetComponent<TagComponent>().Tag);
 	CopyComponent<TransformComponent>(newEntity, *this);
-	CopyComponent<ScriptComponent>(newEntity, *this);
 	CopyComponent<MeshComponent>(newEntity, *this);
 	CopyComponent<CameraComponent>(newEntity, *this);
+	CopyComponent<DirectionalLightComponent>(newEntity, *this);
+	CopyComponent<SkylightComponent>(newEntity, *this);
+	CopyComponent<ScriptComponent>(newEntity, *this);
 	CopyComponent<SpriteRendererComponent>(newEntity, *this);
 	CopyComponent<RigidBody2DComponent>(newEntity, *this);
 	CopyComponent<BoxCollider2DComponent>(newEntity, *this);

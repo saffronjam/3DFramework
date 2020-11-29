@@ -183,6 +183,23 @@ void Gui::EndPropertyGrid()
 	PopID();
 }
 
+bool Gui::BeginTreeNode(const String &name, bool defaultOpen)
+{
+	ImGuiTreeNodeFlags treeNodeFlags =
+		ImGuiTreeNodeFlags_Framed |
+		ImGuiTreeNodeFlags_SpanAvailWidth |
+		ImGuiTreeNodeFlags_FramePadding;
+	if ( defaultOpen )
+		treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+	return ImGui::TreeNodeEx(name.c_str(), treeNodeFlags);
+}
+
+void Gui::EndTreeNode()
+{
+	ImGui::TreePop();
+}
+
 void Gui::Property(const String &name, const Function<void()> &onClick, bool secondColumn)
 {
 	if ( secondColumn )

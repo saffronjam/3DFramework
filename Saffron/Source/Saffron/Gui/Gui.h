@@ -33,6 +33,9 @@ public:
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();
 
+	static bool BeginTreeNode(const String &name, bool defaultOpen = true);
+	static void EndTreeNode();
+
 	static void Property(const String &name, const Function<void()> &onClick, bool secondColumn = false);
 	static void Property(const String &name, const String &value);
 	static bool Property(const String &name, String &value);

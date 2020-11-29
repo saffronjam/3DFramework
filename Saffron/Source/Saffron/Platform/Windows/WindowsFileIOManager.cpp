@@ -43,7 +43,7 @@ Filepath FileIOManager::OpenFile(const Filter &filter)
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
 	ofn.lpstrFile = szFile;
-	ofn.nMaxFile = sizeof(szFile);
+	ofn.nMaxFile = sizeof szFile;
 	ofn.lpstrFilter = formattedFilter;
 	ofn.nFilterIndex = 1;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
@@ -71,7 +71,7 @@ Filepath FileIOManager::SaveFile(const Filter &filter)
 	ofn.hwndOwner = glfwGetWin32Window(static_cast<GLFWwindow *>(m_Window->GetNativeWindow()));
 	ofn.lpstrFile = szFile;
 	ofn.lpstrDefExt = fallbackExtension;
-	ofn.nMaxFile = sizeof(szFile);
+	ofn.nMaxFile = sizeof szFile;
 	ofn.lpstrFilter = formattedFilter;
 	ofn.nFilterIndex = 1;
 	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR | OFN_OVERWRITEPROMPT | OFN_EXTENSIONDIFFERENT;

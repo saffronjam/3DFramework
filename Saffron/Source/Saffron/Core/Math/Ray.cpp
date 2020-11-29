@@ -64,6 +64,6 @@ bool Ray::IntersectsTriangle(const Vector3f &A, const Vector3f &B, const Vector3
 	const float u = glm::dot(E2, DAO) * invdet;
 	const float v = -glm::dot(E1, DAO) * invdet;
 	t = glm::dot(AO, N) * invdet;
-	return (det >= 1e-6f && t >= 0.0f && u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f);
+	return det >= 1e-6f && t >= 0.0f && u >= 0.0f && v >= 0.0f && u + v <= 1.0f;
 }
 }

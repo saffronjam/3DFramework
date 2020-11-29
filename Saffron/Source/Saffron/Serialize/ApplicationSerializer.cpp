@@ -68,7 +68,7 @@ bool ApplicationSerializer::Deserialize(const Filepath &filepath)
 				continue;
 			}
 
-			auto project = Shared<Project>::Create(projectFilepath);
+			auto project = CreateShared<Project>(projectFilepath);
 			if ( project->IsValid() )
 			{
 				m_Application.AddProject(project);
