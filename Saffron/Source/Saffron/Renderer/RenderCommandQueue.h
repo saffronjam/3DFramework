@@ -4,22 +4,19 @@
 
 namespace Se
 {
-typedef void(*RenderCommandFn)(void *);
+using RenderCommand = Function<void()>;
 
 class RenderCommandQueue
 {
 public:
 	RenderCommandQueue();
-	~RenderCommandQueue();
 
-	void *Allocate(RenderCommandFn fn, Uint32 size);
+	void Submit(const RenderCommand &fn);
 	void Execute();
 
 private:
-	Uint8 *m_CommandBuffer;
-	Uint8 *m_CommandBufferPtr;
-	Uint32 m_CommandCount;
-
+	ArrayList<RenderCommand> m_CommandBuffer;
+	Uint32 m_nCommands = 0;
 };
 }
 

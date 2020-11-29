@@ -168,17 +168,17 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-	const auto activeScene = GetActiveScene();
+	/*const auto activeScene = GetActiveScene();
 	if ( activeScene != m_CachedActiveScene )
 	{
 		OnSceneChange(activeScene, {});
-	}
+	}*/
 
 	switch ( m_SceneState )
 	{
 	case SceneState::Edit:
 	{
-		m_MainViewportPane->IsFocused() ? m_EditorScene->EnableCamera() : m_EditorScene->DisableCamera();
+		//m_MainViewportPane->IsFocused() ? m_EditorScene->EnableCamera() : m_EditorScene->DisableCamera();
 
 		m_EditorScene->OnUpdate();
 		m_EditorScene->OnRender();

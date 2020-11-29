@@ -36,8 +36,7 @@ public:
 	// For OpenGL
 	static void ClearMagenta();
 
-	template<typename FuncT>
-	static void Submit(FuncT &&func);
+	static void Submit(const RenderCommand &func);
 	static void Execute();
 
 	// ~Actual~ Renderer here... TODO: remove confusion later
@@ -53,21 +52,4 @@ private:
 	static RenderCommandQueue &GetRenderCommandQueue();
 	static struct RendererData s_Data;
 };
-
-template <typename FuncT>
-void Renderer::Submit(FuncT &&func)
-{
-	auto renderCmd = [](void *ptr)
-	{
-		auto pFunc = *static_cast<FuncT *>(ptr);
-		pFunc();
-
-		// NOTE: Instead of destroying we could try and enforce all items to be trivially destructible
-		// however some items like uniforms which contain Strings still exist for now
-		// static_assert(std::is_trivially_destructible_v<FuncT>, "FuncT must be trivially destructible");
-		pFunc.~FuncT();
-	};
-	auto storageBuffer = GetRenderCommandQueue().Allocate(renderCmd, sizeof func);
-	new(storageBuffer) FuncT(std::forward<FuncT>(func));
-}
 }

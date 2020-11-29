@@ -56,12 +56,12 @@ void EditorScene::OnRender()
 	SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
 
 	ArrayList<std::shared_ptr<SceneRenderer::Target>> targets = { SceneRenderer::GetMainTarget() };
-	if ( m_SceneEntity && m_SelectedEntity.HasComponent<CameraComponent>() )
-	{
-		//targets.push_back(m_MiniTarget);
-	}
+	//if ( m_SceneEntity && m_SelectedEntity.HasComponent<CameraComponent>() )
+	//{
+	//	//targets.push_back(m_MiniTarget);
+	//}
 
-	SceneRenderer::BeginScene(this, targets);
+	SceneRenderer::BeginScene(this, { targets });
 	auto meshGroup = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 	for ( const auto &entityHandle : meshGroup )
 	{
@@ -87,6 +87,10 @@ void EditorScene::OnRender()
 			cameraComponent.Camera->RenderFrustum(transformComponent.Transform);
 		}
 	}
+
+	SceneRenderer::EndScene();
+
+	return;
 
 	static auto render2DPhysicsBoundingBox = [this](Entity entity)
 	{
@@ -146,7 +150,6 @@ void EditorScene::OnRender()
 		}
 	}
 
-	SceneRenderer::EndScene();
 }
 
 void EditorScene::OnGuiRender()

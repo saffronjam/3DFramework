@@ -163,6 +163,11 @@ void Renderer::ClearMagenta()
 	Clear(1, 0, 1);
 }
 
+void Renderer::Submit(const RenderCommand &func)
+{
+	s_Data.m_CommandQueue.Submit(func);
+}
+
 void Renderer::Execute()
 {
 	s_Data.m_CommandQueue.Execute();

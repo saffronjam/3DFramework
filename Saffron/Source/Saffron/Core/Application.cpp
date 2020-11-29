@@ -99,8 +99,10 @@ void Application::RenderGui()
 {
 	Gui::Begin();
 
-	for ( std::shared_ptr<Layer> layer : m_LayerStack )
+	for ( const auto &layer : m_LayerStack )
+	{
 		layer->OnGuiRender();
+	}
 
 	Gui::End();
 }
@@ -119,8 +121,10 @@ void Application::Run()
 		m_Window->HandleBufferedEvents();
 		if ( !m_Minimized )
 		{
-			for ( std::shared_ptr<Layer> layer : m_LayerStack )
+			for ( const auto &layer : m_LayerStack )
+			{
 				layer->OnUpdate();
+			}
 			ScriptEngine::OnUpdate();
 			Input::OnUpdate();
 			m_Window->OnUpdate();
@@ -161,7 +165,7 @@ void Application::OnEvent(const Event &event)
 
 bool Application::OnWindowClose(const WindowCloseEvent &event)
 {
-	m_Running = false;
+	Exit();
 	return true;
 }
 
