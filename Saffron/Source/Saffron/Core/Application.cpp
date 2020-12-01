@@ -27,7 +27,6 @@ Application::Application(const Properties &properties)
 
 	m_Window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 	m_Window->GetSignal(Window::Signals::OnEvent).Connect(SE_BIND_EVENT_FN(OnEvent));
-	m_Window->Maximize();
 	m_Window->SetVSync(true);
 	m_Window->SetWindowIcon("Resources/Assets/Editor/Saffron_windowIcon.png");
 	m_Window->HandleBufferedEvents();

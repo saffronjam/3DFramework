@@ -45,7 +45,7 @@ const Filepath &Project::AddScene(Filepath filepath)
 {
 	auto candidateSceneFilepath = "res/Scenes/" + filepath.stem().string() + filepath.extension().string();
 
-	auto maybeCopy = std::find(m_SceneFilepaths.begin(), m_SceneFilepaths.end(), candidateSceneFilepath);
+	const auto maybeCopy = std::find(m_SceneFilepaths.begin(), m_SceneFilepaths.end(), candidateSceneFilepath);
 	if ( maybeCopy != m_SceneFilepaths.end() )
 	{
 		return *maybeCopy;

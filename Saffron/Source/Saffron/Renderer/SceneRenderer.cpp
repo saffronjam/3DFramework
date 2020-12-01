@@ -725,7 +725,7 @@ void SceneRenderer::BeginScene(const Scene *scene, ArrayList<std::shared_ptr<Tar
 	s_Data.RenderTargets = Move(targets);
 
 	s_Data.SceneData.SkyboxMaterial = scene->GetSkybox().Material;
-	s_Data.SceneData.SceneEnvironment = scene->GetEnvironment();
+	s_Data.SceneData.SceneEnvironment = scene->GetSceneEnvironment();
 	s_Data.SceneData.ActiveLight = scene->GetLight();
 	s_Data.SceneData.SceneLightEnvironment = scene->GetLightEnvironment();
 	s_Data.LineIndexCount = 0;
@@ -961,6 +961,11 @@ std::shared_ptr<SceneRenderer::Target> &SceneRenderer::GetMainTarget()
 SceneRenderer::Options &SceneRenderer::GetOptions()
 {
 	return s_Data.Options;
+}
+
+void SceneRenderer::SetFocusPoint(const Vector2f &focusPoint)
+{
+	s_Data.FocusPoint = focusPoint;
 }
 
 void SceneRenderer::FlushDrawList()

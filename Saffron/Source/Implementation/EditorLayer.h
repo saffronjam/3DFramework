@@ -78,7 +78,6 @@ private:
 	std::shared_ptr<EditorScene> m_EditorScene;
 	std::shared_ptr<RuntimeScene> m_RuntimeScene;
 	std::shared_ptr<ViewportPane> m_MainViewportPane;
-	std::shared_ptr<ViewportPane> m_MiniViewportPane;
 	ArrayList<Pair<std::shared_ptr<ModelSpaceScene>, std::shared_ptr<ViewportPane>>> m_ModelSpaceSceneViews;
 	ArrayList<bool> m_DockedModelSpaceScene;
 	mutable std::shared_ptr<Scene> m_LastFocusedScene;

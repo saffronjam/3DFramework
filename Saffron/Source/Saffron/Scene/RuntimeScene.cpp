@@ -34,9 +34,8 @@ RuntimeScene::RuntimeScene(std::shared_ptr<Scene> copyFrom)
 	m_Light = copyFrom->GetLight();
 	m_LightMultiplier = copyFrom->GetLight().Multiplier;
 
-	m_Environment = copyFrom->GetEnvironment();
+	m_SceneEnvironment = copyFrom->GetSceneEnvironment();
 	m_Skybox = copyFrom->GetSkybox();
-	m_SkyboxLod = copyFrom->GetSkyboxLod();
 
 	auto &otherRegistry = copyFrom->GetEntityRegistry();
 	Map<UUID, Entity> entityMap;
@@ -117,10 +116,41 @@ void RuntimeScene::OnUpdate()
 
 void RuntimeScene::OnRender()
 {
+	// Process lights
+	{
+		m_LightEnvironment = LightEnvironment();
+		auto lights = m_EntityRegistry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
+		Uint32 directionalLightIndex = 0;
+		for ( auto entity : lights )
+		{
+			auto [transformComponent, lightComponent] = lights.get<TransformComponent, DirectionalLightComponent>(entity);
+			Vector3f direction = -glm::normalize(Matrix3f(transformComponent.Transform) * Vector3f(1.0f));
+			m_LightEnvironment.DirectionalLights[directionalLightIndex++] =
+			{
+				direction,
+				lightComponent.Radiance,
+				lightComponent.Intensity,
+				lightComponent.CastShadows
+			};
+		}
+	}
+
+	// TODO: only one sky light at the moment!
+	{
+		auto lights = m_EntityRegistry.group<SkylightComponent>(entt::get<TransformComponent>);
+		for ( auto entity : lights )
+		{
+			auto [transformComponent, skyLightComponent] = lights.get<TransformComponent, SkylightComponent>(entity);
+			m_SceneEnvironment = skyLightComponent.SceneEnvironment;
+			m_SceneEnvironment->SetIntensity(skyLightComponent.Intensity);
+			SetSkybox(m_SceneEnvironment->GetRadianceMap());
+		}
+	}
+
 	if ( m_DebugCameraActivated )
 	{
 		m_DebugCamera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
-		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_DebugCamera) , m_DebugCamera->GetViewMatrix() });
+		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_DebugCamera) , m_DebugCamera->GetViewMatrix(), 0.1f, 1000.0f, 45.0f });
 	}
 	else
 	{
@@ -133,10 +163,10 @@ void RuntimeScene::OnRender()
 		std::shared_ptr<SceneCamera> camera = cameraEntity.GetComponent<CameraComponent>();
 		camera->SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 		const Matrix4f cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
-		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(camera) , cameraViewMatrix });
+		SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(camera) , cameraViewMatrix, 0.1f, 1000.0f, 45.0f });
 	}
 
-	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
+	m_Skybox.Material->Set("u_TextureLod", m_Skybox.Lod);
 
 	SceneRenderer::BeginScene(this, { SceneRenderer::GetMainTarget() });
 	auto meshGroup = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
@@ -231,15 +261,7 @@ void RuntimeScene::OnGuiRender()
 
 	Gui::BeginPropertyGrid();
 	Gui::Property("Debug Camera", m_DebugCameraActivated);
-	Gui::Property("Load Environment Map", [this]
-				  {
-					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
-					  if ( !filepath.empty() )
-					  {
-						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
-					  }
-				  }, true);
-	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
+	Gui::Property("Skybox LOD", m_Skybox.Lod, 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
 	auto &light = GetLight();
 	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
 	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);

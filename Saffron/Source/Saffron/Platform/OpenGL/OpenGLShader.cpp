@@ -633,11 +633,11 @@ void OpenGLShader::ResolveUniforms()
 		}
 		else if ( resource->GetCount() > 1 )
 		{
-			glResource->m_Register = 0;
+			glResource->m_Register = sampler;
 			const Uint32 count = glResource->GetCount();
 			int *samplers = new int[count];
 			for ( Uint32 s = 0; s < count; s++ )
-				samplers[s] = s;
+				samplers[s] = sampler++;
 			UploadUniformIntArray(glResource->GetName(), samplers, count);
 			delete[] samplers;
 		}
@@ -673,7 +673,7 @@ void OpenGLShader::CompileAndUploadShader()
 			ArrayList<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
-			SE_CORE_ERROR("Shader compilation failed:\n{0}", &infoLog[0]);
+			SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_Filepath.string(), &infoLog[0]);
 
 			// We don't need the shader anymore.
 			glDeleteShader(shaderRendererID);
@@ -699,7 +699,7 @@ void OpenGLShader::CompileAndUploadShader()
 		// The maxLength includes the NULL character
 		ArrayList<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-		SE_CORE_ERROR("Shader compilation failed:\n{0}", &infoLog[0]);
+		SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", m_Filepath.string(), &infoLog[0]);
 
 		// We don't need the program anymore.
 		glDeleteProgram(program);
@@ -710,7 +710,9 @@ void OpenGLShader::CompileAndUploadShader()
 
 	// Always detach shaders after a successful link.
 	for ( auto id : shaderRendererIDs )
+	{
 		glDetachShader(program, id);
+	}
 
 	m_RendererID = program;
 }
@@ -751,7 +753,7 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration *uniform,
 	switch ( uniform->GetType() )
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool:
-		UploadUniformInt(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
+		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const float *>(&buffer.Data()[offset]));
@@ -790,7 +792,7 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration *uni
 	switch ( uniform->GetType() )
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool:
-		UploadUniformInt(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
+		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const bool *>(&buffer.Data()[offset]));
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(uniform->GetLocation(), *reinterpret_cast<const float *>(&buffer.Data()[offset]));
@@ -826,7 +828,7 @@ void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaratio
 	switch ( field.GetType() )
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool:
-		UploadUniformInt(field.GetLocation(), *reinterpret_cast<const bool *>(&data[offset]));
+		UploadUniformFloat(field.GetLocation(), *reinterpret_cast<const bool *>(&data[offset]));
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Float32:
 		UploadUniformFloat(field.GetLocation(), *reinterpret_cast<const float *>(&data[offset]));

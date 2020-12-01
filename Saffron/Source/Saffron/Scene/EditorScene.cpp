@@ -5,6 +5,7 @@
 
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Core/Misc.h"
+#include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Serialize/SceneSerializer.h"
@@ -51,9 +52,40 @@ void EditorScene::OnUpdate()
 
 void EditorScene::OnRender()
 {
-	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
+	// Process lights
+	{
+		m_LightEnvironment = LightEnvironment();
+		auto lights = m_EntityRegistry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
+		Uint32 directionalLightIndex = 0;
+		for ( auto entity : lights )
+		{
+			auto [transformComponent, lightComponent] = lights.get<TransformComponent, DirectionalLightComponent>(entity);
+			Vector3f direction = -glm::normalize(Matrix3f(transformComponent.Transform) * Vector3f(1.0f));
+			m_LightEnvironment.DirectionalLights[directionalLightIndex++] =
+			{
+				direction,
+				lightComponent.Radiance,
+				lightComponent.Intensity,
+				lightComponent.CastShadows
+			};
+		}
+	}
 
-	SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
+	// TODO: only one sky light at the moment!
+	{
+		auto lights = m_EntityRegistry.group<SkylightComponent>(entt::get<TransformComponent>);
+		for ( auto entity : lights )
+		{
+			auto [transformComponent, skyLightComponent] = lights.get<TransformComponent, SkylightComponent>(entity);
+			m_SceneEnvironment = skyLightComponent.SceneEnvironment;
+			m_SceneEnvironment->SetIntensity(skyLightComponent.Intensity);
+			SetSkybox(m_SceneEnvironment->GetRadianceMap());
+		}
+	}
+
+	m_Skybox.Material->Set("u_TextureLod", m_Skybox.Lod);
+
+	SceneRenderer::GetMainTarget()->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix(), 0.1f, 1000.0f, 45.0f });
 
 	ArrayList<std::shared_ptr<SceneRenderer::Target>> targets = { SceneRenderer::GetMainTarget() };
 	//if ( m_SceneEntity && m_SelectedEntity.HasComponent<CameraComponent>() )
@@ -157,15 +189,7 @@ void EditorScene::OnGuiRender()
 	ImGui::Begin("Scene");
 
 	Gui::BeginPropertyGrid();
-	Gui::Property("Load Environment Map", [this]
-				  {
-					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
-					  if ( !filepath.empty() )
-					  {
-						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
-					  }
-				  }, true);
-	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
+	Gui::Property("Skybox LOD", m_Skybox.Lod, 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
 	auto &light = GetLight();
 	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
 	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);

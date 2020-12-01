@@ -34,12 +34,13 @@ public:
 	void Bind();
 
 	Uint32 GetFlags() const { return m_MaterialFlags; }
+	void SetFlag(Flag flag) { m_MaterialFlags |= static_cast<Uint32>(flag); }
+
+	const std::shared_ptr<Shader> &GetShader() const { return m_Shader; }
 	template<typename T>
 	T &Get(const String &name);
 	template<typename T>
 	std::shared_ptr<T> GetResource(const String &name);
-
-	void SetFlag(Flag flag) { m_MaterialFlags |= static_cast<Uint32>(flag); }
 	template <typename T>
 	void Set(const String &name, const T &value);
 	void Set(const String &name, const std::shared_ptr<Texture> &texture);

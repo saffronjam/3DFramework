@@ -11,9 +11,7 @@ EditorLayer::EditorLayer(const Shared <Project> &project)
 	:
 	m_Style(static_cast<int>(Gui::Style::Dark)),
 	m_Project(Move(project)),
-	m_EditorScene(CreateShared<EditorScene>("")),
 	m_MainViewportPane(CreateShared<ViewportPane>("Main Viewport", SceneRenderer::GetMainTarget())),
-	m_MiniViewportPane(CreateShared<ViewportPane>("Mini Viewport", m_EditorScene->GetMiniTarget())),
 	m_LastFocusedScene(m_EditorScene),
 	m_CachedActiveScene(m_EditorScene),
 	m_SceneState(SceneState::Edit)
@@ -168,17 +166,17 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate()
 {
-	/*const auto activeScene = GetActiveScene();
+	const auto activeScene = GetActiveScene();
 	if ( activeScene != m_CachedActiveScene )
 	{
 		OnSceneChange(activeScene, {});
-	}*/
+	}
 
 	switch ( m_SceneState )
 	{
 	case SceneState::Edit:
 	{
-		//m_MainViewportPane->IsFocused() ? m_EditorScene->EnableCamera() : m_EditorScene->DisableCamera();
+		m_MainViewportPane->IsFocused() ? m_EditorScene->EnableCamera() : m_EditorScene->DisableCamera();
 
 		m_EditorScene->OnUpdate();
 		m_EditorScene->OnRender();
@@ -255,21 +253,22 @@ void EditorLayer::OnGuiRender()
 			if ( !wantOpen )
 			{
 				const UUID sceneUUID = scene->GetUUID();
-				Run::Later([sceneUUID, this] {
-					const auto deleteIterator = std::find_if(m_ModelSpaceSceneViews.begin(),
-															 m_ModelSpaceSceneViews.end(),
-															 [sceneUUID, this](auto &pair) {
-																 return pair.first->GetUUID() == sceneUUID;
-															 });
-					if ( deleteIterator == m_ModelSpaceSceneViews.begin() )
-					{
-						m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
-					}
-					else
-					{
-						m_LastFocusedScene = std::dynamic_pointer_cast<Scene>((deleteIterator - 1)->first);
-					}
-					m_ModelSpaceSceneViews.erase(deleteIterator);
+				Run::Later([sceneUUID, this]
+						   {
+							   const auto deleteIterator = std::find_if(m_ModelSpaceSceneViews.begin(),
+																		m_ModelSpaceSceneViews.end(),
+																		[sceneUUID, this](auto &pair) {
+																			return pair.first->GetUUID() == sceneUUID;
+																		});
+							   if ( deleteIterator == m_ModelSpaceSceneViews.begin() )
+							   {
+								   m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
+							   }
+							   else
+							   {
+								   m_LastFocusedScene = std::dynamic_pointer_cast<Scene>((deleteIterator - 1)->first);
+							   }
+							   m_ModelSpaceSceneViews.erase(deleteIterator);
 						   });
 			}
 		}
@@ -297,6 +296,11 @@ void EditorLayer::OnGuiRender()
 
 void EditorLayer::OnEvent(const Event &event)
 {
+	if ( !m_EditorScene )
+	{
+		return;
+	}
+
 	if ( m_SceneState == SceneState::Edit )
 	{
 		m_EditorScene->OnEvent(event);
@@ -484,20 +488,17 @@ void EditorLayer::PromptNewScene()
 
 	if ( !filepath.empty() )
 	{
+		OnStop();
 		String sceneName = filepath.stem().string();
 		Shared <EditorScene> newScene = CreateShared<EditorScene>(sceneName);
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
-		newScene->SetEnvironment(SceneEnvironment::Load("Resources/Assets/Env/birchwood_4k.hdr"));
 		const Scene::Light light = { {-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f };
 		newScene->SetLight(light);
 
 		m_EditorScene = newScene;
 		m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
-
-		m_EntityPanel->SetContext(m_EditorScene);
-		ScriptEngine::SetSceneContext(m_EditorScene);
 
 		SaveActiveScene();
 		OnSceneChange(m_EditorScene, {});
@@ -578,7 +579,6 @@ void EditorLayer::LoadProjectScene(const Filepath &filepath)
 	}
 
 	m_EditorScene = newScene;
-	m_MiniViewportPane->SetTarget(m_EditorScene->GetMiniTarget());
 	m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
 
 	OnEntityUnselected(m_SelectedEntity);
@@ -603,7 +603,7 @@ void EditorLayer::OnProjectChange(const Shared <Project> &project)
 	ScriptEngine::OnProjectChange(project);
 	m_Project = project;
 	m_AssetPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "Resources/Assets/Meshes");
-	m_ScriptPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "/src");
+	m_ScriptPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "Source");
 
 	LoadProjectScene(m_Project->GetSceneFilepaths().front());
 }

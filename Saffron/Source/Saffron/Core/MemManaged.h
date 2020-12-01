@@ -8,6 +8,8 @@ template <class ManagedType>
 class MemManaged : public std::enable_shared_from_this<ManagedType>
 {
 public:
+	virtual ~MemManaged() = default;
+
 	_NODISCARD std::shared_ptr<ManagedType> GetShared()
 	{
 		return this->shared_from_this();

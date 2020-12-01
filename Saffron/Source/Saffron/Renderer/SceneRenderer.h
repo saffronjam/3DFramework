@@ -122,6 +122,8 @@ public:
 	static std::shared_ptr<Target> &SceneRenderer::GetMainTarget();
 	static Options &GetOptions();
 
+	static void SetFocusPoint(const Vector2f &focusPoint);
+
 private:
 	static void FlushDrawList();
 

@@ -63,6 +63,7 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 
 Scene::Scene()
 	:
+	m_FallbackSceneEnvironment(SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr")),
 	m_SceneEntity(m_EntityRegistry.create(), this),
 	m_ViewportWidth(100),
 	m_ViewportHeight(100)
@@ -149,20 +150,15 @@ Entity Scene::GetEntity(const String &tag)
 	return Entity::Null();
 }
 
-void Scene::SetSelectedEntity(Entity entity)
-{
-	m_SelectedEntity = entity;
-}
-
-Entity Scene::GetSelectedEntity()
-{
-	return m_SelectedEntity;
-}
-
 void Scene::SetViewportSize(Uint32 width, Uint32 height)
 {
 	m_ViewportWidth = width;
 	m_ViewportHeight = height;
+}
+
+const std::shared_ptr<SceneEnvironment> &Scene::GetSceneEnvironment() const
+{
+	return m_SceneEnvironment ? m_SceneEnvironment : m_FallbackSceneEnvironment;
 }
 
 Entity Scene::GetMainCameraEntity()
@@ -185,26 +181,10 @@ std::shared_ptr<Scene> Scene::GetScene(UUID uuid)
 	return nullptr;
 }
 
-void Scene::SetName(String name)
+void Scene::SetSkybox(const std::shared_ptr<TextureCube> &skybox)
 {
-	m_Name = Move(name);
-}
-
-void Scene::SetLight(const Light &light)
-{
-	m_Light = light;
-}
-
-void Scene::SetEnvironment(const std::shared_ptr<SceneEnvironment> &environment)
-{
-	m_Environment = environment;
-	SetSkyboxTexture(environment->GetRadianceMap());
-}
-
-void Scene::SetSkyboxTexture(const std::shared_ptr<TextureCube> &skyboxTexture)
-{
-	m_Skybox.Texture = skyboxTexture;
-	m_Skybox.Material->Set("u_Texture", skyboxTexture);
+	m_Skybox.Texture = skybox;
+	m_Skybox.Material->Set("u_Texture", skybox);
 }
 
 void Scene::ShowMeshBoundingBoxes(bool show)

@@ -85,9 +85,6 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 	auto environment = data["Environment"];
 	if ( environment )
 	{
-		auto envPath = environment["AssetPath"].as<String>();
-		m_Scene.SetEnvironment(SceneEnvironment::Load(envPath));
-
 		auto lightNode = environment["Light"];
 		if ( lightNode )
 		{
@@ -132,7 +129,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 	{
 		for ( auto entity : entities )
 		{
-			auto uuid = entity["Entity"].as<uint64_t>();
+			auto uuid = entity["Entity"].as<Uint64>();
 
 			String name;
 			auto tagComponent = entity["TagComponent"];
@@ -147,7 +144,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				// Entities always have transforms
 				auto &transform = deserializedEntity.GetComponent<TransformComponent>().Transform;
 				auto translation = transformComponent["Position"].as<Vector3f>();
-				auto rotation = transformComponent["Rotation"].as<glm::quat>();
+				auto rotation = transformComponent["Rotation"].as<Quaternion>();
 				auto scale = transformComponent["Scale"].as<Vector3f>();
 
 				transform = Math::ComposeMatrix(translation, rotation, scale);
@@ -168,7 +165,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 						{
 							// TODO: Look over overwritten variables
 							auto name = field["Name"].as<String>();
-							FieldType type = static_cast<FieldType>(field["Type"].as<uint32_t>());
+							FieldType type = static_cast<FieldType>(field["Type"].as<Uint32>());
 							EntityInstanceData &data = ScriptEngine::GetEntityInstanceData(m_Scene.GetUUID(), uuid);
 							auto &moduleFieldMap = data.ModuleFieldMap;
 							auto &publicFields = moduleFieldMap[moduleName];
@@ -187,7 +184,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 							}
 							case FieldType::Int:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<int32_t>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Int32>());
 								break;
 							}
 							case FieldType::UnsignedInt:
@@ -229,7 +226,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				auto &component = deserializedEntity.AddComponent<MeshComponent>();
 				auto meshPath = meshComponent["AssetPath"].as<String>();
 				auto translation = meshComponent["Position"].as<Vector3f>();
-				auto rotation = meshComponent["Rotation"].as<glm::quat>();
+				auto rotation = meshComponent["Rotation"].as<Quaternion>();
 				auto scale = meshComponent["Scale"].as<Vector3f>();
 				component.Mesh = CreateShared<Mesh>(meshPath);
 				component.Mesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
@@ -241,13 +238,32 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 			{
 				auto &component = deserializedEntity.AddComponent<CameraComponent>();
 				auto translation = cameraComponent["Position"].as<Vector3f>();
-				auto rotation = cameraComponent["Rotation"].as<glm::quat>();
+				auto rotation = cameraComponent["Rotation"].as<Quaternion>();
 				auto scale = cameraComponent["Scale"].as<Vector3f>();
 				component.Camera = CreateShared<SceneCamera>();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 				component.DrawMesh = cameraComponent["DrawMesh"].as<bool>();
 				component.DrawFrustum = cameraComponent["DrawFrustum"].as<bool>();
 				component.CameraMesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
+			}
+
+			auto directionalLightComponent = entity["DirectionalLightComponent"];
+			if ( directionalLightComponent )
+			{
+				auto &component = deserializedEntity.AddComponent<DirectionalLightComponent>();
+				component.Radiance = directionalLightComponent["Radiance"].as<Vector3f>();
+				component.CastShadows = directionalLightComponent["CastShadows"].as<bool>();
+				component.SoftShadows = directionalLightComponent["SoftShadows"].as<bool>();
+				component.LightSize = directionalLightComponent["LightSize"].as<float>();
+			}
+
+			auto skyLightComponent = entity["SkylightComponent"];
+			if ( skyLightComponent )
+			{
+				Filepath environmentFilepath = skyLightComponent["EnvironmentAssetPath"].as<String>();
+				auto &component = deserializedEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load(environmentFilepath));
+				component.Intensity = skyLightComponent["Intensity"].as<float>();
+				component.Angle = skyLightComponent["Angle"].as<float>();
 			}
 
 			auto spriteRendererComponent = entity["SpriteRendererComponent"];
@@ -416,6 +432,21 @@ void SceneSerializer::SerializeEntity(YAML::Emitter &emitter, Entity entity) con
 	emitter << YAML::Key << "Scale" << YAML::Value << scale;
 	END_YAML_COMPONENT_MAP();
 
+	BEGIN_YAML_COMPONENT_MAP(DirectionalLightComponent);
+	auto &directionalLightComponent = entity.GetComponent<DirectionalLightComponent>();
+	emitter << YAML::Key << "Radiance" << YAML::Value << directionalLightComponent.Radiance;
+	emitter << YAML::Key << "CastShadows" << YAML::Value << directionalLightComponent.CastShadows;
+	emitter << YAML::Key << "SoftShadows" << YAML::Value << directionalLightComponent.SoftShadows;
+	emitter << YAML::Key << "LightSize" << YAML::Value << directionalLightComponent.LightSize;
+	END_YAML_COMPONENT_MAP();
+
+	BEGIN_YAML_COMPONENT_MAP(SkylightComponent);
+	auto &skyLightComponent = entity.GetComponent<SkylightComponent>();
+	emitter << YAML::Key << "EnvironmentAssetPath" << YAML::Value << skyLightComponent.SceneEnvironment->GetFilepath().string();
+	emitter << YAML::Key << "Intensity" << YAML::Value << skyLightComponent.Intensity;
+	emitter << YAML::Key << "Angle" << YAML::Value << skyLightComponent.Angle;
+	END_YAML_COMPONENT_MAP();
+
 	BEGIN_YAML_COMPONENT_MAP(SpriteRendererComponent);
 	auto &spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 	emitter << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
@@ -479,7 +510,7 @@ void SceneSerializer::SerializeEnvironment(YAML::Emitter &emitter) const
 	emitter << YAML::Key << "Environment";
 	emitter << YAML::Value;
 	emitter << YAML::BeginMap; // Environment
-	emitter << YAML::Key << "AssetPath" << YAML::Value << m_Scene.GetEnvironment()->GetFilepath().string();
+	emitter << YAML::Key << "AssetPath" << YAML::Value << m_Scene.GetSceneEnvironment()->GetFilepath().string();
 	const auto &light = m_Scene.GetLight();
 	emitter << YAML::Key << "Light" << YAML::Value;
 	emitter << YAML::BeginMap; // Light

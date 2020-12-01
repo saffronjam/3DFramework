@@ -118,9 +118,9 @@ public:
 	virtual void UploadUniformBuffer(const Uniform::BufferBase &uniformBuffer) = 0;
 
 	// TODO: Implement materials and remove these
-	virtual void SetFloat(const String &name, float value) = 0;
 	virtual void SetInt(const String &name, int value) = 0;
 	virtual void SetBool(const String &name, bool value) = 0;
+	virtual void SetFloat(const String &name, float value) = 0;
 	virtual void SetFloat2(const String &name, const Vector2f &value) = 0;
 	virtual void SetFloat3(const String &name, const Vector3f &value) = 0;
 	virtual void SetMat4(const String &name, const Matrix4f &value) = 0;

@@ -13,7 +13,9 @@ public:
 	const Filepath &GetFilepath() const { return m_FilePath; }
 	const std::shared_ptr<TextureCube> &GetRadianceMap() const { return m_RadianceMap; }
 	const std::shared_ptr<TextureCube> &GetIrradianceMap() const { return m_IrradianceMap; }
+
 	float GetIntensity() const { return m_Intensity; }
+	void SetIntensity(float intensity) { m_Intensity = intensity; }
 
 	static std::shared_ptr<SceneEnvironment> Load(const Filepath &filepath);
 

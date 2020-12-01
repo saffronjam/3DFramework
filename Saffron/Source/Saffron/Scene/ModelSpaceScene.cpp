@@ -27,7 +27,7 @@ void ModelSpaceScene::OnUpdate()
 
 void ModelSpaceScene::OnRender()
 {
-	m_Skybox.Material->Set("u_TextureLod", m_SkyboxLod);
+	m_Skybox.Material->Set("u_TextureLod", m_Skybox.Lod);
 
 	m_Target->SetCameraData({ std::dynamic_pointer_cast<Camera>(m_EditorCamera), m_EditorCamera->GetViewMatrix() });
 	SceneRenderer::BeginScene(this, { m_Target });
@@ -49,15 +49,7 @@ void ModelSpaceScene::OnGuiRender()
 	ImGui::Begin("Scene");
 
 	Gui::BeginPropertyGrid();
-	Gui::Property("Load Environment Map", [this]
-				  {
-					  const Filepath filepath = FileIOManager::OpenFile({ "HDR Image (*.hdr)", {"*.hdr"} });
-					  if ( !filepath.empty() )
-					  {
-						  SetEnvironment(SceneEnvironment::Load(filepath.string()));
-					  }
-				  }, true);
-	Gui::Property("Skybox LOD", GetSkyboxLod(), 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
+	Gui::Property("Skybox LOD", m_Skybox.Lod, 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
 	auto &light = GetLight();
 	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
 	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);

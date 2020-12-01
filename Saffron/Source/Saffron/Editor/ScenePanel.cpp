@@ -162,7 +162,7 @@ void ScenePanel::OnCreateEntity(bool viewModal, const std::shared_ptr<ScriptPane
 				}
 				if ( skylightComponent )
 				{
-					newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/birchwood_4k.hdr"));
+					newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr"));
 					cameraComponent = false;
 				}
 				if ( scriptComponent )
@@ -239,7 +239,7 @@ void ScenePanel::OnCreateDirectionalLight()
 void ScenePanel::OnCreateSkylight()
 {
 	auto newEntity = m_Context->CreateEntity("Sky Light");
-	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/birchwood_4k.hdr"));
+	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr"));
 	GetSignals().Emit(Signals::OnNewSelection, newEntity);
 }
 

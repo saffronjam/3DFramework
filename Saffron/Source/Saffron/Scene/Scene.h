@@ -45,13 +45,14 @@ public:
 
 	struct Skybox
 	{
+		float Lod{};
 		std::shared_ptr<TextureCube> Texture;
 		std::shared_ptr<MaterialInstance> Material;
 	};
 
 public:
-	explicit Scene();
-	~Scene();
+	Scene();
+	virtual ~Scene();
 
 	virtual void OnUpdate() = 0;
 	virtual void OnRender() = 0;
@@ -66,32 +67,30 @@ public:
 	const EntityMap &GetEntityMap() const { return m_EntityIDMap; }
 	EntityRegistry &GetEntityRegistry() { return m_EntityRegistry; }
 	const EntityRegistry &GetEntityRegistry() const { return m_EntityRegistry; }
-
 	virtual const std::shared_ptr<SceneRenderer::Target> &GetTarget() const = 0;
 
-	virtual Entity GetSelectedEntity();
-	virtual	void SetSelectedEntity(Entity entity);
+	Entity GetEntity() const { return m_SceneEntity; }
+	virtual Entity GetSelectedEntity() const { return m_SelectedEntity; }
+	virtual	void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
 	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
 	UUID GetUUID() const { return m_SceneID; }
 	const String &GetName() const { return m_Name; }
-
-	Entity GetEntity() const { return m_SceneEntity; }
+	void SetName(String name) { m_Name = name; };
 
 	Light &GetLight() { return m_Light; }
 	const Light &GetLight() const { return m_Light; }
+	void SetLight(const Light &light) { m_Light = light; }
 	const LightEnvironment &GetLightEnvironment() const { return m_LightEnvironment; }
+	const std::shared_ptr<SceneEnvironment> &GetSceneEnvironment() const;
 
 	Entity GetMainCameraEntity();
-	float &GetSkyboxLod() { return m_SkyboxLod; }
 	static std::shared_ptr<Scene> GetScene(UUID uuid);
-	Skybox GetSkybox() const { return m_Skybox; }
-	const std::shared_ptr<SceneEnvironment> &GetEnvironment() const { return m_Environment; }
 
-	void SetName(String name);
-	void SetLight(const Light &light);
-	void SetEnvironment(const std::shared_ptr<SceneEnvironment> &environment);
-	void SetSkyboxTexture(const std::shared_ptr<TextureCube> &skyboxTexture);
+	const Skybox &GetSkybox() const { return m_Skybox; }
+	void SetSkybox(const Skybox &skybox) { m_Skybox = skybox; }
+	void SetSkybox(const std::shared_ptr<TextureCube> &skybox);
+
 	void ShowMeshBoundingBoxes(bool show);
 	void ShowPhysicsBodyBoundingBoxes(bool show);
 
@@ -104,6 +103,9 @@ protected:
 	Light m_Light;
 	float m_LightMultiplier = 0.3f;
 	LightEnvironment m_LightEnvironment;
+	std::shared_ptr<SceneEnvironment> m_SceneEnvironment;
+	std::shared_ptr<SceneEnvironment> m_FallbackSceneEnvironment;
+	Skybox m_Skybox;
 
 	EntityRegistry m_EntityRegistry;
 	EntityMap m_EntityIDMap;
@@ -112,12 +114,8 @@ protected:
 
 	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
 
-	std::shared_ptr<SceneEnvironment> m_Environment;
-	Skybox m_Skybox;
-
 	bool m_RadiancePrefilter = false;
 	float m_EnvMapRotation = 0.0f;
-	float m_SkyboxLod = 1.0f;
 	bool m_UIShowMeshBoundingBoxes = false;
 	bool m_UIShowPhysicsBodyBoundingBoxes = false;
 

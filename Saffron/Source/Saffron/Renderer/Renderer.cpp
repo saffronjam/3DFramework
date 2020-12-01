@@ -198,13 +198,24 @@ void Renderer::EndRenderPass()
 void Renderer::SubmitQuad(std::shared_ptr<MaterialInstance> material, const Matrix4f &transform)
 {
 	bool depthTest = true;
+	bool cullFace = true;
 	if ( material )
 	{
 		material->Bind();
 		depthTest = material->GetFlag(Material::Flag::DepthTest);
+		cullFace = !material->GetFlag(Material::Flag::TwoSided);
 
 		auto shader = material->GetShader();
 		shader->SetMat4("u_Transform", transform);
+	}
+
+	if ( cullFace )
+	{
+		Submit([]() { glEnable(GL_CULL_FACE); });
+	}
+	else
+	{
+		Submit([]() { glDisable(GL_CULL_FACE); });
 	}
 
 	s_Data.m_FullscreenQuadVertexBuffer->Bind();
@@ -262,7 +273,24 @@ void Renderer::SubmitMesh(std::shared_ptr<Mesh> mesh, const Matrix4f &transform,
 
 		Submit([submesh, material]()
 			   {
-				   material->GetFlag(Material::Flag::DepthTest) ? glEnable(GL_DEPTH_TEST) : glDisable(GL_DEPTH_TEST);
+				   if ( material->GetFlag(Material::Flag::DepthTest) )
+				   {
+					   glEnable(GL_DEPTH_TEST);
+				   }
+				   else
+				   {
+					   glDisable(GL_DEPTH_TEST);
+				   }
+
+				   if ( !material->GetFlag(Material::Flag::TwoSided) )
+				   {
+					   Submit([]() { glEnable(GL_CULL_FACE); });
+				   }
+				   else
+				   {
+					   Submit([]() { glDisable(GL_CULL_FACE); });
+				   }
+
 				   glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT, reinterpret_cast<void *>(sizeof(Uint32) * submesh.BaseIndex), submesh.BaseVertex);
 			   });
 	}

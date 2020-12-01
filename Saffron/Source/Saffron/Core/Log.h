@@ -3,8 +3,7 @@
 #include <mutex>
 
 #include <spdlog/spdlog.h>
-#include <spdlog/sinks/stdout_sinks.h>
-#include <spdlog/sinks/base_sink.h>
+#include <spdlog/fmt/ostr.h>
 
 #include "Saffron/Core/Math/SaffronMath.h"
 
@@ -39,6 +38,12 @@ private:
 	static std::shared_ptr<spdlog::logger> s_CoreLogger;
 	static std::shared_ptr<spdlog::logger> s_ClientLogger;
 };
+}
+
+template<typename OStream, typename t_Number>
+OStream &operator<<(OStream &os, const Se::Vector<2, t_Number> &vec)
+{
+	return os << '(' << vec.x << ", " << vec.y << ')';
 }
 
 template<typename OStream, typename t_Number>

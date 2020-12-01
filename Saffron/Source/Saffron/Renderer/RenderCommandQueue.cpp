@@ -14,6 +14,7 @@ RenderCommandQueue::RenderCommandQueue()
 
 void RenderCommandQueue::Submit(const RenderCommand &fn)
 {
+	SE_CORE_ASSERT(fn, "Function has to be valid");
 	m_CommandBuffer.push_back(fn);
 	m_nCommands++;
 }
