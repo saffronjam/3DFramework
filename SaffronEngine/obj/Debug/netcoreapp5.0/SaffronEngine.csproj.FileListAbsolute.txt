@@ -1,0 +1,17 @@
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\SaffronEngine.deps.json
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\SaffronEngine.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\ref\SaffronEngine.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\SaffronEngine.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.csproj.CoreCompileInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.csproj.CopyComplete
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\ref\SaffronEngine.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp5.0\SaffronEngine.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\bgfx.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp5.0\bgfx_debug.dll

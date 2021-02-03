@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>9</LangVersion>
+    </PropertyGroup>
+	
+	<ItemGroup>
+		<None Include="dll\bgfx.dll">
+			<Link>bgfx.dll</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include="dll\bgfx_debug.dll">
+			<Link>bgfx_debug.dll</Link>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+  </ItemGroup>
+
+</Project>

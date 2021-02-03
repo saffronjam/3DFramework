@@ -1,0 +1,11 @@
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp3.1\bgfx.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp3.1\bgfx_debug.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp3.1\Renderer.deps.json
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp3.1\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp3.1\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.csproj.CoreCompileInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp3.1\Renderer.pdb

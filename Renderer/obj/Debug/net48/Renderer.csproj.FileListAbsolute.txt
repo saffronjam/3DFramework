@@ -1,0 +1,8 @@
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\net48\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\net48\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.csproj.CoreCompileInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\net48\Renderer.pdb

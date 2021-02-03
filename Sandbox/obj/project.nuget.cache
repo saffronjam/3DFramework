@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "R4hYZiaFyQk9IR5Cxi1UgNBefYyBZyNSiSiFoXPLLjtHNex13RORj/6cKY6kiP+/HDWHNC7bj2uJ7MYwzhF/ug==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\Sandbox\\Sandbox.csproj",
+  "expectedPackageFiles": [
+    "C:\\Program Files\\NuGet\\packages\\imgui.net\\1.78.0\\imgui.net.1.78.0.nupkg.sha512",
+    "C:\\Program Files\\NuGet\\packages\\serilog\\2.10.1-dev-01265\\serilog.2.10.1-dev-01265.nupkg.sha512",
+    "C:\\Program Files\\NuGet\\packages\\serilog.sinks.console\\4.0.0-dev-00839\\serilog.sinks.console.4.0.0-dev-00839.nupkg.sha512",
+    "C:\\Program Files\\NuGet\\packages\\system.buffers\\4.4.0\\system.buffers.4.4.0.nupkg.sha512",
+    "C:\\Program Files\\NuGet\\packages\\system.numerics.vectors\\4.4.0\\system.numerics.vectors.4.4.0.nupkg.sha512",
+    "C:\\Program Files\\NuGet\\packages\\system.runtime.compilerservices.unsafe\\4.4.0\\system.runtime.compilerservices.unsafe.4.4.0.nupkg.sha512"
+  ],
+  "logs": []
+}

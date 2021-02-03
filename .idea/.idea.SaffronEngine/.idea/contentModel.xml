@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Users\ownem\AppData\Local\JetBrains\Rider2020.2\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\ownem\AppData\Local\JetBrains\Rider2020.2\resharper-host\Local\Transient\Rider\v202\SolutionCaches\_SaffronEngine.-907410451.00" t="ExcludeRecursive" />
+    <e p="C:\Users\ownem\source\repos\SaffronEngine" t="IncludeFlat">
+      <e p="packages" t="ExcludeRecursive" />
+      <e p="Renderer" t="IncludeRecursive">
+        <e p="Bgfx.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Callbacks.cs" t="Include" />
+        <e p="Capabilities.cs" t="Include" />
+        <e p="dll" t="Include">
+          <e p="bgfx.dll" t="Include" />
+          <e p="bgfx_debug.dll" t="Include" />
+        </e>
+        <e p="DynamicIndexBuffer.cs" t="Include" />
+        <e p="DynamicVertexBuffer.cs" t="Include" />
+        <e p="Encoder.cs" t="Include" />
+        <e p="Enums.cs" t="Include" />
+        <e p="FrameBuffer.cs" t="Include" />
+        <e p="IndexBuffer.cs" t="Include" />
+        <e p="IndirectBuffer.cs" t="Include" />
+        <e p="InstanceDataBuffer.cs" t="Include" />
+        <e p="MemoryBlock.cs" t="Include" />
+        <e p="NativeMethods.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Renderer.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="OcclusionQuery.cs" t="Include" />
+        <e p="PlatformData.cs" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="Renderer.csproj" t="IncludeRecursive" />
+        <e p="RenderState.cs" t="Include" />
+        <e p="Shader.cs" t="Include" />
+        <e p="StencilFlags.cs" t="Include" />
+        <e p="Texture.cs" t="Include" />
+        <e p="TransientIndexBuffer.cs" t="Include" />
+        <e p="TransientVertexBuffer.cs" t="Include" />
+        <e p="Uniform.cs" t="Include" />
+        <e p="VertexBuffer.cs" t="Include" />
+        <e p="VertexLayout.cs" t="Include" />
+      </e>
+      <e p="SaffronEngine" t="IncludeRecursive">
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Collection" t="Include">
+          <e p="Dockspace.cs" t="Include" />
+          <e p="FadePane.cs" t="Include" />
+          <e p="Logo.cs" t="Include" />
+          <e p="SplashScreenPane.cs" t="Include" />
+          <e p="ViewportPane.cs" t="Include" />
+        </e>
+        <e p="Common" t="Include">
+          <e p="Application.cs" t="Include" />
+          <e p="Batch.cs" t="Include" />
+          <e p="Clock.cs" t="Include" />
+          <e p="Component.cs" t="Include" />
+          <e p="Cube.cs" t="Include" />
+          <e p="Entity.cs" t="Include" />
+          <e p="Event.cs" t="Include" />
+          <e p="EventArgs.cs" t="Include" />
+          <e p="GenUtils.cs" t="Include" />
+          <e p="Global.cs" t="Include" />
+          <e p="Gui.cs" t="Include" />
+          <e p="Input.cs" t="Include" />
+          <e p="InputCodes.cs" t="Include" />
+          <e p="Layer.cs" t="Include" />
+          <e p="Mesh.cs" t="Include" />
+          <e p="ResourceLoader.cs" t="Include" />
+          <e p="Schedule.cs" t="Include" />
+          <e p="Time.cs" t="Include" />
+          <e p="VertexTypes.cs" t="Include" />
+          <e p="Window.cs" t="Include" />
+        </e>
+        <e p="Exceptions" t="Include">
+          <e p="SaffronStateException.cs" t="Include" />
+        </e>
+        <e p="fs_cubes.sc" t="Include" />
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="SaffronEngine.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Platform" t="Include">
+          <e p="Windows" t="Include">
+            <e p="NativeMethods.cs" t="Include" />
+            <e p="WindowsWindow.cs" t="Include" />
+          </e>
+        </e>
+        <e p="Rendering" t="Include">
+          <e p="Scene.cs" t="Include" />
+          <e p="SceneRenderer.cs" t="Include" />
+        </e>
+        <e p="SaffronEngine.csproj" t="IncludeRecursive" />
+        <e p="varying.def.sc" t="Include" />
+        <e p="vs_cubes.sc" t="Include" />
+      </e>
+      <e p="SaffronEngine.sln" t="IncludeFlat" />
+      <e p="Sandbox" t="IncludeRecursive">
+        <e p="App.cs" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Layers" t="Include">
+          <e p="EditorLayer.cs" t="Include" />
+        </e>
+        <e p="obj" t="ExcludeRecursive">
+          <e p="Debug" t="Include">
+            <e p="netcoreapp3.1" t="Include">
+              <e p="Sandbox.AssemblyInfo.cs" t="Include" />
+            </e>
+          </e>
+        </e>
+        <e p="Sandbox.csproj" t="IncludeRecursive" />
+      </e>
+    </e>
+  </component>
+</project>

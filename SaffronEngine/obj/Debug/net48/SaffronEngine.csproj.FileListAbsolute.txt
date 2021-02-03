@@ -1,0 +1,12 @@
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\net48\SaffronEngine.exe.config
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\net48\SaffronEngine.exe
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\net48\SaffronEngine.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.csproj.CoreCompileInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.exe
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\net48\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\net48\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\net48\SaffronEngine.csproj.CopyComplete

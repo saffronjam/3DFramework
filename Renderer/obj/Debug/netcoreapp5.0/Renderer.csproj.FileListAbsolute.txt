@@ -1,0 +1,14 @@
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\Renderer.deps.json
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\ref\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.csproj.CoreCompileInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\ref\Renderer.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\obj\Debug\netcoreapp5.0\Renderer.pdb
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\bgfx.dll
+C:\Users\ownem\source\repos\SaffronEngine\Renderer\bin\Debug\netcoreapp5.0\bgfx_debug.dll

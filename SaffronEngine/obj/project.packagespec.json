@@ -1,0 +1,66 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\SaffronEngine\\SaffronEngine.csproj",
+    "projectName": "SaffronEngine",
+    "projectPath": "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\SaffronEngine\\SaffronEngine.csproj",
+    "outputPath": "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\SaffronEngine\\obj\\",
+    "projectStyle": "PackageReference",
+    "originalTargetFrameworks": [
+      "netcoreapp3.1"
+    ],
+    "sources": {
+      "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+      "https://api.nuget.org/v3/index.json": {},
+      "https://www.nuget.org/api/v2": {}
+    },
+    "frameworks": {
+      "netcoreapp3.1": {
+        "projectReferences": {
+          "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\Renderer\\Renderer.csproj": {
+            "projectPath": "C:\\Users\\ownem\\source\\repos\\SaffronEngine\\Renderer\\Renderer.csproj"
+          }
+        }
+      }
+    },
+    "warningProperties": {
+      "warnAsError": [
+        "NU1605"
+      ]
+    }
+  },
+  "frameworks": {
+    "netcoreapp3.1": {
+      "dependencies": {
+        "ImGui.NET": {
+          "target": "Package",
+          "version": "[1.78.0, )"
+        },
+        "Serilog": {
+          "target": "Package",
+          "version": "[2.10.1-dev-01265, )"
+        },
+        "Serilog.Sinks.Console": {
+          "target": "Package",
+          "version": "[4.0.0-dev-00839, )"
+        }
+      },
+      "imports": [
+        "net461",
+        "net462",
+        "net47",
+        "net471",
+        "net472",
+        "net48"
+      ],
+      "assetTargetFallback": true,
+      "warn": true,
+      "frameworkReferences": {
+        "Microsoft.NETCore.App": {
+          "privateAssets": "all"
+        }
+      },
+      "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
+    }
+  }
+}
