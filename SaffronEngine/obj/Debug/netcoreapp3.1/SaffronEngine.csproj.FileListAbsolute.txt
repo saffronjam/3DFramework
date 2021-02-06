@@ -1,3 +1,7 @@
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.csprojAssemblyReference.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.AssemblyInfoInputs.cache
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.AssemblyInfo.cs
+C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.csproj.CoreCompileInputs.cache
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\bgfx.dll
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\bgfx_debug.dll
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\SaffronEngine.deps.json
@@ -5,10 +9,6 @@ C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\SaffronEngine.pdb
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\Renderer.dll
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\bin\Debug\netcoreapp3.1\Renderer.pdb
-C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.csprojAssemblyReference.cache
-C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.AssemblyInfoInputs.cache
-C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.AssemblyInfo.cs
-C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.csproj.CoreCompileInputs.cache
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.csproj.CopyComplete
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.dll
 C:\Users\ownem\source\repos\SaffronEngine\SaffronEngine\obj\Debug\netcoreapp3.1\SaffronEngine.pdb

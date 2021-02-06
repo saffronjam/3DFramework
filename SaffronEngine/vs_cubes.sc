@@ -6,7 +6,7 @@ $output v_color0
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include "../common/common.sh"
+#include "shaderBase.sc"
 
 void main()
 {

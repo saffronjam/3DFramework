@@ -4,7 +4,9 @@
     <e p="C:\Users\ownem\AppData\Local\JetBrains\Rider2020.2\extResources" t="IncludeRecursive" />
     <e p="C:\Users\ownem\AppData\Local\JetBrains\Rider2020.2\resharper-host\Local\Transient\Rider\v202\SolutionCaches\_SaffronEngine.-907410451.00" t="ExcludeRecursive" />
     <e p="C:\Users\ownem\source\repos\SaffronEngine" t="IncludeFlat">
+      <e p="build" t="Include" />
       <e p="packages" t="ExcludeRecursive" />
+      <e p="Project" t="Include" />
       <e p="Renderer" t="IncludeRecursive">
         <e p="Bgfx.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />
@@ -55,6 +57,7 @@
           <e p="ViewportPane.cs" t="Include" />
         </e>
         <e p="Common" t="Include">
+          <e p="AABB.cs" t="Include" />
           <e p="Application.cs" t="Include" />
           <e p="Batch.cs" t="Include" />
           <e p="Clock.cs" t="Include" />
@@ -80,6 +83,8 @@
           <e p="SaffronStateException.cs" t="Include" />
         </e>
         <e p="fs_cubes.sc" t="Include" />
+        <e p="fs_imgui_image.sc" t="Include" />
+        <e p="fs_ocornut_imgui.sc" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
@@ -100,8 +105,11 @@
         <e p="SaffronEngine.csproj" t="IncludeRecursive" />
         <e p="varying.def.sc" t="Include" />
         <e p="vs_cubes.sc" t="Include" />
+        <e p="vs_imgui_image.sc" t="Include" />
+        <e p="vs_ocornut_imgui.sc" t="Include" />
       </e>
       <e p="SaffronEngine.sln" t="IncludeFlat" />
+      <e p="SaffronEngine.targets" t="Include" />
       <e p="Sandbox" t="IncludeRecursive">
         <e p="App.cs" t="Include" />
         <e p="bin" t="ExcludeRecursive" />

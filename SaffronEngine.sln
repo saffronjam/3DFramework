@@ -6,6 +6,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Renderer", "Renderer\Render
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{A694B707-5819-43A3-BB18-C23FE04F4AC5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{309EE256-F3A0-44FE-ADA6-71790AE5FAF6}"
+ProjectSection(SolutionItems) = preProject
+	SaffronEngine.targets = SaffronEngine.targets
+EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Project", "Project", "{8D915A1C-C8FC-4A53-B001-DE84043A61C3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +31,10 @@ Global
 		{A694B707-5819-43A3-BB18-C23FE04F4AC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A694B707-5819-43A3-BB18-C23FE04F4AC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A694B707-5819-43A3-BB18-C23FE04F4AC5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{56BED695-08F5-46B5-B0C0-FEA101BBF4ED} = {8D915A1C-C8FC-4A53-B001-DE84043A61C3}
+		{5A453CD4-3C83-4EC0-A17D-F482C1FFFFDE} = {8D915A1C-C8FC-4A53-B001-DE84043A61C3}
+		{A694B707-5819-43A3-BB18-C23FE04F4AC5} = {8D915A1C-C8FC-4A53-B001-DE84043A61C3}
 	EndGlobalSection
 EndGlobal

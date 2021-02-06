@@ -5,9 +5,11 @@ $input v_color0
  * License: http://www.opensource.org/licenses/BSD-2-Clause
  */
 
-#include "../common/common.sh"
+#include "shaderBase.sc"
 
 void main()
 {
-	gl_FragColor = v_color0;
+	vec4 color = v_color0;
+	color.r = 0.0;
+	gl_FragColor = color;
 }

@@ -17,6 +17,7 @@ namespace Sandbox.Layers
         private IndexBuffer ibh;
         private Program program;
         private IntPtr image;
+        private Mesh mesh;
 
 
         public void OnAttach(Batch batch)
@@ -27,6 +28,7 @@ namespace Sandbox.Layers
                 vbh = Cube.CreateVertexBuffer();
                 ibh = Cube.CreateIndexBuffer();
                 program = ResourceLoader.LoadProgram("vs_cubes", "fs_cubes");
+                mesh = ResourceLoader.LoadMesh("bunny.obj");
             }), "Creating resources");
             image = Gui.AddTexture(ResourceLoader.LoadTexture("Saffron.dds"));
         }
@@ -78,6 +80,8 @@ namespace Sandbox.Layers
                         Bgfx.Submit((ushort) SceneRenderer.ViewID.Main, program);
                     }
                 }
+                
+                // mesh.Submit((ushort) SceneRenderer.ViewID, program, Matrix4x4.CreateTranslation(new Vector3(0, 0, 10)), new RenderStateGroup(), );
             });
         }
 

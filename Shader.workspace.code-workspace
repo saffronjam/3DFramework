@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"files.exclude": {
+			"**/*.cs": true,	
+			"**/*.csproj": true,
+			"**/*.targets": true,
+			"**/*.user": true,
+			"**/*.sln": true,
+			"**/*.exe": true,
+			"**/*.dll": true,
+			"**/bin": true,
+			"**/dll": true,
+			"**/obj": true
+		}
+	}
+}
