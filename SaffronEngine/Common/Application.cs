@@ -19,8 +19,8 @@ namespace SaffronEngine.Common
     {
         private static Application _instance;
         public Window Window { get; private set; }
-        private SceneRenderer _sceneRenderer;
-        
+        public SceneRenderer SceneRenderer { get; private set; }
+
         private Thread _thread;
         private readonly Batch _attachBatch = new Batch();
         private readonly FadePane _fadeIn = new FadePane(FadePane.Type.In, Time.FromSeconds(0.5f));
@@ -82,8 +82,8 @@ namespace SaffronEngine.Common
             // These instructions must run in the renderer thread
             ///////////////////////////////////////////////////////
             Bgfx.Init();
-            
-            _sceneRenderer = new SceneRenderer();
+
+            SceneRenderer = new SceneRenderer();
             _gui = new Gui();
 
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayText);
@@ -99,6 +99,7 @@ namespace SaffronEngine.Common
                     _fadeIn.Start();
                 }
 
+                Input.OnUpdate();
                 Window.DispatchEvents();
 
                 _gui.Begin();
@@ -121,7 +122,6 @@ namespace SaffronEngine.Common
                 _dockspace.End();
                 _gui.End();
 
-                _sceneRenderer.Execute();
                 Bgfx.Frame();
             }
 

@@ -326,8 +326,8 @@ namespace SaffronEngine.Common
 
             private void SetupBuffers()
             {
-                _imguiProgram = ResourceLoader.LoadProgram("vs_ocornut_imgui", "fs_ocornut_imgui");
-                _textureProgram = ResourceLoader.LoadProgram("vs_imgui_image", "fs_imgui_image");
+                _imguiProgram = ResourceLoader.LoadProgram("ocornut_imgui", "ocornut_imgui");
+                _textureProgram = ResourceLoader.LoadProgram("imgui_image", "imgui_image");
 
                 _vertexLayout = new VertexLayout();
                 _vertexLayout.Begin()
@@ -436,12 +436,14 @@ namespace SaffronEngine.Common
 
             private void OnKeyPressed(object sender, KeyEventArgs args)
             {
+                if (args.Code == KeyCode.Unknown) return;
                 var io = ImGui.GetIO();
                 io.KeysDown[(int) args.Code] = true;
             }
 
             private void OnKeyReleased(object sender, KeyEventArgs args)
             {
+                if (args.Code == KeyCode.Unknown) return;
                 var io = ImGui.GetIO();
                 io.KeysDown[(int) args.Code] = false;
             }

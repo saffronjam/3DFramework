@@ -118,12 +118,18 @@ namespace SaffronEngine.Common
 
         private static void OnKeyPressed(object sender, KeyEventArgs args)
         {
-            KeyboardState[(int) args.Code] = true;
+            if (args.Code != KeyCode.Unknown)
+            {
+                KeyboardState[(int) args.Code] = true;
+            }
         }
 
         private static void OnKeyReleased(object sender, KeyEventArgs args)
         {
-            KeyboardState[(int) args.Code] = false;
+            if (args.Code != KeyCode.Unknown)
+            {
+                KeyboardState[(int) args.Code] = false;
+            }
         }
 
         private static void OnMouseButtonPressed(object sender, MouseButtonEventArgs args)

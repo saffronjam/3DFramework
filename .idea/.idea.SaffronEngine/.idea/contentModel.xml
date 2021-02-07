@@ -60,9 +60,11 @@
           <e p="AABB.cs" t="Include" />
           <e p="Application.cs" t="Include" />
           <e p="Batch.cs" t="Include" />
+          <e p="Camera.cs" t="Include" />
           <e p="Clock.cs" t="Include" />
           <e p="Component.cs" t="Include" />
           <e p="Cube.cs" t="Include" />
+          <e p="EditorCamera.cs" t="Include" />
           <e p="Entity.cs" t="Include" />
           <e p="Event.cs" t="Include" />
           <e p="EventArgs.cs" t="Include" />
@@ -82,8 +84,10 @@
         <e p="Exceptions" t="Include">
           <e p="SaffronStateException.cs" t="Include" />
         </e>
+        <e p="fs_bunny.sc" t="Include" />
         <e p="fs_cubes.sc" t="Include" />
         <e p="fs_imgui_image.sc" t="Include" />
+        <e p="fs_mesh.sc" t="Include" />
         <e p="fs_ocornut_imgui.sc" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
@@ -104,8 +108,10 @@
         </e>
         <e p="SaffronEngine.csproj" t="IncludeRecursive" />
         <e p="varying.def.sc" t="Include" />
+        <e p="vs_bunny.sc" t="Include" />
         <e p="vs_cubes.sc" t="Include" />
         <e p="vs_imgui_image.sc" t="Include" />
+        <e p="vs_mesh.sc" t="Include" />
         <e p="vs_ocornut_imgui.sc" t="Include" />
       </e>
       <e p="SaffronEngine.sln" t="IncludeFlat" />

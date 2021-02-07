@@ -46,15 +46,15 @@ namespace SaffronEngine.Common
 
         public static Program LoadProgram(string vsName, string fsName)
         {
-            var vsh = LoadShader(vsName);
-            var fsh = LoadShader(fsName);
+            var vsh = LoadShader("vs_" + vsName);
+            var fsh = LoadShader("fs_" + fsName);
 
             return new Program(vsh, fsh, true);
         }
 
         public static Program LoadProgram(string csName)
         {
-            var csh = LoadShader(csName);
+            var csh = LoadShader("cs_" + csName);
             return new Program(csh, true);
         }
 
@@ -67,9 +67,62 @@ namespace SaffronEngine.Common
 
         public static Mesh LoadMesh(string fileName)
         {
-            var path = Path.Combine(RootPath, "Meshes/", fileName);
-            var scene = _assimpContext.ImportFile(path);
-            return Mesh.Create(scene);
+            var path = Path.Combine(RootPath, "Meshes/", fileName) + ".bin";
+            var groups = new List<MeshGroup>();
+            var group = new MeshGroup();
+            VertexLayout layout = null;
+
+            using (var reader = new MemoryReader(File.ReadAllBytes(path)))
+            {
+                while (!reader.Done)
+                {
+                    var tag = reader.Read<uint>();
+                    if (tag == ChunkTagVB)
+                    {
+                        // skip bounding volume info
+                        reader.Skip(BoundingVolumeSize);
+
+                        layout = ReadVertexLayout(reader);
+
+                        var vertexCount = reader.Read<ushort>();
+                        var vertexData = reader.ReadArray<byte>(vertexCount * layout.Stride);
+                        group.VertexBuffer = new VertexBuffer(MemoryBlock.FromArray(vertexData), layout);
+                    }
+                    else if (tag == ChunkTagIB)
+                    {
+                        var indexCount = reader.Read<uint>();
+                        var indexData = reader.ReadArray<ushort>((int) indexCount);
+
+                        group.IndexBuffer = new IndexBuffer(MemoryBlock.FromArray(indexData));
+                    }
+                    else if (tag == ChunkTagPri)
+                    {
+                        // skip material name
+                        var len = reader.Read<ushort>();
+                        reader.Skip(len);
+
+                        // read primitive data
+                        var count = reader.Read<ushort>();
+                        for (var i = 0; i < count; i++)
+                        {
+                            // skip name
+                            len = reader.Read<ushort>();
+                            reader.Skip(len);
+
+                            var prim = reader.Read<Primitive>();
+                            group.Primitives.Add(prim);
+
+                            // skip bounding volumes
+                            reader.Skip(BoundingVolumeSize);
+                        }
+
+                        groups.Add(group);
+                        group = new MeshGroup();
+                    }
+                }
+            }
+
+            return new Mesh(layout, groups);
         }
 
         private static VertexLayout ReadVertexLayout(MemoryReader reader)

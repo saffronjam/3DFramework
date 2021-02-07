@@ -88,6 +88,9 @@ namespace SaffronEngine.Collection
 
             Target.Width = (uint) ViewportSize.X;
             Target.Height = (uint) ViewportSize.Y;
+
+            Resized?.Invoke(this,
+                new SizeEventArgs(new SizeEvent {Width = (uint) ViewportSize.X, Height = (uint) ViewportSize.Y}));
         }
 
         public Vector2 TopLeft
@@ -106,5 +109,7 @@ namespace SaffronEngine.Collection
         public bool Focused { get; private set; }
 
         public Vector2 ViewportSize => BottomRight - TopLeft;
+
+        public event EventHandler<SizeEventArgs> Resized = null;
     }
 }

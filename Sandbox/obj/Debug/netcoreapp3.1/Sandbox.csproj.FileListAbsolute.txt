@@ -6,7 +6,14 @@ C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Sandbo
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Sandbox.runtimeconfig.dev.json
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Sandbox.dll
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Sandbox.pdb
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\AssimpNet.dll
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\ImGui.NET.dll
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Serilog.dll
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Serilog.Sinks.Console.dll
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\libassimp.so
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libassimp.dylib
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\assimp.dll
+C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\assimp.dll
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\libcimgui.so
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libcimgui.dylib
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\cimgui.dll
@@ -23,10 +30,3 @@ C:\Users\ownem\source\repos\SaffronEngine\Sandbox\obj\Debug\netcoreapp3.1\Sandbo
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\obj\Debug\netcoreapp3.1\Sandbox.dll
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\obj\Debug\netcoreapp3.1\Sandbox.pdb
 C:\Users\ownem\source\repos\SaffronEngine\Sandbox\obj\Debug\netcoreapp3.1\Sandbox.genruntimeconfig.cache
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Serilog.dll
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\Serilog.Sinks.Console.dll
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\AssimpNet.dll
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\linux-x64\native\libassimp.so
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libassimp.dylib
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\assimp.dll
-C:\Users\ownem\source\repos\SaffronEngine\Sandbox\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\assimp.dll

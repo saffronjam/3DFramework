@@ -26,193 +26,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="0494500c-4f8c-4ba4-bdf9-99e5ce2e56f7" name="Default Changelist" comment="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog">
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny_decimated.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny_patched.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/column.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/column.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/cube.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/hollowcube.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/meshes.ninja" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/orb.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/platform.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod0_1.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod0_2.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod1_1.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod1_2.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod2_1.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod2_2.obj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Textures/figure-rgba.dds" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/Textures/flare.dds" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine.targets" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/Common/AABB.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_imgui_image.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_ocornut_imgui.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/fs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/fs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/vs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/vs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/dx11/vs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/fs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/fs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/vs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/vs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/bin/glsl/vs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/fs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/fs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/fs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/vs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/vs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/dx11/vs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/fs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/fs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/fs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/vs_cubes.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/vs_imgui_image.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/glsl/vs_ocornut_imgui.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_imgui_image.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_ocornut_imgui.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/AssimpNet.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/runtimes/linux-x64/native/libassimp.so" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libassimp.dylib" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/assimp.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/assimp.dll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shaders/computeBase.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shaders/shaderBase.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Shaders/shaderLib.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Common/Camera.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Common/EditorCamera.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_mesh.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_mesh.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_bunny.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_mesh.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_bunny.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_mesh.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_bunny.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_mesh.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_bunny.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_mesh.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Textures/ImageGlass_8.0.12.8_x64.msi" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.assets.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.csprojAssemblyReference.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine.sln" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine.sln" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/SaffronEngine.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/SaffronEngine.csproj" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.deps.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/fs_imgui_image.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/fs_ocornut_imgui.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/vs_cubes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/vs_imgui_image.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/dx11/vs_ocornut_imgui.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/fs_imgui_image.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/fs_ocornut_imgui.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/vs_cubes.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/vs_imgui_image.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/bin/glsl/vs_ocornut_imgui.bin" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/Renderer.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/Renderer.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/SaffronEngine.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/bgfx.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Release/netcoreapp3.1/bgfx_debug.dll" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net472/.NETFramework,Version=v4.7.2.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net472/SaffronEngine.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net472/SaffronEngine.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net472/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net472/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/.NETFramework,Version=v4.8.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.csproj.CopyComplete" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.exe.withSupportedRuntime.config" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/net48/SaffronEngine.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp2.1/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.assets.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.CoreCompileInputs.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/apphost.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/.NETCoreApp,Version=v5.0.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.GeneratedMSBuildEditorConfig.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.csproj.CopyComplete" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/SaffronEngine.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/apphost.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp5.0/ref/SaffronEngine.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netstandard2.0/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netstandard2.0/SaffronEngine.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netstandard2.1/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/.NETCoreApp,Version=v3.1.AssemblyAttributes.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.AssemblyInfo.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.AssemblyInfoInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.assets.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.csproj.CopyComplete" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.csproj.CoreCompileInputs.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.csproj.FileListAbsolute.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Release/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/SaffronEngine.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/SaffronEngine.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/SaffronEngine.csproj.nuget.g.targets" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/SaffronEngine.csproj.nuget.g.targets" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/project.packagespec.json" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/project.packagespec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/rider.project.restore.info" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/varying.def.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/varying.def.sc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/vs_cubes.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/vs_cubes.sc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/Sandbox.csproj" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Sandbox.csproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.deps.json" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.deps.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_cubes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_cubes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/ImGui.NET.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Renderer.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Renderer.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.deps.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.exe" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.pdb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.runtimeconfig.dev.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/Sandbox.runtimeconfig.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/bgfx.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/bgfx_debug.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/runtimes/linux-x64/native/libcimgui.so" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/runtimes/osx-x64/native/libcimgui.dylib" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/runtimes/win-x64/native/cimgui.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Release/netcoreapp3.1/runtimes/win-x86/native/cimgui.dll" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.assets.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.assets.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/Sandbox.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Sandbox.csproj.nuget.dgspec.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/project.assets.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/project.nuget.cache" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -230,6 +87,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/82/2550f23b/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/34A/CultureInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/2b/876eef94/Vector3D.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/SaffronEngine/Rendering/SceneRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/10EE303D-F50D-4894-8BC9-E82224ABF672/8/Vector2_Intrinsics.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/e3/7e341c6d/Face.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/B6/ParseNumbers.cs" root0="SKIP_HIGHLIGHTING" />
@@ -242,6 +100,7 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/79/FlagsAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/e8/fd1a01e8/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C80B499D-ADA7-49E0-A8EE-7A9B1744160B/406/ConcurrentQueue.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/Sandbox/Layers/EditorLayer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/fc/25b4b0be/Node.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C80B499D-ADA7-49E0-A8EE-7A9B1744160B/101/Vector2_Intrinsics.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2209C224-AEC4-4EBC-B597-A676F9C23031/31/Logger.cs" root0="SKIP_HIGHLIGHTING" />
@@ -250,23 +109,21 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/10EE303D-F50D-4894-8BC9-E82224ABF672/4/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2209C224-AEC4-4EBC-B597-A676F9C23031/3/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/3D5/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/SaffronEngine/Rendering/SceneRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/1E0/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/185814B4-4727-4CD2-BB9F-11CA8747554D/b6/07584e8d/ImGuiIOPtr.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/185814B4-4727-4CD2-BB9F-11CA8747554D/5c/7b8e600e/ImGui.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/29B/Assembly.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2209C224-AEC4-4EBC-B597-A676F9C23031/2/Log.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/2A/Math.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/A220C977-C44A-4969-BE08-5DBC9CA1ED5A/5/Point.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/10EE303D-F50D-4894-8BC9-E82224ABF672/9/Vector3.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Sandbox/App.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/SaffronEngine/Platform/Windows/NativeMethods.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Log.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Event.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/EventArgs.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/NativeMethods.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Platform/Windows/NativeMethods.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/Window.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Platform/Windows/WindowsWindow.cs" />
@@ -294,25 +151,30 @@
         <option value="$PROJECT_DIR$/SaffronEngine/Graphics/Dockspace.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Scene/SceneRenderer.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Collection/Dockspace.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Collection/FadePane.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" />
-        <option value="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/AABB.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/vs_pbr_static.sc" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/fs_imgui_image.sc" />
         <option value="$PROJECT_DIR$/SaffronEngine/fs_ocornut_imgui.sc" />
         <option value="$PROJECT_DIR$/SaffronEngine/vs_imgui_image.sc" />
         <option value="$PROJECT_DIR$/SaffronEngine/vs_ocornut_imgui.sc" />
         <option value="$PROJECT_DIR$/SaffronEngine.targets" />
         <option value="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/vs_bunny.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" />
+        <option value="$PROJECT_DIR$/Renderer/Shader.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Camera.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/EditorCamera.cs" />
+        <option value="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" />
       </list>
     </option>
   </component>
@@ -432,7 +294,8 @@
       <workItem from="1612174857591" duration="37265000" />
       <workItem from="1612303062017" duration="5478000" />
       <workItem from="1612380282028" duration="15847000" />
-      <workItem from="1612542136847" duration="15156000" />
+      <workItem from="1612542136847" duration="25795000" />
+      <workItem from="1612697393643" duration="10563000" />
     </task>
     <task id="LOCAL−00001" summary="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog">
       <created>1612384887362</created>
@@ -450,7 +313,7 @@
     <option name="coveragePercentColumnWidth" value="150" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="234" />
+    <option name="symbolColumnWidth" value="313" />
     <coverage-tree-state>
       <expand />
       <select />
@@ -468,6 +331,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
@@ -476,90 +340,90 @@
     <option name="LAST_COMMIT_MESSAGE" value="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="556" height="464" key="DebuggerActiveHint" timestamp="1612396035238">
+    <state width="556" height="464" key="DebuggerActiveHint" timestamp="1612703054051">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="556" height="464" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1612396035238" />
-    <state width="1877" height="183" key="GridCell.Tab.0.bottom" timestamp="1612630335951">
+    <state width="556" height="464" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1612703054051" />
+    <state width="1877" height="183" key="GridCell.Tab.0.bottom" timestamp="1612707741851">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612630335951" />
-    <state width="1877" height="183" key="GridCell.Tab.0.center" timestamp="1612630335951">
+    <state width="1877" height="183" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
+    <state width="1877" height="183" key="GridCell.Tab.0.center" timestamp="1612707741851">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612630335951" />
-    <state width="1877" height="183" key="GridCell.Tab.0.left" timestamp="1612630335951">
+    <state width="1877" height="183" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
+    <state width="1877" height="183" key="GridCell.Tab.0.left" timestamp="1612707741851">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612630335951" />
-    <state width="1877" height="183" key="GridCell.Tab.0.right" timestamp="1612630335951">
+    <state width="1877" height="183" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
+    <state width="1877" height="183" key="GridCell.Tab.0.right" timestamp="1612707741851">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612630335951" />
-    <state width="1877" height="230" key="GridCell.Tab.1.bottom" timestamp="1612626282373">
+    <state width="1877" height="183" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
+    <state width="1877" height="230" key="GridCell.Tab.1.bottom" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.1.center" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.1.center" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.1.left" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.1.left" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.1.right" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.1.right" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.2.bottom" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.2.bottom" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.2.center" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.2.center" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.2.left" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.2.left" timestamp="1612703081282">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.2.right" timestamp="1612626282373">
+    <state width="1877" height="230" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
+    <state width="1877" height="230" key="GridCell.Tab.2.right" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282373" />
-    <state width="1877" height="230" key="GridCell.Tab.3.bottom" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.3.bottom" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.3.center" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.3.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.3.center" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.3.left" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.3.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.3.left" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.3.right" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.3.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.3.right" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.4.bottom" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.4.bottom" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.4.center" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.4.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.4.center" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.4.left" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.4.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.4.left" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
-    <state width="1877" height="230" key="GridCell.Tab.4.right" timestamp="1612626282374">
+    <state width="1877" height="230" key="GridCell.Tab.4.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="230" key="GridCell.Tab.4.right" timestamp="1612703081283">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612626282374" />
+    <state width="1877" height="230" key="GridCell.Tab.4.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
     <state x="552" y="252" key="Rider.ProjectTemplateDialog.Size" timestamp="1612551383458">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -568,10 +432,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="779" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612304840061" />
-    <state x="461" y="165" key="SettingsEditor" timestamp="1612629019579">
+    <state x="461" y="165" key="SettingsEditor" timestamp="1612633332415">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1612629019579" />
+    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1612633332415" />
     <state width="498" height="446" key="SwitcherDM" timestamp="1612179937519">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -580,18 +444,22 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state width="968" height="528" key="XDebugger.FullValuePopup/0.0.1920.1040@0.0.1920.1040" timestamp="1612208777417" />
-    <state x="638" y="119" width="644" height="801" key="find.popup" timestamp="1612102289548">
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1612706507089">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="638" y="119" width="644" height="801" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612102289548" />
-    <state x="616" y="240" key="run.anything.popup" timestamp="1612391444216">
+    <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612706507089" />
+    <state x="638" y="119" width="644" height="801" key="find.popup" timestamp="1612633265863">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612391444216" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1612388608909">
+    <state x="638" y="119" width="644" height="801" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612633265863" />
+    <state x="616" y="240" key="run.anything.popup" timestamp="1612700835783">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612388608909" />
+    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612700835783" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1612699390015">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612699390015" />
   </component>
   <component name="XDebuggerManager">
     <pin-to-top-manager>

@@ -9,6 +9,19 @@ namespace SaffronEngine.Rendering
 {
     public class SceneRenderer
     {
+        private class RenderCommand
+        {
+            public Mesh Mesh { get; private set; }
+            public Matrix4x4 Transform { get; private set; }
+
+            public RenderCommand(Mesh mesh, Matrix4x4 transform)
+            {
+                Mesh = mesh;
+                Transform = transform;
+            }
+        }
+
+
         public enum ViewID : ushort
         {
             Main = 0,
@@ -58,18 +71,54 @@ namespace SaffronEngine.Rendering
             public event EventHandler<SizeEventArgs> Resized = null;
         }
 
+        public struct CameraData
+        {
+            public Matrix4x4 Projection;
+            public Matrix4x4 View;
+
+            public CameraData(Matrix4x4 projection, Matrix4x4 view)
+            {
+                Projection = projection;
+                View = view;
+            }
+        }
+
         private static SceneRenderer _inst;
         public static Target Main { get; private set; }
 
         private readonly List<Action> _scheduledRendering = new List<Action>();
+        private readonly List<RenderCommand> _renderCommands = new List<RenderCommand>();
+
+        private readonly Program _meshProgram;
 
         public Color ClearColor { get; set; }
+
+        private Scene _activeScene = null;
+        public CameraData Camera { get; set; }
+
 
         public SceneRenderer()
         {
             _inst = this;
             Main = new Target {FrameBuffer = new FrameBuffer(1, 1, TextureFormat.RGBA8)};
             Application.Instance.Window.Resized += (sender, args) => OnWindowResize(args.Width, args.Height);
+
+            _meshProgram = ResourceLoader.LoadProgram("mesh", "mesh");
+        }
+
+        public void Begin(Scene scene)
+        {
+            _activeScene = scene;
+        }
+
+        public void End()
+        {
+            ExecuteSubmitions();
+
+            _inst._scheduledRendering.Clear();
+            _inst._renderCommands.Clear();
+
+            _activeScene = null;
         }
 
         public static void Sumbit(Action renderAction)
@@ -77,7 +126,12 @@ namespace SaffronEngine.Rendering
             _inst._scheduledRendering.Add(renderAction);
         }
 
-        public void Execute()
+        public static void Sumbit(Mesh mesh, Matrix4x4 transform)
+        {
+            _inst._renderCommands.Add(new RenderCommand(mesh, transform));
+        }
+
+        private void ExecuteSubmitions()
         {
             if (Main.AwaitingResize)
             {
@@ -106,6 +160,18 @@ namespace SaffronEngine.Rendering
             }
 
             Bgfx.Touch(0);
+            unsafe
+            {
+                var view = Camera.View;
+                var projection = Camera.Projection;
+                Bgfx.SetViewTransform((ushort) ViewID.Main, (float*) &view, (float*) &projection);
+            }
+
+            foreach (var renderCommand in _renderCommands)
+            {
+                renderCommand.Mesh.Submit((byte) ViewID.Main, _meshProgram, renderCommand.Transform,
+                    new RenderStateGroup(RenderState.Default, 0, StencilFlags.None, StencilFlags.None));
+            }
 
             foreach (var action in _scheduledRendering)
             {
