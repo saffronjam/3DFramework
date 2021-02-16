@@ -25,48 +25,226 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0494500c-4f8c-4ba4-bdf9-99e5ce2e56f7" name="Default Changelist" comment="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog">
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/Common/Camera.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/Common/EditorCamera.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_mesh.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_mesh.sc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_bunny.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_mesh.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_bunny.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_mesh.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_bunny.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_mesh.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_bunny.bin" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_mesh.bin" afterDir="false" />
+    <list default="true" id="0494500c-4f8c-4ba4-bdf9-99e5ce2e56f7" name="Default Changelist" comment="Add working editor camera and ECS">
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny_decimated.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/bunny_patched.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/cube.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/hollowcube.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/orb.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/platform.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/test_scene.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod0_1.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod0_2.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod1_1.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod1_2.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod2_1.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tree1b_lod2_2.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/tricube.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Meshes/unit_sphere.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/8k_mars.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/bark1.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/bolonga_irr.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/bolonga_lod.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/dmap.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/fieldstone-n.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/kyoto_irr.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/kyoto_lod.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/leafs1.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/lightmap.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/msdf.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/parallax-d.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/parallax-h.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/parallax-n.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/particle.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_10x5.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_4x4.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_5x5.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_6x6.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_8x5.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_astc_8x6.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_atc.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_atce.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_atci.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_bc1.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_bc2.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_bc3.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_bc7.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_etc1.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_etc2.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_ptc12.pvr" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_ptc14.pvr" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_ptc22.pvr" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/texture_compression_ptc24.pvr" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/uffizi.dds" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/Textures/uffizi.ktx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/ClearValues.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/IUniformGroup.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/Light.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/Material.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/RenderStates.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/RenderTarget.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/ShadowMapManager.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/common.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_hdr_skybox.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_black.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_main.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm_csm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm_linear.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm_linear_csm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm_linear_omni.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_vsm_omni.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_texture.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_hblur.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_hblur_vsm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_packdepth.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_packdepth_linear.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_packdepth_vsm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_packdepth_vsm_linear.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_texture.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_unpackdepth.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_unpackdepth_vsm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_vblur.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_vblur_vsm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_hdr_skybox.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting_csm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting_linear.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting_linear_csm.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting_linear_omni.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_lighting_omni.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_color_texture.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_depth.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_hblur.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_packdepth.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_packdepth_linear.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_texture.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_texture_lighting.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_unpackdepth.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SaffronEngine/vs_shadowmaps_vblur.sc" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_hdr_skybox.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_black.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_lighting_vsm_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_color_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_hblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_hblur_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_packdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_packdepth_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_packdepth_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_packdepth_vsm_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_unpackdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_unpackdepth_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_vblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_shadowmaps_vblur_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_hdr_skybox.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_lighting_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_color_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_depth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_hblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_packdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_packdepth_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_texture_lighting.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_unpackdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_shadowmaps_vblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_hdr_skybox.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_black.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_esm_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_hard_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_pcf_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_lighting_vsm_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_color_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_hblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_hblur_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_packdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_packdepth_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_packdepth_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_packdepth_vsm_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_unpackdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_unpackdepth_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_vblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_shadowmaps_vblur_vsm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_hdr_skybox.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting_linear_csm.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting_linear_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_lighting_omni.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_color_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_depth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_hblur.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_packdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_packdepth_linear.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_texture.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_texture_lighting.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_unpackdepth.bin" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_shadowmaps_vblur.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/contentModel.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.SaffronEngine/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Renderer/obj/Debug/netcoreapp3.1/Renderer.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/GenUtils.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/GenUtils.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/Common/VertexTypes.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Common/VertexTypes.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.CoreCompileInputs.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csproj.CoreCompileInputs.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/obj/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/varying.def.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/varying.def.sc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SaffronEngine/vs_mesh.sc" beforeDir="false" afterPath="$PROJECT_DIR$/SaffronEngine/vs_mesh.sc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/SaffronEngine.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/Sandbox.pdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/fs_cubes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/fs_cubes.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_mesh.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/dx11/vs_mesh.bin" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_mesh.bin" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/bin/glsl/vs_mesh.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/imgui.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/bin/Debug/netcoreapp3.1/imgui.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.FileListAbsolute.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csproj.FileListAbsolute.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.dll" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/obj/Debug/netcoreapp3.1/Sandbox.pdb" afterDir="false" />
@@ -75,6 +253,10 @@
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ElmWorkspace">
+    <elmProjects />
+    <settings elmCompilerPath="" elmFormatPath="" elmTestPath="" isElmFormatOnSaveEnabled="false" />
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -87,20 +269,19 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/82/2550f23b/Mesh.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/34A/CultureInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/2b/876eef94/Vector3D.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/SaffronEngine/Rendering/SceneRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/10EE303D-F50D-4894-8BC9-E82224ABF672/8/Vector2_Intrinsics.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/e3/7e341c6d/Face.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/B6/ParseNumbers.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/E1/UInt16.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/13A/Thread.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/8b/a361fa87/BoundingBox.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/38/String.Manipulation.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/14E/ExecutionContext.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/83/Index.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/185814B4-4727-4CD2-BB9F-11CA8747554D/b6/b76c39d9/ImDrawListPtr.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/79/FlagsAttribute.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/e8/fd1a01e8/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C80B499D-ADA7-49E0-A8EE-7A9B1744160B/406/ConcurrentQueue.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/Sandbox/Layers/EditorLayer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/CE936998-CFB2-467C-8902-046CF55148FD/fc/25b4b0be/Node.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/C80B499D-ADA7-49E0-A8EE-7A9B1744160B/101/Vector2_Intrinsics.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2209C224-AEC4-4EBC-B597-A676F9C23031/31/Logger.cs" root0="SKIP_HIGHLIGHTING" />
@@ -109,7 +290,6 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/10EE303D-F50D-4894-8BC9-E82224ABF672/4/Matrix4x4.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2209C224-AEC4-4EBC-B597-A676F9C23031/3/LoggerConfiguration.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/3D5/Dictionary.cs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="mock://C:/Users/ownem/source/repos/SaffronEngine/SaffronEngine/Rendering/SceneRenderer.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2BC5ED24-0D5C-402C-8B6A-BD14FFCEE267/1E0/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/185814B4-4727-4CD2-BB9F-11CA8747554D/b6/07584e8d/ImGuiIOPtr.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/185814B4-4727-4CD2-BB9F-11CA8747554D/5c/7b8e600e/ImGui.cs" root0="SKIP_HIGHLIGHTING" />
@@ -124,27 +304,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/SaffronEngine/Platform/Windows/NativeMethods.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Window.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Platform/Windows/WindowsWindow.cs" />
-        <option value="$PROJECT_DIR$/Renderer/Bgfx.cs" />
-        <option value="$PROJECT_DIR$/Sandbox/App.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Layer.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/Colors.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/Color.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Global.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Clock.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Time.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/UI.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Cube.cs" />
-        <option value="$PROJECT_DIR$/Renderer/Texture.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Run.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Schedule.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Batch.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/SplashScreenPane.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/FadePane.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/RenderTargetManager.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Graphics/ViewportPane.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/Dockspace.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Graphics/Gui.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Graphics/FrameBufferPool.cs" />
@@ -161,20 +320,41 @@
         <option value="$PROJECT_DIR$/SaffronEngine.targets" />
         <option value="$PROJECT_DIR$/SaffronEngine/fs_cubes.sc" />
         <option value="$PROJECT_DIR$/SaffronEngine/vs_bunny.sc" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" />
         <option value="$PROJECT_DIR$/Renderer/Shader.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/Component.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/Input.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/Camera.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/ResourceLoader.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/vs_mesh.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/fs_hdr_skybox.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/vs_hdr_skybox.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/tmp.txt" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/UniformGroup.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/IUniformGroup.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/RenderStates.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/ShadowMap.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/Material.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/Light.cs" />
+        <option value="$PROJECT_DIR$/Renderer/Bgfx.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/ClearValues.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/GenUtils.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Collection/ViewportPane.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Mesh.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Collection/SplashScreenPane.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Application.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Common/EditorCamera.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/common.sh" />
+        <option value="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_color_lighting_main.sh" />
+        <option value="$PROJECT_DIR$/SaffronEngine/fs_shadowmaps_packdepth_vsm.sc" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Entity.cs" />
+        <option value="$PROJECT_DIR$/Renderer/RenderState.cs" />
         <option value="$PROJECT_DIR$/Sandbox/Layers/EditorLayer.cs" />
-        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/ShadowMapManager.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/Gui.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/RenderTarget.cs" />
         <option value="$PROJECT_DIR$/SaffronEngine/Rendering/Scene.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Common/VertexTypes.cs" />
+        <option value="$PROJECT_DIR$/SaffronEngine/Rendering/SceneRenderer.cs" />
       </list>
     </option>
   </component>
@@ -188,11 +368,11 @@
   </component>
   <component name="PropertiesComponent">
     <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.72806066" />
+    <property name="DebuggerViewTab_PTCS_FirstProportionKey" value="0.49404117" />
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.62621886" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="XThreadsFramesViewSplitterKey" value="0.44616976" />
+    <property name="XThreadsFramesViewSplitterKey" value="0.7798165" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -200,8 +380,9 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="nodejs_package_manager_path" value="npm" />
+    <property name="org.elm.workspace.PROJECT_DISCOVERY" value="true" />
     <property name="restartRequiresConfirmation" value="false" />
-    <property name="settings.editor.selected.configurable" value="SolutionBuilderGeneralOptionsPageId" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected=".NET Project.Sandbox">
@@ -295,7 +476,16 @@
       <workItem from="1612303062017" duration="5478000" />
       <workItem from="1612380282028" duration="15847000" />
       <workItem from="1612542136847" duration="25795000" />
-      <workItem from="1612697393643" duration="10563000" />
+      <workItem from="1612697393643" duration="33606000" />
+      <workItem from="1612804080905" duration="20334000" />
+      <workItem from="1612867035311" duration="30080000" />
+      <workItem from="1612967366001" duration="16349000" />
+      <workItem from="1613044869238" duration="12093000" />
+      <workItem from="1613080586078" duration="213000" />
+      <workItem from="1613081566480" duration="612000" />
+      <workItem from="1613302729186" duration="6212000" />
+      <workItem from="1613474649741" duration="603000" />
+      <workItem from="1613475364337" duration="6303000" />
     </task>
     <task id="LOCAL−00001" summary="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog">
       <created>1612384887362</created>
@@ -303,7 +493,13 @@
       <option name="presentableId" value="LOCAL−00001" />
       <updated>1612384887362</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL−00002" summary="Add working editor camera and ECS">
+      <created>1612708131817</created>
+      <option name="number" value="LOCAL−00002" />
+      <option name="presentableId" value="LOCAL−00002" />
+      <updated>1612708131817</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -313,7 +509,7 @@
     <option name="coveragePercentColumnWidth" value="150" />
     <option name="sortOrder" value="DESCENDING" />
     <option name="sortedColumn" value="1" />
-    <option name="symbolColumnWidth" value="313" />
+    <option name="symbolColumnWidth" value="373" />
     <coverage-tree-state>
       <expand />
       <select />
@@ -321,6 +517,164 @@
   </component>
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
+  <component name="UnknownFeatures">
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ServiceProcess" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Serialization.Xml" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Web.HttpUtility" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel.TypeConverter" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.InteropServices" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Web" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.Encodings.Web" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Serilog" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Cryptography.Encoding" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Ping" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Requests" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Loader" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.Linq" />
+    <option featureType="com.intellij.fileTypeFactory" implementationName="*.sh" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Data.Common" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.Encoding.Extensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.FileSystem.DriveInfo" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.FileSystem.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Tasks.Extensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Transactions.Local" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Principal" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Globalization.Extensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Sockets" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.AppContext" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.IsolatedStorage" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.TypeExtensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="netstandard" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.Contracts" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.WebProxy" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="mscorlib" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ObjectModel" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.Pipes" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel.Annotations" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Linq.Queryable" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Resources.ResourceManager" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.RegularExpressions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Metadata" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Http" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Overlapped" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Claims" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Globalization" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.InteropServices.RuntimeInformation" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.CompilerServices.Unsafe" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Console" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Microsoft.CSharp" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.FileVersionInfo" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel.DataAnnotations" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Cryptography.X509Certificates" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.Serialization" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.Tracing" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.FileSystem" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Linq" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Mail" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.Compression.ZipFile" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Collections.Concurrent" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.UnmanagedMemoryStream" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.WebClient" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Serialization.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.Encoding.CodePages" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Drawing.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Drawing" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Handles" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Memory" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Dynamic.Runtime" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.XPath" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.TraceSource" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.XmlSerializer" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Microsoft.VisualBasic" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Collections.NonGeneric" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.DiagnosticSource" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Linq.Parallel" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Emit.Lightweight" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Extensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Cryptography.Algorithms" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.ThreadPool" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Numerics" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.DispatchProxy" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.Compression.FileSystem" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.Json" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Data.DataSetExtensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Tasks.Parallel" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Serialization.Formatters" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.StackTrace" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Configuration" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.Compression" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ServiceModel.Web" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Text.Encoding" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Channels" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="AssimpNet" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.WebSockets.Client" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.Tools" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Security" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.CompilerServices.VisualC" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Tasks.Dataflow" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.SecureString" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Numerics.Vectors" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ValueTuple" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.XmlDocument" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Microsoft.VisualBasic.Core" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.NameResolution" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.WebHeaderCollection" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Numerics" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.XDocument" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Serilog.Sinks.Console" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Timer" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="WindowsBase" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.ReaderWriter" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.FileSystem.Watcher" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.InteropServices.WindowsRuntime" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Emit" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.Process" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.TextWriterTraceListener" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Intrinsics" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Collections.Specialized" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Linq.Expressions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Globalization.Calendars" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Collections.Immutable" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.ComponentModel.EventBasedAsync" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Serialization" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="Microsoft.Win32.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Collections" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Extensions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Windows" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection.Emit.ILGeneration" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Core" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Runtime.Serialization.Json" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.MemoryMappedFiles" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.WebSockets" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.ServicePoint" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Diagnostics.Debug" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Resources.Reader" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="ImGui.NET" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Reflection" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Cryptography.Primitives" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.HttpListener" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Thread" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Resources.Writer" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Buffers" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Transactions" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Data" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.IO.Compression.Brotli" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Net.NetworkInformation" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Threading.Tasks" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Xml.XPath.XDocument" />
+    <option featureType="com.jetbrains.rider.solution.reference" implementationName="System.Security.Cryptography.Csp" />
+  </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
@@ -337,109 +691,114 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog" />
-    <option name="LAST_COMMIT_MESSAGE" value="First stage into moving Saffron Engine to C#&#10;- Render to custom framebuffer target&#10;- Resizable framebuffer&#10;- Input and other event from Win32&#10;- Windows support only&#10;- Logging system with serilog" />
+    <MESSAGE value="Add working editor camera and ECS" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add working editor camera and ECS" />
   </component>
   <component name="WindowStateProjectService">
-    <state width="556" height="464" key="DebuggerActiveHint" timestamp="1612703054051">
+    <state width="556" height="464" key="DebuggerActiveHint" timestamp="1613306926267">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="556" height="464" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1612703054051" />
-    <state width="1877" height="183" key="GridCell.Tab.0.bottom" timestamp="1612707741851">
+    <state width="556" height="464" key="DebuggerActiveHint/0.0.1920.1040@0.0.1920.1040" timestamp="1613306926267" />
+    <state width="1877" height="262" key="GridCell.Tab.0.bottom" timestamp="1613499729584">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
-    <state width="1877" height="183" key="GridCell.Tab.0.center" timestamp="1612707741851">
+    <state width="1877" height="262" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613499729584" />
+    <state width="1877" height="262" key="GridCell.Tab.0.center" timestamp="1613499729584">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
-    <state width="1877" height="183" key="GridCell.Tab.0.left" timestamp="1612707741851">
+    <state width="1877" height="262" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613499729584" />
+    <state width="1877" height="262" key="GridCell.Tab.0.left" timestamp="1613499729584">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
-    <state width="1877" height="183" key="GridCell.Tab.0.right" timestamp="1612707741851">
+    <state width="1877" height="262" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613499729584" />
+    <state width="1877" height="262" key="GridCell.Tab.0.right" timestamp="1613499729584">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="183" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612707741851" />
-    <state width="1877" height="230" key="GridCell.Tab.1.bottom" timestamp="1612703081282">
+    <state width="1877" height="262" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613499729584" />
+    <state width="1877" height="248" key="GridCell.Tab.1.bottom" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.1.center" timestamp="1612703081282">
+    <state width="1877" height="248" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.1.center" timestamp="1613499565250">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.1.left" timestamp="1612703081282">
+    <state width="1877" height="248" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565250" />
+    <state width="1877" height="248" key="GridCell.Tab.1.left" timestamp="1613499565250">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.1.right" timestamp="1612703081282">
+    <state width="1877" height="248" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565250" />
+    <state width="1877" height="248" key="GridCell.Tab.1.right" timestamp="1613499565250">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.2.bottom" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565250" />
+    <state width="1877" height="248" key="GridCell.Tab.2.bottom" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.2.center" timestamp="1612703081282">
+    <state width="1877" height="248" key="GridCell.Tab.2.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.2.center" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.2.left" timestamp="1612703081282">
+    <state width="1877" height="248" key="GridCell.Tab.2.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.2.left" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081282" />
-    <state width="1877" height="230" key="GridCell.Tab.2.right" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.2.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.2.right" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.3.bottom" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.2.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.3.bottom" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.3.center" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.3.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.3.center" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.3.left" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.3.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.3.left" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.3.right" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.3.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.3.right" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.4.bottom" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.3.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.4.bottom" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.4.center" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.4.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.4.center" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.center/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.4.left" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.4.center/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.4.left" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.left/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
-    <state width="1877" height="230" key="GridCell.Tab.4.right" timestamp="1612703081283">
+    <state width="1877" height="248" key="GridCell.Tab.4.left/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
+    <state width="1877" height="248" key="GridCell.Tab.4.right" timestamp="1613499565251">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="230" key="GridCell.Tab.4.right/0.0.1920.1040@0.0.1920.1040" timestamp="1612703081283" />
+    <state width="1877" height="248" key="GridCell.Tab.4.right/0.0.1920.1040@0.0.1920.1040" timestamp="1613499565251" />
     <state x="552" y="252" key="Rider.ProjectTemplateDialog.Size" timestamp="1612551383458">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="252" key="Rider.ProjectTemplateDialog.Size/0.0.1920.1040@0.0.1920.1040" timestamp="1612551383458" />
-    <state x="779" y="236" key="RiderGenerateDialog" timestamp="1612304840061">
+    <state x="779" y="236" key="RiderGenerateDialog" timestamp="1612807944208">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="779" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612304840061" />
-    <state x="461" y="165" key="SettingsEditor" timestamp="1612633332415">
+    <state x="779" y="236" key="RiderGenerateDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612807944208" />
+    <state x="687" y="96" key="SettingsEditor" timestamp="1613475246917">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1612633332415" />
-    <state width="498" height="446" key="SwitcherDM" timestamp="1612179937519">
+    <state x="687" y="96" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1613475246917" />
+    <state width="498" height="446" key="SwitcherDM" timestamp="1612823070225">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="498" height="446" key="SwitcherDM/0.0.1920.1040@0.0.1920.1040" timestamp="1612179937519" />
+    <state width="498" height="446" key="SwitcherDM/0.0.1920.1040@0.0.1920.1040" timestamp="1612823070225" />
+    <state x="92" y="92" width="1736" height="856" key="VCS.FileHistoryDialog" timestamp="1612715821971">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="92" y="92" width="1736" height="856" key="VCS.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612715821971" />
     <state width="968" height="528" key="XDebugger.FullValuePopup" timestamp="1612208777417">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -448,20 +807,37 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="92" y="92" width="1736" height="856" key="com.intellij.history.integration.ui.views.FileHistoryDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1612706507089" />
-    <state x="638" y="119" width="644" height="801" key="find.popup" timestamp="1612633265863">
+    <state x="638" y="119" width="644" height="801" key="find.popup" timestamp="1613495451676">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="638" y="119" width="644" height="801" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612633265863" />
-    <state x="616" y="240" key="run.anything.popup" timestamp="1612700835783">
+    <state x="638" y="119" width="644" height="801" key="find.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1613495451676" />
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup" timestamp="1613493863002">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="616" y="240" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612700835783" />
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1612699390015">
+    <state x="616" y="240" width="672" height="677" key="run.anything.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1613493863002" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup" timestamp="1612981026514">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612699390015" />
+    <state x="623" y="225" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1612981026514" />
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Renderer/Bgfx.cs</url>
+          <line>976</line>
+          <properties documentPath="C:\Users\ownem\source\repos\SaffronEngine\Renderer\Bgfx.cs" initialLine="976">
+            <startOffsets>
+              <option value="50322" />
+            </startOffsets>
+            <endOffsets>
+              <option value="50391" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <pin-to-top-manager>
       <pinned-members>
         <PinnedItemInfo parentTag="Frame#Sandbox.Layers.EditorLayer.OnGuiRender" memberName="this" />

@@ -156,7 +156,7 @@ namespace SaffronEngine.Common
                 var height = io.DisplaySize.Y;
 
                 Bgfx.SetViewName((ushort) _bgfxId, "ImGui");
-                Bgfx.SetViewMode((ushort) _bgfxId, ViewMode.Sequential);
+                Bgfx.SetViewMode((ushort) _bgfxId, ViewMode.Default);
 
                 unsafe
                 {

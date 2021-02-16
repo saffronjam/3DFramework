@@ -81,14 +81,37 @@
           <e p="VertexTypes.cs" t="Include" />
           <e p="Window.cs" t="Include" />
         </e>
+        <e p="common.sh" t="Include" />
         <e p="Exceptions" t="Include">
           <e p="SaffronStateException.cs" t="Include" />
         </e>
         <e p="fs_bunny.sc" t="Include" />
         <e p="fs_cubes.sc" t="Include" />
+        <e p="fs_hdr_skybox.sc" t="Include" />
         <e p="fs_imgui_image.sc" t="Include" />
         <e p="fs_mesh.sc" t="Include" />
         <e p="fs_ocornut_imgui.sc" t="Include" />
+        <e p="fs_shadowmaps_color_black.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting.sh" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_main.sh" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm_csm.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm_linear.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm_linear_csm.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm_linear_omni.sc" t="Include" />
+        <e p="fs_shadowmaps_color_lighting_vsm_omni.sc" t="Include" />
+        <e p="fs_shadowmaps_color_texture.sc" t="Include" />
+        <e p="fs_shadowmaps_hblur.sc" t="Include" />
+        <e p="fs_shadowmaps_hblur_vsm.sc" t="Include" />
+        <e p="fs_shadowmaps_packdepth.sc" t="Include" />
+        <e p="fs_shadowmaps_packdepth_linear.sc" t="Include" />
+        <e p="fs_shadowmaps_packdepth_vsm.sc" t="Include" />
+        <e p="fs_shadowmaps_packdepth_vsm_linear.sc" t="Include" />
+        <e p="fs_shadowmaps_texture.sc" t="Include" />
+        <e p="fs_shadowmaps_unpackdepth.sc" t="Include" />
+        <e p="fs_shadowmaps_unpackdepth_vsm.sc" t="Include" />
+        <e p="fs_shadowmaps_vblur.sc" t="Include" />
+        <e p="fs_shadowmaps_vblur_vsm.sc" t="Include" />
         <e p="obj" t="ExcludeRecursive">
           <e p="Debug" t="Include">
             <e p="netcoreapp3.1" t="Include">
@@ -103,16 +126,40 @@
           </e>
         </e>
         <e p="Rendering" t="Include">
+          <e p="ClearValues.cs" t="Include" />
+          <e p="IUniformGroup.cs" t="Include" />
+          <e p="Light.cs" t="Include" />
+          <e p="Material.cs" t="Include" />
+          <e p="RenderStates.cs" t="Include" />
+          <e p="RenderTarget.cs" t="Include" />
           <e p="Scene.cs" t="Include" />
           <e p="SceneRenderer.cs" t="Include" />
+          <e p="ShadowMapManager.cs" t="Include" />
         </e>
         <e p="SaffronEngine.csproj" t="IncludeRecursive" />
         <e p="varying.def.sc" t="Include" />
         <e p="vs_bunny.sc" t="Include" />
         <e p="vs_cubes.sc" t="Include" />
+        <e p="vs_hdr_skybox.sc" t="Include" />
         <e p="vs_imgui_image.sc" t="Include" />
         <e p="vs_mesh.sc" t="Include" />
         <e p="vs_ocornut_imgui.sc" t="Include" />
+        <e p="vs_shadowmaps_color.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting_csm.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting_linear.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting_linear_csm.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting_linear_omni.sc" t="Include" />
+        <e p="vs_shadowmaps_color_lighting_omni.sc" t="Include" />
+        <e p="vs_shadowmaps_color_texture.sc" t="Include" />
+        <e p="vs_shadowmaps_depth.sc" t="Include" />
+        <e p="vs_shadowmaps_hblur.sc" t="Include" />
+        <e p="vs_shadowmaps_packdepth.sc" t="Include" />
+        <e p="vs_shadowmaps_packdepth_linear.sc" t="Include" />
+        <e p="vs_shadowmaps_texture.sc" t="Include" />
+        <e p="vs_shadowmaps_texture_lighting.sc" t="Include" />
+        <e p="vs_shadowmaps_unpackdepth.sc" t="Include" />
+        <e p="vs_shadowmaps_vblur.sc" t="Include" />
       </e>
       <e p="SaffronEngine.sln" t="IncludeFlat" />
       <e p="SaffronEngine.targets" t="Include" />

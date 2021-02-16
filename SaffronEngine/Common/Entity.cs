@@ -124,6 +124,7 @@ namespace SaffronEngine.Common
 
         public Entity()
         {
+            Handle = Guid.NewGuid();
         }
 
         private void AssignRegistry(Registry registry)

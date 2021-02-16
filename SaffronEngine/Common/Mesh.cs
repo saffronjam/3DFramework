@@ -4,14 +4,10 @@ using System.Collections.ObjectModel;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Renderer;
+using SaffronEngine.Rendering;
 
 namespace SaffronEngine.Common
 {
-    public interface IUniformGroup
-    {
-        void SubmitPerDrawUniforms();
-    }
-
     public class RenderStateGroup
     {
         public RenderState State;
@@ -50,32 +46,39 @@ namespace SaffronEngine.Common
         }
 
         public void Submit(
-            byte viewId,
+            ushort viewId,
             Program program,
             Matrix4x4 transform,
             RenderStateGroup renderStateGroup,
+            bool submitShadowMaps = false,
             IUniformGroup uniforms = null,
             Texture texture = null,
             Uniform textureSampler = default)
         {
             foreach (var group in _groups)
             {
-                uniforms?.SubmitPerDrawUniforms();
-
+                uniforms?.SubmitPerDraw();
+                
+                unsafe
+                {
+                    Bgfx.SetTransform((float*) &transform);
+                }
+                Bgfx.SetIndexBuffer(group.IndexBuffer);
+                Bgfx.SetVertexBuffer(0, group.VertexBuffer);
+                
                 if (texture != null)
                 {
                     Bgfx.SetTexture(0, textureSampler, texture);
                 }
 
-                unsafe
+                if (submitShadowMaps)
                 {
-                    Bgfx.SetTransform((float*) &transform);
+                    SceneRenderer.SubmitShadowMaps();
                 }
 
-                Bgfx.SetIndexBuffer(group.IndexBuffer);
-                Bgfx.SetVertexBuffer(0, group.VertexBuffer);
                 Bgfx.SetRenderState(renderStateGroup.State, (int) renderStateGroup.BlendFactorRgba);
                 Bgfx.SetStencil(renderStateGroup.FrontFace, renderStateGroup.BackFace);
+                
                 Bgfx.Submit(viewId, program);
             }
         }

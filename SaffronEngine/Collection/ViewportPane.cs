@@ -13,7 +13,7 @@ namespace SaffronEngine.Collection
     {
         private readonly string _viewportTitle;
         private uint _dockId;
-        public SceneRenderer.Target Target { get; set; }
+        public RenderTarget Target { get; set; }
         private IntPtr _viewportGuiTextureHandle;
 
         private Vector2 _topLeft;
@@ -22,7 +22,7 @@ namespace SaffronEngine.Collection
         private readonly uint _inactiveBorderColor = BitConverter.ToUInt32(new byte[] {255, 140, 0, 80});
         private readonly uint _activeBorderColor = BitConverter.ToUInt32(new byte[] {255, 140, 0, 180});
 
-        public ViewportPane(string viewportTitle, SceneRenderer.Target target)
+        public ViewportPane(string viewportTitle, RenderTarget target)
         {
             this._viewportTitle = viewportTitle;
 
@@ -36,6 +36,8 @@ namespace SaffronEngine.Collection
 
             TopLeft = Vector2.Zero;
             BottomRight = Vector2.Zero;
+
+            target.NewFrameBuffer += (sender, args) => Gui.AddTexture(target.FrameBuffer.GetTexture());
         }
 
         public void OnGuiRender()

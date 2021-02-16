@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Threading;
 using ImGuiNET;
 using Renderer;
@@ -76,17 +79,101 @@ namespace SaffronEngine.Common
             _shouldRun = false;
         }
 
+        class CallbackHandler : ICallbackHandler
+        {
+            public void ReportError(string fileName, int line, ErrorType errorType, string message)
+            {
+                // Log.Debug("({0}:{1}) {2}: {3}", fileName, line, errorType, message);
+            }
+
+            public void ReportDebug(string fileName, int line, string format, IntPtr args)
+            {
+            }
+
+            public int GetCachedSize(long id)
+            {
+                var file = GetCacheFile(id);
+                if (!file.Exists)
+                    return 0;
+
+                return (int) file.Length;
+            }
+
+            public bool GetCacheEntry(long id, IntPtr data, int size)
+            {
+                var file = GetCacheFile(id);
+                if (!file.Exists)
+                    return false;
+
+                var bytes = new byte[size];
+                using (var stream = file.OpenRead())
+                {
+                    var read = stream.Read(bytes, 0, size);
+                    if (read != size)
+                        return false;
+                }
+
+                // we could avoid this extra copy with some more work, but I'm lazy
+                Marshal.Copy(bytes, 0, data, size);
+                return true;
+            }
+
+            public void SetCacheEntry(long id, IntPtr data, int size)
+            {
+              
+            }
+
+            public void SaveScreenShot(string path, int width, int height, int pitch, IntPtr data, int size,
+                bool flipVertical)
+            {
+               
+            }
+
+            public void CaptureStarted(int width, int height, int pitch, TextureFormat format, bool flipVertical)
+            {
+            }
+
+            public void CaptureFrame(IntPtr data, int size)
+            {
+            }
+
+            public void CaptureFinished()
+            {
+            }
+
+            public void ProfilerBegin(string name, int color, string filePath, int line)
+            {
+            }
+
+            public void ProfilerEnd()
+            {
+            }
+
+            static FileInfo GetCacheFile(long id)
+            {
+                // we use the cache id as the filename, and just dump in the current directory
+                return new FileInfo(Path.Combine("bin", id.ToString("x")));
+            }
+        }
+
+
         private void RenderThread()
         {
             ///////////////////////////////////////////////////////
             // These instructions must run in the renderer thread
             ///////////////////////////////////////////////////////
-            Bgfx.Init();
+            Bgfx.Init(new InitSettings
+            {
+                CallbackHandler = new CallbackHandler()
+            });
+            Bgfx.Reset(1280, 720, ResetFlags.Vsync);
 
             SceneRenderer = new SceneRenderer();
             _gui = new Gui();
 
             Bgfx.SetDebugFeatures(DebugFeatures.DisplayText);
+            Bgfx.DebugTextWrite(0, 1, DebugColor.White, DebugColor.Blue, "SharpBgfx/Samples/00-HelloWorld");
+            
 
             OnInit();
             while (_shouldRun)
@@ -177,11 +264,11 @@ namespace SaffronEngine.Common
                     _wantRenderTargetResize = false;
                 }
 
-                _gui.Begin();
+                // _gui.Begin();
                 splashScreenPane.OnUpdate();
-                splashScreenPane.OnGuiRender();
+                // splashScreenPane.OnGuiRender();
                 Window.DispatchEvents();
-                _gui.End();
+                // _gui.End();
                 Schedule.Execute();
                 Global.Clock.Restart();
                 var step = Global.Clock.Frame.AsSeconds();

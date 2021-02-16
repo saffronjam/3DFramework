@@ -14,20 +14,32 @@ namespace Sandbox.Layers
     {
         private ViewportPane _viewportPane;
         private Scene _scene;
-        private Entity _entity;
+        const int count = 15;
+        private List<Entity> _entities = new List<Entity>(count);
+        private Texture texture;
 
         public void OnAttach(Batch batch)
         {
+            _scene = new Scene(Application.Instance.SceneRenderer);
             batch.Sumbit((() =>
                 {
-                    _scene = new Scene(Application.Instance.SceneRenderer);
                     _viewportPane = new ViewportPane("Viewport", SceneRenderer.Main);
                     _viewportPane.Resized += (sender, args) => OnResize(args.Width, args.Height);
 
-                    _entity = _scene.CreateEntity();
 
-                    _entity.AddComponent<Component.Mesh>().Handle = Mesh.Create("bunny");
-                    _entity.AddComponent<Component.Transform>();
+                    for (var i = 0; i < count; i++)
+                    {
+                        var newEntity = _scene.CreateEntity();
+                        _entities.Add(newEntity);
+                        newEntity.AddComponent<Component.Transform>().Matrix *= Matrix4x4.CreateTranslation(
+                            (float) (Math.Sin(i * 2.0f * Math.PI / count) * 20.0f),
+                            0.0f,
+                            (float) (Math.Cos(i * 2.0f * Math.PI / count) * 20.0f)
+                        );
+                        newEntity.AddComponent<Component.Mesh>().Handle = Mesh.Create("bunny");
+                    }
+
+                    texture = ResourceLoader.LoadTexture("uffizi.dds");
                 }),
                 "Creating resources");
         }
@@ -40,32 +52,48 @@ namespace Sandbox.Layers
         {
             var dt = Global.Clock.Frame;
 
+
             // write some debug text
             Bgfx.DebugTextClear();
-            Bgfx.DebugTextWrite(0, 1, DebugColor.White, DebugColor.Blue, "SharpBgfx/Samples/01-Cubes");
-            Bgfx.DebugTextWrite(0, 2, DebugColor.White, DebugColor.Cyan, "Description: Rendering simple static mesh.");
-            Bgfx.DebugTextWrite(0, 3, DebugColor.White, DebugColor.Cyan, "Frame: {0:F3} ms", dt.AsSeconds() * 1000);
-            Bgfx.DebugTextWrite(0, 4, DebugColor.White, DebugColor.Cyan, "Size: {0}:{1}", _viewportPane.ViewportSize.X,
-                _viewportPane.ViewportSize.Y);
-            
+            Bgfx.DebugTextWrite(0, 5, DebugColor.White, DebugColor.Cyan, "Frame: {0:F3} ms", dt.AsSeconds() * 1000);
+            // Bgfx.DebugTextWrite(0, 4, DebugColor.White, DebugColor.Cyan, "Size: {0}:{1}", _viewportPane.ViewportSize.X,
+            //     _viewportPane.ViewportSize.Y);
+
             var transform = Matrix4x4.CreateFromYawPitchRoll(Global.Clock.TotalTime.AsSeconds() + 5 * 0.21f,
                 Global.Clock.TotalTime.AsSeconds() + 5 * 0.37f, 0.0f);
-            
+
             // transform.M41 = -15.0f * 5.0f;
             // transform.M42 = -15.0f * 5.0f;
             // transform.M43 = 0.0f;
             // model matrix
             // _entity.GetComponent<Component.Transform>().Matrix = transform;
 
+            for (var i = 0; i < count; i++)
+            {
+                _entities[i].GetComponent<Component.Transform>().Matrix = Matrix4x4.CreateTranslation(
+                    (float) (Math.Sin(i * 2.0f * Math.PI / count) * 5.0f),
+                    (float) Math.Sin(i * 2.0f * Math.PI * Global.Clock.TotalTime.AsSeconds() / count) * 10.0f,
+                    (float) (Math.Cos(i * 2.0f * Math.PI / count) * 5.0f)
+                );
+            }
+
 
             _scene.OnUpdate();
             _scene.OnRender();
         }
 
+        private IntPtr handle;
+
         public void OnGuiRender()
         {
             ImGui.ShowDemoWindow();
             _viewportPane.OnGuiRender();
+
+            handle = Gui.AddTexture(texture);
+
+            ImGui.Begin("test");
+            ImGui.Image(handle, Vector2.One * 1000.0f, Vector2.Zero, Vector2.One);
+            ImGui.End();
         }
 
         public void OnResize(uint width, uint height)
