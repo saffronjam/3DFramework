@@ -1,0 +1,1 @@
+project "bgfx"    kind "None"	    files    {        "include/**.h"    }    includedirs    {        "include"    }

@@ -1,2 +1,0 @@
-Shared<(?<Var>.*)>::Create
-CreateShared<${Var}>

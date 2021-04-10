@@ -1,0 +1,76 @@
+<Project>
+  <PropertyGroup>
+    <!-- Instucts Visual Studio to always start MSBuild when building. -->
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+
+    <ShaderCPath Condition=" $(ShaderCPath) == '' ">$(MSBuildThisFileDirectory)Tools\shaderc.exe</ShaderCPath>
+    <ShaderIncludeDir Condition=" $(ShaderIncludeDir) == '' ">Shaders\</ShaderIncludeDir>
+    <VertexShaderIncludePattern Condition=" $(VertexShaderIncludePattern) == '' ">Shaders\vs_*.sc</VertexShaderIncludePattern>
+    <FragmentShaderIncludePattern Condition=" $(FragmentShaderIncludePattern) == '' ">Shaders\fs_*.sc</FragmentShaderIncludePattern>
+    <ComputeShaderIncludePattern Condition=" $(ComputeShaderIncludePattern) == '' ">**\cs_*.sc</ComputeShaderIncludePattern>
+    <ShaderOutputDir Condition=" $(ShaderOutputDir) == '' ">ShaderBin\</ShaderOutputDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <VertexShaders Include="$(VertexShaderIncludePattern)" />
+    <FragmentShaders Include="$(FragmentShaderIncludePattern)" />
+    <ComputeShaders Include="$(ComputeShaderIncludePattern)" />
+  </ItemGroup>
+
+  <!-- Build process hooks. -->
+  <PropertyGroup>
+    <CleanDependsOn>CleanShaders;$(CoreCompileDependsOn)</CleanDependsOn>
+    <CoreCompileDependsOn>$(CoreCompileDependsOn);CompileShaders</CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CleanShaders" BeforeTargets="CoreClean">
+    <RemoveDir Condition=" Exists('$(IntermediateOutputPath)$(ShaderOutputDir)') "
+               Directories="$(IntermediateOutputPath)$(ShaderOutputDir)" />
+
+    <RemoveDir Condition=" Exists('$(TargetDir)$(ShaderOutputDir)') "
+               Directories="$(TargetDir)$(ShaderOutputDir)" />
+  </Target>
+
+  <Target Name="CompileShaders"
+          BeforeTargets="AfterBuild"
+          AfterTargets="CopyFilesToOutputDirectory"
+          DependsOnTargets="EnsureShaderIntermediateOutputDirectory;CompileVertexShaders;CompileFragmentShaders;CompileComputeShaders;CopyShaderBinariesToOutputDirectory" />
+
+  <!-- Create directories. -->
+  <Target Name="EnsureShaderIntermediateOutputDirectory">
+    <MakeDir Directories="$(ShaderOutputDir)" />
+  </Target>
+
+
+  <!-- Compile. -->
+  <Target Name="CompileVertexShaders" Inputs="@(VertexShaders)"
+          Outputs="$(ShaderOutputDir)%(VertexShaders.Filename).bin">
+    
+    <Exec
+      Command="$(ShaderCPath) --platform windows --type vertex -p vs_4_0 -O 3 -f &quot;@(VertexShaders)&quot; -o &quot;$(ShaderOutputDir)%(VertexShaders.Filename).bin&quot; -i &quot;$(ShaderIncludeDir)&quot;" />
+  </Target>
+
+  <Target Name="CompileFragmentShaders" Inputs="@(FragmentShaders)"
+          Outputs="$(ShaderOutputDir)%(FragmentShaders.Filename).bin">
+    <Exec
+      Command="$(ShaderCPath) --platform windows --type fragment -p ps_4_0 -O 3 -f &quot;@(FragmentShaders)&quot; -o &quot;$(ShaderOutputDir)%(FragmentShaders.Filename).bin&quot; -i &quot;$(ShaderIncludeDir)&quot;" />
+  </Target>
+
+  <Target Name="CompileComputeShaders" Inputs="@(ComputeShaders)"
+          Outputs="$(ShaderOutputDir)%(ComputeShaders.Filename).bin">
+    <Exec
+      Command="$(ShaderCPath) --platform windows --type compute -p cs_5_0 -O 3 -f &quot;@(ComputeShaders)&quot; -o &quot;$(ShaderOutputDir)%(ComputeShaders.Filename).bin&quot; -i &quot;$(ShaderIncludeDir)&quot;" />
+  </Target>
+
+
+  <!-- Copy binaries. -->
+  <Target Name="CopyShaderBinariesToOutputDirectory">
+    <ItemGroup>
+      <ShaderBinaries Include="$(ShaderOutputDir)**\*.bin" />
+    </ItemGroup>
+
+    <Copy SourceFiles="@(ShaderBinaries)"
+          DestinationFolder="$(ShaderOutputDir)%(RecursiveDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>
