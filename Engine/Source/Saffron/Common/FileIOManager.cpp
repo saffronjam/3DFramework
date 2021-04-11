@@ -121,7 +121,7 @@ size_t FileIOManager::Read(const Filepath& filepath, OutputStringStream& destina
 	String data;
 	InputStream is(filepath);
 
-	size_t fileSize = -1;
+	size_t fileSize = 0ull;
 	if (is.is_open())
 	{
 		is.seekg(0, std::ios::end);

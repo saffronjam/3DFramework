@@ -3,12 +3,12 @@
     <!-- Instucts Visual Studio to always start MSBuild when building. -->
     <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 
-    <ShaderCPath Condition=" $(ShaderCPath) == '' ">$(MSBuildThisFileDirectory)Tools\shaderc.exe</ShaderCPath>
-    <ShaderIncludeDir Condition=" $(ShaderIncludeDir) == '' ">Shaders\</ShaderIncludeDir>
-    <VertexShaderIncludePattern Condition=" $(VertexShaderIncludePattern) == '' ">Shaders\vs_*.sc</VertexShaderIncludePattern>
-    <FragmentShaderIncludePattern Condition=" $(FragmentShaderIncludePattern) == '' ">Shaders\fs_*.sc</FragmentShaderIncludePattern>
-    <ComputeShaderIncludePattern Condition=" $(ComputeShaderIncludePattern) == '' ">**\cs_*.sc</ComputeShaderIncludePattern>
-    <ShaderOutputDir Condition=" $(ShaderOutputDir) == '' ">ShaderBin\</ShaderOutputDir>
+    <ShaderCPath Condition=" $(ShaderCPath) == '' ">$(MSBuildThisFileDirectory)\..\Tools\shaderc.exe</ShaderCPath>
+    <ShaderIncludeDir Condition=" $(ShaderIncludeDir) == '' ">Source\</ShaderIncludeDir>
+    <VertexShaderIncludePattern Condition=" $(VertexShaderIncludePattern) == '' ">Source\vs_*.sc</VertexShaderIncludePattern>
+    <FragmentShaderIncludePattern Condition=" $(FragmentShaderIncludePattern) == '' ">Source\fs_*.sc</FragmentShaderIncludePattern>
+    <ComputeShaderIncludePattern Condition=" $(ComputeShaderIncludePattern) == '' ">Source\cs_*.sc</ComputeShaderIncludePattern>
+    <ShaderOutputDir Condition=" $(ShaderOutputDir) == '' ">..\Editor\ShaderBin\</ShaderOutputDir>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,6 @@
   <Target Name="CleanShaders" BeforeTargets="CoreClean">
     <RemoveDir Condition=" Exists('$(IntermediateOutputPath)$(ShaderOutputDir)') "
                Directories="$(IntermediateOutputPath)$(ShaderOutputDir)" />
-
     <RemoveDir Condition=" Exists('$(TargetDir)$(ShaderOutputDir)') "
                Directories="$(TargetDir)$(ShaderOutputDir)" />
   </Target>
@@ -34,7 +33,9 @@
   <Target Name="CompileShaders"
           BeforeTargets="AfterBuild"
           AfterTargets="CopyFilesToOutputDirectory"
-          DependsOnTargets="EnsureShaderIntermediateOutputDirectory;CompileVertexShaders;CompileFragmentShaders;CompileComputeShaders;CopyShaderBinariesToOutputDirectory" />
+          DependsOnTargets="EnsureShaderIntermediateOutputDirectory;CompileVertexShaders;CompileFragmentShaders;CompileComputeShaders;CopyShaderBinariesToOutputDirectory">
+
+  </Target>
 
   <!-- Create directories. -->
   <Target Name="EnsureShaderIntermediateOutputDirectory">
@@ -45,7 +46,7 @@
   <!-- Compile. -->
   <Target Name="CompileVertexShaders" Inputs="@(VertexShaders)"
           Outputs="$(ShaderOutputDir)%(VertexShaders.Filename).bin">
-    
+
     <Exec
       Command="$(ShaderCPath) --platform windows --type vertex -p vs_4_0 -O 3 -f &quot;@(VertexShaders)&quot; -o &quot;$(ShaderOutputDir)%(VertexShaders.Filename).bin&quot; -i &quot;$(ShaderIncludeDir)&quot;" />
   </Target>
@@ -65,6 +66,7 @@
 
   <!-- Copy binaries. -->
   <Target Name="CopyShaderBinariesToOutputDirectory">
+
     <ItemGroup>
       <ShaderBinaries Include="$(ShaderOutputDir)**\*.bin" />
     </ItemGroup>

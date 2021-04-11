@@ -10,16 +10,15 @@ namespace Se
 {
 Texture::Texture(Filepath filepath, Uint32 slot, TextureFlags::Enum flags) :
 	_slot(slot),
-	_filepath(Move(filepath))
+	_filepath(TextureFolder + Move(filepath).string())
 {
 	OutputStringStream oss;
-	const size_t fileSize = FileIOManager::Read(_filepath, oss);
-	const String data = oss.str();
+	const auto data = FileIOManager::ReadBinary(_filepath);
 
-	if (fileSize > 0)
+	if (data.size() > 0)
 	{
 		bimg::ImageContainer imageContainer;
-		const bool result = bimg::imageParse(imageContainer, data.c_str(), static_cast<Uint32>(fileSize));
+		const bool result = bimg::imageParse(imageContainer, data.data(), static_cast<Uint32>(data.size()));
 
 		if (result)
 		{

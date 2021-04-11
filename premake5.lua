@@ -32,16 +32,32 @@ workspace "Saffron"
 -- Editor
 -- --------------------------------------
 
-group "Dependencies"
+
+group "Engine"
+group "Engine/Dependencies"
 	include "Engine/ThirdParty/bgfx/premake5"
 	include "Engine/ThirdParty/DirectXTK/premake5"
 	include "Engine/ThirdParty/ImGui/premake5"
 	include "Engine/ThirdParty/spdlog/premake5"
-group ""
-
 group "Engine"
 include "Engine/premake5"
 group ""
+
+project "Shaders"
+	location "Shaders"
+	kind "StaticLib"
+	
+	targetdir ("Bin/" .. outputDirectory .. "/%{prj.name}")
+	objdir ("Bin-Int/" .. outputDirectory .. "/%{prj.name}")
+	
+	files
+	{
+		"%{prj.name}/dummy.cpp",
+		"%{prj.name}/Source/**.sc",
+		"%{prj.name}/Source/**.sh",	
+		"%{prj.name}/Directory.Build.props",
+		
+	}
 
 project "Editor"
 	location "Editor"
@@ -62,7 +78,6 @@ project "Editor"
 		"%{prj.name}/Source/**.c", 
 		"%{prj.name}/Source/**.hpp", 
 		"%{prj.name}/Source/**.cpp",
-		"Directory.Build.props",	
 	}
 	
 	includedirs

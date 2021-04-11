@@ -9,6 +9,10 @@ void ProjectLayer::OnAttach(std::shared_ptr<BatchLoader>& loader)
 	_scene = CreateShared<EditorScene>();
 	_editorCamera = CreateShared<EditorCamera>();
 	_scene->SetProjectionMatrix(_editorCamera->GetProjectionMatrix());
+
+
+	auto texture = Texture::Create("bark1.dds");
+	
 }
 
 void ProjectLayer::OnDetach()

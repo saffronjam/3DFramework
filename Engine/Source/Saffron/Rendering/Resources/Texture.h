@@ -43,6 +43,6 @@ private:
 	Filepath _filepath;
 	TextureInfo _info;
 
-	static constexpr const char* TextureFolder = "../Assets/Textures/";
+	static constexpr const char* TextureFolder = "Assets/Textures/";
 };
 }
