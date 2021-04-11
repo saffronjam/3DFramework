@@ -1,7 +1,10 @@
 #pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Common/Events/KeyboardEvent.h"
+#include "Saffron/Common/Events/MouseEvent.h"
 #include "Saffron/Common/Events/WindowEvent.h"
+#include "Saffron/Common/EventSubscriberList.h"
 #include "Saffron/Math/SaffronMath.h"
 #include "Saffron/Rendering/AntiAliasing.h"
 
@@ -13,15 +16,9 @@ class Window : public MemManaged<Window>, public Signaller
 	friend class Mouse;
 
 public:
-	struct Signals
-	{
-		static SignalAggregate<const Event&> OnEvent;
-	};
-
-public:
 	struct Properties
 	{
-		explicit Properties( String title = "Saffron Engine", Uint32 width = 1280, Uint32 height = 720,
+		explicit Properties(String title = "Saffron Engine", Uint32 width = 1280, Uint32 height = 720,
 		                    const Vector2 position = {100.0f, 100.0f},
 		                    AntiAliasing antiAliasing = AntiAliasing::Sample8) :
 			Title(Move(title)),
@@ -31,7 +28,7 @@ public:
 			AntiAliasing(antiAliasing)
 		{
 		}
-		
+
 		String Title;
 		Uint32 Width;
 		Uint32 Height;
@@ -88,6 +85,33 @@ private:
 	virtual void ConfineCursor() = 0;
 	virtual void FreeCursor() = 0;
 
+public:
+	// Window events
+	mutable EventSubscriberList<WindowResizedEvent> Resized;
+	mutable EventSubscriberList<WindowMinimizedEvent> Minimized;
+	mutable EventSubscriberList<WindowMaximizedEvent> Maximized;
+	mutable EventSubscriberList<WindowMovedEvent> Moved;
+	mutable EventSubscriberList<WindowGainedFocusEvent> GainedFocus;
+	mutable EventSubscriberList<WindowLostFocusEvent> LostFocus;
+	mutable EventSubscriberList<WindowClosedEvent> Closed;
+	mutable EventSubscriberList<WindowDroppedFilesEvent> DroppedFiles;
+	mutable EventSubscriberList<WindowNewTitleEvent> NewTitle;
+
+	// Keyboard events
+	mutable EventSubscriberList<KeyPressedEvent> KeyPressed;
+	mutable EventSubscriberList<KeyReleasedEvent> KeyReleased;
+	mutable EventSubscriberList<KeyRepeatedEvent> KeyRepeated;
+	mutable EventSubscriberList<TextInputEvent> TextInput;
+
+	// Mouse events
+	mutable EventSubscriberList<MouseButtonPressedEvent> MouseButtonPressed;
+	mutable EventSubscriberList<MouseButtonReleasedEvent> MouseButtonReleased;
+	mutable EventSubscriberList<MouseWheelScrolledEvent> MouseWheelScrolled;
+	mutable EventSubscriberList<MouseMovedEvent> MouseMoved;
+	mutable EventSubscriberList<MouseMovedRawEvent> MouseMovedRaw;
+	mutable EventSubscriberList<CursorEnteredEvent> CursorEntered;
+	mutable EventSubscriberList<CursorLeftEvent> CursorLeft;
+
 protected:
 	String _title;
 	Vector2 _position;
@@ -102,6 +126,5 @@ template <typename T, typename...Params>
 void Window::PushEvent(Params&&...params)
 {
 	_events.emplace_back(CreateShared<T>(std::forward<Params>(params)...));
-	//SE_CORE_INFO("{0}", _events.back()->ToString());
 }
 };

@@ -71,6 +71,7 @@ size_t FileIOManager::GetFileSize(const Filepath& filepath)
 	{
 		SE_CORE_WARN("Failed to get file size from file: {}. What: ", filepath.string(), fe.what());
 	}
+	return 0ull;
 }
 
 size_t FileIOManager::Write(const Uint8* data, size_t size, const Filepath& filepath, bool overwrite)

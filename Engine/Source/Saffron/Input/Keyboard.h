@@ -1,18 +1,18 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Common/EventSubscriberList.h"
 #include "Saffron/Common/Events/KeyboardEvent.h"
 #include "Saffron/Input/InputCodes.h"
 
 namespace Se
 {
-class Keyboard : public Signaller, public MemManaged<Keyboard>
+class Keyboard : public MemManaged<Keyboard>
 {
 public:
 	Keyboard();
-	
+
 	void OnUpdate();
-	void OnEvent(const Event& event);
 
 	static bool IsPressed(KeyCode keyCode);
 	static bool IsReleased(KeyCode keyCode);
@@ -29,13 +29,19 @@ private:
 	bool OnKeyPressed(const KeyPressedEvent& event);
 	bool OnKeyReleased(const KeyReleasedEvent& event);
 	bool OnKeyRepeated(const KeyRepeatedEvent& event);
-	bool OnText(const TextEvent& event);
+	bool OnTextInput(const TextInputEvent& event);
 
 	static Keyboard& Instance()
 	{
 		SE_CORE_ASSERT(_instance != nullptr, "Keyboard was not instansiated")
 		return *_instance;
 	}
+
+public:
+	mutable EventSubscriberList<KeyPressedEvent> Pressed;
+	mutable EventSubscriberList<KeyReleasedEvent> Released;
+	mutable EventSubscriberList<KeyRepeatedEvent> Repeated;
+	mutable EventSubscriberList<TextInputEvent> TextInput;
 
 private:
 	UnorderedMap<KeyCode, bool> _keyboardState;

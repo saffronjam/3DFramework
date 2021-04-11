@@ -42,7 +42,7 @@ Gui::Gui()
 	//AddFont("Resources/Assets/Fonts/segoeui.ttf", 56);
 	//AddFont("Resources/Assets/Fonts/segoeui.ttf", 72);
 
-	App& app = App::Get();
+	App& app = App::Instance();
 	const auto hwnd = static_cast<HWND>(app.GetWindow()->GetNativeWindow());
 
 
@@ -149,7 +149,7 @@ void Gui::Begin()
 void Gui::End()
 {
 	return;
-	auto& app = App::Get();
+	auto& app = App::Instance();
 	auto& io = ImGui::GetIO();
 	io.DisplaySize = ImVec2(static_cast<float>(app.GetWindow()->GetWidth()),
 	                        static_cast<float>(app.GetWindow()->GetHeight()));

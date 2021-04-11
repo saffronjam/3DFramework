@@ -31,7 +31,7 @@ void BaseLayer::OnGuiRender()
 {
 	if ( _viewSystem )
 	{
-		App::Get().OnGuiRender();
+		App::Instance().OnGuiRender();
 	}
 }
 }

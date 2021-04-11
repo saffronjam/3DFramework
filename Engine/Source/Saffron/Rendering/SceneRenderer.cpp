@@ -19,8 +19,7 @@ SceneRenderer::SceneRenderer() :
 	SE_CORE_ASSERT(_instance == nullptr && "Scene renderer was already instansiated");
 	_instance = this;
 
-	_jobs.insert({RenderChannel::Main, {}});
-	_jobs.insert({RenderChannel::Shadow, {}});
+	ClearJobs();
 }
 
 void SceneRenderer::Begin(const Shared<Scene>& scene)
@@ -31,6 +30,7 @@ void SceneRenderer::Begin(const Shared<Scene>& scene)
 void SceneRenderer::End()
 {
 	_renderGraph->Execute(_jobs);
+	ClearJobs();
 	_activeScene.reset();
 }
 
@@ -56,5 +56,12 @@ Scene& SceneRenderer::GetActiveScene()
 const Scene& SceneRenderer::GetActiveScene() const
 {
 	return *_activeScene;
+}
+
+void SceneRenderer::ClearJobs()
+{
+	_jobs.clear();
+	_jobs.insert({RenderChannel::Main, {}});
+	_jobs.insert({RenderChannel::Shadow, {}});
 }
 }

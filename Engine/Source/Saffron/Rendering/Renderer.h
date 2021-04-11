@@ -18,8 +18,6 @@ public:
 	Renderer(const Renderer&) = delete;
 	Renderer& operator=(const Renderer&) = delete;
 	~Renderer();
-
-	void OnEvent(const Event& event);
 	
 	void SetViewId(Uint16 id);
 	void SetViewSize(Uint16 width, Uint16 height);
@@ -32,7 +30,7 @@ public:
 
 private:
 	bool OnRendertargetResize(Uint32 width, Uint32 height);
-	bool OnWindowResize(const WindowResizeEvent& event);
+	bool OnWindowResize(const WindowResizedEvent& event);
 
 private:
 	static Renderer* _instance;

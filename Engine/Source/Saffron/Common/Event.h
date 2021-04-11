@@ -23,30 +23,30 @@ public:
 	bool InCategory(Category category) const;
 
 public:
-	mutable bool Handled = false;
+	mutable bool Consumed = false;
 
 public:
 	enum class Type
 	{
 		None = 0,
-		AppTick,
-		AppUpdate,
-		AppRender,
-		WindowResize,
-		WindowMove,
+		AppTicked,
+		AppUpdated,
+		AppRendered,
+		WindowResized,
+		WindowMoved,
 		WindowGainedFocus,
 		WindowLostFocus,
-		WindowClose,
-		WindowDropFiles,
+		WindowClosed,
+		WindowDroppedFiles,
 		WindowNewTitle,
 		WindowNewIcon,
 		WindowNewAntiAliasing,
 		WindowMinimized,
 		WindowMaximized,
 		KeyPressed,
-		KeyboardReleased,
+		KeyReleased,
 		KeyRepeated,
-		Text,
+		TextInput,
 		MouseButtonPressed,
 		MouseButtonReleased,
 		MouseWheelScrolled,
@@ -82,22 +82,22 @@ class EventDispatcher
 {
 public:
 	explicit EventDispatcher(const Event& event) :
-		m_Event(event)
+		_event(event)
 	{
 	}
 
 	template <typename EventType, typename Fn>
 	bool Try(const Fn& func) const
 	{
-		if (!m_Event.Handled && typeid(m_Event) == typeid(EventType))
+		if (!_event.Consumed && typeid(_event) == typeid(EventType))
 		{
-			m_Event.Handled = func(static_cast<const EventType&>(m_Event));
+			_event.Consumed = func(static_cast<const EventType&>(_event));
 			return true;
 		}
 		return false;
 	}
 
 private:
-	const Event& m_Event;
+	const Event& _event;
 };
 }

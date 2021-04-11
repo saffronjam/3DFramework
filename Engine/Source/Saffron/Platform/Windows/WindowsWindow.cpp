@@ -65,7 +65,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 
 	WindowsWindow::SetVSync(true);
 
-	PushEvent<WindowResizeEvent>(_width, _height);
+	PushEvent<WindowResizedEvent>(_width, _height);
 }
 
 WindowsWindow::~WindowsWindow()
@@ -86,11 +86,11 @@ void WindowsWindow::OnUpdate()
 void WindowsWindow::OnEvent(const Event& event)
 {
 	const EventDispatcher dispatcher(event);
-	dispatcher.Try<WindowResizeEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnResize));
-	dispatcher.Try<WindowMoveEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnMove));
+	dispatcher.Try<WindowResizedEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnResize));
+	dispatcher.Try<WindowMovedEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnMove));
 	dispatcher.Try<WindowGainedFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnGainFocus));
 	dispatcher.Try<WindowLostFocusEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnLostFocus));
-	dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
+	dispatcher.Try<WindowClosedEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnClose));
 	dispatcher.Try<WindowNewTitleEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewTitle));
 	dispatcher.Try<WindowNewIconEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewIcon));
 	dispatcher.Try<WindowNewAntiAliasingEvent>(SE_BIND_EVENT_FN(WindowsWindow::OnNewAntiAliasing));
@@ -199,7 +199,7 @@ void WindowsWindow::ShowCursor()
 	while (::ShowCursor(TRUE) < 0);
 }
 
-bool WindowsWindow::OnResize(const WindowResizeEvent& event)
+bool WindowsWindow::OnResize(const WindowResizedEvent& event)
 {
 	_width = event.GetWidth();
 	_height = event.GetHeight();
@@ -217,7 +217,7 @@ bool WindowsWindow::OnResize(const WindowResizeEvent& event)
 	return false;
 }
 
-bool WindowsWindow::OnMove(const WindowMoveEvent& event)
+bool WindowsWindow::OnMove(const WindowMovedEvent& event)
 {
 	_position = event.GetPosition();
 	return false;
@@ -233,7 +233,7 @@ bool WindowsWindow::OnLostFocus(const WindowLostFocusEvent& event)
 	return false;
 }
 
-bool WindowsWindow::OnClose(const WindowCloseEvent& event)
+bool WindowsWindow::OnClose(const WindowClosedEvent& event)
 {
 	return false;
 }
@@ -328,10 +328,10 @@ LRESULT WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LP
 
 	switch (msg)
 	{
-	case WM_QUIT: PushEvent<WindowCloseEvent>();
+	case WM_QUIT: PushEvent<WindowClosedEvent>();
 		break;
 	case WM_CLOSE: PostQuitMessage(0);
-		PushEvent<WindowCloseEvent>();
+		PushEvent<WindowClosedEvent>();
 		return 0;
 	case WM_SETFOCUS: PushEvent<WindowGainedFocusEvent>();
 		break;
@@ -387,7 +387,7 @@ LRESULT WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LP
 			break;
 		}*/
 
-		PushEvent<TextEvent>(static_cast<Uint8>(wParam));
+		PushEvent<TextInputEvent>(static_cast<Uint8>(wParam));
 		break;
 		/*********** END KEYBOARD MESSAGES ***********/
 

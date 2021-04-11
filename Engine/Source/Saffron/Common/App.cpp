@@ -19,19 +19,16 @@ App::App(const Properties& properties)
 
 	_preLoader = CreateShared<BatchLoader>("Preloader");
 
+	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
+
 	_keyboard = CreateShared<Keyboard>();
 	_mouse = CreateShared<Mouse>();
 
-	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth,
-	                                            properties.WindowHeight));
 
 	SE_CORE_INFO("--- Saffron 2D Framework ---");
 	SE_CORE_INFO("Creating application {0}", properties.Name);
 
-	_window->GetSignal(Window::Signals::OnEvent).Connect([this](const Event& event)
-	{
-		OnEvent(event);
-	});
+	_window->Closed += SE_BIND_EVENT_FN(OnWindowClose);
 
 	_renderer = CreateUnique<Renderer>(_window);
 	_sceneRenderer = CreateUnique<SceneRenderer>();
@@ -140,25 +137,7 @@ void App::OnGuiRender()
 	ImGui::End();*/
 }
 
-void App::OnEvent(const Event& event)
-{
-	const EventDispatcher dispatcher(event);
-	if (dispatcher.Try<WindowCloseEvent>(SE_BIND_EVENT_FN(App::OnWindowClose)))
-	{
-		return;
-	}
-
-	_renderer->OnEvent(event);
-	_window->OnEvent(event);
-	_keyboard->OnEvent(event);
-	_mouse->OnEvent(event);
-	for (auto it = _layerStack.end(); it != _layerStack.begin();)
-	{
-		(*--it)->OnEvent(event);
-	}
-}
-
-bool App::OnWindowClose(const WindowCloseEvent& event)
+bool App::OnWindowClose(const WindowClosedEvent& event)
 {
 	Exit();
 	return true;
@@ -218,10 +197,13 @@ void App::Frame()
 		//_fadeIn.Start();
 	}
 
+
 	Global::Timer::Mark();
 	_keyboard->OnUpdate();
 	_mouse->OnUpdate();
 	_window->HandleBufferedEvents();
+
+
 	if (!_minimized)
 	{
 		//_gui->Begin();
@@ -239,14 +221,13 @@ void App::Frame()
 
 		//_gui->End();
 
+
 		_window->OnUpdate();
 	}
 	OnUpdate();
-	
 	_renderer->Execute();
-
 	Run::Execute();
-		
-	std::this_thread::sleep_for(std::chrono::milliseconds(6));
+
+	std::this_thread::sleep_for(std::chrono::milliseconds(5));
 }
 }

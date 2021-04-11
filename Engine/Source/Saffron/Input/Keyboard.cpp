@@ -1,5 +1,6 @@
 ﻿#include "SaffronPCH.h"
 
+#include "Saffron/Common/App.h"
 #include "Saffron/Input/Keyboard.h"
 
 namespace Se
@@ -10,6 +11,12 @@ Keyboard::Keyboard()
 {
 	SE_CORE_ASSERT(_instance == nullptr, "Keyboard was already instansiated");
 	_instance = this;
+
+	const auto& window = App::Instance().GetWindow();
+	window->KeyPressed += SE_BIND_EVENT_FN(OnKeyPressed);
+	window->KeyReleased += SE_BIND_EVENT_FN(OnKeyReleased);
+	window->KeyRepeated += SE_BIND_EVENT_FN(OnKeyRepeated);
+	window->TextInput += SE_BIND_EVENT_FN(OnTextInput);
 }
 
 void Keyboard::OnUpdate()
@@ -18,16 +25,6 @@ void Keyboard::OnUpdate()
 	{
 		_prevKeyboardState[key] = state;
 	}
-}
-
-void Keyboard::OnEvent(const Event& event)
-{
-	const auto dispatcher = EventDispatcher(event);
-
-	dispatcher.Try<KeyPressedEvent>(SE_BIND_EVENT_FN(OnKeyPressed));
-	dispatcher.Try<KeyReleasedEvent>(SE_BIND_EVENT_FN(OnKeyReleased));
-	dispatcher.Try<KeyRepeatedEvent>(SE_BIND_EVENT_FN(OnKeyRepeated));
-	dispatcher.Try<TextEvent>(SE_BIND_EVENT_FN(OnText));
 }
 
 bool Keyboard::IsPressed(KeyCode keyCode)
@@ -72,12 +69,14 @@ bool Keyboard::IsRepeatEnabled()
 
 bool Keyboard::OnKeyPressed(const KeyPressedEvent& event)
 {
+	Pressed.Invoke(event);
 	_keyboardState[event.GetKey()] = true;
 	return false;
 }
 
 bool Keyboard::OnKeyReleased(const KeyReleasedEvent& event)
 {
+	Released.Invoke(event);
 	_keyboardState[event.GetKey()] = false;
 	_keyboardRepeatedState[event.GetKey()] = false;
 	return false;
@@ -85,12 +84,14 @@ bool Keyboard::OnKeyReleased(const KeyReleasedEvent& event)
 
 bool Keyboard::OnKeyRepeated(const KeyRepeatedEvent& event)
 {
+	Repeated.Invoke(event);
 	_keyboardRepeatedState[event.GetKey()] = true;
 	return false;
 }
 
-bool Keyboard::OnText(const TextEvent& event)
+bool Keyboard::OnTextInput(const TextInputEvent& event)
 {
+	TextInput.Invoke(event);
 	_text = event.GetCharacter();
 	return false;
 }

@@ -7,7 +7,7 @@ namespace Se
 class AppTickEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(AppTick);
+	EVENT_CLASS_TYPE(AppTicked);
 
 	EVENT_CLASS_CATEGORY(CategoryApplication);
 
@@ -18,7 +18,7 @@ public:
 class AppUpdateEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(AppUpdate);
+	EVENT_CLASS_TYPE(AppUpdated);
 
 	EVENT_CLASS_CATEGORY(CategoryApplication);
 
@@ -29,7 +29,7 @@ public:
 class AppRenderEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(AppRender);
+	EVENT_CLASS_TYPE(AppRendered);
 
 	EVENT_CLASS_CATEGORY(CategoryApplication);
 

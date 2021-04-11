@@ -1,29 +1,18 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Common/EventSubscriberList.h"
 #include "Saffron/Common/Events/MouseEvent.h"
 #include "Saffron/Input/InputCodes.h"
 
 namespace Se
 {
-class Mouse : public Signaller, public MemManaged<Mouse>
+class Mouse : public MemManaged<Mouse>
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<MouseButtonCode> OnPressed;
-		static SignalAggregate<MouseButtonCode> OnReleased;
-		static SignalAggregate<float> OnScrolled;
-		static SignalAggregate<Vector2> OnMoved;
-		static SignalAggregate<void> OnEntered;
-		static SignalAggregate<void> OnLeft;
-	};
-
 public:
 	Mouse();
 
 	void OnUpdate();
-	void OnEvent(const Event& event);
 
 	static bool IsPressed(MouseButtonCode mouseButtonCode);
 	static bool IsReleased(MouseButtonCode mouseButtonCode);
@@ -64,6 +53,19 @@ private:
 		SE_CORE_ASSERT(_instance != nullptr && "Mouse was not instansiated")
 		return *_instance;
 	}
+	static bool Instansiated()
+	{
+		return _instance != nullptr;
+	}
+
+public:
+	EventSubscriberList<MouseButtonPressedEvent> ButtonPressed;
+	EventSubscriberList<MouseButtonReleasedEvent> ButtonReleased;
+	EventSubscriberList<MouseWheelScrolledEvent> WheelScrolled;
+	EventSubscriberList<MouseMovedEvent> Moved;
+	EventSubscriberList<MouseMovedRawEvent> MovedRaw;
+	EventSubscriberList<CursorEnteredEvent> CursorEntered;
+	EventSubscriberList<CursorLeftEvent> CursorLeft;
 
 private:
 	UnorderedMap<MouseButtonCode, bool> _mouseState;

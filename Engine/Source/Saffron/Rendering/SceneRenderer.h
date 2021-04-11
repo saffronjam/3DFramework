@@ -35,6 +35,9 @@ public:
 	}
 
 private:
+	void ClearJobs();
+
+private:
 	static SceneRenderer* _instance;
 
 	Unique<RenderGraph> _renderGraph;

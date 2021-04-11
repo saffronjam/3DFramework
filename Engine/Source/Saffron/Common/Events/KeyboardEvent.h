@@ -34,7 +34,7 @@ private:
 class KeyReleasedEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(KeyboardReleased);
+	EVENT_CLASS_TYPE(KeyReleased);
 
 	EVENT_CLASS_CATEGORY(CategoryKeyboard | CategoryInput);
 
@@ -83,15 +83,15 @@ private:
 	KeyCode _key;
 };
 
-class TextEvent : public Event
+class TextInputEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(Text);
+	EVENT_CLASS_TYPE(TextInput);
 
 	EVENT_CLASS_CATEGORY(CategoryKeyboard | CategoryInput);
 
 public:
-	explicit TextEvent(Uint8 character) :
+	explicit TextInputEvent(Uint8 character) :
 		_character(character)
 	{
 	}

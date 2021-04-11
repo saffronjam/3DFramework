@@ -39,11 +39,11 @@ private:
 	void ShowCursor() override;
 
 private:
-	bool OnResize(const WindowResizeEvent& event);
-	bool OnMove(const WindowMoveEvent& event);
+	bool OnResize(const WindowResizedEvent& event);
+	bool OnMove(const WindowMovedEvent& event);
 	bool OnGainFocus(const WindowGainedFocusEvent& event);
 	bool OnLostFocus(const WindowLostFocusEvent& event);
-	bool OnClose(const WindowCloseEvent& event);
+	bool OnClose(const WindowClosedEvent& event);
 	bool OnNewTitle(const WindowNewTitleEvent& event);
 	bool OnNewIcon(const WindowNewIconEvent& event);
 	bool OnNewAntiAliasing(const WindowNewAntiAliasingEvent& event);

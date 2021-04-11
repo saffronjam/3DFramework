@@ -9,15 +9,15 @@
 
 namespace Se
 {
-class WindowResizeEvent : public Event
+class WindowResizedEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(WindowResize);
+	EVENT_CLASS_TYPE(WindowResized);
 
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	WindowResizeEvent(int width, int height) :
+	WindowResizedEvent(int width, int height) :
 		m_Width(width),
 		m_Height(height)
 	{
@@ -38,15 +38,15 @@ private:
 	int m_Width, m_Height;
 };
 
-class WindowMoveEvent : public Event
+class WindowMovedEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(WindowMove);
+	EVENT_CLASS_TYPE(WindowMoved);
 
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowMoveEvent(const Vector2& position) :
+	explicit WindowMovedEvent(const Vector2& position) :
 		m_Position(position)
 	{
 	}
@@ -86,10 +86,10 @@ public:
 	String ToString() const override { return GetName(); }
 };
 
-class WindowCloseEvent : public Event
+class WindowClosedEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(WindowClose);
+	EVENT_CLASS_TYPE(WindowClosed);
 
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
@@ -97,15 +97,15 @@ public:
 	String ToString() const override { return GetName(); }
 };
 
-class WindowDropFilesEvent : public Event
+class WindowDroppedFilesEvent : public Event
 {
 public:
-	EVENT_CLASS_TYPE(WindowDropFiles);
+	EVENT_CLASS_TYPE(WindowDroppedFiles);
 
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowDropFilesEvent(ArrayList<Filepath> filepaths) :
+	explicit WindowDroppedFilesEvent(ArrayList<Filepath> filepaths) :
 		m_Filepaths(Move(filepaths))
 	{
 	}
@@ -205,7 +205,7 @@ private:
 	AntiAliasing m_AntiAliasing;
 };
 
-class WindowMinimizeEvent : public Event
+class WindowMinimizedEvent : public Event
 {
 public:
 	EVENT_CLASS_TYPE(WindowMinimized);
@@ -213,7 +213,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowMinimizeEvent(bool restored) :
+	explicit WindowMinimizedEvent(bool restored) :
 		m_Restored(restored)
 	{
 	}
@@ -232,7 +232,7 @@ private:
 };
 
 
-class WindowMaximizeEvent : public Event
+class WindowMaximizedEvent : public Event
 {
 public:
 	EVENT_CLASS_TYPE(WindowMaximized);
@@ -240,7 +240,7 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowMaximizeEvent(bool restored) :
+	explicit WindowMaximizedEvent(bool restored) :
 		m_Restored(restored)
 	{
 	}

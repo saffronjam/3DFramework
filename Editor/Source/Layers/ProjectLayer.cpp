@@ -19,13 +19,13 @@ void ProjectLayer::OnDetach()
 void ProjectLayer::OnUpdate()
 {
 	BaseLayer::OnUpdate();
-
+	
 	_editorCamera->OnUpdate();
 	_scene->SetViewMatrix(_editorCamera->GetViewMatrix());
 
 	_scene->OnUpdate();
 	_scene->OnRender();
-
+	
 	//ImGui::Begin("Test");
 	//ImGui::Image(reinterpret_cast<ImTextureID>(&_cubeTexture->GetNativeHandle()), ImGui::GetWindowSize());
 	//ImGui::End();

@@ -37,7 +37,6 @@ public:
 	virtual void OnShutdown() = 0;
 	virtual void OnUpdate() = 0;
 	virtual void OnGuiRender();
-	virtual void OnEvent(const Event& event);
 
 	void PushLayer(Shared<Layer> layer);
 	void PushOverlay(Shared<Layer> overlay);
@@ -48,7 +47,7 @@ public:
 
 	Shared<Window>& GetWindow() { return _window; }
 
-	static App& Get() { return *s_Instance; }
+	static App& Instance() { return *s_Instance; }
 
 	static String GetConfigurationName();
 	static String GetPlatformName();
@@ -56,7 +55,7 @@ public:
 private:
 	void Frame();
 
-	bool OnWindowClose(const WindowCloseEvent& event);
+	bool OnWindowClose(const WindowClosedEvent& event);
 
 	void RunSplashScreen();
 

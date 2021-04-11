@@ -4,6 +4,8 @@
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/Scene.h"
 
+#include "Saffron/Common/Timer.h"
+
 namespace Se
 {
 Scene::Scene() :

@@ -10,8 +10,6 @@
 
 namespace Se
 {
-SignalAggregate<const Event&> Window::Signals::OnEvent;
-
 Window::Window(const Properties& properties) :
 	_title(properties.Title),
 	_position(properties.Position),
@@ -25,7 +23,43 @@ void Window::HandleBufferedEvents()
 {
 	for (const auto& event : _events)
 	{
-		GetSignals().Emit<const Event&>(Signals::OnEvent, *event);
+		switch (event->GetType())
+		{
+#define CASE(source, eventType) case Event::Type::source ## eventType: {\
+		const auto& castedEvent = static_cast<const source ## eventType ## Event&>(*event); \
+		eventType.Invoke(castedEvent); \
+		break; \
+		}
+		CASE(Window, Resized);
+		CASE(Window, Moved);
+		CASE(Window, Closed);
+		CASE(Window, GainedFocus);
+		CASE(Window, LostFocus);
+		CASE(Window, DroppedFiles);
+		CASE(Window, NewTitle);
+		CASE(Window, Maximized);
+		CASE(Window, Minimized);
+#undef CASE
+
+#define CASE(source, eventType) case Event::Type::source ## eventType: {\
+		const auto& castedEvent = static_cast<const source ## eventType ## Event&>(*event); \
+		source ## eventType.Invoke(castedEvent); \
+		break; \
+		}
+		CASE(Key, Pressed);
+		CASE(Key, Released);
+		CASE(Key, Repeated);
+		CASE(Text, Input);
+
+		CASE(MouseButton, Pressed);
+		CASE(MouseButton, Released);
+		CASE(MouseWheel, Scrolled);
+		CASE(Mouse, Moved);
+		CASE(Mouse, MovedRaw);
+		CASE(Cursor, Entered);
+		CASE(Cursor, Left);
+#undef CASE
+		}
 	}
 	_events.clear();
 }

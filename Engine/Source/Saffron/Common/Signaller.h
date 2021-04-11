@@ -33,7 +33,7 @@ public:
 	}
 
 protected:
-	/** Get the signal container.
+	/** Instance the signal container.
 	* @return Reference to the signal container.
 	*/
 	SignalContainer& GetSignals();

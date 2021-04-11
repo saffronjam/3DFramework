@@ -5,19 +5,23 @@
 
 namespace Se
 {
-SignalAggregate<MouseButtonCode> Mouse::Signals::OnPressed;
-SignalAggregate<MouseButtonCode> Mouse::Signals::OnReleased;
-SignalAggregate<float> Mouse::Signals::OnScrolled;
-SignalAggregate<Vector2> Mouse::Signals::OnMoved;
-SignalAggregate<void> Mouse::Signals::OnEntered;
-SignalAggregate<void> Mouse::Signals::OnLeft;
-
 Mouse* Mouse::_instance = nullptr;
 
 Mouse::Mouse()
 {
 	SE_CORE_ASSERT(_instance == nullptr, "Mouse was already instansiated");
 	_instance = this;
+
+	const auto &window = App::Instance().GetWindow();
+	window->MouseButtonPressed += SE_BIND_EVENT_FN(Mouse::OnMouseButtonPressed);
+	window->MouseButtonReleased += SE_BIND_EVENT_FN(Mouse::OnMouseButtonReleased);
+	window->MouseWheelScrolled += SE_BIND_EVENT_FN(Mouse::OnMouseWheelScrolled);
+	window->MouseMoved += SE_BIND_EVENT_FN(Mouse::OnMouseMoved);
+	window->CursorEntered += SE_BIND_EVENT_FN(Mouse::OnCursorEntered);
+	window->CursorLeft += SE_BIND_EVENT_FN(Mouse::OnCursorLeft);
+
+	FreeCursor();
+	ShowCursor();
 }
 
 void Mouse::OnUpdate()
@@ -33,18 +37,6 @@ void Mouse::OnUpdate()
 	{
 		scroll = 0;
 	}
-}
-
-void Mouse::OnEvent(const Event& event)
-{
-	const auto dispatcher = EventDispatcher(event);
-
-	dispatcher.Try<MouseButtonPressedEvent>(SE_BIND_EVENT_FN(Mouse::OnMouseButtonPressed));
-	dispatcher.Try<MouseButtonReleasedEvent>(SE_BIND_EVENT_FN(Mouse::OnMouseButtonReleased));
-	dispatcher.Try<MouseWheelScrolledEvent>(SE_BIND_EVENT_FN(Mouse::OnMouseWheelScrolled));
-	dispatcher.Try<MouseMovedEvent>(SE_BIND_EVENT_FN(Mouse::OnMouseMoved));
-	dispatcher.Try<CursorEnteredEvent>(SE_BIND_EVENT_FN(Mouse::OnCursorEntered));
-	dispatcher.Try<CursorLeftEvent>(SE_BIND_EVENT_FN(Mouse::OnCursorLeft));
 }
 
 bool Mouse::IsPressed(MouseButtonCode mouseButtonCode)
@@ -75,7 +67,7 @@ Vector2 Mouse::GetPosition()
 Vector2 Mouse::GetSwipe()
 {
 	Vector2 swipe = Instance()._position - Instance()._lastPosition;
-	if (swipe.LengthSquared() > 1000.0f)
+	if (swipe.LengthSquared() > 10000.0f)
 	{
 		swipe = Vector2::Zero;
 	}
@@ -84,57 +76,57 @@ Vector2 Mouse::GetSwipe()
 
 bool Mouse::IsCursorEnabled()
 {
-	return Instance()._cursorEnabled;
+	return Instansiated() && Instance()._cursorEnabled;
 }
 
 void Mouse::EnableCursor()
 {
-	App::Get().GetWindow()->EnableCursor();
+	App::Instance().GetWindow()->EnableCursor();
 }
 
 void Mouse::DisableCursor()
 {
-	App::Get().GetWindow()->DisableCursor();
+	App::Instance().GetWindow()->DisableCursor();
 }
 
 bool Mouse::IsCursorVisible()
 {
-	return Instance()._cursorVisible;
+	return Instansiated() && Instance()._cursorVisible;
 }
 
 void Mouse::ShowCursor()
 {
-	App::Get().GetWindow()->ShowCursor();
+	App::Instance().GetWindow()->ShowCursor();
 }
 
 void Mouse::HideCursor()
 {
-	App::Get().GetWindow()->HideCursor();
+	App::Instance().GetWindow()->HideCursor();
 }
 
 bool Mouse::IsCursorConfined()
 {
-	return Instance()._cursorConfined;
+	return Instansiated() && Instance()._cursorConfined;
 }
 
 void Mouse::ConfineCursor()
 {
-	App::Get().GetWindow()->ConfineCursor();
+	App::Instance().GetWindow()->ConfineCursor();
 }
 
 void Mouse::FreeCursor()
 {
-	App::Get().GetWindow()->FreeCursor();
+	App::Instance().GetWindow()->FreeCursor();
 }
 
 bool Mouse::InWindow()
 {
-	return Instance()._inWindow;
+	return Instansiated() && Instance()._inWindow;
 }
 
 bool Mouse::IsRawInputEnabled()
 {
-	return Instance()._rawInput;
+	return Instansiated() && Instance()._rawInput;
 }
 
 void Mouse::EnableRawInput()
@@ -147,27 +139,27 @@ void Mouse::DisableRawInput()
 
 bool Mouse::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 {
-	GetSignals().Emit(Signals::OnPressed, event.GetButton());
+	ButtonPressed.Invoke(event);
 	_mouseState[event.GetButton()] = true;
 	return false;
 }
 
 bool Mouse::OnMouseButtonReleased(const MouseButtonReleasedEvent& event)
 {
-	GetSignals().Emit(Signals::OnPressed, event.GetButton());
+	ButtonReleased.Invoke(event);
 	_mouseState[event.GetButton()] = false;
 	return false;
 }
 
 bool Mouse::OnMouseWheelScrolled(const MouseWheelScrolledEvent& event)
 {
-	GetSignals().Emit(Signals::OnScrolled, event.GetOffset());
+	WheelScrolled.Invoke(event);
 	return false;
 }
 
 bool Mouse::OnMouseMoved(const MouseMovedEvent& event)
 {
-	GetSignals().Emit(Signals::OnMoved, event.GetPosition());
+	Moved.Invoke(event);
 	_lastPosition = _position;
 	_position = event.GetPosition();
 	return false;
@@ -175,14 +167,14 @@ bool Mouse::OnMouseMoved(const MouseMovedEvent& event)
 
 bool Mouse::OnCursorEntered(const CursorEnteredEvent& event)
 {
-	GetSignals().Emit<>(Signals::OnEntered);
+	CursorEntered.Invoke(event);
 	_inWindow = true;
 	return false;
 }
 
 bool Mouse::OnCursorLeft(const CursorLeftEvent& event)
 {
-	GetSignals().Emit(Signals::OnLeft);
+	CursorLeft.Invoke(event);
 	_inWindow = false;
 	return false;
 }
