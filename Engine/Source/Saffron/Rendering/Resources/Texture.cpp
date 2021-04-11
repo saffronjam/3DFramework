@@ -19,7 +19,7 @@ Texture::Texture(Filepath filepath, Uint32 slot, TextureFlags::Enum flags) :
 	if (fileSize > 0)
 	{
 		bimg::ImageContainer imageContainer;
-		const bool result = bimg::imageParse(imageContainer, data.c_str(), fileSize);
+		const bool result = bimg::imageParse(imageContainer, data.c_str(), static_cast<Uint32>(fileSize));
 
 		if (result)
 		{

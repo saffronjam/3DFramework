@@ -1,21 +1,12 @@
 #pragma once
 
-#include "Saffron/Config.h"
-#include "Layer.h"
+#include "Saffron/Base.h"
+#include "Saffron/Common/Layer.h"
 
 namespace Se
 {
-class LayerStack : public Signaller
+class LayerStack
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<Shared<Layer>> OnPushLayer;
-		static SignalAggregate<Shared<Layer>> OnPushOverlay;
-		static SignalAggregate<Shared<Layer>> OnPopLayer;
-		static SignalAggregate<Shared<Layer>> OnPopOverlay;
-	};
-
 public:
 	LayerStack() = default;
 	~LayerStack();
@@ -31,12 +22,18 @@ public:
 	Shared<Layer> Front();
 	Shared<Layer> Back();
 
-	ArrayList<Shared<Layer>>::iterator begin() { return m_Layers.begin(); }
+	ArrayList<Shared<Layer>>::iterator begin() { return _layers.begin(); }
 
-	ArrayList<Shared<Layer>>::iterator end() { return m_Layers.end(); }
+	ArrayList<Shared<Layer>>::iterator end() { return _layers.end(); }
+
+public:
+	EventSubscriberList<Shared<Layer>> PushedLayer;
+	EventSubscriberList<Shared<Layer>> PushedOverlay;
+	EventSubscriberList<Shared<Layer>> PoppedLayer;
+	EventSubscriberList<Shared<Layer>> PoppedOverlay;
 
 private:
-	ArrayList<Shared<Layer>> m_Layers;
+	ArrayList<Shared<Layer>> _layers;
 	unsigned int m_LayerInsertIndex = 0;
 };
 }

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
-#include "Saffron/Base.h"
+#include "Saffron/Common/UUID.h"
+#include "Saffron/Common/TypeDefs.h"
 
 namespace Se
 {
@@ -13,6 +14,26 @@ public:
 
 public:
 	void Invoke(const EventArgs &args);
+
+	CancellationToken Subscribe(Handler handler);
+	void Unsubscribe(CancellationToken token);
+
+	CancellationToken operator +=(Handler handler);
+	void operator -=(CancellationToken token);
+
+private:
+	UnorderedMap<CancellationToken, Handler> _subscribers;
+};
+
+template <>
+class EventSubscriberList<void>
+{
+public:
+	using CancellationToken = UUID;
+	using Handler = Function<bool()>;
+
+public:
+	void Invoke();
 
 	CancellationToken Subscribe(Handler handler);
 	void Unsubscribe(CancellationToken token);
@@ -47,11 +68,7 @@ typename EventSubscriberList<EventArgs>::CancellationToken EventSubscriberList<E
 template <typename EventArgs>
 void EventSubscriberList<EventArgs>::Unsubscribe(CancellationToken token)
 {
-	const auto result = _subscribers.find(token);
-	if (result != _subscribers.end())
-	{
-		_subscribers.erase(result);
-	}
+	_subscribers.erase(token);
 }
 
 template <typename EventArgs>

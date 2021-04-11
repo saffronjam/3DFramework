@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class BaseLayer : public Layer, public Signaller
+class BaseLayer : public Layer
 {
 public:
 	BaseLayer();

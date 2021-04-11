@@ -5,11 +5,8 @@
 
 namespace Se
 {
-SignalAggregate<void> BatchLoader::Signals::OnStart;
-SignalAggregate<void> BatchLoader::Signals::OnFinish;
-
 BatchLoader::BatchLoader(String name) :
-	m_Name(Move(name))
+	_name(Move(name))
 {
 }
 
@@ -20,62 +17,62 @@ BatchLoader::~BatchLoader()
 
 void BatchLoader::Submit(Function<void()> function, String shortDescription)
 {
-	ScopedLock queueLock(m_QueueMutex);
-	m_Queue.emplace_back(Move(function), Move(shortDescription));
+	ScopedLock queueLock(_queueMutex);
+	_queue.emplace_back(Move(function), Move(shortDescription));
 }
 
 void BatchLoader::Execute()
 {
-	ScopedLock queueLock(m_QueueMutex);
-	if (m_Worker.joinable())
+	const ScopedLock queueLock(_queueMutex);
+	if (_worker.joinable())
 	{
-		m_Worker.join();
+		_worker.join();
 	}
 
 	const auto& workerFn = [this]
 	{
-		ScopedLock queueLock(m_QueueMutex);
+		const ScopedLock threadQueueLock(_queueMutex);
 
-		m_Running = true;
-		GetSignals().Emit(Signals::OnStart);
+		_running = true;
+		//Started.Invoke();
 
-		m_Progress = 0.0f;
-		for (const auto& [function, shortDescription] : m_Queue)
+		_progress = 0.0f;
+		for (const auto& [function, shortDescription] : _queue)
 		{
-			if (m_ShouldExit)
+			if (_shouldExit)
 			{
 				break;
 			}
-			ScopedLock scopedLock(m_ExecutionMutex);
-			m_Status = &shortDescription;
+			ScopedLock scopedLock(_executionMutex);
+			_status = &shortDescription;
 			function();
-			m_Progress = m_Progress + 100.0f / static_cast<float>(m_Queue.size());
+			_progress = _progress + 100.0f / static_cast<float>(_queue.size());
 		}
-		m_Progress = 100.0f;
-		m_Queue.clear();
+		_progress = 100.0f;
+		_queue.clear();
 
-		GetSignals().Emit(Signals::OnFinish);
+		//Finished.Invoke();
 	};
 
-	m_Worker = Thread(workerFn);
+	_worker = Thread(workerFn);
 }
 
 void BatchLoader::ForceExit()
 {
-	m_ShouldExit = true;
-	if (m_Worker.joinable())
+	_shouldExit = true;
+	if (_worker.joinable())
 	{
-		m_Worker.join();
+		_worker.join();
 	}
 }
 
 void BatchLoader::Reset()
 {
-	ScopedLock queueLock(m_QueueMutex);
-	ScopedLock scopedLock(m_ExecutionMutex);
+	const ScopedLock queueLock(_queueMutex);
+	const ScopedLock scopedLock(_executionMutex);
 	ForceExit();
-	m_Queue.clear();
-	m_Progress = 0.0f;
-	m_ShouldExit = false;
+	_queue.clear();
+	_progress = 0.0f;
+	_shouldExit = false;
 }
 }

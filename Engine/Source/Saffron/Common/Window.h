@@ -11,7 +11,7 @@
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public MemManaged<Window>, public Signaller
+class Window : public MemManaged<Window>
 {
 	friend class Mouse;
 

@@ -4,15 +4,8 @@
 
 namespace Se
 {
-class BatchLoader : public MemManaged<BatchLoader>, public Signaller
+class BatchLoader : public MemManaged<BatchLoader>
 {
-public:
-	struct Signals
-	{
-		static SignalAggregate<void> OnStart;
-		static SignalAggregate<void> OnFinish;
-	};
-
 public:
 	explicit BatchLoader(String name);
 	~BatchLoader();
@@ -22,22 +15,26 @@ public:
 	void ForceExit();
 	void Reset();
 
-	float GetProgress() const { return m_Progress; }
+	float GetProgress() const { return _progress; }
 
-	const String* GetStatus() const { return m_Status; }
+	const String* GetStatus() const { return _status; }
 
-	bool IsFinished() const { return m_Progress >= 100.0f; }
+	bool IsFinished() const { return _progress >= 100.0f; }
 
-	Mutex& GetExecutionMutex() { return m_ExecutionMutex; }
+	Mutex& GetExecutionMutex() { return _executionMutex; }
+
+public:
+	//EventSubscriberList<void> Started;
+	//EventSubscriberList<void> Finished;
 
 private:
-	String m_Name;
+	String _name;
 
-	ArrayList<Pair<Function<void()>, String>> m_Queue;
-	Atomic<float> m_Progress = 0.0f;
-	Atomic<const String*> m_Status = nullptr;
-	Atomic<bool> m_Running = false, m_ShouldExit = false;
-	Mutex m_QueueMutex, m_ExecutionMutex;
-	Thread m_Worker;
+	ArrayList<Pair<Function<void()>, String>> _queue;
+	Atomic<float> _progress = 0.0f;
+	Atomic<const String*> _status = nullptr;
+	Atomic<bool> _running = false, _shouldExit = false;
+	Mutex _queueMutex, _executionMutex;
+	Thread _worker;
 };
 }
