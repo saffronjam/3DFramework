@@ -4,8 +4,9 @@
 
 namespace Se
 {
-struct Material
+class Material
 {
+public:
 	Color Ambient;
 	Color Diffuse;
 	Color Specular;

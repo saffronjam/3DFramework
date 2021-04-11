@@ -4,6 +4,8 @@
 
 #include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Rendering/RenderPass.h"
+#include "Saffron/Rendering/Graphs/DefaultRenderGraph.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/Scene.h"
 
@@ -12,14 +14,13 @@ namespace Se
 SceneRenderer* SceneRenderer::_instance = nullptr;
 
 SceneRenderer::SceneRenderer() :
-	_commonProgram(CreateShared<Program>("cubes"))
+	_renderGraph(CreateUnique<DefaultRenderGraph>())
 {
 	SE_CORE_ASSERT(_instance == nullptr && "Scene renderer was already instansiated");
 	_instance = this;
-}
 
-SceneRenderer::~SceneRenderer()
-{
+	_jobs.insert({RenderChannel::Main, {}});
+	_jobs.insert({RenderChannel::Shadow, {}});
 }
 
 void SceneRenderer::Begin(const Shared<Scene>& scene)
@@ -29,24 +30,22 @@ void SceneRenderer::Begin(const Shared<Scene>& scene)
 
 void SceneRenderer::End()
 {
-	for (const auto& [channel, mesh] : _submitions)
-	{
-		mesh->_vertexBuffer->Bind();
-		mesh->_indexBuffer->Bind();
-
-		auto viewProj = _activeScene->GetCameraTransforms().MainView * _activeScene->GetCameraTransforms().
-			MainProjection;
-		bgfx::setTransform(viewProj.m);
-
-		bgfx::submit(0, _commonProgram->GetNativeHandle());
-	}
-
+	_renderGraph->Execute(_jobs);
 	_activeScene.reset();
 }
 
-void SceneRenderer::Submit(const Shared<Mesh>& mesh, RenderChannel renderChannel)
+void SceneRenderer::Submit(const Shared<Mesh>& mesh, const Shared<Material>& material, RenderChannel renderChannel)
 {
-	_submitions.emplace(renderChannel, mesh);
+	auto emplaceIfOnChannel = [&](const Shared<Mesh> mesh, RenderChannel check, RenderChannel match)
+	{
+		if (check & match != 0)
+		{
+			_jobs.at(check).emplace_back(mesh, material, Matrix::Identity);
+		}
+	};
+
+	emplaceIfOnChannel(mesh, renderChannel, RenderChannel::Main);
+	emplaceIfOnChannel(mesh, renderChannel, RenderChannel::Shadow);
 }
 
 Scene& SceneRenderer::GetActiveScene()

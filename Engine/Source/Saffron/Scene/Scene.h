@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Rendering/RenderGraph.h"
 
 // TODO: Temporary
 #include "Saffron/Rendering/Mesh.h"
@@ -35,7 +34,5 @@ public:
 private:
 	CameraTransforms _cameraTransforms;
 	Shared<Mesh> _cube;
-
-	RenderGraph _renderGraph;
 };
 }

@@ -1,13 +1,8 @@
 ﻿#include "SaffronPCH.h"
 
-#include "Saffron/Common/Global.h"
-#include "Saffron/Gui/Gui.h"
 #include "Saffron/Math/Random.h"
-#include "Saffron/Rendering/Renderer.h"
-#include "Saffron/Scene/Scene.h"
-
-#include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/SceneRenderer.h"
+#include "Saffron/Scene/Scene.h"
 
 namespace Se
 {
@@ -28,8 +23,8 @@ void Scene::OnUpdate()
 void Scene::OnRender()
 {
 	SceneRenderer::Instance().Begin(GetShared());
-	
-	SceneRenderer::Instance().Submit(_cube, RenderChannel::Main);
+
+	SceneRenderer::Instance().Submit(_cube, nullptr, RenderChannel::Main);
 
 	SceneRenderer::Instance().End();
 }

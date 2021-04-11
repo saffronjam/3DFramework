@@ -64,6 +64,8 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	SE_CORE_INFO("Creating Window \"{0}\" ({1:d}x{2:d})", _title, _width, _height);
 
 	WindowsWindow::SetVSync(true);
+
+	PushEvent<WindowResizeEvent>(_width, _height);
 }
 
 WindowsWindow::~WindowsWindow()

@@ -7,6 +7,8 @@
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Rendering/RenderPass.h"
+#include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 
 namespace Se

@@ -5,11 +5,10 @@
 
 namespace Se
 {
-class RenderPass
+class DefaultRenderGraph : public RenderGraph
 {
 public:
-	virtual ~RenderPass() = default;
-
-	virtual void Execute(const RenderGraph& rendergraph) = 0;
+	DefaultRenderGraph();
+	
 };
 }

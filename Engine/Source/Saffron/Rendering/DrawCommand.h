@@ -6,8 +6,15 @@
 
 namespace Se
 {
-struct RenderCommand
+struct DrawCommand
 {
+	DrawCommand(Shared<Mesh> mesh, Shared<Material> material, Matrix transform) :
+		Mesh(mesh),
+		Material(material),
+		Transform(transform)
+	{
+	}
+
 	Shared<Mesh> Mesh;
 	Shared<Material> Material;
 	Matrix Transform;

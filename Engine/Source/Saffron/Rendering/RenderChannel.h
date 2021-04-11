@@ -14,9 +14,24 @@ struct RenderChannel
 	{
 	}
 
+	Uint64 operator &(const RenderChannel& rhs) const
+	{
+		return Value & rhs.Value;
+	}
+	
+	Uint64 operator |(const RenderChannel& rhs) const
+	{
+		return Value | rhs.Value;
+	}
+	
 	bool operator==(const RenderChannel& rhs) const
 	{
 		return Value == rhs.Value;
+	}
+
+	bool operator!=(const RenderChannel& rhs) const
+	{
+		return Value != rhs.Value;
 	}
 };
 }
