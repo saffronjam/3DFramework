@@ -42,15 +42,15 @@ RelWithDebInfo
 
 # Executables
 *.exe
-!Dependencies/*/Bin/*.exe
+!Programs/*/Bin/*.exe
 *.out
 *.app
 
 # Build directory
-Saffron/bin/
+Engine/bin/
 
 # Folders
 .vs/
 Bin/
 Bin-Int/
-!Dependencies/*/Bin/
+!Programs/*/Bin/
