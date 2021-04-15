@@ -11,7 +11,7 @@
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"
 
-#include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Rendering/Renderer.h"
 
 #include "Saffron/Resource/ResourceManager.h"
 
@@ -21,8 +21,8 @@
 namespace Se
 {
 App::App(const Properties& properties) :
-	Instansiated(this),
-	m_PreLoader(CreateShared<BatchLoader>("Preloader"))
+	SingleTon(this),
+	m_PreLoader(Shared<BatchLoader>::Create("Preloader"))
 {
 	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 
@@ -33,14 +33,14 @@ App::App(const Properties& properties) :
 
 	_renderer = CreateUnique<Renderer>();
 	_sceneRenderer = CreateUnique<SceneRenderer>();
-	Renderer::Execute();
 
 	_scriptEngine = CreateUnique<ScriptEngine>();
 	_fileIOManager = CreateUnique<FileIOManager>(_window);
-	_gui = CreateUnique<Gui>();
 
 	_keyboard = CreateUnique<Keyboard>();
 	_mouse = CreateUnique<Mouse>();
+
+	_gui = CreateUnique<Gui>();
 
 	m_PreLoader->Started += []
 	{
@@ -63,6 +63,8 @@ App::App(const Properties& properties) :
 	{
 		Gui::SetStyle(Gui::Style::Dark);
 	}, "Initializing GUI");
+
+	Renderer::WaitAndRender();
 }
 
 App::~App()
@@ -70,7 +72,6 @@ App::~App()
 	const AppSerializer serializer(*this);
 	serializer.Serialize("App/ApplicationProperties.sap");
 	ResourceManager::Clear();
-	FramebufferPool::GetGlobal()->Clear();
 }
 
 void App::PushLayer(Shared<Layer> layer)
@@ -107,7 +108,7 @@ void App::RenderGui()
 {
 	_gui->Begin();
 
-	for (const auto& layer : _layerStack)
+	for (auto& layer : _layerStack)
 	{
 		layer->OnGuiRender();
 	}
@@ -137,21 +138,22 @@ void App::Run()
 		}
 
 		Global::Timer::Mark();
-		_keyboard->OnUpdate();
-		_mouse->OnUpdate();
-		_window->HandleBufferedEvents();
 
 		if (!_minimized)
 		{
-			for (const auto& layer : _layerStack)
+			for (auto& layer : _layerStack)
 			{
 				layer->OnUpdate();
 			}
-			ScriptEngine::OnUpdate();
-			_window->OnUpdate();
 			Renderer::Submit([this]() { RenderGui(); });
-			Renderer::Execute();
+
+			Renderer::WaitAndRender();
 		}
+		ScriptEngine::OnUpdate();
+		_window->OnUpdate();
+		_keyboard->OnUpdate();
+		_mouse->OnUpdate();
+		_window->HandleBufferedEvents();
 		OnUpdate();
 		Run::Execute();
 	}
@@ -236,7 +238,12 @@ void App::RunSplashScreen()
 {
 	m_PreLoader->Execute();
 
-	SplashScreenPane splashScreenPane(m_PreLoader);
+	while (!m_PreLoader->IsFinished())
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
+	}
+
+	/*SplashScreenPane splashScreenPane(m_PreLoader);
 	while (!splashScreenPane.IsFinished())
 	{
 		_gui->Begin();
@@ -244,7 +251,7 @@ void App::RunSplashScreen()
 		_window->OnUpdate();
 		_window->HandleBufferedEvents();
 		_gui->End();
-		Renderer::Execute();
+		Renderer::WaitAndRender();
 		Run::Execute();
 		Global::Timer::Mark();
 		const auto duration = splashScreenPane.GetBatchLoader()->IsFinished()
@@ -253,6 +260,6 @@ void App::RunSplashScreen()
 				                      0ll, static_cast<long long>(1000.0 / 60.0 - Global::Timer::GetStep().ms()));
 		std::this_thread::sleep_for(std::chrono::milliseconds(duration));
 		Global::Timer::Sync();
-	}
+	}*/
 }
 }

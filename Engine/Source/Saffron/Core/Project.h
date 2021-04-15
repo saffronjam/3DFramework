@@ -7,7 +7,7 @@ namespace Se
 {
 class EditorScene;
 
-class Project : public MemManaged<Project>
+class Project : public Managed
 {
 	friend class ProjectSerializer;
 public:

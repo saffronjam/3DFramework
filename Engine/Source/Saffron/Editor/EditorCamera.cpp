@@ -114,6 +114,51 @@ void EditorCamera::Reset()
 	UpdateCameraView();
 }
 
+void EditorCamera::Enable()
+{
+	m_Enabled = true;
+}
+
+void EditorCamera::Disable()
+{
+	m_Enabled = false;
+}
+
+bool EditorCamera::IsEnabled() const
+{
+	return m_Enabled;
+}
+
+const Matrix4f& EditorCamera::GetViewMatrix() const
+{
+	return m_ViewMatrix;
+}
+
+Matrix4f EditorCamera::GetViewProjection() const
+{
+	return m_ProjectionMatrix * m_ViewMatrix;
+}
+
+const Vector3f& EditorCamera::GetPosition() const
+{
+	return m_Position;
+}
+
+float EditorCamera::GetPitch() const
+{
+	return m_Pitch;
+}
+
+float EditorCamera::GetYaw() const
+{
+	return m_Yaw;
+}
+
+float EditorCamera::GetRoll() const
+{
+	return 0.0f;
+}
+
 
 void EditorCamera::SetPosition(const Vector3f& position)
 {
@@ -142,6 +187,16 @@ Vector3f EditorCamera::GetRightDirection() const
 Vector3f EditorCamera::GetForwardDirection() const
 {
 	return m_Forward;
+}
+
+EditorCamera::ControllerStyle EditorCamera::GetControllerStyle() const
+{
+	return m_ControllerStyle;
+}
+
+void EditorCamera::SetControllerStyle(ControllerStyle style)
+{
+	m_ControllerStyle = style;
 }
 
 bool EditorCamera::OnMouseScroll(const MouseWheelScrolledEvent& event)

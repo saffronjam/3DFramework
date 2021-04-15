@@ -1,31 +1,33 @@
 #pragma once
 
-#include "Saffron/Renderer/VertexBuffer.h"
+#include "Saffron/Rendering/Resources/VertexBuffer.h"
 
 namespace Se
 {
 class OpenGLVertexBuffer : public VertexBuffer
 {
 public:
-	OpenGLVertexBuffer(void *data, Uint32 size, Usage usage = Usage::Static);
-	OpenGLVertexBuffer(Uint32 size, Usage usage = Usage::Dynamic);
+	OpenGLVertexBuffer(void* data, uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Static);
+	OpenGLVertexBuffer(uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 	virtual ~OpenGLVertexBuffer();
 
 	void Bind() const override;
 
-	void SetData(void *buffer, Uint32 size, Uint32 offset = 0) override;
-	void SetData(const Buffer &buffer, Uint32 offset = 0) override;
+	void SetData(const void* data, uint32_t size, uint32_t offset = 0) override;
+	void SetData(const Buffer& buffer, uint32_t offset) override;
 
-	Uint32 GetSize() const override { return m_Size; }
-	RendererID GetRendererID() const override { return m_RendererID; }
+	const VertexBufferLayout& GetLayout() const override;
 
-private:
-	void Create();
+	void SetLayout(const VertexBufferLayout& layout) override;
 
+	virtual uint32_t GetSize() const;
+
+	virtual RendererID GetRendererID() const;
 private:
 	RendererID m_RendererID = 0;
-	Uint32 m_Size;
-	Usage m_Usage;
+	uint32_t m_Size;
+	VertexBufferUsage m_Usage;
+	VertexBufferLayout m_Layout;
 
 	Buffer m_LocalData;
 };

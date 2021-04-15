@@ -39,13 +39,9 @@ public:
 	template <typename T>
 	T* As();
 
-
-	Uint8* Data() { return _data; }
-
-	const Uint8* Data() const { return _data; }
-
-	Uint32 Size() const { return _size; }
-
+	Uint8* Data();
+	const Uint8* Data() const;
+	Uint32 Size() const;
 
 private:
 	Uint8* _data;

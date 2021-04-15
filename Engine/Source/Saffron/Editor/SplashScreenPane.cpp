@@ -6,19 +6,18 @@
 
 namespace Se
 {
-SplashScreenPane::SplashScreenPane(const Shared<BatchLoader> &batchLoader)
-	: m_BatchLoader(batchLoader),
-	m_Texture(Factory::Create<Texture2D>(Filepath("Editor/Saffron.png"))),
+SplashScreenPane::SplashScreenPane(const Shared<BatchLoader>& batchLoader) :
+	m_BatchLoader(batchLoader),
+	m_Texture(Texture2D::Create(Filepath("Editor/Saffron.png"))),
 	m_FinalizingStatus("Finalizing")
 {
 }
 
 void SplashScreenPane::OnGuiRender()
 {
-	if ( m_Hidden )
-		return;
+	if (m_Hidden) return;
 
-	ImGuiViewport *viewport = ImGui::GetMainViewport();
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
@@ -26,7 +25,7 @@ void SplashScreenPane::OnGuiRender()
 	oss << "Loading Screen##";
 	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-	if ( m_BatchLoader->GetProgress() != m_GoalProgressView )
+	if (m_BatchLoader->GetProgress() != m_GoalProgressView)
 	{
 		m_GoalProgressView = m_BatchLoader->GetProgress();
 		m_CurrentSinTimer = 0.0f;
@@ -35,21 +34,23 @@ void SplashScreenPane::OnGuiRender()
 	{
 		m_CurrentSinTimer += Global::Timer::GetStep().sec();
 	}
-	m_CurrentProgressView += (m_GoalProgressView - m_CurrentProgressView) * std::sin(m_CurrentSinTimer / (2.0f * Math::PI));
+	m_CurrentProgressView += (m_GoalProgressView - m_CurrentProgressView) * std::sin(
+		m_CurrentSinTimer / (2.0f * Math::PI));
 
 	const auto windowSize = ImGui::GetWindowSize();
 
 	const auto logoWidth = 200;
 	const auto logoHeight = 200;
-	ImGui::SetCursorPos({ windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f });
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_Texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0), ImVec2(1, 1));
+	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
+	ImGui::Image(reinterpret_cast<ImTextureID>(m_Texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0),
+	             ImVec2(1, 1));
 
 
 	Gui::SetFontSize(36);
 	ImGui::NewLine();
 	Gui::SetFontSize(48);
 
-	const char *title = "Saffron Engine";
+	const char* title = "Saffron Engine";
 	const float titleTextWidth = ImGui::CalcTextSize(title).x;
 	ImGui::SetCursorPosX(ImGui::GetWindowWidth() / 2.0f - titleTextWidth / 2.0f);
 	ImGui::Text(title);
@@ -72,8 +73,8 @@ void SplashScreenPane::OnGuiRender()
 
 	Gui::SetFontSize(18);
 
-	const String *status = m_GoalProgressView < 100.0f ? m_BatchLoader->GetStatus() : &m_FinalizingStatus;
-	if ( status && !status->empty() )
+	const String* status = m_GoalProgressView < 100.0f ? m_BatchLoader->GetStatus() : &m_FinalizingStatus;
+	if (status && !status->empty())
 	{
 		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
 		ImGui::NewLine();
@@ -96,7 +97,7 @@ void SplashScreenPane::Hide()
 
 bool SplashScreenPane::IsIdle() const
 {
-	return  static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
+	return static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
 }
 
 bool SplashScreenPane::IsFinished() const

@@ -22,7 +22,7 @@ struct EntityScriptClass;
 
 
 ///////////////////////////////////////////////////////////////////////////
-/// Field Type
+/// Field UniformType
 ///////////////////////////////////////////////////////////////////////////
 
 enum class FieldType
@@ -116,7 +116,7 @@ using EntityInstanceMap = UnorderedMap<UUID, UnorderedMap<UUID, EntityInstanceDa
 /// Script Engine
 ///////////////////////////////////////////////////////////////////////////
 
-class ScriptEngine : public Instansiated<ScriptEngine>
+class ScriptEngine : public SingleTon<ScriptEngine>
 {
 public:
 	ScriptEngine();

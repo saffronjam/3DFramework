@@ -1,144 +1,134 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Renderer/ShaderUniform.h"
+#include "Saffron/Rendering/Resources/ShaderUniform.h"
 
 namespace Se
 {
-
-//////////////////////////////////////////////////////////////
-/// OpenGL Shader Resource Declaration
-//////////////////////////////////////////////////////////////
-
 class OpenGLShaderResourceDeclaration : public ShaderResourceDeclaration
 {
 public:
 	enum class Type
 	{
-		None, Texture2D, TextureCube
+		NONE,
+		TEXTURE2D,
+		TEXTURECUBE
 	};
 
 private:
 	friend class OpenGLShader;
 
+public:
+	OpenGLShaderResourceDeclaration(Type type, const std::string& name, uint32_t count);
+
+	const std::string& GetName() const override;
+	uint32_t GetRegister() const override;
+	uint32_t GetCount() const override;
+	Type GetType() const;
+
+	static Type StringToType(const std::string& type);
+	static std::string TypeToString(Type type);
+
 private:
-	String m_Name;
-	Uint32 m_Register = 0;
-	Uint32 m_Count;
+	std::string m_Name;
+	uint32_t m_Register = 0;
+	uint32_t m_Count;
 	Type m_Type;
-
-public:
-	OpenGLShaderResourceDeclaration(Type type, String name, Uint32 count);
-	~OpenGLShaderResourceDeclaration()
-	{
-
-	}
-
-	const String &GetName() const override { return m_Name; }
-	Uint32 GetRegister() const override { return m_Register; }
-	Uint32 GetCount() const override { return m_Count; }
-
-	Type GetType() const { return m_Type; }
-public:
-	static Type StringToType(const String &type);
-	static String TypeToString(Type type);
 };
-
-
-////////////////////////////////////////////////////////
-/// OpenGL Shader Uniform Declaration
-////////////////////////////////////////////////////////
 
 class OpenGLShaderUniformDeclaration : public ShaderUniformDeclaration
 {
 private:
 	friend class OpenGLShader;
 	friend class OpenGLShaderUniformBufferDeclaration;
-
 public:
 	enum class Type
 	{
-		None, Float32, Vec2, Vec3, Vec4, Mat3, Mat4, Int32, Bool, Struct
+		None,
+		Float32,
+		Vec2,
+		Vec3,
+		Vec4,
+		Mat3,
+		Mat4,
+		Int32,
+		Bool,
+		Struct
 	};
 
 private:
-	ShaderStruct *m_Struct;
-
-	String m_Name;
-	Uint32 m_Count;
-	Uint32 m_Size;
-	Uint32 m_Offset{};
+	std::string m_Name;
+	uint32_t m_Size;
+	uint32_t m_Count;
+	uint32_t m_Offset;
 	ShaderDomain m_Domain;
 
 	Type m_Type;
-	mutable Int32 m_Location{};
-
+	ShaderStruct* m_Struct;
+	mutable int32_t m_Location;
 public:
-	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, String name, Uint32 count = 1);
-	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct *uniformStruct, String name, Uint32 count = 1);
-	~OpenGLShaderUniformDeclaration()
-	{
+	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const std::string& name, uint32_t count = 1);
+	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct* uniformStruct, const std::string& name,
+	                               uint32_t count = 1);
 
-	}
+	const std::string& GetName() const override;
+	uint32_t GetSize() const override;
+	uint32_t GetCount() const override;
 
-	const String &GetName() const override { return m_Name; }
-	Uint32 GetSize() const override { return m_Size; }
-	Uint32 GetCount() const override { return m_Count; }
-	Uint32 GetOffset() const override { return m_Offset; }
-	Uint32 GetAbsoluteOffset() const { return m_Struct ? m_Struct->GetOffset() + m_Offset : m_Offset; }
-	ShaderDomain GetDomain() const override { return m_Domain; }
+	uint32_t GetOffset() const override;
+	uint32_t GetAbsoluteOffset() const;
 
-	Int32 GetLocation() const { return m_Location; }
-	Type GetType() const { return m_Type; }
-	bool IsArray() const { return m_Count > 1; }
-	const ShaderStruct &GetShaderUniformStruct() const { SE_CORE_ASSERT(m_Struct, ""); return *m_Struct; }
+	ShaderDomain GetDomain() const override;
+	int32_t GetLocation() const;
+	Type GetType() const;
+
+	bool IsArray() const;
+
+	const ShaderStruct& GetShaderUniformStruct() const;
+
 protected:
-	void SetOffset(Uint32 offset) override;
+	void SetOffset(uint32_t offset) override;
+
 public:
-	static Uint32 SizeOfUniformType(Type type);
-	static Type StringToType(const String &type);
-	static String TypeToString(Type type);
+	static uint32_t SizeOfUniformType(Type type);
+	static Type StringToType(const std::string& type);
+	static std::string TypeToString(Type type);
 };
 
-///////////////////////////////////
-/// OpenGL Shader Uniform Field ///
-///////////////////////////////////
 struct GLShaderUniformField
 {
-	OpenGLShaderUniformDeclaration::Type Type;
-	String Name;
-	Uint32 Count;
-	mutable Uint32 Size;
-	mutable Int32 Location;
+	OpenGLShaderUniformDeclaration::Type type;
+	std::string name;
+	uint32_t count;
+	mutable uint32_t size;
+	mutable int32_t location;
 };
 
-////////////////////////////////////////////////
-/// OpenGL Shader Uniform Buffer Declaration ///
-////////////////////////////////////////////////
 class OpenGLShaderUniformBufferDeclaration : public ShaderUniformBufferDeclaration
 {
 private:
 	friend class Shader;
 private:
-	String m_Name;
-	ShaderUniformDeclaration::List m_Uniforms;
-	Uint32 m_Register;
-	Uint32 m_Size;
+	std::string m_Name;
+	ShaderUniformList m_Uniforms;
+	uint32_t m_Register;
+	uint32_t m_Size;
 	ShaderDomain m_Domain;
 public:
-	OpenGLShaderUniformBufferDeclaration(String name, ShaderDomain domain);
-	~OpenGLShaderUniformBufferDeclaration() = default;
+	OpenGLShaderUniformBufferDeclaration(const std::string& name, ShaderDomain domain);
 
-	void PushUniform(OpenGLShaderUniformDeclaration *uniform);
+	void PushUniform(OpenGLShaderUniformDeclaration* uniform);
 
-	const String &GetName() const override { return m_Name; }
-	Uint32 GetRegister() const override { return m_Register; }
-	Uint32 GetSize() const override { return m_Size; }
-	ShaderDomain GetDomain() const { return m_Domain; }
-	const ShaderUniformDeclaration::List &GetUniformDeclarations() const override { return m_Uniforms; }
+	const std::string& GetName() const override { return m_Name; }
 
-	ShaderUniformDeclaration *FindUniform(const String &name) override;
+	uint32_t GetRegister() const override { return m_Register; }
+
+	uint32_t GetSize() const override { return m_Size; }
+
+	virtual ShaderDomain GetDomain() const { return m_Domain; }
+
+	const ShaderUniformList& GetUniformDeclarations() const override { return m_Uniforms; }
+
+	ShaderUniformDeclaration* FindUniform(const std::string& name) override;
 };
-
 }
-

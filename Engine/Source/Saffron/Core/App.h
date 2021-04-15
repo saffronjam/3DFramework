@@ -12,14 +12,14 @@
 
 #include "Saffron/Gui/Gui.h"
 
-#include "Saffron/Renderer/Renderer.h"
-#include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Rendering/SceneRenderer.h"
 
 #include "Saffron/Script/ScriptEngine.h"
 
 namespace Se
 {
-class App : public Instansiated<App>
+class App : public SingleTon<App>
 {
 	friend class AppSerializer;
 
@@ -92,11 +92,11 @@ private:
 	LayerStack _layerStack;
 	Mutex _finalPreloaderMessageMutex;
 
-	Shared<Mouse> _mouse;
-	Shared<Keyboard> _keyboard;
+	Unique<Mouse> _mouse;
+	Unique<Keyboard> _keyboard;
 
-	mutable ArrayList<std::shared_ptr<Project>> _recentProjectList;
-	std::shared_ptr<Project> _activeProject = nullptr;
+	mutable ArrayList<Shared<Project>> _recentProjectList;
+	Shared<Project> _activeProject = nullptr;
 };
 
 // Implemented by client

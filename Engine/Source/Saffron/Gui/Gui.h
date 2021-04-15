@@ -11,7 +11,7 @@ namespace Se
 {
 using Font = ImFont;
 
-class Gui : public Instansiated<Gui>
+class Gui : public SingleTon<Gui>
 {
 public:
 	enum class Style : int

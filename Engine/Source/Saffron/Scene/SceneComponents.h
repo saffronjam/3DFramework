@@ -42,11 +42,11 @@ struct EditorCameraComponent
 	Shared<EditorCamera> Camera;
 
 	EditorCameraComponent()
-		: Camera(CreateShared<EditorCamera>())
+		: Camera(Shared<EditorCamera>::Create())
 	{
 	}
 	EditorCameraComponent(Matrix4f projectionMatrix)
-		: Camera(CreateShared<EditorCamera>(projectionMatrix))
+		: Camera(Shared<EditorCamera>::Create(projectionMatrix))
 	{
 	}
 	EditorCameraComponent(const EditorCameraComponent &other) = default;

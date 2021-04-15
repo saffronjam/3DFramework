@@ -6,7 +6,7 @@ namespace Se
 {
 EditorLayer::EditorLayer(const Shared<Project>& project) :
 	m_Project(Move(project)),
-	m_MainViewportPane(CreateShared<ViewportPane>("Main Viewport", SceneRenderer::GetMainTarget())),
+	m_MainViewportPane(Shared<ViewportPane>::Create("Main Viewport")),
 	m_LastFocusedScene(m_EditorScene),
 	m_CachedActiveScene(m_EditorScene),
 	m_SceneState(SceneState::Edit)
@@ -23,16 +23,16 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 
 	loader->Submit([this]
 	{
-		m_TexStore["Checkerboard"] = Factory::Create<Texture2D>("Editor/Checkerboard.tga");
-		m_TexStore["Checkerboard2"] = Factory::Create<Texture2D>("Editor/Checkerboard.tga");
-		m_TexStore["PlayButton"] = Factory::Create<Texture2D>("Editor/PlayButton.png");
-		m_TexStore["PauseButton"] = Factory::Create<Texture2D>("Editor/PauseButton.png");
-		m_TexStore["StopButton"] = Factory::Create<Texture2D>("Editor/StopButton.png");
-		m_TexStore["TranslateButton"] = Factory::Create<Texture2D>("Editor/Translate_w.png");
-		m_TexStore["RotateButton"] = Factory::Create<Texture2D>("Editor/Rotate_w.png");
-		m_TexStore["ScaleButton"] = Factory::Create<Texture2D>("Editor/Scale_w.png");
-		m_TexStore["ControllerGameButton"] = Factory::Create<Texture2D>("Editor/ControllerGame_w.png");
-		m_TexStore["ControllerMayaButton"] = Factory::Create<Texture2D>("Editor/ControllerMaya_w.png");
+		m_TexStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
+		m_TexStore["Checkerboard2"] = Texture2D::Create("Editor/Checkerboard.tga");
+		m_TexStore["PlayButton"] = Texture2D::Create("Editor/PlayButton.png");
+		m_TexStore["PauseButton"] = Texture2D::Create("Editor/PauseButton.png");
+		m_TexStore["StopButton"] = Texture2D::Create("Editor/StopButton.png");
+		m_TexStore["TranslateButton"] = Texture2D::Create("Editor/Translate_w.png");
+		m_TexStore["RotateButton"] = Texture2D::Create("Editor/Rotate_w.png");
+		m_TexStore["ScaleButton"] = Texture2D::Create("Editor/Scale_w.png");
+		m_TexStore["ControllerGameButton"] = Texture2D::Create("Editor/ControllerGame_w.png");
+		m_TexStore["ControllerMayaButton"] = Texture2D::Create("Editor/ControllerMaya_w.png");
 	}, "Loading Editor Textures");
 
 
@@ -40,16 +40,16 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 	{
 		if (m_Project->IsValid())
 		{
-			m_AssetPanel = CreateShared<AssetPanel>(m_Project->GetProjectFolderpath().string() + "/Assets/Meshes");
-			m_ScriptPanel = CreateShared<ScriptPanel>(m_Project->GetProjectFolderpath().string() + "/Src");
+			m_AssetPanel = Shared<AssetPanel>::Create(m_Project->GetProjectFolderpath().string() + "/Assets/Meshes");
+			m_ScriptPanel = Shared<ScriptPanel>::Create(m_Project->GetProjectFolderpath().string() + "/Src");
 		}
 		else
 		{
-			m_AssetPanel = CreateShared<AssetPanel>();
-			m_ScriptPanel = CreateShared<ScriptPanel>();
+			m_AssetPanel = Shared<AssetPanel>::Create();
+			m_ScriptPanel = Shared<ScriptPanel>::Create();
 		}
-		m_EntityPanel = CreateShared<EntityComponentsPanel>(m_EditorScene);
-		m_ScenePanel = CreateShared<SceneHierarchyPanel>(m_EditorScene);
+		m_EntityPanel = Shared<EntityComponentsPanel>::Create(m_EditorScene);
+		m_ScenePanel = Shared<SceneHierarchyPanel>::Create(m_EditorScene);
 	}, "Initializing Editor Panels");
 
 	loader->Submit([this]
@@ -151,7 +151,6 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 		Keyboard::Pressed += SE_BIND_EVENT_FN(EditorLayer::OnKeyboardPress);
 		Mouse::ButtonPressed += SE_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed);
 		App::Instance().GetWindow().DroppedFiles += SE_BIND_EVENT_FN(EditorLayer::OnWindowDropFiles);
-		
 	}, "Setting Up System Callbacks");
 }
 
@@ -180,14 +179,6 @@ void EditorLayer::OnUpdate()
 
 		m_EditorScene->OnUpdate();
 		m_EditorScene->OnRender();
-
-		for (auto& [scene, viewportPane] : m_ModelSpaceSceneViews)
-		{
-			viewportPane->IsFocused() ? scene->EnableCamera() : scene->DisableCamera();
-
-			scene->OnUpdate();
-			scene->OnRender();
-		}
 		break;
 	}
 	case SceneState::Play:
@@ -229,7 +220,7 @@ void EditorLayer::OnGuiRender()
 	OnGuiRenderToolbar();
 
 	Renderer::OnGuiRender();
-	SceneRenderer::OnGuiRender();
+	//SceneRenderer::OnGuiRender();
 	ScriptEngine::OnGuiRender();
 	Shader::OnGuiRender();
 	m_EditorTerminal.OnGuiRender();
@@ -239,38 +230,6 @@ void EditorLayer::OnGuiRender()
 	m_ScenePanel->OnGuiRender(m_ScriptPanel);
 	GetActiveScene()->OnGuiRender();
 	m_MainViewportPane->OnGuiRender();
-
-	if (m_SceneState == SceneState::Edit)
-	{
-		for (auto& [scene, viewportPane] : m_ModelSpaceSceneViews)
-		{
-			OutputStringStream oss;
-			oss << scene->GetName() << "##" << scene->GetUUID();
-			bool wantOpen;
-			viewportPane->OnGuiRender(&wantOpen);
-			if (!wantOpen)
-			{
-				const UUID sceneUUID = scene->GetUUID();
-				Run::Later([sceneUUID, this]
-				{
-					const auto deleteIterator = std::find_if(m_ModelSpaceSceneViews.begin(),
-					                                         m_ModelSpaceSceneViews.end(), [sceneUUID, this](auto& pair)
-					                                         {
-						                                         return pair.first->GetUUID() == sceneUUID;
-					                                         });
-					if (deleteIterator == m_ModelSpaceSceneViews.begin())
-					{
-						m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
-					}
-					else
-					{
-						m_LastFocusedScene = std::dynamic_pointer_cast<Scene>((deleteIterator - 1)->first);
-					}
-					m_ModelSpaceSceneViews.erase(deleteIterator);
-				});
-			}
-		}
-	}
 
 	ImGui::End();
 
@@ -282,12 +241,6 @@ void EditorLayer::OnGuiRender()
 			m_RuntimeScene->SetViewportSize(viewportSize.x, viewportSize.y);
 		}
 		m_EditorScene->SetViewportSize(viewportSize.x, viewportSize.y);
-	}
-
-	for (auto& [scene, viewportPane] : m_ModelSpaceSceneViews)
-	{
-		const auto viewportSize = viewportPane->GetViewportSize();
-		scene->SetViewportSize(viewportSize.x, viewportSize.y);
 	}
 }
 
@@ -401,7 +354,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 			auto meshEntities = GetActiveScene()->GetEntityRegistry().view<MeshComponent>();
 			for (auto entityHandle : meshEntities)
 			{
-				const Entity entity = {entityHandle, m_EditorScene.get()};
+				const Entity entity = {entityHandle, m_EditorScene.Raw()};
 				auto mesh = entity.GetComponent<MeshComponent>().Mesh;
 				if (mesh)
 				{
@@ -411,7 +364,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 			auto camereaEntities = GetActiveScene()->GetEntityRegistry().view<CameraComponent>();
 			for (auto entityHandle : camereaEntities)
 			{
-				const Entity entity = {entityHandle, m_EditorScene.get()};
+				const Entity entity = {entityHandle, m_EditorScene.Raw()};
 				auto cameraComponent = entity.GetComponent<CameraComponent>();
 				if (cameraComponent.CameraMesh && cameraComponent.DrawMesh)
 				{
@@ -456,15 +409,15 @@ void EditorLayer::PromptNewScene()
 	{
 		OnStop();
 		String sceneName = filepath.stem().string();
-		Shared<EditorScene> newScene = CreateShared<EditorScene>(sceneName);
+		Shared<EditorScene> newScene = Shared<EditorScene>::Create(sceneName);
 
 		// Default construct environment and light
 		// TODO: Prompt user with templates instead?
-		const Scene::Light light = {{-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f};
+		const Light light = {{-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f};
 		newScene->SetLight(light);
 
 		m_EditorScene = newScene;
-		m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
+		m_LastFocusedScene = m_EditorScene;
 
 		SaveActiveScene();
 		OnSceneChange(m_EditorScene, {});
@@ -494,7 +447,7 @@ void EditorLayer::PromptOpenProject()
 	const Filepath filepath = FileIOManager::OpenFile({"Saffron Scene (*.spr)", {"*.spr"}});
 	if (Project::IsValidProjectFilepath(filepath))
 	{
-		auto newProject = CreateShared<Project>(filepath);
+		auto newProject = Shared<Project>::Create(filepath);
 		if (newProject->IsValid())
 		{
 			OnProjectChange(newProject);
@@ -539,12 +492,12 @@ void EditorLayer::LoadProjectScene(const Filepath& filepath)
 
 	if (!newScene)
 	{
-		newScene = CreateShared<EditorScene>(fullSceneFilepath);
+		newScene = Shared<EditorScene>::Create(fullSceneFilepath);
 		m_Project->AddCachedScene(newScene);
 	}
 
 	m_EditorScene = newScene;
-	m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
+	m_LastFocusedScene = m_EditorScene;
 
 	OnEntityUnselected(m_SelectedEntity);
 	OnSceneChange(m_EditorScene, {});
@@ -586,7 +539,7 @@ void EditorLayer::OnPlay()
 	{
 		ScriptEngine::ReloadAssembly(m_Project->GetProjectFilepath().stem().string());
 	}
-	m_RuntimeScene = CreateShared<RuntimeScene>(m_EditorScene);
+	m_RuntimeScene = Shared<RuntimeScene>::Create(m_EditorScene);
 	m_RuntimeScene->OnStart();
 	m_GizmoType = -1;
 
@@ -642,16 +595,9 @@ Shared<ViewportPane> EditorLayer::GetActiveViewportPane() const
 	}
 
 	const auto activeScene = GetActiveScene();
-	if (activeScene == std::dynamic_pointer_cast<Scene>(m_EditorScene))
+	if (activeScene == m_EditorScene)
 	{
 		return m_MainViewportPane;
-	}
-	for (const auto& [scene, viewportPane] : m_ModelSpaceSceneViews)
-	{
-		if (activeScene == scene)
-		{
-			return viewportPane;
-		}
 	}
 	SE_CORE_WARN("Detected a scene without a viewport pane. Scene name: {}", activeScene->GetName());
 	return m_MainViewportPane;
@@ -661,23 +607,14 @@ Shared<Scene> EditorLayer::GetActiveScene() const
 {
 	if (m_SceneState == SceneState::Play)
 	{
-		m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_RuntimeScene);
+		m_LastFocusedScene = m_RuntimeScene;
 		return m_LastFocusedScene;
 	}
 
 	if (m_MainViewportPane->IsFocused())
 	{
-		m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(m_EditorScene);
+		m_LastFocusedScene = m_EditorScene;
 		return m_LastFocusedScene;
-	}
-
-	for (const auto& [scene, viewportPane] : m_ModelSpaceSceneViews)
-	{
-		if (viewportPane->IsFocused())
-		{
-			m_LastFocusedScene = std::dynamic_pointer_cast<Scene>(scene);
-			return m_LastFocusedScene;
-		}
 	}
 
 	return m_LastFocusedScene;
@@ -920,58 +857,6 @@ bool EditorLayer::OnEntityCopied(Entity entity)
 
 bool EditorLayer::OnNewModelSpaceView(Entity entity)
 {
-	const auto& tag = entity.GetComponent<TagComponent>().Tag;
-	auto newScene = CreateShared<ModelSpaceScene>(entity);
-	auto newViewportPane = CreateShared<ViewportPane>(tag, newScene->GetTarget());
-	auto& emplacedPair = m_ModelSpaceSceneViews.emplace_back(newScene, newViewportPane);
-	m_DockedModelSpaceScene.push_back(false);
-
-	const auto postRenderFn = [this, emplacedPair]
-	{
-		const auto& scene = emplacedPair.first;
-		const auto& viewportPane = emplacedPair.second;
-		Entity modelEntity = scene->GetModelEntity();
-
-		if (m_SceneState == SceneState::Edit && m_GizmoType != -1 && GetActiveScene() == scene && modelEntity)
-		{
-			const auto viewportSize = viewportPane->GetViewportSize();
-			const auto& editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
-
-			const bool snap = Keyboard::IsPressed(KeyCode::LControl);
-			auto& entityTransform = modelEntity.Transform();
-			const float snapValue = GetSnapValue();
-			float snapValues[3] = {snapValue, snapValue, snapValue};
-
-			ImGuizmo::SetDrawlist();
-			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
-
-			if (m_SelectionMode == SelectionMode::Entity)
-			{
-				ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-				                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
-				                     static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL,
-				                     glm::value_ptr(entityTransform), nullptr, snap ? snapValues : nullptr);
-			}
-			else
-			{
-				glm::mat4 transformBase = entityTransform * modelEntity.GetComponent<TransformComponent>().Transform;
-				ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
-				                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
-				                     static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::LOCAL,
-				                     glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr);
-
-				modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) *
-					transformBase;
-			}
-		}
-	};
-
-	emplacedPair.second->FinishedRender += [postRenderFn]
-	{
-		postRenderFn();
-		return false;
-	};
-
 	return false;
 }
 

@@ -1,7 +1,6 @@
 #include "SaffronPCH.h"
 
 #include "Saffron/Core/Buffer.h"
-#include "Saffron/Core/Assert.h"
 
 namespace Se
 {
@@ -107,5 +106,20 @@ Uint8& Buffer::operator[](int index)
 Uint8 Buffer::operator[](int index) const
 {
 	return _data[index];
+}
+
+Uint8* Buffer::Data()
+{
+	return _data;
+}
+
+const Uint8* Buffer::Data() const
+{
+	return _data;
+}
+
+Uint32 Buffer::Size() const
+{
+	return _size;
 }
 }

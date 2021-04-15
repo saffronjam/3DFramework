@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Saffron/Input/InputCodes.h"
-#include "Saffron/Renderer/Mesh.h"
-#include "Saffron/Renderer/Material.h"
+#include "Saffron/Rendering/Mesh.h"
+#include "Saffron/Rendering/Material.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 extern "C" {

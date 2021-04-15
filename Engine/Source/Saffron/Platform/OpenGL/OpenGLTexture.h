@@ -2,44 +2,44 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Misc.h"
-#include "Saffron/Renderer/Texture.h"
+#include "Saffron/Rendering/Resources/Texture.h"
 
 namespace Se
 {
 class OpenGLTexture2D : public Texture2D
 {
 public:
-	OpenGLTexture2D(Format format, Uint32 width, Uint32 height, Wrap wrap);
-	OpenGLTexture2D(Filepath filepath, bool sRGB);
+	OpenGLTexture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap);
+	OpenGLTexture2D(Filepath filepath, bool srgb);
 	virtual ~OpenGLTexture2D();
 
-	void Bind(Uint32 slot = 0) const override;
+	bool operator==(const Texture& other) const override;
 
-	size_t GetIdentifier() override;
-	Format GetFormat() const override { return m_Format; }
-	Uint32 GetWidth() const override { return m_Width; }
-	Uint32 GetHeight() const override { return m_Height; }
+	void Bind(uint32_t slot = 0) const override;
+
+	TextureFormat GetFormat() const override;
+	uint32_t GetWidth() const override;
+	uint32_t GetHeight() const override;
 	// This function currently returns the expected number of mips based on image size,
 	// not present mips in data
-	Uint32 GetMipLevelCount() const override;
+	uint32_t GetMipLevelCount() const override;
 
 	void Lock() override;
 	void Unlock() override;
 
-	void Resize(Uint32 width, Uint32 height) override;
-	bool Loaded() const override { return m_Loaded; }
+	void Resize(uint32_t width, uint32_t height) override;
+	Buffer& GetWriteableBuffer() override;
 
-	Buffer &GetWriteableBuffer() override;
-	const Filepath &GetFilepath() const override { return m_Filepath; }
-	RendererID GetRendererID() const override { return m_RendererID; }
-
-	bool operator==(const Texture &other) const override;
+	const Filepath& GetFilepath() const override;
+	RendererID GetRendererID() const override;
+	
+	bool Loaded() const override;
 
 private:
-	RendererID m_RendererID{};
-	Format m_Format;
-	Uint32 m_Width, m_Height;
-	Wrap m_Wrap = Wrap::Clamp;
+	RendererID m_RendererID;
+	TextureFormat m_Format;
+	TextureWrap m_Wrap = TextureWrap::Clamp;
+	uint32_t m_Width, m_Height;
 
 	Buffer m_ImageData;
 	bool m_IsHDR = false;
@@ -47,41 +47,42 @@ private:
 	bool m_Locked = false;
 	bool m_Loaded = false;
 
-	Filepath m_Filepath;
+	Filepath m_FilePath;
 };
 
 class OpenGLTextureCube : public TextureCube
 {
 public:
-	OpenGLTextureCube(Format format, Uint32 width, Uint32 height);
+	OpenGLTextureCube(TextureFormat format, uint32_t width, uint32_t height);
 	OpenGLTextureCube(Filepath filepath);
 	virtual ~OpenGLTextureCube();
 
-	void Bind(Uint32 slot = 0) const override;
+	bool operator==(const Texture& other) const override;
 
-	// TODO: Implement proper texture identifiers
-	size_t GetIdentifier() override { return UUID(); }
-	Format GetFormat() const override { return m_Format; }
-	Uint32 GetWidth() const override { return m_Width; }
-	Uint32 GetHeight() const override { return m_Height; }
+	void Bind(uint32_t slot = 0) const override;
+
+	TextureFormat GetFormat() const override;
+
+	uint32_t GetWidth() const override;
+
+	uint32_t GetHeight() const override;
+
 	// This function currently returns the expected number of mips based on image size,
 	// not present mips in data
-	Uint32 GetMipLevelCount() const override;
+	uint32_t GetMipLevelCount() const override;
 
-	const Filepath &GetFilepath() const override { return m_Filepath; }
+	const Filepath& GetFilepath() const override;
 
-	RendererID GetRendererID() const override { return m_RendererID; }
+	RendererID GetRendererID() const override;
 
-	bool operator==(const Texture &other) const override;
 
 private:
-	RendererID m_RendererID{};
-	Format m_Format;
-	Uint32 m_Width, m_Height;
+	RendererID m_RendererID;
+	TextureFormat m_Format;
+	uint32_t m_Width, m_Height;
 
-	Buffer m_ImageData;
+	unsigned char* m_ImageData;
 
-	Filepath m_Filepath;
+	Filepath m_FilePath;
 };
 }
-

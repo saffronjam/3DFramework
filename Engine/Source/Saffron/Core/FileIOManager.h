@@ -8,7 +8,7 @@ namespace Se
 {
 namespace fs = std::filesystem;
 
-class FileIOManager : public Instansiated<FileIOManager>
+class FileIOManager : public SingleTon<FileIOManager>
 {
 public:
 	struct Filter

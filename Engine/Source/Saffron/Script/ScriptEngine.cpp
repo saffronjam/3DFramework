@@ -30,7 +30,7 @@ static Uint32 GetFieldSize(FieldType type)
 	case FieldType::Vec2: return 4 * 2;
 	case FieldType::Vec3: return 4 * 3;
 	case FieldType::Vec4: return 4 * 4;
-	default: SE_CORE_ASSERT(false, "Unknown field type!");
+	default: SE_CORE_FALSE_ASSERT("Unknown field type!");
 		return 0;
 	}
 }
@@ -436,7 +436,7 @@ void PublicField::SetRuntimeValue_Internal(void* value) const
 
 
 ScriptEngine::ScriptEngine() :
-	Instansiated(this)
+	SingleTon(this)
 {
 	InitMono();
 }

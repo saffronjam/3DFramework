@@ -4,7 +4,7 @@
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/Scene.h"
 #include "Saffron/Script/ScriptEngine.h"
 
@@ -74,9 +74,9 @@ Scene::Scene() :
 
 	s_ActiveScenes[m_SceneID] = this;
 
-	const auto skyboxShader = Factory::Create<Shader>("Skybox");
-	m_Skybox.Material = MaterialInstance::Create(Factory::Create<Material>(skyboxShader));
-	m_Skybox.Material->SetFlag(Material::Flag::DepthTest, false);
+	const auto skyboxShader = Shader::Create("Skybox");
+	m_Skybox.Material = MaterialInstance::Create(Shared<Material>::Create(skyboxShader));
+	m_Skybox.Material->SetFlag(MaterialFlag::DepthTest, false);
 }
 
 Scene::~Scene()
@@ -167,7 +167,7 @@ Entity Scene::GetMainCameraEntity()
 
 Shared<Scene> Scene::GetScene(UUID uuid)
 {
-	if (s_ActiveScenes.find(uuid) != s_ActiveScenes.end()) return s_ActiveScenes.at(uuid)->GetShared();
+	if (s_ActiveScenes.find(uuid) != s_ActiveScenes.end()) return s_ActiveScenes.at(uuid);
 
 	return nullptr;
 }
@@ -180,12 +180,12 @@ void Scene::SetSkybox(const Shared<TextureCube>& skybox)
 
 void Scene::ShowMeshBoundingBoxes(bool show)
 {
-	SceneRenderer::GetOptions().ShowMeshBoundingBoxes = show;
+	SceneRenderer::GetOptions().ShowBoundingBoxes = show;
 }
 
 void Scene::ShowPhysicsBodyBoundingBoxes(bool show)
 {
-	SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes = show;
+	//SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes = show;
 }
 
 bool Scene::IsValidFilepath(const Filepath& filepath)

@@ -5,7 +5,7 @@ namespace Se
 {
 Shared<Resource> &ResourceManager::Get(Shared<Resource> resource)
 {
-	return Get(resource->GetIdentifier());
+	return Get(resource->GetResourceID());
 }
 
 Shared<Resource> &ResourceManager::Get(size_t identifer)
@@ -15,7 +15,7 @@ Shared<Resource> &ResourceManager::Get(size_t identifer)
 
 bool ResourceManager::Exists(Shared<Resource> resource)
 {
-	return Exists(resource->GetIdentifier());
+	return Exists(resource->GetResourceID());
 }
 
 bool ResourceManager::Exists(size_t identifier)
@@ -27,7 +27,7 @@ bool ResourceManager::Exists(size_t identifier)
 void ResourceManager::Emplace(Shared<Resource> resource)
 {
 	auto &instance = GetInstance();
-	instance->m_Memory.emplace(resource->GetIdentifier(), resource);
+	instance->m_Memory.emplace(resource->GetResourceID(), resource);
 }
 
 void ResourceManager::Emplace(Shared<Resource> resource, size_t identifier)
@@ -55,7 +55,7 @@ void ResourceManager::Clear()
 
 Shared<ResourceManager> &ResourceManager::GetInstance()
 {
-	static Shared<ResourceManager> s_ResourceManager = CreateShared<ResourceManager>();
+	static Shared<ResourceManager> s_ResourceManager = Shared<ResourceManager>::Create();
 	return s_ResourceManager;
 }
 

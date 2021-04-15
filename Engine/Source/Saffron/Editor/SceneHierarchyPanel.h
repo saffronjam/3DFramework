@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class SceneHierarchyPanel
+class SceneHierarchyPanel : public Managed
 {
 public:
 	explicit SceneHierarchyPanel(const Shared<Scene>& context);

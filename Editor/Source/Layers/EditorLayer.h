@@ -23,11 +23,11 @@ public:
 	};
 
 public:
-	explicit EditorLayer(const std::shared_ptr<Project>& project);
+	explicit EditorLayer(const Shared<Project>& project);
 
 	~EditorLayer() override = default;
 
-	void OnAttach(std::shared_ptr<BatchLoader>& loader) override;
+	void OnAttach(Shared<BatchLoader>& loader) override;
 	void OnDetach() override;
 
 	void OnUpdate() override;
@@ -59,8 +59,8 @@ private:
 	bool OnEntityCopied(Entity entity);
 
 	bool OnNewModelSpaceView(Entity entity);
-	void OnSceneChange(std::shared_ptr<Scene> scene, Entity selection);
-	void OnProjectChange(const std::shared_ptr<Project>& project);
+	void OnSceneChange(Shared<Scene> scene, Entity selection);
+	void OnProjectChange(const Shared<Project>& project);
 	void OnWantProjectSelector();
 
 	void OnPlay();
@@ -68,8 +68,8 @@ private:
 
 	float GetSnapValue() const;
 
-	std::shared_ptr<ViewportPane> GetActiveViewportPane() const;
-	std::shared_ptr<Scene> GetActiveScene() const;
+	Shared<ViewportPane> GetActiveViewportPane() const;
+	Shared<Scene> GetActiveScene() const;
 
 public:
 	EventSubscriberList<void> WantProjectSelector;
@@ -78,33 +78,32 @@ private:
 	int m_Style = static_cast<int>(Gui::Style::Dark);
 	int m_GizmoType = -1;
 
-	std::shared_ptr<Project> m_Project;
+	Shared<Project> m_Project;
 
-	std::shared_ptr<EditorScene> m_EditorScene;
-	std::shared_ptr<RuntimeScene> m_RuntimeScene;
-	std::shared_ptr<ViewportPane> m_MainViewportPane;
-	ArrayList<Pair<std::shared_ptr<ModelSpaceScene>, std::shared_ptr<ViewportPane>>> m_ModelSpaceSceneViews;
+	Shared<EditorScene> m_EditorScene;
+	Shared<RuntimeScene> m_RuntimeScene;
+	Shared<ViewportPane> m_MainViewportPane;
 	ArrayList<bool> m_DockedModelSpaceScene;
-	mutable std::shared_ptr<Scene> m_LastFocusedScene;
-	std::shared_ptr<Scene> m_CachedActiveScene;
+	mutable Shared<Scene> m_LastFocusedScene;
+	Shared<Scene> m_CachedActiveScene;
 
 	bool m_ReloadScriptOnPlay = true;
 
 	EditorTerminal m_EditorTerminal;
 
-	std::shared_ptr<Shader> m_BrushShader;
-	std::shared_ptr<Material> m_SphereBaseMaterial;
+	Shared<Shader> m_BrushShader;
+	Shared<Material> m_SphereBaseMaterial;
 
-	std::shared_ptr<Material> m_MeshMaterial;
-	ArrayList<std::shared_ptr<MaterialInstance>> m_MetalSphereMaterialInstances, m_DielectricSphereMaterialInstances;
+	Shared<Material> m_MeshMaterial;
+	ArrayList<Shared<MaterialInstance>> m_MetalSphereMaterialInstances, m_DielectricSphereMaterialInstances;
 
 	// Editor resources
-	Map<String, std::shared_ptr<Texture2D>> m_TexStore;
+	Map<String, Shared<Texture2D>> m_TexStore;
 
-	std::shared_ptr<AssetPanel> m_AssetPanel;
-	std::shared_ptr<EntityComponentsPanel> m_EntityPanel;
-	std::shared_ptr<ScriptPanel> m_ScriptPanel;
-	std::shared_ptr<SceneHierarchyPanel> m_ScenePanel;
+	Shared<AssetPanel> m_AssetPanel;
+	Shared<EntityComponentsPanel> m_EntityPanel;
+	Shared<ScriptPanel> m_ScriptPanel;
+	Shared<SceneHierarchyPanel> m_ScenePanel;
 	Run::Handle m_AssetScriptRunHandle;
 
 	SceneState m_SceneState;

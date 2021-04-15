@@ -1,23 +1,23 @@
 #pragma once
 
-#include "Saffron/Renderer/Pipeline.h"
+#include "Saffron/Rendering/Resources/Pipeline.h"
 
 namespace Se
 {
 class OpenGLPipeline : public Pipeline
 {
 public:
-	OpenGLPipeline(Specification spec);
+	explicit OpenGLPipeline(const PipelineSpecification& specification);
 	virtual ~OpenGLPipeline();
 
 	void Bind() override;
 	void Invalidate() override;
 
-	Specification &GetSpecification() override { return m_Specification; }
-	const Specification &GetSpecification() const override { return m_Specification; }
+	PipelineSpecification& GetSpecification() override;
+	const PipelineSpecification& GetSpecification() const override;
 
 private:
-	Specification m_Specification;
-	Uint32 m_VertexArrayRendererID = 0;
+	PipelineSpecification m_Specification;
+	uint32_t m_VertexArrayRendererID = 0;
 };
 }

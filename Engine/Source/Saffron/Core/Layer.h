@@ -5,10 +5,10 @@
 
 namespace Se
 {
-class Layer : public MemManaged<Layer>
+class Layer : public Managed
 {
 public:
-	Layer(const String& name = "Layer");
+	explicit Layer(const String& name = "Layer");
 	virtual ~Layer() = default;
 
 	virtual void OnAttach(Shared<BatchLoader>& loader)

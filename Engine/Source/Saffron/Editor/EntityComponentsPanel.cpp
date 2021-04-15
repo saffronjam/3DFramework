@@ -65,7 +65,7 @@ static void DrawComponent(const String& name, Entity entity, UIFunction uiFuncti
 EntityComponentsPanel::EntityComponentsPanel(const Shared<Scene>& context) :
 	m_Context(context)
 {
-	m_TexStore["Checkerboard"] = Factory::Create<Texture2D>("Editor/Checkerboard.tga");
+	m_TexStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
 }
 
 void EntityComponentsPanel::OnGuiRender()
@@ -84,8 +84,8 @@ void EntityComponentsPanel::SetContext(const Shared<Scene>& context)
 		// Try and find same entity in new scene
 		const auto& entityMap = m_Context->GetEntityMap();
 		const UUID selectedEntityUUID = m_SelectionContext.GetUUID();
-		if (entityMap.find(selectedEntityUUID) != entityMap.end())
-			m_SelectionContext = entityMap.at(selectedEntityUUID);
+		if (entityMap.find(selectedEntityUUID) != entityMap.end()) m_SelectionContext = entityMap.
+			at(selectedEntityUUID);
 	}
 }
 
@@ -118,7 +118,7 @@ void EntityComponentsPanel::OnGuiRenderProperties()
 				if (ImGui::Button("Mesh"))
 				{
 					const String defaultMeshPath = "Cube1m.fbx";
-					m_SelectionContext.AddComponent<MeshComponent>(CreateShared<Mesh>(defaultMeshPath));
+					m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -253,8 +253,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 
 							auto& albedoColor = materialInstance->Get<Vector3f>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
-							Shared<Texture2D> albedoMap = materialInstance->TryGetResource<Texture2D
-							>("u_AlbedoTexture");
+							auto albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(
 								albedoMap
 									? reinterpret_cast<void*>(albedoMap->GetRendererID())
@@ -277,21 +276,20 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
-										albedoMap = Factory::Create<Texture2D>(
-											filepath.string(), true/*m_AlbedoInput.sRGB*/);
+										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
 										materialInstance->Set("u_AlbedoTexture", albedoMap);
 									}
 								}
 							}
 							ImGui::SameLine();
 							ImGui::BeginGroup();
-							if (ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap))
-								materialInstance->Set<float>("u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap)) materialInstance->Set<float>(
+								"u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
 
 							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.sRGB))
 							{
 								if (m_AlbedoInput.TextureMap)
-									m_AlbedoInput.TextureMap = Factory::Create<Texture2D>(m_AlbedoInput.TextureMap->GetPath(), m_AlbedoInput.sRGB);
+									m_AlbedoInput.TextureMap = Shared<Texture2D>(m_AlbedoInput.TextureMap->::CreateGetPath(), m_AlbedoInput.sRGB);
 							}*/
 							ImGui::EndGroup();
 							ImGui::SameLine();
@@ -305,8 +303,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							bool useNormalMap = materialInstance->Get<float>("u_NormalTexToggle");
-							Shared<Texture2D> normalMap = materialInstance->TryGetResource<Texture2D
-							>("u_NormalTexture");
+							auto normalMap = materialInstance->TryGetResource<Texture2D>("u_NormalTexture");
 							ImGui::Image(
 								normalMap
 									? reinterpret_cast<void*>(normalMap->GetRendererID())
@@ -329,14 +326,14 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
-										normalMap = Factory::Create<Texture2D>(filepath.string());
+										normalMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_NormalTexture", normalMap);
 									}
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##NormalMap", &useNormalMap))
-								materialInstance->Set<float>("u_NormalTexToggle", useNormalMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##NormalMap", &useNormalMap)) materialInstance->Set<float>(
+								"u_NormalTexToggle", useNormalMap ? 1.0f : 0.0f);
 						}
 					}
 					{
@@ -346,8 +343,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto& metalnessValue = materialInstance->Get<float>("u_Metalness");
 							bool useMetalnessMap = materialInstance->Get<float>("u_MetalnessTexToggle");
-							Shared<Texture2D> metalnessMap = materialInstance->TryGetResource<Texture2D>(
-								"u_MetalnessTexture");
+							auto metalnessMap = materialInstance->TryGetResource<Texture2D>("u_MetalnessTexture");
 							ImGui::Image(
 								metalnessMap
 									? reinterpret_cast<void*>(metalnessMap->GetRendererID())
@@ -371,14 +367,14 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
-										metalnessMap = Factory::Create<Texture2D>(filepath.string());
+										metalnessMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_MetalnessTexture", metalnessMap);
 									}
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##MetalnessMap", &useMetalnessMap))
-								materialInstance->Set<float>("u_MetalnessTexToggle", useMetalnessMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##MetalnessMap", &useMetalnessMap)) materialInstance->Set<float>(
+								"u_MetalnessTexToggle", useMetalnessMap ? 1.0f : 0.0f);
 							ImGui::SameLine();
 							ImGui::SliderFloat("Value##MetalnessInput", &metalnessValue, 0.0f, 1.0f);
 						}
@@ -390,8 +386,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 							auto& roughnessValue = materialInstance->Get<float>("u_Roughness");
 							bool useRoughnessMap = materialInstance->Get<float>("u_RoughnessTexToggle");
-							Shared<Texture2D> roughnessMap = materialInstance->TryGetResource<Texture2D>(
-								"u_RoughnessTexture");
+							auto roughnessMap = materialInstance->TryGetResource<Texture2D>("u_RoughnessTexture");
 							ImGui::Image(
 								roughnessMap
 									? reinterpret_cast<void*>(roughnessMap->GetRendererID())
@@ -415,14 +410,14 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
-										roughnessMap = Factory::Create<Texture2D>(filepath.string());
+										roughnessMap = Texture2D::Create(filepath.string());
 										materialInstance->Set("u_RoughnessTexture", roughnessMap);
 									}
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##RoughnessMap", &useRoughnessMap))
-								materialInstance->Set<float>("u_RoughnessTexToggle", useRoughnessMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##RoughnessMap", &useRoughnessMap)) materialInstance->Set<float>(
+								"u_RoughnessTexToggle", useRoughnessMap ? 1.0f : 0.0f);
 							ImGui::SameLine();
 							ImGui::SliderFloat("Value##RoughnessInput", &roughnessValue, 0.0f, 1.0f);
 						}
@@ -451,8 +446,8 @@ void EntityComponentsPanel::OnGuiRenderMeshDebug()
 		{
 			if (ImGui::CollapsingHeader("Animation"))
 			{
-				if (ImGui::Button(mesh->m_AnimationPlaying ? "Pause" : "Play"))
-					mesh->m_AnimationPlaying = !mesh->m_AnimationPlaying;
+				if (ImGui::Button(mesh->m_AnimationPlaying ? "Pause" : "Play")) mesh->m_AnimationPlaying = !mesh->
+					m_AnimationPlaying;
 
 				ImGui::SliderFloat("##AnimationTime", &mesh->m_AnimationTime, 0.0f,
 				                   (float)mesh->m_Scene->mAnimations[0]->mDuration);
@@ -611,7 +606,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 			const auto filepath = FileIOManager::OpenFile(FileIOManager::Filter{"Mesh"});
 			if (!filepath.empty())
 			{
-				mc.Mesh = CreateShared<Mesh>(filepath);
+				mc.Mesh = Shared<Mesh>::Create(filepath);
 			}
 		}
 		ImGui::Columns(1);
@@ -735,7 +730,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 				auto& publicFields = moduleFieldMap.at(sc.ModuleName);
 				for (auto& [name, field] : publicFields)
 				{
-					bool isRuntime = DynamicPointerCast<RuntimeScene>(m_Context) && field.IsRuntimeAvailable();
+					bool isRuntime = dynamic_cast<RuntimeScene*>(m_Context.Raw()) && field.IsRuntimeAvailable();
 					switch (field.Type)
 					{
 					case FieldType::Int:

@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Saffron/Math/SaffronMath.h"
-#include "Saffron/Renderer/SceneRenderer.h"
+#include "Saffron/Rendering/SceneRenderer.h"
 
 namespace Se
 {
-class ViewportPane : public MemManaged<ViewportPane>
+class ViewportPane : public Managed
 {
 public:
-	explicit ViewportPane(String windowTitle, Shared<SceneRenderer::Target> target);
+	explicit ViewportPane(String windowTitle);
 
 	void OnGuiRender(bool *open = nullptr, UUID uuid = 0);
 
@@ -24,14 +24,11 @@ public:
 	bool IsHovered() const { return m_Hovered; }
 	bool IsFocused() const { return m_Focused; }
 
-	void SetTarget(Shared<SceneRenderer::Target> target) { m_Target = Move(target); }
-
 public:
 	mutable EventSubscriberList<void> FinishedRender;
 
 private:
 	String m_WindowTitle;
-	Shared<SceneRenderer::Target> m_Target;
 	Shared<Texture> m_FallbackTexture;
 	Uint32 m_DockID = 0;
 

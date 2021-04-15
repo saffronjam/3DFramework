@@ -11,7 +11,7 @@ namespace Se
 static int s_UIContextID = 0;
 
 Gui::Gui() :
-	Instansiated(this)
+	SingleTon(this)
 {
 	// Setup Dear ImGui context
 	IMGUI_CHECKVERSION();

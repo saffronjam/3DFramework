@@ -13,7 +13,7 @@ App* Se::CreateApplication()
 
 EditorApplication::EditorApplication(const Properties& props) :
 	App(props),
-	m_StartupLayer(CreateShared<StartupLayer>())
+	m_StartupLayer(Shared<StartupLayer>::Create())
 {
 	const auto wantProjectSelectorFn = [this]
 	{
@@ -21,18 +21,18 @@ EditorApplication::EditorApplication(const Properties& props) :
 		{
 			PopLayer();
 			m_PreLoader->Reset();
-			m_EditorLayer.reset();
+			m_EditorLayer.Reset();
 			PushLayer(m_StartupLayer);
 		});
 		return false;
 	};
-	const auto projectSelectFn = [wantProjectSelectorFn, this](const std::shared_ptr<Project>& project)
+	const auto projectSelectFn = [wantProjectSelectorFn, this](const Shared<Project>& project)
 	{
 		Run::Later([=]
 		{
 			PopLayer();
 			m_PreLoader->Reset();
-			m_EditorLayer = CreateShared<EditorLayer>(project);
+			m_EditorLayer = Shared<EditorLayer>::Create(project);
 			m_EditorLayer->WantProjectSelector += wantProjectSelectorFn;
 			PushLayer(m_EditorLayer);
 		});
@@ -43,9 +43,9 @@ EditorApplication::EditorApplication(const Properties& props) :
 
 
 	// TEMP
-	auto project = CreateShared<Project>(
+	auto project = Shared<Project>::Create(
 		"C:/Users/ownem/source/repos/SaffronEngine/Games/2DGameProject/2DGameProject.spr");
-	m_EditorLayer = CreateShared<EditorLayer>(project);
+	m_EditorLayer = Shared<EditorLayer>::Create(project);
 	// ----
 }
 

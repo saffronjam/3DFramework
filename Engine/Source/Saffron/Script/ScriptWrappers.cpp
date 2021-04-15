@@ -364,7 +364,7 @@ size_t Saffron_Mesh_GetMaterialCount(Shared<Mesh>* mesh)
 
 Shared<Texture2D>* Saffron_Texture2D_Constructor(Uint32 width, Uint32 height)
 {
-	const auto result = Factory::Create<Texture2D>(Texture::Format::RGBA, width, height);
+	const auto result = Texture2D::Create(TextureFormat::RGBA, width, height);
 	return new Shared<Texture2D>(result);
 }
 

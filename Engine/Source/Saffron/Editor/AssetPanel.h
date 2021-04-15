@@ -4,7 +4,7 @@
 
 namespace  Se
 {
-class AssetPanel : public MemManaged<AssetPanel>
+class AssetPanel : public Managed
 {
 public:
 	struct AssetStat

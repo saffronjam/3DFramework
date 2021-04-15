@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class Event : public MemManaged<Event>
+class Event : public Managed
 {
 public:
 	enum class Type;

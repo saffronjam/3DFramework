@@ -1,41 +1,40 @@
 #pragma once
 
-#include "Saffron/Renderer/Framebuffer.h"
+#include "Saffron/Rendering/Resources/Framebuffer.h"
 
 namespace Se
 {
 class OpenGLFramebuffer : public Framebuffer
 {
 public:
-	OpenGLFramebuffer(const Specification &spec);
+	explicit OpenGLFramebuffer(const FramebufferSpecification& specification);
 	virtual ~OpenGLFramebuffer();
 
-	void Resize(Uint32 width, Uint32 height, bool forceRecreate = false) override;
+	void Resize(uint32_t width, uint32_t height, bool forceRecreate = false) override;
 
 	void Bind() const override;
 	void Unbind() const override;
 
-	void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const override;
+	void BindTexture(uint32_t attachmentIndex = 0, uint32_t slot = 0) const override;
 
-	Uint32 GetWidth() const override { return m_Width; }
-	Uint32 GetHeight() const override { return m_Height; }
+	uint32_t GetWidth() const override;
+	uint32_t GetHeight() const override;
 
-	RendererID GetRendererID() const override { return m_RendererID; }
-	RendererID GetColorAttachmentRendererID(int index = 0) const override { return m_ColorAttachments[index]; }
-	RendererID GetDepthAttachmentRendererID() const override { return m_DepthAttachment; }
+	RendererID GetRendererID() const override;
+	RendererID GetColorAttachmentRendererID(int index = 0) const override;
+	RendererID GetDepthAttachmentRendererID() const override;
 
-	const Specification &GetSpecification() const override { return m_Specification; }
+	const FramebufferSpecification& GetSpecification() const override;
 private:
-	Specification m_Specification;
+	FramebufferSpecification m_Specification;
 	RendererID m_RendererID = 0;
 
-	ArrayList<RendererID> m_ColorAttachments;
+	std::vector<RendererID> m_ColorAttachments;
 	RendererID m_DepthAttachment;
 
-	ArrayList<TextureFormat> m_ColorAttachmentFormats;
-	TextureFormat m_DepthAttachmentFormat = TextureFormat::None;
+	std::vector<FramebufferTextureFormat> m_ColorAttachmentFormats;
+	FramebufferTextureFormat m_DepthAttachmentFormat = FramebufferTextureFormat::None;
 
-	Uint32 m_Width = 0, m_Height = 0;
+	uint32_t m_Width = 0, m_Height = 0;
 };
 }
-

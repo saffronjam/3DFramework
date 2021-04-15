@@ -19,7 +19,6 @@ public:
 	void Return();
 
 	const Shared<EditorCamera> &GetDebugCamera() const { return m_DebugCamera; }
-	const Shared<SceneRenderer::Target> &GetTarget() const override { return SceneRenderer::GetMainTarget(); }
 
 private:
 	Shared<EditorCamera> m_DebugCamera;

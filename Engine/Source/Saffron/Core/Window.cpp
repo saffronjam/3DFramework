@@ -109,9 +109,9 @@ Shared<Window> Window::Create(const Properties& properties)
 {
 	// TODO: Use RendererAPI::Current()
 #ifdef SE_PLATFORM_WINDOWS
-	return CreateShared<WindowsWindow>(properties);
+	return Shared<WindowsWindow>::Create(properties);
 #else
-	SE_CORE_ASSERT(false, "Unknown platform!");
+	SE_CORE_FALSE_ASSERT("Unknown platform!");
 	return nullptr;
 #endif
 }

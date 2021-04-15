@@ -194,7 +194,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 							}
 							case FieldType::String:
 							{
-								SE_CORE_ASSERT(false, "Unimplemented");
+								SE_CORE_FALSE_ASSERT("Unimplemented");
 								break;
 							}
 							case FieldType::Vec2:
@@ -228,7 +228,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				auto translation = meshComponent["Position"].as<Vector3f>();
 				auto rotation = meshComponent["Rotation"].as<Quaternion>();
 				auto scale = meshComponent["Scale"].as<Vector3f>();
-				component.Mesh = CreateShared<Mesh>(meshPath);
+				component.Mesh = Shared<Mesh>::Create(meshPath);
 				component.Mesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
 
 			}
@@ -240,7 +240,7 @@ bool SceneSerializer::Deserialize(const Filepath &filepath)
 				auto translation = cameraComponent["Position"].as<Vector3f>();
 				auto rotation = cameraComponent["Rotation"].as<Quaternion>();
 				auto scale = cameraComponent["Scale"].as<Vector3f>();
-				component.Camera = CreateShared<SceneCamera>();
+				component.Camera = Shared<SceneCamera>::Create();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 				component.DrawMesh = cameraComponent["DrawMesh"].as<bool>();
 				component.DrawFrustum = cameraComponent["DrawFrustum"].as<bool>();

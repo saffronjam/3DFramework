@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class BatchLoader : public MemManaged<BatchLoader>
+class BatchLoader : public Managed
 {
 public:
 	explicit BatchLoader(String name);

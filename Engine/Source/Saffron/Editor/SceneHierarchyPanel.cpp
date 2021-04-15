@@ -24,7 +24,7 @@ void SceneHierarchyPanel::OnGuiRender(const Shared<ScriptPanel>& scriptPanel)
 	{
 		m_Context->GetEntityRegistry().each([&](auto entityHandle)
 		{
-			const Entity entity(entityHandle, m_Context.get());
+			const Entity entity(entityHandle, m_Context.Raw());
 			if (entity.HasComponent<IDComponent>()) DrawEntityNode(entity);
 		});
 
@@ -139,8 +139,8 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 
 				if (meshComponent)
 				{
-					const String defaultMeshPath = "Resources/Assets/meshes/Cube1m.fbx";
-					newEntity.AddComponent<MeshComponent>(CreateShared<Mesh>(defaultMeshPath));
+					const String defaultMeshPath = "Cube1m.fbx";
+					newEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 					meshComponent = false;
 				}
 				if (cameraComponent)
@@ -156,7 +156,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 				if (skylightComponent)
 				{
 					newEntity.AddComponent<SkylightComponent>(
-						SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr"));
+						SceneEnvironment::Load("pink_sunrise_4k.hdr"));
 					cameraComponent = false;
 				}
 				if (scriptComponent)
@@ -217,7 +217,7 @@ void SceneHierarchyPanel::OnCreateMesh()
 {
 	auto newEntity = m_Context->CreateEntity("Mesh");
 	const String defaultMeshPath = "Resources/Assets/meshes/Cube1m.fbx";
-	newEntity.AddComponent<MeshComponent>(CreateShared<Mesh>(defaultMeshPath));
+	newEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 	NewSelection.Invoke(newEntity);
 }
 
@@ -234,7 +234,7 @@ void SceneHierarchyPanel::OnCreateDirectionalLight()
 void SceneHierarchyPanel::OnCreateSkylight()
 {
 	auto newEntity = m_Context->CreateEntity("Sky Light");
-	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr"));
+	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("pink_sunrise_4k.hdr"));
 	NewSelection.Invoke(newEntity);
 }
 

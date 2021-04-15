@@ -5,12 +5,12 @@
 #include "Saffron/Core/Events/MouseEvent.h"
 #include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Math/SaffronMath.h"
-#include "Saffron/Renderer/AntiAliasing.h"
+#include "Saffron/Rendering/AntiAliasing.h"
 
 namespace Se
 {
 // Interface representing a desktop system based Window
-class Window : public MemManaged<Window>
+class Window : public Managed
 {
 public:
 	struct Properties
@@ -113,7 +113,7 @@ private:
 template <typename T, typename...Params>
 void Window::PushEvent(Params&&...params)
 {
-	_events.emplace_back(CreateShared<T>(std::forward<Params>(params)...));
+	_events.emplace_back(Shared<T>::Create(std::forward<Params>(params)...));
 	//SE_INFO("{0}", _events.back()->ToString());
 }
 };

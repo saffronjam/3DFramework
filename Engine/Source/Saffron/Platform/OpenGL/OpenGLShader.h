@@ -1,108 +1,112 @@
 #pragma once
 
-#include "Saffron/Renderer/Shader.h"
 #include <glad/glad.h>
 
-#include "OpenGLShaderUniform.h"
+#include "Saffron/Rendering/Resources/Shader.h"
+#include "Saffron/Platform/OpenGL/OpenGLShaderUniform.h"
 
 namespace Se
 {
-	class OpenGLShader : public Shader
-	{
-	public:
-		OpenGLShader() = default;
-		OpenGLShader(Filepath filepath);
-		OpenGLShader(const Buffer& source);
-		~OpenGLShader() = default;
+class OpenGLShader : public Shader
+{
+public:
+	OpenGLShader() = default;
+	OpenGLShader(const Filepath& filepath);
+	static Shared<OpenGLShader> Create(const Buffer& source);
 
-		void Bind() override;
-		void Reload() override;
+	void Reload() override;
+	void AddShaderReloadedCallback(const ShaderReloadedCallback& callback) override;
 
-		void UploadUniformBuffer(const Uniform::BufferBase& uniformBuffer) override;
+	void Bind() override;
 
-		RendererID GetRendererID() const override { return m_RendererID; }
-		const String& GetName() const override { return m_Name; }
-		size_t GetIdentifier() override;
+	RendererID GetRendererID() const override { return m_RendererID; }
 
-		void SetVSMaterialUniformBuffer(const Buffer& buffer) override;
-		void SetPSMaterialUniformBuffer(const Buffer& buffer) override;
+	void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) override;
 
-		void SetInt(const String& name, int value) override;
-		void SetBool(const String& name, bool value) override;
-		void SetFloat(const String& name, float value) override;
-		void SetFloat2(const String& name, const Vector2f& value) override;
-		void SetFloat3(const String& name, const Vector3f& value) override;
+	void SetVSMaterialUniformBuffer(Buffer buffer) override;
+	void SetPSMaterialUniformBuffer(Buffer buffer) override;
 
-		void SetMat4(const String& name, const Matrix4f& value) override;
-		void SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind = true) override;
-		void SetIntArray(const String& name, int* values, Uint32 size) override;
+	void SetInt(const std::string& name, int value) override;
+	void SetBool(const std::string& name, bool value) override;
+	void SetFloat(const std::string& name, float value) override;
+	void SetFloat2(const std::string& name, const glm::vec2& value) override;
+	void SetFloat3(const std::string& name, const glm::vec3& value) override;
+	void SetMat4(const std::string& name, const glm::mat4& value) override;
+	void SetMat4FromRenderThread(const std::string& name, const glm::mat4& value, bool bind = true) override;
 
-	private:
-		void Load(const Buffer& source);
+	void SetIntArray(const std::string& name, int* values, uint32_t size) override;
 
-		Buffer ReadFromFile(const Filepath& filepath) const;
-		UnorderedMap<GLenum, String> PreProcess(const Buffer& source);
-		void Parse();
-		void ParseUniform(const String& statement, ShaderDomain domain);
-		void ParseUniformStruct(const String& block, ShaderDomain domain);
-		ShaderStruct* FindStruct(const String& name);
+	const std::string& GetName() const override { return m_Name; }
 
-		Int32 GetUniformLocation(const String& name) const;
+private:
+	void Load(const Buffer& source);
 
-		void ResolveUniforms();
-		void ValidateUniforms();
-		void CompileAndUploadShader();
-		static GLenum ShaderTypeFromString(const String& type);
+	Buffer ReadShaderFromFile(const std::string& filepath) const;
+	std::unordered_map<GLenum, std::string> PreProcess(const Buffer& source);
+	void Parse();
+	void ParseUniform(const std::string& statement, ShaderDomain domain);
+	void ParseUniformStruct(const std::string& block, ShaderDomain domain);
+	ShaderStruct* FindStruct(const std::string& name);
 
-		void ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration>& decl, const Buffer& buffer);
-		void ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform, const Buffer& buffer);
-		void ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uniform, const Buffer& buffer);
-		void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, const Uint8* data, Int32 offset);
+	int32_t GetUniformLocation(const std::string& name) const;
 
-		void UploadUniformInt(Uint32 location, Int32 value);
-		void UploadUniformIntArray(Uint32 location, Int32* values, Int32 count);
-		void UploadUniformFloat(Uint32 location, float value);
-		void UploadUniformFloat2(Uint32 location, const Vector2f& value);
-		void UploadUniformFloat3(Uint32 location, const Vector3f& value);
-		void UploadUniformFloat4(Uint32 location, const Vector4f& value);
-		void UploadUniformMat3(Uint32 location, const Matrix3f& values);
-		void UploadUniformMat4(Uint32 location, const Matrix4f& values);
-		void UploadUniformMat4Array(Uint32 location, const Matrix4f& values, Uint32 count);
+	void ResolveUniforms();
+	void ValidateUniforms();
+	void CompileAndUploadShader();
+	static GLenum ShaderTypeFromString(const std::string& type);
 
-		void UploadUniformInt(const String& name, Int32 value);
-		void UploadUniformIntArray(const String& name, Int32* values, Uint32 count);
-		void UploadUniformFloat(const String& name, float value);
-		void UploadUniformFloat2(const String& name, const Vector2f& values);
-		void UploadUniformFloat3(const String& name, const Vector3f& values);
-		void UploadUniformFloat4(const String& name, const Vector4f& values);
-		void UploadUniformMat3(const String& name, const Vector4f& values);
-		void UploadUniformMat4(const String& name, const Matrix4f& values);
+	void ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration>& decl, Buffer buffer);
+	void ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform, Buffer buffer);
+	void ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uniform, Buffer buffer);
+	void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, Uint8* data, int32_t offset);
 
-		void UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, const Uint8* buffer, Uint32 offset);
+	void UploadUniformInt(uint32_t location, int32_t value);
+	void UploadUniformIntArray(uint32_t location, int32_t* values, int32_t count);
+	void UploadUniformFloat(uint32_t location, float value);
+	void UploadUniformFloat2(uint32_t location, const glm::vec2& value);
+	void UploadUniformFloat3(uint32_t location, const glm::vec3& value);
+	void UploadUniformFloat4(uint32_t location, const glm::vec4& value);
+	void UploadUniformMat3(uint32_t location, const glm::mat3& values);
+	void UploadUniformMat4(uint32_t location, const glm::mat4& values);
+	void UploadUniformMat4Array(uint32_t location, const glm::mat4& values, uint32_t count);
 
-		const ShaderUniformBufferDeclaration::List& GetVSRendererUniforms() const override;
-		const ShaderUniformBufferDeclaration::List& GetPSRendererUniforms() const override;
-		const ShaderUniformBufferDeclaration& GetVSMaterialUniformBuffer() const override;
-		const ShaderUniformBufferDeclaration& GetPSMaterialUniformBuffer() const override;
+	void UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, Uint8* buffer, uint32_t offset);
 
-		const ShaderResourceDeclaration::List& GetResources() const override { return m_Resources; }
+	void UploadUniformInt(const std::string& name, int32_t value);
+	void UploadUniformIntArray(const std::string& name, int32_t* values, uint32_t count);
 
-		bool HasVSMaterialUniformBuffer() const override { return static_cast<bool>(m_VSMaterialUniformBuffer); }
-		bool HasPSMaterialUniformBuffer() const override { return static_cast<bool>(m_PSMaterialUniformBuffer); }
-	private:
-		RendererID m_RendererID = 0;
-		bool m_Loaded = false;
-		bool m_IsCompute = false;
+	void UploadUniformFloat(const std::string& name, float value);
+	void UploadUniformFloat2(const std::string& name, const glm::vec2& value);
+	void UploadUniformFloat3(const std::string& name, const glm::vec3& value);
+	void UploadUniformFloat4(const std::string& name, const glm::vec4& value);
 
-		String m_Name;
-		Filepath m_Filepath;
-		UnorderedMap<GLenum, String> m_ShaderSource;
+	void UploadUniformMat4(const std::string& name, const glm::mat4& value);
 
-		ShaderUniformBufferDeclaration::List m_VSRendererUniformBuffers;
-		ShaderUniformBufferDeclaration::List m_PSRendererUniformBuffers;
-		Shared<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
-		Shared<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
-		ShaderResourceDeclaration::List m_Resources;
-		ShaderStruct::List m_Structs;
-	};
+	const ShaderUniformBufferList& GetVSRendererUniforms() const override;
+	const ShaderUniformBufferList& GetPSRendererUniforms() const override;
+
+	bool HasVSMaterialUniformBuffer() const override;
+	bool HasPSMaterialUniformBuffer() const override;
+
+	const ShaderUniformBufferDeclaration& GetVSMaterialUniformBuffer() const override;
+	const ShaderUniformBufferDeclaration& GetPSMaterialUniformBuffer() const override;
+
+	const ShaderResourceList& GetResources() const override;
+private:
+	RendererID m_RendererID = 0;
+	bool m_Loaded = false;
+	bool m_IsCompute = false;
+
+	std::string m_Name, m_AssetPath;
+	std::unordered_map<GLenum, std::string> m_ShaderSource;
+
+	std::vector<ShaderReloadedCallback> m_ShaderReloadedCallbacks;
+
+	ShaderUniformBufferList m_VSRendererUniformBuffers;
+	ShaderUniformBufferList m_PSRendererUniformBuffers;
+	Shared<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
+	Shared<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
+	ShaderResourceList m_Resources;
+	ShaderStructList m_Structs;
+};
 }

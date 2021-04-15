@@ -2,12 +2,12 @@
 
 #include "Saffron/Editor/ScriptPanel.h"
 #include "Saffron/Entity/Entity.h"
-#include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Scene/Scene.h"
 
 namespace Se
 {
-class EntityComponentsPanel
+class EntityComponentsPanel : public Managed
 {
 public:
 	explicit EntityComponentsPanel(const Shared<Scene>& context);

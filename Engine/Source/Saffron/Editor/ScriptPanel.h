@@ -4,7 +4,7 @@
 
 namespace Se
 {
-class ScriptPanel : public MemManaged<ScriptPanel>
+class ScriptPanel : public Managed
 {
 public:
 	struct ScriptStat

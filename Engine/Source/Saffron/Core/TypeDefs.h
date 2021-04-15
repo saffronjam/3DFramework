@@ -15,7 +15,6 @@
 #include <optional>
 #include <bitset>
 #include <initializer_list>
-#include <wrl.h>
 
 namespace Se
 {
@@ -67,12 +66,10 @@ using InitializerList = std::initializer_list<t_ElemType>;
 // Memory
 template <typename T>
 using Unique = std::unique_ptr<T>;
-template <typename T>
-using Shared = std::shared_ptr<T>;
+//template <typename T>
+//using Shared = std::shared_ptr<T>;
 template <typename T>
 using Weak = std::weak_ptr<T>;
-template <typename T>
-using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 using String = std::string;
 using WideString = std::wstring;
@@ -100,17 +97,17 @@ constexpr auto CreatePair(FirstClass&& first, SecondClass&& second) noexcept
 	return Mypair(std::forward<FirstClass>(first), std::forward<SecondClass>(second));
 }
 
-template <class PtrClassTo, class PtrClassFrom>
-constexpr Shared<PtrClassTo> DynamicPointerCast(Shared<PtrClassFrom>& ptr) noexcept
-{
-	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
-}
-
-template <class PtrClassTo, class PtrClassFrom>
-constexpr Shared<PtrClassTo> DynamicPointerCast(const Shared<PtrClassFrom>& ptr) noexcept
-{
-	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
-}
+//template <class PtrClassTo, class PtrClassFrom>
+//constexpr Shared<PtrClassTo> DynamicPointerCast(Shared<PtrClassFrom>& ptr) noexcept
+//{
+//	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
+//}
+//
+//template <class PtrClassTo, class PtrClassFrom>
+//constexpr Shared<PtrClassTo> DynamicPointerCast(const Shared<PtrClassFrom>& ptr) noexcept
+//{
+//	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
+//}
 
 // Memory
 
@@ -120,11 +117,11 @@ constexpr Unique<T> CreateUnique(Args&& ... args)
 	return std::make_unique<T>(std::forward<Args>(args)...);
 }
 
-template <typename T, typename ... Args>
-constexpr Shared<T> CreateShared(Args&& ... args)
-{
-	return std::make_shared<T>(std::forward<Args>(args)...);
-}
+//template <typename T, typename ... Args>
+//constexpr Shared<T> CreateShared(Args&& ... args)
+//{
+//	return std::make_shared<T>(std::forward<Args>(args)...);
+//}
 
 
 template <typename T>
@@ -133,13 +130,5 @@ constexpr Unique<T> CreateUniqueFromDonor(T* donor)
 	Unique<T> unique;
 	unique.reset(donor);
 	return unique;
-}
-
-template <typename T>
-constexpr Shared<T> CreateSharedFromDonor(T* donor)
-{
-	Shared<T> shared;
-	shared.reset(donor);
-	return shared;
 }
 }

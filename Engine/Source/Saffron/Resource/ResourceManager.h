@@ -1,11 +1,12 @@
 #pragma once
 
-#include "Saffron/Core/MemManaged.h"
-#include "Saffron/Resource/Resource.h"
+#include "Saffron/Core/Managed.h"
+#include "Saffron/Core/Memory.h"
+#include "Saffron/Rendering/Resource.h"
 
 namespace Se
 {
-class ResourceManager : public MemManaged<ResourceManager>
+class ResourceManager : public Managed
 {
 public:
 	static Shared<Resource> &Get(Shared<Resource> resource);
@@ -41,7 +42,7 @@ void ResourceManager::ForEach(Function<void(ResourceType &)> function)
 
 	for ( auto iter = instance->m_Memory.begin(); iter != instance->m_Memory.end(); ++iter )
 	{
-		if ( (dyncastResource = dynamic_cast<ResourceType *>(iter->second.get())) )
+		if ( (dyncastResource = dynamic_cast<ResourceType *>(iter->second.Raw())) )
 		{
 			function(*dyncastResource);
 		}

@@ -3,82 +3,98 @@
 #include <glad/glad.h>
 
 #include "Saffron/Platform/OpenGL/OpenGLVertexBuffer.h"
-#include "Saffron/Renderer/Renderer.h"
+#include "Saffron/Rendering/Renderer.h"
 
 namespace Se
 {
-static GLenum OpenGLUsage(VertexBuffer::Usage usage)
+static GLenum OpenGLUsage(VertexBufferUsage usage)
 {
-	switch ( usage )
+	switch (usage)
 	{
-	case VertexBuffer::Usage::Static:	return GL_STATIC_DRAW;
-	case VertexBuffer::Usage::Dynamic:	return GL_DYNAMIC_DRAW;
-	case VertexBuffer::Usage::None:
-	default:
-		SE_CORE_ASSERT(false, "Unknown vertex buffer usage");
-		return 0;
+	case VertexBufferUsage::Static: return GL_STATIC_DRAW;
+	case VertexBufferUsage::Dynamic: return GL_DYNAMIC_DRAW;
 	}
+	SE_CORE_ASSERT(false, "Unknown vertex buffer usage");
+	return 0;
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(void *data, Uint32 size, Usage usage)
-	: m_Size(size), m_Usage(usage)
+OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, uint32_t size, VertexBufferUsage usage) :
+	m_Size(size),
+	m_Usage(usage)
 {
-	if ( data && m_Size )
+	m_LocalData = Buffer::Copy(data, size);
+	Shared<OpenGLVertexBuffer> instance = this;
+	Renderer::Submit([instance]() mutable
 	{
-		m_LocalData = Buffer::Copy(data, m_Size);
-	}
-	Run::Later([this] { Create(); });
+		glCreateBuffers(1, &instance->m_RendererID);
+		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(),
+		                  OpenGLUsage(instance->m_Usage));
+	});
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(Uint32 size, Usage usage)
-	: m_Size(size), m_Usage(usage)
+OpenGLVertexBuffer::OpenGLVertexBuffer(uint32_t size, VertexBufferUsage usage) :
+	m_Size(size),
+	m_Usage(usage)
 {
-	Run::Later([this] { Create(); });
+	Shared<OpenGLVertexBuffer> instance = this;
+	Renderer::Submit([instance]() mutable
+	{
+		glCreateBuffers(1, &instance->m_RendererID);
+		glNamedBufferData(instance->m_RendererID, instance->m_Size, nullptr, OpenGLUsage(instance->m_Usage));
+	});
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
 	GLuint rendererID = m_RendererID;
-	Renderer::Submit([rendererID]() {
+	Renderer::Submit([rendererID]()
+	{
 		glDeleteBuffers(1, &rendererID);
-					 });
+	});
 }
 
 void OpenGLVertexBuffer::Bind() const
 {
-	auto instance = GetDynShared<OpenGLVertexBuffer>();
-	Renderer::Submit([instance]() {
+	Shared<const OpenGLVertexBuffer> instance = this;
+	Renderer::Submit([instance]()
+	{
 		glBindBuffer(GL_ARRAY_BUFFER, instance->m_RendererID);
-					 });
+	});
 }
 
-void OpenGLVertexBuffer::SetData(void *buffer, Uint32 size, Uint32 offset)
+void OpenGLVertexBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
 {
-	m_LocalData = Buffer::Copy(buffer, size);
+	m_LocalData = Buffer::Copy(data, size);
 	m_Size = size;
-	auto instance = GetDynShared<OpenGLVertexBuffer>();
-	Renderer::Submit([instance, offset]() {
+	Shared<OpenGLVertexBuffer> instance = this;
+	Renderer::Submit([instance, offset]()
+	{
 		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
-					 });
+	});
 }
 
-void OpenGLVertexBuffer::SetData(const Buffer &buffer, Uint32 offset)
+void OpenGLVertexBuffer::SetData(const Buffer& buffer, uint32_t offset)
 {
-	m_LocalData = Buffer::Copy(buffer);
-	m_Size = buffer.Size();
-	auto instance = GetDynShared<OpenGLVertexBuffer>();
-	Renderer::Submit([instance, offset]() {
-		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
-					 });
+	SetData(buffer.Data(), buffer.Size(), offset);
 }
 
-void OpenGLVertexBuffer::Create()
+const VertexBufferLayout& OpenGLVertexBuffer::GetLayout() const
 {
-	auto instance = GetDynShared<OpenGLVertexBuffer>();
-	Renderer::Submit([instance]() mutable
-					 {
-						 glCreateBuffers(1, &instance->m_RendererID);
-						 glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(), OpenGLUsage(instance->m_Usage));
-					 });
+	return m_Layout;
+}
+
+void OpenGLVertexBuffer::SetLayout(const VertexBufferLayout& layout)
+{
+	m_Layout = layout;
+}
+
+uint32_t OpenGLVertexBuffer::GetSize() const
+{
+	return m_Size;
+}
+
+RendererID OpenGLVertexBuffer::GetRendererID() const
+{
+	return m_RendererID;
 }
 }

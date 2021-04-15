@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class Keyboard : public MemManaged<Keyboard>
+class Keyboard : public Managed
 {
 public:
 	Keyboard();

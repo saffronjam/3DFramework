@@ -10,7 +10,7 @@ FileIOManager::Filter FileIOManager::Filter::Empty()
 }
 
 Se::FileIOManager::FileIOManager(const Shared<Window>& window) :
-	Instansiated(this),
+	SingleTon(this),
 	_window(window)
 {
 }

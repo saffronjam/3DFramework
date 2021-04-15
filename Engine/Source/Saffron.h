@@ -26,18 +26,18 @@
 #include "Saffron/Gui/Gui.h"
 
 // --- SaffronRender API ------------------------------
-#include "Saffron/Renderer/Renderer.h"
-#include "Saffron/Renderer/SceneRenderer.h"
-#include "Saffron/Renderer/RenderPass.h"
-#include "Saffron/Renderer/Framebuffer.h"
-#include "Saffron/Renderer/VertexBuffer.h"
-#include "Saffron/Renderer/IndexBuffer.h"
-#include "Saffron/Renderer/Pipeline.h"
-#include "Saffron/Renderer/Texture.h"
-#include "Saffron/Renderer/Shader.h"
-#include "Saffron/Renderer/Mesh.h"
-#include "Saffron/Renderer/Camera.h"
-#include "Saffron/Renderer/Material.h"
+#include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Rendering/SceneRenderer.h"
+#include "Saffron/Rendering/RenderPass.h"
+#include "Saffron/Rendering/Resources/Framebuffer.h"
+#include "Saffron/Rendering/Resources/VertexBuffer.h"
+#include "Saffron/Rendering/Resources/IndexBuffer.h"
+#include "Saffron/Rendering/Resources/Pipeline.h"
+#include "Saffron/Rendering/Resources/Texture.h"
+#include "Saffron/Rendering/Resources/Shader.h"
+#include "Saffron/Rendering/Mesh.h"
+#include "Saffron/Rendering/Camera.h"
+#include "Saffron/Rendering/Material.h"
 // ---------------------------------------------------
 
 // Scenes
@@ -54,7 +54,6 @@
 #include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Editor/SplashScreenPane.h"
 #include "Saffron/Scene/EditorScene.h"
-#include "Saffron/Scene/ModelSpaceScene.h"
 #include "Saffron/Scene/RuntimeScene.h"
 
 #include "Saffron/Core/BatchLoader.h"

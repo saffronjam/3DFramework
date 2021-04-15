@@ -2,11 +2,11 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/BatchLoader.h"
-#include "Saffron/Renderer/Texture.h"
+#include "Saffron/Rendering/Resources/Texture.h"
 
 namespace Se
 {
-class SplashScreenPane : public MemManaged<SplashScreenPane>
+class SplashScreenPane : public Managed
 {
 public:
 	explicit SplashScreenPane(const Shared<BatchLoader> &batchLoader);

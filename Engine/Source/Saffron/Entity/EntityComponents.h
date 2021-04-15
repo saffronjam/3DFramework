@@ -2,8 +2,8 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Renderer/LightType.h"
-#include "Saffron/Renderer/Mesh.h"
+#include "Saffron/Rendering/LightType.h"
+#include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Scene/SceneEnvironment.h"
 #include "Saffron/Scene/SceneCamera.h"
 
@@ -115,8 +115,8 @@ struct CameraComponent
 	bool DrawFrustum = false;
 
 	CameraComponent() :
-		Camera(CreateShared<SceneCamera>()),
-		CameraMesh(CreateShared<Mesh>("Camera.fbx"))
+		Camera(Shared<SceneCamera>::Create()),
+		CameraMesh(Shared<Mesh>::Create("Camera.fbx"))
 	{
 		CameraMesh->GetMaterial()->Set<Vector3f>("u_AlbedoColor", {0.0f, 0.0f, 0.45});
 	}

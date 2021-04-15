@@ -1,7 +1,20 @@
 #include "SaffronPCH.h"
 #include "OpenGLRenderPass.h"
 
-Se::OpenGLRenderPass::OpenGLRenderPass(const Specification &specification)
-	: m_Specification(specification)
+namespace Se
 {
+OpenGLRenderPass::OpenGLRenderPass(const RenderPassSpecification& spec) :
+	m_Specification(spec)
+{
+}
+
+RenderPassSpecification& OpenGLRenderPass::GetSpecification()
+{
+	return m_Specification;
+}
+
+const RenderPassSpecification& OpenGLRenderPass::GetSpecification() const
+{
+	return m_Specification;
+}
 }

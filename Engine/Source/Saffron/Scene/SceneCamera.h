@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Renderer/Camera.h"
+#include "Saffron/Rendering/Camera.h"
 
 namespace Se
 {

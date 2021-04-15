@@ -1,14 +1,13 @@
 #pragma once
 
-#include <mutex>
-
 #include <spdlog/spdlog.h>
 #include <spdlog/fmt/ostr.h>
 
+#include "Saffron/Core/Memory.h"
 #include "Saffron/Math/SaffronMath.h"
 
-namespace Se {
-
+namespace Se
+{
 class Log
 {
 public:
@@ -29,31 +28,32 @@ public:
 public:
 	static void Init();
 
-	static void AddCoreSink(Shared<class LogSink> sink);
-	static void AddClientSink(Shared<class LogSink> sink);
+	static void AddCoreSink(std::shared_ptr<class LogSink> sink);
+	static void AddClientSink(std::shared_ptr<class LogSink> sink);
 
-	static Shared<spdlog::logger> &GetCoreLogger() { return s_CoreLogger; }
-	static Shared<spdlog::logger> &GetClientLogger() { return s_ClientLogger; }
+	static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
+	static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+
 private:
-	static Shared<spdlog::logger> s_CoreLogger;
-	static Shared<spdlog::logger> s_ClientLogger;
+	static std::shared_ptr<spdlog::logger> s_CoreLogger;
+	static std::shared_ptr<spdlog::logger> s_ClientLogger;
 };
 }
 
-template<typename OStream, typename t_Number>
-OStream &operator<<(OStream &os, const Se::Vector<2, t_Number> &vec)
+template <typename OStream, typename t_Number>
+OStream& operator<<(OStream& os, const Se::Vector<2, t_Number>& vec)
 {
 	return os << '(' << vec.x << ", " << vec.y << ')';
 }
 
-template<typename OStream, typename t_Number>
-OStream &operator<<(OStream &os, const Se::Vector<3, t_Number> &vec)
+template <typename OStream, typename t_Number>
+OStream& operator<<(OStream& os, const Se::Vector<3, t_Number>& vec)
 {
 	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ')';
 }
 
-template<typename OStream, typename t_Number>
-OStream &operator<<(OStream &os, const Se::Vector<4, t_Number> &vec)
+template <typename OStream, typename t_Number>
+OStream& operator<<(OStream& os, const Se::Vector<4, t_Number>& vec)
 {
 	return os << '(' << vec.x << ", " << vec.y << ", " << vec.z << ", " << vec.w << ')';
 }
@@ -71,4 +71,3 @@ OStream &operator<<(OStream &os, const Se::Vector<4, t_Number> &vec)
 #define SE_WARN(...)	Se::Log::GetClientLogger()->warn(__VA_ARGS__)
 #define SE_ERROR(...)	Se::Log::GetClientLogger()->error(__VA_ARGS__)
 #define SE_FATAL(...)	Se::Log::GetClientLogger()->critical(__VA_ARGS__)
-

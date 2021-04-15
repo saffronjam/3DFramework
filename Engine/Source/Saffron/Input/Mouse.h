@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class Mouse : public MemManaged<Mouse>
+class Mouse : public Managed
 {
 public:
 	Mouse();

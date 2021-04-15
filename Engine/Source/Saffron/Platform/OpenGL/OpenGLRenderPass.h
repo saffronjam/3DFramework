@@ -1,21 +1,19 @@
 #pragma once
 
-#include "Saffron/Renderer/RenderPass.h"
+#include "Saffron/Rendering/RenderPass.h"
 
 namespace Se
 {
 class OpenGLRenderPass : public RenderPass
 {
 public:
-	explicit OpenGLRenderPass(const Specification &specification);
-	~OpenGLRenderPass() override
-	{
-	};
+	explicit OpenGLRenderPass(const RenderPassSpecification& spec);
+	virtual ~OpenGLRenderPass() = default;
 
-	Specification &GetSpecification() override { return m_Specification; }
-	const Specification &GetSpecification() const override { return m_Specification; }
+	RenderPassSpecification& GetSpecification() override;
+	const RenderPassSpecification& GetSpecification() const override;
 
 private:
-	Specification m_Specification;
+	RenderPassSpecification m_Specification;
 };
 }

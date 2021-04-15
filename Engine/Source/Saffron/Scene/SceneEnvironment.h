@@ -1,11 +1,11 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Renderer/Texture.h"
+#include "Saffron/Rendering/Resources/Texture.h"
 
 namespace Se
 {
-class SceneEnvironment : public MemManaged<SceneEnvironment>
+class SceneEnvironment : public Managed
 {
 public:
 	SceneEnvironment(Filepath filepath, const Shared<TextureCube> &radianceMap, const Shared<TextureCube> &irradianceMap);

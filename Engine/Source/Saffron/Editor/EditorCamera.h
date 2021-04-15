@@ -5,7 +5,7 @@
 #include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Math/SaffronMath.h"
 #include "Saffron/Core/Time.h"
-#include "Saffron/Renderer/Camera.h"
+#include "Saffron/Rendering/Camera.h"
 
 namespace Se
 {
@@ -27,23 +27,17 @@ public:
 
 	void Reset();
 
-	void Enable() { m_Enabled = true; }
+	void Enable();
+	void Disable();
+	bool IsEnabled() const;
 
-	void Disable() { m_Enabled = false; }
+	const Matrix4f& GetViewMatrix() const;
+	Matrix4f GetViewProjection() const;
+	const Vector3f& GetPosition() const;
 
-	bool IsEnabled() const { return m_Enabled; }
-
-	const Matrix4f& GetViewMatrix() const { return m_ViewMatrix; }
-
-	Matrix4f GetViewProjection() const { return m_ProjectionMatrix * m_ViewMatrix; }
-
-	const Vector3f& GetPosition() const { return m_Position; }
-
-	float GetPitch() const { return m_Pitch; }
-
-	float GetYaw() const { return m_Yaw; }
-
-	float GetRoll() const { return 0.0f; }
+	float GetPitch() const;
+	float GetYaw() const;
+	float GetRoll() const;
 
 	void SetPosition(const Vector3f& position);
 	void SetRotation(const Vector3f& rotation);
@@ -52,9 +46,8 @@ public:
 	Vector3f GetRightDirection() const;
 	Vector3f GetForwardDirection() const;
 
-	ControllerStyle GetControllerStyle() const { return m_ControllerStyle; }
-
-	void SetControllerStyle(ControllerStyle style) { m_ControllerStyle = style; }
+	ControllerStyle GetControllerStyle() const;
+	void SetControllerStyle(ControllerStyle style);
 
 private:
 	bool OnMouseScroll(const MouseWheelScrolledEvent& event);
