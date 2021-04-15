@@ -4,7 +4,7 @@
 
 #include "Saffron/Math/SaffronMath.h"
 #include "Saffron/Core/Misc.h"
-#include "Saffron/Editor/ScenePanel.h"
+#include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Gui/Gui.h"
 
 
@@ -12,12 +12,12 @@ namespace Se
 {
 Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix);
 
-ScenePanel::ScenePanel(const Shared<Scene>& context) :
+SceneHierarchyPanel::SceneHierarchyPanel(const Shared<Scene>& context) :
 	m_Context(context)
 {
 }
 
-void ScenePanel::OnGuiRender(const Shared<ScriptPanel>& scriptPanel)
+void SceneHierarchyPanel::OnGuiRender(const Shared<ScriptPanel>& scriptPanel)
 {
 	ImGui::Begin("Scene Hierarchy");
 	if (m_Context)
@@ -59,7 +59,7 @@ void ScenePanel::OnGuiRender(const Shared<ScriptPanel>& scriptPanel)
 	ImGui::End();
 }
 
-void ScenePanel::OnCreateEntity(bool viewModal, const Shared<ScriptPanel>& scriptPanel)
+void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPanel>& scriptPanel)
 {
 	if (viewModal)
 	{
@@ -213,7 +213,7 @@ void ScenePanel::OnCreateEntity(bool viewModal, const Shared<ScriptPanel>& scrip
 	}
 }
 
-void ScenePanel::OnCreateMesh()
+void SceneHierarchyPanel::OnCreateMesh()
 {
 	auto newEntity = m_Context->CreateEntity("Mesh");
 	const String defaultMeshPath = "Resources/Assets/meshes/Cube1m.fbx";
@@ -221,7 +221,7 @@ void ScenePanel::OnCreateMesh()
 	NewSelection.Invoke(newEntity);
 }
 
-void ScenePanel::OnCreateDirectionalLight()
+void SceneHierarchyPanel::OnCreateDirectionalLight()
 {
 	auto newEntity = m_Context->CreateEntity("Directional Light");
 	newEntity.AddComponent<DirectionalLightComponent>();
@@ -231,7 +231,7 @@ void ScenePanel::OnCreateDirectionalLight()
 	NewSelection.Invoke(newEntity);
 }
 
-void ScenePanel::OnCreateSkylight()
+void SceneHierarchyPanel::OnCreateSkylight()
 {
 	auto newEntity = m_Context->CreateEntity("Sky Light");
 	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("Resources/Assets/Env/pink_sunrise_4k.hdr"));
@@ -239,7 +239,7 @@ void ScenePanel::OnCreateSkylight()
 }
 
 
-void ScenePanel::DrawEntityNode(Entity entity)
+void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 {
 	String name = "Unnamed";
 	if (entity.HasComponent<TagComponent>()) name = entity.GetComponent<TagComponent>().Tag;
@@ -291,7 +291,7 @@ void ScenePanel::DrawEntityNode(Entity entity)
 	}
 }
 
-void ScenePanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUID) const
+void SceneHierarchyPanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUID) const
 {
 	OutputStringStream oss;
 	oss << "Mesh##" << entityUUID;
@@ -305,7 +305,7 @@ void ScenePanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUID) const
 	}
 }
 
-void ScenePanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4f& parentTransform,
+void SceneHierarchyPanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4f& parentTransform,
                                    Uint32 level) const
 {
 	const Matrix4f localTransform = Mat4FromAssimpMat4(node->mTransformation);

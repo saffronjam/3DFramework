@@ -252,7 +252,7 @@ void SceneRenderer::Target::GeometryPass()
 		baseMaterial->Set("u_DirectionalLights", instData.SceneData.SceneLightEnvironment.DirectionalLights[0]);
 
 		auto rd = baseMaterial->FindResourceDeclaration("u_ShadowMapTexture");
-		if (rd)
+		if (false && rd)
 		{
 			auto reg = rd->GetRegister();
 

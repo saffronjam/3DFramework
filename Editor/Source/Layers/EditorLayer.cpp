@@ -5,7 +5,6 @@
 namespace Se
 {
 EditorLayer::EditorLayer(const Shared<Project>& project) :
-	m_Style(static_cast<int>(Gui::Style::Dark)),
 	m_Project(Move(project)),
 	m_MainViewportPane(CreateShared<ViewportPane>("Main Viewport", SceneRenderer::GetMainTarget())),
 	m_LastFocusedScene(m_EditorScene),
@@ -49,8 +48,8 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			m_AssetPanel = CreateShared<AssetPanel>();
 			m_ScriptPanel = CreateShared<ScriptPanel>();
 		}
-		m_EntityPanel = CreateShared<EntityPanel>(m_EditorScene);
-		m_ScenePanel = CreateShared<ScenePanel>(m_EditorScene);
+		m_EntityPanel = CreateShared<EntityComponentsPanel>(m_EditorScene);
+		m_ScenePanel = CreateShared<SceneHierarchyPanel>(m_EditorScene);
 	}, "Initializing Editor Panels");
 
 	loader->Submit([this]
@@ -760,7 +759,7 @@ void EditorLayer::OnGuiRenderMenuBar()
 
 		if (ImGui::BeginMenu("Style"))
 		{
-			ImGui::RadioButton("Dark", &m_Style, 0);
+			ImGui::RadioButton("DarkColorful", &m_Style, 0);
 			ImGui::RadioButton("Light", &m_Style, 1);
 			ImGui::EndMenu();
 		}

@@ -20,6 +20,11 @@ public:
 
 		Filter() = default;
 
+		explicit Filter(String description) :
+			Description(Move(description))
+		{
+		}
+
 		Filter(String description, ArrayList<String> extensions) :
 			Description(Move(description)),
 			Extensions(Move(extensions))
@@ -49,7 +54,7 @@ public:
 
 	static size_t Read(const Filepath& filepath, OutputStringStream& destination);
 	static ArrayList<char> ReadBinary(const Filepath& filepath);
-	
+
 private:
 	const Shared<Window>& _window;
 };

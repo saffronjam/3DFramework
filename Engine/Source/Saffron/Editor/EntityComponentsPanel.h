@@ -7,14 +7,14 @@
 
 namespace Se
 {
-class EntityPanel : public MemManaged<EntityPanel>
+class EntityComponentsPanel
 {
 public:
-	explicit EntityPanel(const Shared<Scene> &context);
+	explicit EntityComponentsPanel(const Shared<Scene>& context);
 
 	void OnGuiRender();
 
-	void SetContext(const Shared<Scene> &context);
+	void SetContext(const Shared<Scene>& context);
 	void SetSelectedEntity(Entity entity);
 
 private:
@@ -23,6 +23,7 @@ private:
 	void OnGuiRenderMeshDebug();
 
 	void DrawComponents(Entity entity);
+	static bool DrawVec3Control(const String& label, Vector3f& value, float resetValue = 0.0f, float columnWidth = 100.0f);
 
 private:
 	Shared<Scene> m_Context;

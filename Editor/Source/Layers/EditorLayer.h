@@ -75,7 +75,7 @@ public:
 	EventSubscriberList<void> WantProjectSelector;
 
 private:
-	int m_Style;
+	int m_Style = static_cast<int>(Gui::Style::Dark);
 	int m_GizmoType = -1;
 
 	std::shared_ptr<Project> m_Project;
@@ -102,9 +102,9 @@ private:
 	Map<String, std::shared_ptr<Texture2D>> m_TexStore;
 
 	std::shared_ptr<AssetPanel> m_AssetPanel;
-	std::shared_ptr<EntityPanel> m_EntityPanel;
+	std::shared_ptr<EntityComponentsPanel> m_EntityPanel;
 	std::shared_ptr<ScriptPanel> m_ScriptPanel;
-	std::shared_ptr<ScenePanel> m_ScenePanel;
+	std::shared_ptr<SceneHierarchyPanel> m_ScenePanel;
 	Run::Handle m_AssetScriptRunHandle;
 
 	SceneState m_SceneState;

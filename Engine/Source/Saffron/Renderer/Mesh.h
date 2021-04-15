@@ -199,7 +199,7 @@ private:
 	static constexpr const char *MeshesFolder = "Assets/Meshes/";
 	
 	friend class Renderer;
-	friend class EntityPanel;
-	friend class ScenePanel;
+	friend class EntityComponentsPanel;
+	friend class SceneHierarchyPanel;
 };
 }

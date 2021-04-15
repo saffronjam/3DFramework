@@ -237,6 +237,8 @@ struct SkylightComponent
 	float Intensity = 1.0f;
 	float Angle = 0.0f;
 
+	SkylightComponent() = default;
+
 	explicit SkylightComponent(Shared<Se::SceneEnvironment>& sceneEnvironment) :
 		SceneEnvironment(sceneEnvironment)
 	{

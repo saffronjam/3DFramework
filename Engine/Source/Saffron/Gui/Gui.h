@@ -16,8 +16,9 @@ class Gui : public Instansiated<Gui>
 public:
 	enum class Style : int
 	{
-		Dark = 0,
-		Light = 1
+		DarkColorful,
+		Dark,
+		Light
 	};
 
 	enum class PropertyFlag
@@ -38,27 +39,27 @@ public:
 	static void BeginPropertyGrid(float width = -1.0);
 	static void EndPropertyGrid();
 
-	static bool BeginTreeNode(const String& name, bool defaultOpen = true);
+	static bool BeginTreeNode(const String& label, bool defaultOpen = true);
 	static void EndTreeNode();
 
-	static void Property(const String& name, const Function<void()>& onClick, bool secondColumn = false);
-	static void Property(const String& name, const String& value);
-	static bool Property(const String& name, String& value);
-	static bool Property(const String& name, bool& value);
-	static bool Property(const String& name, const String& text, const String& buttonName,
+	static void Property(const String& label, const Function<void()>& onClick, bool secondColumn = false);
+	static void Property(const String& label, const String& value);
+	static bool Property(const String& label, String& value, bool error = false);
+	static bool Property(const String& label, bool& value);
+	static bool Property(const String& label, const String& text, const String& buttonName,
 	                     const Function<void()>& onButtonPress);
-	static bool Property(const String& name, int& value, int min = -1, int max = 1, float step = 1,
+	static bool Property(const String& label, int& value, int min = -1, int max = 1, float step = 1,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& name, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& name, Vector2f& value, PropertyFlag flags);
-	static bool Property(const String& name, Vector2f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, Vector2f& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector2f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& name, Vector3f& value, PropertyFlag flags);
-	static bool Property(const String& name, Vector3f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
-	                     PropertyFlag flags = PropertyFlag::None, Optional<Function<void()>> fn = {});
-	static bool Property(const String& name, Vector4f& value, PropertyFlag flags);
-	static bool Property(const String& name, Vector4f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, Vector3f& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector3f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	                     PropertyFlag flags = PropertyFlag::None);
+	static bool Property(const String& label, Vector4f& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector4f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 
 	static void HelpMarker(const String& desc);
@@ -80,11 +81,16 @@ private:
 	static void PopID();
 	static Font* GetAppropriateFont(int size);
 
-private:
-	static Style m_CurrentStyle;
-	static Map<int, ImFont*> m_Fonts;
-	static Pair<int, ImFont*> m_CurrentFont;
+	static void ApplyStyle(Style style);
 
+private:
+	Style m_CurrentStyle;
+	Map<int, ImFont*> m_Fonts;
+	Pair<int, ImFont*> m_CurrentFont;
+
+	char s_IDBuffer[16];
+	Uint32 s_Counter = 0;
+	
 	static constexpr const char *FontsLocation = "Assets/Fonts/";
 	static constexpr const char *FontsExtension = ".ttf";
 };

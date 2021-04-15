@@ -6,10 +6,10 @@
 
 namespace Se
 {
-class ScenePanel : public MemManaged<ScenePanel>
+class SceneHierarchyPanel
 {
 public:
-	explicit ScenePanel(const Shared<Scene>& context);
+	explicit SceneHierarchyPanel(const Shared<Scene>& context);
 
 	void OnGuiRender(const Shared<ScriptPanel>& scriptPanel);
 

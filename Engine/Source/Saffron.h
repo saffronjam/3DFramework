@@ -20,7 +20,7 @@
 
 #include "Saffron/Editor/AssetPanel.h"
 #include "Saffron/Editor/ViewportPane.h"
-#include "Saffron/Editor/EntityPanel.h"
+#include "Saffron/Editor/EntityComponentsPanel.h"
 #include "Saffron/Editor/ScriptPanel.h"
 
 #include "Saffron/Gui/Gui.h"
@@ -50,8 +50,8 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Editor/EditorTerminal.h"
-#include "Saffron/Editor/EntityPanel.h"
-#include "Saffron/Editor/ScenePanel.h"
+#include "Saffron/Editor/EntityComponentsPanel.h"
+#include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Editor/SplashScreenPane.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Scene/ModelSpaceScene.h"
