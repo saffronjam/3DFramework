@@ -46,7 +46,7 @@ void RendererAPI::Init()
 	glEnable(GL_MULTISAMPLE);
 	glEnable(GL_STENCIL_TEST);
 
-	auto& caps = RendererAPI::GetCapabilities();
+	auto& caps = GetCapabilities();
 
 	caps.Vendor = (const char*)glGetString(GL_VENDOR);
 	caps.Renderer = (const char*)glGetString(GL_RENDERER);

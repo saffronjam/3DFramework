@@ -5,18 +5,17 @@
 
 namespace Se
 {
-
 //////////////////////////////////////////////////////////////////////
 /// Helper functions
 //////////////////////////////////////////////////////////////////////
 
-template<typename T>
+template <typename T>
 static void CopyComponent(Entity destination, Entity source)
 {
-	if ( source.HasComponent<T>() )
+	if (source.HasComponent<T>())
 	{
-		auto &srcComponent = source.GetComponent<T>();
-		if ( destination.HasComponent<T>() )
+		auto& srcComponent = source.GetComponent<T>();
+		if (destination.HasComponent<T>())
 		{
 			destination.GetComponent<T>() = srcComponent;
 		}
@@ -32,24 +31,24 @@ static void CopyComponent(Entity destination, Entity source)
 /// Entity
 //////////////////////////////////////////////////////////////////////
 
-Entity::Entity(EntityHandle handle, Scene *scene)
-	: m_Scene(scene),
+Entity::Entity(EntityHandle handle, Scene* scene) :
+	m_Scene(scene),
 	m_Registry(&scene->GetEntityRegistry()),
 	m_Handle(handle)
 {
 }
 
-bool Entity::operator==(const Entity &other) const
+bool Entity::operator==(const Entity& other) const
 {
 	return m_Handle == other.m_Handle && m_Scene == other.m_Scene;
 }
 
-bool Entity::operator!=(const Entity &other) const
+bool Entity::operator!=(const Entity& other) const
 {
 	return !(*this == other);
 }
 
-bool Entity::operator<(const Entity &other) const
+bool Entity::operator<(const Entity& other) const
 {
 	return this->m_Handle < other.m_Handle;
 }
@@ -59,9 +58,9 @@ UUID Entity::GetSceneUUID() const
 	return m_Scene->GetUUID();
 }
 
-Entity Entity::Copy(Optional<Scene *> separateScene)
+Entity Entity::Copy(Optional<Scene*> separateScene)
 {
-	Scene *copyTo = separateScene.value_or(m_Scene);
+	Scene* copyTo = separateScene.value_or(m_Scene);
 
 	Entity newEntity = copyTo->CreateEntity(GetComponent<TagComponent>().Tag);
 	CopyComponent<TransformComponent>(newEntity, *this);

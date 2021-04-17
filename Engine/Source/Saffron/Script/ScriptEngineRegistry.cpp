@@ -10,16 +10,15 @@
 
 namespace Se
 {
-
 #define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Se." << #className << "::" << #functionName << "_Native";\
 	mono_add_internal_call(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
 	RegisterFunctionBuffer.str("");\
 	RegisterFunctionBuffer.clear();
 
-UnorderedMap<MonoType *, Function<bool(Entity &)>> s_HasComponentFuncs;
-UnorderedMap<MonoType *, Function<void(Entity &)>> s_CreateComponentFuncs;
+UnorderedMap<MonoType*, Function<bool(Entity&)>> s_HasComponentFuncs;
+UnorderedMap<MonoType*, Function<void(Entity&)>> s_CreateComponentFuncs;
 
-extern MonoImage *s_CoreAssemblyImage;
+extern MonoImage* s_CoreAssemblyImage;
 
 #define ComponentRegisterType(Type) \
 	{\
@@ -133,6 +132,5 @@ void ScriptEngineRegistry::RegisterAll()
 
 	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, GetRadius);
 	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, SetRadius);
-
 }
 }

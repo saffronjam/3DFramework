@@ -172,7 +172,7 @@ private:
 	static constexpr const char* ScriptsExtension = ".dll";
 
 	static constexpr const char* FriendlyDomainName = "Saffron Runtime";
-	static constexpr const char *ScriptCoreScript = "Assets/Scripts/ScriptCore.dll";
+	static constexpr const char* ScriptCoreScript = "Assets/Scripts/ScriptCore.dll";
 };
 
 

@@ -15,9 +15,9 @@ static GLenum HazelToOpenGLTextureFormat(TextureFormat format)
 {
 	switch (format)
 	{
-	case Se::TextureFormat::RGB: return GL_RGB;
-	case Se::TextureFormat::RGBA: return GL_RGBA;
-	case Se::TextureFormat::Float16: return GL_RGBA16F;
+	case TextureFormat::RGB: return GL_RGB;
+	case TextureFormat::RGBA: return GL_RGBA;
+	case TextureFormat::Float16: return GL_RGBA16F;
 	}
 	SE_CORE_ASSERT(false, "Unknown texture format!");
 	return 0;
@@ -29,9 +29,9 @@ static GLenum HazelToOpenGLTextureFormat(TextureFormat format)
 
 OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap) :
 	m_Format(format),
+	m_Wrap(wrap),
 	m_Width(width),
-	m_Height(height),
-	m_Wrap(wrap)
+	m_Height(height)
 {
 	Shared<OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance]() mutable
@@ -53,7 +53,7 @@ OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32_t width, uint32_t 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	});
 
-	m_ImageData.Allocate(width * height * Texture::GetBPP(m_Format));
+	m_ImageData.Allocate(width * height * GetBPP(m_Format));
 }
 
 OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
@@ -92,7 +92,7 @@ OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
 		if (srgb)
 		{
 			glCreateTextures(GL_TEXTURE_2D, 1, &instance->m_RendererID);
-			int levels = Texture::CalculateMipMapCount(instance->m_Width, instance->m_Height);
+			int levels = CalculateMipMapCount(instance->m_Width, instance->m_Height);
 			glTextureStorage2D(instance->m_RendererID, levels, GL_SRGB8, instance->m_Width, instance->m_Height);
 			glTextureParameteri(instance->m_RendererID, GL_TEXTURE_MIN_FILTER,
 			                    levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
@@ -188,7 +188,7 @@ void OpenGLTexture2D::Resize(uint32_t width, uint32_t height)
 {
 	SE_CORE_ASSERT(m_Locked, "Texture must be locked!");
 
-	m_ImageData.Allocate(width * height * Texture::GetBPP(m_Format));
+	m_ImageData.Allocate(width * height * GetBPP(m_Format));
 #if HZ_DEBUG
 	m_ImageData.ZeroInitialize();
 #endif
@@ -217,7 +217,7 @@ bool OpenGLTexture2D::Loaded() const
 
 uint32_t OpenGLTexture2D::GetMipLevelCount() const
 {
-	return Texture::CalculateMipMapCount(m_Width, m_Height);
+	return CalculateMipMapCount(m_Width, m_Height);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, uint32_t width, uint3
 	m_Height = height;
 	m_Format = format;
 
-	uint32_t levels = Texture::CalculateMipMapCount(width, height);
+	uint32_t levels = CalculateMipMapCount(width, height);
 	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, levels]() mutable
 	{
@@ -395,6 +395,6 @@ void OpenGLTextureCube::Bind(uint32_t slot) const
 
 uint32_t OpenGLTextureCube::GetMipLevelCount() const
 {
-	return Texture::CalculateMipMapCount(m_Width, m_Height);
+	return CalculateMipMapCount(m_Width, m_Height);
 }
 }

@@ -65,11 +65,11 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	std::ptrdiff_t Cursor = 0;
 	int Index = 0;
 
-	virtual const Uint8* GetBuffer() const override { return Buffer; }
+	const Uint8* GetBuffer() const override { return Buffer; }
 
-	virtual const UniformDecl* GetUniforms() const override { return Uniforms; }
+	const UniformDecl* GetUniforms() const override { return Uniforms; }
 
-	virtual unsigned int GetUniformCount() const { return U; }
+	unsigned int GetUniformCount() const override { return U; }
 
 	template <typename T>
 	void Push(const std::string& name, const T& data)
@@ -88,7 +88,7 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	void Push(const std::string& name, const glm::vec3& data)
 	{
 		Uniforms[Index++] = {UniformType::Float3, Cursor, name};
-		memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec3));
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::vec3));
 		Cursor += sizeof(glm::vec3);
 	}
 
@@ -96,7 +96,7 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	void Push(const std::string& name, const glm::vec4& data)
 	{
 		Uniforms[Index++] = {UniformType::Float4, Cursor, name};
-		memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::vec4));
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::vec4));
 		Cursor += sizeof(glm::vec4);
 	}
 
@@ -104,7 +104,7 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	void Push(const std::string& name, const glm::mat4& data)
 	{
 		Uniforms[Index++] = {UniformType::Matrix4x4, Cursor, name};
-		memcpy(Buffer + Cursor, glm::value_ptr(data), sizeof(glm::mat4));
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::mat4));
 		Cursor += sizeof(glm::mat4);
 	}
 };

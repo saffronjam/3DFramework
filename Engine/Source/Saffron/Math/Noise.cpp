@@ -13,5 +13,4 @@ float Noise::PerlinNoise(float x, float y)
 	const float result = s_FastNoise.GetNoise(x, y); // This returns a value between -1 and 1
 	return result;
 }
-
 }

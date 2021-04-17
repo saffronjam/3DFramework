@@ -2,6 +2,7 @@
 
 #pragma warning(disable : 4244)
 #pragma warning(disable : 4006)
+#pragma warning(disable : 4312)
 
 #include "Saffron/Config.h"
 #include "Saffron/Core/Assert.h"

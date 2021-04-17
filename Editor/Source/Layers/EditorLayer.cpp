@@ -215,13 +215,6 @@ void EditorLayer::OnGuiRender()
 		const ImGuiID dockspace_id = ImGui::GetID("EditorLayerDockspace");
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 	}
-
-	static bool test = false;
-	static int testint = 0;
-	ImGui::Begin("TESTING");
-	ImGui::Checkbox("Testing", &test);
-	ImGui::SliderInt("Testing slider", &testint, 0, 10);
-	ImGui::End();
 	
 	OnGuiRenderMenuBar();
 	OnGuiRenderToolbar();

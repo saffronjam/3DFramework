@@ -544,8 +544,7 @@ Mesh::Mesh(Filepath filepath) :
 	if (m_IsAnimated)
 	{
 		m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(),
-		                                               static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(
-			                                               AnimatedVertex)));
+		                                      static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -556,7 +555,7 @@ Mesh::Mesh(Filepath filepath) :
 	else
 	{
 		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(),
-		                                               static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
+		                                      static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -564,8 +563,7 @@ Mesh::Mesh(Filepath filepath) :
 		};
 	}
 
-	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(),
-	                                             static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
+	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = vertexLayout;
@@ -709,11 +707,11 @@ void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Mat
 	if (nodeAnim)
 	{
 		const Vector3f translation = InterpolateTranslation(AnimationTime, nodeAnim);
-		const Matrix4f translationMatrix = glm::translate(Matrix4f(1.0f),
-		                                                  Vector3f(translation.x, translation.y, translation.z));
+		const Matrix4f translationMatrix = translate(Matrix4f(1.0f),
+		                                             Vector3f(translation.x, translation.y, translation.z));
 
 		const glm::quat rotation = InterpolateRotation(AnimationTime, nodeAnim);
-		const Matrix4f rotationMatrix = glm::toMat4(rotation);
+		const Matrix4f rotationMatrix = toMat4(rotation);
 
 		const Vector3f scale = InterpolateScale(AnimationTime, nodeAnim);
 		const Matrix4f scaleMatrix = glm::scale(Matrix4f(1.0f), Vector3f(scale.x, scale.y, scale.z));

@@ -4,12 +4,14 @@
 
 namespace Se
 {
-ShaderStruct::ShaderStruct(String name)
-	: m_Name(Move(name)), m_Size(0), m_Offset(0)
+ShaderStruct::ShaderStruct(String name) :
+	m_Name(Move(name)),
+	m_Size(0),
+	m_Offset(0)
 {
 }
 
-void ShaderStruct::AddField(ShaderUniformDeclaration *field)
+void ShaderStruct::AddField(ShaderUniformDeclaration* field)
 {
 	m_Size += field->GetSize();
 	Uint32 offset = 0;

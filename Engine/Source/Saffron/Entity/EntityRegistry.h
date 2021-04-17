@@ -6,4 +6,3 @@ namespace Se
 {
 using EntityRegistry = entt::registry;
 }
-

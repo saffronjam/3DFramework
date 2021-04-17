@@ -6,9 +6,9 @@ namespace Se
 {
 OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const std::string& name,
                                                                uint32_t count) :
+	m_Domain(domain),
 	m_Type(type),
-	m_Struct(nullptr),
-	m_Domain(domain)
+	m_Struct(nullptr)
 {
 	m_Name = name;
 	m_Count = count;
@@ -17,9 +17,9 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 
 OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct* uniformStruct,
                                                                const std::string& name, uint32_t count) :
-	m_Struct(uniformStruct),
-	m_Type(OpenGLShaderUniformDeclaration::Type::Struct),
-	m_Domain(domain)
+	m_Domain(domain),
+	m_Type(Type::Struct),
+	m_Struct(uniformStruct)
 {
 	m_Name = name;
 	m_Count = count;
@@ -79,7 +79,7 @@ const ShaderStruct& OpenGLShaderUniformDeclaration::GetShaderUniformStruct() con
 
 void OpenGLShaderUniformDeclaration::SetOffset(uint32_t offset)
 {
-	if (m_Type == OpenGLShaderUniformDeclaration::Type::Struct) m_Struct->SetOffset(offset);
+	if (m_Type == Type::Struct) m_Struct->SetOffset(offset);
 
 	m_Offset = offset;
 }
@@ -88,14 +88,14 @@ uint32_t OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 {
 	switch (type)
 	{
-	case OpenGLShaderUniformDeclaration::Type::Bool: return 1;
-	case OpenGLShaderUniformDeclaration::Type::Int32: return 4;
-	case OpenGLShaderUniformDeclaration::Type::Float32: return 4;
-	case OpenGLShaderUniformDeclaration::Type::Vec2: return 4 * 2;
-	case OpenGLShaderUniformDeclaration::Type::Vec3: return 4 * 3;
-	case OpenGLShaderUniformDeclaration::Type::Vec4: return 4 * 4;
-	case OpenGLShaderUniformDeclaration::Type::Mat3: return 4 * 3 * 3;
-	case OpenGLShaderUniformDeclaration::Type::Mat4: return 4 * 4 * 4;
+	case Type::Bool: return 1;
+	case Type::Int32: return 4;
+	case Type::Float32: return 4;
+	case Type::Vec2: return 4 * 2;
+	case Type::Vec3: return 4 * 3;
+	case Type::Vec4: return 4 * 4;
+	case Type::Mat3: return 4 * 3 * 3;
+	case Type::Mat4: return 4 * 4 * 4;
 	}
 	return 0;
 }
@@ -118,14 +118,14 @@ std::string OpenGLShaderUniformDeclaration::TypeToString(Type type)
 {
 	switch (type)
 	{
-	case OpenGLShaderUniformDeclaration::Type::Int32: return "int32";
-	case OpenGLShaderUniformDeclaration::Type::Bool: return "bool";
-	case OpenGLShaderUniformDeclaration::Type::Float32: return "float";
-	case OpenGLShaderUniformDeclaration::Type::Vec2: return "vec2";
-	case OpenGLShaderUniformDeclaration::Type::Vec3: return "vec3";
-	case OpenGLShaderUniformDeclaration::Type::Vec4: return "vec4";
-	case OpenGLShaderUniformDeclaration::Type::Mat3: return "mat3";
-	case OpenGLShaderUniformDeclaration::Type::Mat4: return "mat4";
+	case Type::Int32: return "int32";
+	case Type::Bool: return "bool";
+	case Type::Float32: return "float";
+	case Type::Vec2: return "vec2";
+	case Type::Vec3: return "vec3";
+	case Type::Vec4: return "vec4";
+	case Type::Mat3: return "mat3";
+	case Type::Mat4: return "mat4";
 	}
 	return "Invalid Type";
 }
@@ -133,9 +133,9 @@ std::string OpenGLShaderUniformDeclaration::TypeToString(Type type)
 OpenGLShaderUniformBufferDeclaration::OpenGLShaderUniformBufferDeclaration(
 	const std::string& name, ShaderDomain domain) :
 	m_Name(name),
-	m_Domain(domain),
+	m_Register(0),
 	m_Size(0),
-	m_Register(0)
+	m_Domain(domain)
 {
 }
 
@@ -144,7 +144,7 @@ void OpenGLShaderUniformBufferDeclaration::PushUniform(OpenGLShaderUniformDeclar
 	uint32_t offset = 0;
 	if (m_Uniforms.size())
 	{
-		OpenGLShaderUniformDeclaration* previous = (OpenGLShaderUniformDeclaration*)m_Uniforms.back();
+		OpenGLShaderUniformDeclaration* previous = static_cast<OpenGLShaderUniformDeclaration*>(m_Uniforms.back());
 		offset = previous->m_Offset + previous->m_Size;
 	}
 	uniform->SetOffset(offset);
@@ -162,9 +162,9 @@ ShaderUniformDeclaration* OpenGLShaderUniformBufferDeclaration::FindUniform(cons
 }
 
 OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, const std::string& name, uint32_t count) :
-	m_Type(type),
 	m_Name(name),
-	m_Count(count)
+	m_Count(count),
+	m_Type(type)
 {
 	m_Name = name;
 	m_Count = count;

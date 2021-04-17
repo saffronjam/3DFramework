@@ -20,9 +20,9 @@ public:
 
 	void SetLayout(const VertexBufferLayout& layout) override;
 
-	virtual uint32_t GetSize() const;
+	uint32_t GetSize() const override;
 
-	virtual RendererID GetRendererID() const;
+	RendererID GetRendererID() const override;
 private:
 	RendererID m_RendererID = 0;
 	uint32_t m_Size;
@@ -31,5 +31,4 @@ private:
 
 	Buffer m_LocalData;
 };
-
 }

@@ -26,9 +26,9 @@ class SceneRenderer : public SingleTon<SceneRenderer>
 public:
 	SceneRenderer();
 	~SceneRenderer();
-	
+
 	static void OnGuiRender();
-	
+
 	static void BeginScene(const class Scene* scene, const SceneRendererCamera& camera);
 	static void EndScene();
 

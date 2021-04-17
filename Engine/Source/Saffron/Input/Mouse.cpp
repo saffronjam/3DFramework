@@ -81,7 +81,7 @@ Vector2f Mouse::GetPositionNDC()
 Vector2f Mouse::GetSwipe()
 {
 	Vector2f swipe = Instance()._position - Instance()._lastPosition;
-	if (glm::length2(swipe) > 10000.0f)
+	if (length2(swipe) > 10000.0f)
 	{
 		swipe = Vector2f(0);
 	}

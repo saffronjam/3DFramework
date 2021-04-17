@@ -9,7 +9,7 @@ FileIOManager::Filter FileIOManager::Filter::Empty()
 	return Filter("All Files", {"*.*"});
 }
 
-Se::FileIOManager::FileIOManager(const Shared<Window>& window) :
+FileIOManager::FileIOManager(const Shared<Window>& window) :
 	SingleTon(this),
 	_window(window)
 {
@@ -64,7 +64,7 @@ size_t FileIOManager::GetFileSize(const Filepath& filepath)
 {
 	try
 	{
-		return fs::file_size(filepath);
+		return file_size(filepath);
 	}
 	catch (fs::filesystem_error& fe)
 	{
@@ -99,19 +99,19 @@ size_t FileIOManager::Write(const Buffer buffer, const Filepath& filepath, bool 
 bool FileIOManager::CreateDirectories(const Filepath& filepath)
 {
 	std::error_code errorCode;
-	return fs::create_directories(filepath, errorCode);
+	return create_directories(filepath, errorCode);
 }
 
 bool FileIOManager::FileExists(const Filepath& filepath)
 {
 	std::error_code errorCode;
-	return fs::exists(filepath, errorCode);
+	return exists(filepath, errorCode);
 }
 
 bool FileIOManager::Copy(const Filepath& source, const Filepath& destination)
 {
 	std::error_code errorCode;
-	fs::copy_file(source, destination, errorCode);
+	copy_file(source, destination, errorCode);
 	return static_cast<bool>(errorCode);
 }
 
@@ -138,7 +138,7 @@ size_t FileIOManager::Read(const Filepath& filepath, OutputStringStream& destina
 
 ArrayList<char> FileIOManager::ReadBinary(const Filepath& filepath)
 {
-	InputStream is(filepath, ::std::ios::binary);
+	InputStream is(filepath, std::ios::binary);
 
 	ArrayList<char> data;
 	if (is.is_open())

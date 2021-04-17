@@ -4,17 +4,17 @@
 #include "Saffron/Rendering/Resource.h"
 #include "Saffron/Rendering/RendererAPI.h"
 
-namespace Se {
-
+namespace Se
+{
 enum class FramebufferTextureFormat
 {
-	None    = 0,
+	None = 0,
 
 	// Color
-	RGBA8   = 1,
+	RGBA8 = 1,
 	RGBA16F = 2,
 	RGBA32F = 3,
-	RG32F   = 4,
+	RG32F = 4,
 
 	// Depth/stencil
 	DEPTH32F = 5,
@@ -27,7 +27,11 @@ enum class FramebufferTextureFormat
 struct FramebufferTextureSpecification
 {
 	FramebufferTextureSpecification() = default;
-	FramebufferTextureSpecification(FramebufferTextureFormat format) : TextureFormat(format) {}
+
+	FramebufferTextureSpecification(FramebufferTextureFormat format) :
+		TextureFormat(format)
+	{
+	}
 
 	FramebufferTextureFormat TextureFormat;
 	// TODO: filtering/wrap
@@ -36,8 +40,11 @@ struct FramebufferTextureSpecification
 struct FramebufferAttachmentSpecification
 {
 	FramebufferAttachmentSpecification() = default;
-	FramebufferAttachmentSpecification(const std::initializer_list<FramebufferTextureSpecification>& attachments)
-		: Attachments(attachments) {}
+
+	FramebufferAttachmentSpecification(const std::initializer_list<FramebufferTextureSpecification>& attachments) :
+		Attachments(attachments)
+	{
+	}
 
 	std::vector<FramebufferTextureSpecification> Attachments;
 };
@@ -50,7 +57,7 @@ struct FramebufferSpecification
 	FramebufferAttachmentSpecification Attachments;
 	uint32_t Samples = 1; // multisampling
 
-						  // TODO: Temp, needs scale
+	// TODO: Temp, needs scale
 	bool NoResize = false;
 
 	// SwapChainTarget = screen buffer (i.e. no framebuffer)
@@ -60,7 +67,10 @@ struct FramebufferSpecification
 class Framebuffer : public Resource
 {
 public:
-	virtual ~Framebuffer() {}
+	virtual ~Framebuffer()
+	{
+	}
+
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
@@ -90,13 +100,14 @@ public:
 	void Add(const Shared<Framebuffer>& framebuffer);
 
 	std::vector<Shared<Framebuffer>>& GetAll() { return m_Pool; }
+
 	const std::vector<Shared<Framebuffer>>& GetAll() const { return m_Pool; }
 
-	inline static FramebufferPool* GetGlobal() { return s_Instance; }
+	static FramebufferPool* GetGlobal() { return s_Instance; }
+
 private:
 	std::vector<Shared<Framebuffer>> m_Pool;
 
 	static FramebufferPool* s_Instance;
 };
-
 }

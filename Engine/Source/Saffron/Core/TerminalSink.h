@@ -13,12 +13,11 @@ public:
 	void Clear();
 
 protected:
-	void Sink(const LogMessage &message) override;
+	void Sink(const LogMessage& message) override;
 	void Flush() override;
 
 private:
 	ImGuiTextBuffer m_TextBuffer;
 	ArrayList<int> m_LineOffsets;
-
 };
 }

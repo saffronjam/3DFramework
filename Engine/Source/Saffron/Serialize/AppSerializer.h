@@ -8,12 +8,12 @@ namespace Se
 class AppSerializer
 {
 public:
-	AppSerializer(App &application);
+	AppSerializer(App& application);
 
-	void Serialize(const Filepath &filepath) const;
-	bool Deserialize(const Filepath &filepath);
+	void Serialize(const Filepath& filepath) const;
+	bool Deserialize(const Filepath& filepath);
 
 private:
-	App &m_Application;
+	App& m_Application;
 };
 }

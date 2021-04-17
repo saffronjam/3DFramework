@@ -8,12 +8,12 @@ namespace Se
 class ProjectSerializer
 {
 public:
-	explicit ProjectSerializer(Project &project);
+	explicit ProjectSerializer(Project& project);
 
-	void Serialize(const Filepath &filepath) const;
-	bool Deserialize(const Filepath &filepath);
+	void Serialize(const Filepath& filepath) const;
+	bool Deserialize(const Filepath& filepath);
 
 private:
-	Project &m_Project;
+	Project& m_Project;
 };
 }

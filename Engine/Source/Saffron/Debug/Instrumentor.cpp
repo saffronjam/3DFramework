@@ -4,32 +4,32 @@
 
 namespace Se
 {
-
-void Instrumentor::BeginSession(const String &name, const String &filepath)
+void Instrumentor::BeginSession(const String& name, const String& filepath)
 {
 	std::lock_guard lock(m_Mutex);
-	if ( m_CurrentSession )
+	if (m_CurrentSession)
 	{
 		// If there is already a current session, then close it before beginning new one.
 		// Subsequent profiling output meant for the original session will end up in the
 		// newly opened session instead.  That's better than having badly formatted
 		// profiling output.
-		if ( Log::GetCoreLogger() ) // Edge case: BeginSession() might be before Log::Init()
+		if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
 		{
-			SE_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name, m_CurrentSession->Name);
+			SE_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name,
+			              m_CurrentSession->Name);
 		}
 		InternalEndSession();
 	}
 	m_OutputStream.open(filepath);
 
-	if ( m_OutputStream.is_open() )
+	if (m_OutputStream.is_open())
 	{
-		m_CurrentSession = new InstrumentationSession({ name });
+		m_CurrentSession = new InstrumentationSession({name});
 		WriteHeader();
 	}
 	else
 	{
-		if ( Log::GetCoreLogger() ) // Edge case: BeginSession() might be before Log::Init()
+		if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
 		{
 			SE_CORE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
 		}
@@ -42,7 +42,7 @@ void Instrumentor::EndSession()
 	InternalEndSession();
 }
 
-void Instrumentor::WriteProfile(const ProfileResult &result)
+void Instrumentor::WriteProfile(const ProfileResult& result)
 {
 	StringStream json;
 
@@ -58,20 +58,21 @@ void Instrumentor::WriteProfile(const ProfileResult &result)
 	json << R"(})";
 
 	std::lock_guard lock(m_Mutex);
-	if ( m_CurrentSession )
+	if (m_CurrentSession)
 	{
 		m_OutputStream << json.str();
 		m_OutputStream.flush();
 	}
 }
 
-Instrumentor &Instrumentor::Get()
+Instrumentor& Instrumentor::Get()
 {
 	static Instrumentor instance;
 	return instance;
 }
 
-Instrumentor::Instrumentor() : m_CurrentSession(nullptr)
+Instrumentor::Instrumentor() :
+	m_CurrentSession(nullptr)
 {
 }
 
@@ -94,7 +95,7 @@ void Instrumentor::WriteFooter()
 
 void Instrumentor::InternalEndSession()
 {
-	if ( m_CurrentSession )
+	if (m_CurrentSession)
 	{
 		WriteFooter();
 		m_OutputStream.close();
@@ -103,8 +104,7 @@ void Instrumentor::InternalEndSession()
 	}
 }
 
-InstrumentationTimer::InstrumentationTimer(const char *name)
-	:
+InstrumentationTimer::InstrumentationTimer(const char* name) :
 	Timer(name),
 	m_Stopped(false)
 {
@@ -112,19 +112,18 @@ InstrumentationTimer::InstrumentationTimer(const char *name)
 
 InstrumentationTimer::~InstrumentationTimer()
 {
-	if ( !m_Stopped )
-		Stop();
+	if (!m_Stopped) Stop();
 }
 
 void InstrumentationTimer::Stop()
 {
 	try
 	{
-		Instrumentor::Get().WriteProfile(ProfileResult{ m_Name, GetStart(), Peek(), std::this_thread::get_id() });
+		Instrumentor::Get().WriteProfile(ProfileResult{m_Name, GetStart(), Peek(), std::this_thread::get_id()});
 
 		m_Stopped = true;
 	}
-	catch ( ... )
+	catch (...)
 	{
 		SE_WARN("Failed to stop instrumentor timer");
 	}

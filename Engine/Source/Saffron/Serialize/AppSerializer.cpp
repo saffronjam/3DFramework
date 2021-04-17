@@ -9,13 +9,12 @@
 
 namespace Se
 {
-
-AppSerializer::AppSerializer(App &application)
-	: m_Application(application)
+AppSerializer::AppSerializer(App& application) :
+	m_Application(application)
 {
 }
 
-void AppSerializer::Serialize(const Filepath &filepath) const
+void AppSerializer::Serialize(const Filepath& filepath) const
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
@@ -24,7 +23,7 @@ void AppSerializer::Serialize(const Filepath &filepath) const
 	out << YAML::Key << "Recent Projects";
 	out << YAML::Value << YAML::BeginSeq;
 
-	for ( const auto &project : m_Application.GetRecentProjectList() )
+	for (const auto& project : m_Application.GetRecentProjectList())
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "ProjectFilepath" << YAML::Value << project->GetProjectFilepath().string();
@@ -38,38 +37,37 @@ void AppSerializer::Serialize(const Filepath &filepath) const
 	fout << out.c_str();
 }
 
-bool AppSerializer::Deserialize(const Filepath &filepath)
+bool AppSerializer::Deserialize(const Filepath& filepath)
 {
 	InputStream stream(filepath);
 	StringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node data = YAML::Load(strStream.str());
-	if ( !data["App"] )
-		return false;
+	if (!data["App"]) return false;
 
 	SE_CORE_INFO("Deserializing App");
 
 	// Deserializing recent projects
 	auto recentProjects = data["Recent Projects"];
-	if ( recentProjects )
+	if (recentProjects)
 	{
-		for ( const auto &recentProjectRef : recentProjects )
+		for (const auto& recentProjectRef : recentProjects)
 		{
 			auto recentProjectFilepathNode = recentProjectRef["ProjectFilepath"];
-			if ( !recentProjectFilepathNode )
+			if (!recentProjectFilepathNode)
 			{
 				continue;
 			}
 
 			Filepath projectFilepath = recentProjectFilepathNode.as<String>();
-			if ( !FileIOManager::FileExists(projectFilepath) )
+			if (!FileIOManager::FileExists(projectFilepath))
 			{
 				continue;
 			}
 
 			auto project = Shared<Project>::Create(projectFilepath);
-			if ( project->IsValid() )
+			if (project->IsValid())
 			{
 				m_Application.AddProject(project);
 			}

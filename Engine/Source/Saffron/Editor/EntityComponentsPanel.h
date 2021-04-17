@@ -23,7 +23,8 @@ private:
 	void OnGuiRenderMeshDebug();
 
 	void DrawComponents(Entity entity);
-	static bool DrawVec3Control(const String& label, Vector3f& value, float resetValue = 0.0f, float columnWidth = 100.0f);
+	static bool DrawVec3Control(const String& label, Vector3f& value, float resetValue = 0.0f,
+	                            float columnWidth = 100.0f);
 
 private:
 	Shared<Scene> m_Context;

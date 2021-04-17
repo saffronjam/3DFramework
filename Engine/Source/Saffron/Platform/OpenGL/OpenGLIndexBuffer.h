@@ -18,11 +18,11 @@ public:
 	void SetData(const void* data, uint32_t size, uint32_t offset = 0) override;
 	void SetData(const Buffer& buffer, Uint32 offset) override;
 
-	virtual uint32_t GetCount() const { return m_Size / sizeof(uint32_t); }
+	uint32_t GetCount() const override { return m_Size / sizeof(uint32_t); }
 
-	virtual uint32_t GetSize() const { return m_Size; }
+	uint32_t GetSize() const override { return m_Size; }
 
-	virtual RendererID GetRendererID() const { return m_RendererID; }
+	RendererID GetRendererID() const override { return m_RendererID; }
 
 private:
 	RendererID m_RendererID = 0;

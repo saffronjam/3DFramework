@@ -194,7 +194,7 @@ bool Gui::Property(const String& label, bool& value)
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (ImGui::Checkbox(inst.s_IDBuffer, &value)) modified = true;
 
 	SE_CORE_INFO("Button with id: {0}", inst.s_IDBuffer);
@@ -258,7 +258,7 @@ bool Gui::Property(const String& label, int& value, float step, int min, int max
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (flags == PropertyFlag::Slider) changed = ImGui::SliderInt(inst.s_IDBuffer, &value, min, max);
 	else changed = ImGui::DragInt(inst.s_IDBuffer, &value, step, min, max);
 
@@ -281,7 +281,7 @@ bool Gui::Property(const String& label, float& value, float step, float min, flo
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat(inst.s_IDBuffer, &value, min, max);
 	else changed = ImGui::DragFloat(inst.s_IDBuffer, &value, step, min, max);
 
@@ -291,7 +291,7 @@ bool Gui::Property(const String& label, float& value, float step, float min, flo
 	return changed;
 }
 
-bool Gui::Property(const String& label, Vector2f& value, Gui::PropertyFlag flags)
+bool Gui::Property(const String& label, Vector2f& value, PropertyFlag flags)
 {
 	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
@@ -309,9 +309,9 @@ bool Gui::Property(const String& label, Vector2f& value, float step, float min, 
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
-	if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat2(inst.s_IDBuffer, glm::value_ptr(value), min, max);
-	else changed = ImGui::DragFloat2(inst.s_IDBuffer, glm::value_ptr(value), step, min, max);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat2(inst.s_IDBuffer, value_ptr(value), min, max);
+	else changed = ImGui::DragFloat2(inst.s_IDBuffer, value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
@@ -337,12 +337,11 @@ bool Gui::Property(const String& label, Vector3f& value, float step, float min, 
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color))
-		changed = ImGui::ColorEdit3(inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat3(
-		inst.s_IDBuffer, glm::value_ptr(value), min, max);
-	else changed = ImGui::DragFloat3(inst.s_IDBuffer, glm::value_ptr(value), step, min, max);
+		changed = ImGui::ColorEdit3(inst.s_IDBuffer, value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat3(inst.s_IDBuffer, value_ptr(value), min, max);
+	else changed = ImGui::DragFloat3(inst.s_IDBuffer, value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
@@ -368,12 +367,11 @@ bool Gui::Property(const String& label, Vector4f& value, float step, float min, 
 	inst.s_IDBuffer[0] = '#';
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
-	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
+	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color))
-		changed = ImGui::ColorEdit3(inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat4(
-		inst.s_IDBuffer, glm::value_ptr(value), min, max);
-	else changed = ImGui::DragFloat4(inst.s_IDBuffer, glm::value_ptr(value), step, min, max);
+		changed = ImGui::ColorEdit3(inst.s_IDBuffer, value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat4(inst.s_IDBuffer, value_ptr(value), min, max);
+	else changed = ImGui::DragFloat4(inst.s_IDBuffer, value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();

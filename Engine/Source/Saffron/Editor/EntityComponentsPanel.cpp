@@ -293,8 +293,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							}*/
 							ImGui::EndGroup();
 							ImGui::SameLine();
-							ImGui::ColorEdit3("Color##Albedo", glm::value_ptr(albedoColor),
-							                  ImGuiColorEditFlags_NoInputs);
+							ImGui::ColorEdit3("Color##Albedo", value_ptr(albedoColor), ImGuiColorEditFlags_NoInputs);
 						}
 					}
 					{
@@ -450,7 +449,7 @@ void EntityComponentsPanel::OnGuiRenderMeshDebug()
 					m_AnimationPlaying;
 
 				ImGui::SliderFloat("##AnimationTime", &mesh->m_AnimationTime, 0.0f,
-				                   (float)mesh->m_Scene->mAnimations[0]->mDuration);
+				                   static_cast<float>(mesh->m_Scene->mAnimations[0]->mDuration));
 				ImGui::DragFloat("Time Scale", &mesh->m_TimeMultiplier, 0.05f, 0.0f, 10.0f);
 			}
 		}
@@ -581,8 +580,8 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 
 		if (updateTransform)
 		{
-			component.Transform = glm::translate(glm::mat4(1.0f), translation) * glm::toMat4(
-				glm::quat(glm::radians(rotation))) * glm::scale(glm::mat4(1.0f), scale);
+			component.Transform = glm::translate(glm::mat4(1.0f), translation) * toMat4(glm::quat(radians(rotation))) *
+				glm::scale(glm::mat4(1.0f), scale);
 		}
 	});
 
@@ -616,7 +615,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	{
 		// Projection Type
 		const char* projTypeStrings[] = {"Perspective", "Orthographic"};
-		const char* currentProj = projTypeStrings[(int)cc.Camera->GetProjectionMode()];
+		const char* currentProj = projTypeStrings[static_cast<int>(cc.Camera->GetProjectionMode())];
 		if (ImGui::BeginCombo("Projection", currentProj))
 		{
 			for (int type = 0; type < 2; type++)
@@ -625,7 +624,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 				if (ImGui::Selectable(projTypeStrings[type], is_selected))
 				{
 					currentProj = projTypeStrings[type];
-					cc.Camera->SetProjectionMode((SceneCamera::ProjectionMode)type);
+					cc.Camera->SetProjectionMode(static_cast<SceneCamera::ProjectionMode>(type));
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}
@@ -807,7 +806,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	{
 		// Rigidbody2D Type
 		const char* rb2dTypeStrings[] = {"Static", "Dynamic", "Kinematic"};
-		const char* currentType = rb2dTypeStrings[(int)rb2dc.BodyType];
+		const char* currentType = rb2dTypeStrings[static_cast<int>(rb2dc.BodyType)];
 		if (ImGui::BeginCombo("Type", currentType))
 		{
 			for (int type = 0; type < 3; type++)
@@ -816,7 +815,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 				if (ImGui::Selectable(rb2dTypeStrings[type], is_selected))
 				{
 					currentType = rb2dTypeStrings[type];
-					rb2dc.BodyType = (RigidBody2DComponent::Type)type;
+					rb2dc.BodyType = static_cast<RigidBody2DComponent::Type>(type);
 				}
 				if (is_selected) ImGui::SetItemDefaultFocus();
 			}

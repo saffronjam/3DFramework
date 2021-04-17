@@ -24,7 +24,7 @@ class Renderer : public SingleTon<Renderer>
 public:
 	Renderer();
 	~Renderer();
-	
+
 	static void OnGuiRender();
 
 	// Commands
@@ -43,7 +43,7 @@ public:
 	{
 		auto renderCmd = [](void* ptr)
 		{
-			auto pFunc = (FuncT*)ptr;
+			auto pFunc = static_cast<FuncT*>(ptr);
 			(*pFunc)();
 
 			// NOTE: Instead of destroying we could try and enforce all items to be trivally destructible

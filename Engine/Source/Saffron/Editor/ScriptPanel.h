@@ -14,15 +14,16 @@ public:
 		String Class;
 		Filepath Path;
 
-		ScriptStat(String namespaceName, String className, Filepath path)
-			:Full(namespaceName + className),
+		ScriptStat(String namespaceName, String className, Filepath path) :
+			Full(namespaceName + className),
 			Namespace(Move(namespaceName)),
 			Class(Move(className)),
 			Path(Move(path))
 		{
 		}
-		ScriptStat(const ScriptStat &stat)
-			:ScriptStat(stat.Namespace, stat.Class, stat.Path)
+
+		ScriptStat(const ScriptStat& stat) :
+			ScriptStat(stat.Namespace, stat.Class, stat.Path)
 		{
 		}
 	};
@@ -30,7 +31,7 @@ public:
 	struct Drop
 	{
 		size_t StorageIndex;
-		ScriptStat *Stat;
+		ScriptStat* Stat;
 	};
 
 public:
@@ -41,7 +42,8 @@ public:
 	void SyncScriptPaths();
 
 	void SetAssetFolderpath(Filepath folderpath) { m_ScriptFolderPath = Move(folderpath); }
-	const ArrayList<ScriptStat> &GetScriptStats() const { return m_ScriptStats; }
+
+	const ArrayList<ScriptStat>& GetScriptStats() const { return m_ScriptStats; }
 
 private:
 	Filepath m_ScriptFolderPath;

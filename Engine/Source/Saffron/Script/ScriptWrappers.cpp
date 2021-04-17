@@ -82,14 +82,14 @@ void Saffron_Entity_GetTransform(Uint64 entityID, Matrix4f* outTransform)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& transformComponent = entity.GetComponent<TransformComponent>();
-	memcpy(outTransform, glm::value_ptr(transformComponent.Transform), sizeof(Matrix4f));
+	memcpy(outTransform, value_ptr(transformComponent.Transform), sizeof(Matrix4f));
 }
 
 void Saffron_Entity_SetTransform(Uint64 entityID, Matrix4f* inTransform)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& transformComponent = entity.GetComponent<TransformComponent>();
-	memcpy(glm::value_ptr(transformComponent.Transform), inTransform, sizeof(Matrix4f));
+	memcpy(value_ptr(transformComponent.Transform), inTransform, sizeof(Matrix4f));
 }
 
 void Saffron_Entity_CreateComponent(Uint64 entityID, void* type)

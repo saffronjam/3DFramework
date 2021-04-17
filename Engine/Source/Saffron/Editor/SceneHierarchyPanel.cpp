@@ -134,7 +134,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 					auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 					auto cameraFrontPosition = editorCamera->GetPosition() + editorCamera->GetForwardDirection() *
 						30.0f;
-					transform = glm::translate(cameraFrontPosition) * glm::toMat4(rotation) * glm::scale(scale);
+					transform = translate(cameraFrontPosition) * toMat4(rotation) * glm::scale(scale);
 				}
 
 				if (meshComponent)
@@ -155,8 +155,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 				}
 				if (skylightComponent)
 				{
-					newEntity.AddComponent<SkylightComponent>(
-						SceneEnvironment::Load("pink_sunrise_4k.hdr"));
+					newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("pink_sunrise_4k.hdr"));
 					cameraComponent = false;
 				}
 				if (scriptComponent)
@@ -225,9 +224,7 @@ void SceneHierarchyPanel::OnCreateDirectionalLight()
 {
 	auto newEntity = m_Context->CreateEntity("Directional Light");
 	newEntity.AddComponent<DirectionalLightComponent>();
-	newEntity.GetComponent<TransformComponent>().Transform = glm::toMat4(Quaternion(glm::radians(Vector3f{
-		80.0f, 10.0f, 0.0f
-	})));
+	newEntity.GetComponent<TransformComponent>().Transform = toMat4(Quaternion(radians(Vector3f{80.0f, 10.0f, 0.0f})));
 	NewSelection.Invoke(newEntity);
 }
 
@@ -306,7 +303,7 @@ void SceneHierarchyPanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUI
 }
 
 void SceneHierarchyPanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4f& parentTransform,
-                                   Uint32 level) const
+                                            Uint32 level) const
 {
 	const Matrix4f localTransform = Mat4FromAssimpMat4(node->mTransformation);
 	const Matrix4f transform = parentTransform * localTransform;

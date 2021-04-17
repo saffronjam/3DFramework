@@ -14,7 +14,7 @@ SceneCamera::SceneCamera(Uint32 width, Uint32 height, ProjectionMode projectionT
 }
 
 
-void SceneCamera::RenderFrustum(const Matrix4f &transform) const
+void SceneCamera::RenderFrustum(const Matrix4f& transform) const
 {
 	const float nearClip = GetPerspectiveNearClip();
 	const float farClip = GetPerspectiveFarClip();
@@ -23,10 +23,10 @@ void SceneCamera::RenderFrustum(const Matrix4f &transform) const
 
 	auto [translation, rotation, scale] = Misc::GetTransformDecomposition(transform);
 
-	Vector3f &position = translation;
-	Vector3f forward = glm::normalize(glm::rotate(rotation, { 0.0f, 0.0f, -1.0f }));
-	Vector3f right = glm::normalize(glm::cross(forward, { 0.0f, 1.0f, 0.0f }));
-	Vector3f up = glm::normalize(glm::cross(right, forward));
+	Vector3f& position = translation;
+	Vector3f forward = normalize(rotate(rotation, {0.0f, 0.0f, -1.0f}));
+	Vector3f right = normalize(cross(forward, {0.0f, 1.0f, 0.0f}));
+	Vector3f up = normalize(cross(right, forward));
 
 	float Hnear = 2.0f * std::tan(fov / 2) * nearClip;
 	float Wnear = Hnear * ratio;
@@ -92,14 +92,14 @@ void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
 {
 	Camera::SetViewportSize(width, height);
-	switch ( m_ProjectionMode )
+	switch (m_ProjectionMode)
 	{
-	case ProjectionMode::Perspective:
-		m_ProjectionMatrix = glm::perspectiveFov(m_PerspectiveFOV, static_cast<float>(width), static_cast<float>(height), m_PerspectiveNear, m_PerspectiveFar);
+	case ProjectionMode::Perspective: m_ProjectionMatrix = glm::perspectiveFov(
+			m_PerspectiveFOV, static_cast<float>(width), static_cast<float>(height), m_PerspectiveNear,
+			m_PerspectiveFar);
 		break;
 
-	case ProjectionMode::Orthographic:
-		const float aspect = static_cast<float>(width) / static_cast<float>(height);
+	case ProjectionMode::Orthographic: const float aspect = static_cast<float>(width) / static_cast<float>(height);
 		const float Width = m_OrthographicSize * aspect;
 		const float Height = m_OrthographicSize;
 		m_ProjectionMatrix = glm::ortho(-Width * 0.5f, Width * 0.5f, -Height * 0.5f, Height * 0.5f);

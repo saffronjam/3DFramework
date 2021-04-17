@@ -10,18 +10,21 @@ class ViewportPane : public Managed
 public:
 	explicit ViewportPane(String windowTitle);
 
-	void OnGuiRender(bool *open = nullptr, UUID uuid = 0);
+	void OnGuiRender(bool* open = nullptr, UUID uuid = 0);
 
 	bool InViewport(Vector2f positionNDC) const;
 
 	Vector2f GetMousePosition() const;
 	Vector2f GetViewportSize() const;
+
 	Uint32 GetDockID() const { return m_DockID; }
 
-	const Vector2f &GetTopLeft() const { return m_TopLeft; }
-	const Vector2f &GetBottomRight() const { return m_BottomRight; }
+	const Vector2f& GetTopLeft() const { return m_TopLeft; }
+
+	const Vector2f& GetBottomRight() const { return m_BottomRight; }
 
 	bool IsHovered() const { return m_Hovered; }
+
 	bool IsFocused() const { return m_Focused; }
 
 public:
@@ -36,7 +39,5 @@ private:
 	Vector2f m_BottomRight;
 	bool m_Hovered;
 	bool m_Focused;
-
 };
-
 }

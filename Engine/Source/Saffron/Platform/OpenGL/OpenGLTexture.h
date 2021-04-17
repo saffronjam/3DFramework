@@ -32,7 +32,7 @@ public:
 
 	const Filepath& GetFilepath() const override;
 	RendererID GetRendererID() const override;
-	
+
 	bool Loaded() const override;
 
 private:

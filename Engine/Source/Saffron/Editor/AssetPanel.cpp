@@ -6,8 +6,8 @@
 
 namespace Se
 {
-AssetPanel::AssetPanel(Filepath path)
-	: m_AssetFolderPath(Move(path))
+AssetPanel::AssetPanel(Filepath path) :
+	m_AssetFolderPath(Move(path))
 {
 }
 
@@ -21,13 +21,13 @@ void AssetPanel::OnGuiRender()
 	ImGui::SetNextItemWidth(ImGui::GetFontSize() * static_cast<float>(noCollums));
 	ImGui::Columns(noCollums, nullptr, false);
 
-	for ( size_t i = 0; i < m_AssetStats.size(); i++ )
+	for (size_t i = 0; i < m_AssetStats.size(); i++)
 	{
 		ImGui::Button(m_AssetStats[i].Full.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 5, 60));
 
-		if ( ImGui::BeginDragDropSource(ImGuiDragDropFlags_None) )
+		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
 		{
-			Drop drop = { i, new AssetStat(m_AssetStats[i]) };
+			Drop drop = {i, new AssetStat(m_AssetStats[i])};
 			ImGui::SetDragDropPayload("ASSETMGR_DND", &drop, sizeof(Drop));
 			ImGui::Text("%s", m_AssetStats[i].Full.c_str());
 			ImGui::EndDragDropSource();
@@ -43,16 +43,16 @@ void AssetPanel::OnGuiRender()
 void AssetPanel::SyncAssetPaths()
 {
 	ScopedLock scopedLock(m_FilepathMutex);
-	if ( m_AssetFolderPath.empty() )
+	if (m_AssetFolderPath.empty())
 	{
 		return;
 	}
 
 	m_AssetStats.clear();
 	auto rawPaths = FileIOManager::GetFiles(m_AssetFolderPath, ".fbx");
-	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry &entry) mutable
-				  {
-					  m_AssetStats.emplace_back(entry.path().stem().string(), entry.path().extension().string(), entry.path());
-				  });
+	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry& entry) mutable
+	{
+		m_AssetStats.emplace_back(entry.path().stem().string(), entry.path().extension().string(), entry.path());
+	});
 }
 }

@@ -24,4 +24,3 @@
 #include "Saffron/Debug/Instrumentor.h"
 #include "Saffron/Core/Log.h"
 #include "Saffron/Core/Assert.h"
-

@@ -981,7 +981,7 @@ bool IsUsing()
 
 bool IsOver()
 {
-	return GetMoveType(NULL) != NONE || GetRotateType() != NONE || GetScaleType() != NONE || IsUsing();
+	return GetMoveType(nullptr) != NONE || GetRotateType() != NONE || GetScaleType() != NONE || IsUsing();
 }
 
 void Enable(bool enable)

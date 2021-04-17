@@ -13,22 +13,21 @@ namespace Se
 class SceneSerializer
 {
 public:
-	explicit SceneSerializer(Scene &scene);
+	explicit SceneSerializer(Scene& scene);
 
-	void Serialize(const Filepath &filepath)const;
-	void SerializeRuntime(const Filepath &filepath)const;
+	void Serialize(const Filepath& filepath) const;
+	void SerializeRuntime(const Filepath& filepath) const;
 
-	bool Deserialize(const Filepath &filepath);
-	bool DeserializeRuntime(const Filepath &filepath);
-
-private:
-	void SerializeEntity(YAML::Emitter &emitter, Entity entity) const;
-	void SerializeEnvironment(YAML::Emitter &emitter) const;
-	void SerializeEditorCamera(YAML::Emitter &emitter) const;
-
+	bool Deserialize(const Filepath& filepath);
+	bool DeserializeRuntime(const Filepath& filepath);
 
 private:
-	Scene &m_Scene;
+	void SerializeEntity(YAML::Emitter& emitter, Entity entity) const;
+	void SerializeEnvironment(YAML::Emitter& emitter) const;
+	void SerializeEditorCamera(YAML::Emitter& emitter) const;
+
+
+private:
+	Scene& m_Scene;
 };
 }
-

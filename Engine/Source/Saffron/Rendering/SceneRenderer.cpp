@@ -252,7 +252,7 @@ void SceneRenderer::OnGuiRender()
 
 		float size = ImGui::GetContentRegionAvailWidth(); // (float)fb->GetWidth() * 0.5f, (float)fb->GetHeight() * 0.5f
 		float w = size;
-		float h = w / ((float)fb->GetWidth() / (float)fb->GetHeight());
+		float h = w / (static_cast<float>(fb->GetWidth()) / static_cast<float>(fb->GetHeight()));
 		ImGui::Image((ImTextureID)id, {w, h}, {0, 1}, {1, 0});
 		Gui::EndTreeNode();
 	}
@@ -344,7 +344,7 @@ Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Filepath& fil
 
 	Renderer::Submit([envUnfiltered, envFiltered, cubemapSize]()
 	{
-		const float deltaRoughness = 1.0f / glm::max((float)(envFiltered->GetMipLevelCount() - 1.0f), 1.0f);
+		const float deltaRoughness = 1.0f / glm::max(static_cast<float>(envFiltered->GetMipLevelCount() - 1.0f), 1.0f);
 		for (int level = 1, size = cubemapSize / 2; level < envFiltered->GetMipLevelCount(); level++, size /= 2) // <= ?
 		{
 			const GLuint numGroups = glm::max(1, size / 32);
@@ -397,16 +397,16 @@ void SceneRenderer::GeometryPass()
 	auto& sceneCamera = instData.SceneData.SceneCamera;
 
 	auto viewProjection = sceneCamera.Camera.GetProjectionMatrix() * sceneCamera.ViewMatrix;
-	glm::vec3 cameraPosition = glm::inverse(instData.SceneData.SceneCamera.ViewMatrix)[3]; // TODO: Negate instead
+	glm::vec3 cameraPosition = inverse(instData.SceneData.SceneCamera.ViewMatrix)[3]; // TODO: Negate instead
 
 	// Skybox
 	auto skyboxShader = instData.SceneData.SkyboxMaterial->GetShader();
-	instData.SceneData.SkyboxMaterial->Set("u_InverseVP", glm::inverse(viewProjection));
+	instData.SceneData.SkyboxMaterial->Set("u_InverseVP", inverse(viewProjection));
 	instData.SceneData.SkyboxMaterial->Set("u_SkyIntensity", instData.SceneData.SceneEnvironmentIntensity);
 	Renderer::SubmitFullscreenQuad(instData.SceneData.SkyboxMaterial);
 
-	float aspectRatio = (float)instData.GeoPass->GetSpecification().TargetFramebuffer->GetWidth() / (float)instData.
-		GeoPass->GetSpecification().TargetFramebuffer->GetHeight();
+	float aspectRatio = static_cast<float>(instData.GeoPass->GetSpecification().TargetFramebuffer->GetWidth()) /
+		static_cast<float>(instData.GeoPass->GetSpecification().TargetFramebuffer->GetHeight());
 	float frustumSize = 2.0f * sceneCamera.Near * glm::tan(sceneCamera.FOV * 0.5f) * aspectRatio;
 
 	// Render entities
@@ -594,8 +594,8 @@ void SceneRenderer::GeometryPass()
 	{
 		instData.GridMaterial->Set("u_ViewProjection", viewProjection);
 		Renderer::SubmitQuad(instData.GridMaterial,
-		                     glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) *
-		                     glm::scale(glm::mat4(1.0f), glm::vec3(16.0f)));
+		                     rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)) * scale(
+			                     glm::mat4(1.0f), glm::vec3(16.0f)));
 	}
 
 	if (GetOptions().ShowBoundingBoxes)
@@ -753,7 +753,7 @@ void SceneRenderer::CalculateCascades(CascadeData* cascades, const glm::vec3& li
 		};
 
 		// Project frustum corners into world space
-		glm::mat4 invCam = glm::inverse(viewProjection);
+		glm::mat4 invCam = inverse(viewProjection);
 		for (uint32_t i = 0; i < 8; i++)
 		{
 			glm::vec4 invCorner = invCam * glm::vec4(frustumCorners[i], 1.0f);
@@ -778,7 +778,7 @@ void SceneRenderer::CalculateCascades(CascadeData* cascades, const glm::vec3& li
 		float radius = 0.0f;
 		for (uint32_t i = 0; i < 8; i++)
 		{
-			float distance = glm::length(frustumCorners[i] - frustumCenter);
+			float distance = length(frustumCorners[i] - frustumCenter);
 			radius = glm::max(radius, distance);
 		}
 		radius = std::ceil(radius * 16.0f) / 16.0f;
@@ -787,8 +787,8 @@ void SceneRenderer::CalculateCascades(CascadeData* cascades, const glm::vec3& li
 		glm::vec3 minExtents = -maxExtents;
 
 		glm::vec3 lightDir = -lightDirection;
-		glm::mat4 lightViewMatrix = glm::lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter,
-		                                        glm::vec3(0.0f, 0.0f, 1.0f));
+		glm::mat4 lightViewMatrix = lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter,
+		                                   glm::vec3(0.0f, 0.0f, 1.0f));
 		glm::mat4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y,
 		                                        0.0f + instData.CascadeNearPlaneOffset,
 		                                        maxExtents.z - minExtents.z + instData.CascadeFarPlaneOffset);
@@ -837,7 +837,7 @@ void SceneRenderer::ShadowMapPass()
 		glm::mat4 shadowMapVP = cascades[i].ViewProj;
 		instData.ShadowMapShader->SetMat4("u_ViewProjection", shadowMapVP);
 
-		static glm::mat4 scaleBiasMatrix = glm::scale(glm::mat4(1.0f), {0.5f, 0.5f, 0.5f}) * glm::translate(
+		static glm::mat4 scaleBiasMatrix = scale(glm::mat4(1.0f), {0.5f, 0.5f, 0.5f}) * translate(
 			glm::mat4(1.0f), {1, 1, 1});
 		instData.LightMatrices[i] = scaleBiasMatrix * cascades[i].ViewProj;
 

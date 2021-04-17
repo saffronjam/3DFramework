@@ -2,7 +2,7 @@
 
 #include "Saffron/Scene/Scene.h"
 
-namespace  Se
+namespace Se
 {
 class EditorScene : public Scene
 {
@@ -14,10 +14,12 @@ public:
 	void OnGuiRender() override;
 
 	void EnableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Enable(); }
+
 	void DisableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
 
-	const Shared<EditorCamera> &GetEditorCamera() const { return m_EditorCamera; }
-	const Filepath &GetFilepath() const { return m_Filepath; }
+	const Shared<EditorCamera>& GetEditorCamera() const { return m_EditorCamera; }
+
+	const Filepath& GetFilepath() const { return m_Filepath; }
 
 	void SetSelectedEntity(Entity entity) override;
 	void SetViewportSize(Uint32 width, Uint32 height) override;

@@ -4,7 +4,7 @@
 
 namespace Se
 {
-typedef void(*RenderCommand)(void*);
+typedef void (*RenderCommand)(void*);
 
 class RenderCommandQueue
 {
@@ -21,4 +21,3 @@ private:
 	uint32_t m_CommandCount = 0;
 };
 }
-

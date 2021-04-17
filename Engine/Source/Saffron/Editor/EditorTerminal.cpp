@@ -5,7 +5,6 @@
 
 namespace Se
 {
-
 // TODO: Implement as a GUI interface
 static Uint64 s_GuiID = 0;
 
@@ -27,22 +26,21 @@ void EditorTerminal::OnGuiRender()
 	OutputStringStream oss;
 	oss << "Terminal##" << s_GuiID++;
 
-	if ( !ImGui::Begin("Terminal") )
+	if (!ImGui::Begin("Terminal"))
 	{
 		ImGui::End();
 		return;
 	}
 
 	// Options menu
-	if ( ImGui::BeginPopup("Options") )
+	if (ImGui::BeginPopup("Options"))
 	{
 		ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
 		ImGui::EndPopup();
 	}
 
 	// Main window
-	if ( ImGui::Button("Options") )
-		ImGui::OpenPopup("Options");
+	if (ImGui::Button("Options")) ImGui::OpenPopup("Options");
 	ImGui::SameLine();
 	const bool clear = ImGui::Button("Clear");
 	ImGui::SameLine();
@@ -53,36 +51,35 @@ void EditorTerminal::OnGuiRender()
 	ImGui::Separator();
 	ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
 
-	if ( clear )
-		Clear();
-	if ( copy )
-		ImGui::LogToClipboard();
+	if (clear) Clear();
+	if (copy) ImGui::LogToClipboard();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	const char *buf = m_Sink->m_TextBuffer.begin();
-	const char *buf_end = m_Sink->m_TextBuffer.end();
-	if ( m_Filter.IsActive() )
+	const char* buf = m_Sink->m_TextBuffer.begin();
+	const char* buf_end = m_Sink->m_TextBuffer.end();
+	if (m_Filter.IsActive())
 	{
-		for ( int line_no = 0; line_no < m_Sink->m_LineOffsets.size(); line_no++ )
+		for (int line_no = 0; line_no < m_Sink->m_LineOffsets.size(); line_no++)
 		{
-			const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
-			const char *line_end = line_no + 1 < m_Sink->m_LineOffsets.size() ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1 : buf_end;
-			if ( m_Filter.PassFilter(line_start, line_end) )
-				ImGui::TextUnformatted(line_start, line_end);
+			const char* line_start = buf + m_Sink->m_LineOffsets[line_no];
+			const char* line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
+				                       ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
+				                       : buf_end;
+			if (m_Filter.PassFilter(line_start, line_end)) ImGui::TextUnformatted(line_start, line_end);
 		}
 	}
 	else
 	{
 		ImGuiListClipper clipper;
 		clipper.Begin(m_Sink->m_LineOffsets.size());
-		while ( clipper.Step() )
+		while (clipper.Step())
 		{
-			for ( int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++ )
+			for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 			{
-				const char *line_start = buf + m_Sink->m_LineOffsets[line_no];
-				const char *line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
-					? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
-					: buf_end;
+				const char* line_start = buf + m_Sink->m_LineOffsets[line_no];
+				const char* line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
+					                       ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
+					                       : buf_end;
 				ImGui::TextUnformatted(line_start, line_end);
 			}
 		}
@@ -90,8 +87,7 @@ void EditorTerminal::OnGuiRender()
 	}
 	ImGui::PopStyleVar();
 
-	if ( m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY() )
-		ImGui::SetScrollHereY(1.0f);
+	if (m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
 
 	ImGui::EndChild();
 	ImGui::End();

@@ -7,7 +7,6 @@
 
 namespace Se
 {
-
 class IndexBuffer : public Resource
 {
 public:

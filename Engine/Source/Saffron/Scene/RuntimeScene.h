@@ -18,11 +18,10 @@ public:
 	void Escape();
 	void Return();
 
-	const Shared<EditorCamera> &GetDebugCamera() const { return m_DebugCamera; }
+	const Shared<EditorCamera>& GetDebugCamera() const { return m_DebugCamera; }
 
 private:
 	Shared<EditorCamera> m_DebugCamera;
 	bool m_DebugCameraActivated = false;
 };
 }
-

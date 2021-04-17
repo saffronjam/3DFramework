@@ -6,12 +6,12 @@
 #include "Saffron/Serialize/ProjectSerializer.h"
 #include "Saffron/Scene/EditorScene.h"
 
-namespace YAML {
-
-template<>
+namespace YAML
+{
+template <>
 struct convert<Se::DateTime>
 {
-	static Node encode(const Se::DateTime &rhs)
+	static Node encode(const Se::DateTime& rhs)
 	{
 		Node node;
 		node.push_back(rhs.Year());
@@ -24,40 +24,33 @@ struct convert<Se::DateTime>
 		return node;
 	}
 
-	static bool decode(const Node &node, Se::DateTime &rhs)
+	static bool decode(const Node& node, Se::DateTime& rhs)
 	{
-		if ( !node.IsSequence() || node.size() != 7 )
-			return false;
+		if (!node.IsSequence() || node.size() != 7) return false;
 
-		rhs = Se::DateTime(node[0].as<int>(),
-						   node[1].as<int>(),
-						   node[2].as<int>(),
-						   node[3].as<int>(),
-						   node[4].as<int>(),
-						   node[5].as<int>(),
-						   node[6].as<int>());
+		rhs = Se::DateTime(node[0].as<int>(), node[1].as<int>(), node[2].as<int>(), node[3].as<int>(),
+		                   node[4].as<int>(), node[5].as<int>(), node[6].as<int>());
 		return true;
 	}
 };
-
 }
 
 namespace Se
 {
-
-YAML::Emitter &operator<<(YAML::Emitter &out, const DateTime &dateTime)
+YAML::Emitter& operator<<(YAML::Emitter& out, const DateTime& dateTime)
 {
 	out << YAML::Flow;
-	out << YAML::BeginSeq << dateTime.Year() << dateTime.Month() << dateTime.Day() << dateTime.Weekday() << dateTime.Hour() << dateTime.Minutes() << dateTime.Seconds() << YAML::EndSeq;
+	out << YAML::BeginSeq << dateTime.Year() << dateTime.Month() << dateTime.Day() << dateTime.Weekday() << dateTime.
+		Hour() << dateTime.Minutes() << dateTime.Seconds() << YAML::EndSeq;
 	return out;
 }
 
-ProjectSerializer::ProjectSerializer(Project &project)
-	: m_Project(project)
+ProjectSerializer::ProjectSerializer(Project& project) :
+	m_Project(project)
 {
 }
 
-void ProjectSerializer::Serialize(const Filepath &filepath) const
+void ProjectSerializer::Serialize(const Filepath& filepath) const
 {
 	YAML::Emitter out;
 
@@ -70,7 +63,7 @@ void ProjectSerializer::Serialize(const Filepath &filepath) const
 	out << YAML::Key << "ProjectFolderpath" << YAML::Value << m_Project.GetProjectFolderpath().string();
 	out << YAML::Key << "Scenes";
 	out << YAML::Value << YAML::BeginSeq;
-	for ( const auto &scene : m_Project.GetSceneFilepaths() )
+	for (const auto& scene : m_Project.GetSceneFilepaths())
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "SceneFilepath" << YAML::Value << scene.string();
@@ -84,39 +77,41 @@ void ProjectSerializer::Serialize(const Filepath &filepath) const
 	fout << out.c_str();
 }
 
-bool ProjectSerializer::Deserialize(const Filepath &filepath)
+bool ProjectSerializer::Deserialize(const Filepath& filepath)
 {
 	InputStream stream(filepath);
 	StringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node project = YAML::Load(strStream.str());
-	if ( !project["Project"] )
-		return false;
+	if (!project["Project"]) return false;
 
 	SE_CORE_INFO("Deserializing Project {}", project["Project"].as<String>());
 
-	std::array<YAML::Node, 6> nodes{ project["Project"], project["UUID"],project["ProjectFolderpath"],project["ProjectFilepath"], project["Scenes"], project["LastOpened"] };
+	std::array<YAML::Node, 6> nodes{
+		project["Project"], project["UUID"], project["ProjectFolderpath"], project["ProjectFilepath"],
+		project["Scenes"], project["LastOpened"]
+	};
 	bool badNode = false;
-	for ( auto &node : nodes )
+	for (auto& node : nodes)
 	{
-		if ( !node )
+		if (!node)
 		{
 			badNode = true;
 			break;
 		}
 	}
-	if ( badNode )
+	if (badNode)
 	{
 		SE_CORE_WARN("Bad project data in application file");
 		return false;
 	}
 
 	ArrayList<Filepath> sceneFilepaths;
-	for ( const auto &sceneRef : project["Scenes"] )
+	for (const auto& sceneRef : project["Scenes"])
 	{
-		const auto &sceneFilepathNode = sceneRef["SceneFilepath"];
-		if ( sceneFilepathNode )
+		const auto& sceneFilepathNode = sceneRef["SceneFilepath"];
+		if (sceneFilepathNode)
 		{
 			sceneFilepaths.push_back(sceneFilepathNode.as<String>());
 		}
@@ -131,5 +126,4 @@ bool ProjectSerializer::Deserialize(const Filepath &filepath)
 
 	return true;
 }
-
 }

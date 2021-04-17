@@ -16,13 +16,13 @@ namespace Se
 constexpr glm::precision DefaultVectorPrecision = glm::defaultp;
 constexpr glm::precision DefaultMatrixPrecision = glm::defaultp;
 
-template<glm::length_t Dimension, typename NumberType, glm::precision Precision = DefaultVectorPrecision>
+template <glm::length_t Dimension, typename NumberType, glm::precision Precision = DefaultVectorPrecision>
 using Vector = glm::vec<Dimension, NumberType, Precision>;
-template<typename NumberType>
+template <typename NumberType>
 using Vector2 = Vector<2, NumberType, DefaultVectorPrecision>;
-template<typename NumberType>
+template <typename NumberType>
 using Vector3 = Vector<3, NumberType, DefaultVectorPrecision>;
-template<typename NumberType>
+template <typename NumberType>
 using Vector4 = Vector<4, NumberType, DefaultVectorPrecision>;
 
 using Vector2f = Vector2<float>;
@@ -45,13 +45,14 @@ using Vector2b = Vector2<bool>;
 using Vector3b = Vector3<bool>;
 using Vector4b = Vector4<bool>;
 
-template<glm::length_t DimensionX, glm::length_t DimensionY, typename NumberType, glm::precision Precision = DefaultMatrixPrecision>
+template <glm::length_t DimensionX, glm::length_t DimensionY, typename NumberType, glm::precision Precision =
+	          DefaultMatrixPrecision>
 using Matrix = glm::mat<DimensionX, DimensionY, NumberType, Precision>;
-template<typename NumberType>
+template <typename NumberType>
 using Matrix2 = Matrix<2, 2, NumberType, DefaultMatrixPrecision>;
-template<typename NumberType>
+template <typename NumberType>
 using Matrix3 = Matrix<3, 3, NumberType, DefaultMatrixPrecision>;
-template<typename NumberType>
+template <typename NumberType>
 using Matrix4 = Matrix<4, 4, NumberType, DefaultMatrixPrecision>;
 
 using Matrix2f = Matrix2<float>;
@@ -85,10 +86,9 @@ public:
 	static constexpr float E = 2.71828182845904523536f;
 	static constexpr double E_D = static_cast<double>(E);
 
-	static Matrix4f ComposeMatrix(const Vector3f &translation, const Quaternion &rotation, const Vector3f &scale)
+	static Matrix4f ComposeMatrix(const Vector3f& translation, const Quaternion& rotation, const Vector3f& scale)
 	{
-		return glm::translate(translation) * glm::toMat4(rotation) * glm::scale(scale);
+		return translate(translation) * toMat4(rotation) * glm::scale(scale);
 	}
 };
-
 }

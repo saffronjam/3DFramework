@@ -5,12 +5,12 @@
 
 namespace Se
 {
-Shared<Pipeline> Pipeline::Create(const PipelineSpecification &spec)
+Shared<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
 {
 	switch (RendererAPI::Current())
 	{
-	case RendererApiType::None:    return nullptr;
-	case RendererApiType::OpenGL:  return Shared<OpenGLPipeline>::Create(spec);
+	case RendererApiType::None: return nullptr;
+	case RendererApiType::OpenGL: return Shared<OpenGLPipeline>::Create(spec);
 	}
 	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
 	return nullptr;

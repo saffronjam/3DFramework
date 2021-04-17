@@ -22,15 +22,15 @@ struct InstrumentationSession
 class Instrumentor
 {
 public:
-	Instrumentor(const Instrumentor &) = delete;
-	Instrumentor(Instrumentor &&) = delete;
+	Instrumentor(const Instrumentor&) = delete;
+	Instrumentor(Instrumentor&&) = delete;
 
-	void BeginSession(const String &name, const String &filepath = "results.json");
+	void BeginSession(const String& name, const String& filepath = "results.json");
 	void EndSession();
 
-	void WriteProfile(const ProfileResult &result);
+	void WriteProfile(const ProfileResult& result);
 
-	static Instrumentor &Get();
+	static Instrumentor& Get();
 private:
 	Instrumentor();
 	~Instrumentor();
@@ -44,14 +44,14 @@ private:
 
 private:
 	Mutex m_Mutex;
-	InstrumentationSession *m_CurrentSession;
+	InstrumentationSession* m_CurrentSession;
 	OutputStream m_OutputStream;
 };
 
 class InstrumentationTimer : public Timer
 {
 public:
-	explicit InstrumentationTimer(const char *name);
+	explicit InstrumentationTimer(const char* name);
 	~InstrumentationTimer();
 
 	void Stop();
@@ -69,19 +69,18 @@ struct ChangeResult
 };
 
 template <size_t N, size_t K>
-constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
+constexpr auto CleanupOutputString(const char (&expr)[N], const char (&remove)[K])
 {
 	ChangeResult<N> result = {};
 
 	size_t srcIndex = 0;
 	size_t dstIndex = 0;
-	while ( srcIndex < N )
+	while (srcIndex < N)
 	{
 		size_t matchIndex = 0;
-		while ( matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex] )
+		while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex])
 			matchIndex++;
-		if ( matchIndex == K - 1 )
-			srcIndex += matchIndex;
+		if (matchIndex == K - 1) srcIndex += matchIndex;
 		result.Data[dstIndex++] = expr[srcIndex] == '"' ? '\'' : expr[srcIndex];
 		srcIndex++;
 	}

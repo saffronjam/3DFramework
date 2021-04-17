@@ -7,7 +7,6 @@
 
 namespace Se
 {
-
 ////////////////////////////////////////////////////////
 /// Components for Scenes
 ////////////////////////////////////////////////////////
@@ -21,8 +20,8 @@ struct PhysicsWorld2DComponent
 {
 	PhysicsWorld2D World;
 
-	PhysicsWorld2DComponent(Scene &scene)
-		: World(scene)
+	PhysicsWorld2DComponent(Scene& scene) :
+		World(scene)
 	{
 	}
 };
@@ -31,8 +30,8 @@ struct PhysicsWorld3DComponent
 {
 	PhysicsWorld3D World;
 
-	PhysicsWorld3DComponent(Scene &scene)
-		: World(scene)
+	PhysicsWorld3DComponent(Scene& scene) :
+		World(scene)
 	{
 	}
 };
@@ -41,15 +40,17 @@ struct EditorCameraComponent
 {
 	Shared<EditorCamera> Camera;
 
-	EditorCameraComponent()
-		: Camera(Shared<EditorCamera>::Create())
+	EditorCameraComponent() :
+		Camera(Shared<EditorCamera>::Create())
 	{
 	}
-	EditorCameraComponent(Matrix4f projectionMatrix)
-		: Camera(Shared<EditorCamera>::Create(projectionMatrix))
+
+	EditorCameraComponent(Matrix4f projectionMatrix) :
+		Camera(Shared<EditorCamera>::Create(projectionMatrix))
 	{
 	}
-	EditorCameraComponent(const EditorCameraComponent &other) = default;
+
+	EditorCameraComponent(const EditorCameraComponent& other) = default;
 
 	operator Shared<EditorCamera>() const { return Camera; }
 };

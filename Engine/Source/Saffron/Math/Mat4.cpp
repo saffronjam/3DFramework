@@ -5,7 +5,6 @@
 
 namespace Se
 {
-
 /*Matrix4f Mat4::FromAssimpMat4(const aiMatrix4x4& matrix)
 {
 	Matrix4f result;
@@ -16,5 +15,4 @@ namespace Se
 	result[0][3] = matrix.d1; result[1][3] = matrix.d2; result[2][3] = matrix.d3; result[3][3] = matrix.d4;
 	return result;
 }*/
-
 }

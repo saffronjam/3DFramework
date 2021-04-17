@@ -9,13 +9,12 @@ namespace Se
 class EditorSerializer
 {
 public:
-	EditorSerializer(Layer &editorLayer);
+	EditorSerializer(Layer& editorLayer);
 
-	void Serialize(const Filepath &filepath) const;
-	bool Deserialize(const Filepath &filepath);
+	void Serialize(const Filepath& filepath) const;
+	bool Deserialize(const Filepath& filepath);
 
 private:
-	Layer &m_EditorLayer;
-
+	Layer& m_EditorLayer;
 };
 }

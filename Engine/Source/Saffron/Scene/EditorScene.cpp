@@ -36,8 +36,7 @@ void EditorScene::OnUpdate()
 			Shared<SceneCamera> camera = m_SelectedEntity.GetComponent<CameraComponent>().Camera;
 
 			camera->SetViewportSize(static_cast<Uint32>(m_ViewportWidth), static_cast<Uint32>(m_ViewportHeight));
-			const glm::mat4 cameraViewMatrix = glm::inverse(
-				m_SelectedEntity.GetComponent<TransformComponent>().Transform);
+			const glm::mat4 cameraViewMatrix = inverse(m_SelectedEntity.GetComponent<TransformComponent>().Transform);
 
 			//m_MiniTarget->SetCameraData({ camera.get(), cameraViewMatrix });
 			//m_MiniTarget->Enable();
@@ -60,7 +59,7 @@ void EditorScene::OnRender()
 		{
 			auto [transformComponent, lightComponent] = lights.get<
 				TransformComponent, DirectionalLightComponent>(entity);
-			glm::vec3 direction = -glm::normalize(glm::mat3(transformComponent.Transform) * glm::vec3(1.0f));
+			glm::vec3 direction = -normalize(glm::mat3(transformComponent.Transform) * glm::vec3(1.0f));
 			m_LightEnvironment.DirectionalLights[directionalLightIndex++] = {
 				direction, lightComponent.Radiance, lightComponent.Intensity, lightComponent.CastShadows
 			};

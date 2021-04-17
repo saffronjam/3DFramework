@@ -9,11 +9,11 @@ namespace Se
 class SplashScreenPane : public Managed
 {
 public:
-	explicit SplashScreenPane(const Shared<BatchLoader> &batchLoader);
+	explicit SplashScreenPane(const Shared<BatchLoader>& batchLoader);
 
 	void OnGuiRender();
 
-	const Shared<BatchLoader> &GetBatchLoader() const { return m_BatchLoader; }
+	const Shared<BatchLoader>& GetBatchLoader() const { return m_BatchLoader; }
 
 	void Show();
 	void Hide();
@@ -31,4 +31,3 @@ private:
 	float m_CurrentSinTimer = 0.0f;
 };
 }
-

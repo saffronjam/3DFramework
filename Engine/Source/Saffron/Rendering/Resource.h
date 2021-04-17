@@ -7,7 +7,7 @@ namespace Se
 class Resource : public Managed
 {
 public:
-	template<typename T>
+	template <typename T>
 	using Ref = Shared<T>;
 
 	virtual ~Resource() = default;

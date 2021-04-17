@@ -120,7 +120,7 @@ void RuntimeScene::OnRender()
 	if (!cameraEntity) return;
 
 	// Process camera entity
-	glm::mat4 cameraViewMatrix = glm::inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
+	glm::mat4 cameraViewMatrix = inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 	SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
 	SceneCamera& camera = *cameraEntity.GetComponent<CameraComponent>().Camera;
 	camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
@@ -134,7 +134,7 @@ void RuntimeScene::OnRender()
 		{
 			auto [transformComponent, lightComponent] = lights.get<
 				TransformComponent, DirectionalLightComponent>(entity);
-			glm::vec3 direction = -glm::normalize(glm::mat3(transformComponent.Transform) * glm::vec3(1.0f));
+			glm::vec3 direction = -normalize(glm::mat3(transformComponent.Transform) * glm::vec3(1.0f));
 			m_LightEnvironment.DirectionalLights[directionalLightIndex++] = {
 				direction, lightComponent.Radiance, lightComponent.Intensity, lightComponent.CastShadows
 			};

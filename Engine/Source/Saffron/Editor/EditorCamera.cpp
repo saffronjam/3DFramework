@@ -213,12 +213,12 @@ void EditorCamera::UpdateCameraView()
 	front.x = std::cos(m_Yaw) * std::cos(m_Pitch);
 	front.y = std::sin(m_Pitch);
 	front.z = std::sin(m_Yaw) * std::cos(m_Pitch);
-	m_Forward = glm::normalize(front);
+	m_Forward = normalize(front);
 
-	m_Right = glm::normalize(glm::cross(m_Forward, m_WorldUp));
-	m_Up = glm::normalize(glm::cross(m_Right, m_Forward));
+	m_Right = normalize(cross(m_Forward, m_WorldUp));
+	m_Up = normalize(cross(m_Right, m_Forward));
 
-	m_ViewMatrix = glm::lookAt(m_Position, m_Position + m_Forward, m_Up);
+	m_ViewMatrix = lookAt(m_Position, m_Position + m_Forward, m_Up);
 }
 
 float EditorCamera::GetZoomSpeed() const

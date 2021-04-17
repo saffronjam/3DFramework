@@ -6,7 +6,6 @@ constexpr auto BUILD_ID = "v0.1a";
 
 namespace Se
 {
-
 void Core::Initialize()
 {
 	Log::Init();
@@ -19,5 +18,4 @@ void Core::Shutdown()
 {
 	SE_CORE_TRACE("Shutting down...");
 }
-
 }

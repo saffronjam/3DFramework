@@ -29,14 +29,14 @@ public:
 	template <typename T2>
 	Shared(const Shared<T2>& other)
 	{
-		m_Instance = (T*)other.m_Instance;
+		m_Instance = static_cast<T*>(other.m_Instance);
 		IncRef();
 	}
 
 	template <typename T2>
 	Shared(Shared<T2>&& other)
 	{
-		m_Instance = (T*)other.m_Instance;
+		m_Instance = static_cast<T*>(other.m_Instance);
 		other.m_Instance = nullptr;
 	}
 

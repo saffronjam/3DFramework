@@ -59,13 +59,13 @@ void OpenGLPipeline::Bind()
 			if (glBaseType == GL_INT)
 			{
 				glVertexAttribIPointer(attribIndex, element.GetComponentCount(), glBaseType, layout.GetStride(),
-				                       (const void*)(intptr_t)element.Offset);
+				                       (const void*)static_cast<intptr_t>(element.Offset));
 			}
 			else
 			{
 				glVertexAttribPointer(attribIndex, element.GetComponentCount(), glBaseType,
 				                      element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(),
-				                      (const void*)(intptr_t)element.Offset);
+				                      (const void*)static_cast<intptr_t>(element.Offset));
 			}
 			attribIndex++;
 		}

@@ -38,7 +38,7 @@ Renderer::Renderer() :
 	SingleTon(this),
 	_data(new RendererData)
 {
-	Renderer::Submit([]() { RendererAPI::Init(); });
+	Submit([]() { RendererAPI::Init(); });
 
 	auto staticShader = Shader::Create("SaffronPBR_Static");
 	auto animShader = Shader::Create("SaffronPBR_Anim");
@@ -118,7 +118,7 @@ void Renderer::OnGuiRender()
 
 void Renderer::Clear()
 {
-	Renderer::Submit([]()
+	Submit([]()
 	{
 		RendererAPI::Clear(0.0f, 0.0f, 0.0f, 1.0f);
 	});
@@ -126,7 +126,7 @@ void Renderer::Clear()
 
 void Renderer::Clear(float r, float g, float b, float a)
 {
-	Renderer::Submit([=]()
+	Submit([=]()
 	{
 		RendererAPI::Clear(r, g, b, a);
 	});
@@ -138,7 +138,7 @@ void Renderer::SetClearColor(float r, float g, float b, float a)
 
 void Renderer::DrawIndexed(uint32_t count, PrimitiveType type, bool depthTest)
 {
-	Renderer::Submit([=]()
+	Submit([=]()
 	{
 		RendererAPI::DrawIndexed(count, type, depthTest);
 	});
@@ -146,7 +146,7 @@ void Renderer::DrawIndexed(uint32_t count, PrimitiveType type, bool depthTest)
 
 void Renderer::SetLineThickness(float thickness)
 {
-	Renderer::Submit([=]()
+	Submit([=]()
 	{
 		RendererAPI::SetLineThickness(thickness);
 	});
@@ -168,7 +168,7 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 	if (clear)
 	{
 		const glm::vec4& clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
-		Renderer::Submit([=]()
+		Submit([=]()
 		{
 			RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		});
@@ -198,14 +198,14 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& tr
 		shader->SetMat4("u_Transform", transform);
 	}
 
-	if (cullFace)Renderer::Submit([]() { glEnable(GL_CULL_FACE); });
-	else Renderer::Submit([]() { glDisable(GL_CULL_FACE); });
+	if (cullFace)Submit([]() { glEnable(GL_CULL_FACE); });
+	else Submit([]() { glDisable(GL_CULL_FACE); });
 
 	auto& instData = *Instance()._data;
 	instData.m_FullscreenQuadVertexBuffer->Bind();
 	instData.m_FullscreenQuadPipeline->Bind();
 	instData.m_FullscreenQuadIndexBuffer->Bind();
-	Renderer::DrawIndexed(6, PrimitiveType::Triangles, depthTest);
+	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
 void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform, Shared<MaterialInstance> overrideMaterial)
@@ -235,15 +235,15 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform, Shared<
 		}
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
 
-		Renderer::Submit([submesh, material]()
+		Submit([submesh, material]()
 		{
 			if (material->GetFlag(MaterialFlag::DepthTest))
 				glEnable(GL_DEPTH_TEST);
 			else
 				glDisable(GL_DEPTH_TEST);
 
-			if (!material->GetFlag(MaterialFlag::TwoSided)) Renderer::Submit([]() { glEnable(GL_CULL_FACE); });
-			else Renderer::Submit([]() { glDisable(GL_CULL_FACE); });
+			if (!material->GetFlag(MaterialFlag::TwoSided)) Submit([]() { glEnable(GL_CULL_FACE); });
+			else Submit([]() { glDisable(GL_CULL_FACE); });
 
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT,
 			                         (void*)(sizeof(uint32_t) * submesh.BaseIndex), submesh.BaseVertex);
@@ -277,10 +277,10 @@ void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
 	instData.m_FullscreenQuadPipeline->Bind();
 	instData.m_FullscreenQuadIndexBuffer->Bind();
 
-	if (cullFace)Renderer::Submit([]() { glEnable(GL_CULL_FACE); });
-	else Renderer::Submit([]() { glDisable(GL_CULL_FACE); });
+	if (cullFace)Submit([]() { glEnable(GL_CULL_FACE); });
+	else Submit([]() { glDisable(GL_CULL_FACE); });
 
-	Renderer::DrawIndexed(6, PrimitiveType::Triangles, depthTest);
+	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
 void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transform, Shared<Shader> shader)
@@ -293,7 +293,7 @@ void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transfor
 	{
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
 
-		Renderer::Submit([submesh]()
+		Submit([submesh]()
 		{
 			glDrawElementsBaseVertex(GL_TRIANGLES, submesh.IndexCount, GL_UNSIGNED_INT,
 			                         (void*)(sizeof(uint32_t) * submesh.BaseIndex), submesh.BaseVertex);

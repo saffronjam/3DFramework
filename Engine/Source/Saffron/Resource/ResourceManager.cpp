@@ -3,12 +3,12 @@
 
 namespace Se
 {
-Shared<Resource> &ResourceManager::Get(Shared<Resource> resource)
+Shared<Resource>& ResourceManager::Get(Shared<Resource> resource)
 {
 	return Get(resource->GetResourceID());
 }
 
-Shared<Resource> &ResourceManager::Get(size_t identifer)
+Shared<Resource>& ResourceManager::Get(size_t identifer)
 {
 	return GetInstance()->m_Memory.at(identifer);
 }
@@ -20,26 +20,26 @@ bool ResourceManager::Exists(Shared<Resource> resource)
 
 bool ResourceManager::Exists(size_t identifier)
 {
-	auto &instance = GetInstance();
+	auto& instance = GetInstance();
 	return instance->m_Memory.find(identifier) != instance->m_Memory.end();
 }
 
 void ResourceManager::Emplace(Shared<Resource> resource)
 {
-	auto &instance = GetInstance();
+	auto& instance = GetInstance();
 	instance->m_Memory.emplace(resource->GetResourceID(), resource);
 }
 
 void ResourceManager::Emplace(Shared<Resource> resource, size_t identifier)
 {
-	auto &instance = GetInstance();
+	auto& instance = GetInstance();
 	instance->m_Memory.emplace(identifier, resource);
 }
 
-const ArrayList<Shared<Resource>> &ResourceManager::GetAll()
+const ArrayList<Shared<Resource>>& ResourceManager::GetAll()
 {
-	auto &instance = GetInstance();
-	if ( instance->m_NeedCacheSync )
+	auto& instance = GetInstance();
+	if (instance->m_NeedCacheSync)
 	{
 		instance->SyncCache();
 	}
@@ -53,7 +53,7 @@ void ResourceManager::Clear()
 	GetInstance()->m_NeedCacheSync = false;
 }
 
-Shared<ResourceManager> &ResourceManager::GetInstance()
+Shared<ResourceManager>& ResourceManager::GetInstance()
 {
 	static Shared<ResourceManager> s_ResourceManager = Shared<ResourceManager>::Create();
 	return s_ResourceManager;
@@ -64,7 +64,7 @@ void ResourceManager::SyncCache()
 	m_ReturnCache.clear();
 	m_ReturnCache.reserve(m_Memory.size());
 	std::transform(m_Memory.begin(), m_Memory.end(), std::back_inserter(m_ReturnCache),
-				   [](const auto &pair) { return pair.second; });
+	               [](const auto& pair) { return pair.second; });
 	m_NeedCacheSync = false;
 }
 }
