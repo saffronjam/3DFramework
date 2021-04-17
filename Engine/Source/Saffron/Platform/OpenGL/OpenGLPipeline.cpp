@@ -28,10 +28,10 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	return 0;
 }
 
-OpenGLPipeline::OpenGLPipeline(const PipelineSpecification& specification) :
-	m_Specification(specification)
+OpenGLPipeline::OpenGLPipeline(PipelineSpecification specification) :
+	m_Specification(Move(specification))
 {
-	Invalidate();
+	OpenGLPipeline::Invalidate();
 }
 
 OpenGLPipeline::~OpenGLPipeline()
@@ -51,7 +51,7 @@ void OpenGLPipeline::Bind()
 		glBindVertexArray(instance->m_VertexArrayRendererID);
 
 		const auto& layout = instance->m_Specification.Layout;
-		uint32_t attribIndex = 0;
+		Uint32 attribIndex = 0;
 		for (const auto& element : layout)
 		{
 			auto glBaseType = ShaderDataTypeToOpenGLBaseType(element.Type);
@@ -59,13 +59,13 @@ void OpenGLPipeline::Bind()
 			if (glBaseType == GL_INT)
 			{
 				glVertexAttribIPointer(attribIndex, element.GetComponentCount(), glBaseType, layout.GetStride(),
-				                       (const void*)static_cast<intptr_t>(element.Offset));
+				                       reinterpret_cast<const void*>(static_cast<intptr_t>(element.Offset)));
 			}
 			else
 			{
 				glVertexAttribPointer(attribIndex, element.GetComponentCount(), glBaseType,
 				                      element.Normalized ? GL_TRUE : GL_FALSE, layout.GetStride(),
-				                      (const void*)static_cast<intptr_t>(element.Offset));
+				                      reinterpret_cast<const void*>(static_cast<intptr_t>(element.Offset)));
 			}
 			attribIndex++;
 		}
@@ -89,7 +89,7 @@ void OpenGLPipeline::Invalidate()
 
 #if 0
 			const auto& layout = instance->m_Specification.Layout;
-			uint32_t attribIndex = 0;
+			Uint32 attribIndex = 0;
 			for (const auto& element : layout)
 			{
 				auto glBaseType = ShaderDataTypeToOpenGLBaseType(element.Type);

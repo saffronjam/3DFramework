@@ -8,7 +8,7 @@
 #include "Saffron/Rendering/Material.h"
 #include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Rendering/Renderer.h"
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Rendering/Resources/Shader.h"
 
@@ -32,13 +32,13 @@ struct RendererData
 };
 
 
-RendererApiType RendererAPI::m_sCurrentAPI = RendererApiType::OpenGL;
+RendererApiType RendererApi::m_sCurrentAPI = RendererApiType::OpenGL;
 
 Renderer::Renderer() :
 	SingleTon(this),
 	_data(new RendererData)
 {
-	Submit([]() { RendererAPI::Init(); });
+	Submit([]() { RendererApi::Init(); });
 
 	auto staticShader = Shader::Create("SaffronPBR_Static");
 	auto animShader = Shader::Create("SaffronPBR_Anim");
@@ -104,7 +104,7 @@ void Renderer::OnGuiRender()
 		Counter = Time::Zero();
 	}
 
-	const auto& caps = RendererAPI::GetCapabilities();
+	const auto& caps = RendererApi::GetCapabilities();
 
 	ImGui::Begin("Renderer");
 	ImGui::Text("Vendor: %s", caps.Vendor.c_str());
@@ -120,7 +120,7 @@ void Renderer::Clear()
 {
 	Submit([]()
 	{
-		RendererAPI::Clear(0.0f, 0.0f, 0.0f, 1.0f);
+		RendererApi::Clear(0.0f, 0.0f, 0.0f, 1.0f);
 	});
 }
 
@@ -128,7 +128,7 @@ void Renderer::Clear(float r, float g, float b, float a)
 {
 	Submit([=]()
 	{
-		RendererAPI::Clear(r, g, b, a);
+		RendererApi::Clear(r, g, b, a);
 	});
 }
 
@@ -140,7 +140,7 @@ void Renderer::DrawIndexed(uint32_t count, PrimitiveType type, bool depthTest)
 {
 	Submit([=]()
 	{
-		RendererAPI::DrawIndexed(count, type, depthTest);
+		RendererApi::DrawIndexed(count, type, depthTest);
 	});
 }
 
@@ -148,7 +148,7 @@ void Renderer::SetLineThickness(float thickness)
 {
 	Submit([=]()
 	{
-		RendererAPI::SetLineThickness(thickness);
+		RendererApi::SetLineThickness(thickness);
 	});
 }
 
@@ -170,7 +170,7 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 		const glm::vec4& clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
 		Submit([=]()
 		{
-			RendererAPI::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
+			RendererApi::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		});
 	}
 }

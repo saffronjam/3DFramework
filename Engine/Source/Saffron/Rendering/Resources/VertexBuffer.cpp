@@ -5,7 +5,7 @@
 
 namespace Se
 {
-uint32_t ShaderDataTypeSize(ShaderDataType type)
+Uint32 ShaderDataTypeSize(ShaderDataType type)
 {
 	switch (type)
 	{
@@ -26,7 +26,7 @@ uint32_t ShaderDataTypeSize(ShaderDataType type)
 	return 0;
 }
 
-VertexBufferElement::VertexBufferElement(ShaderDataType type, const std::string& name, bool normalized):
+VertexBufferElement::VertexBufferElement(ShaderDataType type, const String& name, bool normalized):
 	Name(name),
 	Type(type),
 	Size(ShaderDataTypeSize(type)),
@@ -35,7 +35,7 @@ VertexBufferElement::VertexBufferElement(ShaderDataType type, const std::string&
 {
 }
 
-uint32_t VertexBufferElement::GetComponentCount() const
+Uint32 VertexBufferElement::GetComponentCount() const
 {
 	switch (Type)
 	{
@@ -60,45 +60,45 @@ VertexBufferLayout::VertexBufferLayout()
 {
 }
 
-VertexBufferLayout::VertexBufferLayout(const std::initializer_list<VertexBufferElement>& elements):
+VertexBufferLayout::VertexBufferLayout(const InitializerList<VertexBufferElement>& elements):
 	m_Elements(elements)
 {
 	CalculateOffsetsAndStride();
 }
 
-uint32_t VertexBufferLayout::GetStride() const
+Uint32 VertexBufferLayout::GetStride() const
 {
 	return m_Stride;
 }
 
-const std::vector<VertexBufferElement>& VertexBufferLayout::GetElements() const
+const ArrayList<VertexBufferElement>& VertexBufferLayout::GetElements() const
 {
 	return m_Elements;
 }
 
-std::vector<VertexBufferElement>::iterator VertexBufferLayout::begin()
+ArrayList<VertexBufferElement>::iterator VertexBufferLayout::begin()
 {
 	return m_Elements.begin();
 }
 
-std::vector<VertexBufferElement>::iterator VertexBufferLayout::end()
+ArrayList<VertexBufferElement>::iterator VertexBufferLayout::end()
 {
 	return m_Elements.end();
 }
 
-std::vector<VertexBufferElement>::const_iterator VertexBufferLayout::begin() const
+ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::begin() const
 {
 	return m_Elements.begin();
 }
 
-std::vector<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
+ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
 {
 	return m_Elements.end();
 }
 
 void VertexBufferLayout::CalculateOffsetsAndStride()
 {
-	uint32_t offset = 0;
+	Uint32 offset = 0;
 	m_Stride = 0;
 	for (auto& element : m_Elements)
 	{
@@ -108,9 +108,9 @@ void VertexBufferLayout::CalculateOffsetsAndStride()
 	}
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(void* data, uint32_t size, VertexBufferUsage usage)
+Shared<VertexBuffer> VertexBuffer::Create(void* data, Uint32 size, VertexBufferUsage usage)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLVertexBuffer>::Create(data, size, usage);
@@ -119,9 +119,9 @@ Shared<VertexBuffer> VertexBuffer::Create(void* data, uint32_t size, VertexBuffe
 	return nullptr;
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(uint32_t size, VertexBufferUsage usage)
+Shared<VertexBuffer> VertexBuffer::Create(Uint32 size, VertexBufferUsage usage)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLVertexBuffer>::Create(size, usage);

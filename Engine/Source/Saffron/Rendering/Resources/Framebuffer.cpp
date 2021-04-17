@@ -9,11 +9,22 @@ namespace Se
 /// Framebuffer
 ///////////////////////////////////////////////////////////////////////////
 
+FramebufferTextureSpecification::FramebufferTextureSpecification(FramebufferTextureFormat format):
+	TextureFormat(format)
+{
+}
+
+FramebufferAttachmentSpecification::FramebufferAttachmentSpecification(
+	const InitializerList<FramebufferTextureSpecification>& attachments):
+	Attachments(attachments)
+{
+}
+
 Shared<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 {
 	Shared<Framebuffer> result = nullptr;
 
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: result = Shared<OpenGLFramebuffer>::Create(spec);
@@ -28,7 +39,7 @@ Shared<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 
 FramebufferPool* FramebufferPool::s_Instance = new FramebufferPool;
 
-FramebufferPool::FramebufferPool(uint32_t maxFBs /* = 32 */) :
+FramebufferPool::FramebufferPool(Uint32 maxFBs /* = 32 */) :
 	SingleTon(this)
 {
 }
@@ -37,10 +48,10 @@ FramebufferPool::~FramebufferPool()
 {
 }
 
-std::weak_ptr<Framebuffer> FramebufferPool::AllocateBuffer()
+Weak<Framebuffer> FramebufferPool::AllocateBuffer()
 {
 	// m_Pool.push_back();
-	return std::weak_ptr<Framebuffer>();
+	return Weak<Framebuffer>();
 }
 
 void FramebufferPool::Add(const Shared<Framebuffer>& framebuffer)

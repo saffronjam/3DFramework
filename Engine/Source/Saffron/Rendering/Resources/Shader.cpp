@@ -42,7 +42,7 @@ Shared<Shader> Shader::Create(Filepath filepath)
 		return ResourceManager::Get(filepathHash);
 	}
 
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
 		return nullptr;
@@ -62,7 +62,7 @@ Shared<Shader> Shader::Create(Filepath filepath)
 
 Shared<Shader> Shader::Create(const Buffer& source)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return OpenGLShader::Create(source);

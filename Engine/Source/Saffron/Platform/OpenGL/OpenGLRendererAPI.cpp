@@ -2,7 +2,7 @@
 
 #include <Glad/glad.h>
 
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 #include "Saffron/Rendering/Resources/Shader.h"
 
 namespace Se
@@ -25,7 +25,7 @@ static void OpenGLLogMessage(GLenum source, GLenum type, GLuint id, GLenum sever
 	}
 }
 
-void RendererAPI::Init()
+void RendererApi::Init()
 {
 	glDebugMessageCallback(OpenGLLogMessage, nullptr);
 	glEnable(GL_DEBUG_OUTPUT);
@@ -65,22 +65,22 @@ void RendererAPI::Init()
 	}
 }
 
-void RendererAPI::Shutdown()
+void RendererApi::Shutdown()
 {
 }
 
-void RendererAPI::Clear(float r, float g, float b, float a)
+void RendererApi::Clear(float r, float g, float b, float a)
 {
 	glClearColor(r, g, b, a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void RendererAPI::SetClearColor(float r, float g, float b, float a)
+void RendererApi::SetClearColor(float r, float g, float b, float a)
 {
 	glClearColor(r, g, b, a);
 }
 
-void RendererAPI::DrawIndexed(uint32_t count, PrimitiveType type, bool depthTest)
+void RendererApi::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
 {
 	if (!depthTest)
 		glDisable(GL_DEPTH_TEST);
@@ -100,7 +100,7 @@ void RendererAPI::DrawIndexed(uint32_t count, PrimitiveType type, bool depthTest
 		glEnable(GL_DEPTH_TEST);
 }
 
-void RendererAPI::SetLineThickness(float thickness)
+void RendererApi::SetLineThickness(float thickness)
 {
 	glLineWidth(thickness);
 }

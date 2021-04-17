@@ -4,8 +4,8 @@
 
 namespace Se
 {
-OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const std::string& name,
-                                                               uint32_t count) :
+OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const String& name,
+                                                               Uint32 count) :
 	m_Domain(domain),
 	m_Type(type),
 	m_Struct(nullptr)
@@ -16,7 +16,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 }
 
 OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct* uniformStruct,
-                                                               const std::string& name, uint32_t count) :
+                                                               const String& name, Uint32 count) :
 	m_Domain(domain),
 	m_Type(Type::Struct),
 	m_Struct(uniformStruct)
@@ -26,27 +26,27 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 	m_Size = m_Struct->GetSize() * count;
 }
 
-const std::string& OpenGLShaderUniformDeclaration::GetName() const
+const String& OpenGLShaderUniformDeclaration::GetName() const
 {
 	return m_Name;
 }
 
-uint32_t OpenGLShaderUniformDeclaration::GetSize() const
+Uint32 OpenGLShaderUniformDeclaration::GetSize() const
 {
 	return m_Size;
 }
 
-uint32_t OpenGLShaderUniformDeclaration::GetCount() const
+Uint32 OpenGLShaderUniformDeclaration::GetCount() const
 {
 	return m_Count;
 }
 
-uint32_t OpenGLShaderUniformDeclaration::GetOffset() const
+Uint32 OpenGLShaderUniformDeclaration::GetOffset() const
 {
 	return m_Offset;
 }
 
-uint32_t OpenGLShaderUniformDeclaration::GetAbsoluteOffset() const
+Uint32 OpenGLShaderUniformDeclaration::GetAbsoluteOffset() const
 {
 	return m_Struct ? m_Struct->GetOffset() + m_Offset : m_Offset;
 }
@@ -77,14 +77,14 @@ const ShaderStruct& OpenGLShaderUniformDeclaration::GetShaderUniformStruct() con
 	return *m_Struct;
 }
 
-void OpenGLShaderUniformDeclaration::SetOffset(uint32_t offset)
+void OpenGLShaderUniformDeclaration::SetOffset(Uint32 offset)
 {
 	if (m_Type == Type::Struct) m_Struct->SetOffset(offset);
 
 	m_Offset = offset;
 }
 
-uint32_t OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
+Uint32 OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 {
 	switch (type)
 	{
@@ -100,7 +100,7 @@ uint32_t OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 	return 0;
 }
 
-OpenGLShaderUniformDeclaration::Type OpenGLShaderUniformDeclaration::StringToType(const std::string& type)
+OpenGLShaderUniformDeclaration::Type OpenGLShaderUniformDeclaration::StringToType(const String& type)
 {
 	if (type == "int") return Type::Int32;
 	if (type == "bool") return Type::Bool;
@@ -114,7 +114,7 @@ OpenGLShaderUniformDeclaration::Type OpenGLShaderUniformDeclaration::StringToTyp
 	return Type::None;
 }
 
-std::string OpenGLShaderUniformDeclaration::TypeToString(Type type)
+String OpenGLShaderUniformDeclaration::TypeToString(Type type)
 {
 	switch (type)
 	{
@@ -131,7 +131,7 @@ std::string OpenGLShaderUniformDeclaration::TypeToString(Type type)
 }
 
 OpenGLShaderUniformBufferDeclaration::OpenGLShaderUniformBufferDeclaration(
-	const std::string& name, ShaderDomain domain) :
+	const String& name, ShaderDomain domain) :
 	m_Name(name),
 	m_Register(0),
 	m_Size(0),
@@ -141,7 +141,7 @@ OpenGLShaderUniformBufferDeclaration::OpenGLShaderUniformBufferDeclaration(
 
 void OpenGLShaderUniformBufferDeclaration::PushUniform(OpenGLShaderUniformDeclaration* uniform)
 {
-	uint32_t offset = 0;
+	Uint32 offset = 0;
 	if (m_Uniforms.size())
 	{
 		OpenGLShaderUniformDeclaration* previous = static_cast<OpenGLShaderUniformDeclaration*>(m_Uniforms.back());
@@ -152,7 +152,32 @@ void OpenGLShaderUniformBufferDeclaration::PushUniform(OpenGLShaderUniformDeclar
 	m_Uniforms.push_back(uniform);
 }
 
-ShaderUniformDeclaration* OpenGLShaderUniformBufferDeclaration::FindUniform(const std::string& name)
+const String& OpenGLShaderUniformBufferDeclaration::GetName() const
+{
+	return m_Name;
+}
+
+Uint32 OpenGLShaderUniformBufferDeclaration::GetRegister() const
+{
+	return m_Register;
+}
+
+Uint32 OpenGLShaderUniformBufferDeclaration::GetSize() const
+{
+	return m_Size;
+}
+
+ShaderDomain OpenGLShaderUniformBufferDeclaration::GetDomain() const
+{
+	return m_Domain;
+}
+
+const ShaderUniformList& OpenGLShaderUniformBufferDeclaration::GetUniformDeclarations() const
+{
+	return m_Uniforms;
+}
+
+ShaderUniformDeclaration* OpenGLShaderUniformBufferDeclaration::FindUniform(const String& name)
 {
 	for (ShaderUniformDeclaration* uniform : m_Uniforms)
 	{
@@ -161,7 +186,7 @@ ShaderUniformDeclaration* OpenGLShaderUniformBufferDeclaration::FindUniform(cons
 	return nullptr;
 }
 
-OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, const std::string& name, uint32_t count) :
+OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, const String& name, Uint32 count) :
 	m_Name(name),
 	m_Count(count),
 	m_Type(type)
@@ -170,17 +195,17 @@ OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, cons
 	m_Count = count;
 }
 
-const std::string& OpenGLShaderResourceDeclaration::GetName() const
+const String& OpenGLShaderResourceDeclaration::GetName() const
 {
 	return m_Name;
 }
 
-uint32_t OpenGLShaderResourceDeclaration::GetRegister() const
+Uint32 OpenGLShaderResourceDeclaration::GetRegister() const
 {
 	return m_Register;
 }
 
-uint32_t OpenGLShaderResourceDeclaration::GetCount() const
+Uint32 OpenGLShaderResourceDeclaration::GetCount() const
 {
 	return m_Count;
 }
@@ -190,7 +215,7 @@ OpenGLShaderResourceDeclaration::Type OpenGLShaderResourceDeclaration::GetType()
 	return m_Type;
 }
 
-OpenGLShaderResourceDeclaration::Type OpenGLShaderResourceDeclaration::StringToType(const std::string& type)
+OpenGLShaderResourceDeclaration::Type OpenGLShaderResourceDeclaration::StringToType(const String& type)
 {
 	if (type == "sampler2D") return Type::TEXTURE2D;
 	if (type == "sampler2DMS") return Type::TEXTURE2D;
@@ -199,7 +224,7 @@ OpenGLShaderResourceDeclaration::Type OpenGLShaderResourceDeclaration::StringToT
 	return Type::NONE;
 }
 
-std::string OpenGLShaderResourceDeclaration::TypeToString(Type type)
+String OpenGLShaderResourceDeclaration::TypeToString(Type type)
 {
 	switch (type)
 	{

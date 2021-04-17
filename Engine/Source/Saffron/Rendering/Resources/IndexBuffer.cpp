@@ -7,7 +7,7 @@ namespace Se
 {
 Shared<IndexBuffer> IndexBuffer::Create(Uint32 size)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLIndexBuffer>::Create(size);
@@ -18,7 +18,7 @@ Shared<IndexBuffer> IndexBuffer::Create(Uint32 size)
 
 Shared<IndexBuffer> IndexBuffer::Create(void* data, Uint32 size)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLIndexBuffer>::Create(data, size);
@@ -29,7 +29,7 @@ Shared<IndexBuffer> IndexBuffer::Create(void* data, Uint32 size)
 
 Shared<IndexBuffer> IndexBuffer::Create(const Buffer& buffer)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLIndexBuffer>::Create(buffer);

@@ -18,7 +18,7 @@ Uint32 Texture::GetBPP(TextureFormat format)
 
 Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
 {
-	uint32_t levels = 1;
+	Uint32 levels = 1;
 	while ((width | height) >> levels) levels++;
 
 	return levels;
@@ -26,7 +26,7 @@ Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
 
 Shared<Texture2D> Texture2D::Create(TextureFormat format, Uint32 width, Uint32 height, TextureWrap wrap)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTexture2D>::Create(format, width, height, wrap);
@@ -37,7 +37,7 @@ Shared<Texture2D> Texture2D::Create(TextureFormat format, Uint32 width, Uint32 h
 
 Shared<Texture2D> Texture2D::Create(Filepath filepath, bool sRGB)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTexture2D>::Create(Move(filepath), sRGB);
@@ -48,7 +48,7 @@ Shared<Texture2D> Texture2D::Create(Filepath filepath, bool sRGB)
 
 Shared<TextureCube> TextureCube::Create(TextureFormat format, Uint32 width, Uint32 height)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTextureCube>::Create(format, width, height);
@@ -59,7 +59,7 @@ Shared<TextureCube> TextureCube::Create(TextureFormat format, Uint32 width, Uint
 
 Shared<TextureCube> TextureCube::Create(Filepath filepath)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTextureCube>::Create(Move(filepath));

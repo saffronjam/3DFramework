@@ -7,7 +7,7 @@ namespace Se
 class OpenGLPipeline : public Pipeline
 {
 public:
-	explicit OpenGLPipeline(const PipelineSpecification& specification);
+	explicit OpenGLPipeline(PipelineSpecification specification);
 	virtual ~OpenGLPipeline();
 
 	void Bind() override;
@@ -18,6 +18,6 @@ public:
 
 private:
 	PipelineSpecification m_Specification;
-	uint32_t m_VertexArrayRendererID = 0;
+	Uint32 m_VertexArrayRendererID = 0;
 };
 }

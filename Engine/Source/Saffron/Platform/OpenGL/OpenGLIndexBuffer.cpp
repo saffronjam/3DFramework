@@ -7,7 +7,7 @@
 
 namespace Se
 {
-OpenGLIndexBuffer::OpenGLIndexBuffer(void* data, uint32_t size) :
+OpenGLIndexBuffer::OpenGLIndexBuffer(void* data, Uint32 size) :
 	OpenGLIndexBuffer(Buffer(static_cast<Uint8*>(data), size))
 {
 }
@@ -25,7 +25,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(const Buffer& buffer) :
 	});
 }
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(uint32_t size) :
+OpenGLIndexBuffer::OpenGLIndexBuffer(Uint32 size) :
 	m_Size(size)
 {
 	// m_LocalData = Buffer(size);
@@ -47,7 +47,7 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer()
 	});
 }
 
-void OpenGLIndexBuffer::SetData(const void* data, uint32_t size, uint32_t offset)
+void OpenGLIndexBuffer::SetData(const void* data, Uint32 size, Uint32 offset)
 {
 	m_LocalData = Buffer::Copy(data, size);
 	m_Size = size;
@@ -61,6 +61,21 @@ void OpenGLIndexBuffer::SetData(const void* data, uint32_t size, uint32_t offset
 void OpenGLIndexBuffer::SetData(const Buffer& buffer, Uint32 offset)
 {
 	SetData(buffer.Data(), buffer.Size(), offset);
+}
+
+Uint32 OpenGLIndexBuffer::GetCount() const
+{
+	return m_Size / sizeof(Uint32);
+}
+
+Uint32 OpenGLIndexBuffer::GetSize() const
+{
+	return m_Size;
+}
+
+RendererID OpenGLIndexBuffer::GetRendererID() const
+{
+	return m_RendererID;
 }
 
 void OpenGLIndexBuffer::Bind() const

@@ -21,9 +21,9 @@ OpenGLShader::OpenGLShader(const Filepath& filepath)
 	const auto fpString = m_Filepath.string();
 
 	size_t found = fpString.find_last_of("/\\");
-	m_Name = found != std::string::npos ? fpString.substr(found + 1) : fpString;
+	m_Name = found != String::npos ? fpString.substr(found + 1) : fpString;
 	found = m_Name.find_last_of('.');
-	m_Name = found != std::string::npos ? m_Name.substr(0, found) : m_Name;
+	m_Name = found != String::npos ? m_Name.substr(0, found) : m_Name;
 
 	static int i = 0;
 	SE_CORE_INFO("Loading no: {0}: filepath: {1}", i++, filepath.string());
@@ -89,7 +89,7 @@ void OpenGLShader::Bind()
 
 Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
 {
-	std::string result;
+	String result;
 	std::ifstream in(filepath, std::ios::in | std::ios::binary);
 	if (in)
 	{
@@ -107,21 +107,21 @@ Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
 	return Buffer::Copy(result.c_str(), result.length() * sizeof(String::value_type));
 }
 
-std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const Buffer& source)
+UnorderedMap<GLenum, String> OpenGLShader::PreProcess(const Buffer& source)
 {
-	std::unordered_map<GLenum, std::string> shaderSources;
+	UnorderedMap<GLenum, String> shaderSources;
 
 	String data(reinterpret_cast<const char*>(source.Data()), source.Size());
 
 	const char* typeToken = "#type";
 	size_t typeTokenLength = strlen(typeToken);
 	size_t pos = data.find(typeToken, 0);
-	while (pos != std::string::npos)
+	while (pos != String::npos)
 	{
 		size_t eol = data.find_first_of("\r\n", pos);
-		SE_CORE_ASSERT(eol != std::string::npos, "Syntax error");
+		SE_CORE_ASSERT(eol != String::npos, "Syntax error");
 		size_t begin = pos + typeTokenLength + 1;
-		std::string type = data.substr(begin, eol - begin);
+		String type = data.substr(begin, eol - begin);
 		SE_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel" || type == "compute",
 		               "Invalid shader type specified");
 
@@ -129,7 +129,7 @@ std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const Buffer& s
 		pos = data.find(typeToken, nextLinePos);
 		auto shaderType = ShaderTypeFromString(type);
 		shaderSources[shaderType] = data.substr(nextLinePos,
-		                                        pos - (nextLinePos == std::string::npos ? data.size() - 1 : nextLinePos
+		                                        pos - (nextLinePos == String::npos ? data.size() - 1 : nextLinePos
 		                                        ));
 
 		// Compute shaders cannot contain other types
@@ -144,7 +144,7 @@ std::unordered_map<GLenum, std::string> OpenGLShader::PreProcess(const Buffer& s
 }
 
 // Parsing helper functions
-const char* FindToken(const char* str, const std::string& token)
+const char* FindToken(const char* str, const String& token)
 {
 	const char* t = str;
 	while (t = strstr(t, token.c_str()))
@@ -158,24 +158,24 @@ const char* FindToken(const char* str, const std::string& token)
 	return nullptr;
 }
 
-const char* FindToken(const std::string& string, const std::string& token)
+const char* FindToken(const String& string, const String& token)
 {
 	return FindToken(string.c_str(), token);
 }
 
-std::vector<std::string> SplitString(const std::string& string, const std::string& delimiters)
+ArrayList<String> SplitString(const String& string, const String& delimiters)
 {
 	size_t start = 0;
 	size_t end = string.find_first_of(delimiters);
 
-	std::vector<std::string> result;
+	ArrayList<String> result;
 
-	while (end <= std::string::npos)
+	while (end <= String::npos)
 	{
-		std::string token = string.substr(start, end - start);
+		String token = string.substr(start, end - start);
 		if (!token.empty()) result.push_back(token);
 
-		if (end == std::string::npos) break;
+		if (end == String::npos) break;
 
 		start = end + 1;
 		end = string.find_first_of(delimiters, start);
@@ -184,42 +184,42 @@ std::vector<std::string> SplitString(const std::string& string, const std::strin
 	return result;
 }
 
-std::vector<std::string> SplitString(const std::string& string, const char delimiter)
+ArrayList<String> SplitString(const String& string, const char delimiter)
 {
-	return SplitString(string, std::string(1, delimiter));
+	return SplitString(string, String(1, delimiter));
 }
 
-std::vector<std::string> Tokenize(const std::string& string)
+ArrayList<String> Tokenize(const String& string)
 {
 	return SplitString(string, " \t\n\r");
 }
 
-std::vector<std::string> GetLines(const std::string& string)
+ArrayList<String> GetLines(const String& string)
 {
 	return SplitString(string, "\n");
 }
 
-std::string GetBlock(const char* str, const char** outPosition)
+String GetBlock(const char* str, const char** outPosition)
 {
 	const char* end = strstr(str, "}");
 	if (!end) return str;
 
 	if (outPosition) *outPosition = end;
-	uint32_t length = end - str + 1;
-	return std::string(str, length);
+	Uint32 length = end - str + 1;
+	return String(str, length);
 }
 
-std::string GetStatement(const char* str, const char** outPosition)
+String GetStatement(const char* str, const char** outPosition)
 {
 	const char* end = strstr(str, ";");
 	if (!end) return str;
 
 	if (outPosition) *outPosition = end;
-	uint32_t length = end - str + 1;
-	return std::string(str, length);
+	Uint32 length = end - str + 1;
+	return String(str, length);
 }
 
-bool StartsWith(const std::string& string, const std::string& start)
+bool StartsWith(const String& string, const String& start)
 {
 	return string.find(start) == 0;
 }
@@ -254,7 +254,7 @@ void OpenGLShader::Parse()
 	while (token = FindToken(fstr, "uniform")) ParseUniform(GetStatement(token, &fstr), ShaderDomain::Pixel);
 }
 
-static bool IsTypeStringResource(const std::string& type)
+static bool IsTypeStringResource(const String& type)
 {
 	if (type == "sampler1D") return true;
 	if (type == "sampler2D") return true;
@@ -264,7 +264,7 @@ static bool IsTypeStringResource(const std::string& type)
 	return false;
 }
 
-ShaderStruct* OpenGLShader::FindStruct(const std::string& name)
+ShaderStruct* OpenGLShader::FindStruct(const String& name)
 {
 	for (ShaderStruct* s : m_Structs)
 	{
@@ -273,26 +273,26 @@ ShaderStruct* OpenGLShader::FindStruct(const std::string& name)
 	return nullptr;
 }
 
-void OpenGLShader::ParseUniform(const std::string& statement, ShaderDomain domain)
+void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 {
-	std::vector<std::string> tokens = Tokenize(statement);
-	uint32_t index = 0;
+	ArrayList<String> tokens = Tokenize(statement);
+	Uint32 index = 0;
 
 	index++; // "uniform"
-	std::string typeString = tokens[index++];
-	std::string name = tokens[index++];
+	String typeString = tokens[index++];
+	String name = tokens[index++];
 	// Strip ; from name if present
-	if (const char* s = strstr(name.c_str(), ";")) name = std::string(name.c_str(), s - name.c_str());
+	if (const char* s = strstr(name.c_str(), ";")) name = String(name.c_str(), s - name.c_str());
 
-	std::string n(name);
+	String n(name);
 	int32_t count = 1;
 	const char* namestr = n.c_str();
 	if (const char* s = strstr(namestr, "["))
 	{
-		name = std::string(namestr, s - namestr);
+		name = String(namestr, s - namestr);
 
 		const char* end = strstr(namestr, "]");
-		std::string c(s + 1, end - s);
+		String c(s + 1, end - s);
 		count = atoi(c.c_str());
 	}
 
@@ -346,33 +346,33 @@ void OpenGLShader::ParseUniform(const std::string& statement, ShaderDomain domai
 	}
 }
 
-void OpenGLShader::ParseUniformStruct(const std::string& block, ShaderDomain domain)
+void OpenGLShader::ParseUniformStruct(const String& block, ShaderDomain domain)
 {
-	std::vector<std::string> tokens = Tokenize(block);
+	ArrayList<String> tokens = Tokenize(block);
 
-	uint32_t index = 0;
+	Uint32 index = 0;
 	index++; // struct
-	std::string name = tokens[index++];
+	String name = tokens[index++];
 	ShaderStruct* uniformStruct = new ShaderStruct(name);
 	index++; // {
 	while (index < tokens.size())
 	{
 		if (tokens[index] == "}") break;
 
-		std::string type = tokens[index++];
-		std::string name = tokens[index++];
+		String type = tokens[index++];
+		String name = tokens[index++];
 
 		// Strip ; from name if present
-		if (const char* s = strstr(name.c_str(), ";")) name = std::string(name.c_str(), s - name.c_str());
+		if (const char* s = strstr(name.c_str(), ";")) name = String(name.c_str(), s - name.c_str());
 
-		uint32_t count = 1;
+		Uint32 count = 1;
 		const char* namestr = name.c_str();
 		if (const char* s = strstr(namestr, "["))
 		{
-			name = std::string(namestr, s - namestr);
+			name = String(namestr, s - namestr);
 
 			const char* end = strstr(namestr, "]");
-			std::string c(s + 1, end - s);
+			String c(s + 1, end - s);
 			count = atoi(c.c_str());
 		}
 		ShaderUniformDeclaration* field = new OpenGLShaderUniformDeclaration(
@@ -488,7 +488,7 @@ void OpenGLShader::ResolveUniforms()
 		}
 	}
 
-	uint32_t sampler = 0;
+	Uint32 sampler = 0;
 	for (size_t i = 0; i < m_Resources.size(); i++)
 	{
 		OpenGLShaderResourceDeclaration* resource = static_cast<OpenGLShaderResourceDeclaration*>(m_Resources[i]);
@@ -504,9 +504,9 @@ void OpenGLShader::ResolveUniforms()
 		else if (resource->GetCount() > 1)
 		{
 			resource->m_Register = sampler;
-			uint32_t count = resource->GetCount();
+			Uint32 count = resource->GetCount();
 			int* samplers = new int[count];
-			for (uint32_t s = 0; s < count; s++) samplers[s] = sampler++;
+			for (Uint32 s = 0; s < count; s++) samplers[s] = sampler++;
 			UploadUniformIntArray(resource->GetName(), samplers, count);
 			delete[] samplers;
 		}
@@ -517,7 +517,7 @@ void OpenGLShader::ValidateUniforms()
 {
 }
 
-int32_t OpenGLShader::GetUniformLocation(const std::string& name) const
+int32_t OpenGLShader::GetUniformLocation(const String& name) const
 {
 	int32_t result = glGetUniformLocation(m_RendererID, name.c_str());
 	if (result == -1)
@@ -526,7 +526,7 @@ int32_t OpenGLShader::GetUniformLocation(const std::string& name) const
 	return result;
 }
 
-GLenum OpenGLShader::ShaderTypeFromString(const std::string& type)
+GLenum OpenGLShader::ShaderTypeFromString(const String& type)
 {
 	if (type == "vertex") return GL_VERTEX_SHADER;
 	if (type == "fragment" || type == "pixel") return GL_FRAGMENT_SHADER;
@@ -537,13 +537,13 @@ GLenum OpenGLShader::ShaderTypeFromString(const std::string& type)
 
 void OpenGLShader::CompileAndUploadShader()
 {
-	std::vector<GLuint> shaderRendererIDs;
+	ArrayList<GLuint> shaderRendererIDs;
 
 	GLuint program = glCreateProgram();
 	for (auto& kv : m_ShaderSource)
 	{
 		GLenum type = kv.first;
-		std::string& source = kv.second;
+		String& source = kv.second;
 
 		GLuint shaderRendererID = glCreateShader(type);
 		const GLchar* sourceCstr = static_cast<const GLchar*>(source.c_str());
@@ -559,7 +559,7 @@ void OpenGLShader::CompileAndUploadShader()
 			glGetShaderiv(shaderRendererID, GL_INFO_LOG_LENGTH, &maxLength);
 
 			// The maxLength includes the NULL character
-			std::vector<GLchar> infoLog(maxLength);
+			ArrayList<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
 			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
@@ -586,7 +586,7 @@ void OpenGLShader::CompileAndUploadShader()
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
 		// The maxLength includes the NULL character
-		std::vector<GLchar> infoLog(maxLength);
+		ArrayList<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
 
@@ -639,7 +639,7 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 
 	SE_CORE_ASSERT(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
-	uint32_t offset = uniform->GetOffset();
+	Uint32 offset = uniform->GetOffset();
 	switch (uniform->GetType())
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool: UploadUniformFloat(
@@ -652,19 +652,19 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 	                                                                   *(int32_t*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			uniform->GetLocation(), *(glm::vec2*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector2f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			uniform->GetLocation(), *(glm::vec3*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector3f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			uniform->GetLocation(), *(glm::vec4*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector4f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(uniform->GetLocation(),
-	                                                                   *(glm::mat3*)&buffer.Data()[offset]);
+	                                                                   *(Matrix3f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(uniform->GetLocation(),
-	                                                                   *(glm::mat4*)&buffer.Data()[offset]);
+	                                                                   *(Matrix4f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
@@ -676,7 +676,7 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 {
 	//SE_CORE_ASSERT(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
-	uint32_t offset = uniform->GetOffset();
+	Uint32 offset = uniform->GetOffset();
 	switch (uniform->GetType())
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool: UploadUniformFloat(
@@ -689,19 +689,19 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 	                                                                   *(int32_t*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			uniform->GetLocation(), *(glm::vec2*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector2f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			uniform->GetLocation(), *(glm::vec3*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector3f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			uniform->GetLocation(), *(glm::vec4*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector4f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(uniform->GetLocation(),
-	                                                                   *(glm::mat3*)&buffer.Data()[offset]);
+	                                                                   *(Matrix3f*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4Array(
-			uniform->GetLocation(), *(glm::mat4*)&buffer.Data()[offset], uniform->GetCount());
+			uniform->GetLocation(), *(Matrix4f*)&buffer.Data()[offset], uniform->GetCount());
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
@@ -720,17 +720,17 @@ void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaratio
 	case OpenGLShaderUniformDeclaration::Type::Int32: UploadUniformInt(field.GetLocation(), *(int32_t*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			field.GetLocation(), *(glm::vec2*)&data[offset]);
+			field.GetLocation(), *(Vector2f*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			field.GetLocation(), *(glm::vec3*)&data[offset]);
+			field.GetLocation(), *(Vector3f*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			field.GetLocation(), *(glm::vec4*)&data[offset]);
+			field.GetLocation(), *(Vector4f*)&data[offset]);
 		break;
-	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(field.GetLocation(), *(glm::mat3*)&data[offset]);
+	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(field.GetLocation(), *(Matrix3f*)&data[offset]);
 		break;
-	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(field.GetLocation(), *(glm::mat4*)&data[offset]);
+	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(field.GetLocation(), *(Matrix4f*)&data[offset]);
 		break;
 	default: SE_CORE_ASSERT(false, "Unknown uniform type!");
 	}
@@ -745,7 +745,7 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		{
 		case UniformType::Float:
 		{
-			const std::string& name = decl.Name;
+			const String& name = decl.Name;
 			float value = *(float*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
@@ -754,8 +754,8 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		}
 		case UniformType::Float3:
 		{
-			const std::string& name = decl.Name;
-			glm::vec3& values = *(glm::vec3*)(uniformBuffer.GetBuffer() + decl.Offset);
+			const String& name = decl.Name;
+			Vector3f& values = *(Vector3f*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformFloat3(name, values);
@@ -763,8 +763,8 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		}
 		case UniformType::Float4:
 		{
-			const std::string& name = decl.Name;
-			glm::vec4& values = *(glm::vec4*)(uniformBuffer.GetBuffer() + decl.Offset);
+			const String& name = decl.Name;
+			Vector4f& values = *(Vector4f*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformFloat4(name, values);
@@ -772,8 +772,8 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		}
 		case UniformType::Matrix4x4:
 		{
-			const std::string& name = decl.Name;
-			glm::mat4& values = *(glm::mat4*)(uniformBuffer.GetBuffer() + decl.Offset);
+			const String& name = decl.Name;
+			Matrix4f& values = *(Matrix4f*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformMat4(name, values);
@@ -783,7 +783,7 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 	}
 }
 
-void OpenGLShader::SetFloat(const std::string& name, float value)
+void OpenGLShader::SetFloat(const String& name, float value)
 {
 	Renderer::Submit([=]()
 	{
@@ -791,7 +791,7 @@ void OpenGLShader::SetFloat(const std::string& name, float value)
 	});
 }
 
-void OpenGLShader::SetInt(const std::string& name, int value)
+void OpenGLShader::SetInt(const String& name, int value)
 {
 	Renderer::Submit([=]()
 	{
@@ -799,7 +799,7 @@ void OpenGLShader::SetInt(const std::string& name, int value)
 	});
 }
 
-void OpenGLShader::SetBool(const std::string& name, bool value)
+void OpenGLShader::SetBool(const String& name, bool value)
 {
 	Renderer::Submit([=]()
 	{
@@ -807,7 +807,7 @@ void OpenGLShader::SetBool(const std::string& name, bool value)
 	});
 }
 
-void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
+void OpenGLShader::SetFloat2(const String& name, const Vector2f& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -815,7 +815,7 @@ void OpenGLShader::SetFloat2(const std::string& name, const glm::vec2& value)
 	});
 }
 
-void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
+void OpenGLShader::SetFloat3(const String& name, const Vector3f& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -823,7 +823,7 @@ void OpenGLShader::SetFloat3(const std::string& name, const glm::vec3& value)
 	});
 }
 
-void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
+void OpenGLShader::SetMat4(const String& name, const Matrix4f& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -831,7 +831,7 @@ void OpenGLShader::SetMat4(const std::string& name, const glm::mat4& value)
 	});
 }
 
-void OpenGLShader::SetMat4FromRenderThread(const std::string& name, const glm::mat4& value, bool bind)
+void OpenGLShader::SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind)
 {
 	if (bind)
 	{
@@ -844,7 +844,7 @@ void OpenGLShader::SetMat4FromRenderThread(const std::string& name, const glm::m
 	}
 }
 
-void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t size)
+void OpenGLShader::SetIntArray(const String& name, int* values, Uint32 size)
 {
 	Renderer::Submit([=]()
 	{
@@ -852,52 +852,52 @@ void OpenGLShader::SetIntArray(const std::string& name, int* values, uint32_t si
 	});
 }
 
-void OpenGLShader::UploadUniformInt(uint32_t location, int32_t value)
+void OpenGLShader::UploadUniformInt(Uint32 location, int32_t value)
 {
 	glUniform1i(location, value);
 }
 
-void OpenGLShader::UploadUniformIntArray(uint32_t location, int32_t* values, int32_t count)
+void OpenGLShader::UploadUniformIntArray(Uint32 location, int32_t* values, int32_t count)
 {
 	glUniform1iv(location, count, values);
 }
 
-void OpenGLShader::UploadUniformFloat(uint32_t location, float value)
+void OpenGLShader::UploadUniformFloat(Uint32 location, float value)
 {
 	glUniform1f(location, value);
 }
 
-void OpenGLShader::UploadUniformFloat2(uint32_t location, const glm::vec2& value)
+void OpenGLShader::UploadUniformFloat2(Uint32 location, const Vector2f& value)
 {
 	glUniform2f(location, value.x, value.y);
 }
 
-void OpenGLShader::UploadUniformFloat3(uint32_t location, const glm::vec3& value)
+void OpenGLShader::UploadUniformFloat3(Uint32 location, const Vector3f& value)
 {
 	glUniform3f(location, value.x, value.y, value.z);
 }
 
-void OpenGLShader::UploadUniformFloat4(uint32_t location, const glm::vec4& value)
+void OpenGLShader::UploadUniformFloat4(Uint32 location, const Vector4f& value)
 {
 	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
-void OpenGLShader::UploadUniformMat3(uint32_t location, const glm::mat3& value)
+void OpenGLShader::UploadUniformMat3(Uint32 location, const Matrix3f& value)
 {
 	glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(value));
 }
 
-void OpenGLShader::UploadUniformMat4(uint32_t location, const glm::mat4& value)
+void OpenGLShader::UploadUniformMat4(Uint32 location, const Matrix4f& value)
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(value));
 }
 
-void OpenGLShader::UploadUniformMat4Array(uint32_t location, const glm::mat4& values, uint32_t count)
+void OpenGLShader::UploadUniformMat4Array(Uint32 location, const Matrix4f& values, Uint32 count)
 {
 	glUniformMatrix4fv(location, count, GL_FALSE, value_ptr(values));
 }
 
-void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, Uint8* buffer, uint32_t offset)
+void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, Uint8* buffer, Uint32 offset)
 {
 	const ShaderStruct& s = uniform->GetShaderUniformStruct();
 	const auto& fields = s.GetFields();
@@ -909,19 +909,19 @@ void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, 
 	}
 }
 
-void OpenGLShader::UploadUniformInt(const std::string& name, int32_t value)
+void OpenGLShader::UploadUniformInt(const String& name, int32_t value)
 {
 	int32_t location = GetUniformLocation(name);
 	glUniform1i(location, value);
 }
 
-void OpenGLShader::UploadUniformIntArray(const std::string& name, int32_t* values, uint32_t count)
+void OpenGLShader::UploadUniformIntArray(const String& name, int32_t* values, Uint32 count)
 {
 	int32_t location = GetUniformLocation(name);
 	glUniform1iv(location, count, values);
 }
 
-void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
+void OpenGLShader::UploadUniformFloat(const String& name, float value)
 {
 	glUseProgram(m_RendererID);
 	auto location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -930,7 +930,7 @@ void OpenGLShader::UploadUniformFloat(const std::string& name, float value)
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2& values)
+void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& values)
 {
 	glUseProgram(m_RendererID);
 	auto location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -940,7 +940,7 @@ void OpenGLShader::UploadUniformFloat2(const std::string& name, const glm::vec2&
 }
 
 
-void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3& values)
+void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& values)
 {
 	glUseProgram(m_RendererID);
 	auto location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -949,7 +949,7 @@ void OpenGLShader::UploadUniformFloat3(const std::string& name, const glm::vec3&
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4& values)
+void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& values)
 {
 	glUseProgram(m_RendererID);
 	auto location = glGetUniformLocation(m_RendererID, name.c_str());
@@ -958,7 +958,7 @@ void OpenGLShader::UploadUniformFloat4(const std::string& name, const glm::vec4&
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformMat4(const std::string& name, const glm::mat4& values)
+void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
 {
 	glUseProgram(m_RendererID);
 	auto location = glGetUniformLocation(m_RendererID, name.c_str());

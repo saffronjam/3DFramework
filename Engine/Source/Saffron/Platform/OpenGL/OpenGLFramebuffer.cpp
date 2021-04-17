@@ -15,7 +15,7 @@ static GLenum TextureTarget(bool multisampled)
 	return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
 
-static void CreateTextures(bool multisampled, RendererID* outID, uint32_t count)
+static void CreateTextures(bool multisampled, RendererID* outID, Uint32 count)
 {
 	glCreateTextures(TextureTarget(multisampled), 1, outID);
 }
@@ -41,7 +41,7 @@ static GLenum DataType(GLenum format)
 	return 0;
 }
 
-static void AttachColorTexture(RendererID id, int samples, GLenum format, uint32_t width, uint32_t height, int index)
+static void AttachColorTexture(RendererID id, int samples, GLenum format, Uint32 width, Uint32 height, int index)
 {
 	bool multisampled = samples > 1;
 	if (multisampled)
@@ -62,8 +62,8 @@ static void AttachColorTexture(RendererID id, int samples, GLenum format, uint32
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), id, 0);
 }
 
-static void AttachDepthTexture(RendererID id, int samples, GLenum format, GLenum attachmentType, uint32_t width,
-                               uint32_t height)
+static void AttachDepthTexture(RendererID id, int samples, GLenum format, GLenum attachmentType, Uint32 width,
+                               Uint32 height)
 {
 	bool multisampled = samples > 1;
 	if (multisampled)
@@ -117,7 +117,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer()
 	});
 }
 
-void OpenGLFramebuffer::Resize(uint32_t width, uint32_t height, bool forceRecreate)
+void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 {
 	if (!forceRecreate && (m_Width == width && m_Height == height)) return;
 
@@ -333,7 +333,7 @@ void OpenGLFramebuffer::Unbind() const
 	});
 }
 
-void OpenGLFramebuffer::BindTexture(uint32_t attachmentIndex, uint32_t slot) const
+void OpenGLFramebuffer::BindTexture(Uint32 attachmentIndex, Uint32 slot) const
 {
 	Shared<const OpenGLFramebuffer> instance = this;
 	Renderer::Submit([instance, attachmentIndex, slot]()
@@ -342,12 +342,12 @@ void OpenGLFramebuffer::BindTexture(uint32_t attachmentIndex, uint32_t slot) con
 	});
 }
 
-uint32_t OpenGLFramebuffer::GetWidth() const
+Uint32 OpenGLFramebuffer::GetWidth() const
 {
 	return m_Specification.Width;
 }
 
-uint32_t OpenGLFramebuffer::GetHeight() const
+Uint32 OpenGLFramebuffer::GetHeight() const
 {
 	return m_Specification.Height;
 }

@@ -4,7 +4,7 @@
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
 #include "Saffron/Rendering/Resource.h"
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 
 namespace Se
 {

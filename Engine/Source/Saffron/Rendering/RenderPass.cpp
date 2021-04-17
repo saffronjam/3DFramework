@@ -8,7 +8,7 @@ namespace Se
 {
 Shared<RenderPass> RenderPass::Create(const RenderPassSpecification& specification)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
 		return nullptr;

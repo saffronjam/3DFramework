@@ -42,7 +42,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	// Create GLFW Window
 	{
 #ifdef SE_DEBUG
-		if (RendererAPI::Current() == RendererApiType::OpenGL) glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
+		if (RendererApi::Current() == RendererApiType::OpenGL) glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 		_nativeWindow = glfwCreateWindow(static_cast<int>(props.Width), static_cast<int>(props.Height), _title.c_str(),
 		                                 nullptr, nullptr);

@@ -3,7 +3,7 @@
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
 #include "Saffron/Math/SaffronMath.h"
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 #include "Saffron/Rendering/Resource.h"
 #include "Saffron/Rendering/Resources/ShaderUniform.h"
 
@@ -35,7 +35,7 @@ struct UniformDecl
 {
 	UniformType Type;
 	std::ptrdiff_t Offset;
-	std::string Name;
+	String Name;
 };
 
 struct UniformBuffer
@@ -47,7 +47,7 @@ struct UniformBuffer
 	// nothing to do with GL uniform buffers, this is simply a CPU-side
 	// buffer abstraction.
 	Uint8* Buffer;
-	std::vector<UniformDecl> Uniforms;
+	ArrayList<UniformDecl> Uniforms;
 };
 
 struct UniformBufferBase
@@ -58,7 +58,7 @@ struct UniformBufferBase
 };
 
 template <unsigned int N, unsigned int U>
-struct UniformBufferDeclaration : public UniformBufferBase
+struct UniformBufferDeclaration : UniformBufferBase
 {
 	Uint8 Buffer[N];
 	UniformDecl Uniforms[U];
@@ -72,12 +72,12 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	unsigned int GetUniformCount() const override { return U; }
 
 	template <typename T>
-	void Push(const std::string& name, const T& data)
+	void Push(const String& name, const T& data)
 	{
 	}
 
 	template <>
-	void Push(const std::string& name, const float& data)
+	void Push(const String& name, const float& data)
 	{
 		Uniforms[Index++] = {UniformType::Float, Cursor, name};
 		memcpy(Buffer + Cursor, &data, sizeof(float));
@@ -85,34 +85,34 @@ struct UniformBufferDeclaration : public UniformBufferBase
 	}
 
 	template <>
-	void Push(const std::string& name, const glm::vec3& data)
+	void Push(const String& name, const Vector3f& data)
 	{
 		Uniforms[Index++] = {UniformType::Float3, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::vec3));
-		Cursor += sizeof(glm::vec3);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector3f));
+		Cursor += sizeof(Vector3f);
 	}
 
 	template <>
-	void Push(const std::string& name, const glm::vec4& data)
+	void Push(const String& name, const Vector4f& data)
 	{
 		Uniforms[Index++] = {UniformType::Float4, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::vec4));
-		Cursor += sizeof(glm::vec4);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector4f));
+		Cursor += sizeof(Vector4f);
 	}
 
 	template <>
-	void Push(const std::string& name, const glm::mat4& data)
+	void Push(const String& name, const Matrix4f& data)
 	{
 		Uniforms[Index++] = {UniformType::Matrix4x4, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(glm::mat4));
-		Cursor += sizeof(glm::mat4);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Matrix4f));
+		Cursor += sizeof(Matrix4f);
 	}
 };
 
 class Shader : public Resource
 {
 public:
-	using ShaderReloadedCallback = std::function<void()>;
+	using ShaderReloadedCallback = Function<void()>;
 
 	static void OnGuiRender();
 
@@ -125,17 +125,17 @@ public:
 	virtual void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) = 0;
 
 	// Temporary while we don't have materials
-	virtual void SetFloat(const std::string& name, float value) = 0;
-	virtual void SetInt(const std::string& name, int value) = 0;
-	virtual void SetBool(const std::string& name, bool value) = 0;
-	virtual void SetFloat2(const std::string& name, const glm::vec2& value) = 0;
-	virtual void SetFloat3(const std::string& name, const glm::vec3& value) = 0;
-	virtual void SetMat4(const std::string& name, const glm::mat4& value) = 0;
-	virtual void SetMat4FromRenderThread(const std::string& name, const glm::mat4& value, bool bind = true) = 0;
+	virtual void SetFloat(const String& name, float value) = 0;
+	virtual void SetInt(const String& name, int value) = 0;
+	virtual void SetBool(const String& name, bool value) = 0;
+	virtual void SetFloat2(const String& name, const Vector2f& value) = 0;
+	virtual void SetFloat3(const String& name, const Vector3f& value) = 0;
+	virtual void SetMat4(const String& name, const Matrix4f& value) = 0;
+	virtual void SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind = true) = 0;
 
-	virtual void SetIntArray(const std::string& name, int* values, uint32_t size) = 0;
+	virtual void SetIntArray(const String& name, int* values, Uint32 size) = 0;
 
-	virtual const std::string& GetName() const = 0;
+	virtual const String& GetName() const = 0;
 
 	// Represents a complete shader program stored in a single file.
 	// Note: currently for simplicity this is simply a string filepath, however

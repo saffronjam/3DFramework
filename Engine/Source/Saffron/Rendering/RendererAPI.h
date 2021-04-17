@@ -24,12 +24,10 @@ struct RendererCapabilities
 	int MaxTextureUnits = 0;
 };
 
-class RendererAPI
+class RendererApi
 {
 public:
-
-public:
-	virtual ~RendererAPI() = default;
+	virtual ~RendererApi() = default;
 
 	static void Init();
 	static void Shutdown();
@@ -49,6 +47,4 @@ private:
 	static RendererCapabilities m_sCapabilities;
 	static float m_LineThickness;
 };
-
-//RendererAPI::RendererCapabilities RendererAPI::m_sCapabilities = {};
 }

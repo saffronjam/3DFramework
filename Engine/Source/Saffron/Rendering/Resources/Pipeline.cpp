@@ -7,7 +7,7 @@ namespace Se
 {
 Shared<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
 {
-	switch (RendererAPI::Current())
+	switch (RendererApi::Current())
 	{
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLPipeline>::Create(spec);

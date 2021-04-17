@@ -7,7 +7,7 @@
 #include "Saffron/Core/FileIOManager.h"
 #include "Saffron/Platform/OpenGL/OpenGLTexture.h"
 #include "Saffron/Rendering/Renderer.h"
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 
 namespace Se
 {
@@ -27,7 +27,7 @@ static GLenum HazelToOpenGLTextureFormat(TextureFormat format)
 // Texture2D
 //////////////////////////////////////////////////////////////////////////////////
 
-OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32_t width, uint32_t height, TextureWrap wrap) :
+OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, Uint32 width, Uint32 height, TextureWrap wrap) :
 	m_Format(format),
 	m_Wrap(wrap),
 	m_Width(width),
@@ -45,7 +45,7 @@ OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint32_t width, uint32_t 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrap);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrap);
 		glTextureParameterf(instance->m_RendererID, GL_TEXTURE_MAX_ANISOTROPY,
-		                    RendererAPI::GetCapabilities().MaxAnisotropy);
+		                    RendererApi::GetCapabilities().MaxAnisotropy);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, HazelToOpenGLTextureFormat(instance->m_Format), instance->m_Width,
 		             instance->m_Height, 0, HazelToOpenGLTextureFormat(instance->m_Format), GL_UNSIGNED_BYTE, nullptr);
@@ -65,7 +65,7 @@ OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
 	if (stbi_is_hdr(filepathString.c_str()))
 	{
 		SE_CORE_INFO("Loading HDR texture {0}, srgb={1}", filepathString.c_str(), srgb);
-		m_ImageData = Buffer((Uint8*)stbi_loadf(filepathString.c_str(), &width, &height, &channels, 0), filesize);
+		m_ImageData = Buffer(reinterpret_cast<Uint8*>(stbi_loadf(filepathString.c_str(), &width, &height, &channels, 0)), filesize);
 		m_IsHDR = true;
 		m_Format = TextureFormat::Float16;
 	}
@@ -143,7 +143,7 @@ bool OpenGLTexture2D::operator==(const Texture& other) const
 	return m_RendererID == other.GetRendererID();
 }
 
-void OpenGLTexture2D::Bind(uint32_t slot) const
+void OpenGLTexture2D::Bind(Uint32 slot) const
 {
 	Shared<const OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, slot]()
@@ -157,12 +157,12 @@ TextureFormat OpenGLTexture2D::GetFormat() const
 	return m_Format;
 }
 
-uint32_t OpenGLTexture2D::GetWidth() const
+Uint32 OpenGLTexture2D::GetWidth() const
 {
 	return m_Width;
 }
 
-uint32_t OpenGLTexture2D::GetHeight() const
+Uint32 OpenGLTexture2D::GetHeight() const
 {
 	return m_Height;
 }
@@ -184,7 +184,7 @@ void OpenGLTexture2D::Unlock()
 	});
 }
 
-void OpenGLTexture2D::Resize(uint32_t width, uint32_t height)
+void OpenGLTexture2D::Resize(Uint32 width, Uint32 height)
 {
 	SE_CORE_ASSERT(m_Locked, "Texture must be locked!");
 
@@ -215,7 +215,7 @@ bool OpenGLTexture2D::Loaded() const
 	return m_Loaded;
 }
 
-uint32_t OpenGLTexture2D::GetMipLevelCount() const
+Uint32 OpenGLTexture2D::GetMipLevelCount() const
 {
 	return CalculateMipMapCount(m_Width, m_Height);
 }
@@ -224,13 +224,13 @@ uint32_t OpenGLTexture2D::GetMipLevelCount() const
 // TextureCube
 //////////////////////////////////////////////////////////////////////////////////
 
-OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, uint32_t width, uint32_t height)
+OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, Uint32 width, Uint32 height)
 {
 	m_Width = width;
 	m_Height = height;
 	m_Format = format;
 
-	uint32_t levels = CalculateMipMapCount(width, height);
+	Uint32 levels = CalculateMipMapCount(width, height);
 	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, levels]() mutable
 	{
@@ -261,8 +261,8 @@ OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
 	m_Height = height;
 	m_Format = TextureFormat::RGB;
 
-	uint32_t faceWidth = m_Width / 4;
-	uint32_t faceHeight = m_Height / 3;
+	Uint32 faceWidth = m_Width / 4;
+	Uint32 faceHeight = m_Height / 3;
 	SE_CORE_ASSERT(faceWidth == faceHeight, "Non-square faces!");
 
 	std::array<uint8_t*, 6> faces;
@@ -317,7 +317,7 @@ OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		glTextureParameterf(instance->m_RendererID, GL_TEXTURE_MAX_ANISOTROPY,
-		                    RendererAPI::GetCapabilities().MaxAnisotropy);
+		                    RendererApi::GetCapabilities().MaxAnisotropy);
 
 		auto format = HazelToOpenGLTextureFormat(instance->m_Format);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE,
@@ -364,12 +364,12 @@ TextureFormat OpenGLTextureCube::GetFormat() const
 	return m_Format;
 }
 
-uint32_t OpenGLTextureCube::GetWidth() const
+Uint32 OpenGLTextureCube::GetWidth() const
 {
 	return m_Width;
 }
 
-uint32_t OpenGLTextureCube::GetHeight() const
+Uint32 OpenGLTextureCube::GetHeight() const
 {
 	return m_Height;
 }
@@ -384,7 +384,7 @@ RendererID OpenGLTextureCube::GetRendererID() const
 	return m_RendererID;
 }
 
-void OpenGLTextureCube::Bind(uint32_t slot) const
+void OpenGLTextureCube::Bind(Uint32 slot) const
 {
 	Shared<const OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, slot]()
@@ -393,7 +393,7 @@ void OpenGLTextureCube::Bind(uint32_t slot) const
 	});
 }
 
-uint32_t OpenGLTextureCube::GetMipLevelCount() const
+Uint32 OpenGLTextureCube::GetMipLevelCount() const
 {
 	return CalculateMipMapCount(m_Width, m_Height);
 }

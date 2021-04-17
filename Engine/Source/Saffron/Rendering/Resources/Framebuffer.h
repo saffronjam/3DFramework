@@ -27,11 +27,7 @@ enum class FramebufferTextureFormat
 struct FramebufferTextureSpecification
 {
 	FramebufferTextureSpecification() = default;
-
-	FramebufferTextureSpecification(FramebufferTextureFormat format) :
-		TextureFormat(format)
-	{
-	}
+	explicit FramebufferTextureSpecification(FramebufferTextureFormat format);
 
 	FramebufferTextureFormat TextureFormat;
 	// TODO: filtering/wrap
@@ -40,22 +36,18 @@ struct FramebufferTextureSpecification
 struct FramebufferAttachmentSpecification
 {
 	FramebufferAttachmentSpecification() = default;
+	FramebufferAttachmentSpecification(const InitializerList<FramebufferTextureSpecification>& attachments);
 
-	FramebufferAttachmentSpecification(const std::initializer_list<FramebufferTextureSpecification>& attachments) :
-		Attachments(attachments)
-	{
-	}
-
-	std::vector<FramebufferTextureSpecification> Attachments;
+	ArrayList<FramebufferTextureSpecification> Attachments;
 };
 
 struct FramebufferSpecification
 {
-	uint32_t Width = 1280;
-	uint32_t Height = 720;
-	glm::vec4 ClearColor;
+	Uint32 Width = 1280;
+	Uint32 Height = 720;
+	Vector4f ClearColor;
 	FramebufferAttachmentSpecification Attachments;
-	uint32_t Samples = 1; // multisampling
+	Uint32 Samples = 1; // multisampling
 
 	// TODO: Temp, needs scale
 	bool NoResize = false;
@@ -74,12 +66,12 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
-	virtual void Resize(uint32_t width, uint32_t height, bool forceRecreate = false) = 0;
+	virtual void Resize(Uint32 width, Uint32 height, bool forceRecreate = false) = 0;
 
-	virtual void BindTexture(uint32_t attachmentIndex = 0, uint32_t slot = 0) const = 0;
+	virtual void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const = 0;
 
-	virtual uint32_t GetWidth() const = 0;
-	virtual uint32_t GetHeight() const = 0;
+	virtual Uint32 GetWidth() const = 0;
+	virtual Uint32 GetHeight() const = 0;
 
 	virtual RendererID GetRendererID() const = 0;
 	virtual RendererID GetColorAttachmentRendererID(int index = 0) const = 0;
@@ -93,20 +85,20 @@ public:
 class FramebufferPool final : public SingleTon<FramebufferPool>
 {
 public:
-	FramebufferPool(uint32_t maxFBs = 32);
+	explicit FramebufferPool(Uint32 maxFBs = 32);
 	~FramebufferPool();
 
-	std::weak_ptr<Framebuffer> AllocateBuffer();
+	Weak<Framebuffer> AllocateBuffer();
 	void Add(const Shared<Framebuffer>& framebuffer);
 
-	std::vector<Shared<Framebuffer>>& GetAll() { return m_Pool; }
+	ArrayList<Shared<Framebuffer>>& GetAll() { return m_Pool; }
 
-	const std::vector<Shared<Framebuffer>>& GetAll() const { return m_Pool; }
+	const ArrayList<Shared<Framebuffer>>& GetAll() const { return m_Pool; }
 
 	static FramebufferPool* GetGlobal() { return s_Instance; }
 
 private:
-	std::vector<Shared<Framebuffer>> m_Pool;
+	ArrayList<Shared<Framebuffer>> m_Pool;
 
 	static FramebufferPool* s_Instance;
 };

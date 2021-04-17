@@ -1,9 +1,9 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 
 namespace Se
 {
-RendererCapabilities RendererAPI::m_sCapabilities = {};
-float RendererAPI::m_LineThickness = 1.0f;
+RendererCapabilities RendererApi::m_sCapabilities = {};
+float RendererApi::m_LineThickness = 1.0f;
 }

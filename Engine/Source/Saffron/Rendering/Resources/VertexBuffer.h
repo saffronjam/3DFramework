@@ -2,7 +2,7 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Core/Buffer.h"
-#include "Saffron/Rendering/RendererAPI.h"
+#include "Saffron/Rendering/RendererApi.h"
 
 
 namespace Se
@@ -23,20 +23,20 @@ enum class ShaderDataType
 	Bool
 };
 
-static uint32_t ShaderDataTypeSize(ShaderDataType type);
+static Uint32 ShaderDataTypeSize(ShaderDataType type);
 
 struct VertexBufferElement
 {
-	std::string Name;
+	String Name;
 	ShaderDataType Type;
-	uint32_t Size;
-	uint32_t Offset;
+	Uint32 Size;
+	Uint32 Offset;
 	bool Normalized;
 
 	VertexBufferElement() = default;
-	VertexBufferElement(ShaderDataType type, const std::string& name, bool normalized = false);
+	VertexBufferElement(ShaderDataType type, const String& name, bool normalized = false);
 
-	uint32_t GetComponentCount() const;
+	Uint32 GetComponentCount() const;
 };
 
 class VertexBufferLayout
@@ -44,22 +44,22 @@ class VertexBufferLayout
 public:
 	VertexBufferLayout();
 
-	explicit VertexBufferLayout(const std::initializer_list<VertexBufferElement>& elements);
+	explicit VertexBufferLayout(const InitializerList<VertexBufferElement>& elements);
 
-	uint32_t GetStride() const;
-	const std::vector<VertexBufferElement>& GetElements() const;
+	Uint32 GetStride() const;
+	const ArrayList<VertexBufferElement>& GetElements() const;
 
-	std::vector<VertexBufferElement>::iterator begin();
-	std::vector<VertexBufferElement>::iterator end();
-	std::vector<VertexBufferElement>::const_iterator begin() const;
-	std::vector<VertexBufferElement>::const_iterator end() const;
+	ArrayList<VertexBufferElement>::iterator begin();
+	ArrayList<VertexBufferElement>::iterator end();
+	ArrayList<VertexBufferElement>::const_iterator begin() const;
+	ArrayList<VertexBufferElement>::const_iterator end() const;
 
 private:
 	void CalculateOffsetsAndStride();
 
 private:
-	std::vector<VertexBufferElement> m_Elements;
-	uint32_t m_Stride = 0;
+	ArrayList<VertexBufferElement> m_Elements;
+	Uint32 m_Stride = 0;
 };
 
 enum class VertexBufferUsage
@@ -76,8 +76,8 @@ public:
 
 	virtual void Bind() const = 0;
 
-	virtual void SetData(const void* buffer, uint32_t size, uint32_t offset = 0) = 0;
-	virtual void SetData(const Buffer& buffer, uint32_t offset = 0) = 0;
+	virtual void SetData(const void* buffer, Uint32 size, Uint32 offset = 0) = 0;
+	virtual void SetData(const Buffer& buffer, Uint32 offset = 0) = 0;
 
 	virtual const VertexBufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const VertexBufferLayout& layout) = 0;
@@ -85,7 +85,7 @@ public:
 	virtual unsigned int GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	static Shared<VertexBuffer> Create(void* data, uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Static);
-	static Shared<VertexBuffer> Create(uint32_t size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
+	static Shared<VertexBuffer> Create(void* data, Uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
+	static Shared<VertexBuffer> Create(Uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 };
 }
