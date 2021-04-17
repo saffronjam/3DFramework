@@ -22,7 +22,7 @@ namespace Se
 {
 App::App(const Properties& properties) :
 	SingleTon(this),
-	m_PreLoader(Shared<BatchLoader>::Create("Preloader"))
+	_preLoader(Shared<BatchLoader>::Create("Preloader"))
 {
 	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 
@@ -42,24 +42,24 @@ App::App(const Properties& properties) :
 
 	_gui = CreateUnique<Gui>();
 
-	m_PreLoader->Started += []
+	_preLoader->Started += []
 	{
 		ScriptEngine::AttachThread();
 		return false;
 	};
-	m_PreLoader->Finished += []
+	_preLoader->Finished += []
 	{
 		ScriptEngine::DetachThread();
 		return false;
 	};
 
-	m_PreLoader->Submit([this]
+	_preLoader->Submit([this]
 	{
 		AppSerializer serializer(*this);
 		serializer.Deserialize("App/ApplicationProperties.sap");
 	}, "Deserializing Engine Properties");
 
-	m_PreLoader->Submit([]
+	_preLoader->Submit([]
 	{
 		Gui::SetStyle(Gui::Style::Dark);
 	}, "Initializing GUI");
@@ -76,12 +76,12 @@ App::~App()
 
 void App::PushLayer(Shared<Layer> layer)
 {
-	_layerStack.PushLayer(layer, m_PreLoader);
+	_layerStack.PushLayer(layer, _preLoader);
 }
 
 void App::PushOverlay(Shared<Layer> overlay)
 {
-	_layerStack.PushOverlay(overlay, m_PreLoader);
+	_layerStack.PushOverlay(overlay, _preLoader);
 }
 
 void App::PopLayer(int count)
@@ -132,7 +132,7 @@ void App::Run()
 
 	while (_running)
 	{
-		if (!m_PreLoader->IsFinished())
+		if (!_preLoader->IsFinished())
 		{
 			RunSplashScreen();
 		}
@@ -165,7 +165,7 @@ void App::Run()
 
 void App::Exit()
 {
-	m_PreLoader->ForceExit();
+	_preLoader->ForceExit();
 	_running = false;
 }
 
@@ -236,14 +236,14 @@ String App::GetPlatformName()
 
 void App::RunSplashScreen()
 {
-	m_PreLoader->Execute();
+	_preLoader->Execute();
 
-	while (!m_PreLoader->IsFinished())
+	while (!_preLoader->IsFinished())
 	{
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 
-	/*SplashScreenPane splashScreenPane(m_PreLoader);
+	/*SplashScreenPane splashScreenPane(_preLoader);
 	while (!splashScreenPane.IsFinished())
 	{
 		_gui->Begin();

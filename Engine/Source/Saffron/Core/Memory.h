@@ -9,17 +9,17 @@ class Shared
 {
 public:
 	Shared() :
-		m_Instance(nullptr)
+		_instance(nullptr)
 	{
 	}
 
 	Shared(std::nullptr_t n) :
-		m_Instance(nullptr)
+		_instance(nullptr)
 	{
 	}
 
 	Shared(T* instance) :
-		m_Instance(instance)
+		_instance(instance)
 	{
 		static_assert(std::is_base_of<Managed, T>::value, "Class is not Managed!");
 
@@ -29,15 +29,15 @@ public:
 	template <typename T2>
 	Shared(const Shared<T2>& other)
 	{
-		m_Instance = static_cast<T*>(other.m_Instance);
+		_instance = static_cast<T*>(other._instance);
 		IncRef();
 	}
 
 	template <typename T2>
 	Shared(Shared<T2>&& other)
 	{
-		m_Instance = static_cast<T*>(other.m_Instance);
-		other.m_Instance = nullptr;
+		_instance = static_cast<T*>(other._instance);
+		other._instance = nullptr;
 	}
 
 	~Shared()
@@ -46,7 +46,7 @@ public:
 	}
 
 	Shared(const Shared<T>& other) :
-		m_Instance(other.m_Instance)
+		_instance(other._instance)
 	{
 		IncRef();
 	}
@@ -54,7 +54,7 @@ public:
 	Shared& operator=(std::nullptr_t)
 	{
 		DecRef();
-		m_Instance = nullptr;
+		_instance = nullptr;
 		return *this;
 	}
 
@@ -63,7 +63,7 @@ public:
 		other.IncRef();
 		DecRef();
 
-		m_Instance = other.m_Instance;
+		_instance = other._instance;
 		return *this;
 	}
 
@@ -73,7 +73,7 @@ public:
 		other.IncRef();
 		DecRef();
 
-		m_Instance = other.m_Instance;
+		_instance = other._instance;
 		return *this;
 	}
 
@@ -82,31 +82,31 @@ public:
 	{
 		DecRef();
 
-		m_Instance = other.m_Instance;
-		other.m_Instance = nullptr;
+		_instance = other._instance;
+		other._instance = nullptr;
 		return *this;
 	}
 
-	operator bool() { return m_Instance != nullptr; }
+	operator bool() { return _instance != nullptr; }
 
-	operator bool() const { return m_Instance != nullptr; }
+	operator bool() const { return _instance != nullptr; }
 
-	T* operator->() { return m_Instance; }
+	T* operator->() { return _instance; }
 
-	const T* operator->() const { return m_Instance; }
+	const T* operator->() const { return _instance; }
 
-	T& operator*() { return *m_Instance; }
+	T& operator*() { return *_instance; }
 
-	const T& operator*() const { return *m_Instance; }
+	const T& operator*() const { return *_instance; }
 
-	T* Raw() { return m_Instance; }
+	T* Raw() { return _instance; }
 
-	const T* Raw() const { return m_Instance; }
+	const T* Raw() const { return _instance; }
 
 	void Reset(T* instance = nullptr)
 	{
 		DecRef();
-		m_Instance = instance;
+		_instance = instance;
 	}
 
 	template <typename... Args>
@@ -118,23 +118,23 @@ public:
 private:
 	void IncRef() const
 	{
-		if (m_Instance) m_Instance->IncRefCount();
+		if (_instance) _instance->IncRefCount();
 	}
 
 	void DecRef() const
 	{
-		if (m_Instance)
+		if (_instance)
 		{
-			m_Instance->DecRefCount();
-			if (m_Instance->GetRefCount() == 0)
+			_instance->DecRefCount();
+			if (_instance->GetRefCount() == 0)
 			{
-				delete m_Instance;
+				delete _instance;
 			}
 		}
 	}
 
 	template <class T2>
 	friend class Shared;
-	T* m_Instance;
+	T* _instance;
 };
 }

@@ -16,12 +16,12 @@ namespace Se
 {
 struct RendererData
 {
-	Shared<RenderPass> m_ActiveRenderPass;
-	RenderCommandQueue m_CommandQueue;
+	Shared<RenderPass> _activeRenderPass;
+	RenderCommandQueue _commandQueue;
 
-	Shared<VertexBuffer> m_FullscreenQuadVertexBuffer;
-	Shared<IndexBuffer> m_FullscreenQuadIndexBuffer;
-	Shared<Pipeline> m_FullscreenQuadPipeline;
+	Shared<VertexBuffer> _fullscreenQuadVertexBuffer;
+	Shared<IndexBuffer> _fullscreenQuadIndexBuffer;
+	Shared<Pipeline> _fullscreenQuadPipeline;
 
 	static constexpr Uint32 MaxLines = 10000;
 	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
@@ -32,7 +32,7 @@ struct RendererData
 };
 
 
-RendererApiType RendererApi::m_sCurrentAPI = RendererApiType::OpenGL;
+RendererApiType RendererApi::_sCurrentAPI = RendererApiType::OpenGL;
 
 Renderer::Renderer() :
 	SingleTon(this),
@@ -69,11 +69,11 @@ Renderer::Renderer() :
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = {{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float2, "a_TexCoord"}};
-	_data->m_FullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
+	_data->_fullscreenQuadPipeline = Pipeline::Create(pipelineSpecification);
 
-	_data->m_FullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
+	_data->_fullscreenQuadVertexBuffer = VertexBuffer::Create(data, 4 * sizeof(QuadVertex));
 	uint32_t indices[6] = {0, 1, 2, 2, 3, 0,};
-	_data->m_FullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32_t));
+	_data->_fullscreenQuadIndexBuffer = IndexBuffer::Create(indices, 6 * sizeof(uint32_t));
 }
 
 Renderer::~Renderer()
@@ -87,13 +87,13 @@ void Renderer::OnGuiRender()
 
 	static Time CachedFrametime = Time::Zero();
 	static Time AverageFrameTimeCounter = Time::Zero();
-	static Uint32 m_CachedFrameCounter = 0;
-	m_CachedFrameCounter++;
+	static Uint32 _cachedFrameCounter = 0;
+	_cachedFrameCounter++;
 	if ((AverageFrameTimeCounter += ts).sec() > 1.0f)
 	{
-		CachedFrametime = AverageFrameTimeCounter / static_cast<float>(m_CachedFrameCounter);
+		CachedFrametime = AverageFrameTimeCounter / static_cast<float>(_cachedFrameCounter);
 		AverageFrameTimeCounter = Time::Zero();
-		m_CachedFrameCounter = 0;
+		_cachedFrameCounter = 0;
 	}
 
 	static Time SavedTS = Time::Zero();
@@ -162,7 +162,7 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
 
 	// TODO: Convert all of this into a render command buffer
-	Instance()._data->m_ActiveRenderPass = renderPass;
+	Instance()._data->_activeRenderPass = renderPass;
 
 	renderPass->GetSpecification().TargetFramebuffer->Bind();
 	if (clear)
@@ -178,10 +178,10 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 void Renderer::EndRenderPass()
 {
 	auto& instData = *Instance()._data;
-	SE_CORE_ASSERT(instData.m_ActiveRenderPass,
+	SE_CORE_ASSERT(instData._activeRenderPass,
 	               "No active render pass! Have you called Renderer::EndRenderPass twice?");
-	instData.m_ActiveRenderPass->GetSpecification().TargetFramebuffer->Unbind();
-	instData.m_ActiveRenderPass = nullptr;
+	instData._activeRenderPass->GetSpecification().TargetFramebuffer->Unbind();
+	instData._activeRenderPass = nullptr;
 }
 
 void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& transform)
@@ -202,9 +202,9 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& tr
 	else Submit([]() { glDisable(GL_CULL_FACE); });
 
 	auto& instData = *Instance()._data;
-	instData.m_FullscreenQuadVertexBuffer->Bind();
-	instData.m_FullscreenQuadPipeline->Bind();
-	instData.m_FullscreenQuadIndexBuffer->Bind();
+	instData._fullscreenQuadVertexBuffer->Bind();
+	instData._fullscreenQuadPipeline->Bind();
+	instData._fullscreenQuadIndexBuffer->Bind();
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
@@ -213,24 +213,24 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform, Shared<
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
 	// TODO: Sort this out
-	mesh->m_VertexBuffer->Bind();
-	mesh->m_Pipeline->Bind();
-	mesh->m_IndexBuffer->Bind();
+	mesh->_vertexBuffer->Bind();
+	mesh->_pipeline->Bind();
+	mesh->_indexBuffer->Bind();
 
 	auto& materials = mesh->GetMaterials();
-	for (Submesh& submesh : mesh->m_Submeshes)
+	for (Submesh& submesh : mesh->_submeshes)
 	{
 		// Material
 		auto material = overrideMaterial ? overrideMaterial : materials[submesh.MaterialIndex];
 		auto shader = material->GetShader();
 		material->Bind();
 
-		if (mesh->m_IsAnimated)
+		if (mesh->_isAnimated)
 		{
-			for (size_t i = 0; i < mesh->m_BoneTransforms.size(); i++)
+			for (size_t i = 0; i < mesh->_boneTransforms.size(); i++)
 			{
 				std::string uniformName = std::string("u_BoneTransforms[") + std::to_string(i) + std::string("]");
-				mesh->m_MeshShader->SetMat4(uniformName, mesh->m_BoneTransforms[i]);
+				mesh->_meshShader->SetMat4(uniformName, mesh->_boneTransforms[i]);
 			}
 		}
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
@@ -253,12 +253,12 @@ void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform, Shared<
 
 RenderCommandQueue& Renderer::GetRenderCommandQueue()
 {
-	return Instance()._data->m_CommandQueue;
+	return Instance()._data->_commandQueue;
 }
 
 void Renderer::WaitAndRender()
 {
-	Instance()._data->m_CommandQueue.Execute();
+	Instance()._data->_commandQueue.Execute();
 }
 
 void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
@@ -273,9 +273,9 @@ void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
 	}
 
 	auto& instData = *Instance()._data;
-	instData.m_FullscreenQuadVertexBuffer->Bind();
-	instData.m_FullscreenQuadPipeline->Bind();
-	instData.m_FullscreenQuadIndexBuffer->Bind();
+	instData._fullscreenQuadVertexBuffer->Bind();
+	instData._fullscreenQuadPipeline->Bind();
+	instData._fullscreenQuadIndexBuffer->Bind();
 
 	if (cullFace)Submit([]() { glEnable(GL_CULL_FACE); });
 	else Submit([]() { glDisable(GL_CULL_FACE); });
@@ -285,11 +285,11 @@ void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
 
 void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transform, Shared<Shader> shader)
 {
-	mesh->m_VertexBuffer->Bind();
-	mesh->m_Pipeline->Bind();
-	mesh->m_IndexBuffer->Bind();
+	mesh->_vertexBuffer->Bind();
+	mesh->_pipeline->Bind();
+	mesh->_indexBuffer->Bind();
 
-	for (Submesh& submesh : mesh->m_Submeshes)
+	for (Submesh& submesh : mesh->_submeshes)
 	{
 		shader->SetMat4("u_Transform", transform * submesh.Transform);
 
@@ -326,7 +326,7 @@ void Renderer::DrawAABB(const AABB& aabb, const glm::mat4& transform, const glm:
 
 void Renderer::DrawAABB(Shared<Mesh> mesh, const glm::mat4& transform, const glm::vec4& color)
 {
-	for (Submesh& submesh : mesh->m_Submeshes)
+	for (Submesh& submesh : mesh->_submeshes)
 	{
 		auto& aabb = submesh.BoundingBox;
 		auto aabbTransform = transform * submesh.Transform;

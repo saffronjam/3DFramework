@@ -15,6 +15,6 @@ public:
 	bool Deserialize(const Filepath& filepath);
 
 private:
-	Layer& m_EditorLayer;
+	Layer& _editorLayer;
 };
 }

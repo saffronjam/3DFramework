@@ -1,4 +1,4 @@
-﻿#include "SaffronPCH.h"
+#include "SaffronPCH.h"
 
 #include <yaml-cpp/yaml.h>
 
@@ -46,7 +46,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const DateTime& dateTime)
 }
 
 ProjectSerializer::ProjectSerializer(Project& project) :
-	m_Project(project)
+	_project(project)
 {
 }
 
@@ -55,15 +55,15 @@ void ProjectSerializer::Serialize(const Filepath& filepath) const
 	YAML::Emitter out;
 
 	out << YAML::BeginMap;
-	out << YAML::Key << "Project" << m_Project.GetName();
-	out << YAML::Key << "UUID" << YAML::Value << static_cast<Uint64>(m_Project.GetUUID());
-	out << YAML::Key << "LastOpened" << YAML::Value << m_Project.LastOpened();
+	out << YAML::Key << "Project" << _project.GetName();
+	out << YAML::Key << "UUID" << YAML::Value << static_cast<Uint64>(_project.GetUUID());
+	out << YAML::Key << "LastOpened" << YAML::Value << _project.LastOpened();
 
-	out << YAML::Key << "ProjectFilepath" << YAML::Value << m_Project.GetProjectFilepath().string();
-	out << YAML::Key << "ProjectFolderpath" << YAML::Value << m_Project.GetProjectFolderpath().string();
+	out << YAML::Key << "ProjectFilepath" << YAML::Value << _project.GetProjectFilepath().string();
+	out << YAML::Key << "ProjectFolderpath" << YAML::Value << _project.GetProjectFolderpath().string();
 	out << YAML::Key << "Scenes";
 	out << YAML::Value << YAML::BeginSeq;
-	for (const auto& scene : m_Project.GetSceneFilepaths())
+	for (const auto& scene : _project.GetSceneFilepaths())
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "SceneFilepath" << YAML::Value << scene.string();
@@ -116,13 +116,13 @@ bool ProjectSerializer::Deserialize(const Filepath& filepath)
 			sceneFilepaths.push_back(sceneFilepathNode.as<String>());
 		}
 	}
-	m_Project.m_UUID = project["UUID"].as<Uint64>();
-	m_Project.m_Name = project["Project"].as<String>();
-	m_Project.m_LastOpened = project["LastOpened"].as<DateTime>();
-	m_Project.m_ProjectFolderpath = project["ProjectFolderpath"].as<String>();
-	m_Project.m_ProjectFilepath = project["ProjectFilepath"].as<String>();
-	m_Project.m_SceneFilepaths = Move(sceneFilepaths);
-	m_Project.m_SceneCache.clear();
+	_project._uuid = project["UUID"].as<Uint64>();
+	_project._name = project["Project"].as<String>();
+	_project._lastOpened = project["LastOpened"].as<DateTime>();
+	_project._projectFolderpath = project["ProjectFolderpath"].as<String>();
+	_project._projectFilepath = project["ProjectFilepath"].as<String>();
+	_project._sceneFilepaths = Move(sceneFilepaths);
+	_project._sceneCache.clear();
 
 	return true;
 }

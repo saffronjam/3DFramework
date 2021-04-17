@@ -22,7 +22,7 @@ public:
 	static TimePoint GetInitialStart();
 
 private:
-	static Time m_Ts;
+	static Time _ts;
 };
 };
 }

@@ -32,11 +32,11 @@ public:
 
 	const Matrix4f& Transform() const { return GetComponent<TransformComponent>(); }
 
-	operator Uint32() const { return static_cast<Uint32>(m_Handle); }
+	operator Uint32() const { return static_cast<Uint32>(_handle); }
 
-	operator entt::entity() const { return m_Handle; }
+	operator entt::entity() const { return _handle; }
 
-	operator bool() const { return static_cast<Uint32>(m_Handle) && m_Scene; }
+	operator bool() const { return static_cast<Uint32>(_handle) && _scene; }
 
 	bool operator==(const Entity& other) const;
 	bool operator!=(const Entity& other) const;
@@ -46,20 +46,20 @@ public:
 
 	UUID GetSceneUUID() const;
 
-	Scene* GetScene() { return m_Scene; }
+	Scene* GetScene() { return _scene; }
 
-	const Scene* GetScene() const { return m_Scene; }
+	const Scene* GetScene() const { return _scene; }
 
-	EntityHandle GetHandle() const { return m_Handle; }
+	EntityHandle GetHandle() const { return _handle; }
 
 	Entity Copy(Optional<Scene*> separateScene = {});
 
 	static Entity Null() { return {entt::null, nullptr}; }
 
 private:
-	class Scene* m_Scene = nullptr;
-	EntityRegistry* m_Registry = nullptr;
-	EntityHandle m_Handle{entt::null};
+	class Scene* _scene = nullptr;
+	EntityRegistry* _registry = nullptr;
+	EntityHandle _handle{entt::null};
 
 	friend class SceneSerializer;
 };
@@ -68,33 +68,33 @@ template <typename T, typename ... Args>
 T& Entity::AddComponent(Args&&... args)
 {
 	SE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
-	return m_Registry->emplace<T>(m_Handle, std::forward<Args>(args)...);
+	return _registry->emplace<T>(_handle, std::forward<Args>(args)...);
 }
 
 template <typename T>
 T& Entity::GetComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Registry->get<T>(m_Handle);
+	return _registry->get<T>(_handle);
 }
 
 template <typename T>
 const T& Entity::GetComponent() const
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	return m_Registry->get<T>(m_Handle);
+	return _registry->get<T>(_handle);
 }
 
 template <typename T>
 bool Entity::HasComponent() const
 {
-	return m_Registry->has<T>(m_Handle);
+	return _registry->has<T>(_handle);
 }
 
 template <typename T>
 void Entity::RemoveComponent()
 {
 	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
-	m_Registry->remove<T>(m_Handle);
+	_registry->remove<T>(_handle);
 }
 }

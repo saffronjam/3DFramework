@@ -14,6 +14,6 @@ public:
 	const RenderPassSpecification& GetSpecification() const override;
 
 private:
-	RenderPassSpecification m_Specification;
+	RenderPassSpecification _specification;
 };
 }

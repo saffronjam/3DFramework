@@ -63,9 +63,9 @@ static void DrawComponent(const String& name, Entity entity, UIFunction uiFuncti
 ///////////////////////////////////////////////////////////////////////////
 
 EntityComponentsPanel::EntityComponentsPanel(const Shared<Scene>& context) :
-	m_Context(context)
+	_context(context)
 {
-	m_TexStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
+	_texStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
 }
 
 void EntityComponentsPanel::OnGuiRender()
@@ -78,127 +78,127 @@ void EntityComponentsPanel::OnGuiRender()
 
 void EntityComponentsPanel::SetContext(const Shared<Scene>& context)
 {
-	m_Context = context;
-	if (m_SelectionContext)
+	_context = context;
+	if (_selectionContext)
 	{
 		// Try and find same entity in new scene
-		const auto& entityMap = m_Context->GetEntityMap();
-		const UUID selectedEntityUUID = m_SelectionContext.GetUUID();
-		if (entityMap.find(selectedEntityUUID) != entityMap.end()) m_SelectionContext = entityMap.
+		const auto& entityMap = _context->GetEntityMap();
+		const UUID selectedEntityUUID = _selectionContext.GetUUID();
+		if (entityMap.find(selectedEntityUUID) != entityMap.end()) _selectionContext = entityMap.
 			at(selectedEntityUUID);
 	}
 }
 
 void EntityComponentsPanel::SetSelectedEntity(Entity entity)
 {
-	m_SelectionContext = entity;
+	_selectionContext = entity;
 }
 
 void EntityComponentsPanel::OnGuiRenderProperties()
 {
 	ImGui::Begin("Properties");
-	if (m_SelectionContext)
+	if (_selectionContext)
 	{
-		DrawComponents(m_SelectionContext);
+		DrawComponents(_selectionContext);
 
 		if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponentPanel");
 
 		if (ImGui::BeginPopup("AddComponentPanel"))
 		{
-			if (!m_SelectionContext.HasComponent<CameraComponent>())
+			if (!_selectionContext.HasComponent<CameraComponent>())
 			{
 				if (ImGui::Button("Camera"))
 				{
-					m_SelectionContext.AddComponent<CameraComponent>();
+					_selectionContext.AddComponent<CameraComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<MeshComponent>())
+			if (!_selectionContext.HasComponent<MeshComponent>())
 			{
 				if (ImGui::Button("Mesh"))
 				{
 					const String defaultMeshPath = "Cube1m.fbx";
-					m_SelectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
+					_selectionContext.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<DirectionalLightComponent>())
+			if (!_selectionContext.HasComponent<DirectionalLightComponent>())
 			{
 				if (ImGui::Button("Directional Light"))
 				{
-					m_SelectionContext.AddComponent<DirectionalLightComponent>();
+					_selectionContext.AddComponent<DirectionalLightComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<SkylightComponent>())
+			if (!_selectionContext.HasComponent<SkylightComponent>())
 			{
 				if (ImGui::Button("Skylight"))
 				{
-					m_SelectionContext.AddComponent<SkylightComponent>(SceneEnvironment::Load("birchwood_4k.hdr"));
+					_selectionContext.AddComponent<SkylightComponent>(SceneEnvironment::Load("birchwood_4k.hdr"));
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<ScriptComponent>())
+			if (!_selectionContext.HasComponent<ScriptComponent>())
 			{
 				if (ImGui::Button("Script"))
 				{
-					m_SelectionContext.AddComponent<ScriptComponent>();
+					_selectionContext.AddComponent<ScriptComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
+			if (!_selectionContext.HasComponent<SpriteRendererComponent>())
 			{
 				if (ImGui::Button("Sprite Renderer"))
 				{
-					m_SelectionContext.AddComponent<SpriteRendererComponent>();
+					_selectionContext.AddComponent<SpriteRendererComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<RigidBody2DComponent>())
+			if (!_selectionContext.HasComponent<RigidBody2DComponent>())
 			{
 				if (ImGui::Button("Rigidbody 2D"))
 				{
-					m_SelectionContext.AddComponent<RigidBody2DComponent>();
+					_selectionContext.AddComponent<RigidBody2DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<BoxCollider2DComponent>())
+			if (!_selectionContext.HasComponent<BoxCollider2DComponent>())
 			{
 				if (ImGui::Button("Box Collider 2D"))
 				{
-					m_SelectionContext.AddComponent<BoxCollider2DComponent>();
+					_selectionContext.AddComponent<BoxCollider2DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<CircleCollider2DComponent>())
+			if (!_selectionContext.HasComponent<CircleCollider2DComponent>())
 			{
 				if (ImGui::Button("Circle Collider 2D"))
 				{
-					m_SelectionContext.AddComponent<CircleCollider2DComponent>();
+					_selectionContext.AddComponent<CircleCollider2DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<RigidBody3DComponent>())
+			if (!_selectionContext.HasComponent<RigidBody3DComponent>())
 			{
 				if (ImGui::Button("Rigidbody 3D"))
 				{
-					m_SelectionContext.AddComponent<RigidBody3DComponent>();
+					_selectionContext.AddComponent<RigidBody3DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<BoxCollider3DComponent>())
+			if (!_selectionContext.HasComponent<BoxCollider3DComponent>())
 			{
 				if (ImGui::Button("Box Collider 3D"))
 				{
-					m_SelectionContext.AddComponent<BoxCollider3DComponent>();
+					_selectionContext.AddComponent<BoxCollider3DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
-			if (!m_SelectionContext.HasComponent<SphereCollider3DComponent>())
+			if (!_selectionContext.HasComponent<SphereCollider3DComponent>())
 			{
 				if (ImGui::Button("Sphere Collider 3D"))
 				{
-					m_SelectionContext.AddComponent<SphereCollider3DComponent>();
+					_selectionContext.AddComponent<SphereCollider3DComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -212,9 +212,9 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 {
 	ImGui::Begin("Materials");
 
-	if (m_SelectionContext)
+	if (_selectionContext)
 	{
-		Entity selectedEntity = m_SelectionContext;
+		Entity selectedEntity = _selectionContext;
 		if (selectedEntity.HasComponent<MeshComponent>())
 		{
 			Shared<Mesh> mesh = selectedEntity.GetComponent<MeshComponent>().Mesh;
@@ -257,7 +257,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::Image(
 								albedoMap
 									? reinterpret_cast<void*>(albedoMap->GetRendererID())
-									: reinterpret_cast<void*>(m_TexStore["Checkerboard"]->GetRendererID()),
+									: reinterpret_cast<void*>(_texStore["Checkerboard"]->GetRendererID()),
 								ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if (ImGui::IsItemHovered())
@@ -276,7 +276,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 									const Filepath filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
-										albedoMap = Texture2D::Create(filepath.string(), true/*m_AlbedoInput.sRGB*/);
+										albedoMap = Texture2D::Create(filepath.string(), true/*_albedoInput.sRGB*/);
 										materialInstance->Set("u_AlbedoTexture", albedoMap);
 									}
 								}
@@ -286,10 +286,10 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							if (ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap)) materialInstance->Set<float>(
 								"u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
 
-							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &m_AlbedoInput.sRGB))
+							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &_albedoInput.sRGB))
 							{
-								if (m_AlbedoInput.TextureMap)
-									m_AlbedoInput.TextureMap = Shared<Texture2D>(m_AlbedoInput.TextureMap->::CreateGetPath(), m_AlbedoInput.sRGB);
+								if (_albedoInput.TextureMap)
+									_albedoInput.TextureMap = Shared<Texture2D>(_albedoInput.TextureMap->::CreateGetPath(), _albedoInput.sRGB);
 							}*/
 							ImGui::EndGroup();
 							ImGui::SameLine();
@@ -306,7 +306,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::Image(
 								normalMap
 									? reinterpret_cast<void*>(normalMap->GetRendererID())
-									: reinterpret_cast<void*>(m_TexStore["Checkerboard"]->GetRendererID()),
+									: reinterpret_cast<void*>(_texStore["Checkerboard"]->GetRendererID()),
 								ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if (ImGui::IsItemHovered())
@@ -346,7 +346,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::Image(
 								metalnessMap
 									? reinterpret_cast<void*>(metalnessMap->GetRendererID())
-									: reinterpret_cast<void*>(m_TexStore["Checkerboard"]->GetRendererID()),
+									: reinterpret_cast<void*>(_texStore["Checkerboard"]->GetRendererID()),
 								ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if (ImGui::IsItemHovered())
@@ -389,7 +389,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							ImGui::Image(
 								roughnessMap
 									? reinterpret_cast<void*>(roughnessMap->GetRendererID())
-									: reinterpret_cast<void*>(m_TexStore["Checkerboard"]->GetRendererID()),
+									: reinterpret_cast<void*>(_texStore["Checkerboard"]->GetRendererID()),
 								ImVec2(64, 64));
 							ImGui::PopStyleVar();
 							if (ImGui::IsItemHovered())
@@ -432,25 +432,25 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 void EntityComponentsPanel::OnGuiRenderMeshDebug()
 {
 	ImGui::Begin("Mesh Debug");
-	if (!m_SelectionContext)
+	if (!_selectionContext)
 	{
 		ImGui::Text("No selected entity");
 	}
-	else if (m_SelectionContext.HasComponent<MeshComponent>())
+	else if (_selectionContext.HasComponent<MeshComponent>())
 	{
-		Shared<Mesh> mesh = m_SelectionContext.GetComponent<MeshComponent>().Mesh;
+		Shared<Mesh> mesh = _selectionContext.GetComponent<MeshComponent>().Mesh;
 		ImGui::TextWrapped("File: %s", mesh->GetFilepath().c_str());
 
-		if (mesh->m_IsAnimated)
+		if (mesh->_isAnimated)
 		{
 			if (ImGui::CollapsingHeader("Animation"))
 			{
-				if (ImGui::Button(mesh->m_AnimationPlaying ? "Pause" : "Play")) mesh->m_AnimationPlaying = !mesh->
-					m_AnimationPlaying;
+				if (ImGui::Button(mesh->_animationPlaying ? "Pause" : "Play")) mesh->_animationPlaying = !mesh->
+					_animationPlaying;
 
-				ImGui::SliderFloat("##AnimationTime", &mesh->m_AnimationTime, 0.0f,
-				                   static_cast<float>(mesh->m_Scene->mAnimations[0]->mDuration));
-				ImGui::DragFloat("Time Scale", &mesh->m_TimeMultiplier, 0.05f, 0.0f, 10.0f);
+				ImGui::SliderFloat("##AnimationTime", &mesh->_animationTime, 0.0f,
+				                   static_cast<float>(mesh->_scene->mAnimations[0]->mDuration));
+				ImGui::DragFloat("Time Scale", &mesh->_timeMultiplier, 0.05f, 0.0f, 10.0f);
 			}
 		}
 	}
@@ -493,75 +493,75 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 
 	if (ImGui::BeginPopup("AddComponentPanel"))
 	{
-		if (!m_SelectionContext.HasComponent<CameraComponent>())
+		if (!_selectionContext.HasComponent<CameraComponent>())
 		{
 			if (ImGui::Button("Camera"))
 			{
-				m_SelectionContext.AddComponent<CameraComponent>();
+				_selectionContext.AddComponent<CameraComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<MeshComponent>())
+		if (!_selectionContext.HasComponent<MeshComponent>())
 		{
 			if (ImGui::Button("Mesh"))
 			{
-				m_SelectionContext.AddComponent<MeshComponent>();
+				_selectionContext.AddComponent<MeshComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<DirectionalLightComponent>())
+		if (!_selectionContext.HasComponent<DirectionalLightComponent>())
 		{
 			if (ImGui::Button("Directional Light"))
 			{
-				m_SelectionContext.AddComponent<DirectionalLightComponent>();
+				_selectionContext.AddComponent<DirectionalLightComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<SkylightComponent>())
+		if (!_selectionContext.HasComponent<SkylightComponent>())
 		{
 			if (ImGui::Button("Sky Light"))
 			{
-				m_SelectionContext.AddComponent<SkylightComponent>();
+				_selectionContext.AddComponent<SkylightComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<ScriptComponent>())
+		if (!_selectionContext.HasComponent<ScriptComponent>())
 		{
 			if (ImGui::Button("Script"))
 			{
-				m_SelectionContext.AddComponent<ScriptComponent>();
+				_selectionContext.AddComponent<ScriptComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<SpriteRendererComponent>())
+		if (!_selectionContext.HasComponent<SpriteRendererComponent>())
 		{
 			if (ImGui::Button("Sprite Renderer"))
 			{
-				m_SelectionContext.AddComponent<SpriteRendererComponent>();
+				_selectionContext.AddComponent<SpriteRendererComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<RigidBody2DComponent>())
+		if (!_selectionContext.HasComponent<RigidBody2DComponent>())
 		{
 			if (ImGui::Button("Rigidbody 2D"))
 			{
-				m_SelectionContext.AddComponent<RigidBody2DComponent>();
+				_selectionContext.AddComponent<RigidBody2DComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<BoxCollider2DComponent>())
+		if (!_selectionContext.HasComponent<BoxCollider2DComponent>())
 		{
 			if (ImGui::Button("Box Collider 2D"))
 			{
-				m_SelectionContext.AddComponent<BoxCollider2DComponent>();
+				_selectionContext.AddComponent<BoxCollider2DComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
-		if (!m_SelectionContext.HasComponent<CircleCollider2DComponent>())
+		if (!_selectionContext.HasComponent<CircleCollider2DComponent>())
 		{
 			if (ImGui::Button("Circle Collider 2D"))
 			{
-				m_SelectionContext.AddComponent<CircleCollider2DComponent>();
+				_selectionContext.AddComponent<CircleCollider2DComponent>();
 				ImGui::CloseCurrentPopup();
 			}
 		}
@@ -729,7 +729,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 				auto& publicFields = moduleFieldMap.at(sc.ModuleName);
 				for (auto& [name, field] : publicFields)
 				{
-					bool isRuntime = dynamic_cast<RuntimeScene*>(m_Context.Raw()) && field.IsRuntimeAvailable();
+					bool isRuntime = dynamic_cast<RuntimeScene*>(_context.Raw()) && field.IsRuntimeAvailable();
 					switch (field.Type)
 					{
 					case FieldType::Int:

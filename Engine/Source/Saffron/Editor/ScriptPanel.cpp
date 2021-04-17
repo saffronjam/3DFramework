@@ -7,14 +7,14 @@
 namespace Se
 {
 ScriptPanel::ScriptPanel(Filepath path) :
-	m_ScriptFolderPath(Move(path))
+	_scriptFolderPath(Move(path))
 {
 	SyncScriptPaths();
 }
 
 void ScriptPanel::OnGuiRender()
 {
-	ScopedLock scopedLock(m_FilepathMutex);
+	ScopedLock scopedLock(_filepathMutex);
 	ImGui::Begin("Scripts");
 
 	const int noCollums = std::max(1, static_cast<int>(ImGui::GetContentRegionAvailWidth() / 100.0f));
@@ -22,15 +22,15 @@ void ScriptPanel::OnGuiRender()
 	ImGui::SetNextItemWidth(ImGui::GetFontSize() * static_cast<float>(noCollums));
 	ImGui::Columns(noCollums, nullptr, false);
 
-	for (size_t i = 0; i < m_ScriptStats.size(); i++)
+	for (size_t i = 0; i < _scriptStats.size(); i++)
 	{
-		ImGui::Button(m_ScriptStats[i].Class.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 5, 60));
+		ImGui::Button(_scriptStats[i].Class.c_str(), ImVec2(ImGui::GetContentRegionAvailWidth() - 5, 60));
 
 		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
 		{
-			Drop drop = {i, new ScriptStat(m_ScriptStats[i])};
+			Drop drop = {i, new ScriptStat(_scriptStats[i])};
 			ImGui::SetDragDropPayload("SCRIPTMGR_DND", &drop, sizeof(Drop));
-			ImGui::Text("%s", m_ScriptStats[i].Class.c_str());
+			ImGui::Text("%s", _scriptStats[i].Class.c_str());
 			ImGui::EndDragDropSource();
 		}
 		ImGui::NextColumn();
@@ -43,17 +43,17 @@ void ScriptPanel::OnGuiRender()
 
 void ScriptPanel::SyncScriptPaths()
 {
-	ScopedLock scopedLock(m_FilepathMutex);
-	if (m_ScriptFolderPath.empty())
+	ScopedLock scopedLock(_filepathMutex);
+	if (_scriptFolderPath.empty())
 	{
 		return;
 	}
 
-	m_ScriptStats.clear();
-	auto rawPaths = FileIOManager::GetFiles(m_ScriptFolderPath, ".cs");
+	_scriptStats.clear();
+	auto rawPaths = FileIOManager::GetFiles(_scriptFolderPath, ".cs");
 	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry& entry) mutable
 	{
-		m_ScriptStats.emplace_back("Script", entry.path().stem().string(), entry.path());
+		_scriptStats.emplace_back("Script", entry.path().stem().string(), entry.path());
 	});
 }
 }

@@ -161,7 +161,7 @@ public:
 	mutable EventSubscriberList<void> Reloaded;
 
 protected:
-	Filepath m_Filepath;
+	Filepath _filepath;
 
 private:
 	static constexpr const char* ShaderLocation = "Assets/Shaders/";

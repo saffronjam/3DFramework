@@ -10,8 +10,8 @@ StartupLayer::StartupLayer()
 
 void StartupLayer::OnAttach(Shared<BatchLoader>& loader)
 {
-	m_TextureStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
-	m_TextureStore["SelectorBG"] = Texture2D::Create("Editor/SelectorBG.png");
+	_textureStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
+	_textureStore["SelectorBG"] = Texture2D::Create("Editor/SelectorBG.png");
 }
 
 void StartupLayer::OnDetach()
@@ -43,12 +43,12 @@ void StartupLayer::OnGuiRender()
 
 		const auto winSize = ImGui::GetWindowSize();
 		const Vector2f textureSize = {
-			static_cast<float>(m_TextureStore["SelectorBG"]->GetWidth()),
-			static_cast<float>(m_TextureStore["SelectorBG"]->GetHeight())
+			static_cast<float>(_textureStore["SelectorBG"]->GetWidth()),
+			static_cast<float>(_textureStore["SelectorBG"]->GetHeight())
 		};
 		const ImVec2 imgageSize = {winSize.y * (textureSize.x / textureSize.y), winSize.y};
 		ImGui::SetCursorPos({winSize.x - imgageSize.x, 0.0f});
-		ImGui::Image(reinterpret_cast<ImTextureID>(m_TextureStore["SelectorBG"]->GetRendererID()), imgageSize,
+		ImGui::Image(reinterpret_cast<ImTextureID>(_textureStore["SelectorBG"]->GetRendererID()), imgageSize,
 		             {0.0f, 0.0f}, {1.0f, 1.0f}, {0.6f, 0.6f, 0.6f, 1.0f});
 
 		ImGui::SetCursorPos({0.0f, 0.0f});
@@ -91,12 +91,12 @@ void StartupLayer::OnGuiRender()
 
 					oss << "\n\n##" << project->GetUUID();
 					bool badProject = false;
-					if (ImGui::Selectable(oss.str().c_str(), project == m_SelectedProject))
+					if (ImGui::Selectable(oss.str().c_str(), project == _selectedProject))
 					{
 						if (project->IsValid())
 						{
 							ProjectSelected.Invoke(project);
-							m_SelectedProject = project;
+							_selectedProject = project;
 						}
 						else
 						{
@@ -267,16 +267,16 @@ void StartupLayer::OnGuiRender()
 				FileIOManager::CreateDirectories(projectScenesFolder);
 				FileIOManager::Copy(templateSceneChoice, projectStartupSceneFilepath);
 
-				m_NewProject = Shared<Project>::Create(projectName, DateTime{}, projectFilepath,
+				_newProject = Shared<Project>::Create(projectName, DateTime{}, projectFilepath,
 				                                       ArrayList<Filepath>{projectStartupSceneFilepath});
 
-				ProjectSerializer serializer(*m_NewProject.value());
+				ProjectSerializer serializer(*_newProject.value());
 				serializer.Serialize(projectFilepath);
 
-				App::Instance().AddProject(m_NewProject.value());
-				App::Instance().SetActiveProject(m_NewProject.value());
+				App::Instance().AddProject(_newProject.value());
+				App::Instance().SetActiveProject(_newProject.value());
 
-				ProjectSelected.Invoke(m_NewProject.value());
+				ProjectSelected.Invoke(_newProject.value());
 
 				ImGui::CloseCurrentPopup();
 				projectName = "";

@@ -20,6 +20,7 @@ FramebufferAttachmentSpecification::FramebufferAttachmentSpecification(
 {
 }
 
+
 Shared<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 {
 	Shared<Framebuffer> result = nullptr;
@@ -50,12 +51,12 @@ FramebufferPool::~FramebufferPool()
 
 Weak<Framebuffer> FramebufferPool::AllocateBuffer()
 {
-	// m_Pool.push_back();
+	// _pool.push_back();
 	return Weak<Framebuffer>();
 }
 
 void FramebufferPool::Add(const Shared<Framebuffer>& framebuffer)
 {
-	m_Pool.push_back(framebuffer);
+	_pool.push_back(framebuffer);
 }
 }

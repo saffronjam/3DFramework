@@ -34,6 +34,6 @@ public:
 
 private:
 	ArrayList<Shared<Layer>> _layers;
-	unsigned int m_LayerInsertIndex = 0;
+	unsigned int _layerInsertIndex = 0;
 };
 }

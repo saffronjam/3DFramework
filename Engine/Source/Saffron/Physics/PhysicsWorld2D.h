@@ -26,9 +26,9 @@ public:
 	void SetGravity(const Vector2f& gravity);
 
 private:
-	b2World* m_NativeWorld;
-	Scene* m_Scene;
-	class Entity* m_PhysicsBodyEntityBuffer;
-	bool m_FilledWorld = false;
+	b2World* _nativeWorld;
+	Scene* _scene;
+	class Entity* _physicsBodyEntityBuffer;
+	bool _filledWorld = false;
 };
 }

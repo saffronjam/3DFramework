@@ -27,7 +27,7 @@ Gui::Gui() :
 
 	auto* newFont = AddFont("segoeui", 18);
 	io.FontDefault = newFont;
-	m_CurrentFont = {18, newFont};
+	_currentFont = {18, newFont};
 
 	AddFont("segoeui", 8);
 	AddFont("segoeui", 12);
@@ -422,15 +422,15 @@ void Gui::InfoModal(const char* title, const char* text, bool& open)
 
 int Gui::GetFontSize()
 {
-	return Instance().m_CurrentFont.first;
+	return Instance()._currentFont.first;
 }
 
 void Gui::SetStyle(Style style)
 {
-	if (Instance().m_CurrentStyle != style)
+	if (Instance()._currentStyle != style)
 	{
 		ApplyStyle(style);
-		Instance().m_CurrentStyle = style;
+		Instance()._currentStyle = style;
 	}
 }
 
@@ -445,7 +445,7 @@ Font* Gui::AddFont(const Filepath& filepath, int size)
 {
 	const String fullFilepath = FontsLocation + filepath.string() + FontsExtension;
 	auto* newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(fullFilepath.c_str(), static_cast<float>(size));
-	Instance().m_Fonts.emplace(size, newFont);
+	Instance()._fonts.emplace(size, newFont);
 	return newFont;
 }
 
@@ -490,7 +490,7 @@ Font* Gui::GetAppropriateFont(int size)
 {
 	ImFont* candidate = nullptr;
 	int bestDiff = std::numeric_limits<int>::max();
-	for (auto& [fontSize, font] : Instance().m_Fonts)
+	for (auto& [fontSize, font] : Instance()._fonts)
 	{
 		if (std::abs(fontSize - size) > bestDiff)
 		{

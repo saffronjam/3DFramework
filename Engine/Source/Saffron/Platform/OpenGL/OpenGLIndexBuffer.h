@@ -23,9 +23,9 @@ public:
 	RendererID GetRendererID() const override;
 
 private:
-	RendererID m_RendererID = 0;
-	Uint32 m_Size;
+	RendererID _rendererID = 0;
+	Uint32 _size;
 
-	Buffer m_LocalData;
+	Buffer _localData;
 };
 }

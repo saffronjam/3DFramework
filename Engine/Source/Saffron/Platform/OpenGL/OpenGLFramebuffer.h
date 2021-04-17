@@ -26,15 +26,15 @@ public:
 
 	const FramebufferSpecification& GetSpecification() const override;
 private:
-	FramebufferSpecification m_Specification;
-	RendererID m_RendererID = 0;
+	FramebufferSpecification _specification;
+	RendererID _rendererID = 0;
 
-	ArrayList<RendererID> m_ColorAttachments;
-	RendererID m_DepthAttachment;
+	ArrayList<RendererID> _colorAttachments;
+	RendererID _depthAttachment;
 
-	ArrayList<FramebufferTextureFormat> m_ColorAttachmentFormats;
-	FramebufferTextureFormat m_DepthAttachmentFormat = FramebufferTextureFormat::None;
+	ArrayList<FramebufferTextureFormat> _colorAttachmentFormats;
+	FramebufferTextureFormat _depthAttachmentFormat = FramebufferTextureFormat::None;
 
-	Uint32 m_Width = 0, m_Height = 0;
+	Uint32 _width = 0, _height = 0;
 };
 }

@@ -5,11 +5,11 @@
 namespace Se
 {
 EditorLayer::EditorLayer(const Shared<Project>& project) :
-	m_Project(Move(project)),
-	m_MainViewportPane(Shared<ViewportPane>::Create("Main Viewport")),
-	m_LastFocusedScene(m_EditorScene),
-	m_CachedActiveScene(m_EditorScene),
-	m_SceneState(SceneState::Edit)
+	_project(Move(project)),
+	_mainViewportPane(Shared<ViewportPane>::Create("Main Viewport")),
+	_lastFocusedScene(_editorScene),
+	_cachedActiveScene(_editorScene),
+	_sceneState(SceneState::Edit)
 {
 	App::Instance().GetWindow().SetAntiAliasing(AntiAliasing::Sample16);
 }
@@ -18,51 +18,51 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 {
 	loader->Submit([this]
 	{
-		Gui::SetStyle(static_cast<Gui::Style>(m_Style));
+		Gui::SetStyle(static_cast<Gui::Style>(_style));
 	}, "Initializing GUI Style");
 
 	loader->Submit([this]
 	{
-		m_TexStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
-		m_TexStore["Checkerboard2"] = Texture2D::Create("Editor/Checkerboard.tga");
-		m_TexStore["PlayButton"] = Texture2D::Create("Editor/PlayButton.png");
-		m_TexStore["PauseButton"] = Texture2D::Create("Editor/PauseButton.png");
-		m_TexStore["StopButton"] = Texture2D::Create("Editor/StopButton.png");
-		m_TexStore["TranslateButton"] = Texture2D::Create("Editor/Translate_w.png");
-		m_TexStore["RotateButton"] = Texture2D::Create("Editor/Rotate_w.png");
-		m_TexStore["ScaleButton"] = Texture2D::Create("Editor/Scale_w.png");
-		m_TexStore["ControllerGameButton"] = Texture2D::Create("Editor/ControllerGame_w.png");
-		m_TexStore["ControllerMayaButton"] = Texture2D::Create("Editor/ControllerMaya_w.png");
+		_texStore["Checkerboard"] = Texture2D::Create("Editor/Checkerboard.tga");
+		_texStore["Checkerboard2"] = Texture2D::Create("Editor/Checkerboard.tga");
+		_texStore["PlayButton"] = Texture2D::Create("Editor/PlayButton.png");
+		_texStore["PauseButton"] = Texture2D::Create("Editor/PauseButton.png");
+		_texStore["StopButton"] = Texture2D::Create("Editor/StopButton.png");
+		_texStore["TranslateButton"] = Texture2D::Create("Editor/Translate_w.png");
+		_texStore["RotateButton"] = Texture2D::Create("Editor/Rotate_w.png");
+		_texStore["ScaleButton"] = Texture2D::Create("Editor/Scale_w.png");
+		_texStore["ControllerGameButton"] = Texture2D::Create("Editor/ControllerGame_w.png");
+		_texStore["ControllerMayaButton"] = Texture2D::Create("Editor/ControllerMaya_w.png");
 	}, "Loading Editor Textures");
 
 
 	loader->Submit([this]
 	{
-		if (m_Project->IsValid())
+		if (_project->IsValid())
 		{
-			m_AssetPanel = Shared<AssetPanel>::Create(m_Project->GetProjectFolderpath().string() + "/Assets/Meshes");
-			m_ScriptPanel = Shared<ScriptPanel>::Create(m_Project->GetProjectFolderpath().string() + "/Src");
+			_assetPanel = Shared<AssetPanel>::Create(_project->GetProjectFolderpath().string() + "/Assets/Meshes");
+			_scriptPanel = Shared<ScriptPanel>::Create(_project->GetProjectFolderpath().string() + "/Src");
 		}
 		else
 		{
-			m_AssetPanel = Shared<AssetPanel>::Create();
-			m_ScriptPanel = Shared<ScriptPanel>::Create();
+			_assetPanel = Shared<AssetPanel>::Create();
+			_scriptPanel = Shared<ScriptPanel>::Create();
 		}
-		m_EntityPanel = Shared<EntityComponentsPanel>::Create(m_EditorScene);
-		m_ScenePanel = Shared<SceneHierarchyPanel>::Create(m_EditorScene);
+		_entityPanel = Shared<EntityComponentsPanel>::Create(_editorScene);
+		_scenePanel = Shared<SceneHierarchyPanel>::Create(_editorScene);
 	}, "Initializing Editor Panels");
 
 	loader->Submit([this]
 	{
-		OnProjectChange(m_Project);
+		OnProjectChange(_project);
 	}, "Loading Default Scene");
 
 	loader->Submit([this]
 	{
-		m_AssetScriptRunHandle = Run::Periodically([this]
+		_assetScriptRunHandle = Run::Periodically([this]
 		{
-			m_AssetPanel->SyncAssetPaths();
-			m_ScriptPanel->SyncScriptPaths();
+			_assetPanel->SyncAssetPaths();
+			_scriptPanel->SyncScriptPaths();
 		}, Time(1.0f));
 	}, "Setting Up Periodic Callbacks");
 
@@ -70,11 +70,11 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 	{
 		const auto postRenderFn = [this]()
 		{
-			const auto& scene = m_EditorScene;
-			const auto& viewportPane = m_MainViewportPane;
-			Entity modelEntity = m_SelectedEntity;
+			const auto& scene = _editorScene;
+			const auto& viewportPane = _mainViewportPane;
+			Entity modelEntity = _selectedEntity;
 
-			if (m_SceneState == SceneState::Edit && m_GizmoType != -1 && GetActiveScene() == scene && modelEntity)
+			if (_sceneState == SceneState::Edit && _gizmoType != -1 && GetActiveScene() == scene && modelEntity)
 			{
 				const auto viewportSize = viewportPane->GetViewportSize();
 				const auto& editorCamera = scene->GetEntity().GetComponent<EditorCameraComponent>().Camera;
@@ -90,10 +90,10 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 
 				static float bounds[] = {-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f};
 				float* boundsPtr;
-				if (m_SelectedEntity.HasComponent<MeshComponent>())
+				if (_selectedEntity.HasComponent<MeshComponent>())
 				{
-					auto boundingBoxes = m_SelectedEntity.GetComponent<MeshComponent>().Mesh->GetBoundingBoxes(
-						m_SelectedEntity.GetComponent<TransformComponent>().Transform);
+					auto boundingBoxes = _selectedEntity.GetComponent<MeshComponent>().Mesh->GetBoundingBoxes(
+						_selectedEntity.GetComponent<TransformComponent>().Transform);
 					auto& first = boundingBoxes.front();
 					bounds[0] = first.Min.x;
 					bounds[1] = first.Min.y;
@@ -108,11 +108,11 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 					boundsPtr = nullptr;
 				}
 
-				if (m_SelectionMode == SelectionMode::Entity)
+				if (_selectionMode == SelectionMode::Entity)
 				{
 					ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
 					                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
-					                     static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::WORLD,
+					                     static_cast<ImGuizmo::OPERATION>(_gizmoType), ImGuizmo::WORLD,
 					                     glm::value_ptr(entityTransform), nullptr, snap ? snapValues : nullptr,
 					                     boundsPtr);
 				}
@@ -122,7 +122,7 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 					                                                        Transform;
 					ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
 					                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
-					                     static_cast<ImGuizmo::OPERATION>(m_GizmoType), ImGuizmo::WORLD,
+					                     static_cast<ImGuizmo::OPERATION>(_gizmoType), ImGuizmo::WORLD,
 					                     glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr,
 					                     boundsPtr);
 
@@ -132,18 +132,18 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			}
 		};
 
-		m_MainViewportPane->FinishedRender += [postRenderFn]
+		_mainViewportPane->FinishedRender += [postRenderFn]
 		{
 			postRenderFn();
 			return false;
 		};
 
-		m_ScenePanel->EntityDeleted += SE_BIND_EVENT_FN(OnEntityDeleted);
-		m_ScenePanel->EntityCopied += SE_BIND_EVENT_FN(OnEntityCopied);
-		m_ScenePanel->ViewInModelSpace += SE_BIND_EVENT_FN(EditorLayer::OnNewModelSpaceView);
-		m_ScenePanel->NewSelection += [this](Entity entity)
+		_scenePanel->EntityDeleted += SE_BIND_EVENT_FN(OnEntityDeleted);
+		_scenePanel->EntityCopied += SE_BIND_EVENT_FN(OnEntityCopied);
+		_scenePanel->ViewInModelSpace += SE_BIND_EVENT_FN(EditorLayer::OnNewModelSpaceView);
+		_scenePanel->NewSelection += [this](Entity entity)
 		{
-			OnEntityUnselected(m_SelectedEntity);
+			OnEntityUnselected(_selectedEntity);
 			OnEntitySelected(entity);
 			return false;
 		};
@@ -156,35 +156,35 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 
 void EditorLayer::OnDetach()
 {
-	if (m_SceneState == SceneState::Play)
+	if (_sceneState == SceneState::Play)
 	{
 		OnStop();
 	}
-	Run::Remove(m_AssetScriptRunHandle);
+	Run::Remove(_assetScriptRunHandle);
 }
 
 void EditorLayer::OnUpdate()
 {
 	const auto activeScene = GetActiveScene();
-	if (activeScene != m_CachedActiveScene)
+	if (activeScene != _cachedActiveScene)
 	{
 		OnSceneChange(activeScene, {});
 	}
 
-	switch (m_SceneState)
+	switch (_sceneState)
 	{
 	case SceneState::Edit:
 	{
-		m_MainViewportPane->IsFocused() ? m_EditorScene->EnableCamera() : m_EditorScene->DisableCamera();
+		_mainViewportPane->IsFocused() ? _editorScene->EnableCamera() : _editorScene->DisableCamera();
 
-		m_EditorScene->OnUpdate();
-		m_EditorScene->OnRender();
+		_editorScene->OnUpdate();
+		_editorScene->OnRender();
 		break;
 	}
 	case SceneState::Play:
 	{
-		m_RuntimeScene->OnUpdate();
-		m_RuntimeScene->OnRender();
+		_runtimeScene->OnUpdate();
+		_runtimeScene->OnRender();
 		break;
 	}
 	case SceneState::Pause:
@@ -223,36 +223,36 @@ void EditorLayer::OnGuiRender()
 	SceneRenderer::OnGuiRender();
 	ScriptEngine::OnGuiRender();
 	Shader::OnGuiRender();
-	m_EditorTerminal.OnGuiRender();
-	m_AssetPanel->OnGuiRender();
-	m_EntityPanel->OnGuiRender();
-	m_ScriptPanel->OnGuiRender();
-	m_ScenePanel->OnGuiRender(m_ScriptPanel);
+	_editorTerminal.OnGuiRender();
+	_assetPanel->OnGuiRender();
+	_entityPanel->OnGuiRender();
+	_scriptPanel->OnGuiRender();
+	_scenePanel->OnGuiRender(_scriptPanel);
 	GetActiveScene()->OnGuiRender();
-	m_MainViewportPane->OnGuiRender();
+	_mainViewportPane->OnGuiRender();
 
 	ImGui::End();
 
 	// Correct scene viewport size after rendering viewport panes
 	{
-		const auto viewportSize = m_MainViewportPane->GetViewportSize();
-		if (m_SceneState == SceneState::Play)
+		const auto viewportSize = _mainViewportPane->GetViewportSize();
+		if (_sceneState == SceneState::Play)
 		{
-			m_RuntimeScene->SetViewportSize(viewportSize.x, viewportSize.y);
+			_runtimeScene->SetViewportSize(viewportSize.x, viewportSize.y);
 		}
-		m_EditorScene->SetViewportSize(viewportSize.x, viewportSize.y);
+		_editorScene->SetViewportSize(viewportSize.x, viewportSize.y);
 	}
 }
 
 bool EditorLayer::OnKeyboardPress(const KeyPressedEvent& event)
 {
-	if (m_SceneState == SceneState::Edit && m_MainViewportPane->IsFocused())
+	if (_sceneState == SceneState::Edit && _mainViewportPane->IsFocused())
 	{
 		switch (event.GetKey())
 		{
-		case KeyCode::Delete: if (m_SelectedEntity)
+		case KeyCode::Delete: if (_selectedEntity)
 			{
-				OnEntityDeleted(m_SelectedEntity);
+				OnEntityDeleted(_selectedEntity);
 			}
 			break;
 		default: break;
@@ -262,9 +262,9 @@ bool EditorLayer::OnKeyboardPress(const KeyPressedEvent& event)
 		{
 			switch (event.GetKey())
 			{
-			case KeyCode::C: if (m_SelectedEntity)
+			case KeyCode::C: if (_selectedEntity)
 				{
-					OnEntityCopied(m_SelectedEntity);
+					OnEntityCopied(_selectedEntity);
 				}
 				break;
 			case KeyCode::G:
@@ -299,16 +299,16 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 	const auto& activeScene = GetActiveScene();
 
 	if (activeScene && activeViewport->IsFocused() && event.GetButton() == MouseButtonCode::Left && !
-		Keyboard::IsPressed(KeyCode::LAlt) && !ImGuizmo::IsOver() && m_SceneState != SceneState::Play)
+		Keyboard::IsPressed(KeyCode::LAlt) && !ImGuizmo::IsOver() && _sceneState != SceneState::Play)
 	{
 		const auto MousePosition = activeViewport->GetMousePosition();
 		if (MousePosition.x > -1.0f && MousePosition.x < 1.0f && MousePosition.y > -1.0f && MousePosition.y < 1.0f)
 		{
 			auto rayResult = CastRay(MousePosition.x, MousePosition.y);
 
-			if (m_SelectedEntity)
+			if (_selectedEntity)
 			{
-				OnEntityUnselected(m_SelectedEntity);
+				OnEntityUnselected(_selectedEntity);
 			}
 
 			struct Selection
@@ -354,7 +354,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 			auto meshEntities = GetActiveScene()->GetEntityRegistry().view<MeshComponent>();
 			for (auto entityHandle : meshEntities)
 			{
-				const Entity entity = {entityHandle, m_EditorScene.Raw()};
+				const Entity entity = {entityHandle, _editorScene.Raw()};
 				auto mesh = entity.GetComponent<MeshComponent>().Mesh;
 				if (mesh)
 				{
@@ -364,7 +364,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 			auto camereaEntities = GetActiveScene()->GetEntityRegistry().view<CameraComponent>();
 			for (auto entityHandle : camereaEntities)
 			{
-				const Entity entity = {entityHandle, m_EditorScene.Raw()};
+				const Entity entity = {entityHandle, _editorScene.Raw()};
 				auto cameraComponent = entity.GetComponent<CameraComponent>();
 				if (cameraComponent.CameraMesh && cameraComponent.DrawMesh)
 				{
@@ -384,7 +384,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 
 bool EditorLayer::OnWindowDropFiles(const WindowDroppedFilesEvent& event)
 {
-	if (m_SceneState == SceneState::Edit)
+	if (_sceneState == SceneState::Edit)
 	{
 		for (const auto& filepath : event.GetFilepaths())
 		{
@@ -392,7 +392,7 @@ bool EditorLayer::OnWindowDropFiles(const WindowDroppedFilesEvent& event)
 			{
 				Run::Later([filepath, this]
 				{
-					const auto& transformedFilepath = m_Project->AddScene(filepath);
+					const auto& transformedFilepath = _project->AddScene(filepath);
 					LoadProjectScene(transformedFilepath);
 				});
 			}
@@ -416,14 +416,14 @@ void EditorLayer::PromptNewScene()
 		const Light light = {{-0.5f, -0.5f, 1.0f}, {1.0f, 1.0f, 1.0f}, 1.0f};
 		newScene->SetLight(light);
 
-		m_EditorScene = newScene;
-		m_LastFocusedScene = m_EditorScene;
+		_editorScene = newScene;
+		_lastFocusedScene = _editorScene;
 
 		SaveActiveScene();
-		OnSceneChange(m_EditorScene, {});
+		OnSceneChange(_editorScene, {});
 
-		m_Project->AddScene(filepath);
-		m_Project->AddCachedScene(newScene);
+		_project->AddScene(filepath);
+		_project->AddCachedScene(newScene);
 	}
 }
 
@@ -437,7 +437,7 @@ void EditorLayer::PromptImportScene()
 	const Filepath filepath = FileIOManager::OpenFile({"Saffron Scene (*.ssc)", {"*.ssc"}});
 	if (Scene::IsValidFilepath(filepath))
 	{
-		const auto& retFilepath = m_Project->AddScene(Move(filepath));
+		const auto& retFilepath = _project->AddScene(Move(filepath));
 		LoadProjectScene(filepath);
 	}
 }
@@ -461,7 +461,7 @@ void EditorLayer::PromptOpenProject()
 
 void EditorLayer::SaveActiveProject() const
 {
-	for (const auto& cachedScene : m_Project->GetSceneCache())
+	for (const auto& cachedScene : _project->GetSceneCache())
 	{
 		cachedScene->Save();
 	}
@@ -469,20 +469,20 @@ void EditorLayer::SaveActiveProject() const
 
 void EditorLayer::SaveActiveScene() const
 {
-	m_EditorScene->Save();
+	_editorScene->Save();
 }
 
 void EditorLayer::LoadProjectScene(const Filepath& filepath)
 {
-	if (!m_Project->IsValidSceneFilepath(filepath))
+	if (!_project->IsValidSceneFilepath(filepath))
 	{
 		return;
 	}
-	const auto fullSceneFilepath = m_Project->GetFullSceneFilepath(filepath);
+	const auto fullSceneFilepath = _project->GetFullSceneFilepath(filepath);
 
 	Shared<EditorScene> newScene(nullptr);
 
-	for (const auto& cachedScene : m_Project->GetSceneCache())
+	for (const auto& cachedScene : _project->GetSceneCache())
 	{
 		if (cachedScene->GetFilepath() == filepath)
 		{
@@ -493,37 +493,37 @@ void EditorLayer::LoadProjectScene(const Filepath& filepath)
 	if (!newScene)
 	{
 		newScene = Shared<EditorScene>::Create(fullSceneFilepath);
-		m_Project->AddCachedScene(newScene);
+		_project->AddCachedScene(newScene);
 	}
 
-	m_EditorScene = newScene;
-	m_LastFocusedScene = m_EditorScene;
+	_editorScene = newScene;
+	_lastFocusedScene = _editorScene;
 
-	OnEntityUnselected(m_SelectedEntity);
-	OnSceneChange(m_EditorScene, {});
+	OnEntityUnselected(_selectedEntity);
+	OnSceneChange(_editorScene, {});
 }
 
 void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 {
 	ScriptEngine::OnSceneChange(scene);
-	m_EntityPanel->SetContext(scene);
-	m_EntityPanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
-	m_ScenePanel->SetContext(scene);
-	m_ScenePanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
-	m_SelectedEntity = selection ? selection : scene->GetSelectedEntity();
-	m_CachedActiveScene = scene;
-	m_LastFocusedScene = scene;
+	_entityPanel->SetContext(scene);
+	_entityPanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
+	_scenePanel->SetContext(scene);
+	_scenePanel->SetSelectedEntity(selection ? selection : scene->GetSelectedEntity());
+	_selectedEntity = selection ? selection : scene->GetSelectedEntity();
+	_cachedActiveScene = scene;
+	_lastFocusedScene = scene;
 }
 
 void EditorLayer::OnProjectChange(const Shared<Project>& project)
 {
 	SE_CORE_ASSERT(project->IsValid());
 	ScriptEngine::OnProjectChange(project);
-	m_Project = project;
-	m_AssetPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "Assets/Meshes");
-	m_ScriptPanel->SetAssetFolderpath(m_Project->GetProjectFolderpath().string() + "Source");
+	_project = project;
+	_assetPanel->SetAssetFolderpath(_project->GetProjectFolderpath().string() + "Assets/Meshes");
+	_scriptPanel->SetAssetFolderpath(_project->GetProjectFolderpath().string() + "Source");
 
-	LoadProjectScene(m_Project->GetSceneFilepaths().front());
+	LoadProjectScene(_project->GetSceneFilepaths().front());
 }
 
 void EditorLayer::OnWantProjectSelector()
@@ -533,52 +533,52 @@ void EditorLayer::OnWantProjectSelector()
 
 void EditorLayer::OnPlay()
 {
-	m_SceneState = SceneState::Play;
+	_sceneState = SceneState::Play;
 
-	if (m_ReloadScriptOnPlay && m_Project->IsValid())
+	if (_reloadScriptOnPlay && _project->IsValid())
 	{
-		ScriptEngine::ReloadAssembly(m_Project->GetProjectFilepath().stem().string());
+		ScriptEngine::ReloadAssembly(_project->GetProjectFilepath().stem().string());
 	}
-	m_RuntimeScene = Shared<RuntimeScene>::Create(m_EditorScene);
-	m_RuntimeScene->OnStart();
-	m_GizmoType = -1;
+	_runtimeScene = Shared<RuntimeScene>::Create(_editorScene);
+	_runtimeScene->OnStart();
+	_gizmoType = -1;
 
 	// Swap selected entity to the copied entity in the runtime scene
 	Entity transfer = {};
-	if (m_SelectedEntity)
+	if (_selectedEntity)
 	{
-		const auto& entityMap = m_RuntimeScene->GetEntityMap();
-		const UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		const auto& entityMap = _runtimeScene->GetEntityMap();
+		const UUID selectedEntityUUID = _selectedEntity.GetUUID();
 		if (entityMap.find(selectedEntityUUID) != entityMap.end()) transfer = entityMap.at(selectedEntityUUID);
 	}
-	OnSceneChange(m_RuntimeScene, transfer);
+	OnSceneChange(_runtimeScene, transfer);
 }
 
 void EditorLayer::OnStop()
 {
-	m_SceneState = SceneState::Edit;
-	m_RuntimeScene->OnStop();
+	_sceneState = SceneState::Edit;
+	_runtimeScene->OnStop();
 
 	// Swap selected entity to the copied entity in the editor scene
 	Entity transfer = {};
-	if (m_SelectedEntity)
+	if (_selectedEntity)
 	{
-		const auto& entityMap = m_EditorScene->GetEntityMap();
-		const Se::UUID selectedEntityUUID = m_SelectedEntity.GetUUID();
+		const auto& entityMap = _editorScene->GetEntityMap();
+		const Se::UUID selectedEntityUUID = _selectedEntity.GetUUID();
 		if (entityMap.find(selectedEntityUUID) != entityMap.end())
 		{
 			transfer = entityMap.at(selectedEntityUUID);
 		}
 	}
-	OnSceneChange(m_EditorScene, transfer);
+	OnSceneChange(_editorScene, transfer);
 
 	// Unload runtime scene
-	m_RuntimeScene = nullptr;
+	_runtimeScene = nullptr;
 }
 
 float EditorLayer::GetSnapValue() const
 {
-	switch (m_GizmoType)
+	switch (_gizmoType)
 	{
 	case ImGuizmo::OPERATION::TRANSLATE: return 0.5f;
 	case ImGuizmo::OPERATION::ROTATE: return 45.0f;
@@ -589,35 +589,35 @@ float EditorLayer::GetSnapValue() const
 
 Shared<ViewportPane> EditorLayer::GetActiveViewportPane() const
 {
-	if (m_SceneState == SceneState::Play)
+	if (_sceneState == SceneState::Play)
 	{
-		return m_MainViewportPane;
+		return _mainViewportPane;
 	}
 
 	const auto activeScene = GetActiveScene();
-	if (activeScene == m_EditorScene)
+	if (activeScene == _editorScene)
 	{
-		return m_MainViewportPane;
+		return _mainViewportPane;
 	}
 	SE_CORE_WARN("Detected a scene without a viewport pane. Scene name: {}", activeScene->GetName());
-	return m_MainViewportPane;
+	return _mainViewportPane;
 }
 
 Shared<Scene> EditorLayer::GetActiveScene() const
 {
-	if (m_SceneState == SceneState::Play)
+	if (_sceneState == SceneState::Play)
 	{
-		m_LastFocusedScene = m_RuntimeScene;
-		return m_LastFocusedScene;
+		_lastFocusedScene = _runtimeScene;
+		return _lastFocusedScene;
 	}
 
-	if (m_MainViewportPane->IsFocused())
+	if (_mainViewportPane->IsFocused())
 	{
-		m_LastFocusedScene = m_EditorScene;
-		return m_LastFocusedScene;
+		_lastFocusedScene = _editorScene;
+		return _lastFocusedScene;
 	}
 
-	return m_LastFocusedScene;
+	return _lastFocusedScene;
 }
 
 
@@ -675,32 +675,32 @@ void EditorLayer::OnGuiRenderMenuBar()
 
 		if (ImGui::BeginMenu("Script"))
 		{
-			if (m_SceneState == SceneState::Play)
+			if (_sceneState == SceneState::Play)
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 			}
-			if (ImGui::MenuItem("Reload C# Assembly") && m_Project->IsValid())
+			if (ImGui::MenuItem("Reload C# Assembly") && _project->IsValid())
 			{
-				ScriptEngine::ReloadAssembly(m_Project->GetProjectFilepath().stem().string());
+				ScriptEngine::ReloadAssembly(_project->GetProjectFilepath().stem().string());
 			}
-			if (m_SceneState == SceneState::Play)
+			if (_sceneState == SceneState::Play)
 			{
 				ImGui::PopItemFlag();
 				ImGui::PopStyleVar();
 			}
 
-			ImGui::MenuItem("Reload assembly on play", nullptr, &m_ReloadScriptOnPlay);
+			ImGui::MenuItem("Reload assembly on play", nullptr, &_reloadScriptOnPlay);
 			ImGui::EndMenu();
 		}
 
 		if (ImGui::BeginMenu("Style"))
 		{
-			ImGui::RadioButton("DarkColorful", &m_Style, 0);
-			ImGui::RadioButton("Light", &m_Style, 1);
+			ImGui::RadioButton("DarkColorful", &_style, 0);
+			ImGui::RadioButton("Light", &_style, 1);
 			ImGui::EndMenu();
 		}
-		Gui::SetStyle(static_cast<Gui::Style>(m_Style));
+		Gui::SetStyle(static_cast<Gui::Style>(_style));
 
 		ImGui::EndMenuBar();
 	}
@@ -722,22 +722,22 @@ void EditorLayer::OnGuiRenderToolbar()
 	ImGui::Begin("Toolbar");
 
 
-	Shared<Texture> ButtonTexture = m_SceneState == SceneState::Edit
-		                                ? m_TexStore["PlayButton"]
-		                                : m_TexStore["StopButton"];
+	Shared<Texture> ButtonTexture = _sceneState == SceneState::Edit
+		                                ? _texStore["PlayButton"]
+		                                : _texStore["StopButton"];
 	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(ButtonTexture->GetRendererID()), ImVec2(25, 32), ImVec2(0, 0),
 	                       ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ClearWhite))
 	{
-		m_SceneState == SceneState::Edit ? OnPlay() : OnStop();
+		_sceneState == SceneState::Edit ? OnPlay() : OnStop();
 	}
 
 	ImGui::SameLine();
 	ImGui::Separator();
 	ImGui::SameLine();
 
-	ImVec4 TranslateColorTint = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? ImGuiBlue : ClearWhite;
-	ImVec4 RotateColorTint = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? ImGuiBlue : ClearWhite;
-	ImVec4 ScaleColorTint = m_GizmoType == ImGuizmo::OPERATION::SCALE ? ImGuiBlue : ClearWhite;
+	ImVec4 TranslateColorTint = _gizmoType == ImGuizmo::OPERATION::TRANSLATE ? ImGuiBlue : ClearWhite;
+	ImVec4 RotateColorTint = _gizmoType == ImGuizmo::OPERATION::ROTATE ? ImGuiBlue : ClearWhite;
+	ImVec4 ScaleColorTint = _gizmoType == ImGuizmo::OPERATION::SCALE ? ImGuiBlue : ClearWhite;
 	ImVec4 ControllerWASDTint;
 	ImVec4 ControllerMayaTint;
 
@@ -762,25 +762,25 @@ void EditorLayer::OnGuiRenderToolbar()
 	}
 
 
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["TranslateButton"]->GetRendererID()),
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["TranslateButton"]->GetRendererID()),
 	                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), TranslateColorTint))
 	{
-		if (m_SceneState == SceneState::Edit)
-			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
+		if (_sceneState == SceneState::Edit)
+			_gizmoType = _gizmoType == ImGuizmo::OPERATION::TRANSLATE ? -1 : ImGuizmo::OPERATION::TRANSLATE;
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["RotateButton"]->GetRendererID()), ImVec2(32, 32),
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["RotateButton"]->GetRendererID()), ImVec2(32, 32),
 	                       ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), RotateColorTint))
 	{
-		if (m_SceneState == SceneState::Edit)
-			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::ROTATE ? -1 : ImGuizmo::OPERATION::ROTATE;
+		if (_sceneState == SceneState::Edit)
+			_gizmoType = _gizmoType == ImGuizmo::OPERATION::ROTATE ? -1 : ImGuizmo::OPERATION::ROTATE;
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ScaleButton"]->GetRendererID()), ImVec2(32, 32),
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ScaleButton"]->GetRendererID()), ImVec2(32, 32),
 	                       ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ScaleColorTint))
 	{
-		if (m_SceneState == SceneState::Edit)
-			m_GizmoType = m_GizmoType == ImGuizmo::OPERATION::SCALE ? -1 : ImGuizmo::OPERATION::SCALE;
+		if (_sceneState == SceneState::Edit)
+			_gizmoType = _gizmoType == ImGuizmo::OPERATION::SCALE ? -1 : ImGuizmo::OPERATION::SCALE;
 	}
 
 	ImGui::SameLine();
@@ -788,18 +788,18 @@ void EditorLayer::OnGuiRenderToolbar()
 	ImGui::SameLine();
 
 	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerGameButton"]->GetRendererID()),
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerGameButton"]->GetRendererID()),
 	                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint))
 	{
-		if (m_SceneState == SceneState::Edit)
+		if (_sceneState == SceneState::Edit)
 			scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
 				EditorCamera::ControllerStyle::Game);
 	}
 	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(m_TexStore["ControllerMayaButton"]->GetRendererID()),
+	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerMayaButton"]->GetRendererID()),
 	                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint))
 	{
-		if (m_SceneState == SceneState::Edit)
+		if (_sceneState == SceneState::Edit)
 			scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
 				EditorCamera::ControllerStyle::Maya);
 	}
@@ -812,11 +812,11 @@ void EditorLayer::OnGuiRenderToolbar()
 bool EditorLayer::OnEntitySelected(Entity entity)
 {
 	auto activeScene = GetActiveScene();
-	if (activeScene == m_EditorScene || activeScene == m_RuntimeScene)
+	if (activeScene == _editorScene || activeScene == _runtimeScene)
 	{
-		m_SelectedEntity = entity;
-		m_EntityPanel->SetSelectedEntity(entity);
-		m_ScenePanel->SetSelectedEntity(entity);
+		_selectedEntity = entity;
+		_entityPanel->SetSelectedEntity(entity);
+		_scenePanel->SetSelectedEntity(entity);
 		activeScene->SetSelectedEntity(entity);
 	}
 	return false;
@@ -825,11 +825,11 @@ bool EditorLayer::OnEntitySelected(Entity entity)
 bool EditorLayer::OnEntityUnselected(Entity entity)
 {
 	auto activeScene = GetActiveScene();
-	if (activeScene == m_EditorScene || activeScene == m_RuntimeScene)
+	if (activeScene == _editorScene || activeScene == _runtimeScene)
 	{
-		m_SelectedEntity = {};
-		m_EntityPanel->SetSelectedEntity({});
-		m_ScenePanel->SetSelectedEntity({});
+		_selectedEntity = {};
+		_entityPanel->SetSelectedEntity({});
+		_scenePanel->SetSelectedEntity({});
 		activeScene->SetSelectedEntity({});
 	}
 	return false;
@@ -837,19 +837,19 @@ bool EditorLayer::OnEntityUnselected(Entity entity)
 
 bool EditorLayer::OnEntityDeleted(Entity entity)
 {
-	if (m_SelectedEntity == entity)
+	if (_selectedEntity == entity)
 	{
-		m_EditorScene->DestroyEntity(m_SelectedEntity);
-		OnEntityUnselected(m_SelectedEntity);
+		_editorScene->DestroyEntity(_selectedEntity);
+		OnEntityUnselected(_selectedEntity);
 	}
 	return false;
 }
 
 bool EditorLayer::OnEntityCopied(Entity entity)
 {
-	if (m_SelectedEntity == entity)
+	if (_selectedEntity == entity)
 	{
-		const Entity copy = m_SelectedEntity.Copy();
+		const Entity copy = _selectedEntity.Copy();
 		OnEntitySelected(copy);
 	}
 	return false;

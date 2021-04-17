@@ -14,6 +14,6 @@ public:
 	bool Deserialize(const Filepath& filepath);
 
 private:
-	App& m_Application;
+	App& _application;
 };
 }

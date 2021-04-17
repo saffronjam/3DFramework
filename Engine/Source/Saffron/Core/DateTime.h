@@ -29,19 +29,19 @@ public:
 	bool operator<(const DateTime& rhs) const;
 	bool operator>(const DateTime& rhs) const;
 
-	int Seconds() const { return m_Date.Seconds; }
+	int Seconds() const { return _date.Seconds; }
 
-	int Minutes() const { return m_Date.Minutes; }
+	int Minutes() const { return _date.Minutes; }
 
-	int Hour() const { return m_Date.Hour; }
+	int Hour() const { return _date.Hour; }
 
-	int Weekday() const { return m_Date.Weekday; }
+	int Weekday() const { return _date.Weekday; }
 
-	int Day() const { return m_Date.Day; }
+	int Day() const { return _date.Day; }
 
-	int Month() const { return m_Date.Month; }
+	int Month() const { return _date.Month; }
 
-	int Year() const { return m_Date.Year; }
+	int Year() const { return _date.Year; }
 
 	String WeekdayString(bool abbreviation = false) const;
 	String MonthString(bool abbreviation = false) const;
@@ -53,6 +53,6 @@ private:
 	void Clamp();
 
 private:
-	Date m_Date{};
+	Date _date{};
 };
 }

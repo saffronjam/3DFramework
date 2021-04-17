@@ -9,21 +9,21 @@ class ScopedLock
 {
 public:
 	explicit ScopedLock(MutexTypes&... mutexes) :
-		m_Mutexes(mutexes)
+		_mutexes(mutexes)
 	{
-		std::lock(m_Mutexes);
+		std::lock(_mutexes);
 	}
 
 	~ScopedLock() noexcept
 	{
-		std::apply([](MutexTypes&... mutexTypes) { (..., (void)mutexTypes.unlock()); }, m_Mutexes);
+		std::apply([](MutexTypes&... mutexTypes) { (..., (void)mutexTypes.unlock()); }, _mutexes);
 	}
 
 	ScopedLock(const ScopedLock&) = delete;
 	ScopedLock& operator=(const ScopedLock&) = delete;
 
 private:
-	Tuple<MutexTypes&...> m_Mutexes;
+	Tuple<MutexTypes&...> _mutexes;
 };
 
 template <class MutexType>
@@ -31,20 +31,20 @@ class ScopedLock<MutexType>
 {
 public:
 	explicit ScopedLock(MutexType& mutex) :
-		m_Mutex(mutex)
+		_mutex(mutex)
 	{
-		m_Mutex.lock();
+		_mutex.lock();
 	}
 
 	~ScopedLock() noexcept
 	{
-		m_Mutex.unlock();
+		_mutex.unlock();
 	}
 
 	ScopedLock(const ScopedLock&) = delete;
 	ScopedLock& operator=(const ScopedLock&) = delete;
 
 private:
-	MutexType& m_Mutex;
+	MutexType& _mutex;
 };
 }

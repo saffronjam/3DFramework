@@ -41,13 +41,13 @@ public:
 	void OnGuiRender();
 	void SyncAssetPaths();
 
-	void SetAssetFolderpath(Filepath folderpath) { m_AssetFolderPath = Move(folderpath); }
+	void SetAssetFolderpath(Filepath folderpath) { _assetFolderPath = Move(folderpath); }
 
-	const ArrayList<AssetStat>& GetAssetStats() const { return m_AssetStats; }
+	const ArrayList<AssetStat>& GetAssetStats() const { return _assetStats; }
 
 private:
-	Filepath m_AssetFolderPath;
-	ArrayList<AssetStat> m_AssetStats;
-	Mutex m_FilepathMutex;
+	Filepath _assetFolderPath;
+	ArrayList<AssetStat> _assetStats;
+	Mutex _filepathMutex;
 };
 }

@@ -29,8 +29,8 @@ void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity)
 	Scene* scene = s_ActiveScenes[sceneID];
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
-	SE_CORE_ASSERT(scene->m_EntityIDMap.find(entityID) != scene->m_EntityIDMap.end());
-	ScriptEngine::InitScriptEntity(scene->m_EntityIDMap.at(entityID));
+	SE_CORE_ASSERT(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());
+	ScriptEngine::InitScriptEntity(scene->_entityIDMap.at(entityID));
 }
 
 void OnScriptComponentDestroy(EntityRegistry& registry, EntityHandle entity)
@@ -60,80 +60,80 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 ///////////////////////////////////////////////////////////////////////////
 
 Scene::Scene() :
-	m_FallbackSceneEnvironment(SceneEnvironment::Load("pink_sunrise_4k.hdr")),
-	m_SceneEntity(m_EntityRegistry.create(), this),
-	m_ViewportWidth(100),
-	m_ViewportHeight(100)
+	_fallbackSceneEnvironment(SceneEnvironment::Load("pink_sunrise_4k.hdr")),
+	_sceneEntity(_entityRegistry.create(), this),
+	_viewportWidth(100),
+	_viewportHeight(100)
 {
-	m_EntityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
-	m_EntityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
+	_entityRegistry.on_construct<ScriptComponent>().connect<&OnScriptComponentConstruct>();
+	_entityRegistry.on_destroy<ScriptComponent>().connect<&OnScriptComponentDestroy>();
 
-	m_SceneEntity.AddComponent<SceneIDComponent>(m_SceneID);
-	m_SceneEntity.AddComponent<PhysicsWorld2DComponent>(*this);
-	m_SceneEntity.AddComponent<PhysicsWorld3DComponent>(*this);
+	_sceneEntity.AddComponent<SceneIDComponent>(_sceneID);
+	_sceneEntity.AddComponent<PhysicsWorld2DComponent>(*this);
+	_sceneEntity.AddComponent<PhysicsWorld3DComponent>(*this);
 
-	s_ActiveScenes[m_SceneID] = this;
+	s_ActiveScenes[_sceneID] = this;
 
 	const auto skyboxShader = Shader::Create("Skybox");
-	m_Skybox.Material = MaterialInstance::Create(Shared<Material>::Create(skyboxShader));
-	m_Skybox.Material->SetFlag(MaterialFlag::DepthTest, false);
+	_skybox.Material = MaterialInstance::Create(Shared<Material>::Create(skyboxShader));
+	_skybox.Material->SetFlag(MaterialFlag::DepthTest, false);
 }
 
 Scene::~Scene()
 {
-	if (m_SceneEntity.HasComponent<PhysicsWorld2DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld2DComponent>())
 	{
-		m_SceneEntity.RemoveComponent<PhysicsWorld2DComponent>();
+		_sceneEntity.RemoveComponent<PhysicsWorld2DComponent>();
 	}
-	if (m_SceneEntity.HasComponent<PhysicsWorld3DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		m_SceneEntity.RemoveComponent<PhysicsWorld3DComponent>();
+		_sceneEntity.RemoveComponent<PhysicsWorld3DComponent>();
 	}
 
-	m_EntityRegistry.on_destroy<ScriptComponent>().disconnect();
-	m_EntityRegistry.clear();
+	_entityRegistry.on_destroy<ScriptComponent>().disconnect();
+	_entityRegistry.clear();
 
-	s_ActiveScenes.erase(m_SceneID);
+	s_ActiveScenes.erase(_sceneID);
 }
 
 Entity Scene::CreateEntity(String name)
 {
-	auto entity = Entity{m_EntityRegistry.create(), this};
+	auto entity = Entity{_entityRegistry.create(), this};
 	auto& idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = {};
 
 	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if (!name.empty()) entity.AddComponent<TagComponent>(Move(name));
 
-	m_EntityIDMap[idComponent.ID] = entity;
+	_entityIDMap[idComponent.ID] = entity;
 	return entity;
 }
 
 Entity Scene::CreateEntity(UUID uuid, const String& name)
 {
-	auto entity = Entity{m_EntityRegistry.create(), this};
+	auto entity = Entity{_entityRegistry.create(), this};
 	auto& idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = uuid;
 
 	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if (!name.empty()) entity.AddComponent<TagComponent>(name);
 
-	SE_CORE_ASSERT(m_EntityIDMap.find(uuid) == m_EntityIDMap.end());
-	m_EntityIDMap[uuid] = entity;
+	SE_CORE_ASSERT(_entityIDMap.find(uuid) == _entityIDMap.end());
+	_entityIDMap[uuid] = entity;
 	return entity;
 }
 
 void Scene::DestroyEntity(Entity entity)
 {
-	if (entity.HasComponent<ScriptComponent>()) ScriptEngine::OnScriptComponentDestroyed(m_SceneID, entity.GetUUID());
+	if (entity.HasComponent<ScriptComponent>()) ScriptEngine::OnScriptComponentDestroyed(_sceneID, entity.GetUUID());
 
-	m_EntityRegistry.destroy(entity.GetHandle());
+	_entityRegistry.destroy(entity.GetHandle());
 }
 
 Entity Scene::GetEntity(const String& tag)
 {
 	// TODO: If this becomes used often, consider indexing by tag
-	auto view = m_EntityRegistry.view<TagComponent>();
+	auto view = _entityRegistry.view<TagComponent>();
 	for (auto entity : view)
 	{
 		const auto& candidate = view.get<TagComponent>(entity).Tag;
@@ -145,18 +145,18 @@ Entity Scene::GetEntity(const String& tag)
 
 void Scene::SetViewportSize(Uint32 width, Uint32 height)
 {
-	m_ViewportWidth = width;
-	m_ViewportHeight = height;
+	_viewportWidth = width;
+	_viewportHeight = height;
 }
 
 const Shared<SceneEnvironment>& Scene::GetSceneEnvironment() const
 {
-	return m_SceneEnvironment ? m_SceneEnvironment : m_FallbackSceneEnvironment;
+	return _sceneEnvironment ? _sceneEnvironment : _fallbackSceneEnvironment;
 }
 
 Entity Scene::GetMainCameraEntity()
 {
-	auto view = m_EntityRegistry.view<CameraComponent>();
+	auto view = _entityRegistry.view<CameraComponent>();
 	for (auto entity : view)
 	{
 		auto& comp = view.get<CameraComponent>(entity);
@@ -174,8 +174,8 @@ Shared<Scene> Scene::GetScene(UUID uuid)
 
 void Scene::SetSkybox(const Shared<TextureCube>& skybox)
 {
-	m_Skybox.Texture = skybox;
-	m_Skybox.Material->Set("u_Texture", skybox);
+	_skybox.Texture = skybox;
+	_skybox.Material->Set("u_Texture", skybox);
 }
 
 void Scene::ShowMeshBoundingBoxes(bool show)

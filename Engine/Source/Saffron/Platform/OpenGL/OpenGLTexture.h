@@ -36,18 +36,18 @@ public:
 	bool Loaded() const override;
 
 private:
-	RendererID m_RendererID;
-	TextureFormat m_Format;
-	TextureWrap m_Wrap = TextureWrap::Clamp;
-	Uint32 m_Width, m_Height;
+	RendererID _rendererID;
+	TextureFormat _format;
+	TextureWrap _wrap = TextureWrap::Clamp;
+	Uint32 _width, _height;
 
-	Buffer m_ImageData;
-	bool m_IsHDR = false;
+	Buffer _imageData;
+	bool _isHDR = false;
 
-	bool m_Locked = false;
-	bool m_Loaded = false;
+	bool _locked = false;
+	bool _loaded = false;
 
-	Filepath m_FilePath;
+	Filepath _filePath;
 };
 
 class OpenGLTextureCube : public TextureCube
@@ -75,12 +75,12 @@ public:
 
 
 private:
-	RendererID m_RendererID;
-	TextureFormat m_Format;
-	Uint32 m_Width, m_Height;
+	RendererID _rendererID;
+	TextureFormat _format;
+	Uint32 _width, _height;
 
-	unsigned char* m_ImageData;
+	unsigned char* _imageData;
 
-	Filepath m_FilePath;
+	Filepath _filePath;
 };
 }

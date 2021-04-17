@@ -30,10 +30,10 @@ public:
 	void SetGravity(const Vector3f& gravity);
 
 private:
-	reactphysics3d::PhysicsWorld* m_NativeWorld;
-	Scene* m_Scene;
-	class Entity* m_PhysicsBodyEntityBuffer;
-	bool m_FilledWorld = false;
-	float m_DeltaTimeAccumulator = 0.0f;
+	reactphysics3d::PhysicsWorld* _nativeWorld;
+	Scene* _scene;
+	class Entity* _physicsBodyEntityBuffer;
+	bool _filledWorld = false;
+	float _deltaTimeAccumulator = 0.0f;
 };
 }

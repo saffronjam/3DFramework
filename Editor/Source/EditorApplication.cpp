@@ -13,16 +13,16 @@ App* Se::CreateApplication()
 
 EditorApplication::EditorApplication(const Properties& props) :
 	App(props),
-	m_StartupLayer(Shared<StartupLayer>::Create())
+	_startupLayer(Shared<StartupLayer>::Create())
 {
 	const auto wantProjectSelectorFn = [this]
 	{
 		Run::Later([=]
 		{
 			PopLayer();
-			m_PreLoader->Reset();
-			m_EditorLayer.Reset();
-			PushLayer(m_StartupLayer);
+			_preLoader->Reset();
+			_editorLayer.Reset();
+			PushLayer(_startupLayer);
 		});
 		return false;
 	};
@@ -31,27 +31,27 @@ EditorApplication::EditorApplication(const Properties& props) :
 		Run::Later([=]
 		{
 			PopLayer();
-			m_PreLoader->Reset();
-			m_EditorLayer = Shared<EditorLayer>::Create(project);
-			m_EditorLayer->WantProjectSelector += wantProjectSelectorFn;
-			PushLayer(m_EditorLayer);
+			_preLoader->Reset();
+			_editorLayer = Shared<EditorLayer>::Create(project);
+			_editorLayer->WantProjectSelector += wantProjectSelectorFn;
+			PushLayer(_editorLayer);
 		});
 		return false;
 	};
 
-	m_StartupLayer->ProjectSelected += projectSelectFn;
+	_startupLayer->ProjectSelected += projectSelectFn;
 
 
 	// TEMP
 	auto project = Shared<Project>::Create(
 		"C:/Users/ownem/source/repos/SaffronEngine/Games/2DGameProject/2DGameProject.spr");
-	m_EditorLayer = Shared<EditorLayer>::Create(project);
+	_editorLayer = Shared<EditorLayer>::Create(project);
 	// ----
 }
 
 void EditorApplication::OnInit()
 {
-	PushLayer(m_EditorLayer);
+	PushLayer(_editorLayer);
 }
 
 void EditorApplication::OnUpdate()

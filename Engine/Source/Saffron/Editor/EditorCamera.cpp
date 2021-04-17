@@ -26,9 +26,9 @@ void EditorCamera::OnUpdate()
 {
 	const auto ts = Global::Timer::GetStep();
 
-	if (m_Enabled)
+	if (_enabled)
 	{
-		if (m_ControllerStyle == ControllerStyle::Maya)
+		if (_controllerStyle == ControllerStyle::Maya)
 		{
 			if (Keyboard::IsDown(KeyCode::LAlt))
 			{
@@ -42,54 +42,54 @@ void EditorCamera::OnUpdate()
 				//	MouseZoom(swipe.y);
 			}
 		}
-		else if (m_ControllerStyle == ControllerStyle::Game)
+		else if (_controllerStyle == ControllerStyle::Game)
 		{
 			if (Keyboard::IsDown(KeyCode::W))
 			{
-				m_Position += GetForwardDirection() * m_MovementSpeed * ts.sec();
+				_position += GetForwardDirection() * _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::S))
 			{
-				m_Position -= GetForwardDirection() * m_MovementSpeed * ts.sec();
+				_position -= GetForwardDirection() * _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::A))
 			{
-				m_Position -= GetRightDirection() * m_MovementSpeed * ts.sec();
+				_position -= GetRightDirection() * _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::D))
 			{
-				m_Position += GetRightDirection() * m_MovementSpeed * ts.sec();
+				_position += GetRightDirection() * _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::E))
 			{
-				m_Position.y += m_MovementSpeed * ts.sec();
+				_position.y += _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::Q))
 			{
-				m_Position.y -= m_MovementSpeed * ts.sec();
+				_position.y -= _movementSpeed * ts.sec();
 			}
 
 			if (Keyboard::IsDown(KeyCode::LShift))
 			{
-				m_MovementSpeed = 20.0f;
+				_movementSpeed = 20.0f;
 			}
 			else
 			{
-				m_MovementSpeed = 10.0f;
+				_movementSpeed = 10.0f;
 			}
 
 			if (Mouse::IsDown(MouseButtonCode::Right))
 			{
 				const Vector2f swipe = Mouse::GetSwipe() * ts.sec() * 0.3f;
 
-				m_Yaw += swipe.x;
-				m_Pitch -= swipe.y;
-				m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
+				_yaw += swipe.x;
+				_pitch -= swipe.y;
+				_pitch = std::clamp(_pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
 			}
 		}
 
@@ -108,50 +108,50 @@ void EditorCamera::OnGuiRender()
 
 void EditorCamera::Reset()
 {
-	m_Position = {0.0f, 10.0f, 10.0f};
-	m_Yaw = 4 * Math::PI / 3;
-	m_Pitch = -1 * Math::PI / 5.0f;
+	_position = {0.0f, 10.0f, 10.0f};
+	_yaw = 4 * Math::PI / 3;
+	_pitch = -1 * Math::PI / 5.0f;
 	UpdateCameraView();
 }
 
 void EditorCamera::Enable()
 {
-	m_Enabled = true;
+	_enabled = true;
 }
 
 void EditorCamera::Disable()
 {
-	m_Enabled = false;
+	_enabled = false;
 }
 
 bool EditorCamera::IsEnabled() const
 {
-	return m_Enabled;
+	return _enabled;
 }
 
 const Matrix4f& EditorCamera::GetViewMatrix() const
 {
-	return m_ViewMatrix;
+	return _viewMatrix;
 }
 
 Matrix4f EditorCamera::GetViewProjection() const
 {
-	return m_ProjectionMatrix * m_ViewMatrix;
+	return _projectionMatrix * _viewMatrix;
 }
 
 const Vector3f& EditorCamera::GetPosition() const
 {
-	return m_Position;
+	return _position;
 }
 
 float EditorCamera::GetPitch() const
 {
-	return m_Pitch;
+	return _pitch;
 }
 
 float EditorCamera::GetYaw() const
 {
-	return m_Yaw;
+	return _yaw;
 }
 
 float EditorCamera::GetRoll() const
@@ -162,41 +162,41 @@ float EditorCamera::GetRoll() const
 
 void EditorCamera::SetPosition(const Vector3f& position)
 {
-	m_Position = position;
+	_position = position;
 	UpdateCameraView();
 }
 
 void EditorCamera::SetRotation(const Vector3f& rotation)
 {
-	m_Pitch = rotation.x;
-	m_Yaw = rotation.y;
-	m_Pitch = std::clamp(m_Pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
+	_pitch = rotation.x;
+	_yaw = rotation.y;
+	_pitch = std::clamp(_pitch, -Math::PI / 2.0f + 0.01f, Math::PI / 2.0f - 0.01f);
 	UpdateCameraView();
 }
 
 Vector3f EditorCamera::GetUpDirection() const
 {
-	return m_Up;
+	return _up;
 }
 
 Vector3f EditorCamera::GetRightDirection() const
 {
-	return m_Right;
+	return _right;
 }
 
 Vector3f EditorCamera::GetForwardDirection() const
 {
-	return m_Forward;
+	return _forward;
 }
 
 EditorCamera::ControllerStyle EditorCamera::GetControllerStyle() const
 {
-	return m_ControllerStyle;
+	return _controllerStyle;
 }
 
 void EditorCamera::SetControllerStyle(ControllerStyle style)
 {
-	m_ControllerStyle = style;
+	_controllerStyle = style;
 }
 
 bool EditorCamera::OnMouseScroll(const MouseWheelScrolledEvent& event)
@@ -210,25 +210,25 @@ bool EditorCamera::OnMouseScroll(const MouseWheelScrolledEvent& event)
 void EditorCamera::UpdateCameraView()
 {
 	Vector3f front;
-	front.x = std::cos(m_Yaw) * std::cos(m_Pitch);
-	front.y = std::sin(m_Pitch);
-	front.z = std::sin(m_Yaw) * std::cos(m_Pitch);
-	m_Forward = normalize(front);
+	front.x = std::cos(_yaw) * std::cos(_pitch);
+	front.y = std::sin(_pitch);
+	front.z = std::sin(_yaw) * std::cos(_pitch);
+	_forward = normalize(front);
 
-	m_Right = normalize(cross(m_Forward, m_WorldUp));
-	m_Up = normalize(cross(m_Right, m_Forward));
+	_right = normalize(cross(_forward, _worldUp));
+	_up = normalize(cross(_right, _forward));
 
-	m_ViewMatrix = lookAt(m_Position, m_Position + m_Forward, m_Up);
+	_viewMatrix = lookAt(_position, _position + _forward, _up);
 }
 
 float EditorCamera::GetZoomSpeed() const
 {
-	//float distance = m_Distance * 0.2f;
+	//float distance = _distance * 0.2f;
 	//distance = std::max(distance, 0.0f);
 	//float speed = distance * distance;
 	//speed = std::min(speed, 100.0f); // max speed = 100
 	//return speed;
 
-	return m_MovementSpeed;
+	return _movementSpeed;
 }
 }

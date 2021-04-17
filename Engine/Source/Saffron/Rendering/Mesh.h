@@ -157,44 +157,44 @@ private:
 	Vector3f InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim);
 
 private:
-	ArrayList<Submesh> m_Submeshes;
+	ArrayList<Submesh> _submeshes;
 
-	Unique<Assimp::Importer> m_Importer;
+	Unique<Assimp::Importer> _importer;
 
-	Matrix4f m_InverseTransform{};
+	Matrix4f _inverseTransform{};
 
-	Uint32 m_BoneCount = 0;
-	ArrayList<BoneInfo> m_BoneInfo;
+	Uint32 _boneCount = 0;
+	ArrayList<BoneInfo> _boneInfo;
 
-	Shared<Pipeline> m_Pipeline;
-	Shared<VertexBuffer> m_VertexBuffer;
-	Shared<IndexBuffer> m_IndexBuffer;
+	Shared<Pipeline> _pipeline;
+	Shared<VertexBuffer> _vertexBuffer;
+	Shared<IndexBuffer> _indexBuffer;
 
-	ArrayList<Vertex> m_StaticVertices;
-	ArrayList<AnimatedVertex> m_AnimatedVertices;
-	ArrayList<Index> m_Indices;
-	UnorderedMap<String, Uint32> m_BoneMapping;
-	ArrayList<Matrix4f> m_BoneTransforms;
-	const aiScene* m_Scene;
+	ArrayList<Vertex> _staticVertices;
+	ArrayList<AnimatedVertex> _animatedVertices;
+	ArrayList<Index> _indices;
+	UnorderedMap<String, Uint32> _boneMapping;
+	ArrayList<Matrix4f> _boneTransforms;
+	const aiScene* _scene;
 
 	// Materials
-	Shared<Shader> m_MeshShader;
-	Shared<Material> m_BaseMaterial;
-	ArrayList<Shared<Texture2D>> m_Textures;
-	ArrayList<Shared<Texture2D>> m_NormalMaps;
-	ArrayList<Shared<MaterialInstance>> m_Materials;
-	Matrix4f m_LocalTransform;
+	Shared<Shader> _meshShader;
+	Shared<Material> _baseMaterial;
+	ArrayList<Shared<Texture2D>> _textures;
+	ArrayList<Shared<Texture2D>> _normalMaps;
+	ArrayList<Shared<MaterialInstance>> _materials;
+	Matrix4f _localTransform;
 
-	UnorderedMap<Uint32, ArrayList<Triangle>> m_TriangleCache;
+	UnorderedMap<Uint32, ArrayList<Triangle>> _triangleCache;
 
 	// Animation
-	bool m_IsAnimated = false;
-	float m_AnimationTime = 0.0f;
-	float m_WorldTime = 0.0f;
-	float m_TimeMultiplier = 1.0f;
-	bool m_AnimationPlaying = true;
+	bool _isAnimated = false;
+	float _animationTime = 0.0f;
+	float _worldTime = 0.0f;
+	float _timeMultiplier = 1.0f;
+	bool _animationPlaying = true;
 
-	Filepath m_Filepath;
+	Filepath _filepath;
 
 	static constexpr const char* MeshesFolder = "Assets/Meshes/";
 

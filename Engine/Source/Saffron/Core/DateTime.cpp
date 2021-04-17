@@ -89,7 +89,7 @@ DateTime::DateTime() :
 }
 
 DateTime::DateTime(Date date) :
-	m_Date(Move(date))
+	_date(Move(date))
 {
 	Clamp();
 }
@@ -98,20 +98,20 @@ DateTime::DateTime(TimePoint timePoint)
 {
 	time_t time = std::chrono::system_clock::to_time_t(timePoint);
 	const std::tm* tm = std::localtime(&time);
-	m_Date = {tm->tm_sec, tm->tm_min, tm->tm_hour, tm->tm_wday - 1, tm->tm_mday - 1, tm->tm_mon, tm->tm_year + 1900};
+	_date = {tm->tm_sec, tm->tm_min, tm->tm_hour, tm->tm_wday - 1, tm->tm_mday - 1, tm->tm_mon, tm->tm_year + 1900};
 	Clamp();
 }
 
 DateTime::DateTime(int year, int month, int day, int weekday, int hour, int minutes, int seconds) :
-	m_Date({seconds, minutes, hour, weekday, day, month, year})
+	_date({seconds, minutes, hour, weekday, day, month, year})
 {
 	Clamp();
 }
 
 bool DateTime::operator<(const DateTime& rhs) const
 {
-	const auto& lDate = m_Date;
-	const auto& rDate = rhs.m_Date;
+	const auto& lDate = _date;
+	const auto& rDate = rhs._date;
 
 	return std::make_tuple(lDate.Year, lDate.Month, lDate.Day, lDate.Weekday, lDate.Hour, lDate.Minutes, lDate.Seconds)
 		< std::make_tuple(rDate.Year, rDate.Month, rDate.Day, rDate.Weekday, rDate.Hour, rDate.Minutes, rDate.Seconds);
@@ -119,8 +119,8 @@ bool DateTime::operator<(const DateTime& rhs) const
 
 bool DateTime::operator>(const DateTime& rhs) const
 {
-	const auto& lDate = m_Date;
-	const auto& rDate = rhs.m_Date;
+	const auto& lDate = _date;
+	const auto& rDate = rhs._date;
 
 	return std::make_tuple(lDate.Year, lDate.Month, lDate.Day, lDate.Weekday, lDate.Hour, lDate.Minutes, lDate.Seconds)
 		> std::make_tuple(rDate.Year, rDate.Month, rDate.Day, rDate.Weekday, rDate.Hour, rDate.Minutes, rDate.Seconds);
@@ -153,11 +153,11 @@ String DateTime::ANSIDateString() const
 
 void DateTime::Clamp()
 {
-	Misc::Clamp(m_Date.Seconds, 0, 59);
-	Misc::Clamp(m_Date.Seconds, 0, 59);
-	Misc::Clamp(m_Date.Hour, 0, 23);
-	Misc::Clamp(m_Date.Weekday, 0, 6);
-	Misc::Clamp(m_Date.Day, 0, 30);
-	Misc::Clamp(m_Date.Month, 0, 11);
+	Misc::Clamp(_date.Seconds, 0, 59);
+	Misc::Clamp(_date.Seconds, 0, 59);
+	Misc::Clamp(_date.Hour, 0, 23);
+	Misc::Clamp(_date.Weekday, 0, 6);
+	Misc::Clamp(_date.Day, 0, 30);
+	Misc::Clamp(_date.Month, 0, 11);
 }
 }

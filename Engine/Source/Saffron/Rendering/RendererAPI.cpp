@@ -4,6 +4,6 @@
 
 namespace Se
 {
-RendererCapabilities RendererApi::m_sCapabilities = {};
-float RendererApi::m_LineThickness = 1.0f;
+RendererCapabilities RendererApi::_sCapabilities = {};
+float RendererApi::_lineThickness = 1.0f;
 }

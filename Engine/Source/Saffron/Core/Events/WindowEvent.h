@@ -17,24 +17,24 @@ public:
 
 public:
 	WindowResizedEvent(int width, int height) :
-		m_Width(width),
-		m_Height(height)
+		_width(width),
+		_height(height)
 	{
 	}
 
-	int GetWidth() const { return m_Width; }
+	int GetWidth() const { return _width; }
 
-	int GetHeight() const { return m_Height; }
+	int GetHeight() const { return _height; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " " << m_Width << "x" << m_Height;
+		oss << GetName() << " " << _width << "x" << _height;
 		return oss.str();
 	}
 
 private:
-	int m_Width, m_Height;
+	int _width, _height;
 };
 
 class WindowMovedEvent : public Event
@@ -46,21 +46,21 @@ public:
 
 public:
 	explicit WindowMovedEvent(const Vector2f& position) :
-		m_Position(position)
+		_position(position)
 	{
 	}
 
-	const Vector2f& GetPosition() const { return m_Position; }
+	const Vector2f& GetPosition() const { return _position; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " Position: " << m_Position.x << ", " << m_Position.y;
+		oss << GetName() << " Position: " << _position.x << ", " << _position.y;
 		return oss.str();
 	}
 
 private:
-	Vector2f m_Position;
+	Vector2f _position;
 };
 
 class WindowGainedFocusEvent : public Event
@@ -105,17 +105,17 @@ public:
 
 public:
 	explicit WindowDroppedFilesEvent(ArrayList<Filepath> filepaths) :
-		m_Filepaths(Move(filepaths))
+		_filepaths(Move(filepaths))
 	{
 	}
 
-	const ArrayList<Filepath>& GetFilepaths() const { return m_Filepaths; }
+	const ArrayList<Filepath>& GetFilepaths() const { return _filepaths; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
 		oss << GetName() << " Paths: ";
-		for (const auto& filepath : m_Filepaths)
+		for (const auto& filepath : _filepaths)
 		{
 			oss << "[ " << filepath.string() << " ]";
 		}
@@ -123,7 +123,7 @@ public:
 	}
 
 private:
-	ArrayList<Filepath> m_Filepaths;
+	ArrayList<Filepath> _filepaths;
 };
 
 class WindowNewTitleEvent : public Event
@@ -135,21 +135,21 @@ public:
 
 public:
 	explicit WindowNewTitleEvent(String title) :
-		m_Title(Move(title))
+		_title(Move(title))
 	{
 	}
 
-	const String& GetTitle() const { return m_Title; }
+	const String& GetTitle() const { return _title; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " Title: " << m_Title;
+		oss << GetName() << " Title: " << _title;
 		return oss.str();
 	}
 
 private:
-	String m_Title;
+	String _title;
 };
 
 class WindowNewIconEvent : public Event
@@ -161,21 +161,21 @@ public:
 
 public:
 	explicit WindowNewIconEvent(Filepath filepath) :
-		m_Filepath(Move(filepath))
+		_filepath(Move(filepath))
 	{
 	}
 
-	const Filepath& GetFilepath() const { return m_Filepath; }
+	const Filepath& GetFilepath() const { return _filepath; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " Filepath: " << m_Filepath;
+		oss << GetName() << " Filepath: " << _filepath;
 		return oss.str();
 	}
 
 private:
-	Filepath m_Filepath;
+	Filepath _filepath;
 };
 
 class WindowMinimizedEvent : public Event
@@ -187,21 +187,21 @@ public:
 
 public:
 	explicit WindowMinimizedEvent(bool restored) :
-		m_Restored(restored)
+		_restored(restored)
 	{
 	}
 
-	bool Restored() const { return m_Restored; }
+	bool Restored() const { return _restored; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " Minimize Restored: " << m_Restored;
+		oss << GetName() << " Minimize Restored: " << _restored;
 		return oss.str();
 	}
 
 private:
-	bool m_Restored;
+	bool _restored;
 };
 
 
@@ -214,20 +214,20 @@ public:
 
 public:
 	explicit WindowMaximizedEvent(bool restored) :
-		m_Restored(restored)
+		_restored(restored)
 	{
 	}
 
-	bool Restored() const { return m_Restored; }
+	bool Restored() const { return _restored; }
 
 	String ToString() const override
 	{
 		OutputStringStream oss;
-		oss << GetName() << " Maximize Restored: " << m_Restored;
+		oss << GetName() << " Maximize Restored: " << _restored;
 		return oss.str();
 	}
 
 private:
-	bool m_Restored;
+	bool _restored;
 };
 }

@@ -14,24 +14,24 @@ public:
 	explicit Project(Filepath filepath);
 	Project(String name, DateTime lastOpened, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths);
 
-	bool operator==(const Project& rhs) const { return m_UUID == rhs.m_UUID; }
+	bool operator==(const Project& rhs) const { return _uuid == rhs._uuid; }
 
 	const Filepath& AddScene(Filepath filepath);
 	const Shared<EditorScene>& AddCachedScene(const Shared<EditorScene>& editorScene);
 
-	const DateTime& LastOpened() const { return m_LastOpened; }
+	const DateTime& LastOpened() const { return _lastOpened; }
 
-	void SyncLastOpened() { m_LastOpened = DateTime(); }
+	void SyncLastOpened() { _lastOpened = DateTime(); }
 
-	UUID GetUUID() const { return m_UUID; }
+	UUID GetUUID() const { return _uuid; }
 
-	const String& GetName() const { return m_Name; }
+	const String& GetName() const { return _name; }
 
-	const Filepath& GetProjectFolderpath() const { return m_ProjectFolderpath; }
+	const Filepath& GetProjectFolderpath() const { return _projectFolderpath; }
 
-	const Filepath& GetProjectFilepath() const { return m_ProjectFilepath; }
+	const Filepath& GetProjectFilepath() const { return _projectFilepath; }
 
-	const ArrayList<Filepath>& GetSceneFilepaths() const { return m_SceneFilepaths; }
+	const ArrayList<Filepath>& GetSceneFilepaths() const { return _sceneFilepaths; }
 
 	const ArrayList<Shared<EditorScene>>& GetSceneCache() const;
 	const Filepath GetFullSceneFilepath(const Filepath& relativeFilepath);
@@ -46,13 +46,13 @@ private:
 	        ArrayList<Filepath> sceneFilepaths);
 
 private:
-	UUID m_UUID;
-	String m_Name;
-	DateTime m_LastOpened;
+	UUID _uuid;
+	String _name;
+	DateTime _lastOpened;
 
-	Filepath m_ProjectFolderpath;
-	Filepath m_ProjectFilepath;
-	ArrayList<Filepath> m_SceneFilepaths;
-	ArrayList<Shared<EditorScene>> m_SceneCache;
+	Filepath _projectFolderpath;
+	Filepath _projectFilepath;
+	ArrayList<Filepath> _sceneFilepaths;
+	ArrayList<Shared<EditorScene>> _sceneCache;
 };
 }

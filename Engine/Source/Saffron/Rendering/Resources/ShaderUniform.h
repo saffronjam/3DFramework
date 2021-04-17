@@ -67,10 +67,10 @@ private:
 	friend class Shader;
 
 private:
-	String m_Name;
-	ArrayList<ShaderUniformDeclaration*> m_Fields;
-	Uint32 m_Size;
-	Uint32 m_Offset;
+	String _name;
+	ArrayList<ShaderUniformDeclaration*> _fields;
+	Uint32 _size;
+	Uint32 _offset;
 
 public:
 	explicit ShaderStruct(String name);

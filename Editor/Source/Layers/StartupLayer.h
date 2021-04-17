@@ -23,9 +23,9 @@ public:
 	EventSubscriberList<const Shared<Project>&> ProjectSelected;
 
 private:
-	Map<String, Shared<Texture2D>> m_TextureStore;
-	Shared<Project> m_SelectedProject = nullptr;
-	DateTime m_Today;
-	Optional<Shared<Project>> m_NewProject;
+	Map<String, Shared<Texture2D>> _textureStore;
+	Shared<Project> _selectedProject = nullptr;
+	DateTime _today;
+	Optional<Shared<Project>> _newProject;
 };
 }

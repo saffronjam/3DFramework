@@ -13,9 +13,9 @@ public:
 
 	void OnGuiRender(const Shared<ScriptPanel>& scriptPanel);
 
-	void SetContext(const Shared<Scene>& scene) { m_Context = scene; }
+	void SetContext(const Shared<Scene>& scene) { _context = scene; }
 
-	void SetSelectedEntity(Entity entity) { m_SelectionContext = entity; }
+	void SetSelectedEntity(Entity entity) { _selectionContext = entity; }
 
 private:
 	void OnCreateEntity(bool viewModal, const Shared<ScriptPanel>& scriptPanel);
@@ -35,7 +35,7 @@ public:
 	mutable EventSubscriberList<Entity> ViewInModelSpace;
 
 private:
-	Shared<Scene> m_Context;
-	Entity m_SelectionContext;
+	Shared<Scene> _context;
+	Entity _selectionContext;
 };
 }

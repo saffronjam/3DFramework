@@ -28,6 +28,6 @@ private:
 
 
 private:
-	Scene& m_Scene;
+	Scene& _scene;
 };
 }

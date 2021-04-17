@@ -30,10 +30,10 @@ public:
 	static String TypeToString(Type type);
 
 private:
-	String m_Name;
-	Uint32 m_Register = 0;
-	Uint32 m_Count;
-	Type m_Type;
+	String _name;
+	Uint32 _register = 0;
+	Uint32 _count;
+	Type _type;
 };
 
 class OpenGLShaderUniformDeclaration : public ShaderUniformDeclaration
@@ -57,15 +57,15 @@ public:
 	};
 
 private:
-	String m_Name;
-	Uint32 m_Size;
-	Uint32 m_Count;
-	Uint32 m_Offset;
-	ShaderDomain m_Domain;
+	String _name;
+	Uint32 _size;
+	Uint32 _count;
+	Uint32 _offset;
+	ShaderDomain _domain;
 
-	Type m_Type;
-	ShaderStruct* m_Struct;
-	mutable int32_t m_Location;
+	Type _type;
+	ShaderStruct* _struct;
+	mutable int32_t _location;
 public:
 	OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const String& name, Uint32 count = 1);
 	OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct* uniformStruct, const String& name,
@@ -109,11 +109,11 @@ class OpenGLShaderUniformBufferDeclaration : public ShaderUniformBufferDeclarati
 private:
 	friend class Shader;
 private:
-	String m_Name;
-	ShaderUniformList m_Uniforms;
-	Uint32 m_Register;
-	Uint32 m_Size;
-	ShaderDomain m_Domain;
+	String _name;
+	ShaderUniformList _uniforms;
+	Uint32 _register;
+	Uint32 _size;
+	ShaderDomain _domain;
 public:
 	OpenGLShaderUniformBufferDeclaration(const String& name, ShaderDomain domain);
 

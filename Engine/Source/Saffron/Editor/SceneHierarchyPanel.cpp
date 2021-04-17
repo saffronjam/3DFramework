@@ -13,18 +13,18 @@ namespace Se
 Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix);
 
 SceneHierarchyPanel::SceneHierarchyPanel(const Shared<Scene>& context) :
-	m_Context(context)
+	_context(context)
 {
 }
 
 void SceneHierarchyPanel::OnGuiRender(const Shared<ScriptPanel>& scriptPanel)
 {
 	ImGui::Begin("Scene Hierarchy");
-	if (m_Context)
+	if (_context)
 	{
-		m_Context->GetEntityRegistry().each([&](auto entityHandle)
+		_context->GetEntityRegistry().each([&](auto entityHandle)
 		{
-			const Entity entity(entityHandle, m_Context.Raw());
+			const Entity entity(entityHandle, _context.Raw());
 			if (entity.HasComponent<IDComponent>()) DrawEntityNode(entity);
 		});
 
@@ -124,12 +124,12 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 			}
 			else
 			{
-				Entity newEntity = m_Context->CreateEntity(entityName);
+				Entity newEntity = _context->CreateEntity(entityName);
 
-				if (m_Context->GetEntity().HasComponent<EditorCameraComponent>())
+				if (_context->GetEntity().HasComponent<EditorCameraComponent>())
 				{
 					// Put new Entity in front of editor camera
-					auto& editorCamera = m_Context->GetEntity().GetComponent<EditorCameraComponent>().Camera;
+					auto& editorCamera = _context->GetEntity().GetComponent<EditorCameraComponent>().Camera;
 					auto& transform = newEntity.GetComponent<TransformComponent>().Transform;
 					auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 					auto cameraFrontPosition = editorCamera->GetPosition() + editorCamera->GetForwardDirection() *
@@ -214,7 +214,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 
 void SceneHierarchyPanel::OnCreateMesh()
 {
-	auto newEntity = m_Context->CreateEntity("Mesh");
+	auto newEntity = _context->CreateEntity("Mesh");
 	const String defaultMeshPath = "Resources/Assets/meshes/Cube1m.fbx";
 	newEntity.AddComponent<MeshComponent>(Shared<Mesh>::Create(defaultMeshPath));
 	NewSelection.Invoke(newEntity);
@@ -222,7 +222,7 @@ void SceneHierarchyPanel::OnCreateMesh()
 
 void SceneHierarchyPanel::OnCreateDirectionalLight()
 {
-	auto newEntity = m_Context->CreateEntity("Directional Light");
+	auto newEntity = _context->CreateEntity("Directional Light");
 	newEntity.AddComponent<DirectionalLightComponent>();
 	newEntity.GetComponent<TransformComponent>().Transform = toMat4(Quaternion(radians(Vector3f{80.0f, 10.0f, 0.0f})));
 	NewSelection.Invoke(newEntity);
@@ -230,7 +230,7 @@ void SceneHierarchyPanel::OnCreateDirectionalLight()
 
 void SceneHierarchyPanel::OnCreateSkylight()
 {
-	auto newEntity = m_Context->CreateEntity("Sky Light");
+	auto newEntity = _context->CreateEntity("Sky Light");
 	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("pink_sunrise_4k.hdr"));
 	NewSelection.Invoke(newEntity);
 }
@@ -241,15 +241,15 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	String name = "Unnamed";
 	if (entity.HasComponent<TagComponent>()) name = entity.GetComponent<TagComponent>().Tag;
 
-	const ImGuiTreeNodeFlags node_flags = (entity == m_SelectionContext ? ImGuiTreeNodeFlags_Selected : 0) |
+	const ImGuiTreeNodeFlags node_flags = (entity == _selectionContext ? ImGuiTreeNodeFlags_Selected : 0) |
 		ImGuiTreeNodeFlags_OpenOnArrow;
 
 	const bool opened = ImGui::TreeNodeEx(reinterpret_cast<void*>(&entity.GetComponent<IDComponent>().ID), node_flags,
 	                                      name.c_str());
 	if (ImGui::IsItemClicked())
 	{
-		m_SelectionContext = entity;
-		NewSelection.Invoke(m_SelectionContext);
+		_selectionContext = entity;
+		NewSelection.Invoke(_selectionContext);
 	}
 
 	bool entityDeleted = false;
@@ -296,7 +296,7 @@ void SceneHierarchyPanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUI
 	// Mesh Hierarchy
 	if (ImGui::TreeNode(oss.str().c_str()))
 	{
-		auto* rootNode = mesh->m_Scene->mRootNode;
+		auto* rootNode = mesh->_scene->mRootNode;
 		MeshNodeHierarchy(mesh, rootNode);
 		ImGui::TreePop();
 	}

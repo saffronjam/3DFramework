@@ -75,34 +75,34 @@ void SceneCamera::RenderFrustum(const Matrix4f& transform) const
 
 void SceneCamera::SetPerspective(float verticalFOV, float nearClip, float farClip)
 {
-	m_ProjectionMode = ProjectionMode::Perspective;
-	m_PerspectiveFOV = verticalFOV;
-	m_PerspectiveNear = nearClip;
-	m_PerspectiveFar = farClip;
+	_projectionMode = ProjectionMode::Perspective;
+	_perspectiveFOV = verticalFOV;
+	_perspectiveNear = nearClip;
+	_perspectiveFar = farClip;
 }
 
 void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 {
-	m_ProjectionMode = ProjectionMode::Orthographic;
-	m_OrthographicSize = size;
-	m_OrthographicNear = nearClip;
-	m_OrthographicFar = farClip;
+	_projectionMode = ProjectionMode::Orthographic;
+	_orthographicSize = size;
+	_orthographicNear = nearClip;
+	_orthographicFar = farClip;
 }
 
 void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
 {
 	Camera::SetViewportSize(width, height);
-	switch (m_ProjectionMode)
+	switch (_projectionMode)
 	{
-	case ProjectionMode::Perspective: m_ProjectionMatrix = glm::perspectiveFov(
-			m_PerspectiveFOV, static_cast<float>(width), static_cast<float>(height), m_PerspectiveNear,
-			m_PerspectiveFar);
+	case ProjectionMode::Perspective: _projectionMatrix = glm::perspectiveFov(
+			_perspectiveFOV, static_cast<float>(width), static_cast<float>(height), _perspectiveNear,
+			_perspectiveFar);
 		break;
 
 	case ProjectionMode::Orthographic: const float aspect = static_cast<float>(width) / static_cast<float>(height);
-		const float Width = m_OrthographicSize * aspect;
-		const float Height = m_OrthographicSize;
-		m_ProjectionMatrix = glm::ortho(-Width * 0.5f, Width * 0.5f, -Height * 0.5f, Height * 0.5f);
+		const float Width = _orthographicSize * aspect;
+		const float Height = _orthographicSize;
+		_projectionMatrix = glm::ortho(-Width * 0.5f, Width * 0.5f, -Height * 0.5f, Height * 0.5f);
 		break;
 	}
 }

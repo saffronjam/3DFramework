@@ -75,40 +75,40 @@ public:
 	EventSubscriberList<void> WantProjectSelector;
 
 private:
-	int m_Style = static_cast<int>(Gui::Style::Dark);
-	int m_GizmoType = -1;
+	int _style = static_cast<int>(Gui::Style::Dark);
+	int _gizmoType = -1;
 
-	Shared<Project> m_Project;
+	Shared<Project> _project;
 
-	Shared<EditorScene> m_EditorScene;
-	Shared<RuntimeScene> m_RuntimeScene;
-	Shared<ViewportPane> m_MainViewportPane;
-	ArrayList<bool> m_DockedModelSpaceScene;
-	mutable Shared<Scene> m_LastFocusedScene;
-	Shared<Scene> m_CachedActiveScene;
+	Shared<EditorScene> _editorScene;
+	Shared<RuntimeScene> _runtimeScene;
+	Shared<ViewportPane> _mainViewportPane;
+	ArrayList<bool> _dockedModelSpaceScene;
+	mutable Shared<Scene> _lastFocusedScene;
+	Shared<Scene> _cachedActiveScene;
 
-	bool m_ReloadScriptOnPlay = true;
+	bool _reloadScriptOnPlay = true;
 
-	EditorTerminal m_EditorTerminal;
+	EditorTerminal _editorTerminal;
 
-	Shared<Shader> m_BrushShader;
-	Shared<Material> m_SphereBaseMaterial;
+	Shared<Shader> _brushShader;
+	Shared<Material> _sphereBaseMaterial;
 
-	Shared<Material> m_MeshMaterial;
-	ArrayList<Shared<MaterialInstance>> m_MetalSphereMaterialInstances, m_DielectricSphereMaterialInstances;
+	Shared<Material> _meshMaterial;
+	ArrayList<Shared<MaterialInstance>> _metalSphereMaterialInstances, _dielectricSphereMaterialInstances;
 
 	// Editor resources
-	Map<String, Shared<Texture2D>> m_TexStore;
+	Map<String, Shared<Texture2D>> _texStore;
 
-	Shared<AssetPanel> m_AssetPanel;
-	Shared<EntityComponentsPanel> m_EntityPanel;
-	Shared<ScriptPanel> m_ScriptPanel;
-	Shared<SceneHierarchyPanel> m_ScenePanel;
-	Run::Handle m_AssetScriptRunHandle;
+	Shared<AssetPanel> _assetPanel;
+	Shared<EntityComponentsPanel> _entityPanel;
+	Shared<ScriptPanel> _scriptPanel;
+	Shared<SceneHierarchyPanel> _scenePanel;
+	Run::Handle _assetScriptRunHandle;
 
-	SceneState m_SceneState;
+	SceneState _sceneState;
 
-	SelectionMode m_SelectionMode = SelectionMode::Entity;
-	Entity m_SelectedEntity;
+	SelectionMode _selectionMode = SelectionMode::Entity;
+	Entity _selectedEntity;
 };
 }

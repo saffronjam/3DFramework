@@ -4,17 +4,17 @@
 namespace Se
 {
 OpenGLRenderPass::OpenGLRenderPass(const RenderPassSpecification& spec) :
-	m_Specification(spec)
+	_specification(spec)
 {
 }
 
 RenderPassSpecification& OpenGLRenderPass::GetSpecification()
 {
-	return m_Specification;
+	return _specification;
 }
 
 const RenderPassSpecification& OpenGLRenderPass::GetSpecification() const
 {
-	return m_Specification;
+	return _specification;
 }
 }

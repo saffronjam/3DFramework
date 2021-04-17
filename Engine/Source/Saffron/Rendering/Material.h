@@ -58,14 +58,14 @@ private:
 	ShaderUniformDeclaration* FindUniformDeclaration(const String& name);
 	Buffer& GetUniformBufferTarget(ShaderUniformDeclaration* uniformDeclaration);
 private:
-	Shared<Shader> m_Shader;
-	std::unordered_set<MaterialInstance*> m_MaterialInstances;
+	Shared<Shader> _shader;
+	std::unordered_set<MaterialInstance*> _materialInstances;
 
-	Buffer m_VSUniformStorageBuffer;
-	Buffer m_PSUniformStorageBuffer;
-	ArrayList<Shared<Texture>> m_Textures;
+	Buffer _vSUniformStorageBuffer;
+	Buffer _pSUniformStorageBuffer;
+	ArrayList<Shared<Texture>> _textures;
 
-	Uint32 m_MaterialFlags{};
+	Uint32 _materialFlags{};
 };
 
 template <typename T>
@@ -82,8 +82,8 @@ Shared<T> Material::GetResource(const String& name)
 {
 	auto decl = FindResourceDeclaration(name);
 	Uint32 slot = decl->GetRegister();
-	SE_CORE_ASSERT(slot < m_Textures.size(), "Texture slot is invalid!");
-	return m_Textures[slot];
+	SE_CORE_ASSERT(slot < _textures.size(), "Texture slot is invalid!");
+	return _textures[slot];
 }
 
 template <typename T>
@@ -94,7 +94,7 @@ void Material::Set(const String& name, const T& value)
 	auto& buffer = GetUniformBufferTarget(decl);
 	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
 
-	for (auto* mi : m_MaterialInstances) mi->OnMaterialValueUpdated(decl);
+	for (auto* mi : _materialInstances) mi->OnMaterialValueUpdated(decl);
 }
 
 
@@ -138,15 +138,15 @@ private:
 	Buffer& GetUniformBufferTarget(ShaderUniformDeclaration* uniformDeclaration);
 	void OnMaterialValueUpdated(ShaderUniformDeclaration* decl);
 private:
-	Shared<Material> m_Material;
-	String m_Name;
+	Shared<Material> _material;
+	String _name;
 
-	Buffer m_VSUniformStorageBuffer;
-	Buffer m_PSUniformStorageBuffer;
-	ArrayList<Shared<Texture>> m_Textures;
+	Buffer _vSUniformStorageBuffer;
+	Buffer _pSUniformStorageBuffer;
+	ArrayList<Shared<Texture>> _textures;
 
 	// TODO: This is temporary; come up with a proper system to track overrides
-	std::unordered_set<String> m_OverriddenValues;
+	std::unordered_set<String> _overriddenValues;
 };
 
 
@@ -157,7 +157,7 @@ private:
 template <typename T>
 T& MaterialInstance::Get(const String& name)
 {
-	auto* decl = m_Material->FindUniformDeclaration(name);
+	auto* decl = _material->FindUniformDeclaration(name);
 	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
 	auto& buffer = GetUniformBufferTarget(decl);
 	return buffer.Read<T>(decl->GetOffset());
@@ -166,29 +166,29 @@ T& MaterialInstance::Get(const String& name)
 template <typename T>
 Shared<T> MaterialInstance::GetResource(const String& name)
 {
-	const auto* decl = m_Material->FindResourceDeclaration(name);
+	const auto* decl = _material->FindResourceDeclaration(name);
 	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
 	const Uint32 slot = decl->GetRegister();
-	SE_CORE_ASSERT(slot < m_Textures.size(), "Texture slot is invalid!");
-	return Shared<T>(m_Textures[slot]);
+	SE_CORE_ASSERT(slot < _textures.size(), "Texture slot is invalid!");
+	return Shared<T>(_textures[slot]);
 }
 
 template <typename T>
 Shared<T> MaterialInstance::TryGetResource(const String& name)
 {
-	const auto* decl = m_Material->FindResourceDeclaration(name);
+	const auto* decl = _material->FindResourceDeclaration(name);
 	if (!decl) return nullptr;
 
 	const Uint32 slot = decl->GetRegister();
-	if (slot >= m_Textures.size()) return nullptr;
+	if (slot >= _textures.size()) return nullptr;
 
-	return m_Textures[slot];
+	return _textures[slot];
 }
 
 template <typename T>
 void MaterialInstance::Set(const String& name, const T& value)
 {
-	auto* decl = m_Material->FindUniformDeclaration(name);
+	auto* decl = _material->FindUniformDeclaration(name);
 	if (!decl) return;
 
 	//TODO: Fix so I can exchange 'x' with $name
@@ -197,6 +197,6 @@ void MaterialInstance::Set(const String& name, const T& value)
 
 	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
 
-	m_OverriddenValues.insert(name);
+	_overriddenValues.insert(name);
 }
 }

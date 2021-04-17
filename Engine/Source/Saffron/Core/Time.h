@@ -30,6 +30,6 @@ public:
 	static Time Zero;
 
 private:
-	float m_Time;
+	float _time;
 };
 }

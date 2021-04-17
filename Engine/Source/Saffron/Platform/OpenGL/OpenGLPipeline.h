@@ -17,7 +17,7 @@ public:
 	const PipelineSpecification& GetSpecification() const override;
 
 private:
-	PipelineSpecification m_Specification;
-	Uint32 m_VertexArrayRendererID = 0;
+	PipelineSpecification _specification;
+	Uint32 _vertexArrayRendererID = 0;
 };
 }

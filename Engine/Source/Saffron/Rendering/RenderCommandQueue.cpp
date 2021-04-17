@@ -8,39 +8,39 @@ constexpr auto CommandQueueSize = 10 * 1024;
 
 RenderCommandQueue::RenderCommandQueue()
 {
-	m_CommandBuffer = new uint8_t[10 * 1024 * 1024]; // 10mb buffer
-	m_CommandBufferPtr = m_CommandBuffer;
-	memset(m_CommandBuffer, 0, 10 * 1024 * 1024);
+	_commandBuffer = new uint8_t[10 * 1024 * 1024]; // 10mb buffer
+	_commandBufferPtr = _commandBuffer;
+	memset(_commandBuffer, 0, 10 * 1024 * 1024);
 }
 
 RenderCommandQueue::~RenderCommandQueue()
 {
-	delete[] m_CommandBuffer;
+	delete[] _commandBuffer;
 }
 
 void* RenderCommandQueue::Allocate(RenderCommand command, uint32_t size)
 {
 	// TODO: alignment
-	*reinterpret_cast<RenderCommand*>(m_CommandBufferPtr) = command;
-	m_CommandBufferPtr += sizeof(RenderCommand);
+	*reinterpret_cast<RenderCommand*>(_commandBufferPtr) = command;
+	_commandBufferPtr += sizeof(RenderCommand);
 
-	*reinterpret_cast<uint32_t*>(m_CommandBufferPtr) = size;
-	m_CommandBufferPtr += sizeof(uint32_t);
+	*reinterpret_cast<uint32_t*>(_commandBufferPtr) = size;
+	_commandBufferPtr += sizeof(uint32_t);
 
-	void* memory = m_CommandBufferPtr;
-	m_CommandBufferPtr += size;
+	void* memory = _commandBufferPtr;
+	_commandBufferPtr += size;
 
-	m_CommandCount++;
+	_commandCount++;
 	return memory;
 }
 
 void RenderCommandQueue::Execute()
 {
-	//SE_CORE_TRACE("Executing {} commands", m_CommandBuffer.size());
+	//SE_CORE_TRACE("Executing {} commands", _commandBuffer.size());
 
-	Uint8* buffer = m_CommandBuffer;
+	Uint8* buffer = _commandBuffer;
 
-	for (uint32_t i = 0; i < m_CommandCount; i++)
+	for (uint32_t i = 0; i < _commandCount; i++)
 	{
 		RenderCommand function = *(RenderCommand*)buffer;
 		buffer += sizeof(RenderCommand);
@@ -51,7 +51,7 @@ void RenderCommandQueue::Execute()
 		buffer += size;
 	}
 
-	m_CommandBufferPtr = m_CommandBuffer;
-	m_CommandCount = 0;
+	_commandBufferPtr = _commandBuffer;
+	_commandCount = 0;
 }
 }

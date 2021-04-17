@@ -28,9 +28,9 @@ private:
 	void SyncCache();
 
 private:
-	Map<size_t, Shared<Resource>> m_Memory;
-	ArrayList<Shared<Resource>> m_ReturnCache;
-	bool m_NeedCacheSync = true;
+	Map<size_t, Shared<Resource>> _memory;
+	ArrayList<Shared<Resource>> _returnCache;
+	bool _needCacheSync = true;
 };
 
 template <class ResourceType>
@@ -39,7 +39,7 @@ void ResourceManager::ForEach(Function<void(ResourceType&)> function)
 	auto instance = GetInstance();
 	ResourceType* dyncastResource = nullptr;
 
-	for (auto iter = instance->m_Memory.begin(); iter != instance->m_Memory.end(); ++iter)
+	for (auto iter = instance->_memory.begin(); iter != instance->_memory.end(); ++iter)
 	{
 		if ((dyncastResource = dynamic_cast<ResourceType*>(iter->second.Raw())))
 		{
@@ -54,7 +54,7 @@ void ResourceManager::ForEach(Function<void(ResourceType&)> function, Function<b
 	auto instance = GetInstance();
 	ResourceType* dyncastResource = nullptr;
 
-	for (auto iter = instance->m_Memory.begin(); iter != instance->m_Memory.end(); ++iter)
+	for (auto iter = instance->_memory.begin(); iter != instance->_memory.end(); ++iter)
 	{
 		if ((dyncastResource = dynamic_cast<ResourceType*>(iter->second.get())))
 		{

@@ -16,7 +16,7 @@ public:
     void OnUpdate() override;
 
 private:
-    Shared<StartupLayer> m_StartupLayer;
-    Shared<EditorLayer> m_EditorLayer;
+    Shared<StartupLayer> _startupLayer;
+    Shared<EditorLayer> _editorLayer;
 };
 }

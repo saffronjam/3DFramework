@@ -7,10 +7,10 @@ namespace Se
 {
 SceneEnvironment::SceneEnvironment(Filepath filepath, const Shared<TextureCube>& radianceMap,
                                    const Shared<TextureCube>& irradianceMap) :
-	m_FilePath(Move(filepath)),
-	m_RadianceMap(radianceMap),
-	m_IrradianceMap(irradianceMap),
-	m_Intensity(1.0f)
+	_filePath(Move(filepath)),
+	_radianceMap(radianceMap),
+	_irradianceMap(irradianceMap),
+	_intensity(1.0f)
 {
 }
 

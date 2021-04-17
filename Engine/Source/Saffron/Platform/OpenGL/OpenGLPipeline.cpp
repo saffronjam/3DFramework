@@ -29,14 +29,14 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 }
 
 OpenGLPipeline::OpenGLPipeline(PipelineSpecification specification) :
-	m_Specification(Move(specification))
+	_specification(Move(specification))
 {
 	OpenGLPipeline::Invalidate();
 }
 
 OpenGLPipeline::~OpenGLPipeline()
 {
-	GLuint rendererID = m_VertexArrayRendererID;
+	GLuint rendererID = _vertexArrayRendererID;
 	Renderer::Submit([rendererID]()
 	{
 		glDeleteVertexArrays(1, &rendererID);
@@ -48,9 +48,9 @@ void OpenGLPipeline::Bind()
 	Shared<OpenGLPipeline> instance = this;
 	Renderer::Submit([instance]()
 	{
-		glBindVertexArray(instance->m_VertexArrayRendererID);
+		glBindVertexArray(instance->_vertexArrayRendererID);
 
-		const auto& layout = instance->m_Specification.Layout;
+		const auto& layout = instance->_specification.Layout;
 		Uint32 attribIndex = 0;
 		for (const auto& element : layout)
 		{
@@ -74,12 +74,12 @@ void OpenGLPipeline::Bind()
 
 void OpenGLPipeline::Invalidate()
 {
-	SE_CORE_ASSERT(m_Specification.Layout.GetElements().size(), "Layout is empty!");
+	SE_CORE_ASSERT(_specification.Layout.GetElements().size(), "Layout is empty!");
 
 	Shared<OpenGLPipeline> instance = this;
 	Renderer::Submit([instance]() mutable
 	{
-		auto& vertexArrayRendererID = instance->m_VertexArrayRendererID;
+		auto& vertexArrayRendererID = instance->_vertexArrayRendererID;
 
 		if (vertexArrayRendererID)
 			glDeleteVertexArrays(1, &vertexArrayRendererID);
@@ -88,7 +88,7 @@ void OpenGLPipeline::Invalidate()
 		glBindVertexArray(vertexArrayRendererID);
 
 #if 0
-			const auto& layout = instance->m_Specification.Layout;
+			const auto& layout = instance->_specification.Layout;
 			Uint32 attribIndex = 0;
 			for (const auto& element : layout)
 			{
@@ -120,11 +120,11 @@ void OpenGLPipeline::Invalidate()
 
 PipelineSpecification& OpenGLPipeline::GetSpecification()
 {
-	return m_Specification;
+	return _specification;
 }
 
 const PipelineSpecification& OpenGLPipeline::GetSpecification() const
 {
-	return m_Specification;
+	return _specification;
 }
 }

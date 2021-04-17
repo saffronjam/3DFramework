@@ -27,7 +27,7 @@ void Shader::OnGuiRender()
 
 size_t Shader::GetResourceID()
 {
-	return m_Filepath.empty() ? 0ull : Misc::HashFilepath(m_Filepath);
+	return _filepath.empty() ? 0ull : Misc::HashFilepath(_filepath);
 }
 
 Shared<Shader> Shader::Create(Filepath filepath)

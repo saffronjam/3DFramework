@@ -10,15 +10,15 @@ static Uint64 s_GuiID = 0;
 
 EditorTerminal::EditorTerminal()
 {
-	m_Sink = std::make_shared<TerminalSink>();
+	_sink = std::make_shared<TerminalSink>();
 	Clear();
 	SetLevel(Log::Level::Info);
-	Log::AddClientSink(m_Sink);
+	Log::AddClientSink(_sink);
 }
 
 void EditorTerminal::Clear()
 {
-	m_Sink->Clear();
+	_sink->Clear();
 }
 
 void EditorTerminal::OnGuiRender()
@@ -35,7 +35,7 @@ void EditorTerminal::OnGuiRender()
 	// Options menu
 	if (ImGui::BeginPopup("Options"))
 	{
-		ImGui::Checkbox("Auto-scroll", &m_AutoScroll);
+		ImGui::Checkbox("Auto-scroll", &_autoScroll);
 		ImGui::EndPopup();
 	}
 
@@ -46,7 +46,7 @@ void EditorTerminal::OnGuiRender()
 	ImGui::SameLine();
 	const bool copy = ImGui::Button("Copy");
 	ImGui::SameLine();
-	m_Filter.Draw("Filter", -100.0f);
+	_filter.Draw("Filter", -100.0f);
 
 	ImGui::Separator();
 	ImGui::BeginChild("scrolling", ImVec2(0, 0), false, ImGuiWindowFlags_HorizontalScrollbar);
@@ -55,30 +55,30 @@ void EditorTerminal::OnGuiRender()
 	if (copy) ImGui::LogToClipboard();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-	const char* buf = m_Sink->m_TextBuffer.begin();
-	const char* buf_end = m_Sink->m_TextBuffer.end();
-	if (m_Filter.IsActive())
+	const char* buf = _sink->_textBuffer.begin();
+	const char* buf_end = _sink->_textBuffer.end();
+	if (_filter.IsActive())
 	{
-		for (int line_no = 0; line_no < m_Sink->m_LineOffsets.size(); line_no++)
+		for (int line_no = 0; line_no < _sink->_lineOffsets.size(); line_no++)
 		{
-			const char* line_start = buf + m_Sink->m_LineOffsets[line_no];
-			const char* line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
-				                       ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
+			const char* line_start = buf + _sink->_lineOffsets[line_no];
+			const char* line_end = line_no + 1 < _sink->_lineOffsets.size()
+				                       ? buf + _sink->_lineOffsets[line_no + 1] - 1
 				                       : buf_end;
-			if (m_Filter.PassFilter(line_start, line_end)) ImGui::TextUnformatted(line_start, line_end);
+			if (_filter.PassFilter(line_start, line_end)) ImGui::TextUnformatted(line_start, line_end);
 		}
 	}
 	else
 	{
 		ImGuiListClipper clipper;
-		clipper.Begin(m_Sink->m_LineOffsets.size());
+		clipper.Begin(_sink->_lineOffsets.size());
 		while (clipper.Step())
 		{
 			for (int line_no = clipper.DisplayStart; line_no < clipper.DisplayEnd; line_no++)
 			{
-				const char* line_start = buf + m_Sink->m_LineOffsets[line_no];
-				const char* line_end = line_no + 1 < m_Sink->m_LineOffsets.size()
-					                       ? buf + m_Sink->m_LineOffsets[line_no + 1] - 1
+				const char* line_start = buf + _sink->_lineOffsets[line_no];
+				const char* line_end = line_no + 1 < _sink->_lineOffsets.size()
+					                       ? buf + _sink->_lineOffsets[line_no + 1] - 1
 					                       : buf_end;
 				ImGui::TextUnformatted(line_start, line_end);
 			}
@@ -87,7 +87,7 @@ void EditorTerminal::OnGuiRender()
 	}
 	ImGui::PopStyleVar();
 
-	if (m_AutoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
+	if (_autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()) ImGui::SetScrollHereY(1.0f);
 
 	ImGui::EndChild();
 	ImGui::End();
@@ -97,6 +97,6 @@ void EditorTerminal::OnGuiRender()
 
 void EditorTerminal::SetLevel(Log::Level::LevelEnum level)
 {
-	m_Sink->SetLevel(level);
+	_sink->SetLevel(level);
 }
 }

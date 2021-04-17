@@ -77,7 +77,7 @@ private:
 	bool OnWindowClose(const WindowClosedEvent& event);
 
 protected:
-	Shared<BatchLoader> m_PreLoader;
+	Shared<BatchLoader> _preLoader;
 
 private:
 	Unique<Renderer> _renderer;

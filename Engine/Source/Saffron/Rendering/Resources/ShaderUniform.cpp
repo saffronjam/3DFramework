@@ -5,47 +5,47 @@
 namespace Se
 {
 ShaderStruct::ShaderStruct(String name) :
-	m_Name(Move(name)),
-	m_Size(0),
-	m_Offset(0)
+	_name(Move(name)),
+	_size(0),
+	_offset(0)
 {
 }
 
 void ShaderStruct::AddField(ShaderUniformDeclaration* field)
 {
-	m_Size += field->GetSize();
+	_size += field->GetSize();
 	Uint32 offset = 0;
-	if (m_Fields.size())
+	if (_fields.size())
 	{
-		ShaderUniformDeclaration* previous = m_Fields.back();
+		ShaderUniformDeclaration* previous = _fields.back();
 		offset = previous->GetOffset() + previous->GetSize();
 	}
 	field->SetOffset(offset);
-	m_Fields.push_back(field);
+	_fields.push_back(field);
 }
 
 const String& ShaderStruct::GetName() const
 {
-	return m_Name;
+	return _name;
 }
 
 Uint32 ShaderStruct::GetSize() const
 {
-	return m_Size;
+	return _size;
 }
 
 Uint32 ShaderStruct::GetOffset() const
 {
-	return m_Offset;
+	return _offset;
 }
 
 const ArrayList<ShaderUniformDeclaration*>& ShaderStruct::GetFields() const
 {
-	return m_Fields;
+	return _fields;
 }
 
 void ShaderStruct::SetOffset(Uint32 offset)
 {
-	m_Offset = offset;
+	_offset = offset;
 }
 }

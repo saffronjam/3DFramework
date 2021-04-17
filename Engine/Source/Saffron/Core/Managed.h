@@ -62,17 +62,17 @@ public:
 
 	void IncRefCount() const
 	{
-		m_RefCount++;
+		_refCount++;
 	}
 
 	void DecRefCount() const
 	{
-		m_RefCount--;
+		_refCount--;
 	}
 
-	uint32_t GetRefCount() const { return m_RefCount; }
+	uint32_t GetRefCount() const { return _refCount; }
 
 private:
-	mutable uint32_t m_RefCount = 0; // TODO: atomic
+	mutable uint32_t _refCount = 0; // TODO: atomic
 };
 }

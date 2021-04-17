@@ -16,8 +16,8 @@ public:
 
 	void Execute();
 private:
-	uint8_t* m_CommandBuffer;
-	uint8_t* m_CommandBufferPtr;
-	uint32_t m_CommandCount = 0;
+	uint8_t* _commandBuffer;
+	uint8_t* _commandBufferPtr;
+	uint32_t _commandCount = 0;
 };
 }

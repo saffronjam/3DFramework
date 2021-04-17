@@ -15,19 +15,19 @@ public:
 	UUID(Uint64 uuid);
 	UUID(const UUID& other);
 
-	operator Uint64() { return m_UUID; }
+	operator Uint64() { return _uuid; }
 
-	operator const Uint64() const { return m_UUID; }
+	operator const Uint64() const { return _uuid; }
 
 	bool operator==(const UUID& other) const
 	{
-		return m_UUID == other.m_UUID;
+		return _uuid == other._uuid;
 	}
 
 	static UUID Null() { return UUID(0ull); }
 
 private:
-	Uint64 m_UUID;
+	Uint64 _uuid;
 };
 }
 

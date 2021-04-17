@@ -43,8 +43,7 @@ class VertexBufferLayout
 {
 public:
 	VertexBufferLayout();
-
-	explicit VertexBufferLayout(const InitializerList<VertexBufferElement>& elements);
+	VertexBufferLayout(const InitializerList<VertexBufferElement>& elements);
 
 	Uint32 GetStride() const;
 	const ArrayList<VertexBufferElement>& GetElements() const;
@@ -58,8 +57,8 @@ private:
 	void CalculateOffsetsAndStride();
 
 private:
-	ArrayList<VertexBufferElement> m_Elements;
-	Uint32 m_Stride = 0;
+	ArrayList<VertexBufferElement> _elements;
+	Uint32 _stride = 0;
 };
 
 enum class VertexBufferUsage

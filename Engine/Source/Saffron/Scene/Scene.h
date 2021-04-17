@@ -67,42 +67,42 @@ public:
 	void DestroyEntity(Entity entity);
 	Entity GetEntity(const String& tag);
 
-	const EntityMap& GetEntityMap() const { return m_EntityIDMap; }
+	const EntityMap& GetEntityMap() const { return _entityIDMap; }
 
-	EntityRegistry& GetEntityRegistry() { return m_EntityRegistry; }
+	EntityRegistry& GetEntityRegistry() { return _entityRegistry; }
 
-	const EntityRegistry& GetEntityRegistry() const { return m_EntityRegistry; }
+	const EntityRegistry& GetEntityRegistry() const { return _entityRegistry; }
 
-	Entity GetEntity() const { return m_SceneEntity; }
+	Entity GetEntity() const { return _sceneEntity; }
 
-	virtual Entity GetSelectedEntity() const { return m_SelectedEntity; }
+	virtual Entity GetSelectedEntity() const { return _selectedEntity; }
 
-	virtual void SetSelectedEntity(Entity entity) { m_SelectedEntity = entity; }
+	virtual void SetSelectedEntity(Entity entity) { _selectedEntity = entity; }
 
 	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
-	UUID GetUUID() const { return m_SceneID; }
+	UUID GetUUID() const { return _sceneID; }
 
-	const String& GetName() const { return m_Name; }
+	const String& GetName() const { return _name; }
 
-	void SetName(String name) { m_Name = name; };
+	void SetName(String name) { _name = name; };
 
-	Light& GetLight() { return m_Light; }
+	Light& GetLight() { return _light; }
 
-	const Light& GetLight() const { return m_Light; }
+	const Light& GetLight() const { return _light; }
 
-	void SetLight(const Light& light) { m_Light = light; }
+	void SetLight(const Light& light) { _light = light; }
 
-	const LightEnvironment& GetLightEnvironment() const { return m_LightEnvironment; }
+	const LightEnvironment& GetLightEnvironment() const { return _lightEnvironment; }
 
 	const Shared<SceneEnvironment>& GetSceneEnvironment() const;
 
 	Entity GetMainCameraEntity();
 	static Shared<Scene> GetScene(UUID uuid);
 
-	const Skybox& GetSkybox() const { return m_Skybox; }
+	const Skybox& GetSkybox() const { return _skybox; }
 
-	void SetSkybox(const Skybox& skybox) { m_Skybox = skybox; }
+	void SetSkybox(const Skybox& skybox) { _skybox = skybox; }
 
 	void SetSkybox(const Shared<TextureCube>& skybox);
 
@@ -112,27 +112,27 @@ public:
 	static bool IsValidFilepath(const Filepath& filepath);
 
 protected:
-	UUID m_SceneID;
-	String m_Name;
+	UUID _sceneID;
+	String _name;
 
-	Light m_Light;
-	float m_LightMultiplier = 0.3f;
-	LightEnvironment m_LightEnvironment;
-	Shared<SceneEnvironment> m_SceneEnvironment;
-	Shared<SceneEnvironment> m_FallbackSceneEnvironment;
-	Skybox m_Skybox;
+	Light _light;
+	float _lightMultiplier = 0.3f;
+	LightEnvironment _lightEnvironment;
+	Shared<SceneEnvironment> _sceneEnvironment;
+	Shared<SceneEnvironment> _fallbackSceneEnvironment;
+	Skybox _skybox;
 
-	EntityRegistry m_EntityRegistry;
-	EntityMap m_EntityIDMap;
-	Entity m_SceneEntity;
-	Entity m_SelectedEntity;
+	EntityRegistry _entityRegistry;
+	EntityMap _entityIDMap;
+	Entity _sceneEntity;
+	Entity _selectedEntity;
 
-	Uint32 m_ViewportWidth = 0, m_ViewportHeight = 0;
+	Uint32 _viewportWidth = 0, _viewportHeight = 0;
 
-	bool m_RadiancePrefilter = false;
-	float m_EnvMapRotation = 0.0f;
-	bool m_UIShowMeshBoundingBoxes = false;
-	bool m_UIShowPhysicsBodyBoundingBoxes = false;
+	bool _radiancePrefilter = false;
+	float _envMapRotation = 0.0f;
+	bool _uIShowMeshBoundingBoxes = false;
+	bool _uIShowPhysicsBodyBoundingBoxes = false;
 
 private:
 	friend void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity);

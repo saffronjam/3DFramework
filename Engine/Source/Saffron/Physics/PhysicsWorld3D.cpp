@@ -55,17 +55,17 @@ static ContactListener3D s_ContactListener3D;
 reactphysics3d::PhysicsCommon s_PhysicsCommon;
 
 PhysicsWorld3D::PhysicsWorld3D(Scene& scene) :
-	m_Scene(&scene),
-	m_PhysicsBodyEntityBuffer(nullptr)
+	_scene(&scene),
+	_physicsBodyEntityBuffer(nullptr)
 {
 	reactphysics3d::PhysicsWorld::WorldSettings settings;
 	settings.defaultVelocitySolverNbIterations = 20;
 	settings.isSleepingEnabled = false;
 	settings.gravity = reactphysics3d::Vector3(0, -9.81f, 0);
-	m_NativeWorld = s_PhysicsCommon.createPhysicsWorld(settings);
+	_nativeWorld = s_PhysicsCommon.createPhysicsWorld(settings);
 
 	SetGravity({0.0f, -9.82f, 0.0f});
-	m_NativeWorld->setEventListener(&s_ContactListener3D);
+	_nativeWorld->setEventListener(&s_ContactListener3D);
 }
 
 PhysicsWorld3D::~PhysicsWorld3D()
@@ -74,29 +74,29 @@ PhysicsWorld3D::~PhysicsWorld3D()
 }
 
 PhysicsWorld3D::PhysicsWorld3D(const PhysicsWorld3D& world) :
-	m_NativeWorld(world.m_NativeWorld),
-	m_Scene(world.m_Scene),
-	m_PhysicsBodyEntityBuffer(nullptr)
+	_nativeWorld(world._nativeWorld),
+	_scene(world._scene),
+	_physicsBodyEntityBuffer(nullptr)
 {
 }
 
 PhysicsWorld3D::PhysicsWorld3D(PhysicsWorld3D&& world) noexcept :
-	m_NativeWorld(world.m_NativeWorld),
-	m_Scene(world.m_Scene),
-	m_PhysicsBodyEntityBuffer(world.m_PhysicsBodyEntityBuffer)
+	_nativeWorld(world._nativeWorld),
+	_scene(world._scene),
+	_physicsBodyEntityBuffer(world._physicsBodyEntityBuffer)
 {
-	world.m_NativeWorld = nullptr;
-	world.m_Scene = nullptr;
-	world.m_PhysicsBodyEntityBuffer = nullptr;
+	world._nativeWorld = nullptr;
+	world._scene = nullptr;
+	world._physicsBodyEntityBuffer = nullptr;
 }
 
 PhysicsWorld3D& PhysicsWorld3D::operator=(const PhysicsWorld3D& world)
 {
 	if (&world == this) return *this;
 
-	m_NativeWorld = world.m_NativeWorld;
-	m_Scene = world.m_Scene;
-	m_PhysicsBodyEntityBuffer = nullptr;
+	_nativeWorld = world._nativeWorld;
+	_scene = world._scene;
+	_physicsBodyEntityBuffer = nullptr;
 
 	return *this;
 }
@@ -105,18 +105,18 @@ void PhysicsWorld3D::OnUpdate()
 {
 	const float contantTimeStep = 1.0f / 144.0f;
 	const auto ts = Global::Timer::GetStep();
-	m_DeltaTimeAccumulator += ts.sec();
-	while (m_DeltaTimeAccumulator >= contantTimeStep)
+	_deltaTimeAccumulator += ts.sec();
+	while (_deltaTimeAccumulator >= contantTimeStep)
 	{
-		m_NativeWorld->update(contantTimeStep);
-		m_DeltaTimeAccumulator -= contantTimeStep;
+		_nativeWorld->update(contantTimeStep);
+		_deltaTimeAccumulator -= contantTimeStep;
 	}
 
 	{
-		auto view = m_Scene->GetEntityRegistry().view<RigidBody3DComponent>();
+		auto view = _scene->GetEntityRegistry().view<RigidBody3DComponent>();
 		for (auto entityHandle : view)
 		{
-			Entity entity = {entityHandle, m_Scene};
+			Entity entity = {entityHandle, _scene};
 
 			auto& transform = entity.Transform();
 			auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
@@ -166,20 +166,20 @@ void PhysicsWorld3D::OnGuiRender()
 
 void PhysicsWorld3D::OnStart()
 {
-	if (!m_FilledWorld)
+	if (!_filledWorld)
 	{
 		{
-			auto view = m_Scene->GetEntityRegistry().view<RigidBody3DComponent>();
-			m_PhysicsBodyEntityBuffer = new Entity[view.size()];
+			auto view = _scene->GetEntityRegistry().view<RigidBody3DComponent>();
+			_physicsBodyEntityBuffer = new Entity[view.size()];
 			Uint32 physicsBodyEntityBufferIndex = 0;
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 				auto& transform = entity.Transform();
 				auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 				auto& rigidBody3DComponent = entity.GetComponent<RigidBody3DComponent>();
 
-				auto* newRigidBody3D = m_NativeWorld->createRigidBody(reactphysics3d::Transform(
+				auto* newRigidBody3D = _nativeWorld->createRigidBody(reactphysics3d::Transform(
 					{position.x, position.y, position.z}, {rotation.z, rotation.y, -rotation.x, rotation.w}));
 				switch (rigidBody3DComponent.BodyType)
 				{
@@ -192,7 +192,7 @@ void PhysicsWorld3D::OnStart()
 					break;
 				}
 
-				Entity* entityStorage = &m_PhysicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
+				Entity* entityStorage = &_physicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
 				*entityStorage = entity;
 				newRigidBody3D->setUserData(static_cast<void*>(entityStorage));
 				rigidBody3DComponent.RuntimeBody = newRigidBody3D;
@@ -200,10 +200,10 @@ void PhysicsWorld3D::OnStart()
 		}
 
 		{
-			auto view = m_Scene->GetEntityRegistry().view<BoxCollider3DComponent>();
+			auto view = _scene->GetEntityRegistry().view<BoxCollider3DComponent>();
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 
 				if (entity.HasComponent<RigidBody3DComponent>())
 				{
@@ -233,10 +233,10 @@ void PhysicsWorld3D::OnStart()
 		}
 
 		{
-			auto view = m_Scene->GetEntityRegistry().view<SphereCollider3DComponent>();
+			auto view = _scene->GetEntityRegistry().view<SphereCollider3DComponent>();
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 
 				if (entity.HasComponent<RigidBody3DComponent>())
 				{
@@ -262,30 +262,30 @@ void PhysicsWorld3D::OnStart()
 				}
 			}
 		}
-		m_FilledWorld = true;
+		_filledWorld = true;
 	}
 }
 
 void PhysicsWorld3D::OnStop()
 {
-	if (m_FilledWorld)
+	if (_filledWorld)
 	{
-		while (m_NativeWorld->getNbRigidBodies() > 0)
+		while (_nativeWorld->getNbRigidBodies() > 0)
 		{
-			m_NativeWorld->destroyRigidBody(m_NativeWorld->getRigidBody(0));
+			_nativeWorld->destroyRigidBody(_nativeWorld->getRigidBody(0));
 		}
-		m_FilledWorld = false;
+		_filledWorld = false;
 	}
 }
 
 Vector3f PhysicsWorld3D::GetGravity() const
 {
-	const auto& gravity = m_NativeWorld->getGravity();
+	const auto& gravity = _nativeWorld->getGravity();
 	return {gravity.x, gravity.y, gravity.z};
 }
 
 void PhysicsWorld3D::SetGravity(const Vector3f& gravity)
 {
-	m_NativeWorld->setGravity({gravity.x, gravity.y, gravity.z});
+	_nativeWorld->setGravity({gravity.x, gravity.y, gravity.z});
 }
 }

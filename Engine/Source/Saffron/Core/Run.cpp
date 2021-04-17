@@ -5,20 +5,20 @@
 
 namespace Se
 {
-ArrayList<Function<void()>> Run::m_LaterFunctions;
-Map<Run::Handle, Run::PeriodicFunction> Run::m_PeriodicFunctions;
+ArrayList<Function<void()>> Run::_laterFunctions;
+Map<Run::Handle, Run::PeriodicFunction> Run::_periodicFunctions;
 
 void Run::Execute()
 {
 	const auto ts = Global::Timer::GetStep();
 
-	for (auto& function : m_LaterFunctions)
+	for (auto& function : _laterFunctions)
 	{
 		function();
 	}
-	m_LaterFunctions.clear();
+	_laterFunctions.clear();
 
-	for (auto& [handle, periodcalFunction] : m_PeriodicFunctions)
+	for (auto& [handle, periodcalFunction] : _periodicFunctions)
 	{
 		periodcalFunction.currentCounter += ts;
 		if (periodcalFunction.currentCounter >= periodcalFunction.interval)
@@ -31,18 +31,18 @@ void Run::Execute()
 
 void Run::Later(const Function<void()>& function)
 {
-	m_LaterFunctions.push_back(function);
+	_laterFunctions.push_back(function);
 }
 
 Run::Handle Run::Periodically(const Function<void()>& function, Time interval)
 {
 	Handle newHandle;
-	m_PeriodicFunctions.emplace(newHandle, PeriodicFunction{function, interval, Time::Zero()});
+	_periodicFunctions.emplace(newHandle, PeriodicFunction{function, interval, Time::Zero()});
 	return newHandle;
 }
 
 void Run::Remove(Handle handle)
 {
-	m_PeriodicFunctions.erase(handle);
+	_periodicFunctions.erase(handle);
 }
 }

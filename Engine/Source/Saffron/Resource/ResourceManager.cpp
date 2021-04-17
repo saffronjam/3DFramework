@@ -10,7 +10,7 @@ Shared<Resource>& ResourceManager::Get(Shared<Resource> resource)
 
 Shared<Resource>& ResourceManager::Get(size_t identifer)
 {
-	return GetInstance()->m_Memory.at(identifer);
+	return GetInstance()->_memory.at(identifer);
 }
 
 bool ResourceManager::Exists(Shared<Resource> resource)
@@ -21,36 +21,36 @@ bool ResourceManager::Exists(Shared<Resource> resource)
 bool ResourceManager::Exists(size_t identifier)
 {
 	auto& instance = GetInstance();
-	return instance->m_Memory.find(identifier) != instance->m_Memory.end();
+	return instance->_memory.find(identifier) != instance->_memory.end();
 }
 
 void ResourceManager::Emplace(Shared<Resource> resource)
 {
 	auto& instance = GetInstance();
-	instance->m_Memory.emplace(resource->GetResourceID(), resource);
+	instance->_memory.emplace(resource->GetResourceID(), resource);
 }
 
 void ResourceManager::Emplace(Shared<Resource> resource, size_t identifier)
 {
 	auto& instance = GetInstance();
-	instance->m_Memory.emplace(identifier, resource);
+	instance->_memory.emplace(identifier, resource);
 }
 
 const ArrayList<Shared<Resource>>& ResourceManager::GetAll()
 {
 	auto& instance = GetInstance();
-	if (instance->m_NeedCacheSync)
+	if (instance->_needCacheSync)
 	{
 		instance->SyncCache();
 	}
-	return GetInstance()->m_ReturnCache;
+	return GetInstance()->_returnCache;
 }
 
 void ResourceManager::Clear()
 {
-	GetInstance()->m_Memory.clear();
-	GetInstance()->m_ReturnCache.clear();
-	GetInstance()->m_NeedCacheSync = false;
+	GetInstance()->_memory.clear();
+	GetInstance()->_returnCache.clear();
+	GetInstance()->_needCacheSync = false;
 }
 
 Shared<ResourceManager>& ResourceManager::GetInstance()
@@ -61,10 +61,10 @@ Shared<ResourceManager>& ResourceManager::GetInstance()
 
 void ResourceManager::SyncCache()
 {
-	m_ReturnCache.clear();
-	m_ReturnCache.reserve(m_Memory.size());
-	std::transform(m_Memory.begin(), m_Memory.end(), std::back_inserter(m_ReturnCache),
+	_returnCache.clear();
+	_returnCache.reserve(_memory.size());
+	std::transform(_memory.begin(), _memory.end(), std::back_inserter(_returnCache),
 	               [](const auto& pair) { return pair.second; });
-	m_NeedCacheSync = false;
+	_needCacheSync = false;
 }
 }

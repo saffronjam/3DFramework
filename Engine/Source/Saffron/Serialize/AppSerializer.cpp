@@ -10,7 +10,7 @@
 namespace Se
 {
 AppSerializer::AppSerializer(App& application) :
-	m_Application(application)
+	_application(application)
 {
 }
 
@@ -23,7 +23,7 @@ void AppSerializer::Serialize(const Filepath& filepath) const
 	out << YAML::Key << "Recent Projects";
 	out << YAML::Value << YAML::BeginSeq;
 
-	for (const auto& project : m_Application.GetRecentProjectList())
+	for (const auto& project : _application.GetRecentProjectList())
 	{
 		out << YAML::BeginMap;
 		out << YAML::Key << "ProjectFilepath" << YAML::Value << project->GetProjectFilepath().string();
@@ -69,7 +69,7 @@ bool AppSerializer::Deserialize(const Filepath& filepath)
 			auto project = Shared<Project>::Create(projectFilepath);
 			if (project->IsValid())
 			{
-				m_Application.AddProject(project);
+				_application.AddProject(project);
 			}
 		}
 	}

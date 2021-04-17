@@ -144,38 +144,38 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 ////////////////////////////////////////////////////////////////////////
 
 Mesh::Mesh(Filepath filepath) :
-	m_LocalTransform(1),
-	m_Filepath(MeshesFolder + Move(filepath).string())
+	_localTransform(1),
+	_filepath(MeshesFolder + Move(filepath).string())
 {
 	LogStream::Initialize();
 
-	SE_CORE_INFO("Loading mesh: {0}", m_Filepath.string());
+	SE_CORE_INFO("Loading mesh: {0}", _filepath.string());
 
-	m_Importer = std::make_unique<Assimp::Importer>();
+	_importer = std::make_unique<Assimp::Importer>();
 
-	const aiScene* scene = m_Importer->ReadFile(m_Filepath.string().c_str(), s_MeshImportFlags);
+	const aiScene* scene = _importer->ReadFile(_filepath.string().c_str(), s_MeshImportFlags);
 	if (!scene || !scene->HasMeshes())
-		SE_CORE_ERROR("Failed to load mesh file: {0}", m_Filepath.string());
+		SE_CORE_ERROR("Failed to load mesh file: {0}", _filepath.string());
 
-	m_Scene = scene;
+	_scene = scene;
 
-	m_IsAnimated = scene->mAnimations != nullptr;
+	_isAnimated = scene->mAnimations != nullptr;
 
-	const auto* meshShaderPath = m_IsAnimated ? "SaffronPBR_Anim" : "SaffronPBR_Static";
-	m_MeshShader = Shader::Create(meshShaderPath);
-	m_BaseMaterial = Material::Create(m_MeshShader);
-	// m_MaterialInstance = Shared<MaterialInstance>::Create(m_BaseMaterial);
-	//m_InverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
+	const auto* meshShaderPath = _isAnimated ? "SaffronPBR_Anim" : "SaffronPBR_Static";
+	_meshShader = Shader::Create(meshShaderPath);
+	_baseMaterial = Material::Create(_meshShader);
+	// _materialInstance = Shared<MaterialInstance>::Create(_baseMaterial);
+	//_inverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
 	Uint32 vertexCount = 0;
 	Uint32 indexCount = 0;
 
-	m_Submeshes.reserve(scene->mNumMeshes);
+	_submeshes.reserve(scene->mNumMeshes);
 	for (size_t m = 0; m < scene->mNumMeshes; m++)
 	{
 		aiMesh* mesh = scene->mMeshes[m];
 
-		Submesh& submesh = m_Submeshes.emplace_back();
+		Submesh& submesh = _submeshes.emplace_back();
 		submesh.BaseVertex = vertexCount;
 		submesh.BaseIndex = indexCount;
 		submesh.MaterialIndex = mesh->mMaterialIndex;
@@ -189,7 +189,7 @@ Mesh::Mesh(Filepath filepath) :
 		SE_CORE_ASSERT(mesh->HasNormals(), "Meshes require normals.");
 
 		// Vertices
-		if (m_IsAnimated)
+		if (_isAnimated)
 		{
 			for (size_t i = 0; i < mesh->mNumVertices; i++)
 			{
@@ -206,7 +206,7 @@ Mesh::Mesh(Filepath filepath) :
 				if (mesh->HasTextureCoords(0))
 					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
 
-				m_AnimatedVertices.push_back(vertex);
+				_animatedVertices.push_back(vertex);
 			}
 		}
 		else
@@ -235,7 +235,7 @@ Mesh::Mesh(Filepath filepath) :
 				if (mesh->HasTextureCoords(0))
 					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
 
-				m_StaticVertices.push_back(vertex);
+				_staticVertices.push_back(vertex);
 			}
 		}
 
@@ -245,24 +245,24 @@ Mesh::Mesh(Filepath filepath) :
 			const auto& face = mesh->mFaces[i];
 			SE_CORE_ASSERT(face.mNumIndices == 3, "Must have 3 indices.");
 			Index index = {face.mIndices[0], face.mIndices[1], face.mIndices[2]};
-			m_Indices.push_back(index);
+			_indices.push_back(index);
 
-			if (!m_IsAnimated)
-				m_TriangleCache[static_cast<Uint32>(m)].emplace_back(m_StaticVertices[index.V1 + submesh.BaseVertex],
-				                                                     m_StaticVertices[index.V2 + submesh.BaseVertex],
-				                                                     m_StaticVertices[index.V3 + submesh.BaseVertex]);
+			if (!_isAnimated)
+				_triangleCache[static_cast<Uint32>(m)].emplace_back(_staticVertices[index.V1 + submesh.BaseVertex],
+				                                                     _staticVertices[index.V2 + submesh.BaseVertex],
+				                                                     _staticVertices[index.V3 + submesh.BaseVertex]);
 		}
 	}
 
 	TraverseNodes(scene->mRootNode);
 
 	// Bones
-	if (m_IsAnimated)
+	if (_isAnimated)
 	{
 		for (size_t m = 0; m < scene->mNumMeshes; m++)
 		{
 			aiMesh* mesh = scene->mMeshes[m];
-			Submesh& submesh = m_Submeshes[m];
+			Submesh& submesh = _submeshes[m];
 
 			for (size_t i = 0; i < mesh->mNumBones; i++)
 			{
@@ -270,27 +270,27 @@ Mesh::Mesh(Filepath filepath) :
 				String boneName(bone->mName.data);
 				int boneIndex = 0;
 
-				if (m_BoneMapping.find(boneName) == m_BoneMapping.end())
+				if (_boneMapping.find(boneName) == _boneMapping.end())
 				{
 					// Allocate an index for a new bone
-					boneIndex = m_BoneCount;
-					m_BoneCount++;
+					boneIndex = _boneCount;
+					_boneCount++;
 					BoneInfo bi{};
-					m_BoneInfo.push_back(bi);
-					m_BoneInfo[boneIndex].BoneOffset = Mat4FromAssimpMat4(bone->mOffsetMatrix);
-					m_BoneMapping[boneName] = boneIndex;
+					_boneInfo.push_back(bi);
+					_boneInfo[boneIndex].BoneOffset = Mat4FromAssimpMat4(bone->mOffsetMatrix);
+					_boneMapping[boneName] = boneIndex;
 				}
 				else
 				{
 					SE_MESH_LOG("Found existing bone in map");
-					boneIndex = m_BoneMapping[boneName];
+					boneIndex = _boneMapping[boneName];
 				}
 
 				for (size_t j = 0; j < bone->mNumWeights; j++)
 				{
 					int VertexID = submesh.BaseVertex + bone->mWeights[j].mVertexId;
 					float Weight = bone->mWeights[j].mWeight;
-					m_AnimatedVertices[VertexID].AddBoneData(boneIndex, Weight);
+					_animatedVertices[VertexID].AddBoneData(boneIndex, Weight);
 				}
 			}
 		}
@@ -299,17 +299,17 @@ Mesh::Mesh(Filepath filepath) :
 	// Materials
 	if (scene->HasMaterials())
 	{
-		SE_MESH_LOG("---- Materials - {0} ----", m_Filepath.string());
+		SE_MESH_LOG("---- Materials - {0} ----", _filepath.string());
 
-		m_Textures.resize(scene->mNumMaterials);
-		m_Materials.resize(scene->mNumMaterials);
+		_textures.resize(scene->mNumMaterials);
+		_materials.resize(scene->mNumMaterials);
 		for (Uint32 i = 0; i < scene->mNumMaterials; i++)
 		{
 			auto* aiMaterial = scene->mMaterials[i];
 			auto aiMaterialName = aiMaterial->GetName();
 
-			auto mi = Shared<MaterialInstance>::Create(m_BaseMaterial, aiMaterialName.data);
-			m_Materials[i] = mi;
+			auto mi = Shared<MaterialInstance>::Create(_baseMaterial, aiMaterialName.data);
+			_materials[i] = mi;
 
 			SE_MESH_LOG("  {0} (Index = {1})", aiMaterialName.data, i);
 			aiString aiTexPath;
@@ -331,7 +331,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (hasAlbedoMap)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = m_Filepath;
+				Filepath path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -339,8 +339,8 @@ Mesh::Mesh(Filepath filepath) :
 				auto texture = Texture2D::Create(texturePath, true);
 				if (texture->Loaded())
 				{
-					m_Textures[i] = texture;
-					mi->Set("u_AlbedoTexture", m_Textures[i]);
+					_textures[i] = texture;
+					mi->Set("u_AlbedoTexture", _textures[i]);
 					mi->Set("u_AlbedoTexToggle", 1.0f);
 				}
 				else
@@ -361,7 +361,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = m_Filepath;
+				Filepath path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -388,7 +388,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = m_Filepath;
+				Filepath path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -415,7 +415,7 @@ Mesh::Mesh(Filepath filepath) :
 			if ( aiMaterial->Instance("$raw.ReflectionFactor|file", aiPTI_String, 0, aiTexPath) == AI_SUCCESS )
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = m_Filepath;
+				Filepath path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -507,7 +507,7 @@ Mesh::Mesh(Filepath filepath) :
 						metalnessTextureFound = true;
 
 						// TODO: Temp - this should be handled by Saffron's filesystem
-						Filepath path = m_Filepath;
+						Filepath path = _filepath;
 						auto parentPath = path.parent_path();
 						parentPath /= str;
 						String texturePath = parentPath.string();
@@ -541,10 +541,10 @@ Mesh::Mesh(Filepath filepath) :
 	}
 
 	VertexBufferLayout vertexLayout;
-	if (m_IsAnimated)
+	if (_isAnimated)
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_AnimatedVertices.data(),
-		                                      static_cast<Uint32>(m_AnimatedVertices.size() * sizeof(AnimatedVertex)));
+		_vertexBuffer = VertexBuffer::Create(_animatedVertices.data(),
+		                                      static_cast<Uint32>(_animatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -554,8 +554,8 @@ Mesh::Mesh(Filepath filepath) :
 	}
 	else
 	{
-		m_VertexBuffer = VertexBuffer::Create(m_StaticVertices.data(),
-		                                      static_cast<Uint32>(m_StaticVertices.size() * sizeof(Vertex)));
+		_vertexBuffer = VertexBuffer::Create(_staticVertices.data(),
+		                                      static_cast<Uint32>(_staticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -563,32 +563,32 @@ Mesh::Mesh(Filepath filepath) :
 		};
 	}
 
-	m_IndexBuffer = IndexBuffer::Create(m_Indices.data(), static_cast<Uint32>(m_Indices.size() * sizeof(Index)));
+	_indexBuffer = IndexBuffer::Create(_indices.data(), static_cast<Uint32>(_indices.size() * sizeof(Index)));
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = vertexLayout;
-	m_Pipeline = Pipeline::Create(pipelineSpecification);
+	_pipeline = Pipeline::Create(pipelineSpecification);
 }
 
 void Mesh::OnUpdate()
 {
 	const auto ts = Global::Timer::GetStep();
-	if (m_IsAnimated)
+	if (_isAnimated)
 	{
-		if (m_AnimationPlaying)
+		if (_animationPlaying)
 		{
-			m_WorldTime += ts.sec();
+			_worldTime += ts.sec();
 
-			const double base = m_Scene->mAnimations[0]->mTicksPerSecond != 0
-				                    ? m_Scene->mAnimations[0]->mTicksPerSecond
+			const double base = _scene->mAnimations[0]->mTicksPerSecond != 0
+				                    ? _scene->mAnimations[0]->mTicksPerSecond
 				                    : 25.0;
-			const float ticksPerSecond = static_cast<float>(base) * m_TimeMultiplier;
-			m_AnimationTime += (ts * ticksPerSecond).sec();
-			m_AnimationTime = fmod(m_AnimationTime, static_cast<float>(m_Scene->mAnimations[0]->mDuration));
+			const float ticksPerSecond = static_cast<float>(base) * _timeMultiplier;
+			_animationTime += (ts * ticksPerSecond).sec();
+			_animationTime = fmod(_animationTime, static_cast<float>(_scene->mAnimations[0]->mDuration));
 		}
 
 		// TODO: We only need to recalc bones if rendering has been requested at the current animation frame
-		BoneTransform(m_AnimationTime);
+		BoneTransform(_animationTime);
 	}
 }
 
@@ -596,10 +596,10 @@ void Mesh::DumpVertexBuffer()
 {
 	SE_MESH_LOG("------------------------------------------------------");
 	SE_MESH_LOG("Vertex Buffer Dump");
-	SE_MESH_LOG("Mesh: {0}", m_FilePath);
-	if (m_IsAnimated)
+	SE_MESH_LOG("Mesh: {0}", _filePath);
+	if (_isAnimated)
 	{
-		for (auto& animatedVertex : m_AnimatedVertices)
+		for (auto& animatedVertex : _animatedVertices)
 		{
 			const auto& av = animatedVertex;
 			SE_MESH_LOG("Vertex: {0}", i);
@@ -613,7 +613,7 @@ void Mesh::DumpVertexBuffer()
 	}
 	else
 	{
-		for (auto& staticVertex : m_StaticVertices)
+		for (auto& staticVertex : _staticVertices)
 		{
 			const auto& sv = staticVertex;
 			SE_MESH_LOG("Vertex: {0}", i);
@@ -630,52 +630,52 @@ void Mesh::DumpVertexBuffer()
 
 ArrayList<Submesh>& Mesh::GetSubmeshes()
 {
-	return m_Submeshes;
+	return _submeshes;
 }
 
 const ArrayList<Submesh>& Mesh::GetSubmeshes() const
 {
-	return m_Submeshes;
+	return _submeshes;
 }
 
 const Matrix4f& Mesh::GetLocalTransform() const
 {
-	return m_LocalTransform;
+	return _localTransform;
 }
 
 void Mesh::SetLocalTransform(Matrix4f localTransform)
 {
-	m_LocalTransform = Move(localTransform);
+	_localTransform = Move(localTransform);
 }
 
 Shared<Shader> Mesh::GetMeshShader() const
 {
-	return m_MeshShader;
+	return _meshShader;
 }
 
 Shared<Material> Mesh::GetMaterial() const
 {
-	return m_BaseMaterial;
+	return _baseMaterial;
 }
 
 ArrayList<Shared<MaterialInstance>> Mesh::GetMaterials() const
 {
-	return m_Materials;
+	return _materials;
 }
 
 const ArrayList<Shared<Texture2D>>& Mesh::GetTextures() const
 {
-	return m_Textures;
+	return _textures;
 }
 
 const Filepath& Mesh::GetFilepath() const
 {
-	return m_Filepath;
+	return _filepath;
 }
 
 ArrayList<Triangle> Mesh::GetTriangleCache(Uint32 index) const
 {
-	return m_TriangleCache.at(index);
+	return _triangleCache.at(index);
 }
 
 ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f& transform)
@@ -692,15 +692,15 @@ ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f& transform)
 
 void Mesh::BoneTransform(float time)
 {
-	ReadNodeHierarchy(time, m_Scene->mRootNode, Matrix4f(1.0f));
-	m_BoneTransforms.resize(m_BoneCount);
-	for (size_t i = 0; i < m_BoneCount; i++) m_BoneTransforms[i] = m_BoneInfo[i].FinalTransformation;
+	ReadNodeHierarchy(time, _scene->mRootNode, Matrix4f(1.0f));
+	_boneTransforms.resize(_boneCount);
+	for (size_t i = 0; i < _boneCount; i++) _boneTransforms[i] = _boneInfo[i].FinalTransformation;
 }
 
 void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& parentTransform)
 {
 	const String name(pNode->mName.data);
-	const aiAnimation* animation = m_Scene->mAnimations[0];
+	const aiAnimation* animation = _scene->mAnimations[0];
 	Matrix4f nodeTransform(Mat4FromAssimpMat4(pNode->mTransformation));
 	const aiNodeAnim* nodeAnim = FindNodeAnim(animation, name);
 
@@ -721,10 +721,10 @@ void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Mat
 
 	const Matrix4f transform = parentTransform * nodeTransform;
 
-	if (m_BoneMapping.find(name) != m_BoneMapping.end())
+	if (_boneMapping.find(name) != _boneMapping.end())
 	{
-		const Uint32 BoneIndex = m_BoneMapping[name];
-		m_BoneInfo[BoneIndex].FinalTransformation = m_InverseTransform * transform * m_BoneInfo[BoneIndex].BoneOffset;
+		const Uint32 BoneIndex = _boneMapping[name];
+		_boneInfo[BoneIndex].FinalTransformation = _inverseTransform * transform * _boneInfo[BoneIndex].BoneOffset;
 	}
 
 	for (Uint32 i = 0; i < pNode->mNumChildren; i++) ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], transform);
@@ -736,7 +736,7 @@ void Mesh::TraverseNodes(aiNode* node, const Matrix4f& parentTransform, Uint32 l
 	for (Uint32 i = 0; i < node->mNumMeshes; i++)
 	{
 		const Uint32 mesh = node->mMeshes[i];
-		auto& submesh = m_Submeshes[mesh];
+		auto& submesh = _submeshes[mesh];
 		submesh.NodeName = node->mName.C_Str();
 		submesh.Transform = transform;
 	}

@@ -7,46 +7,46 @@ namespace Se
 using namespace std::chrono;
 
 Timer::Timer(const char* name) :
-	m_Name(name),
-	m_LastTimePoint(steady_clock::now()),
-	m_InitialTimePoint(steady_clock::now())
+	_name(name),
+	_lastTimePoint(steady_clock::now()),
+	_initialTimePoint(steady_clock::now())
 {
 }
 
 Time Timer::Mark()
 {
-	const auto old = m_LastTimePoint;
-	m_LastTimePoint = steady_clock::now();
-	return Time(duration<float>(m_LastTimePoint - old).count());
+	const auto old = _lastTimePoint;
+	_lastTimePoint = steady_clock::now();
+	return Time(duration<float>(_lastTimePoint - old).count());
 }
 
 Time Timer::Peek() const
 {
-	return Time(duration<float>(steady_clock::now() - m_LastTimePoint).count());
+	return Time(duration<float>(steady_clock::now() - _lastTimePoint).count());
 }
 
 Time Timer::PeekTotal() const
 {
-	return Time(duration<float>(steady_clock::now() - m_InitialTimePoint).count());
+	return Time(duration<float>(steady_clock::now() - _initialTimePoint).count());
 }
 
 void Timer::Sync()
 {
-	m_LastTimePoint = steady_clock::now();
+	_lastTimePoint = steady_clock::now();
 }
 
 const char* Timer::GetName()
 {
-	return m_Name;
+	return _name;
 }
 
 Timer::TimePoint Timer::GetStart() const
 {
-	return m_LastTimePoint;
+	return _lastTimePoint;
 }
 
 Timer::TimePoint Timer::GetInitialStart() const
 {
-	return m_InitialTimePoint;
+	return _initialTimePoint;
 }
 }

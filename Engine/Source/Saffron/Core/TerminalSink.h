@@ -17,7 +17,7 @@ protected:
 	void Flush() override;
 
 private:
-	ImGuiTextBuffer m_TextBuffer;
-	ArrayList<int> m_LineOffsets;
+	ImGuiTextBuffer _textBuffer;
+	ArrayList<int> _lineOffsets;
 };
 }

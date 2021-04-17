@@ -19,34 +19,34 @@ static GLenum OpenGLUsage(VertexBufferUsage usage)
 }
 
 OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, Uint32 size, VertexBufferUsage usage) :
-	m_Size(size),
-	m_Usage(usage)
+	_size(size),
+	_usage(usage)
 {
-	m_LocalData = Buffer::Copy(data, size);
+	_localData = Buffer::Copy(data, size);
 	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 	{
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(),
-		                  OpenGLUsage(instance->m_Usage));
+		glCreateBuffers(1, &instance->_rendererID);
+		glNamedBufferData(instance->_rendererID, instance->_size, instance->_localData.Data(),
+		                  OpenGLUsage(instance->_usage));
 	});
 }
 
 OpenGLVertexBuffer::OpenGLVertexBuffer(Uint32 size, VertexBufferUsage usage) :
-	m_Size(size),
-	m_Usage(usage)
+	_size(size),
+	_usage(usage)
 {
 	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 	{
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, nullptr, OpenGLUsage(instance->m_Usage));
+		glCreateBuffers(1, &instance->_rendererID);
+		glNamedBufferData(instance->_rendererID, instance->_size, nullptr, OpenGLUsage(instance->_usage));
 	});
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
-	GLuint rendererID = m_RendererID;
+	GLuint rendererID = _rendererID;
 	Renderer::Submit([rendererID]()
 	{
 		glDeleteBuffers(1, &rendererID);
@@ -58,18 +58,18 @@ void OpenGLVertexBuffer::Bind() const
 	Shared<const OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance]()
 	{
-		glBindBuffer(GL_ARRAY_BUFFER, instance->m_RendererID);
+		glBindBuffer(GL_ARRAY_BUFFER, instance->_rendererID);
 	});
 }
 
 void OpenGLVertexBuffer::SetData(const void* data, Uint32 size, Uint32 offset)
 {
-	m_LocalData = Buffer::Copy(data, size);
-	m_Size = size;
+	_localData = Buffer::Copy(data, size);
+	_size = size;
 	Shared<OpenGLVertexBuffer> instance = this;
 	Renderer::Submit([instance, offset]()
 	{
-		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
+		glNamedBufferSubData(instance->_rendererID, offset, instance->_size, instance->_localData.Data());
 	});
 }
 
@@ -80,21 +80,21 @@ void OpenGLVertexBuffer::SetData(const Buffer& buffer, Uint32 offset)
 
 const VertexBufferLayout& OpenGLVertexBuffer::GetLayout() const
 {
-	return m_Layout;
+	return _layout;
 }
 
 void OpenGLVertexBuffer::SetLayout(const VertexBufferLayout& layout)
 {
-	m_Layout = layout;
+	_layout = layout;
 }
 
 Uint32 OpenGLVertexBuffer::GetSize() const
 {
-	return m_Size;
+	return _size;
 }
 
 RendererID OpenGLVertexBuffer::GetRendererID() const
 {
-	return m_RendererID;
+	return _rendererID;
 }
 }

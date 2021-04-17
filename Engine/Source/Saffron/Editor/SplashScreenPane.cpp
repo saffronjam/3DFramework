@@ -7,15 +7,15 @@
 namespace Se
 {
 SplashScreenPane::SplashScreenPane(const Shared<BatchLoader>& batchLoader) :
-	m_BatchLoader(batchLoader),
-	m_Texture(Texture2D::Create(Filepath("Editor/Saffron.png"))),
-	m_FinalizingStatus("Finalizing")
+	_batchLoader(batchLoader),
+	_texture(Texture2D::Create(Filepath("Editor/Saffron.png"))),
+	_finalizingStatus("Finalizing")
 {
 }
 
 void SplashScreenPane::OnGuiRender()
 {
-	if (m_Hidden) return;
+	if (_hidden) return;
 
 	ImGuiViewport* viewport = ImGui::GetMainViewport();
 	ImGui::SetNextWindowPos(viewport->Pos);
@@ -25,24 +25,24 @@ void SplashScreenPane::OnGuiRender()
 	oss << "Loading Screen##";
 	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 
-	if (m_BatchLoader->GetProgress() != m_GoalProgressView)
+	if (_batchLoader->GetProgress() != _goalProgressView)
 	{
-		m_GoalProgressView = m_BatchLoader->GetProgress();
-		m_CurrentSinTimer = 0.0f;
+		_goalProgressView = _batchLoader->GetProgress();
+		_currentSinTimer = 0.0f;
 	}
 	else
 	{
-		m_CurrentSinTimer += Global::Timer::GetStep().sec();
+		_currentSinTimer += Global::Timer::GetStep().sec();
 	}
-	m_CurrentProgressView += (m_GoalProgressView - m_CurrentProgressView) * std::sin(
-		m_CurrentSinTimer / (2.0f * Math::PI));
+	_currentProgressView += (_goalProgressView - _currentProgressView) * std::sin(
+		_currentSinTimer / (2.0f * Math::PI));
 
 	const auto windowSize = ImGui::GetWindowSize();
 
 	const auto logoWidth = 200;
 	const auto logoHeight = 200;
 	ImGui::SetCursorPos({windowSize.x / 2.0f - logoWidth / 2.0f, 2.0f * windowSize.y / 5.0f - logoHeight / 2.0f});
-	ImGui::Image(reinterpret_cast<ImTextureID>(m_Texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0),
+	ImGui::Image(reinterpret_cast<ImTextureID>(_texture->GetRendererID()), ImVec2(logoWidth, logoHeight), ImVec2(0, 0),
 	             ImVec2(1, 1));
 
 
@@ -64,7 +64,7 @@ void SplashScreenPane::OnGuiRender()
 	oss.str("");
 	oss.clear();
 
-	oss << std::setprecision(0) << std::fixed << m_CurrentProgressView << "%";
+	oss << std::setprecision(0) << std::fixed << _currentProgressView << "%";
 
 	ImGui::NewLine();
 	const float currentProgressTextWidth = ImGui::CalcTextSize(oss.str().c_str()).x;
@@ -73,7 +73,7 @@ void SplashScreenPane::OnGuiRender()
 
 	Gui::SetFontSize(18);
 
-	const String* status = m_GoalProgressView < 100.0f ? m_BatchLoader->GetStatus() : &m_FinalizingStatus;
+	const String* status = _goalProgressView < 100.0f ? _batchLoader->GetStatus() : &_finalizingStatus;
 	if (status && !status->empty())
 	{
 		const auto infoTextWidth = ImGui::CalcTextSize(status->c_str()).x;
@@ -87,21 +87,21 @@ void SplashScreenPane::OnGuiRender()
 
 void SplashScreenPane::Show()
 {
-	m_Hidden = false;
+	_hidden = false;
 }
 
 void SplashScreenPane::Hide()
 {
-	m_Hidden = true;
+	_hidden = true;
 }
 
 bool SplashScreenPane::IsIdle() const
 {
-	return static_cast<int>(std::round(m_CurrentProgressView)) == static_cast<int>(std::round(m_GoalProgressView));
+	return static_cast<int>(std::round(_currentProgressView)) == static_cast<int>(std::round(_goalProgressView));
 }
 
 bool SplashScreenPane::IsFinished() const
 {
-	return m_CurrentProgressView >= 100.0f;
+	return _currentProgressView >= 100.0f;
 }
 }

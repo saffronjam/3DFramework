@@ -15,8 +15,8 @@ LayerStack::~LayerStack()
 
 void LayerStack::PushLayer(Shared<Layer> layer, Shared<BatchLoader>& batchLoader)
 {
-	auto newLayer = *_layers.emplace(_layers.begin() + m_LayerInsertIndex, layer);
-	m_LayerInsertIndex++;
+	auto newLayer = *_layers.emplace(_layers.begin() + _layerInsertIndex, layer);
+	_layerInsertIndex++;
 	PushedLayer.Invoke(layer);
 	newLayer->OnAttach(batchLoader);
 }
@@ -34,7 +34,7 @@ void LayerStack::PopLayer(int count)
 		PoppedLayer.Invoke(_layers.back());
 		_layers.back()->OnDetach();
 		_layers.pop_back();
-		m_LayerInsertIndex--;
+		_layerInsertIndex--;
 	}
 }
 
@@ -52,7 +52,7 @@ void LayerStack::EraseLayer(Shared<Layer> layer)
 		PoppedLayer.Invoke(*it);
 		(*it)->OnDetach();
 		_layers.erase(it);
-		m_LayerInsertIndex--;
+		_layerInsertIndex--;
 	}
 }
 

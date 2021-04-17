@@ -19,7 +19,7 @@ public:
 
 	void Bind() override;
 
-	RendererID GetRendererID() const override { return m_RendererID; }
+	RendererID GetRendererID() const override { return _rendererID; }
 
 	void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) override;
 
@@ -36,7 +36,7 @@ public:
 
 	void SetIntArray(const String& name, int* values, Uint32 size) override;
 
-	const String& GetName() const override { return m_Name; }
+	const String& GetName() const override { return _name; }
 
 private:
 	void Load(const Buffer& source);
@@ -93,20 +93,20 @@ private:
 
 	const ShaderResourceList& GetResources() const override;
 private:
-	RendererID m_RendererID = 0;
-	bool m_Loaded = false;
-	bool m_IsCompute = false;
+	RendererID _rendererID = 0;
+	bool _loaded = false;
+	bool _isCompute = false;
 
-	String m_Name;
-	UnorderedMap<GLenum, String> m_ShaderSource;
+	String _name;
+	UnorderedMap<GLenum, String> _shaderSource;
 
-	ArrayList<ShaderReloadedCallback> m_ShaderReloadedCallbacks;
+	ArrayList<ShaderReloadedCallback> _shaderReloadedCallbacks;
 
-	ShaderUniformBufferList m_VSRendererUniformBuffers;
-	ShaderUniformBufferList m_PSRendererUniformBuffers;
-	Shared<OpenGLShaderUniformBufferDeclaration> m_VSMaterialUniformBuffer;
-	Shared<OpenGLShaderUniformBufferDeclaration> m_PSMaterialUniformBuffer;
-	ShaderResourceList m_Resources;
-	ShaderStructList m_Structs;
+	ShaderUniformBufferList _vSRendererUniformBuffers;
+	ShaderUniformBufferList _pSRendererUniformBuffers;
+	Shared<OpenGLShaderUniformBufferDeclaration> _vSMaterialUniformBuffer;
+	Shared<OpenGLShaderUniformBufferDeclaration> _pSMaterialUniformBuffer;
+	ShaderResourceList _resources;
+	ShaderStructList _structs;
 };
 }

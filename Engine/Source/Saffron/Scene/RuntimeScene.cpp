@@ -27,11 +27,11 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	SE_CORE_ASSERT(copyFrom, "Runtime Scene must have a scene to copy from");
 
 	// Environment
-	m_Light = copyFrom->GetLight();
-	m_LightMultiplier = copyFrom->GetLight().Multiplier;
+	_light = copyFrom->GetLight();
+	_lightMultiplier = copyFrom->GetLight().Multiplier;
 
-	m_SceneEnvironment = copyFrom->GetSceneEnvironment();
-	m_Skybox = copyFrom->GetSkybox();
+	_sceneEnvironment = copyFrom->GetSceneEnvironment();
+	_skybox = copyFrom->GetSkybox();
 
 	auto& otherRegistry = copyFrom->GetEntityRegistry();
 	Map<UUID, Entity> entityMap;
@@ -44,20 +44,20 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 		entityMap[uuid] = entity;
 	}
 
-	CopyComponent<TagComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<TransformComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<MeshComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<CameraComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<DirectionalLightComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<SkylightComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<ScriptComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<SpriteRendererComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<RigidBody2DComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<BoxCollider2DComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<CircleCollider2DComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<RigidBody3DComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<BoxCollider3DComponent>(m_EntityRegistry, otherRegistry, entityMap);
-	CopyComponent<SphereCollider3DComponent>(m_EntityRegistry, otherRegistry, entityMap);
+	CopyComponent<TagComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<TransformComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<MeshComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<CameraComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<DirectionalLightComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<SkylightComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<ScriptComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<SpriteRendererComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<RigidBody2DComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<BoxCollider2DComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<CircleCollider2DComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<RigidBody3DComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<BoxCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
+	CopyComponent<SphereCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
 
 	const auto& entityInstanceMap = ScriptEngine::GetEntityInstanceMap();
 	if (entityInstanceMap.find(GetUUID()) != entityInstanceMap.end())
@@ -68,15 +68,15 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	if (copyFrom->GetEntity().HasComponent<PhysicsWorld2DComponent>())
 	{
 		auto& copyFromWorld = copyFrom->GetEntity().GetComponent<PhysicsWorld2DComponent>().World;
-		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.SetGravity(copyFromWorld.GetGravity());
+		_sceneEntity.GetComponent<PhysicsWorld2DComponent>().World.SetGravity(copyFromWorld.GetGravity());
 	}
 	if (copyFrom->GetEntity().HasComponent<PhysicsWorld3DComponent>())
 	{
 		auto& copyFromWorld = copyFrom->GetEntity().GetComponent<PhysicsWorld3DComponent>().World;
-		m_SceneEntity.GetComponent<PhysicsWorld3DComponent>().World.SetGravity(copyFromWorld.GetGravity());
+		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.SetGravity(copyFromWorld.GetGravity());
 	}
 
-	m_DebugCamera = m_SceneEntity.AddComponent<EditorCameraComponent>(
+	_debugCamera = _sceneEntity.AddComponent<EditorCameraComponent>(
 		glm::perspectiveFov(glm::radians(45.0f), 1280.0f, 720.0f, 0.1f, 10000.0f)).Camera;
 }
 
@@ -84,30 +84,30 @@ void RuntimeScene::OnUpdate()
 {
 	const auto ts = Global::Timer::GetStep();
 
-	auto view = m_EntityRegistry.view<ScriptComponent>();
+	auto view = _entityRegistry.view<ScriptComponent>();
 	for (auto entityHandle : view)
 	{
-		const UUID entityID = m_EntityRegistry.get<IDComponent>(entityHandle).ID;
+		const UUID entityID = _entityRegistry.get<IDComponent>(entityHandle).ID;
 		Entity entity = {entityHandle, this};
 		if (ScriptEngine::ModuleExists(entity.GetComponent<ScriptComponent>().ModuleName))
 		{
-			ScriptEngine::OnUpdateEntity(m_SceneID, entityID, ts);
+			ScriptEngine::OnUpdateEntity(_sceneID, entityID, ts);
 		}
 	}
 
 
-	if (m_DebugCameraActivated && Keyboard::IsPressed(KeyCode::LControl))
+	if (_debugCameraActivated && Keyboard::IsPressed(KeyCode::LControl))
 	{
-		m_DebugCamera->OnUpdate();
+		_debugCamera->OnUpdate();
 	}
 
-	if (m_SceneEntity.HasComponent<PhysicsWorld2DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld2DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnUpdate();
+		_sceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnUpdate();
 	}
-	if (m_SceneEntity.HasComponent<PhysicsWorld3DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnUpdate();
+		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnUpdate();
 	}
 }
 
@@ -123,19 +123,19 @@ void RuntimeScene::OnRender()
 	glm::mat4 cameraViewMatrix = inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
 	SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
 	SceneCamera& camera = *cameraEntity.GetComponent<CameraComponent>().Camera;
-	camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+	camera.SetViewportSize(_viewportWidth, _viewportHeight);
 
 	// Process lights
 	{
-		m_LightEnvironment = LightEnvironment();
-		auto lights = m_EntityRegistry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
+		_lightEnvironment = LightEnvironment();
+		auto lights = _entityRegistry.group<DirectionalLightComponent>(entt::get<TransformComponent>);
 		uint32_t directionalLightIndex = 0;
 		for (auto entity : lights)
 		{
 			auto [transformComponent, lightComponent] = lights.get<
 				TransformComponent, DirectionalLightComponent>(entity);
 			glm::vec3 direction = -normalize(glm::mat3(transformComponent.Transform) * glm::vec3(1.0f));
-			m_LightEnvironment.DirectionalLights[directionalLightIndex++] = {
+			_lightEnvironment.DirectionalLights[directionalLightIndex++] = {
 				direction, lightComponent.Radiance, lightComponent.Intensity, lightComponent.CastShadows
 			};
 		}
@@ -143,19 +143,19 @@ void RuntimeScene::OnRender()
 
 	// TODO: only one sky light at the moment!
 	{
-		auto lights = m_EntityRegistry.group<SkylightComponent>(entt::get<TransformComponent>);
+		auto lights = _entityRegistry.group<SkylightComponent>(entt::get<TransformComponent>);
 		for (auto entity : lights)
 		{
 			auto [transformComponent, skyLightComponent] = lights.get<TransformComponent, SkylightComponent>(entity);
-			m_SceneEnvironment = skyLightComponent.SceneEnvironment;
-			m_SceneEnvironment->SetIntensity(skyLightComponent.Intensity);
-			SetSkybox(m_SceneEnvironment->GetRadianceMap());
+			_sceneEnvironment = skyLightComponent.SceneEnvironment;
+			_sceneEnvironment->SetIntensity(skyLightComponent.Intensity);
+			SetSkybox(_sceneEnvironment->GetRadianceMap());
 		}
 	}
 
-	m_Skybox.Material->Set("u_TextureLod", m_Skybox.Lod);
+	_skybox.Material->Set("u_TextureLod", _skybox.Lod);
 
-	auto group = m_EntityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
+	auto group = _entityRegistry.group<MeshComponent>(entt::get<TransformComponent>);
 	SceneRenderer::BeginScene(this, {camera, cameraViewMatrix});
 	for (auto entity : group)
 	{
@@ -177,36 +177,36 @@ void RuntimeScene::OnGuiRender()
 	ImGui::Begin("Scene");
 
 	Gui::BeginPropertyGrid();
-	Gui::Property("Debug Camera", m_DebugCameraActivated);
-	Gui::Property("Skybox LOD", m_Skybox.Lod, 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
+	Gui::Property("Debug Camera", _debugCameraActivated);
+	Gui::Property("Skybox LOD", _skybox.Lod, 0.0f, 11.0f, 0.5f, Gui::PropertyFlag::Drag);
 	auto& light = GetLight();
 	Gui::Property("Light Direction", light.Direction, Gui::PropertyFlag::Slider);
 	Gui::Property("Light Radiance", light.Radiance, Gui::PropertyFlag::Color);
 	Gui::Property("Light Multiplier", light.Multiplier, 0.0f, 5.0f, 0.25f, Gui::PropertyFlag::Slider);
-	Gui::Property("Radiance Prefiltering", m_RadiancePrefilter);
-	Gui::Property("Env Map Rotation", m_EnvMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
-	if (Gui::Property("Mesh Bounding Boxes", m_UIShowMeshBoundingBoxes))
+	Gui::Property("Radiance Prefiltering", _radiancePrefilter);
+	Gui::Property("Env Map Rotation", _envMapRotation, -360.0f, 360.0f, 0.5f, Gui::PropertyFlag::Slider);
+	if (Gui::Property("Mesh Bounding Boxes", _uIShowMeshBoundingBoxes))
 	{
-		ShowMeshBoundingBoxes(m_UIShowMeshBoundingBoxes);
+		ShowMeshBoundingBoxes(_uIShowMeshBoundingBoxes);
 	}
-	if (Gui::Property("Physics Bounding Boxes", m_UIShowPhysicsBodyBoundingBoxes))
+	if (Gui::Property("Physics Bounding Boxes", _uIShowPhysicsBodyBoundingBoxes))
 	{
-		ShowPhysicsBodyBoundingBoxes(m_UIShowPhysicsBodyBoundingBoxes);
+		ShowPhysicsBodyBoundingBoxes(_uIShowPhysicsBodyBoundingBoxes);
 	}
 	Gui::EndPropertyGrid();
 
 	ImGui::End();
 
-	if (m_SceneEntity.HasComponent<PhysicsWorld2DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld2DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnGuiRender();
+		_sceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnGuiRender();
 	}
-	if (m_SceneEntity.HasComponent<PhysicsWorld3DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
+		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
 	}
 
-	m_DebugCamera->OnGuiRender();
+	_debugCamera->OnGuiRender();
 }
 
 void RuntimeScene::OnStart()
@@ -214,7 +214,7 @@ void RuntimeScene::OnStart()
 	ScriptEngine::SetSceneContext(this);
 
 	{
-		auto view = m_EntityRegistry.view<ScriptComponent>();
+		auto view = _entityRegistry.view<ScriptComponent>();
 		for (auto eent : view)
 		{
 			Entity entity = {eent, this};
@@ -226,37 +226,37 @@ void RuntimeScene::OnStart()
 		}
 	}
 
-	if (m_SceneEntity.HasComponent<PhysicsWorld2DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld2DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnStart();
+		_sceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnStart();
 	}
-	if (m_SceneEntity.HasComponent<PhysicsWorld3DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStart();
+		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStart();
 	}
 }
 
 void RuntimeScene::OnStop()
 {
-	if (m_SceneEntity.HasComponent<PhysicsWorld2DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld2DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnStop();
+		_sceneEntity.GetComponent<PhysicsWorld2DComponent>().World.OnStop();
 	}
-	if (m_SceneEntity.HasComponent<PhysicsWorld3DComponent>())
+	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		m_SceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStop();
+		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStop();
 	}
 }
 
 void RuntimeScene::Escape()
 {
-	m_DebugCameraActivated = true;
-	m_DebugCamera->Enable();
+	_debugCameraActivated = true;
+	_debugCamera->Enable();
 }
 
 void RuntimeScene::Return()
 {
-	m_DebugCameraActivated = false;
-	m_DebugCamera->Disable();
+	_debugCameraActivated = false;
+	_debugCamera->Disable();
 }
 }

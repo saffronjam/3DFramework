@@ -5,12 +5,12 @@
 namespace Se::Global
 {
 Se::Timer s_Timer = Se::Timer("Global timer");
-Time Timer::m_Ts = Time::Zero();
+Time Timer::_ts = Time::Zero();
 
 Time Timer::Mark()
 {
-	m_Ts = s_Timer.Mark();
-	return m_Ts;
+	_ts = s_Timer.Mark();
+	return _ts;
 }
 
 Time Timer::Peek()
@@ -25,7 +25,7 @@ Time Timer::PeekTotal()
 
 Time Timer::GetStep()
 {
-	return m_Ts;
+	return _ts;
 }
 
 void Timer::Sync()

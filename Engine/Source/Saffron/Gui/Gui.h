@@ -84,9 +84,9 @@ private:
 	static void ApplyStyle(Style style);
 
 private:
-	Style m_CurrentStyle;
-	Map<int, ImFont*> m_Fonts;
-	Pair<int, ImFont*> m_CurrentFont;
+	Style _currentStyle;
+	Map<int, ImFont*> _fonts;
+	Pair<int, ImFont*> _currentFont;
 
 	char s_IDBuffer[16];
 	Uint32 s_Counter = 0;

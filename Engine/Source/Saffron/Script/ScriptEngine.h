@@ -83,9 +83,9 @@ struct PublicField
 	void SetStoredValue(void* src) const;
 
 private:
-	EntityInstance* m_EntityInstance{};
-	MonoClassField* m_MonoClassField{};
-	Uint8* m_StoredValueBuffer = nullptr;
+	EntityInstance* _entityInstance{};
+	MonoClassField* _monoClassField{};
+	Uint8* _storedValueBuffer = nullptr;
 
 	Uint8* AllocateBuffer(FieldType type);
 	void SetStoredValue_Internal(void* value) const;

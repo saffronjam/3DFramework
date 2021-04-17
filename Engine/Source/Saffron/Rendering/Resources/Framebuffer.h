@@ -27,7 +27,7 @@ enum class FramebufferTextureFormat
 struct FramebufferTextureSpecification
 {
 	FramebufferTextureSpecification() = default;
-	explicit FramebufferTextureSpecification(FramebufferTextureFormat format);
+	FramebufferTextureSpecification(FramebufferTextureFormat format);
 
 	FramebufferTextureFormat TextureFormat;
 	// TODO: filtering/wrap
@@ -91,14 +91,14 @@ public:
 	Weak<Framebuffer> AllocateBuffer();
 	void Add(const Shared<Framebuffer>& framebuffer);
 
-	ArrayList<Shared<Framebuffer>>& GetAll() { return m_Pool; }
+	ArrayList<Shared<Framebuffer>>& GetAll() { return _pool; }
 
-	const ArrayList<Shared<Framebuffer>>& GetAll() const { return m_Pool; }
+	const ArrayList<Shared<Framebuffer>>& GetAll() const { return _pool; }
 
 	static FramebufferPool* GetGlobal() { return s_Instance; }
 
 private:
-	ArrayList<Shared<Framebuffer>> m_Pool;
+	ArrayList<Shared<Framebuffer>> _pool;
 
 	static FramebufferPool* s_Instance;
 };

@@ -6,8 +6,8 @@ namespace Se
 {
 void Instrumentor::BeginSession(const String& name, const String& filepath)
 {
-	std::lock_guard lock(m_Mutex);
-	if (m_CurrentSession)
+	std::lock_guard lock(_mutex);
+	if (_currentSession)
 	{
 		// If there is already a current session, then close it before beginning new one.
 		// Subsequent profiling output meant for the original session will end up in the
@@ -16,15 +16,15 @@ void Instrumentor::BeginSession(const String& name, const String& filepath)
 		if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
 		{
 			SE_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name,
-			              m_CurrentSession->Name);
+			              _currentSession->Name);
 		}
 		InternalEndSession();
 	}
-	m_OutputStream.open(filepath);
+	_outputStream.open(filepath);
 
-	if (m_OutputStream.is_open())
+	if (_outputStream.is_open())
 	{
-		m_CurrentSession = new InstrumentationSession({name});
+		_currentSession = new InstrumentationSession({name});
 		WriteHeader();
 	}
 	else
@@ -38,7 +38,7 @@ void Instrumentor::BeginSession(const String& name, const String& filepath)
 
 void Instrumentor::EndSession()
 {
-	std::lock_guard lock(m_Mutex);
+	std::lock_guard lock(_mutex);
 	InternalEndSession();
 }
 
@@ -57,11 +57,11 @@ void Instrumentor::WriteProfile(const ProfileResult& result)
 	json << R"("ts":)" << result.Start.time_since_epoch().count();
 	json << R"(})";
 
-	std::lock_guard lock(m_Mutex);
-	if (m_CurrentSession)
+	std::lock_guard lock(_mutex);
+	if (_currentSession)
 	{
-		m_OutputStream << json.str();
-		m_OutputStream.flush();
+		_outputStream << json.str();
+		_outputStream.flush();
 	}
 }
 
@@ -72,7 +72,7 @@ Instrumentor& Instrumentor::Get()
 }
 
 Instrumentor::Instrumentor() :
-	m_CurrentSession(nullptr)
+	_currentSession(nullptr)
 {
 }
 
@@ -83,45 +83,45 @@ Instrumentor::~Instrumentor()
 
 void Instrumentor::WriteHeader()
 {
-	m_OutputStream << R"({"otherData": {},"traceEvents":[{})";
-	m_OutputStream.flush();
+	_outputStream << R"({"otherData": {},"traceEvents":[{})";
+	_outputStream.flush();
 }
 
 void Instrumentor::WriteFooter()
 {
-	m_OutputStream << "]}";
-	m_OutputStream.flush();
+	_outputStream << "]}";
+	_outputStream.flush();
 }
 
 void Instrumentor::InternalEndSession()
 {
-	if (m_CurrentSession)
+	if (_currentSession)
 	{
 		WriteFooter();
-		m_OutputStream.close();
-		delete m_CurrentSession;
-		m_CurrentSession = nullptr;
+		_outputStream.close();
+		delete _currentSession;
+		_currentSession = nullptr;
 	}
 }
 
 InstrumentationTimer::InstrumentationTimer(const char* name) :
 	Timer(name),
-	m_Stopped(false)
+	_stopped(false)
 {
 }
 
 InstrumentationTimer::~InstrumentationTimer()
 {
-	if (!m_Stopped) Stop();
+	if (!_stopped) Stop();
 }
 
 void InstrumentationTimer::Stop()
 {
 	try
 	{
-		Instrumentor::Get().WriteProfile(ProfileResult{m_Name, GetStart(), Peek(), std::this_thread::get_id()});
+		Instrumentor::Get().WriteProfile(ProfileResult{_name, GetStart(), Peek(), std::this_thread::get_id()});
 
-		m_Stopped = true;
+		_stopped = true;
 	}
 	catch (...)
 	{

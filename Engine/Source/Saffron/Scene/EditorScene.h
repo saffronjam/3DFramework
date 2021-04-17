@@ -13,13 +13,13 @@ public:
 	void OnRender() override;
 	void OnGuiRender() override;
 
-	void EnableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Enable(); }
+	void EnableCamera() { _sceneEntity.GetComponent<EditorCameraComponent>().Camera->Enable(); }
 
-	void DisableCamera() { m_SceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
+	void DisableCamera() { _sceneEntity.GetComponent<EditorCameraComponent>().Camera->Disable(); }
 
-	const Shared<EditorCamera>& GetEditorCamera() const { return m_EditorCamera; }
+	const Shared<EditorCamera>& GetEditorCamera() const { return _editorCamera; }
 
-	const Filepath& GetFilepath() const { return m_Filepath; }
+	const Filepath& GetFilepath() const { return _filepath; }
 
 	void SetSelectedEntity(Entity entity) override;
 	void SetViewportSize(Uint32 width, Uint32 height) override;
@@ -27,7 +27,7 @@ public:
 	void Save() const;
 
 private:
-	Shared<EditorCamera> m_EditorCamera;
-	Filepath m_Filepath;
+	Shared<EditorCamera> _editorCamera;
+	Filepath _filepath;
 };
 }

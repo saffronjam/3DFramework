@@ -38,14 +38,14 @@ private:
 	void WriteHeader();
 	void WriteFooter();
 
-	// Note: you must already own lock on m_Mutex before
+	// Note: you must already own lock on _mutex before
 	// calling InternalEndSession()
 	void InternalEndSession();
 
 private:
-	Mutex m_Mutex;
-	InstrumentationSession* m_CurrentSession;
-	OutputStream m_OutputStream;
+	Mutex _mutex;
+	InstrumentationSession* _currentSession;
+	OutputStream _outputStream;
 };
 
 class InstrumentationTimer : public Timer
@@ -57,7 +57,7 @@ public:
 	void Stop();
 
 private:
-	bool m_Stopped;
+	bool _stopped;
 };
 
 namespace InstrumentorUtils

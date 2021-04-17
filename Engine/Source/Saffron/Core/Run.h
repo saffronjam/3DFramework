@@ -10,12 +10,12 @@ class Run
 public:
 	struct Handle
 	{
-		bool operator<(const Handle& other) const { return m_UUID < other.m_UUID; }
+		bool operator<(const Handle& other) const { return _uuid < other._uuid; }
 
-		bool operator==(const Handle& other) const { return m_UUID == other.m_UUID; }
+		bool operator==(const Handle& other) const { return _uuid == other._uuid; }
 
 	private:
-		UUID m_UUID;
+		UUID _uuid;
 	};
 
 private:
@@ -33,7 +33,7 @@ public:
 	static void Remove(Handle handle);
 
 private:
-	static ArrayList<Function<void()>> m_LaterFunctions;
-	static Map<Handle, PeriodicFunction> m_PeriodicFunctions;
+	static ArrayList<Function<void()>> _laterFunctions;
+	static Map<Handle, PeriodicFunction> _periodicFunctions;
 };
 }

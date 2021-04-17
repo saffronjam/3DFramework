@@ -67,44 +67,44 @@ static ContactListener2D s_ContactListener2D;
 //////////////////////////////////////////////////////////////
 
 PhysicsWorld2D::PhysicsWorld2D(Scene& scene) :
-	m_NativeWorld(new b2World(b2Vec2{0.0f, -9.8f})),
-	m_Scene(&scene),
-	m_PhysicsBodyEntityBuffer(nullptr)
+	_nativeWorld(new b2World(b2Vec2{0.0f, -9.8f})),
+	_scene(&scene),
+	_physicsBodyEntityBuffer(nullptr)
 {
-	m_NativeWorld->SetContactListener(&s_ContactListener2D);
+	_nativeWorld->SetContactListener(&s_ContactListener2D);
 }
 
 PhysicsWorld2D::~PhysicsWorld2D()
 {
 	OnStop();
-	delete[] m_PhysicsBodyEntityBuffer;
-	m_PhysicsBodyEntityBuffer = nullptr;
+	delete[] _physicsBodyEntityBuffer;
+	_physicsBodyEntityBuffer = nullptr;
 }
 
 PhysicsWorld2D::PhysicsWorld2D(const PhysicsWorld2D& world) :
-	m_NativeWorld(new b2World(*world.m_NativeWorld)),
-	m_Scene(world.m_Scene),
-	m_PhysicsBodyEntityBuffer(nullptr)
+	_nativeWorld(new b2World(*world._nativeWorld)),
+	_scene(world._scene),
+	_physicsBodyEntityBuffer(nullptr)
 {
 }
 
 PhysicsWorld2D::PhysicsWorld2D(PhysicsWorld2D&& world) noexcept :
-	m_NativeWorld(world.m_NativeWorld),
-	m_Scene(world.m_Scene),
-	m_PhysicsBodyEntityBuffer(world.m_PhysicsBodyEntityBuffer)
+	_nativeWorld(world._nativeWorld),
+	_scene(world._scene),
+	_physicsBodyEntityBuffer(world._physicsBodyEntityBuffer)
 {
-	world.m_NativeWorld = nullptr;
-	world.m_Scene = nullptr;
-	world.m_PhysicsBodyEntityBuffer = nullptr;
+	world._nativeWorld = nullptr;
+	world._scene = nullptr;
+	world._physicsBodyEntityBuffer = nullptr;
 }
 
 PhysicsWorld2D& PhysicsWorld2D::operator=(const PhysicsWorld2D& world)
 {
 	if (&world == this) return *this;
 
-	m_NativeWorld = new b2World(*world.m_NativeWorld);
-	m_Scene = world.m_Scene;
-	m_PhysicsBodyEntityBuffer = nullptr;
+	_nativeWorld = new b2World(*world._nativeWorld);
+	_scene = world._scene;
+	_physicsBodyEntityBuffer = nullptr;
 
 	return *this;
 }
@@ -115,13 +115,13 @@ void PhysicsWorld2D::OnUpdate()
 
 	const Int32 velocityIterations = 6;
 	const Int32 positionIterations = 2;
-	m_NativeWorld->Step(ts.sec(), velocityIterations, positionIterations);
+	_nativeWorld->Step(ts.sec(), velocityIterations, positionIterations);
 
 	{
-		auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
+		auto view = _scene->GetEntityRegistry().view<RigidBody2DComponent>();
 		for (auto entityHandle : view)
 		{
-			Entity entity = {entityHandle, m_Scene};
+			Entity entity = {entityHandle, _scene};
 
 			auto& transform = entity.Transform();
 			auto& rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
@@ -175,15 +175,15 @@ void PhysicsWorld2D::OnGuiRender()
 
 void PhysicsWorld2D::OnStart()
 {
-	if (!m_FilledWorld)
+	if (!_filledWorld)
 	{
 		{
-			auto view = m_Scene->GetEntityRegistry().view<RigidBody2DComponent>();
-			m_PhysicsBodyEntityBuffer = new Entity[view.size()];
+			auto view = _scene->GetEntityRegistry().view<RigidBody2DComponent>();
+			_physicsBodyEntityBuffer = new Entity[view.size()];
 			Uint32 physicsBodyEntityBufferIndex = 0;
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 				auto& transform = entity.Transform();
 				auto& rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
 
@@ -197,9 +197,9 @@ void PhysicsWorld2D::OnStart()
 				Vector3f rotation = eulerAngles(decomposition.Rotation);
 				bodyDef.angle = rotation.z;
 
-				b2Body* body = m_NativeWorld->CreateBody(&bodyDef);
+				b2Body* body = _nativeWorld->CreateBody(&bodyDef);
 				body->SetFixedRotation(rigidBody2D.FixedRotation);
-				Entity* entityStorage = &m_PhysicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
+				Entity* entityStorage = &_physicsBodyEntityBuffer[physicsBodyEntityBufferIndex++];
 				*entityStorage = entity;
 				body->SetUserData(static_cast<void*>(entityStorage));
 				rigidBody2D.RuntimeBody = body;
@@ -207,10 +207,10 @@ void PhysicsWorld2D::OnStart()
 		}
 
 		{
-			auto view = m_Scene->GetEntityRegistry().view<BoxCollider2DComponent>();
+			auto view = _scene->GetEntityRegistry().view<BoxCollider2DComponent>();
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 
 				auto& boxCollider2D = entity.GetComponent<BoxCollider2DComponent>();
 				if (entity.HasComponent<RigidBody2DComponent>())
@@ -233,10 +233,10 @@ void PhysicsWorld2D::OnStart()
 		}
 
 		{
-			auto view = m_Scene->GetEntityRegistry().view<CircleCollider2DComponent>();
+			auto view = _scene->GetEntityRegistry().view<CircleCollider2DComponent>();
 			for (auto entityHandle : view)
 			{
-				Entity entity = {entityHandle, m_Scene};
+				Entity entity = {entityHandle, _scene};
 
 				auto& circleCollider2D = entity.GetComponent<CircleCollider2DComponent>();
 				if (entity.HasComponent<RigidBody2DComponent>())
@@ -257,15 +257,15 @@ void PhysicsWorld2D::OnStart()
 				}
 			}
 		}
-		m_FilledWorld = true;
+		_filledWorld = true;
 	}
 }
 
 void PhysicsWorld2D::OnStop()
 {
-	if (m_FilledWorld)
+	if (_filledWorld)
 	{
-		b2Body* body = m_NativeWorld->GetBodyList();
+		b2Body* body = _nativeWorld->GetBodyList();
 		while (body)
 		{
 			b2Body* nextBody = body->GetNext();
@@ -277,21 +277,21 @@ void PhysicsWorld2D::OnStop()
 				fixture = nextFixture;
 			}
 
-			m_NativeWorld->DestroyBody(body);
+			_nativeWorld->DestroyBody(body);
 			body = nextBody;
 		}
-		m_FilledWorld = false;
+		_filledWorld = false;
 	}
 }
 
 Vector2f PhysicsWorld2D::GetGravity() const
 {
-	const b2Vec2 b2Gravity = m_NativeWorld->GetGravity();
+	const b2Vec2 b2Gravity = _nativeWorld->GetGravity();
 	return Vector2f(b2Gravity.x, b2Gravity.y);
 }
 
 void PhysicsWorld2D::SetGravity(const Vector2f& gravity)
 {
-	m_NativeWorld->SetGravity(b2Vec2{gravity.x, gravity.y});
+	_nativeWorld->SetGravity(b2Vec2{gravity.x, gravity.y});
 }
 }

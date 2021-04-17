@@ -12,20 +12,20 @@ public:
 	explicit Camera(Matrix4f projectionMatrix);
 	virtual ~Camera() = default;
 
-	const Matrix4f& GetProjectionMatrix() const { return m_ProjectionMatrix; }
+	const Matrix4f& GetProjectionMatrix() const { return _projectionMatrix; }
 
-	float GetExposure() const { return m_Exposure; }
+	float GetExposure() const { return _exposure; }
 
-	float& GetExposure() { return m_Exposure; }
+	float& GetExposure() { return _exposure; }
 
-	void SetProjectionMatrix(const Matrix4f& projectionMatrix) { m_ProjectionMatrix = projectionMatrix; }
+	void SetProjectionMatrix(const Matrix4f& projectionMatrix) { _projectionMatrix = projectionMatrix; }
 
 	virtual void SetViewportSize(Uint32 width, Uint32 height);
 
 protected:
-	Matrix4f m_ProjectionMatrix = Matrix4f(1.0f);
-	float m_Exposure = 0.8f;
+	Matrix4f _projectionMatrix = Matrix4f(1.0f);
+	float _exposure = 0.8f;
 
-	Uint32 m_ViewportWidth = 1280, m_ViewportHeight = 720;
+	Uint32 _viewportWidth = 1280, _viewportHeight = 720;
 };
 }

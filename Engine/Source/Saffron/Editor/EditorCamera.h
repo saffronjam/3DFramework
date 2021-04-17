@@ -57,19 +57,19 @@ private:
 	float GetZoomSpeed() const;
 
 private:
-	bool m_Enabled = true;
-	float m_MovementSpeed = 10.0f;
-	ControllerStyle m_ControllerStyle = ControllerStyle::Game;
+	bool _enabled = true;
+	float _movementSpeed = 10.0f;
+	ControllerStyle _controllerStyle = ControllerStyle::Game;
 
-	Matrix4f m_ViewMatrix{};
-	Vector3f m_Position{0.0f, 0.0f, 0.0f};
-	Array<bool, 6> m_Keystates{false, false, false, false, false, false};
+	Matrix4f _viewMatrix{};
+	Vector3f _position{0.0f, 0.0f, 0.0f};
+	Array<bool, 6> _keystates{false, false, false, false, false, false};
 
-	Vector3f m_Forward{0.0f, 0.0f, 0.0f};
-	Vector3f m_Up{0.0f, 0.0f, 0.0f};
-	Vector3f m_Right{0.0f, 0.0f, 0.0f};
-	Vector3f m_WorldUp{0.0f, 1.0f, 0.0f};
+	Vector3f _forward{0.0f, 0.0f, 0.0f};
+	Vector3f _up{0.0f, 0.0f, 0.0f};
+	Vector3f _right{0.0f, 0.0f, 0.0f};
+	Vector3f _worldUp{0.0f, 1.0f, 0.0f};
 
-	float m_Pitch = 0.0f, m_Yaw = 0.0f;
+	float _pitch = 0.0f, _yaw = 0.0f;
 };
 }

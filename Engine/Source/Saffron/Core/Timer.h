@@ -24,8 +24,8 @@ public:
 	TimePoint GetInitialStart() const;
 
 protected:
-	const char* m_Name;
-	TimePoint m_LastTimePoint;
-	TimePoint m_InitialTimePoint;
+	const char* _name;
+	TimePoint _lastTimePoint;
+	TimePoint _initialTimePoint;
 };
 }

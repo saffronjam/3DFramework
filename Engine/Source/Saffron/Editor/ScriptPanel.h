@@ -41,13 +41,13 @@ public:
 	void OnGuiRender();
 	void SyncScriptPaths();
 
-	void SetAssetFolderpath(Filepath folderpath) { m_ScriptFolderPath = Move(folderpath); }
+	void SetAssetFolderpath(Filepath folderpath) { _scriptFolderPath = Move(folderpath); }
 
-	const ArrayList<ScriptStat>& GetScriptStats() const { return m_ScriptStats; }
+	const ArrayList<ScriptStat>& GetScriptStats() const { return _scriptStats; }
 
 private:
-	Filepath m_ScriptFolderPath;
-	ArrayList<ScriptStat> m_ScriptStats;
-	Mutex m_FilepathMutex;
+	Filepath _scriptFolderPath;
+	ArrayList<ScriptStat> _scriptStats;
+	Mutex _filepathMutex;
 };
 }

@@ -13,34 +13,34 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(void* data, Uint32 size) :
 }
 
 OpenGLIndexBuffer::OpenGLIndexBuffer(const Buffer& buffer) :
-	m_Size(buffer.Size())
+	_size(buffer.Size())
 {
-	m_LocalData = Buffer::Copy(buffer);
+	_localData = Buffer::Copy(buffer);
 
 	Shared<OpenGLIndexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 	{
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, instance->m_LocalData.Data(), GL_STATIC_DRAW);
+		glCreateBuffers(1, &instance->_rendererID);
+		glNamedBufferData(instance->_rendererID, instance->_size, instance->_localData.Data(), GL_STATIC_DRAW);
 	});
 }
 
 OpenGLIndexBuffer::OpenGLIndexBuffer(Uint32 size) :
-	m_Size(size)
+	_size(size)
 {
-	// m_LocalData = Buffer(size);
+	// _localData = Buffer(size);
 
 	Shared<OpenGLIndexBuffer> instance = this;
 	Renderer::Submit([instance]() mutable
 	{
-		glCreateBuffers(1, &instance->m_RendererID);
-		glNamedBufferData(instance->m_RendererID, instance->m_Size, nullptr, GL_DYNAMIC_DRAW);
+		glCreateBuffers(1, &instance->_rendererID);
+		glNamedBufferData(instance->_rendererID, instance->_size, nullptr, GL_DYNAMIC_DRAW);
 	});
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
 {
-	GLuint rendererID = m_RendererID;
+	GLuint rendererID = _rendererID;
 	Renderer::Submit([rendererID]()
 	{
 		glDeleteBuffers(1, &rendererID);
@@ -49,12 +49,12 @@ OpenGLIndexBuffer::~OpenGLIndexBuffer()
 
 void OpenGLIndexBuffer::SetData(const void* data, Uint32 size, Uint32 offset)
 {
-	m_LocalData = Buffer::Copy(data, size);
-	m_Size = size;
+	_localData = Buffer::Copy(data, size);
+	_size = size;
 	Shared<OpenGLIndexBuffer> instance = this;
 	Renderer::Submit([instance, offset]()
 	{
-		glNamedBufferSubData(instance->m_RendererID, offset, instance->m_Size, instance->m_LocalData.Data());
+		glNamedBufferSubData(instance->_rendererID, offset, instance->_size, instance->_localData.Data());
 	});
 }
 
@@ -65,17 +65,17 @@ void OpenGLIndexBuffer::SetData(const Buffer& buffer, Uint32 offset)
 
 Uint32 OpenGLIndexBuffer::GetCount() const
 {
-	return m_Size / sizeof(Uint32);
+	return _size / sizeof(Uint32);
 }
 
 Uint32 OpenGLIndexBuffer::GetSize() const
 {
-	return m_Size;
+	return _size;
 }
 
 RendererID OpenGLIndexBuffer::GetRendererID() const
 {
-	return m_RendererID;
+	return _rendererID;
 }
 
 void OpenGLIndexBuffer::Bind() const
@@ -83,7 +83,7 @@ void OpenGLIndexBuffer::Bind() const
 	Shared<const OpenGLIndexBuffer> instance = this;
 	Renderer::Submit([instance]()
 	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, instance->m_RendererID);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, instance->_rendererID);
 	});
 }
 }

@@ -24,11 +24,11 @@ public:
 
 	RendererID GetRendererID() const override;
 private:
-	RendererID m_RendererID = 0;
-	Uint32 m_Size;
-	VertexBufferUsage m_Usage;
-	VertexBufferLayout m_Layout;
+	RendererID _rendererID = 0;
+	Uint32 _size;
+	VertexBufferUsage _usage;
+	VertexBufferLayout _layout;
 
-	Buffer m_LocalData;
+	Buffer _localData;
 };
 }

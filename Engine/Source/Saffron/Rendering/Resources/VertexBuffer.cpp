@@ -61,50 +61,50 @@ VertexBufferLayout::VertexBufferLayout()
 }
 
 VertexBufferLayout::VertexBufferLayout(const InitializerList<VertexBufferElement>& elements):
-	m_Elements(elements)
+	_elements(elements)
 {
 	CalculateOffsetsAndStride();
 }
 
 Uint32 VertexBufferLayout::GetStride() const
 {
-	return m_Stride;
+	return _stride;
 }
 
 const ArrayList<VertexBufferElement>& VertexBufferLayout::GetElements() const
 {
-	return m_Elements;
+	return _elements;
 }
 
 ArrayList<VertexBufferElement>::iterator VertexBufferLayout::begin()
 {
-	return m_Elements.begin();
+	return _elements.begin();
 }
 
 ArrayList<VertexBufferElement>::iterator VertexBufferLayout::end()
 {
-	return m_Elements.end();
+	return _elements.end();
 }
 
 ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::begin() const
 {
-	return m_Elements.begin();
+	return _elements.begin();
 }
 
 ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
 {
-	return m_Elements.end();
+	return _elements.end();
 }
 
 void VertexBufferLayout::CalculateOffsetsAndStride()
 {
 	Uint32 offset = 0;
-	m_Stride = 0;
-	for (auto& element : m_Elements)
+	_stride = 0;
+	for (auto& element : _elements)
 	{
 		element.Offset = offset;
 		offset += element.Size;
-		m_Stride += element.Size;
+		_stride += element.Size;
 	}
 }
 

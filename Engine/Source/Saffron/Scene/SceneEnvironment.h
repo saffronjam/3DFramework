@@ -11,23 +11,23 @@ public:
 	SceneEnvironment(Filepath filepath, const Shared<TextureCube>& radianceMap,
 	                 const Shared<TextureCube>& irradianceMap);
 
-	const Filepath& GetFilepath() const { return m_FilePath; }
+	const Filepath& GetFilepath() const { return _filePath; }
 
-	const Shared<TextureCube>& GetRadianceMap() const { return m_RadianceMap; }
+	const Shared<TextureCube>& GetRadianceMap() const { return _radianceMap; }
 
-	const Shared<TextureCube>& GetIrradianceMap() const { return m_IrradianceMap; }
+	const Shared<TextureCube>& GetIrradianceMap() const { return _irradianceMap; }
 
-	float GetIntensity() const { return m_Intensity; }
+	float GetIntensity() const { return _intensity; }
 
-	void SetIntensity(float intensity) { m_Intensity = intensity; }
+	void SetIntensity(float intensity) { _intensity = intensity; }
 
 	static Shared<SceneEnvironment> Load(Filepath filepath);
 
 private:
-	Filepath m_FilePath;
-	Shared<TextureCube> m_RadianceMap;
-	Shared<TextureCube> m_IrradianceMap;
-	float m_Intensity;
+	Filepath _filePath;
+	Shared<TextureCube> _radianceMap;
+	Shared<TextureCube> _irradianceMap;
+	float _intensity;
 
 	static constexpr const char* SceneEnvsFolder = "SceneEnvs/";
 };

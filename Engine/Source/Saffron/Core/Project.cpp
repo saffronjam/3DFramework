@@ -11,11 +11,11 @@ Project::Project(Filepath filepath)
 {
 	const auto invalidateThis = [this]
 	{
-		m_UUID = 0ull;
-		m_Name = "";
-		m_ProjectFilepath = "";
-		m_SceneFilepaths = {};
-		m_SceneCache = {};
+		_uuid = 0ull;
+		_name = "";
+		_projectFilepath = "";
+		_sceneFilepaths = {};
+		_sceneCache = {};
 	};
 
 	if (IsValidProjectFilepath(filepath))
@@ -33,10 +33,10 @@ Project::Project(Filepath filepath)
 }
 
 Project::Project(String name, DateTime lastOpened, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths) :
-	m_Name(std::move(name)),
-	m_LastOpened(lastOpened),
-	m_ProjectFilepath(std::move(projectFilepath)),
-	m_SceneFilepaths(std::move(sceneFilepaths))
+	_name(std::move(name)),
+	_lastOpened(lastOpened),
+	_projectFilepath(std::move(projectFilepath)),
+	_sceneFilepaths(std::move(sceneFilepaths))
 {
 }
 
@@ -44,41 +44,41 @@ const Filepath& Project::AddScene(Filepath filepath)
 {
 	auto candidateSceneFilepath = "res/Scenes/" + filepath.stem().string() + filepath.extension().string();
 
-	const auto maybeCopy = std::find(m_SceneFilepaths.begin(), m_SceneFilepaths.end(), candidateSceneFilepath);
-	if (maybeCopy != m_SceneFilepaths.end())
+	const auto maybeCopy = std::find(_sceneFilepaths.begin(), _sceneFilepaths.end(), candidateSceneFilepath);
+	if (maybeCopy != _sceneFilepaths.end())
 	{
 		return *maybeCopy;
 	}
-	m_SceneFilepaths.push_back(Move(candidateSceneFilepath));
-	return m_SceneFilepaths.back();
+	_sceneFilepaths.push_back(Move(candidateSceneFilepath));
+	return _sceneFilepaths.back();
 }
 
 const Shared<EditorScene>& Project::AddCachedScene(const Shared<EditorScene>& editorScene)
 {
-	m_SceneCache.push_back(editorScene);
-	return m_SceneCache.back();
+	_sceneCache.push_back(editorScene);
+	return _sceneCache.back();
 }
 
 Project::Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFolderpath, Filepath projectFilepath,
                  ArrayList<Filepath> sceneFilepaths) :
-	m_UUID(uuid),
-	m_Name(Move(name)),
-	m_LastOpened(lastOpened),
-	m_ProjectFolderpath(Move(projectFolderpath)),
-	m_ProjectFilepath(Move(projectFolderpath)),
-	m_SceneFilepaths(Move(sceneFilepaths))
+	_uuid(uuid),
+	_name(Move(name)),
+	_lastOpened(lastOpened),
+	_projectFolderpath(Move(projectFolderpath)),
+	_projectFilepath(Move(projectFolderpath)),
+	_sceneFilepaths(Move(sceneFilepaths))
 
 {
 }
 
 const ArrayList<Shared<EditorScene>>& Project::GetSceneCache() const
 {
-	return m_SceneCache;
+	return _sceneCache;
 }
 
 const Filepath Project::GetFullSceneFilepath(const Filepath& relativeFilepath)
 {
-	return m_ProjectFolderpath.string() + relativeFilepath.string();
+	return _projectFolderpath.string() + relativeFilepath.string();
 }
 
 Optional<Shared<EditorScene>> Project::GetCachedScene(const Filepath& filepath)
@@ -88,14 +88,14 @@ Optional<Shared<EditorScene>> Project::GetCachedScene(const Filepath& filepath)
 
 bool Project::IsValid() const
 {
-	const bool correctData = !m_Name.empty() && !m_ProjectFolderpath.empty() && !m_ProjectFilepath.empty() && !
-		m_SceneFilepaths.empty() && !m_SceneFilepaths.front().empty(); // Correct on data level
-	const auto projectFullFilepath = m_ProjectFolderpath.string() + m_ProjectFilepath.string();
-	bool correctOnDisk = FileIOManager::FileExists(m_ProjectFolderpath) && FileIOManager::FileExists(
+	const bool correctData = !_name.empty() && !_projectFolderpath.empty() && !_projectFilepath.empty() && !
+		_sceneFilepaths.empty() && !_sceneFilepaths.front().empty(); // Correct on data level
+	const auto projectFullFilepath = _projectFolderpath.string() + _projectFilepath.string();
+	bool correctOnDisk = FileIOManager::FileExists(_projectFolderpath) && FileIOManager::FileExists(
 		projectFullFilepath);
-	for (const auto& sceneFilepath : m_SceneFilepaths)
+	for (const auto& sceneFilepath : _sceneFilepaths)
 	{
-		const auto sceneFullFilepath = m_ProjectFolderpath.string() + sceneFilepath.string();
+		const auto sceneFullFilepath = _projectFolderpath.string() + sceneFilepath.string();
 		if (!FileIOManager::FileExists(sceneFullFilepath))
 		{
 			correctOnDisk = false;
@@ -114,6 +114,6 @@ bool Project::IsValidSceneFilepath(const Filepath& filepath)
 {
 	return !filepath.empty() && filepath.extension() == ".ssc" &&
 		FileIOManager::FileExists(GetFullSceneFilepath(filepath)) && std::find(
-			m_SceneFilepaths.begin(), m_SceneFilepaths.end(), filepath) != m_SceneFilepaths.end();
+			_sceneFilepaths.begin(), _sceneFilepaths.end(), filepath) != _sceneFilepaths.end();
 }
 }

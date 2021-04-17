@@ -29,7 +29,7 @@ namespace Se
 ///////////////////////////////////////////////////////////////////////////
 
 SceneSerializer::SceneSerializer(Scene& scene) :
-	m_Scene(scene)
+	_scene(scene)
 {
 }
 
@@ -38,14 +38,14 @@ void SceneSerializer::Serialize(const Filepath& filepath) const
 	YAML::Emitter out;
 	out << YAML::BeginMap;
 	out << YAML::Key << "Scene";
-	out << YAML::Value << m_Scene.GetName();
+	out << YAML::Value << _scene.GetName();
 	SerializeEnvironment(out);
 	SerializeEditorCamera(out);
 	out << YAML::Key << "Entities";
 	out << YAML::Value << YAML::BeginSeq;
-	m_Scene.GetEntityRegistry().each([&](auto entityID)
+	_scene.GetEntityRegistry().each([&](auto entityID)
 	{
-		const Entity entity = {entityID, &m_Scene};
+		const Entity entity = {entityID, &_scene};
 		if (!entity || !entity.HasComponent<IDComponent>()) return;
 
 		SerializeEntity(out, entity);
@@ -74,7 +74,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 
 	auto sceneName = data["Scene"].as<String>();
 	SE_CORE_INFO("Deserializing scene '{0}'", sceneName);
-	m_Scene.SetName(sceneName);
+	_scene.SetName(sceneName);
 
 	auto environment = data["Environment"];
 	if (environment)
@@ -82,7 +82,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 		auto lightNode = environment["Light"];
 		if (lightNode)
 		{
-			auto& light = m_Scene.GetLight();
+			auto& light = _scene.GetLight();
 			light.Direction = lightNode["Direction"].as<Vector3f>();
 			light.Radiance = lightNode["Radiance"].as<Vector3f>();
 			light.Multiplier = lightNode["Multiplier"].as<float>();
@@ -92,11 +92,11 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 	auto editorCamera = data["EditorCamera"];
 	if (editorCamera)
 	{
-		if (!m_Scene.GetEntity().HasComponent<EditorCameraComponent>())
+		if (!_scene.GetEntity().HasComponent<EditorCameraComponent>())
 		{
-			m_Scene.GetEntity().AddComponent<EditorCameraComponent>();
+			_scene.GetEntity().AddComponent<EditorCameraComponent>();
 		}
-		auto& camera = m_Scene.GetEntity().GetComponent<EditorCameraComponent>().Camera;
+		auto& camera = _scene.GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
 		auto projectionMatrix = editorCamera["ProjectionMatrix"];
 		if (projectionMatrix)
@@ -129,7 +129,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			auto tagComponent = entity["TagComponent"];
 			if (tagComponent) name = tagComponent["Tag"].as<String>();
 
-			Entity deserializedEntity = m_Scene.CreateEntity(uuid, name);
+			Entity deserializedEntity = _scene.CreateEntity(uuid, name);
 
 			auto transformComponent = entity["TransformComponent"];
 			if (transformComponent)
@@ -159,7 +159,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 							// TODO: Look over overwritten variables
 							auto name = field["Name"].as<String>();
 							FieldType type = static_cast<FieldType>(field["Type"].as<Uint32>());
-							EntityInstanceData& data = ScriptEngine::GetEntityInstanceData(m_Scene.GetUUID(), uuid);
+							EntityInstanceData& data = ScriptEngine::GetEntityInstanceData(_scene.GetUUID(), uuid);
 							auto& moduleFieldMap = data.ModuleFieldMap;
 							auto& publicFields = moduleFieldMap[moduleName];
 							if (publicFields.find(name) == publicFields.end())
@@ -525,8 +525,8 @@ void SceneSerializer::SerializeEnvironment(YAML::Emitter& emitter) const
 	emitter << YAML::Key << "Environment";
 	emitter << YAML::Value;
 	emitter << YAML::BeginMap; // Environment
-	emitter << YAML::Key << "AssetPath" << YAML::Value << m_Scene.GetSceneEnvironment()->GetFilepath().string();
-	const auto& light = m_Scene.GetLight();
+	emitter << YAML::Key << "AssetPath" << YAML::Value << _scene.GetSceneEnvironment()->GetFilepath().string();
+	const auto& light = _scene.GetLight();
 	emitter << YAML::Key << "Light" << YAML::Value;
 	emitter << YAML::BeginMap; // Light
 	emitter << YAML::Key << "Direction" << YAML::Value << light.Direction;
@@ -538,12 +538,12 @@ void SceneSerializer::SerializeEnvironment(YAML::Emitter& emitter) const
 
 void SceneSerializer::SerializeEditorCamera(YAML::Emitter& emitter) const
 {
-	if (!m_Scene.GetEntity().HasComponent<EditorCameraComponent>())
+	if (!_scene.GetEntity().HasComponent<EditorCameraComponent>())
 	{
 		return;
 	}
 
-	const auto& camera = m_Scene.GetEntity().GetComponent<EditorCameraComponent>().Camera;
+	const auto& camera = _scene.GetEntity().GetComponent<EditorCameraComponent>().Camera;
 
 	emitter << YAML::Key << "EditorCamera" << YAML::Value;
 	emitter << YAML::BeginMap;

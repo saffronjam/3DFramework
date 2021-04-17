@@ -16,14 +16,14 @@ namespace Se
 
 OpenGLShader::OpenGLShader(const Filepath& filepath)
 {
-	m_Filepath = Move(filepath);
+	_filepath = Move(filepath);
 
-	const auto fpString = m_Filepath.string();
+	const auto fpString = _filepath.string();
 
 	size_t found = fpString.find_last_of("/\\");
-	m_Name = found != String::npos ? fpString.substr(found + 1) : fpString;
-	found = m_Name.find_last_of('.');
-	m_Name = found != String::npos ? m_Name.substr(0, found) : m_Name;
+	_name = found != String::npos ? fpString.substr(found + 1) : fpString;
+	found = _name.find_last_of('.');
+	_name = found != String::npos ? _name.substr(0, found) : _name;
 
 	static int i = 0;
 	SE_CORE_INFO("Loading no: {0}: filepath: {1}", i++, filepath.string());
@@ -40,14 +40,14 @@ Shared<OpenGLShader> OpenGLShader::Create(const Buffer& source)
 
 void OpenGLShader::Reload()
 {
-	const auto source = ReadShaderFromFile(m_Filepath);
+	const auto source = ReadShaderFromFile(_filepath);
 	Load(source);
 }
 
 void OpenGLShader::Load(const Buffer& source)
 {
-	m_ShaderSource = PreProcess(source);
-	if (!m_IsCompute) Parse();
+	_shaderSource = PreProcess(source);
+	if (!_isCompute) Parse();
 
 	Renderer::Submit([=]()
 	{
@@ -55,35 +55,35 @@ void OpenGLShader::Load(const Buffer& source)
 		SE_CORE_INFO("Submitting no: {0}: ", i++);
 
 
-		if (m_RendererID)
-			glDeleteProgram(m_RendererID);
+		if (_rendererID)
+			glDeleteProgram(_rendererID);
 
 		CompileAndUploadShader();
-		if (!m_IsCompute)
+		if (!_isCompute)
 		{
 			ResolveUniforms();
 			ValidateUniforms();
 		}
 
-		if (m_Loaded)
+		if (_loaded)
 		{
-			for (auto& callback : m_ShaderReloadedCallbacks) callback();
+			for (auto& callback : _shaderReloadedCallbacks) callback();
 		}
 
-		m_Loaded = true;
+		_loaded = true;
 	});
 }
 
 void OpenGLShader::AddShaderReloadedCallback(const ShaderReloadedCallback& callback)
 {
-	m_ShaderReloadedCallbacks.push_back(callback);
+	_shaderReloadedCallbacks.push_back(callback);
 }
 
 void OpenGLShader::Bind()
 {
 	Renderer::Submit([=]()
 	{
-		glUseProgram(m_RendererID);
+		glUseProgram(_rendererID);
 	});
 }
 
@@ -135,7 +135,7 @@ UnorderedMap<GLenum, String> OpenGLShader::PreProcess(const Buffer& source)
 		// Compute shaders cannot contain other types
 		if (shaderType == GL_COMPUTE_SHADER)
 		{
-			m_IsCompute = true;
+			_isCompute = true;
 			break;
 		}
 	}
@@ -231,13 +231,13 @@ void OpenGLShader::Parse()
 	const char* vstr;
 	const char* fstr;
 
-	m_Resources.clear();
-	m_Structs.clear();
-	m_VSMaterialUniformBuffer.Reset();
-	m_PSMaterialUniformBuffer.Reset();
+	_resources.clear();
+	_structs.clear();
+	_vSMaterialUniformBuffer.Reset();
+	_pSMaterialUniformBuffer.Reset();
 
-	auto& vertexSource = m_ShaderSource[GL_VERTEX_SHADER];
-	auto& fragmentSource = m_ShaderSource[GL_FRAGMENT_SHADER];
+	auto& vertexSource = _shaderSource[GL_VERTEX_SHADER];
+	auto& fragmentSource = _shaderSource[GL_FRAGMENT_SHADER];
 
 	// Vertex Shader
 	vstr = vertexSource.c_str();
@@ -266,7 +266,7 @@ static bool IsTypeStringResource(const String& type)
 
 ShaderStruct* OpenGLShader::FindStruct(const String& name)
 {
-	for (ShaderStruct* s : m_Structs)
+	for (ShaderStruct* s : _structs)
 	{
 		if (s->GetName() == name) return s;
 	}
@@ -300,7 +300,7 @@ void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 	{
 		ShaderResourceDeclaration* declaration = new OpenGLShaderResourceDeclaration(
 			OpenGLShaderResourceDeclaration::StringToType(typeString), name, count);
-		m_Resources.push_back(declaration);
+		_resources.push_back(declaration);
 	}
 	else
 	{
@@ -322,25 +322,25 @@ void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 		if (StartsWith(name, "r_"))
 		{
 			if (domain == ShaderDomain::Vertex) static_cast<OpenGLShaderUniformBufferDeclaration*>(
-				m_VSRendererUniformBuffers.front())->PushUniform(declaration);
+				_vSRendererUniformBuffers.front())->PushUniform(declaration);
 			else if (domain == ShaderDomain::Pixel) static_cast<OpenGLShaderUniformBufferDeclaration*>(
-				m_PSRendererUniformBuffers.front())->PushUniform(declaration);
+				_pSRendererUniformBuffers.front())->PushUniform(declaration);
 		}
 		else
 		{
 			if (domain == ShaderDomain::Vertex)
 			{
-				if (!m_VSMaterialUniformBuffer)
-					m_VSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
+				if (!_vSMaterialUniformBuffer)
+					_vSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
-				m_VSMaterialUniformBuffer->PushUniform(declaration);
+				_vSMaterialUniformBuffer->PushUniform(declaration);
 			}
 			else if (domain == ShaderDomain::Pixel)
 			{
-				if (!m_PSMaterialUniformBuffer)
-					m_PSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
+				if (!_pSMaterialUniformBuffer)
+					_pSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
-				m_PSMaterialUniformBuffer->PushUniform(declaration);
+				_pSMaterialUniformBuffer->PushUniform(declaration);
 			}
 		}
 	}
@@ -379,17 +379,17 @@ void OpenGLShader::ParseUniformStruct(const String& block, ShaderDomain domain)
 			domain, OpenGLShaderUniformDeclaration::StringToType(type), name, count);
 		uniformStruct->AddField(field);
 	}
-	m_Structs.push_back(uniformStruct);
+	_structs.push_back(uniformStruct);
 }
 
 void OpenGLShader::ResolveUniforms()
 {
-	glUseProgram(m_RendererID);
+	glUseProgram(_rendererID);
 
-	for (size_t i = 0; i < m_VSRendererUniformBuffers.size(); i++)
+	for (size_t i = 0; i < _vSRendererUniformBuffers.size(); i++)
 	{
 		OpenGLShaderUniformBufferDeclaration* decl = static_cast<OpenGLShaderUniformBufferDeclaration*>(
-			m_VSRendererUniformBuffers[i]);
+			_vSRendererUniformBuffers[i]);
 		const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
 		for (size_t j = 0; j < uniforms.size(); j++)
 		{
@@ -401,20 +401,20 @@ void OpenGLShader::ResolveUniforms()
 				for (size_t k = 0; k < fields.size(); k++)
 				{
 					OpenGLShaderUniformDeclaration* field = static_cast<OpenGLShaderUniformDeclaration*>(fields[k]);
-					field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
+					field->_location = GetUniformLocation(uniform->_name + "." + field->_name);
 				}
 			}
 			else
 			{
-				uniform->m_Location = GetUniformLocation(uniform->m_Name);
+				uniform->_location = GetUniformLocation(uniform->_name);
 			}
 		}
 	}
 
-	for (size_t i = 0; i < m_PSRendererUniformBuffers.size(); i++)
+	for (size_t i = 0; i < _pSRendererUniformBuffers.size(); i++)
 	{
 		OpenGLShaderUniformBufferDeclaration* decl = static_cast<OpenGLShaderUniformBufferDeclaration*>(
-			m_PSRendererUniformBuffers[i]);
+			_pSRendererUniformBuffers[i]);
 		const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
 		for (size_t j = 0; j < uniforms.size(); j++)
 		{
@@ -426,18 +426,18 @@ void OpenGLShader::ResolveUniforms()
 				for (size_t k = 0; k < fields.size(); k++)
 				{
 					OpenGLShaderUniformDeclaration* field = static_cast<OpenGLShaderUniformDeclaration*>(fields[k]);
-					field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
+					field->_location = GetUniformLocation(uniform->_name + "." + field->_name);
 				}
 			}
 			else
 			{
-				uniform->m_Location = GetUniformLocation(uniform->m_Name);
+				uniform->_location = GetUniformLocation(uniform->_name);
 			}
 		}
 	}
 
 	{
-		const auto& decl = m_VSMaterialUniformBuffer;
+		const auto& decl = _vSMaterialUniformBuffer;
 		if (decl)
 		{
 			const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
@@ -451,19 +451,19 @@ void OpenGLShader::ResolveUniforms()
 					for (size_t k = 0; k < fields.size(); k++)
 					{
 						OpenGLShaderUniformDeclaration* field = static_cast<OpenGLShaderUniformDeclaration*>(fields[k]);
-						field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
+						field->_location = GetUniformLocation(uniform->_name + "." + field->_name);
 					}
 				}
 				else
 				{
-					uniform->m_Location = GetUniformLocation(uniform->m_Name);
+					uniform->_location = GetUniformLocation(uniform->_name);
 				}
 			}
 		}
 	}
 
 	{
-		const auto& decl = m_PSMaterialUniformBuffer;
+		const auto& decl = _pSMaterialUniformBuffer;
 		if (decl)
 		{
 			const ShaderUniformList& uniforms = decl->GetUniformDeclarations();
@@ -477,33 +477,33 @@ void OpenGLShader::ResolveUniforms()
 					for (size_t k = 0; k < fields.size(); k++)
 					{
 						OpenGLShaderUniformDeclaration* field = static_cast<OpenGLShaderUniformDeclaration*>(fields[k]);
-						field->m_Location = GetUniformLocation(uniform->m_Name + "." + field->m_Name);
+						field->_location = GetUniformLocation(uniform->_name + "." + field->_name);
 					}
 				}
 				else
 				{
-					uniform->m_Location = GetUniformLocation(uniform->m_Name);
+					uniform->_location = GetUniformLocation(uniform->_name);
 				}
 			}
 		}
 	}
 
 	Uint32 sampler = 0;
-	for (size_t i = 0; i < m_Resources.size(); i++)
+	for (size_t i = 0; i < _resources.size(); i++)
 	{
-		OpenGLShaderResourceDeclaration* resource = static_cast<OpenGLShaderResourceDeclaration*>(m_Resources[i]);
-		int32_t location = GetUniformLocation(resource->m_Name);
+		OpenGLShaderResourceDeclaration* resource = static_cast<OpenGLShaderResourceDeclaration*>(_resources[i]);
+		int32_t location = GetUniformLocation(resource->_name);
 
 		if (resource->GetCount() == 1)
 		{
-			resource->m_Register = sampler;
+			resource->_register = sampler;
 			if (location != -1) UploadUniformInt(location, sampler);
 
 			sampler++;
 		}
 		else if (resource->GetCount() > 1)
 		{
-			resource->m_Register = sampler;
+			resource->_register = sampler;
 			Uint32 count = resource->GetCount();
 			int* samplers = new int[count];
 			for (Uint32 s = 0; s < count; s++) samplers[s] = sampler++;
@@ -519,7 +519,7 @@ void OpenGLShader::ValidateUniforms()
 
 int32_t OpenGLShader::GetUniformLocation(const String& name) const
 {
-	int32_t result = glGetUniformLocation(m_RendererID, name.c_str());
+	int32_t result = glGetUniformLocation(_rendererID, name.c_str());
 	if (result == -1)
 		SE_CORE_WARN("Could not find uniform '{0}' in shader", name);
 
@@ -540,7 +540,7 @@ void OpenGLShader::CompileAndUploadShader()
 	ArrayList<GLuint> shaderRendererIDs;
 
 	GLuint program = glCreateProgram();
-	for (auto& kv : m_ShaderSource)
+	for (auto& kv : _shaderSource)
 	{
 		GLenum type = kv.first;
 		String& source = kv.second;
@@ -562,7 +562,7 @@ void OpenGLShader::CompileAndUploadShader()
 			ArrayList<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
-			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
+			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", _filepath, &infoLog[0]);
 
 			// We don't need the shader anymore.
 			glDeleteShader(shaderRendererID);
@@ -588,7 +588,7 @@ void OpenGLShader::CompileAndUploadShader()
 		// The maxLength includes the NULL character
 		ArrayList<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
+		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", _filepath, &infoLog[0]);
 
 		// We don't need the program anymore.
 		glDeleteProgram(program);
@@ -601,15 +601,15 @@ void OpenGLShader::CompileAndUploadShader()
 	for (auto id : shaderRendererIDs)
 		glDetachShader(program, id);
 
-	m_RendererID = program;
+	_rendererID = program;
 }
 
 void OpenGLShader::SetVSMaterialUniformBuffer(Buffer buffer)
 {
 	Renderer::Submit([this, buffer]()
 	{
-		glUseProgram(m_RendererID);
-		ResolveAndSetUniforms(m_VSMaterialUniformBuffer, buffer);
+		glUseProgram(_rendererID);
+		ResolveAndSetUniforms(_vSMaterialUniformBuffer, buffer);
 	});
 }
 
@@ -617,8 +617,8 @@ void OpenGLShader::SetPSMaterialUniformBuffer(Buffer buffer)
 {
 	Renderer::Submit([this, buffer]()
 	{
-		glUseProgram(m_RendererID);
-		ResolveAndSetUniforms(m_PSMaterialUniformBuffer, buffer);
+		glUseProgram(_rendererID);
+		ResolveAndSetUniforms(_pSMaterialUniformBuffer, buffer);
 	});
 }
 
@@ -839,7 +839,7 @@ void OpenGLShader::SetMat4FromRenderThread(const String& name, const Matrix4f& v
 	}
 	else
 	{
-		int location = glGetUniformLocation(m_RendererID, name.c_str());
+		int location = glGetUniformLocation(_rendererID, name.c_str());
 		if (location != -1) UploadUniformMat4(location, value);
 	}
 }
@@ -905,7 +905,7 @@ void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, 
 	{
 		OpenGLShaderUniformDeclaration* field = static_cast<OpenGLShaderUniformDeclaration*>(fields[k]);
 		ResolveAndSetUniformField(*field, buffer, offset);
-		offset += field->m_Size;
+		offset += field->_size;
 	}
 }
 
@@ -923,8 +923,8 @@ void OpenGLShader::UploadUniformIntArray(const String& name, int32_t* values, Ui
 
 void OpenGLShader::UploadUniformFloat(const String& name, float value)
 {
-	glUseProgram(m_RendererID);
-	auto location = glGetUniformLocation(m_RendererID, name.c_str());
+	glUseProgram(_rendererID);
+	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform1f(location, value);
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
@@ -932,8 +932,8 @@ void OpenGLShader::UploadUniformFloat(const String& name, float value)
 
 void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& values)
 {
-	glUseProgram(m_RendererID);
-	auto location = glGetUniformLocation(m_RendererID, name.c_str());
+	glUseProgram(_rendererID);
+	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform2f(location, values.x, values.y);
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
@@ -942,8 +942,8 @@ void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& value
 
 void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& values)
 {
-	glUseProgram(m_RendererID);
-	auto location = glGetUniformLocation(m_RendererID, name.c_str());
+	glUseProgram(_rendererID);
+	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform3f(location, values.x, values.y, values.z);
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
@@ -951,8 +951,8 @@ void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& value
 
 void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& values)
 {
-	glUseProgram(m_RendererID);
-	auto location = glGetUniformLocation(m_RendererID, name.c_str());
+	glUseProgram(_rendererID);
+	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform4f(location, values.x, values.y, values.z, values.w);
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
@@ -960,8 +960,8 @@ void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& value
 
 void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
 {
-	glUseProgram(m_RendererID);
-	auto location = glGetUniformLocation(m_RendererID, name.c_str());
+	glUseProgram(_rendererID);
+	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniformMatrix4fv(location, 1, GL_FALSE, (const float*)&values);
 	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
@@ -969,36 +969,36 @@ void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
 
 const ShaderUniformBufferList& OpenGLShader::GetVSRendererUniforms() const
 {
-	return m_VSRendererUniformBuffers;
+	return _vSRendererUniformBuffers;
 }
 
 const ShaderUniformBufferList& OpenGLShader::GetPSRendererUniforms() const
 {
-	return m_PSRendererUniformBuffers;
+	return _pSRendererUniformBuffers;
 }
 
 bool OpenGLShader::HasVSMaterialUniformBuffer() const
 {
-	return static_cast<bool>(m_VSMaterialUniformBuffer);
+	return static_cast<bool>(_vSMaterialUniformBuffer);
 }
 
 bool OpenGLShader::HasPSMaterialUniformBuffer() const
 {
-	return static_cast<bool>(m_PSMaterialUniformBuffer);
+	return static_cast<bool>(_pSMaterialUniformBuffer);
 }
 
 const ShaderUniformBufferDeclaration& OpenGLShader::GetVSMaterialUniformBuffer() const
 {
-	return *m_VSMaterialUniformBuffer;
+	return *_vSMaterialUniformBuffer;
 }
 
 const ShaderUniformBufferDeclaration& OpenGLShader::GetPSMaterialUniformBuffer() const
 {
-	return *m_PSMaterialUniformBuffer;
+	return *_pSMaterialUniformBuffer;
 }
 
 const ShaderResourceList& OpenGLShader::GetResources() const
 {
-	return m_Resources;
+	return _resources;
 }
 }

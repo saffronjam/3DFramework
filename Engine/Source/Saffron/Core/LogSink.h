@@ -20,17 +20,17 @@ public:
 protected:
 	void log(const spdlog::details::log_msg& msg) final override
 	{
-		ScopedLock lock(m_Mutex);
+		ScopedLock lock(_mutex);
 		Sink(LogMessage(msg));
 	}
 
 	void flush() final override
 	{
-		ScopedLock lock(m_Mutex);
+		ScopedLock lock(_mutex);
 		Flush();
 	}
 
 private:
-	Mutex m_Mutex;
+	Mutex _mutex;
 };
 }

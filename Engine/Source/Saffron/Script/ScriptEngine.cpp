@@ -359,42 +359,42 @@ PublicField::PublicField(String name, FieldType type) :
 	Name(Move(name)),
 	Type(type)
 {
-	m_StoredValueBuffer = AllocateBuffer(type);
+	_storedValueBuffer = AllocateBuffer(type);
 }
 
 PublicField::PublicField(PublicField&& other)
 {
 	Name = Move(other.Name);
 	Type = other.Type;
-	m_EntityInstance = other.m_EntityInstance;
-	m_MonoClassField = other.m_MonoClassField;
-	m_StoredValueBuffer = other.m_StoredValueBuffer;
+	_entityInstance = other._entityInstance;
+	_monoClassField = other._monoClassField;
+	_storedValueBuffer = other._storedValueBuffer;
 
-	other.m_EntityInstance = nullptr;
-	other.m_MonoClassField = nullptr;
-	other.m_StoredValueBuffer = nullptr;
+	other._entityInstance = nullptr;
+	other._monoClassField = nullptr;
+	other._storedValueBuffer = nullptr;
 }
 
 PublicField::~PublicField()
 {
-	delete[] m_StoredValueBuffer;
+	delete[] _storedValueBuffer;
 }
 
 void PublicField::CopyStoredValueToRuntime() const
 {
-	SE_CORE_ASSERT(m_EntityInstance->GetInstance());
-	mono_field_set_value(m_EntityInstance->GetInstance(), m_MonoClassField, m_StoredValueBuffer);
+	SE_CORE_ASSERT(_entityInstance->GetInstance());
+	mono_field_set_value(_entityInstance->GetInstance(), _monoClassField, _storedValueBuffer);
 }
 
 bool PublicField::IsRuntimeAvailable() const
 {
-	return m_EntityInstance->Handle != 0;
+	return _entityInstance->Handle != 0;
 }
 
 void PublicField::SetStoredValue(void* src) const
 {
 	const Uint32 size = GetFieldSize(Type);
-	memcpy(m_StoredValueBuffer, src, size);
+	memcpy(_storedValueBuffer, src, size);
 }
 
 Uint8* PublicField::AllocateBuffer(FieldType type)
@@ -408,25 +408,25 @@ Uint8* PublicField::AllocateBuffer(FieldType type)
 void PublicField::GetStoredValue_Internal(void* outValue) const
 {
 	const Uint32 size = GetFieldSize(Type);
-	memcpy(outValue, m_StoredValueBuffer, size);
+	memcpy(outValue, _storedValueBuffer, size);
 }
 
 void PublicField::GetRuntimeValue_Internal(void* outValue) const
 {
-	SE_CORE_ASSERT(m_EntityInstance->GetInstance());
-	mono_field_get_value(m_EntityInstance->GetInstance(), m_MonoClassField, outValue);
+	SE_CORE_ASSERT(_entityInstance->GetInstance());
+	mono_field_get_value(_entityInstance->GetInstance(), _monoClassField, outValue);
 }
 
 void PublicField::SetStoredValue_Internal(void* value) const
 {
 	const Uint32 size = GetFieldSize(Type);
-	memcpy(m_StoredValueBuffer, value, size);
+	memcpy(_storedValueBuffer, value, size);
 }
 
 void PublicField::SetRuntimeValue_Internal(void* value) const
 {
-	SE_CORE_ASSERT(m_EntityInstance->GetInstance());
-	mono_field_set_value(m_EntityInstance->GetInstance(), m_MonoClassField, value);
+	SE_CORE_ASSERT(_entityInstance->GetInstance());
+	mono_field_set_value(_entityInstance->GetInstance(), _monoClassField, value);
 }
 
 
@@ -603,7 +603,7 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 				SE_CORE_ASSERT(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
 				auto& fieldMap = dstModuleFieldMap.at(moduleName);
 				SE_CORE_ASSERT(fieldMap.find(fieldName) != fieldMap.end());
-				fieldMap.at(fieldName).SetStoredValue(field.m_StoredValueBuffer);
+				fieldMap.at(fieldName).SetStoredValue(field._storedValueBuffer);
 			}
 		}
 	}
@@ -765,8 +765,8 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 			else
 			{
 				PublicField field = {name, saffronFieldType};
-				field.m_EntityInstance = &entityInstance;
-				field.m_MonoClassField = iter;
+				field._entityInstance = &entityInstance;
+				field._monoClassField = iter;
 				fieldMap.emplace(name, Move(field));
 			}
 		}

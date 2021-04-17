@@ -27,9 +27,9 @@ private:
 	                            float columnWidth = 100.0f);
 
 private:
-	Shared<Scene> m_Context;
-	Entity m_SelectionContext;
+	Shared<Scene> _context;
+	Entity _selectionContext;
 
-	Map<String, Shared<Texture2D>> m_TexStore;
+	Map<String, Shared<Texture2D>> _texStore;
 };
 }

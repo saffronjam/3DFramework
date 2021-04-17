@@ -5,7 +5,7 @@
 namespace Se
 {
 EditorSerializer::EditorSerializer(Layer& editorLayer) :
-	m_EditorLayer(editorLayer)
+	_editorLayer(editorLayer)
 {
 }
 

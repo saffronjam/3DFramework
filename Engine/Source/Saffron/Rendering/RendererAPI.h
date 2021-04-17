@@ -35,16 +35,16 @@ public:
 	static void Clear(float r, float g, float b, float a);
 	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
 
-	static RendererCapabilities& GetCapabilities() { return m_sCapabilities; }
+	static RendererCapabilities& GetCapabilities() { return _sCapabilities; }
 
 	static void SetLineThickness(float thickness);
 	static void SetClearColor(float r, float g, float b, float a);
 
-	static RendererApiType Current() { return m_sCurrentAPI; }
+	static RendererApiType Current() { return _sCurrentAPI; }
 
 private:
-	static RendererApiType m_sCurrentAPI;
-	static RendererCapabilities m_sCapabilities;
-	static float m_LineThickness;
+	static RendererApiType _sCurrentAPI;
+	static RendererCapabilities _sCapabilities;
+	static float _lineThickness;
 };
 }

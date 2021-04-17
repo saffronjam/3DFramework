@@ -13,7 +13,7 @@ public:
 
 	void OnGuiRender();
 
-	const Shared<BatchLoader>& GetBatchLoader() const { return m_BatchLoader; }
+	const Shared<BatchLoader>& GetBatchLoader() const { return _batchLoader; }
 
 	void Show();
 	void Hide();
@@ -21,13 +21,13 @@ public:
 	bool IsFinished() const;
 
 private:
-	Shared<BatchLoader> m_BatchLoader;
-	Shared<Texture2D> m_Texture;
-	bool m_Hidden = false;
-	String m_FinalizingStatus;
+	Shared<BatchLoader> _batchLoader;
+	Shared<Texture2D> _texture;
+	bool _hidden = false;
+	String _finalizingStatus;
 
-	float m_GoalProgressView = 0.0f;
-	float m_CurrentProgressView = 0.0f;
-	float m_CurrentSinTimer = 0.0f;
+	float _goalProgressView = 0.0f;
+	float _currentProgressView = 0.0f;
+	float _currentSinTimer = 0.0f;
 };
 }

@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.sc": "glsl",
+        "system_error": "cpp",
+        "xlocale": "cpp"
+    }
+}

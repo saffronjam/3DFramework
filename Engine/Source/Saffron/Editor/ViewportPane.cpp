@@ -8,12 +8,12 @@
 namespace Se
 {
 ViewportPane::ViewportPane(String windowTitle) :
-	m_WindowTitle(Move(windowTitle)),
-	//m_FallbackTexture(Texture2D::Create("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
-	m_TopLeft(0.0f, 0.0f),
-	m_BottomRight(100.0f, 100.0f),
-	m_Hovered(false),
-	m_Focused(false)
+	_windowTitle(Move(windowTitle)),
+	//_fallbackTexture(Texture2D::Create("Resources/Assets/Editor/FallbackViewportPaneTexture.png")),
+	_topLeft(0.0f, 0.0f),
+	_bottomRight(100.0f, 100.0f),
+	_hovered(false),
+	_focused(false)
 {
 }
 
@@ -25,15 +25,15 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
 	OutputStringStream oss;
-	oss << m_WindowTitle << "##" << uuid;
+	oss << _windowTitle << "##" << uuid;
 
 	ImGui::Begin(oss.str().c_str(), open, ImGuiWindowFlags_NoFocusOnAppearing);
 
-	m_DockID = ImGui::GetWindowDockID();
+	_dockID = ImGui::GetWindowDockID();
 
 	if (ImGui::IsWindowDocked())
 	{
-		auto* wnd = ImGui::FindWindowByName(m_WindowTitle.c_str());
+		auto* wnd = ImGui::FindWindowByName(_windowTitle.c_str());
 		if (wnd)
 		{
 			ImGuiDockNode* node = wnd->DockNode;
@@ -44,8 +44,8 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 		}
 	}
 
-	m_Hovered = ImGui::IsWindowHovered();
-	m_Focused = ImGui::IsWindowFocused();
+	_hovered = ImGui::IsWindowHovered();
+	_focused = ImGui::IsWindowFocused();
 
 	const auto viewportOffset = ImGui::GetCursorPos(); // includes tab bar
 	ImVec2 minBound = ImGui::GetWindowPos();
@@ -56,14 +56,14 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	const ImVec2 maxBound = {
 		minBound.x + windowSize.x - viewportOffset.x, minBound.y + windowSize.y - viewportOffset.y
 	};
-	m_TopLeft = {minBound.x, minBound.y};
-	m_BottomRight = {maxBound.x, maxBound.y};
+	_topLeft = {minBound.x, minBound.y};
+	_bottomRight = {maxBound.x, maxBound.y};
 
 	const auto viewportSize = GetViewportSize();
 	const auto imageRendererID = SceneRenderer::GetFinalColorBufferRendererID();
 	ImGui::Image(reinterpret_cast<void*>(imageRendererID), {viewportSize.x, viewportSize.y}, {0, 1}, {1, 0});
-	ImGui::GetWindowDrawList()->AddRect(ImVec2(m_TopLeft.x, tl.y), ImVec2(br.x, br.y),
-	                                    m_Focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f,
+	ImGui::GetWindowDrawList()->AddRect(ImVec2(_topLeft.x, tl.y), ImVec2(br.x, br.y),
+	                                    _focused ? IM_COL32(255, 140, 0, 180) : IM_COL32(255, 140, 0, 80), 0.0f,
 	                                    ImDrawCornerFlags_All, 4);
 
 	FinishedRender.Invoke();
@@ -76,18 +76,18 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 
 bool ViewportPane::InViewport(Vector2f positionNDC) const
 {
-	positionNDC.x -= m_TopLeft.x;
-	positionNDC.y -= m_TopLeft.y;
-	return positionNDC.x < m_BottomRight.x && positionNDC.y < m_BottomRight.y;
+	positionNDC.x -= _topLeft.x;
+	positionNDC.y -= _topLeft.y;
+	return positionNDC.x < _bottomRight.x && positionNDC.y < _bottomRight.y;
 }
 
 Vector2f ViewportPane::GetMousePosition() const
 {
 	Vector2f position = Mouse::GetPositionNDC();
-	position.x -= m_TopLeft.x;
-	position.y -= m_TopLeft.y;
-	const auto viewportWidth = m_BottomRight.x - m_TopLeft.x;
-	const auto viewportHeight = m_BottomRight.y - m_TopLeft.y;
+	position.x -= _topLeft.x;
+	position.y -= _topLeft.y;
+	const auto viewportWidth = _bottomRight.x - _topLeft.x;
+	const auto viewportHeight = _bottomRight.y - _topLeft.y;
 
 	return {position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f};
 }
