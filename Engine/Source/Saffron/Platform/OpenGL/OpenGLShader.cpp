@@ -14,13 +14,19 @@ namespace Se
 #define HZ_LOG_UNIFORM
 #endif
 
-OpenGLShader::OpenGLShader(const Filepath& filepath) :
-	m_AssetPath(filepath.string())
+OpenGLShader::OpenGLShader(const Filepath& filepath)
 {
-	size_t found = m_AssetPath.find_last_of("/\\");
-	m_Name = found != std::string::npos ? m_AssetPath.substr(found + 1) : m_AssetPath;
-	found = m_Name.find_last_of(".");
+	m_Filepath = Move(filepath);
+
+	const auto fpString = m_Filepath.string();
+	
+	size_t found = fpString.find_last_of("/\\");
+	m_Name = found != std::string::npos ? fpString.substr(found + 1) : fpString;
+	found = m_Name.find_last_of('.');
 	m_Name = found != std::string::npos ? m_Name.substr(0, found) : m_Name;
+
+	static int i = 0;
+	SE_CORE_INFO("Loading no: {0}: filepath: {1}", i++, filepath.string());
 
 	OpenGLShader::Reload();
 }
@@ -34,7 +40,7 @@ Shared<OpenGLShader> OpenGLShader::Create(const Buffer& source)
 
 void OpenGLShader::Reload()
 {
-	const auto source = ReadShaderFromFile(m_AssetPath);
+	const auto source = ReadShaderFromFile(m_Filepath);
 	Load(source);
 }
 
@@ -45,7 +51,9 @@ void OpenGLShader::Load(const Buffer& source)
 
 	Renderer::Submit([=]()
 	{
-		auto& source = m_ShaderSource;
+		static int i = 0;
+		SE_CORE_INFO("Submitting no: {0}: ", i++);
+
 
 		if (m_RendererID)
 			glDeleteProgram(m_RendererID);
@@ -79,7 +87,7 @@ void OpenGLShader::Bind()
 	});
 }
 
-Buffer OpenGLShader::ReadShaderFromFile(const std::string& filepath) const
+Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
 {
 	std::string result;
 	std::ifstream in(filepath, std::ios::in | std::ios::binary);
@@ -313,24 +321,24 @@ void OpenGLShader::ParseUniform(const std::string& statement, ShaderDomain domai
 
 		if (StartsWith(name, "r_"))
 		{
-			if (domain == ShaderDomain::Vertex) ((OpenGLShaderUniformBufferDeclaration*)m_VSRendererUniformBuffers.
-				front())->PushUniform(declaration);
-			else if (domain == ShaderDomain::Pixel) ((OpenGLShaderUniformBufferDeclaration*)m_PSRendererUniformBuffers.
-				front())->PushUniform(declaration);
+			if (domain == ShaderDomain::Vertex)
+				((OpenGLShaderUniformBufferDeclaration*)m_VSRendererUniformBuffers.front())->PushUniform(declaration);
+			else if (domain == ShaderDomain::Pixel)
+				((OpenGLShaderUniformBufferDeclaration*)m_PSRendererUniformBuffers.front())->PushUniform(declaration);
 		}
 		else
 		{
 			if (domain == ShaderDomain::Vertex)
 			{
-				if (!m_VSMaterialUniformBuffer) m_VSMaterialUniformBuffer.Reset(
-					new OpenGLShaderUniformBufferDeclaration("", domain));
+				if (!m_VSMaterialUniformBuffer)
+					m_VSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
 				m_VSMaterialUniformBuffer->PushUniform(declaration);
 			}
 			else if (domain == ShaderDomain::Pixel)
 			{
-				if (!m_PSMaterialUniformBuffer) m_PSMaterialUniformBuffer.Reset(
-					new OpenGLShaderUniformBufferDeclaration("", domain));
+				if (!m_PSMaterialUniformBuffer)
+					m_PSMaterialUniformBuffer.Reset(new OpenGLShaderUniformBufferDeclaration("", domain));
 
 				m_PSMaterialUniformBuffer->PushUniform(declaration);
 			}
@@ -554,7 +562,7 @@ void OpenGLShader::CompileAndUploadShader()
 			std::vector<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
-			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", m_AssetPath, &infoLog[0]);
+			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
 
 			// We don't need the shader anymore.
 			glDeleteShader(shaderRendererID);
@@ -580,7 +588,7 @@ void OpenGLShader::CompileAndUploadShader()
 		// The maxLength includes the NULL character
 		std::vector<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_AssetPath, &infoLog[0]);
+		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", m_Filepath, &infoLog[0]);
 
 		// We don't need the program anymore.
 		glDeleteProgram(program);

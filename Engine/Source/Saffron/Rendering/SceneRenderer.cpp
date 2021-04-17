@@ -196,12 +196,69 @@ SceneRenderer::~SceneRenderer()
 	delete _data;
 }
 
-void SceneRenderer::SetViewportSize(uint32_t width, uint32_t height)
+void SceneRenderer::OnGuiRender()
 {
 	auto& instData = *Instance()._data;
 
-	instData.GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
-	instData.CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	ImGui::Begin("Scene Renderer");
+
+	if (Gui::BeginTreeNode("Shadows"))
+	{
+		Gui::BeginPropertyGrid();
+		Gui::Property("Soft Shadows", instData.SoftShadows);
+		Gui::Property("Light Size", instData.LightSize, 0.01f);
+		Gui::Property("Max Shadow Distance", instData.MaxShadowDistance, 1.0f);
+		Gui::Property("Shadow Fade", instData.ShadowFade, 5.0f);
+		Gui::EndPropertyGrid();
+		if (Gui::BeginTreeNode("Cascade Settings"))
+		{
+			Gui::BeginPropertyGrid();
+			Gui::Property("Show Cascades", instData.ShowCascades);
+			Gui::Property("Cascade Fading", instData.CascadeFading);
+			Gui::Property("Cascade Transition Fade", instData.CascadeTransitionFade, 0.05f, 0.0f, FLT_MAX);
+			Gui::Property("Cascade Split", instData.CascadeSplitLambda, 0.01f);
+			Gui::Property("CascadeNearPlaneOffset", instData.CascadeNearPlaneOffset, 0.1f, -FLT_MAX, 0.0f);
+			Gui::Property("CascadeFarPlaneOffset", instData.CascadeFarPlaneOffset, 0.1f, 0.0f, FLT_MAX);
+			Gui::EndPropertyGrid();
+			Gui::EndTreeNode();
+		}
+		if (Gui::BeginTreeNode("Shadow Map", false))
+		{
+			static int cascadeIndex = 0;
+			auto fb = instData.ShadowMapRenderPass[cascadeIndex]->GetSpecification().TargetFramebuffer;
+			auto id = fb->GetDepthAttachmentRendererID();
+
+			float size = ImGui::GetContentRegionAvailWidth();
+			// (float)fb->GetWidth() * 0.5f, (float)fb->GetHeight() * 0.5f
+			Gui::BeginPropertyGrid();
+			Gui::Property("Cascade Index", cascadeIndex, 1, 1, 3, Gui::PropertyFlag::Slider);
+			Gui::EndPropertyGrid();
+			ImGui::Image((ImTextureID)id, {size, size}, {0, 1}, {1, 0});
+			Gui::EndTreeNode();
+		}
+
+		Gui::EndTreeNode();
+	}
+
+	if (Gui::BeginTreeNode("Bloom"))
+	{
+		Gui::BeginPropertyGrid();
+		Gui::Property("Bloom", instData.EnableBloom);
+		Gui::Property("Bloom threshold", instData.BloomThreshold, 0.05f);
+		Gui::EndPropertyGrid();
+
+		auto fb = instData.BloomBlurPass[0]->GetSpecification().TargetFramebuffer;
+		auto id = fb->GetColorAttachmentRendererID();
+
+		float size = ImGui::GetContentRegionAvailWidth(); // (float)fb->GetWidth() * 0.5f, (float)fb->GetHeight() * 0.5f
+		float w = size;
+		float h = w / ((float)fb->GetWidth() / (float)fb->GetHeight());
+		ImGui::Image((ImTextureID)id, {w, h}, {0, 1}, {1, 0});
+		Gui::EndTreeNode();
+	}
+
+
+	ImGui::End();
 }
 
 void SceneRenderer::BeginScene(const Scene* scene, const SceneRendererCamera& camera)
@@ -868,73 +925,16 @@ void SceneRenderer::SetFocusPoint(const glm::vec2& point)
 	Instance()._data->FocusPoint = point;
 }
 
-SceneRendererOptions& SceneRenderer::GetOptions()
-{
-	return Instance()._data->Options;
-}
-
-void SceneRenderer::OnImGuiRender()
+void SceneRenderer::SetViewportSize(uint32_t width, uint32_t height)
 {
 	auto& instData = *Instance()._data;
 
-	ImGui::Begin("Scene Renderer");
+	instData.GeoPass->GetSpecification().TargetFramebuffer->Resize(width, height);
+	instData.CompositePass->GetSpecification().TargetFramebuffer->Resize(width, height);
+}
 
-	if (Gui::BeginTreeNode("Shadows"))
-	{
-		Gui::BeginPropertyGrid();
-		Gui::Property("Soft Shadows", instData.SoftShadows);
-		Gui::Property("Light Size", instData.LightSize, 0.01f);
-		Gui::Property("Max Shadow Distance", instData.MaxShadowDistance, 1.0f);
-		Gui::Property("Shadow Fade", instData.ShadowFade, 5.0f);
-		Gui::EndPropertyGrid();
-		if (Gui::BeginTreeNode("Cascade Settings"))
-		{
-			Gui::BeginPropertyGrid();
-			Gui::Property("Show Cascades", instData.ShowCascades);
-			Gui::Property("Cascade Fading", instData.CascadeFading);
-			Gui::Property("Cascade Transition Fade", instData.CascadeTransitionFade, 0.05f, 0.0f, FLT_MAX);
-			Gui::Property("Cascade Split", instData.CascadeSplitLambda, 0.01f);
-			Gui::Property("CascadeNearPlaneOffset", instData.CascadeNearPlaneOffset, 0.1f, -FLT_MAX, 0.0f);
-			Gui::Property("CascadeFarPlaneOffset", instData.CascadeFarPlaneOffset, 0.1f, 0.0f, FLT_MAX);
-			Gui::EndPropertyGrid();
-			Gui::EndTreeNode();
-		}
-		if (Gui::BeginTreeNode("Shadow Map", false))
-		{
-			static int cascadeIndex = 0;
-			auto fb = instData.ShadowMapRenderPass[cascadeIndex]->GetSpecification().TargetFramebuffer;
-			auto id = fb->GetDepthAttachmentRendererID();
-
-			float size = ImGui::GetContentRegionAvailWidth();
-			// (float)fb->GetWidth() * 0.5f, (float)fb->GetHeight() * 0.5f
-			Gui::BeginPropertyGrid();
-			Gui::Property("Cascade Index", cascadeIndex, 0, 3, 1, Gui::PropertyFlag::Slider);
-			Gui::EndPropertyGrid();
-			ImGui::Image((ImTextureID)id, {size, size}, {0, 1}, {1, 0});
-			Gui::EndTreeNode();
-		}
-
-		Gui::EndTreeNode();
-	}
-
-	if (Gui::BeginTreeNode("Bloom"))
-	{
-		Gui::BeginPropertyGrid();
-		Gui::Property("Bloom", instData.EnableBloom);
-		Gui::Property("Bloom threshold", instData.BloomThreshold, 0.05f);
-		Gui::EndPropertyGrid();
-
-		auto fb = instData.BloomBlurPass[0]->GetSpecification().TargetFramebuffer;
-		auto id = fb->GetColorAttachmentRendererID();
-
-		float size = ImGui::GetContentRegionAvailWidth(); // (float)fb->GetWidth() * 0.5f, (float)fb->GetHeight() * 0.5f
-		float w = size;
-		float h = w / ((float)fb->GetWidth() / (float)fb->GetHeight());
-		ImGui::Image((ImTextureID)id, {w, h}, {0, 1}, {1, 0});
-		Gui::EndTreeNode();
-	}
-
-
-	ImGui::End();
+SceneRendererOptions& SceneRenderer::GetOptions()
+{
+	return Instance()._data->Options;
 }
 }

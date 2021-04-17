@@ -101,7 +101,7 @@ void EditorCamera::OnGuiRender()
 {
 	ImGui::Begin("Editor Camera");
 	Gui::BeginPropertyGrid();
-	Gui::Property("Exposure", GetExposure(), 0.0f, 100.0f, 0.1f, Gui::PropertyFlag::Drag);
+	Gui::Property("Exposure", GetExposure(), 0.1f, 0.1f, 100.0f, Gui::PropertyFlag::Drag);
 	Gui::EndPropertyGrid();
 	ImGui::End();
 }

@@ -40,8 +40,8 @@ Renderer::Renderer() :
 {
 	Renderer::Submit([]() { RendererAPI::Init(); });
 
-	ResourceManager::Emplace(Shader::Create("SaffronPBR_Static"));
-	ResourceManager::Emplace(Shader::Create("SaffronPBR_Anim"));
+	auto staticShader = Shader::Create("SaffronPBR_Static");
+	auto animShader = Shader::Create("SaffronPBR_Anim");
 
 	// Create fullscreen quad
 	float x = -1;

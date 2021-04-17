@@ -48,18 +48,18 @@ public:
 	static bool Property(const String& label, bool& value);
 	static bool Property(const String& label, const String& text, const String& buttonName,
 	                     const Function<void()>& onButtonPress);
-	static bool Property(const String& label, int& value, int min = -1, int max = 1, float step = 1,
+	static bool Property(const String& label, int& value, float step = 1, int min = 0, int max = 0,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& label, float& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, float& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String& label, Vector2f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector2f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, Vector2f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String& label, Vector3f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector3f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, Vector3f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String& label, Vector4f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector4f& value, float min = -1.0f, float max = 1.0f, float step = 1.0f,
+	static bool Property(const String& label, Vector4f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 
 	static void HelpMarker(const String& desc);
@@ -90,8 +90,8 @@ private:
 
 	char s_IDBuffer[16];
 	Uint32 s_Counter = 0;
-	
-	static constexpr const char *FontsLocation = "Assets/Fonts/";
-	static constexpr const char *FontsExtension = ".ttf";
+
+	static constexpr const char* FontsLocation = "Assets/Fonts/";
+	static constexpr const char* FontsExtension = ".ttf";
 };
 }

@@ -216,11 +216,18 @@ void EditorLayer::OnGuiRender()
 		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_None);
 	}
 
+	static bool test = false;
+	static int testint = 0;
+	ImGui::Begin("TESTING");
+	ImGui::Checkbox("Testing", &test);
+	ImGui::SliderInt("Testing slider", &testint, 0, 10);
+	ImGui::End();
+	
 	OnGuiRenderMenuBar();
 	OnGuiRenderToolbar();
 
 	Renderer::OnGuiRender();
-	//SceneRenderer::OnGuiRender();
+	SceneRenderer::OnGuiRender();
 	ScriptEngine::OnGuiRender();
 	Shader::OnGuiRender();
 	m_EditorTerminal.OnGuiRender();

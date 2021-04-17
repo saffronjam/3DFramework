@@ -41,7 +41,7 @@ public:
 private:
 	void Load(const Buffer& source);
 
-	Buffer ReadShaderFromFile(const std::string& filepath) const;
+	Buffer ReadShaderFromFile(const Filepath& filepath) const;
 	std::unordered_map<GLenum, std::string> PreProcess(const Buffer& source);
 	void Parse();
 	void ParseUniform(const std::string& statement, ShaderDomain domain);
@@ -97,7 +97,7 @@ private:
 	bool m_Loaded = false;
 	bool m_IsCompute = false;
 
-	std::string m_Name, m_AssetPath;
+	std::string m_Name;
 	std::unordered_map<GLenum, std::string> m_ShaderSource;
 
 	std::vector<ShaderReloadedCallback> m_ShaderReloadedCallbacks;

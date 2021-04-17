@@ -26,9 +26,9 @@ class SceneRenderer : public SingleTon<SceneRenderer>
 public:
 	SceneRenderer();
 	~SceneRenderer();
-
-	static void SetViewportSize(uint32_t width, uint32_t height);
-
+	
+	static void OnGuiRender();
+	
 	static void BeginScene(const class Scene* scene, const SceneRendererCamera& camera);
 	static void EndScene();
 
@@ -45,9 +45,10 @@ public:
 	static uint32_t GetFinalColorBufferRendererID();
 	static void SetFocusPoint(const glm::vec2& point);
 
+	static void SetViewportSize(uint32_t width, uint32_t height);
+
 	static SceneRendererOptions& GetOptions();
 
-	static void OnImGuiRender();
 private:
 	static void FlushDrawList();
 	static void GeometryPass();

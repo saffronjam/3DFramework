@@ -69,8 +69,8 @@ App::App(const Properties& properties) :
 
 App::~App()
 {
-	const AppSerializer serializer(*this);
-	serializer.Serialize("App/ApplicationProperties.sap");
+	//const AppSerializer serializer(*this);
+	//serializer.Serialize("App/ApplicationProperties.sap");
 	ResourceManager::Clear();
 }
 

@@ -197,6 +197,8 @@ bool Gui::Property(const String& label, bool& value)
 	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (ImGui::Checkbox(inst.s_IDBuffer, &value)) modified = true;
 
+	SE_CORE_INFO("Button with id: {0}", inst.s_IDBuffer);
+
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
 
@@ -243,7 +245,7 @@ bool Gui::Property(const String& label, const String& text, const String& button
 	return changed;
 }
 
-bool Gui::Property(const String& label, int& value, int min, int max, float step, PropertyFlag flags)
+bool Gui::Property(const String& label, int& value, float step, int min, int max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -266,7 +268,7 @@ bool Gui::Property(const String& label, int& value, int min, int max, float step
 	return changed;
 }
 
-bool Gui::Property(const String& label, float& value, float min, float max, float step, PropertyFlag flags)
+bool Gui::Property(const String& label, float& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -291,10 +293,10 @@ bool Gui::Property(const String& label, float& value, float min, float max, floa
 
 bool Gui::Property(const String& label, Vector2f& value, Gui::PropertyFlag flags)
 {
-	return Property(label, value, -1.0f, 1.0f, 1.0f, flags);
+	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector2f& value, float min, float max, float step, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector2f& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -319,10 +321,10 @@ bool Gui::Property(const String& label, Vector2f& value, float min, float max, f
 
 bool Gui::Property(const String& label, Vector3f& value, PropertyFlag flags)
 {
-	return Property(label, value, -1.0f, 1.0f, 1.0f, flags);
+	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector3f& value, float min, float max, float step, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector3f& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -336,9 +338,10 @@ bool Gui::Property(const String& label, Vector3f& value, float min, float max, f
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
 	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
-	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color)) changed = ImGui::ColorEdit3(
-		inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat3(inst.s_IDBuffer, glm::value_ptr(value), min, max);
+	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color))
+		changed = ImGui::ColorEdit3(inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat3(
+		inst.s_IDBuffer, glm::value_ptr(value), min, max);
 	else changed = ImGui::DragFloat3(inst.s_IDBuffer, glm::value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
@@ -349,10 +352,10 @@ bool Gui::Property(const String& label, Vector3f& value, float min, float max, f
 
 bool Gui::Property(const String& label, Vector4f& value, PropertyFlag flags)
 {
-	return Property(label, value, -1.0f, 1.0f, 1.0f, flags);
+	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector4f& value, float min, float max, float step, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector4f& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -366,9 +369,10 @@ bool Gui::Property(const String& label, Vector4f& value, float min, float max, f
 	inst.s_IDBuffer[1] = '#';
 	memset(inst.s_IDBuffer + 2, 0, 14);
 	itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
-	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color)) changed = ImGui::ColorEdit3(
-		inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
-	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat4(inst.s_IDBuffer, glm::value_ptr(value), min, max);
+	if (static_cast<int>(flags) & static_cast<int>(PropertyFlag::Color))
+		changed = ImGui::ColorEdit3(inst.s_IDBuffer, glm::value_ptr(value), ImGuiColorEditFlags_NoInputs);
+	else if (flags == PropertyFlag::Slider) changed = ImGui::SliderFloat4(
+		inst.s_IDBuffer, glm::value_ptr(value), min, max);
 	else changed = ImGui::DragFloat4(inst.s_IDBuffer, glm::value_ptr(value), step, min, max);
 
 	ImGui::PopItemWidth();
@@ -475,6 +479,7 @@ Vector4f Gui::GetSaffronPurple(float opacity)
 void Gui::PushID()
 {
 	ImGui::PushID(s_UIContextID++);
+	Instance().s_Counter = 0;
 }
 
 void Gui::PopID()
