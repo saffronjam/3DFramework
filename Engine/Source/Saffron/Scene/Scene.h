@@ -1,13 +1,10 @@
 #pragma once
 
-#include "Saffron/Editor/ViewportPane.h"
-
 #include "Saffron/Base.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityRegistry.h"
 #include "Saffron/Rendering/Resources/Texture.h"
 #include "Saffron/Rendering/Material.h"
-#include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/SceneComponents.h"
 
 namespace Se

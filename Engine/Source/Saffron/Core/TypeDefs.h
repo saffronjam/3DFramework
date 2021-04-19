@@ -3,6 +3,8 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <functional>
 #include <tuple>
 #include <string>
@@ -48,6 +50,10 @@ template <typename Key, typename Value>
 using MultiMap = std::multimap<Key, Value>;
 template <typename Key, typename Value>
 using UnorderedMap = std::unordered_map<Key, Value>;
+template <typename T>
+using Set = std::set<T>;
+template <typename T>
+using UnorderedSet = std::unordered_set<T>;
 template <class FunctionType>
 using Function = std::function<FunctionType>;
 template <class... Types>

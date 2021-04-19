@@ -6,6 +6,7 @@
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/Scene.h"
+#include "Saffron/Scene/SceneEnvironment.h"
 #include "Saffron/Script/ScriptEngine.h"
 
 
@@ -15,7 +16,7 @@ namespace Se
 /// Statics
 ///////////////////////////////////////////////////////////////////////////
 
-UnorderedMap<UUID, Scene*> s_ActiveScenes;
+UnorderedMap<UUID, Scene*> _activeScenes;
 
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
@@ -26,7 +27,7 @@ void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity)
 	const auto sceneView = registry.view<SceneIDComponent>();
 	const UUID sceneID = registry.get<SceneIDComponent>(sceneView.front()).SceneID;
 
-	Scene* scene = s_ActiveScenes[sceneID];
+	Scene* scene = _activeScenes[sceneID];
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
 	SE_CORE_ASSERT(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());
@@ -38,7 +39,7 @@ void OnScriptComponentDestroy(EntityRegistry& registry, EntityHandle entity)
 	const auto sceneView = registry.view<SceneIDComponent>();
 	const UUID sceneID = registry.get<SceneIDComponent>(sceneView.front()).SceneID;
 
-	[[maybe_unused]] Scene* scene = s_ActiveScenes[sceneID];
+	[[maybe_unused]] Scene* scene = _activeScenes[sceneID];
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
 	ScriptEngine::OnScriptComponentDestroyed(sceneID, entityID);
@@ -72,7 +73,7 @@ Scene::Scene() :
 	_sceneEntity.AddComponent<PhysicsWorld2DComponent>(*this);
 	_sceneEntity.AddComponent<PhysicsWorld3DComponent>(*this);
 
-	s_ActiveScenes[_sceneID] = this;
+	_activeScenes[_sceneID] = this;
 
 	const auto skyboxShader = Shader::Create("Skybox");
 	_skybox.Material = MaterialInstance::Create(Shared<Material>::Create(skyboxShader));
@@ -93,7 +94,7 @@ Scene::~Scene()
 	_entityRegistry.on_destroy<ScriptComponent>().disconnect();
 	_entityRegistry.clear();
 
-	s_ActiveScenes.erase(_sceneID);
+	_activeScenes.erase(_sceneID);
 }
 
 Entity Scene::CreateEntity(String name)
@@ -167,7 +168,7 @@ Entity Scene::GetMainCameraEntity()
 
 Shared<Scene> Scene::GetScene(UUID uuid)
 {
-	if (s_ActiveScenes.find(uuid) != s_ActiveScenes.end()) return s_ActiveScenes.at(uuid);
+	if (_activeScenes.find(uuid) != _activeScenes.end()) return _activeScenes.at(uuid);
 
 	return nullptr;
 }

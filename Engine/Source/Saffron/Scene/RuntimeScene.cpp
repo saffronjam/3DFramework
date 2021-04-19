@@ -4,6 +4,7 @@
 #include "Saffron/Core/Global.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Input/Keyboard.h"
+#include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/RuntimeScene.h"
 #include "Saffron/Script/ScriptEngine.h"
 

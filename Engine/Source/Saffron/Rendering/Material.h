@@ -1,12 +1,8 @@
 #pragma once
 
-#include <unordered_set>
-
 #include "Saffron/Base.h"
 #include "Saffron/Rendering/Resources/Shader.h"
-#include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/Resources/Texture.h"
-
 
 namespace Se
 {
@@ -59,7 +55,7 @@ private:
 	Buffer& GetUniformBufferTarget(ShaderUniformDeclaration* uniformDeclaration);
 private:
 	Shared<Shader> _shader;
-	std::unordered_set<MaterialInstance*> _materialInstances;
+	UnorderedSet<MaterialInstance*> _materialInstances;
 
 	Buffer _vSUniformStorageBuffer;
 	Buffer _pSUniformStorageBuffer;
@@ -112,7 +108,7 @@ public:
 	void Bind();
 
 	const String& GetName() const;
-	Shared<Shader> GetShader();
+	const Shared<Shader>& GetShader() const;
 	Uint32 GetFlags() const;
 	bool GetFlag(MaterialFlag flag) const;
 

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Editor/EditorCamera.h"
-#include "Saffron/Rendering/LightType.h"
 #include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Scene/SceneEnvironment.h"
 #include "Saffron/Scene/SceneCamera.h"

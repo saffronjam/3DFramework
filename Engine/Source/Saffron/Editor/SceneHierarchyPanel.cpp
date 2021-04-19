@@ -7,7 +7,6 @@
 #include "Saffron/Editor/SceneHierarchyPanel.h"
 #include "Saffron/Gui/Gui.h"
 
-
 namespace Se
 {
 Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix);
@@ -134,7 +133,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 					auto [position, rotation, scale] = Misc::GetTransformDecomposition(transform);
 					auto cameraFrontPosition = editorCamera->GetPosition() + editorCamera->GetForwardDirection() *
 						30.0f;
-					transform = translate(cameraFrontPosition) * toMat4(rotation) * glm::scale(scale);
+					transform = glm::translate(cameraFrontPosition) * toMat4(rotation) * glm::scale(scale);
 				}
 
 				if (meshComponent)

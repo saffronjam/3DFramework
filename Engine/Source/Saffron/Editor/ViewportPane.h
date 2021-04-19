@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Saffron/Math/SaffronMath.h"
-#include "Saffron/Rendering/SceneRenderer.h"
+#include "Saffron/Base.h"
+#include "Saffron/Rendering/Resources/Texture.h"
 
 namespace Se
 {

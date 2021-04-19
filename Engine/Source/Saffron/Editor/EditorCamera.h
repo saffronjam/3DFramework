@@ -1,10 +1,8 @@
 #pragma once
 
+#include "Saffron/Base.h"
 #include "Saffron/Core/Events/MouseEvent.h"
-#include "Saffron/Core/Events/KeyboardEvent.h"
-#include "Saffron/Core/Events/WindowEvent.h"
 #include "Saffron/Math/SaffronMath.h"
-#include "Saffron/Core/Time.h"
 #include "Saffron/Rendering/Camera.h"
 
 namespace Se

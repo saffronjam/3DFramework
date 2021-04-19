@@ -15,6 +15,8 @@ public:
 	void Bind() const override;
 	void Unbind() const override;
 
+	void Clear() override;
+
 	void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const override;
 
 	Uint32 GetWidth() const override;

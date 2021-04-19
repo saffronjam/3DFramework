@@ -145,8 +145,7 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 		if (instance->_colorAttachmentFormats.size())
 		{
 			instance->_colorAttachments.resize(instance->_colorAttachmentFormats.size());
-			Utils::CreateTextures(multisample, instance->_colorAttachments.data(),
-			                      instance->_colorAttachments.size());
+			Utils::CreateTextures(multisample, instance->_colorAttachments.data(), instance->_colorAttachments.size());
 
 			// Create color attachments
 			for (int i = 0; i < instance->_colorAttachments.size(); i++)
@@ -159,12 +158,12 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 						instance->_height, i);
 					break;
 				case FramebufferTextureFormat::RGBA16F: Utils::AttachColorTexture(
-						instance->_colorAttachments[i], instance->_specification.Samples, GL_RGBA16F,
-						instance->_width, instance->_height, i);
+						instance->_colorAttachments[i], instance->_specification.Samples, GL_RGBA16F, instance->_width,
+						instance->_height, i);
 					break;
 				case FramebufferTextureFormat::RGBA32F: Utils::AttachColorTexture(
-						instance->_colorAttachments[i], instance->_specification.Samples, GL_RGBA32F,
-						instance->_width, instance->_height, i);
+						instance->_colorAttachments[i], instance->_specification.Samples, GL_RGBA32F, instance->_width,
+						instance->_height, i);
 					break;
 				case FramebufferTextureFormat::RG32F: Utils::AttachColorTexture(
 						instance->_colorAttachments[i], instance->_specification.Samples, GL_RG32F, instance->_width,
@@ -329,6 +328,18 @@ void OpenGLFramebuffer::Unbind() const
 {
 	Renderer::Submit([]()
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	});
+}
+
+void OpenGLFramebuffer::Clear()
+{
+	Shared<const OpenGLFramebuffer> instance = this;
+	Renderer::Submit([instance]()
+	{
+		const auto& col = instance->_specification.ClearColor;
+		glBindFramebuffer(GL_FRAMEBUFFER, instance->_rendererID);
+		RendererApi::Clear(col.r, col.g, col.b, col.a);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	});
 }

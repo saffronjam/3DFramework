@@ -4,6 +4,7 @@
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Gui/Gui.h"
+#include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Scene/EditorScene.h"
 #include "Saffron/Serialize/SceneSerializer.h"
 

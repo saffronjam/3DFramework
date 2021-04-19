@@ -1,5 +1,6 @@
 #include "SaffronPCH.h"
-#include "Material.h"
+
+#include "Saffron/Rendering/Material.h"
 
 namespace Se
 {
@@ -189,7 +190,7 @@ const String& MaterialInstance::GetName() const
 	return _name;
 }
 
-Shared<Shader> MaterialInstance::GetShader()
+const Shared<Shader>& MaterialInstance::GetShader() const
 {
 	return _material->_shader;
 }

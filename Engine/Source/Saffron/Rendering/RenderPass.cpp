@@ -1,20 +1,71 @@
 #include "SaffronPCH.h"
 
-#include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Core/GenUtils.h"
 #include "Saffron/Rendering/RenderPass.h"
-#include "Saffron/Platform/OpenGL/OpenGLRenderPass.h"
 
 namespace Se
 {
-Shared<RenderPass> RenderPass::Create(const RenderPassSpecification& specification)
+RenderPass::RenderPass(String name) :
+	_name(Move(name))
 {
-	switch (RendererApi::Current())
-	{
-	case RendererApiType::None: SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
-		return nullptr;
-	case RendererApiType::OpenGL: return Shared<OpenGLRenderPass>::Create(specification);
-	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI!");
-	return nullptr;
+}
+
+bool RenderPass::operator==(const RenderPass& rhs) const
+{
+	return _uuid == rhs._uuid;
+}
+
+const String& RenderPass::GetName() const
+{
+	return _name;
+}
+
+void RenderPass::SetStreamLinkage(const String& outputName, const String& inputName)
+{
+	auto& input = GetInput(inputName);
+	const auto inputSplit = GenUtils::SplitString(outputName, ".");
+	SE_CORE_ASSERT(inputSplit.size() == 2,
+	               "Input linkage target has incorrect format. Expected format: \"<pass>.<input>\". Got: " + inputName);
+	input.SetDerived(Move(inputSplit[0]), Move(inputSplit[1]));
+}
+
+const UnorderedMap<String, Unique<Stream::Input>>& RenderPass::GetInputs() const
+{
+	return _inputs;
+}
+
+const UnorderedMap<String, Unique<Stream::Output>>& RenderPass::GetOutputs() const
+{
+	return _outputs;
+}
+
+const Stream::Input& RenderPass::GetInput(const String& name) const
+{
+	return const_cast<RenderPass*>(this)->GetInput(name);
+}
+
+const Stream::Output& RenderPass::GetOutput(const String& name) const
+{
+	return const_cast<RenderPass*>(this)->GetOutput(name);
+}
+
+void RenderPass::AddInput(Unique<Stream::Input> input)
+{
+	_inputs.insert(CreatePair(input->GetName(), Move(input)));
+}
+
+void RenderPass::AddOutput(Unique<Stream::Output> output)
+{
+	_outputs.insert(CreatePair(output->GetName(), Move(output)));
+}
+
+Stream::Input& RenderPass::GetInput(const String& name)
+{
+	return *_inputs.at(name);
+}
+
+Stream::Output& RenderPass::GetOutput(const String& name)
+{
+	return *_outputs.at(name);
 }
 }

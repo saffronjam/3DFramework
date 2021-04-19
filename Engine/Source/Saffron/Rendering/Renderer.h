@@ -57,17 +57,17 @@ public:
 
 	static void WaitAndRender();
 
-	static void BeginRenderPass(Shared<RenderPass> renderPass, bool clear = true);
-	static void EndRenderPass();
+	static void Begin(Shared<Framebuffer> framebuffer, bool clear = true);
+	static void End();
 
-	static void SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& transform = glm::mat4(1.0f));
+	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f& transform = Matrix4f(1.0f));
 	static void SubmitFullscreenQuad(Shared<MaterialInstance> material);
-	static void SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform,
+	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform,
 	                       Shared<MaterialInstance> overrideMaterial = nullptr);
-	static void SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transform, Shared<Shader> shader);
+	static void SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4f& transform, Shared<Shader> shader);
 
-	static void DrawAABB(const AABB& aabb, const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.0f));
-	static void DrawAABB(Shared<Mesh> mesh, const glm::mat4& transform, const glm::vec4& color = glm::vec4(1.0f));
+	static void DrawAABB(const AABB& aabb, const Matrix4f& transform, const Vector4f& color = Vector4f(1.0f));
+	static void DrawAABB(Shared<Mesh> mesh, const Matrix4f& transform, const Vector4f& color = Vector4f(1.0f));
 
 private:
 	static RenderCommandQueue& GetRenderCommandQueue();

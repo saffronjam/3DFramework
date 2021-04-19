@@ -66,6 +66,8 @@ public:
 	virtual void Bind() const = 0;
 	virtual void Unbind() const = 0;
 
+	virtual void Clear() = 0;
+
 	virtual void Resize(Uint32 width, Uint32 height, bool forceRecreate = false) = 0;
 
 	virtual void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const = 0;

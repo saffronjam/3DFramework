@@ -16,7 +16,7 @@ namespace Se
 {
 struct RendererData
 {
-	Shared<RenderPass> _activeRenderPass;
+	Shared<Framebuffer> _activeFramebuffer;
 	RenderCommandQueue _commandQueue;
 
 	Shared<VertexBuffer> _fullscreenQuadVertexBuffer;
@@ -49,23 +49,23 @@ Renderer::Renderer() :
 	float width = 2, height = 2;
 	struct QuadVertex
 	{
-		glm::vec3 Position;
-		glm::vec2 TexCoord;
+		Vector3f Position;
+		Vector2f TexCoord;
 	};
 
 	auto* data = new QuadVertex[4];
 
-	data[0].Position = glm::vec3(x, y, 0.1f);
-	data[0].TexCoord = glm::vec2(0, 0);
+	data[0].Position = Vector3f(x, y, 0.1f);
+	data[0].TexCoord = Vector2f(0, 0);
 
-	data[1].Position = glm::vec3(x + width, y, 0.1f);
-	data[1].TexCoord = glm::vec2(1, 0);
+	data[1].Position = Vector3f(x + width, y, 0.1f);
+	data[1].TexCoord = Vector2f(1, 0);
 
-	data[2].Position = glm::vec3(x + width, y + height, 0.1f);
-	data[2].TexCoord = glm::vec2(1, 1);
+	data[2].Position = Vector3f(x + width, y + height, 0.1f);
+	data[2].TexCoord = Vector2f(1, 1);
 
-	data[3].Position = glm::vec3(x, y + height, 0.1f);
-	data[3].TexCoord = glm::vec2(0, 1);
+	data[3].Position = Vector3f(x, y + height, 0.1f);
+	data[3].TexCoord = Vector2f(0, 1);
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = {{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float2, "a_TexCoord"}};
@@ -157,17 +157,17 @@ void Renderer::ClearMagenta()
 	Clear(1, 0, 1);
 }
 
-void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
+void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 {
-	SE_CORE_ASSERT(renderPass, "Render pass cannot be null!");
+	SE_CORE_ASSERT(framebuffer, "Framebuffer cannot be null!");
 
 	// TODO: Convert all of this into a render command buffer
-	Instance()._data->_activeRenderPass = renderPass;
+	Instance()._data->_activeFramebuffer = framebuffer;
 
-	renderPass->GetSpecification().TargetFramebuffer->Bind();
+	framebuffer->Bind();
 	if (clear)
 	{
-		const glm::vec4& clearColor = renderPass->GetSpecification().TargetFramebuffer->GetSpecification().ClearColor;
+		const Vector4f& clearColor = framebuffer->GetSpecification().ClearColor;
 		Submit([=]()
 		{
 			RendererApi::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -175,16 +175,16 @@ void Renderer::BeginRenderPass(Shared<RenderPass> renderPass, bool clear)
 	}
 }
 
-void Renderer::EndRenderPass()
+void Renderer::End()
 {
 	auto& instData = *Instance()._data;
-	SE_CORE_ASSERT(instData._activeRenderPass,
+	SE_CORE_ASSERT(instData._activeFramebuffer,
 	               "No active render pass! Have you called Renderer::EndRenderPass twice?");
-	instData._activeRenderPass->GetSpecification().TargetFramebuffer->Unbind();
-	instData._activeRenderPass = nullptr;
+	instData._activeFramebuffer->Unbind();
+	instData._activeFramebuffer = nullptr;
 }
 
-void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& transform)
+void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f& transform)
 {
 	bool depthTest = true;
 	bool cullFace = true;
@@ -208,7 +208,7 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const glm::mat4& tr
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMesh(Shared<Mesh> mesh, const glm::mat4& transform, Shared<MaterialInstance> overrideMaterial)
+void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -283,7 +283,7 @@ void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transform, Shared<Shader> shader)
+void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4f& transform, Shared<Shader> shader)
 {
 	mesh->_vertexBuffer->Bind();
 	mesh->_pipeline->Bind();
@@ -301,20 +301,20 @@ void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const glm::mat4& transfor
 	}
 }
 
-void Renderer::DrawAABB(const AABB& aabb, const glm::mat4& transform, const glm::vec4& color)
+void Renderer::DrawAABB(const AABB& aabb, const Matrix4f& transform, const Vector4f& color)
 {
-	glm::vec4 min = {aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f};
-	glm::vec4 max = {aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f};
+	Vector4f min = {aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f};
+	Vector4f max = {aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f};
 
-	glm::vec4 corners[8] = {
-		transform * glm::vec4{aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f},
-		transform * glm::vec4{aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f},
-		transform * glm::vec4{aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f},
-		transform * glm::vec4{aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f},
-		transform * glm::vec4{aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f},
-		transform * glm::vec4{aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f},
-		transform * glm::vec4{aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f},
-		transform * glm::vec4{aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f}
+	Vector4f corners[8] = {
+		transform * Vector4f{aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f},
+		transform * Vector4f{aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f},
+		transform * Vector4f{aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f},
+		transform * Vector4f{aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f},
+		transform * Vector4f{aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f},
+		transform * Vector4f{aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f},
+		transform * Vector4f{aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f},
+		transform * Vector4f{aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f}
 	};
 
 	//for (uint32_t i = 0; i < 4; i++) Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
@@ -324,7 +324,7 @@ void Renderer::DrawAABB(const AABB& aabb, const glm::mat4& transform, const glm:
 	//for (uint32_t i = 0; i < 4; i++) Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 
-void Renderer::DrawAABB(Shared<Mesh> mesh, const glm::mat4& transform, const glm::vec4& color)
+void Renderer::DrawAABB(Shared<Mesh> mesh, const Matrix4f& transform, const Vector4f& color)
 {
 	for (Submesh& submesh : mesh->_submeshes)
 	{
