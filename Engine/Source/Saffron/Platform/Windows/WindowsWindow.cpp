@@ -51,7 +51,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 
 	// Initialize glad
 	{
-		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+		const int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
 		Debug::Assert(status, "Failed to initialize Glad");
 	}
 
@@ -69,7 +69,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 		glfwSetWindowPos(_nativeWindow, static_cast<int>(_position.x), static_cast<int>(_position.y));
 	}
 
-	WindowsWindow::SetVSync(true);
+	WindowsWindow::SetVSync(false);
 
 	_imGuiMouseCursors[ImGuiMouseCursor_Arrow] = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
 	_imGuiMouseCursors[ImGuiMouseCursor_TextInput] = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);

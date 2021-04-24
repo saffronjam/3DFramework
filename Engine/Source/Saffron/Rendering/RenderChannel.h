@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Saffron/Base.h"
+
 namespace Se
 {
 struct RenderChannel

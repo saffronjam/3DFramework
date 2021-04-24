@@ -27,9 +27,12 @@ App::App(const Properties& properties) :
 	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 
 	_window->Closed += SE_BIND_EVENT_FN(App::OnWindowClose);
-	_window->SetVSync(true);
+	_window->SetVSync(false);
+	_window->Maximize();
 	_window->SetWindowIcon("Editor/Saffron_windowIcon.png");
 	_window->HandleBufferedEvents();
+
+	Run::Execute();
 
 	_renderer = CreateUnique<Renderer>();
 	_sceneRenderer = CreateUnique<SceneRenderer>();
@@ -65,7 +68,6 @@ App::App(const Properties& properties) :
 	}, "Initializing GUI");
 
 	Renderer::WaitAndRender();
-	
 }
 
 App::~App()
@@ -150,7 +152,9 @@ void App::Run()
 
 			Renderer::WaitAndRender();
 		}
+
 		ScriptEngine::OnUpdate();
+
 		_window->OnUpdate();
 		_keyboard->OnUpdate();
 		_mouse->OnUpdate();

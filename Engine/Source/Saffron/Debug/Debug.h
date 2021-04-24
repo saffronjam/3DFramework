@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Saffron/Core/Macros.h"
 #include "Saffron/Core/TypeDefs.h"
 
 namespace Se
@@ -50,8 +51,29 @@ public:
 	}
 
 #else
-	template <typename T, typename ... Args>
-	static constexpr void Assert(bool what, Args&& ... args)
+	template <typename Arg, typename... Args>
+	static constexpr void Assert(bool what, const String& message, Arg&& arg, Args&& ... args)
+	{
+	}
+
+	static constexpr void Assert(bool what, const String& message)
+	{
+	}
+
+	static constexpr void Assert(bool what)
+	{
+	}
+
+	template <typename Arg, typename... Args>
+	static constexpr void Break(const String& message, Arg&& arg, Args&& ... args)
+	{
+	}
+
+	static constexpr void Break(const String& message)
+	{
+	}
+
+	static constexpr void Break()
 	{
 	}
 #endif

@@ -5,7 +5,6 @@
 #pragma warning(disable : 4312)
 
 #include "Saffron/Config.h"
-#include "Saffron/Core/Assert.h"
 #include "Saffron/Core/Log.h"
 #include "Saffron/Core/EventSubscriberList.h"
 #include "Saffron/Core/SingleTon.h"
