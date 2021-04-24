@@ -111,7 +111,7 @@ Shared<Window> Window::Create(const Properties& properties)
 #ifdef SE_PLATFORM_WINDOWS
 	return Shared<WindowsWindow>::Create(properties);
 #else
-	SE_CORE_FALSE_ASSERT("Unknown platform!");
+	Debug::Break("Unknown platform!");
 	return nullptr;
 #endif
 }

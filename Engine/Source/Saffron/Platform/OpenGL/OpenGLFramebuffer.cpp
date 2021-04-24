@@ -37,7 +37,7 @@ static GLenum DataType(GLenum format)
 	case GL_DEPTH24_STENCIL8: return GL_UNSIGNED_INT_24_8;
 	}
 
-	SE_CORE_ASSERT(false, "Unknown format!");
+	Debug::Assert(false, "Unknown format!");;
 	return 0;
 }
 
@@ -192,7 +192,7 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 
 		if (instance->_colorAttachments.size() > 1)
 		{
-			SE_CORE_ASSERT(instance->_colorAttachments.size() <= 4);
+			Debug::Assert(instance->_colorAttachments.size() <= 4);;
 			GLenum buffers[4] = {
 				GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3
 			};
@@ -307,7 +307,7 @@ void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
 			}
 #endif
 
-		SE_CORE_ASSERT(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
+		Debug::Assert(glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE,
 		               "Framebuffer is incomplete!");
 
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);

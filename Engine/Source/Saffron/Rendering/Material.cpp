@@ -143,7 +143,7 @@ Buffer& Material::GetUniformBufferTarget(ShaderUniformDeclaration* uniformDeclar
 	{
 	case ShaderDomain::Vertex: return _vSUniformStorageBuffer;
 	case ShaderDomain::Pixel: return _pSUniformStorageBuffer;
-	default: SE_CORE_FALSE_ASSERT("Invalid uniform declaration domain! Material does not support this shader type.");
+	default: Debug::Break("Invalid uniform declaration domain! Material does not support this shader type.");
 		return _vSUniformStorageBuffer;
 	}
 }
@@ -210,7 +210,7 @@ void MaterialInstance::Set(const String& name, const Shared<Texture>& texture)
 	const auto* decl = _material->FindResourceDeclaration(name);
 	if (!decl)
 	{
-		SE_CORE_WARN("Cannot find material property: ", name);
+		Log::CoreWarn("Cannot find material property: ", name);
 		return;
 	}
 	const Uint32 slot = decl->GetRegister();
@@ -260,7 +260,7 @@ Buffer& MaterialInstance::GetUniformBufferTarget(ShaderUniformDeclaration* unifo
 	{
 	case ShaderDomain::Vertex: return _vSUniformStorageBuffer;
 	case ShaderDomain::Pixel: return _pSUniformStorageBuffer;
-	default: SE_CORE_FALSE_ASSERT("Invalid uniform declaration domain! Material does not support this shader type.");
+	default: Debug::Break("Invalid uniform declaration domain! Material does not support this shader type.");
 		return _vSUniformStorageBuffer;
 	}
 }

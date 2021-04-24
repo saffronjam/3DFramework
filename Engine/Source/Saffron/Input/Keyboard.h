@@ -32,7 +32,7 @@ private:
 
 	static Keyboard& Instance()
 	{
-		SE_CORE_ASSERT(_instance != nullptr, "Keyboard was not instansiated")
+		Debug::Assert(_instance != nullptr, "Keyboard was not instansiated");
 		return *_instance;
 	}
 

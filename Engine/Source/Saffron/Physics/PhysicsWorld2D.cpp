@@ -216,7 +216,7 @@ void PhysicsWorld2D::OnStart()
 				if (entity.HasComponent<RigidBody2DComponent>())
 				{
 					auto& rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
-					SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
+					Debug::Assert(rigidBody2D.RuntimeBody);;
 					auto* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
 
 					b2PolygonShape polygonShape;
@@ -242,7 +242,7 @@ void PhysicsWorld2D::OnStart()
 				if (entity.HasComponent<RigidBody2DComponent>())
 				{
 					auto& rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
-					SE_CORE_ASSERT(rigidBody2D.RuntimeBody);
+					Debug::Assert(rigidBody2D.RuntimeBody);;
 					auto* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
 
 					b2CircleShape circleShape;

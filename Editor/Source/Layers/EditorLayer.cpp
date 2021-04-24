@@ -454,7 +454,7 @@ void EditorLayer::PromptOpenProject()
 		}
 		else
 		{
-			SE_CORE_WARN("Failed to deserialize project");
+			Log::Warn("Failed to deserialize project");
 		}
 	}
 }
@@ -517,7 +517,7 @@ void EditorLayer::OnSceneChange(Shared<Scene> scene, Entity selection)
 
 void EditorLayer::OnProjectChange(const Shared<Project>& project)
 {
-	SE_CORE_ASSERT(project->IsValid());
+	Debug::Assert(project->IsValid());
 	ScriptEngine::OnProjectChange(project);
 	_project = project;
 	_assetPanel->SetAssetFolderpath(_project->GetProjectFolderpath().string() + "Assets/Meshes");
@@ -599,7 +599,7 @@ Shared<ViewportPane> EditorLayer::GetActiveViewportPane() const
 	{
 		return _mainViewportPane;
 	}
-	SE_CORE_WARN("Detected a scene without a viewport pane. Scene name: {}", activeScene->GetName());
+	Log::Warn("Detected a scene without a viewport pane. Scene name: {}", activeScene->GetName());
 	return _mainViewportPane;
 }
 

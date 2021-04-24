@@ -100,7 +100,7 @@ void SceneRenderer::BeginScene(const Scene* scene, const SceneRendererCamera& ca
 {
 	auto& sceneInfo = GetSceneInfo();
 
-	SE_CORE_ASSERT(!sceneInfo.ActiveScene, "");
+	Debug::Assert(!sceneInfo.ActiveScene, "");
 
 	ResetDrawContainer();
 
@@ -118,7 +118,7 @@ void SceneRenderer::EndScene()
 {
 	auto& sceneInfo = GetSceneInfo();
 
-	SE_CORE_ASSERT(sceneInfo.ActiveScene, "");
+	Debug::Assert(sceneInfo.ActiveScene, "");
 
 	sceneInfo.ActiveScene = nullptr;
 
@@ -150,7 +150,7 @@ Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Filepath& fil
 	Shared<TextureCube> envUnfiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
 	if (!equirectangularConversionShader) equirectangularConversionShader = Shader::Create("EquirectangularToCubeMap");
 	Shared<Texture2D> envEquirect = Texture2D::Create(filepath);
-	SE_CORE_ASSERT(envEquirect->GetFormat() == TextureFormat::Float16, "Texture is not HDR!");
+	Debug::Assert(envEquirect->GetFormat() == TextureFormat::Float16, "Texture is not HDR!");
 
 	equirectangularConversionShader->Bind();
 	envEquirect->Bind();
@@ -205,7 +205,7 @@ Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Filepath& fil
 
 void SceneRenderer::FlushDrawList()
 {
-	SE_CORE_ASSERT(!Instance()._sceneInfo.ActiveScene, "");
+	Debug::Assert(!Instance()._sceneInfo.ActiveScene, "");
 	Instance()._renderGraph->Execute();
 
 	for (auto& [channel, list] : Instance()._drawContainer)
@@ -226,7 +226,7 @@ void SceneRenderer::ResetDrawContainer()
 const Shared<Texture2D>& SceneRenderer::GetFinalColorBuffer()
 {
 	// return common.CompositePass->GetSpecification().TargetFramebuffer;
-	SE_CORE_ASSERT(false, "Not implemented");
+	Debug::Assert(false, "Not implemented");
 	return nullptr;
 }
 

@@ -435,7 +435,7 @@ void Gui::SetStyle(Style style)
 void Gui::SetFontSize(int size)
 {
 	ImFont* candidate = GetAppropriateFont(size);
-	SE_CORE_ASSERT(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");
+	Debug::Assert(candidate, "Failed to fetch appropriate font and could be caused by an empty font container");;
 	ImGui::SetCurrentFont(candidate);
 }
 

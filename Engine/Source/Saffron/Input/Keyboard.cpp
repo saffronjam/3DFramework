@@ -14,7 +14,7 @@ EventSubscriberList<const TextInputEvent&> Keyboard::TextInput;
 
 Keyboard::Keyboard()
 {
-	SE_CORE_ASSERT(_instance == nullptr, "Keyboard was already instansiated");
+	Debug::Assert(_instance == nullptr, "Keyboard was already instansiated");;
 	_instance = this;
 
 	const auto& window = App::Instance().GetWindow();

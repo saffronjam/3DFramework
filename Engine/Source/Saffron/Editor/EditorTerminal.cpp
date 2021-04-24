@@ -13,7 +13,7 @@ EditorTerminal::EditorTerminal()
 	_sink = std::make_shared<TerminalSink>();
 	Clear();
 	SetLevel(Log::Level::Info);
-	Log::AddClientSink(_sink);
+	Log::Instance().AddClientSink(_sink);
 }
 
 void EditorTerminal::Clear()

@@ -44,11 +44,11 @@ Shared<Shader> Shader::Create(Filepath filepath)
 
 	switch (RendererApi::Current())
 	{
-	case RendererApiType::None: SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
+	case RendererApiType::None: Debug::Break("RendererApi::None is currently not supported!");
 		return nullptr;
 	case RendererApiType::OpenGL: result = Shared<OpenGLShader>::Create(Move(fullFilepath));
 		break;
-	default: SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
+	default: Debug::Break("RendererApi::None is currently not supported!");
 		return nullptr;
 	}
 
@@ -67,7 +67,7 @@ Shared<Shader> Shader::Create(const Buffer& source)
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return OpenGLShader::Create(source);
 	}
-	SE_CORE_FALSE_ASSERT("RendererApi::None is currently not supported!");
+	Debug::Break("RendererApi::None is currently not supported!");
 	return nullptr;
 }
 }

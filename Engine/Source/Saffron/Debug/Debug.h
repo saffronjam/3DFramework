@@ -9,28 +9,44 @@ class Debug
 public:
 
 #ifdef SE_DEBUG
-	template <typename ... Args>
-	static void Assert(bool what, const String& message, Args&& ... formatArgs)
+	template <typename Arg, typename... Args>
+	static constexpr void Assert(bool what, const String& message, Arg&& arg, Args&& ... args)
 	{
 		if (!what)
 		{
-			//Se::Log::GetCoreLogger()->trace(message, std::forward<Args>(formatArgs)...);
+			Log::CoreDebug(AssertionFailed + message, std::forward<Arg>(arg), std::forward<Args>(args)...);
 			SE_DEBUGBREAK();
 		}
 	}
 
-	static void Assert(bool what, const String& message)
+	static constexpr void Assert(bool what, const String& message)
 	{
 		if (!what)
 		{
-			SE_CORE_TRACE("Assertion failed!", message);
+			Log::CoreDebug(AssertionFailed + message);
 			SE_DEBUGBREAK();
 		}
 	}
 
-	static void Assert(bool what)
+	static constexpr void Assert(bool what)
 	{
 		Assert(what, "");
+	}
+
+	template <typename Arg, typename... Args>
+	static constexpr void Break(const String& message, Arg&& arg, Args&& ... args)
+	{
+		Assert(false, message, std::forward<Arg>(arg), std::forward<Args>(args)...);
+	}
+
+	static constexpr void Break(const String& message)
+	{
+		Assert(false, message);
+	}
+
+	static constexpr void Break()
+	{
+		Assert(false, "");
 	}
 
 #else
@@ -39,5 +55,8 @@ public:
 	{
 	}
 #endif
+
+private:
+	static constexpr const char* AssertionFailed = "\033[41m\033[37mAssertion failed\033[m\033[36m ";
 };
 }

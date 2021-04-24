@@ -19,7 +19,7 @@ static bool s_GLFWInitialized = false;
 
 static void GLFWErrorCallback(int error, const char* description)
 {
-	SE_CORE_ERROR("GLFW Error ({0}): {1}", error, description);
+	Log::CoreError("GLFW Error ({0}): {1}", error, description);
 }
 
 WindowsWindow::WindowsWindow(const Properties& props) :
@@ -34,7 +34,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	if (!s_GLFWInitialized)
 	{
 		const int success = glfwInit();
-		SE_CORE_ASSERT(success, "Failed to initialize GLFW");
+		Debug::Assert(success, "Failed to initialize GLFW");
 		glfwSetErrorCallback(GLFWErrorCallback);
 		s_GLFWInitialized = true;
 	}
@@ -51,11 +51,11 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 
 	// Initialize glad
 	{
-		const int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
-		SE_CORE_ASSERT(status, "Failed to initialize Glad!");
+		int status = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+		Debug::Assert(status, "Failed to initialize Glad");
 	}
 
-	SE_CORE_INFO("Creating Window \"{0}\" ({1:d}x{2:d})", _title, _width, _height);
+	Log::CoreInfo("Creating Window \"{0}\" ({1:d}x{2:d})", _title, _width, _height);
 
 	SetupGLFWCallbacks();
 
@@ -245,7 +245,7 @@ bool WindowsWindow::OnNewIcon(const WindowNewIconEvent& event)
 	//rgba channels
 	if (!images[0].pixels)
 	{
-		SE_CORE_WARN("Failed to load window icon. Filepath: {0}", event.GetFilepath().string());
+		Log::CoreWarn("Failed to load window icon. Filepath: {0}", event.GetFilepath().string());
 		stbi_image_free(images[0].pixels);
 		return false;
 	}

@@ -60,7 +60,7 @@ void SceneSerializer::Serialize(const Filepath& filepath) const
 void SceneSerializer::SerializeRuntime(const Filepath& filepath) const
 {
 	// TODO: Implement
-	SE_CORE_ASSERT(false);
+	Debug::Assert(false);;
 }
 
 bool SceneSerializer::Deserialize(const Filepath& filepath)
@@ -73,7 +73,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 	if (!data["Scene"]) return false;
 
 	auto sceneName = data["Scene"].as<String>();
-	SE_CORE_INFO("Deserializing scene '{0}'", sceneName);
+	Log::CoreInfo("Deserializing scene '{0}'", sceneName);
 	_scene.SetName(sceneName);
 
 	auto environment = data["Environment"];
@@ -187,7 +187,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 							}
 							case FieldType::String:
 							{
-								SE_CORE_FALSE_ASSERT("Unimplemented");
+								Debug::Break("Unimplemented");
 								break;
 							}
 							case FieldType::Vec2:
@@ -360,7 +360,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 bool SceneSerializer::DeserializeRuntime(const Filepath& filepath)
 {
 	// Not implemented
-	SE_CORE_ASSERT(false);
+	Debug::Assert(false);;
 	return false;
 }
 

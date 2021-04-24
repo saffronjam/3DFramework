@@ -19,7 +19,7 @@ namespace Se
 
 #define MESH_DEBUG_LOG 0
 #if MESH_DEBUG_LOG
-#define SE_MESH_LOG(...) SE_CORE_TRACE(__VA_ARGS__)
+#define SE_MESH_LOG(...) Log::CoreTrace(__VA_ARGS__)
 #else
 #define SE_MESH_LOG(...)
 #endif
@@ -85,7 +85,7 @@ struct LogStream : Assimp::LogStream
 
 	void write(const char* message) override
 	{
-		SE_CORE_ERROR("Assimp error: {0}", message);
+		Log::CoreError("Assimp error: {0}", message);
 	}
 };
 
@@ -106,7 +106,7 @@ void AnimatedVertex::AddBoneData(Uint32 BoneID, float Weight)
 	}
 
 	// TODO: Keep top weights
-	SE_CORE_WARN(
+	Log::CoreWarn(
 		"Vertex has more than four bones/weights affecting it, extra data will be discarded (BoneID={0}, Weight={1})",
 		BoneID, Weight);
 }
@@ -135,7 +135,7 @@ void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
 	}
 
 	// should never get here - more bones than we have space for
-	SE_CORE_FALSE_ASSERT("Too many bones!");
+	Debug::Break("Too many bones!");
 }
 
 
@@ -149,13 +149,13 @@ Mesh::Mesh(Filepath filepath) :
 {
 	LogStream::Initialize();
 
-	SE_CORE_INFO("Loading mesh: {0}", _filepath.string());
+	Log::CoreInfo("Loading mesh: {0}", _filepath.string());
 
 	_importer = std::make_unique<Assimp::Importer>();
 
 	const aiScene* scene = _importer->ReadFile(_filepath.string().c_str(), s_MeshImportFlags);
 	if (!scene || !scene->HasMeshes())
-		SE_CORE_ERROR("Failed to load mesh file: {0}", _filepath.string());
+		Log::CoreError("Failed to load mesh file: {0}", _filepath.string());
 
 	_scene = scene;
 
@@ -185,8 +185,8 @@ Mesh::Mesh(Filepath filepath) :
 		vertexCount += mesh->mNumVertices;
 		indexCount += submesh.IndexCount;
 
-		SE_CORE_ASSERT(mesh->HasPositions(), "Meshes require positions.");
-		SE_CORE_ASSERT(mesh->HasNormals(), "Meshes require normals.");
+		Debug::Assert(mesh->HasPositions(), "Meshes require positions.");;
+		Debug::Assert(mesh->HasNormals(), "Meshes require normals.");;
 
 		// Vertices
 		if (_isAnimated)
@@ -243,7 +243,7 @@ Mesh::Mesh(Filepath filepath) :
 		for (size_t i = 0; i < mesh->mNumFaces; i++)
 		{
 			const auto& face = mesh->mFaces[i];
-			SE_CORE_ASSERT(face.mNumIndices == 3, "Must have 3 indices.");
+			Debug::Assert(face.mNumIndices == 3, "Must have 3 indices.");;
 			Index index = {face.mIndices[0], face.mIndices[1], face.mIndices[2]};
 			_indices.push_back(index);
 
@@ -345,7 +345,7 @@ Mesh::Mesh(Filepath filepath) :
 				}
 				else
 				{
-					SE_CORE_ERROR("Could not load texture: {0}", texturePath);
+					Log::CoreError("Could not load texture: {0}", texturePath);
 					// Fallback to albedo color
 					mi->Set("u_AlbedoColor", Vector3f{aiColor.r, aiColor.g, aiColor.b});
 				}
@@ -374,7 +374,7 @@ Mesh::Mesh(Filepath filepath) :
 				}
 				else
 				{
-					SE_CORE_ERROR("    Could not load texture: {0}", texturePath);
+					Log::CoreError("    Could not load texture: {0}", texturePath);
 				}
 			}
 			else
@@ -401,7 +401,7 @@ Mesh::Mesh(Filepath filepath) :
 				}
 				else
 				{
-					SE_CORE_ERROR("    Could not load texture: {0}", texturePath);
+					Log::CoreError("    Could not load texture: {0}", texturePath);
 				}
 			}
 			else
@@ -429,7 +429,7 @@ Mesh::Mesh(Filepath filepath) :
 				}
 				else
 				{
-					SE_CORE_ERROR("Could not load texture: {0}", texturePath);
+					Log::CoreError("Could not load texture: {0}", texturePath);
 				}
 			}
 			else
@@ -520,7 +520,7 @@ Mesh::Mesh(Filepath filepath) :
 						}
 						else
 						{
-							SE_CORE_ERROR("    Could not load texture: {0}", texturePath);
+							Log::CoreError("    Could not load texture: {0}", texturePath);
 							mi->Set("u_Metalness", metalness);
 							mi->Set("u_MetalnessTexToggle", 0.0f);
 						}
@@ -758,7 +758,7 @@ Uint32 Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 
 Uint32 Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
-	SE_CORE_ASSERT(pNodeAnim->mNumRotationKeys > 0);
+	Debug::Assert(pNodeAnim->mNumRotationKeys > 0);;
 
 	for (Uint32 i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
 	{
@@ -780,7 +780,7 @@ const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* animation, const String&
 
 Uint32 Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
-	SE_CORE_ASSERT(pNodeAnim->mNumScalingKeys > 0);
+	Debug::Assert(pNodeAnim->mNumScalingKeys > 0);;
 
 	for (Uint32 i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++)
 	{
@@ -801,11 +801,11 @@ Vector3f Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim* nod
 
 	const Uint32 PositionIndex = FindPosition(animationTime, nodeAnim);
 	const Uint32 NextPositionIndex = PositionIndex + 1;
-	SE_CORE_ASSERT(NextPositionIndex < nodeAnim->mNumPositionKeys);
+	Debug::Assert(NextPositionIndex < nodeAnim->mNumPositionKeys);;
 	const float DeltaTime = static_cast<float>(nodeAnim->mPositionKeys[NextPositionIndex].mTime - nodeAnim->
 		mPositionKeys[PositionIndex].mTime);
 	float Factor = (animationTime - static_cast<float>(nodeAnim->mPositionKeys[PositionIndex].mTime)) / DeltaTime;
-	SE_CORE_ASSERT(Factor <= 1.0f, "Factor must be below 1.0f");
+	Debug::Assert(Factor <= 1.0f, "Factor must be below 1.0f");;
 	Factor = glm::clamp(Factor, 0.0f, 1.0f);
 	const aiVector3D& Start = nodeAnim->mPositionKeys[PositionIndex].mValue;
 	const aiVector3D& End = nodeAnim->mPositionKeys[NextPositionIndex].mValue;
@@ -826,11 +826,11 @@ glm::quat Mesh::InterpolateRotation(float animationTime, const aiNodeAnim* nodeA
 
 	const Uint32 RotationIndex = FindRotation(animationTime, nodeAnim);
 	const Uint32 NextRotationIndex = RotationIndex + 1;
-	SE_CORE_ASSERT(NextRotationIndex < nodeAnim->mNumRotationKeys);
+	Debug::Assert(NextRotationIndex < nodeAnim->mNumRotationKeys);;
 	const float DeltaTime = static_cast<float>(nodeAnim->mRotationKeys[NextRotationIndex].mTime - nodeAnim->
 		mRotationKeys[RotationIndex].mTime);
 	float Factor = (animationTime - static_cast<float>(nodeAnim->mRotationKeys[RotationIndex].mTime)) / DeltaTime;
-	SE_CORE_ASSERT(Factor <= 1.0f, "Factor must be below 1.0f");
+	Debug::Assert(Factor <= 1.0f, "Factor must be below 1.0f");;
 	Factor = glm::clamp(Factor, 0.0f, 1.0f);
 	const aiQuaternion& StartRotationQ = nodeAnim->mRotationKeys[RotationIndex].mValue;
 	const aiQuaternion& EndRotationQ = nodeAnim->mRotationKeys[NextRotationIndex].mValue;
@@ -852,11 +852,11 @@ Vector3f Mesh::InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim)
 
 	const Uint32 index = FindScaling(animationTime, nodeAnim);
 	const Uint32 nextIndex = index + 1;
-	SE_CORE_ASSERT(nextIndex < nodeAnim->mNumScalingKeys);
+	Debug::Assert(nextIndex < nodeAnim->mNumScalingKeys);;
 	const float deltaTime = static_cast<float>(nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].
 		mTime);
 	float factor = (animationTime - static_cast<float>(nodeAnim->mScalingKeys[index].mTime)) / deltaTime;
-	SE_CORE_ASSERT(factor <= 1.0f, "Factor must be below 1.0f");
+	Debug::Assert(factor <= 1.0f, "Factor must be below 1.0f");;
 	factor = glm::clamp(factor, 0.0f, 1.0f);
 	const auto& start = nodeAnim->mScalingKeys[index].mValue;
 	const auto& end = nodeAnim->mScalingKeys[nextIndex].mValue;

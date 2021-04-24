@@ -12,15 +12,15 @@ static void OpenGLLogMessage(GLenum source, GLenum type, GLuint id, GLenum sever
 {
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_HIGH: SE_CORE_ERROR("[OpenGL Debug HIGH] {0}", message);
-		SE_CORE_ASSERT(false, "GL_DEBUG_SEVERITY_HIGH");
+	case GL_DEBUG_SEVERITY_HIGH: Log::CoreError("[OpenGL Debug HIGH] {0}", message);
+		Debug::Assert(false, "GL_DEBUG_SEVERITY_HIGH");;
 		break;
-	case GL_DEBUG_SEVERITY_MEDIUM: SE_CORE_WARN("[OpenGL Debug MEDIUM] {0}", message);
+	case GL_DEBUG_SEVERITY_MEDIUM: Log::CoreWarn("[OpenGL Debug MEDIUM] {0}", message);
 		break;
-	case GL_DEBUG_SEVERITY_LOW: SE_CORE_INFO("[OpenGL Debug LOW] {0}", message);
+	case GL_DEBUG_SEVERITY_LOW: Log::CoreInfo("[OpenGL Debug LOW] {0}", message);
 		break;
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
-		// SE_CORE_TRACE("[OpenGL Debug NOTIFICATION] {0}", message);
+		// Log::CoreTrace("[OpenGL Debug NOTIFICATION] {0}", message);
 		break;
 	}
 }
@@ -60,7 +60,7 @@ void RendererApi::Init()
 	GLenum error = glGetError();
 	while (error != GL_NO_ERROR)
 	{
-		SE_CORE_ERROR("OpenGL Error {0}", error);
+		Log::CoreError("OpenGL Error {0}", error);
 		error = glGetError();
 	}
 }

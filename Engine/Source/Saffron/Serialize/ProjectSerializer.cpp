@@ -86,7 +86,7 @@ bool ProjectSerializer::Deserialize(const Filepath& filepath)
 	YAML::Node project = YAML::Load(strStream.str());
 	if (!project["Project"]) return false;
 
-	SE_CORE_INFO("Deserializing Project {}", project["Project"].as<String>());
+	Log::CoreInfo("Deserializing Project {}", project["Project"].as<String>());
 
 	std::array<YAML::Node, 6> nodes{
 		project["Project"], project["UUID"], project["ProjectFolderpath"], project["ProjectFilepath"],
@@ -103,7 +103,7 @@ bool ProjectSerializer::Deserialize(const Filepath& filepath)
 	}
 	if (badNode)
 	{
-		SE_CORE_WARN("Bad project data in application file");
+		Log::CoreWarn("Bad project data in application file");
 		return false;
 	}
 

@@ -114,6 +114,6 @@ template <typename T, typename...Params>
 void Window::PushEvent(Params&&...params)
 {
 	_events.emplace_back(Shared<T>::Create(std::forward<Params>(params)...));
-	//SE_INFO("{0}", _events.back()->ToString());
+	//Log::Info("{0}", _events.back()->ToString());
 }
 };

@@ -9,9 +9,17 @@ namespace Se
 {
 #define UNIFORM_LOGGING 0
 #if UNIFORM_LOGGING
-#define HZ_LOG_UNIFORM(...) SE_CORE_WARN(__VA_ARGS__)
+template <typename Arg, typename... Args>
+constexpr void LogUniform(const String& message, Arg&& arg, Args&& ... args)
+{
+	Log::CoreWarn(message, std::forward(arg), std::forward(args));
+}
 #else
-#define HZ_LOG_UNIFORM
+template <typename Arg, typename... Args>
+constexpr void LogUniform(const String& message, Arg&& arg, Args&& ... args)
+{
+}
+#define SE_LOG_UNIFORM
 #endif
 
 OpenGLShader::OpenGLShader(const Filepath& filepath)
@@ -26,7 +34,7 @@ OpenGLShader::OpenGLShader(const Filepath& filepath)
 	_name = found != String::npos ? _name.substr(0, found) : _name;
 
 	static int i = 0;
-	SE_CORE_INFO("Loading no: {0}: filepath: {1}", i++, filepath.string());
+	Log::CoreInfo("Loading no: {0}: filepath: {1}", i++, filepath.string());
 
 	OpenGLShader::Reload();
 }
@@ -51,10 +59,6 @@ void OpenGLShader::Load(const Buffer& source)
 
 	Renderer::Submit([=]()
 	{
-		static int i = 0;
-		SE_CORE_INFO("Submitting no: {0}: ", i++);
-
-
 		if (_rendererID)
 			glDeleteProgram(_rendererID);
 
@@ -100,7 +104,7 @@ Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
 	}
 	else
 	{
-		SE_CORE_ASSERT(false, "Could not load shader!");
+		Debug::Assert(false, "Could not load shader!");
 	}
 
 	in.close();
@@ -119,18 +123,17 @@ UnorderedMap<GLenum, String> OpenGLShader::PreProcess(const Buffer& source)
 	while (pos != String::npos)
 	{
 		size_t eol = data.find_first_of("\r\n", pos);
-		SE_CORE_ASSERT(eol != String::npos, "Syntax error");
+		Debug::Assert(eol != String::npos, "Syntax error");
 		size_t begin = pos + typeTokenLength + 1;
 		String type = data.substr(begin, eol - begin);
-		SE_CORE_ASSERT(type == "vertex" || type == "fragment" || type == "pixel" || type == "compute",
+		Debug::Assert(type == "vertex" || type == "fragment" || type == "pixel" || type == "compute",
 		               "Invalid shader type specified");
 
 		size_t nextLinePos = data.find_first_not_of("\r\n", eol);
 		pos = data.find(typeToken, nextLinePos);
 		auto shaderType = ShaderTypeFromString(type);
 		shaderSources[shaderType] = data.substr(nextLinePos,
-		                                        pos - (nextLinePos == String::npos ? data.size() - 1 : nextLinePos
-		                                        ));
+		                                        pos - (nextLinePos == String::npos ? data.size() - 1 : nextLinePos));
 
 		// Compute shaders cannot contain other types
 		if (shaderType == GL_COMPUTE_SHADER)
@@ -311,7 +314,7 @@ void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 		{
 			// Find struct
 			ShaderStruct* s = FindStruct(typeString);
-			SE_CORE_ASSERT(s, "");
+			Debug::Assert(s, "");
 			declaration = new OpenGLShaderUniformDeclaration(domain, s, name, count);
 		}
 		else
@@ -321,10 +324,12 @@ void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 
 		if (StartsWith(name, "r_"))
 		{
-			if (domain == ShaderDomain::Vertex) static_cast<OpenGLShaderUniformBufferDeclaration*>(
-				_vSRendererUniformBuffers.front())->PushUniform(declaration);
-			else if (domain == ShaderDomain::Pixel) static_cast<OpenGLShaderUniformBufferDeclaration*>(
-				_pSRendererUniformBuffers.front())->PushUniform(declaration);
+			if (domain == ShaderDomain::Vertex)
+				static_cast<OpenGLShaderUniformBufferDeclaration*>(_vSRendererUniformBuffers.front())->PushUniform(
+					declaration);
+			else if (domain == ShaderDomain::Pixel)
+				static_cast<OpenGLShaderUniformBufferDeclaration*>(_pSRendererUniformBuffers.front())->PushUniform(
+					declaration);
 		}
 		else
 		{
@@ -521,7 +526,7 @@ int32_t OpenGLShader::GetUniformLocation(const String& name) const
 {
 	int32_t result = glGetUniformLocation(_rendererID, name.c_str());
 	if (result == -1)
-		SE_CORE_WARN("Could not find uniform '{0}' in shader", name);
+		Log::CoreWarn("Could not find uniform '{0}' in shader", name);
 
 	return result;
 }
@@ -562,12 +567,12 @@ void OpenGLShader::CompileAndUploadShader()
 			ArrayList<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
-			SE_CORE_ERROR("Shader compilation failed ({0}):\n{1}", _filepath, &infoLog[0]);
+			Log::CoreError("Shader compilation failed ({0}):\n{1}", _filepath, &infoLog[0]);
 
 			// We don't need the shader anymore.
 			glDeleteShader(shaderRendererID);
 
-			SE_CORE_ASSERT(false, "Failed");
+			Debug::Assert(false, "Failed");
 		}
 
 		shaderRendererIDs.push_back(shaderRendererID);
@@ -588,7 +593,7 @@ void OpenGLShader::CompileAndUploadShader()
 		// The maxLength includes the NULL character
 		ArrayList<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-		SE_CORE_ERROR("Shader linking failed ({0}):\n{1}", _filepath, &infoLog[0]);
+		Log::CoreError("Shader linking failed ({0}):\n{1}", _filepath, &infoLog[0]);
 
 		// We don't need the program anymore.
 		glDeleteProgram(program);
@@ -637,7 +642,7 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 {
 	if (uniform->GetLocation() == -1) return;
 
-	SE_CORE_ASSERT(uniform->GetLocation() != -1, "Uniform has invalid location!");
+	Debug::Assert(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
 	Uint32 offset = uniform->GetOffset();
 	switch (uniform->GetType())
@@ -668,13 +673,13 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
-	default: SE_CORE_ASSERT(false, "Unknown uniform type!");
+	default: Debug::Assert(false, "Unknown uniform type!");
 	}
 }
 
 void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uniform, Buffer buffer)
 {
-	//SE_CORE_ASSERT(uniform->GetLocation() != -1, "Uniform has invalid location!");
+	//Debug::Assert(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
 	Uint32 offset = uniform->GetOffset();
 	switch (uniform->GetType())
@@ -705,7 +710,7 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
-	default: SE_CORE_ASSERT(false, "Unknown uniform type!");
+	default: Debug::Assert(false, "Unknown uniform type!");
 	}
 }
 
@@ -732,7 +737,7 @@ void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaratio
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(field.GetLocation(), *(Matrix4f*)&data[offset]);
 		break;
-	default: SE_CORE_ASSERT(false, "Unknown uniform type!");
+	default: Debug::Assert(false, "Unknown uniform type!");
 	}
 }
 
@@ -927,7 +932,7 @@ void OpenGLShader::UploadUniformFloat(const String& name, float value)
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform1f(location, value);
-	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
+	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& values)
@@ -936,7 +941,7 @@ void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& value
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform2f(location, values.x, values.y);
-	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
+	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
 
@@ -946,7 +951,7 @@ void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& value
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform3f(location, values.x, values.y, values.z);
-	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
+	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
 void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& values)
@@ -955,7 +960,7 @@ void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& value
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniform4f(location, values.x, values.y, values.z, values.w);
-	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
+	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
 void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
@@ -964,7 +969,7 @@ void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
 	if (location != -1)
 		glUniformMatrix4fv(location, 1, GL_FALSE, (const float*)&values);
-	else HZ_LOG_UNIFORM("Uniform '{0}' not found!", name);
+	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
 const ShaderUniformBufferList& OpenGLShader::GetVSRendererUniforms() const

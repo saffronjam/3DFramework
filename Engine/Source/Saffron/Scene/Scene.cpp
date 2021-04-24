@@ -30,7 +30,7 @@ void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity)
 	Scene* scene = _activeScenes[sceneID];
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
-	SE_CORE_ASSERT(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());
+	Debug::Assert(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());;
 	ScriptEngine::InitScriptEntity(scene->_entityIDMap.at(entityID));
 }
 
@@ -119,7 +119,7 @@ Entity Scene::CreateEntity(UUID uuid, const String& name)
 	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
 	if (!name.empty()) entity.AddComponent<TagComponent>(name);
 
-	SE_CORE_ASSERT(_entityIDMap.find(uuid) == _entityIDMap.end());
+	Debug::Assert(_entityIDMap.find(uuid) == _entityIDMap.end());;
 	_entityIDMap[uuid] = entity;
 	return entity;
 }

@@ -24,7 +24,7 @@ void LayerStack::PushLayer(Shared<Layer> layer, Shared<BatchLoader>& batchLoader
 void LayerStack::PushOverlay(Shared<Layer> overlay, Shared<BatchLoader>& batchLoader)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");;
 }
 
 void LayerStack::PopLayer(int count)
@@ -41,7 +41,7 @@ void LayerStack::PopLayer(int count)
 void LayerStack::PopOverlay(int count)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");;
 }
 
 void LayerStack::EraseLayer(Shared<Layer> layer)
@@ -59,7 +59,7 @@ void LayerStack::EraseLayer(Shared<Layer> layer)
 void LayerStack::EraseOverlay(Shared<Layer> overlay)
 {
 	// TODO: Implement
-	SE_CORE_ASSERT("NOT IMPLEMETED");
+	Debug::Assert("NOT IMPLEMETED");;
 }
 
 void LayerStack::Clear()

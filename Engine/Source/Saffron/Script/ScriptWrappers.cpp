@@ -37,9 +37,9 @@ enum class ComponentID
 Entity GetEntityFromActiveScene(UUID entityID)
 {
 	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
-	SE_CORE_ASSERT(scene, "No active scene!");
+	Debug::Assert(scene, "No active scene!");;
 	const auto& entityMap = scene->GetEntityMap();
-	SE_CORE_ASSERT(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");
+	Debug::Assert(entityMap.find(entityID) != entityMap.end(), "Invalid entity ID or entity doesn't exist in scene!");;
 
 	return entityMap.at(entityID);
 }
@@ -47,14 +47,14 @@ Entity GetEntityFromActiveScene(UUID entityID)
 template <typename T>
 T& GetComponentWithCheck(Entity entity)
 {
-	SE_CORE_ASSERT(entity.HasComponent<T>());
+	Debug::Assert(entity.HasComponent<T>());;
 	return entity.GetComponent<T>();
 }
 
 Shared<Scene> GetSceneWithCheck()
 {
 	Shared<Scene> scene = ScriptEngine::GetCurrentSceneContext();
-	SE_CORE_ASSERT(scene, "No active scene!");
+	Debug::Assert(scene, "No active scene!");;
 	return scene;
 }
 
@@ -130,7 +130,7 @@ void Saffron_MeshComponent_SetMesh(Uint64 entityID, Shared<Mesh>* inMesh)
 
 void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, Vector2f* impulse, Vector2f* offset, bool wake)
 {
-	SE_CORE_ASSERT(impulse && offset);
+	Debug::Assert(impulse && offset);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody2DComponent>(entity);
 	auto* body = static_cast<b2Body*>(component.RuntimeBody);
@@ -140,7 +140,7 @@ void Saffron_RigidBody2DComponent_ApplyLinearImpulse(Uint64 entityID, Vector2f* 
 
 void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, Vector2f* outVelocity)
 {
-	SE_CORE_ASSERT(outVelocity);
+	Debug::Assert(outVelocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody2DComponent>(entity);
 	auto* body = static_cast<b2Body*>(component.RuntimeBody);
@@ -150,7 +150,7 @@ void Saffron_RigidBody2DComponent_GetLinearVelocity(Uint64 entityID, Vector2f* o
 
 void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, Vector2f* velocity)
 {
-	SE_CORE_ASSERT(velocity);
+	Debug::Assert(velocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody2DComponent>(entity);
 	auto* body = static_cast<b2Body*>(component.RuntimeBody);
@@ -159,7 +159,7 @@ void Saffron_RigidBody2DComponent_SetLinearVelocity(Uint64 entityID, Vector2f* v
 
 void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, Vector2f* offset)
 {
-	SE_CORE_ASSERT(offset);
+	Debug::Assert(offset);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<Collider2DComponent>(entity);
 	*offset = component.Offset;
@@ -167,7 +167,7 @@ void Saffron_Collider2DComponent_GetOffset(Uint64 entityID, Vector2f* offset)
 
 void Saffron_Collider2DComponent_SetOffset(Uint64 entityID, Vector2f* offset)
 {
-	SE_CORE_ASSERT(offset);
+	Debug::Assert(offset);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<Collider2DComponent>(entity);
 	component.Offset = *offset;
@@ -203,7 +203,7 @@ void Saffron_Collider2DComponent_SetFriction(Uint64 entityID, float friction)
 
 void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, Vector2f* size)
 {
-	SE_CORE_ASSERT(size);
+	Debug::Assert(size);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<BoxCollider2DComponent>(entity);
 	*size = component.Size;
@@ -211,7 +211,7 @@ void Saffron_BoxCollider2DComponent_GetSize(Uint64 entityID, Vector2f* size)
 
 void Saffron_BoxCollider2DComponent_SetSize(Uint64 entityID, Vector2f* size)
 {
-	SE_CORE_ASSERT(size);
+	Debug::Assert(size);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<BoxCollider2DComponent>(entity);
 	component.Size = *size;
@@ -233,7 +233,7 @@ void Saffron_CircleCollider2DComponent_SetRadius(Uint64 entityID, float radius)
 
 void Saffron_RigidBody3DComponent_ApplyLinearImpulse(Uint64 entityID, Vector3f* impulse, Vector3f* offset, bool wake)
 {
-	SE_CORE_ASSERT(impulse && offset);
+	Debug::Assert(impulse && offset);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
 	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
@@ -244,7 +244,7 @@ void Saffron_RigidBody3DComponent_ApplyLinearImpulse(Uint64 entityID, Vector3f* 
 
 void Saffron_RigidBody3DComponent_GetLinearVelocity(Uint64 entityID, Vector3f* outVelocity)
 {
-	SE_CORE_ASSERT(outVelocity);
+	Debug::Assert(outVelocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
 	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
@@ -254,7 +254,7 @@ void Saffron_RigidBody3DComponent_GetLinearVelocity(Uint64 entityID, Vector3f* o
 
 void Saffron_RigidBody3DComponent_SetLinearVelocity(Uint64 entityID, Vector3f* velocity)
 {
-	SE_CORE_ASSERT(velocity);
+	Debug::Assert(velocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
 	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
@@ -305,7 +305,7 @@ void Saffron_Collider3DComponent_SetFriction(Uint64 entityID, float friction)
 
 void Saffron_BoxCollider3DComponent_GetSize(Uint64 entityID, Vector3f* size)
 {
-	SE_CORE_ASSERT(size);
+	Debug::Assert(size);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<BoxCollider3DComponent>(entity);
 	*size = component.Size;
@@ -313,7 +313,7 @@ void Saffron_BoxCollider3DComponent_GetSize(Uint64 entityID, Vector3f* size)
 
 void Saffron_BoxCollider3DComponent_SetSize(Uint64 entityID, Vector3f* size)
 {
-	SE_CORE_ASSERT(size);
+	Debug::Assert(size);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<BoxCollider3DComponent>(entity);
 	component.Size = *size;
@@ -352,7 +352,7 @@ Shared<Material>* Saffron_Mesh_GetMaterial(Shared<Mesh>* mesh)
 Shared<MaterialInstance>* Saffron_Mesh_GetMaterialByIndex(Shared<Mesh>* mesh, int index)
 {
 	const auto& materials = (*mesh)->GetMaterials();
-	SE_CORE_ASSERT(index < materials.size());
+	Debug::Assert(index < materials.size());;
 	return new Shared<MaterialInstance>(materials[index]);
 }
 
@@ -375,14 +375,14 @@ void Saffron_Texture2D_Destructor(Shared<Texture2D>* texture)
 
 void Saffron_Texture2D_SetData(Shared<Texture2D>* texture, MonoArray* data, Int32 count)
 {
-	SE_ASSERT(data);
+	Debug::Assert(data);
 
 	Shared<Texture2D>& instance = *texture;
 
 	instance->Lock();
 	Buffer buffer = instance->GetWriteableBuffer();
 	const Uint32 dataSize = count * sizeof(Vector4f) / 4;
-	SE_CORE_ASSERT(dataSize <= buffer.Size());
+	Debug::Assert(dataSize <= buffer.Size());;
 	// Convert RGBA32F color to RGBA8
 	auto* pixels = static_cast<Uint8*>(buffer.Data());
 	for (Uint32 i = 0; i < instance->GetWidth() * instance->GetHeight(); i++)
@@ -403,14 +403,14 @@ void Saffron_Material_Destructor(Shared<Material>* material)
 
 void Saffron_Material_SetFloat(Shared<Material>* material, MonoString* uniform, float value)
 {
-	SE_ASSERT(uniform);
+	Debug::Assert(uniform);
 	Shared<Material>& instance = *static_cast<Shared<Material>*>(material);
 	instance->Set(mono_string_to_utf8(uniform), value);
 }
 
 void Saffron_Material_SetTexture(Shared<Material>* material, MonoString* uniform, Shared<Texture2D>* texture)
 {
-	SE_ASSERT(uniform && texture);
+	Debug::Assert(uniform && texture);
 	Shared<Material>& instance = *static_cast<Shared<Material>*>(material);
 	instance->Set(mono_string_to_utf8(uniform), *texture);
 }
@@ -422,26 +422,26 @@ void Saffron_MaterialInstance_Destructor(Shared<MaterialInstance>* instance)
 
 void Saffron_MaterialInstance_SetFloat(Shared<MaterialInstance>* instance, MonoString* uniform, float value)
 {
-	SE_ASSERT(uniform);
+	Debug::Assert(uniform);
 	(*instance)->Set(mono_string_to_utf8(uniform), value);
 }
 
 void Saffron_MaterialInstance_SetVector3(Shared<MaterialInstance>* instance, MonoString* uniform, Vector3f* value)
 {
-	SE_ASSERT(uniform && value);
+	Debug::Assert(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
 void Saffron_MaterialInstance_SetVector4(Shared<MaterialInstance>* instance, MonoString* uniform, Vector4f* value)
 {
-	SE_ASSERT(uniform && value);
+	Debug::Assert(uniform && value);
 	(*instance)->Set(mono_string_to_utf8(uniform), *value);
 }
 
 void Saffron_MaterialInstance_SetTexture(Shared<MaterialInstance>* instance, MonoString* uniform,
                                          Shared<Texture2D>* texture)
 {
-	SE_ASSERT(uniform && texture);
+	Debug::Assert(uniform && texture);
 	(*instance)->Set(mono_string_to_utf8(uniform), *texture);
 }
 
@@ -480,7 +480,7 @@ void* Saffron_CameraComponent_GetCamera(Uint64 entityID)
 
 void Saffron_CameraComponent_SetCamera(Uint64 entityID, Shared<SceneCamera>* camera)
 {
-	SE_ASSERT(camera);
+	Debug::Assert(camera);
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& cameraComponent = entity.GetComponent<CameraComponent>();
 	cameraComponent.Camera = camera ? *camera : nullptr;
@@ -495,7 +495,7 @@ MonoString* Saffron_ScriptComponent_GetModuleName(Uint64 entityID)
 
 void Saffron_ScriptComponent_SetModuleName(Uint64 entityID, MonoString* moduleName)
 {
-	SE_ASSERT(moduleName);
+	Debug::Assert(moduleName);
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 	scriptComponent.ModuleName = mono_string_to_utf8(moduleName);

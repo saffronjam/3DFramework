@@ -57,10 +57,10 @@ void RenderGraph::SetGlobalStreamLinkage(const String& outputName, const String&
 		                                 return sink->GetName() == inputName;
 	                                 });
 
-	SE_CORE_ASSERT(result != _globalInputs.end(), ("Global sink does not exist: " + inputName).c_str());
+	Debug::Assert(result != _globalInputs.end(), ("Global sink does not exist: " + inputName).c_str());;
 
 	auto targetSplit = GenUtils::SplitString(outputName, ".");
-	SE_CORE_ASSERT(targetSplit.size() >= 2u, "Input target has incorrect format");
+	Debug::Assert(targetSplit.size() >= 2u, "Input target has incorrect format");
 
 	(*result)->SetDerived(targetSplit[0], targetSplit[1]);
 }
@@ -77,7 +77,7 @@ const RenderPass& RenderGraph::GetRenderPass(const String& name) const
 		return pass->GetName() == name;
 	});
 
-	SE_CORE_ASSERT(result != _passes.end(), "Could not find Render pass: " + name);
+	Debug::Assert(result != _passes.end(), "Could not find Render pass: " + name);;
 	return **result;
 }
 
@@ -92,9 +92,9 @@ void RenderGraph::LinkInputs(const RenderPass& renderPass)
 	{
 		const auto& derivedPass = input->GetDerivedPass();
 
-		SE_CORE_ASSERT(!derivedPass.empty(),
-		               "No derived pass set for output named " + input->GetName() + " (Render pass:" + renderPass.
-		               GetName() + ")");
+		Debug::Assert(!derivedPass.empty(),
+		              "No derived pass set for output named " + input->GetName() + " (Render pass:" + renderPass.
+		              GetName() + ")");
 
 		if (derivedPass == "$")
 		{
@@ -105,8 +105,8 @@ void RenderGraph::LinkInputs(const RenderPass& renderPass)
 				                                 return elem->GetName() == matchName;
 			                                 });
 
-			SE_CORE_ASSERT(result != _globalOutputs.end(),
-			               "Output named [" + input->GetDerivedPassOutput() + "] not found in globals");
+			Debug::Assert(result != _globalOutputs.end(),
+			              "Output named [" + input->GetDerivedPassOutput() + "] not found in globals");
 			input->Bind(**result);
 		}
 		else
@@ -116,7 +116,7 @@ void RenderGraph::LinkInputs(const RenderPass& renderPass)
 			                                 {
 				                                 return elem->GetName() == derivedPass;
 			                                 });
-			SE_CORE_ASSERT(result != _passes.end(), "Render pass named [" + derivedPass + "] was not found");
+			Debug::Assert(result != _passes.end(), "Render pass named [" + derivedPass + "] was not found");
 
 			const auto& output = static_cast<const RenderPass&>(**result).GetOutput(input->GetDerivedPassOutput());
 			input->Bind(output);

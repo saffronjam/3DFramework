@@ -31,7 +31,7 @@ Shared<Texture2D> Texture2D::Create(TextureFormat format, Uint32 width, Uint32 h
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTexture2D>::Create(format, width, height, wrap);
 	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
+	Debug::Break("Unknown RendererAPI");
 	return nullptr;
 }
 
@@ -42,7 +42,7 @@ Shared<Texture2D> Texture2D::Create(Filepath filepath, bool sRGB)
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTexture2D>::Create(Move(filepath), sRGB);
 	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
+	Debug::Break("Unknown RendererAPI");
 	return nullptr;
 }
 
@@ -53,7 +53,7 @@ Shared<TextureCube> TextureCube::Create(TextureFormat format, Uint32 width, Uint
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTextureCube>::Create(format, width, height);
 	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
+	Debug::Break("Unknown RendererAPI");
 	return nullptr;
 }
 
@@ -64,7 +64,7 @@ Shared<TextureCube> TextureCube::Create(Filepath filepath)
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLTextureCube>::Create(Move(filepath));
 	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
+	Debug::Break("Unknown RendererAPI");
 	return nullptr;
 }
 }

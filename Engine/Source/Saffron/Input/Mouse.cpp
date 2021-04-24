@@ -17,7 +17,7 @@ EventSubscriberList<const CursorLeftEvent&> Mouse::CursorLeft;
 
 Mouse::Mouse()
 {
-	SE_CORE_ASSERT(_instance == nullptr, "Mouse was already instansiated");
+	Debug::Assert(_instance == nullptr, "Mouse was already instansiated");;
 	_instance = this;
 
 	const auto& window = App::Instance().GetWindow();

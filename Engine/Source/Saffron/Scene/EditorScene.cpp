@@ -21,7 +21,7 @@ EditorScene::EditorScene(Filepath filepath) :
 		SceneSerializer serializer(*this);
 		if (!serializer.Deserialize(_filepath))
 		{
-			SE_WARN("Failed to load scene! Filepath: {0}", _filepath.string());
+			Log::Warn("Failed to load scene! Filepath: {0}", _filepath.string());
 			return;
 		}
 	}

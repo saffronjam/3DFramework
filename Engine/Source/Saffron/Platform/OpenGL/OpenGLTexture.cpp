@@ -11,7 +11,7 @@
 
 namespace Se
 {
-static GLenum HazelToOpenGLTextureFormat(TextureFormat format)
+static GLenum SaffronToOpenGLTextureFormat(TextureFormat format)
 {
 	switch (format)
 	{
@@ -19,7 +19,7 @@ static GLenum HazelToOpenGLTextureFormat(TextureFormat format)
 	case TextureFormat::RGBA: return GL_RGBA;
 	case TextureFormat::Float16: return GL_RGBA16F;
 	}
-	SE_CORE_ASSERT(false, "Unknown texture format!");
+	Debug::Assert(false, "Unknown texture format!");
 	return 0;
 }
 
@@ -47,8 +47,8 @@ OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, Uint32 width, Uint32 heig
 		glTextureParameterf(instance->_rendererID, GL_TEXTURE_MAX_ANISOTROPY,
 		                    RendererApi::GetCapabilities().MaxAnisotropy);
 
-		glTexImage2D(GL_TEXTURE_2D, 0, HazelToOpenGLTextureFormat(instance->_format), instance->_width,
-		             instance->_height, 0, HazelToOpenGLTextureFormat(instance->_format), GL_UNSIGNED_BYTE, nullptr);
+		glTexImage2D(GL_TEXTURE_2D, 0, SaffronToOpenGLTextureFormat(instance->_format), instance->_width,
+		             instance->_height, 0, SaffronToOpenGLTextureFormat(instance->_format), GL_UNSIGNED_BYTE, nullptr);
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	});
@@ -64,17 +64,17 @@ OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
 	int width, height, channels;
 	if (stbi_is_hdr(filepathString.c_str()))
 	{
-		SE_CORE_INFO("Loading HDR texture {0}, srgb={1}", filepathString.c_str(), srgb);
+		Log::CoreInfo("Loading HDR texture {0}, srgb={1}", filepathString.c_str(), srgb);
 		_imageData = Buffer(reinterpret_cast<Uint8*>(stbi_loadf(filepathString.c_str(), &width, &height, &channels, 0)), filesize);
 		_isHDR = true;
 		_format = TextureFormat::Float16;
 	}
 	else
 	{
-		SE_CORE_INFO("Loading texture {0}, srgb={1}", filepathString.c_str(), srgb);
+		Log::CoreInfo("Loading texture {0}, srgb={1}", filepathString.c_str(), srgb);
 		_imageData = Buffer(stbi_load(filepathString.c_str(), &width, &height, &channels,
 		                               srgb ? STBI_rgb : STBI_rgb_alpha), filesize);
-		SE_CORE_ASSERT(_imageData.Data(), "Could not read image!");
+		Debug::Assert(_imageData.Data(), "Could not read image!");
 		_format = TextureFormat::RGBA;
 	}
 
@@ -113,10 +113,10 @@ OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
-			GLenum internalFormat = HazelToOpenGLTextureFormat(instance->_format);
+			GLenum internalFormat = SaffronToOpenGLTextureFormat(instance->_format);
 			GLenum format = srgb
 				                ? GL_SRGB8
-				                : (instance->_isHDR ? GL_RGB : HazelToOpenGLTextureFormat(instance->_format));
+				                : (instance->_isHDR ? GL_RGB : SaffronToOpenGLTextureFormat(instance->_format));
 			// HDR = GL_RGB for now
 			GLenum type = internalFormat == GL_RGBA16F ? GL_FLOAT : GL_UNSIGNED_BYTE;
 			glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, instance->_width, instance->_height, 0, format, type,
@@ -179,14 +179,14 @@ void OpenGLTexture2D::Unlock()
 	Renderer::Submit([instance]()
 	{
 		glTextureSubImage2D(instance->_rendererID, 0, 0, 0, instance->_width, instance->_height,
-		                    HazelToOpenGLTextureFormat(instance->_format), GL_UNSIGNED_BYTE,
+		                    SaffronToOpenGLTextureFormat(instance->_format), GL_UNSIGNED_BYTE,
 		                    instance->_imageData.Data());
 	});
 }
 
 void OpenGLTexture2D::Resize(Uint32 width, Uint32 height)
 {
-	SE_CORE_ASSERT(_locked, "Texture must be locked!");
+	Debug::Assert(_locked, "Texture must be locked!");
 
 	_imageData.Allocate(width * height * GetBPP(_format));
 #if HZ_DEBUG
@@ -196,7 +196,7 @@ void OpenGLTexture2D::Resize(Uint32 width, Uint32 height)
 
 Buffer& OpenGLTexture2D::GetWriteableBuffer()
 {
-	SE_CORE_ASSERT(_locked, "Texture must be locked!");
+	Debug::Assert(_locked, "Texture must be locked!");
 	return _imageData;
 }
 
@@ -235,7 +235,7 @@ OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, Uint32 width, Uint32 
 	Renderer::Submit([instance, levels]() mutable
 	{
 		glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &instance->_rendererID);
-		glTextureStorage2D(instance->_rendererID, levels, HazelToOpenGLTextureFormat(instance->_format),
+		glTextureStorage2D(instance->_rendererID, levels, SaffronToOpenGLTextureFormat(instance->_format),
 		                   instance->_width, instance->_height);
 		glTextureParameteri(instance->_rendererID, GL_TEXTURE_MIN_FILTER,
 		                    levels > 1 ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR);
@@ -263,7 +263,7 @@ OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
 
 	Uint32 faceWidth = _width / 4;
 	Uint32 faceHeight = _height / 3;
-	SE_CORE_ASSERT(faceWidth == faceHeight, "Non-square faces!");
+	Debug::Assert(faceWidth == faceHeight, "Non-square faces!");
 
 	std::array<uint8_t*, 6> faces;
 	for (size_t i = 0; i < faces.size(); i++) faces[i] = new uint8_t[faceWidth * faceHeight * 3]; // 3 BPP
@@ -319,7 +319,7 @@ OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
 		glTextureParameterf(instance->_rendererID, GL_TEXTURE_MAX_ANISOTROPY,
 		                    RendererApi::GetCapabilities().MaxAnisotropy);
 
-		auto format = HazelToOpenGLTextureFormat(instance->_format);
+		auto format = SaffronToOpenGLTextureFormat(instance->_format);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE,
 		             faces[2]);
 		glTexImage2D(GL_TEXTURE_CUBE_MAP_NEGATIVE_X, 0, format, faceWidth, faceHeight, 0, format, GL_UNSIGNED_BYTE,

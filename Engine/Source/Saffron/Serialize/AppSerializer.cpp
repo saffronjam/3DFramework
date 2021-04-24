@@ -46,7 +46,8 @@ bool AppSerializer::Deserialize(const Filepath& filepath)
 	YAML::Node data = YAML::Load(strStream.str());
 	if (!data["App"]) return false;
 
-	SE_CORE_INFO("Deserializing App");
+	
+	Log::CoreInfo("Deserializing App");
 
 	// Deserializing recent projects
 	auto recentProjects = data["Recent Projects"];

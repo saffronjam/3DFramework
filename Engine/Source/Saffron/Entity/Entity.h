@@ -67,21 +67,21 @@ private:
 template <typename T, typename ... Args>
 T& Entity::AddComponent(Args&&... args)
 {
-	SE_CORE_ASSERT(!HasComponent<T>(), "Entity already has component!");
+	Debug::Assert(!HasComponent<T>(), "Entity already has component!");;
 	return _registry->emplace<T>(_handle, std::forward<Args>(args)...);
 }
 
 template <typename T>
 T& Entity::GetComponent()
 {
-	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
+	Debug::Assert(HasComponent<T>(), "Entity doesn't have component!");;
 	return _registry->get<T>(_handle);
 }
 
 template <typename T>
 const T& Entity::GetComponent() const
 {
-	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
+	Debug::Assert(HasComponent<T>(), "Entity doesn't have component!");;
 	return _registry->get<T>(_handle);
 }
 
@@ -94,7 +94,7 @@ bool Entity::HasComponent() const
 template <typename T>
 void Entity::RemoveComponent()
 {
-	SE_CORE_ASSERT(HasComponent<T>(), "Entity doesn't have component!");
+	Debug::Assert(HasComponent<T>(), "Entity doesn't have component!");;
 	_registry->remove<T>(_handle);
 }
 }

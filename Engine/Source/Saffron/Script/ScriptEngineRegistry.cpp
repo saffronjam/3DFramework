@@ -28,7 +28,7 @@ extern MonoImage* s_CoreAssemblyImage;
 			s_HasComponentFuncs[type] = [](Entity& entity) { return entity.HasComponent<Type>(); };\
 			s_CreateComponentFuncs[type] = [](Entity& entity) { entity.AddComponent<Type>(); };\
 		} else {\
-			SE_CORE_ERROR("No C# component class found for " #Type "!");\
+			Log::CoreError("No C# component class found for " #Type "!");\
 		}\
 	}
 

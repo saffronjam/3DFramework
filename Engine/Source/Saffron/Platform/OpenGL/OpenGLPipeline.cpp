@@ -24,7 +24,7 @@ static GLenum ShaderDataTypeToOpenGLBaseType(ShaderDataType type)
 	case ShaderDataType::Bool: return GL_BOOL;
 	}
 
-	SE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	Debug::Assert(false, "Unknown ShaderDataType!");;
 	return 0;
 }
 
@@ -74,7 +74,7 @@ void OpenGLPipeline::Bind()
 
 void OpenGLPipeline::Invalidate()
 {
-	SE_CORE_ASSERT(_specification.Layout.GetElements().size(), "Layout is empty!");
+	Debug::Assert(_specification.Layout.GetElements().size(), "Layout is empty!");;
 
 	Shared<OpenGLPipeline> instance = this;
 	Renderer::Submit([instance]() mutable

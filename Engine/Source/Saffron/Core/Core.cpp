@@ -10,12 +10,12 @@ void Core::Initialize()
 {
 	Log::Init();
 
-	SE_CORE_TRACE("Saffron Engine {}", BUILD_ID);
-	SE_CORE_TRACE("Initializing...");
+	Log::CoreTrace("Saffron Engine {}", BUILD_ID);
+	Log::CoreTrace("Initializing...");
 }
 
 void Core::Shutdown()
 {
-	SE_CORE_TRACE("Shutting down...");
+	Log::CoreTrace("Shutting down...");
 }
 }

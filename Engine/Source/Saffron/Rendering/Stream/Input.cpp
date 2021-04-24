@@ -46,11 +46,11 @@ void Input::SetDerived(String derivedPass, String derivedPassOutput)
 
 void Input::ValidateName(const String& name)
 {
-	SE_CORE_ASSERT(!name.empty(), "Invalid pass- or output name in stream system: <Empty>");
+	Debug::Assert(!name.empty(), "Invalid pass- or output name in stream system: <Empty>");
 	const bool validName = std::all_of(name.begin(), name.end(), [](char c)
 	{
 		return std::isalnum(c) || c == '_';
 	});
-	SE_CORE_ASSERT(validName && !std::isdigit(name.front()), "Invalid pass- or output name in stream system: " + name);
+	Debug::Assert(validName && !std::isdigit(name.front()), "Invalid pass- or output name in stream system: " + name);;
 }
 }

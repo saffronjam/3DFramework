@@ -213,7 +213,7 @@ void PhysicsWorld3D::OnStart()
 
 					auto rot = Misc::GetTransformDecomposition(transformComponent.Transform).Rotation;
 
-					SE_CORE_ASSERT(rigidBody3DComponent.RuntimeBody);
+					Debug::Assert(rigidBody3DComponent.RuntimeBody);;
 					auto* body = static_cast<reactphysics3d::RigidBody*>(rigidBody3DComponent.RuntimeBody);
 
 					const auto halfBoxSize = boxCollider3DComponent.Size * 0.5f;
@@ -243,7 +243,7 @@ void PhysicsWorld3D::OnStart()
 					auto& rigidBody3DComponent = entity.GetComponent<RigidBody3DComponent>();
 					auto& circleCollider3DComponent = entity.GetComponent<SphereCollider3DComponent>();
 
-					SE_CORE_ASSERT(rigidBody3DComponent.RuntimeBody);
+					Debug::Assert(rigidBody3DComponent.RuntimeBody);;
 					auto* body = static_cast<reactphysics3d::RigidBody*>(rigidBody3DComponent.RuntimeBody);
 
 					auto* boxShape = s_PhysicsCommon.createSphereShape(circleCollider3DComponent.Radius);

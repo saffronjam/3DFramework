@@ -24,7 +24,7 @@ void RenderPass::SetStreamLinkage(const String& outputName, const String& inputN
 {
 	auto& input = GetInput(inputName);
 	const auto inputSplit = GenUtils::SplitString(outputName, ".");
-	SE_CORE_ASSERT(inputSplit.size() == 2,
+	Debug::Assert(inputSplit.size() == 2,
 	               "Input linkage target has incorrect format. Expected format: \"<pass>.<input>\". Got: " + inputName);
 	input.SetDerived(Move(inputSplit[0]), Move(inputSplit[1]));
 }

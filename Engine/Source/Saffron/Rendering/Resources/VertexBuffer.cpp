@@ -22,7 +22,7 @@ Uint32 ShaderDataTypeSize(ShaderDataType type)
 	case ShaderDataType::Bool: return 1;
 	}
 
-	SE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	Debug::Assert(false, "Unknown ShaderDataType!");;
 	return 0;
 }
 
@@ -52,7 +52,7 @@ Uint32 VertexBufferElement::GetComponentCount() const
 	case ShaderDataType::Bool: return 1;
 	}
 
-	SE_CORE_ASSERT(false, "Unknown ShaderDataType!");
+	Debug::Assert(false, "Unknown ShaderDataType!");;
 	return 0;
 }
 
@@ -115,7 +115,7 @@ Shared<VertexBuffer> VertexBuffer::Create(void* data, Uint32 size, VertexBufferU
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLVertexBuffer>::Create(data, size, usage);
 	}
-	SE_CORE_ASSERT(false, "Unknown RendererAPI");
+	Debug::Assert(false, "Unknown RendererAPI");;
 	return nullptr;
 }
 
@@ -126,7 +126,7 @@ Shared<VertexBuffer> VertexBuffer::Create(Uint32 size, VertexBufferUsage usage)
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLVertexBuffer>::Create(size, usage);
 	}
-	SE_CORE_ASSERT(false, "Unknown RendererAPI");
+	Debug::Assert(false, "Unknown RendererAPI");;
 	return nullptr;
 }
 }

@@ -30,7 +30,7 @@ const char* FormatFilter(const FileIOManager::Filter& filter)
 
 Filepath FileIOManager::OpenFile(const Filter& filter)
 {
-	SE_CORE_ASSERT(Instance()._window, "FileIOManager was not initialized");
+	Debug::Assert(Instance()._window, "FileIOManager was not initialized");;
 
 	const char* formattedFilter = FormatFilter(filter);
 
@@ -56,7 +56,7 @@ Filepath FileIOManager::OpenFile(const Filter& filter)
 
 Filepath FileIOManager::SaveFile(const Filter& filter)
 {
-	SE_CORE_ASSERT(Instance()._window, "FileIOManager was not initialized");
+	Debug::Assert(Instance()._window, "FileIOManager was not initialized");;
 
 	const char* formattedFilter = FormatFilter(filter);
 	const char* fallbackExtension = filter.Extensions.front() == "*.*" ? "" : filter.Extensions.front().c_str();

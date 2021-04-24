@@ -68,7 +68,7 @@ template <typename T>
 T& Material::Get(const String& name)
 {
 	auto decl = FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	Debug::Assert(decl, "Could not find uniform with name 'x'");;
 	auto& buffer = GetUniformBufferTarget(decl);
 	return buffer.Read<T>(decl->GetOffset());
 }
@@ -78,7 +78,7 @@ Shared<T> Material::GetResource(const String& name)
 {
 	auto decl = FindResourceDeclaration(name);
 	Uint32 slot = decl->GetRegister();
-	SE_CORE_ASSERT(slot < _textures.size(), "Texture slot is invalid!");
+	Debug::Assert(slot < _textures.size(), "Texture slot is invalid!");;
 	return _textures[slot];
 }
 
@@ -86,7 +86,7 @@ template <typename T>
 void Material::Set(const String& name, const T& value)
 {
 	auto decl = FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	Debug::Assert(decl, "Could not find uniform with name 'x'");;
 	auto& buffer = GetUniformBufferTarget(decl);
 	buffer.Write(&value, decl->GetSize(), decl->GetOffset());
 
@@ -154,7 +154,7 @@ template <typename T>
 T& MaterialInstance::Get(const String& name)
 {
 	auto* decl = _material->FindUniformDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	Debug::Assert(decl, "Could not find uniform with name 'x'");;
 	auto& buffer = GetUniformBufferTarget(decl);
 	return buffer.Read<T>(decl->GetOffset());
 }
@@ -163,9 +163,9 @@ template <typename T>
 Shared<T> MaterialInstance::GetResource(const String& name)
 {
 	const auto* decl = _material->FindResourceDeclaration(name);
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	Debug::Assert(decl, "Could not find uniform with name 'x'");;
 	const Uint32 slot = decl->GetRegister();
-	SE_CORE_ASSERT(slot < _textures.size(), "Texture slot is invalid!");
+	Debug::Assert(slot < _textures.size(), "Texture slot is invalid!");;
 	return Shared<T>(_textures[slot]);
 }
 
@@ -188,7 +188,7 @@ void MaterialInstance::Set(const String& name, const T& value)
 	if (!decl) return;
 
 	//TODO: Fix so I can exchange 'x' with $name
-	SE_CORE_ASSERT(decl, "Could not find uniform with name 'x'");
+	Debug::Assert(decl, "Could not find uniform with name 'x'");;
 	auto& buffer = GetUniformBufferTarget(decl);
 
 	buffer.Write(&value, decl->GetSize(), decl->GetOffset());

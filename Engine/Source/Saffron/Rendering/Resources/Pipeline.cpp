@@ -12,7 +12,7 @@ Shared<Pipeline> Pipeline::Create(const PipelineSpecification& spec)
 	case RendererApiType::None: return nullptr;
 	case RendererApiType::OpenGL: return Shared<OpenGLPipeline>::Create(spec);
 	}
-	SE_CORE_FALSE_ASSERT("Unknown RendererAPI");
+	Debug::Break("Unknown RendererAPI");
 	return nullptr;
 }
 }

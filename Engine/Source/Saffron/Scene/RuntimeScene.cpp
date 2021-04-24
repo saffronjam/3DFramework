@@ -25,7 +25,7 @@ static void CopyComponent(EntityRegistry& dstRegistry, EntityRegistry& srcRegist
 
 RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 {
-	SE_CORE_ASSERT(copyFrom, "Runtime Scene must have a scene to copy from");
+	Debug::Assert(copyFrom, "Runtime Scene must have a scene to copy from");;
 
 	// Environment
 	_light = copyFrom->GetLight();
@@ -122,7 +122,7 @@ void RuntimeScene::OnRender()
 
 	// Process camera entity
 	glm::mat4 cameraViewMatrix = inverse(cameraEntity.GetComponent<TransformComponent>().Transform);
-	SE_CORE_ASSERT(cameraEntity, "Scene does not contain any cameras!");
+	Debug::Assert(cameraEntity, "Scene does not contain any cameras!");;
 	SceneCamera& camera = *cameraEntity.GetComponent<CameraComponent>().Camera;
 	camera.SetViewportSize(_viewportWidth, _viewportHeight);
 

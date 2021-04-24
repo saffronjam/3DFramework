@@ -73,7 +73,7 @@ bool OpenGLShaderUniformDeclaration::IsArray() const
 
 const ShaderStruct& OpenGLShaderUniformDeclaration::GetShaderUniformStruct() const
 {
-	SE_CORE_ASSERT(_struct, "");
+	Debug::Assert(_struct, "");;
 	return *_struct;
 }
 

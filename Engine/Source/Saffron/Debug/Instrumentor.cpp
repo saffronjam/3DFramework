@@ -13,10 +13,10 @@ void Instrumentor::BeginSession(const String& name, const String& filepath)
 		// Subsequent profiling output meant for the original session will end up in the
 		// newly opened session instead.  That's better than having badly formatted
 		// profiling output.
-		if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
+		if (Log::IsInitialized()) // Edge case: BeginSession() might be before Log::Init()
 		{
-			SE_CORE_ERROR("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name,
-			              _currentSession->Name);
+			Log::CoreError("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name,
+			               _currentSession->Name);
 		}
 		InternalEndSession();
 	}
@@ -29,9 +29,9 @@ void Instrumentor::BeginSession(const String& name, const String& filepath)
 	}
 	else
 	{
-		if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
+		if (Log::IsInitialized()) // Edge case: BeginSession() might be before Log::Init()
 		{
-			SE_CORE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
+			Log::CoreError("Instrumentor could not open results file '{0}'.", filepath);
 		}
 	}
 }
@@ -125,7 +125,7 @@ void InstrumentationTimer::Stop()
 	}
 	catch (...)
 	{
-		SE_WARN("Failed to stop instrumentor timer");
+		Log::CoreWarn("Failed to stop instrumentor timer");
 	}
 }
 }

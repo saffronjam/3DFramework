@@ -159,7 +159,7 @@ void Renderer::ClearMagenta()
 
 void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 {
-	SE_CORE_ASSERT(framebuffer, "Framebuffer cannot be null!");
+	Debug::Assert(framebuffer, "Framebuffer cannot be null!");
 
 	// TODO: Convert all of this into a render command buffer
 	Instance()._data->_activeFramebuffer = framebuffer;
@@ -178,7 +178,7 @@ void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 void Renderer::End()
 {
 	auto& instData = *Instance()._data;
-	SE_CORE_ASSERT(instData._activeFramebuffer,
+	Debug::Assert(instData._activeFramebuffer,
 	               "No active render pass! Have you called Renderer::EndRenderPass twice?");
 	instData._activeFramebuffer->Unbind();
 	instData._activeFramebuffer = nullptr;

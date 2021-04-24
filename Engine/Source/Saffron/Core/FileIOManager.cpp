@@ -29,7 +29,7 @@ ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath& directoryPath,
 	}
 	catch (fs::filesystem_error& fe)
 	{
-		SE_CORE_WARN("Failed to get files from directory: {} with file extension: {}. What: ", directoryPath.string(),
+		Log::CoreWarn("Failed to get files from directory: {} with file extension: {}. What: ", directoryPath.string(),
 		             extension, fe.what());
 	}
 
@@ -54,7 +54,7 @@ size_t FileIOManager::GetFileCount(const Filepath& directoryPath, const String& 
 	}
 	catch (fs::filesystem_error& fe)
 	{
-		SE_CORE_WARN("Failed to get file count from directory: {} with file extension: {}. What: ",
+		Log::CoreWarn("Failed to get file count from directory: {} with file extension: {}. What: ",
 		             directoryPath.string(), extension, fe.what());
 	}
 	return 0;
@@ -68,7 +68,7 @@ size_t FileIOManager::GetFileSize(const Filepath& filepath)
 	}
 	catch (fs::filesystem_error& fe)
 	{
-		SE_CORE_WARN("Failed to get file size from file: {}. What: ", filepath.string(), fe.what());
+		Log::CoreWarn("Failed to get file size from file: {}. What: ", filepath.string(), fe.what());
 	}
 	return 0ull;
 }
@@ -86,7 +86,7 @@ size_t FileIOManager::Write(const Uint8* data, size_t size, const Filepath& file
 			ofstream.write(reinterpret_cast<const Int8*>(data), size);
 			return ofstream.tellp() - start;
 		}
-		SE_CORE_WARN("Failed to open file: " + filepath.string());
+		Log::CoreWarn("Failed to open file: " + filepath.string());
 	}
 	return 0;
 }

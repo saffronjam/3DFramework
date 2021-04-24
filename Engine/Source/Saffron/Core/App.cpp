@@ -65,6 +65,7 @@ App::App(const Properties& properties) :
 	}, "Initializing GUI");
 
 	Renderer::WaitAndRender();
+	
 }
 
 App::~App()
@@ -200,14 +201,14 @@ const ArrayList<Shared<Project>>& App::GetRecentProjectList() const
 
 const Shared<Project>& App::GetActiveProject() const
 {
-	SE_CORE_ASSERT(_activeProject, "Tried to fetch active project when there was none");
+	Debug::Assert(_activeProject, "Tried to fetch active project when there was none");
 	return _activeProject;
 }
 
 void App::SetActiveProject(const Shared<Project>& project)
 {
 	const auto iter = std::find(_recentProjectList.begin(), _recentProjectList.end(), project);
-	SE_CORE_ASSERT(iter != _recentProjectList.end(), "Tried loading an invalid project");
+	Debug::Assert(iter != _recentProjectList.end(), "Tried loading an invalid project");
 	_activeProject = *iter;
 	_activeProject->SyncLastOpened();
 }

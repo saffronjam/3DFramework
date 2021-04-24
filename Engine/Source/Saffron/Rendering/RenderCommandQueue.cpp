@@ -36,7 +36,7 @@ void* RenderCommandQueue::Allocate(RenderCommand command, uint32_t size)
 
 void RenderCommandQueue::Execute()
 {
-	//SE_CORE_TRACE("Executing {} commands", _commandBuffer.size());
+	//Log::CoreTrace("Executing {} commands", _commandBuffer.size());
 
 	Uint8* buffer = _commandBuffer;
 

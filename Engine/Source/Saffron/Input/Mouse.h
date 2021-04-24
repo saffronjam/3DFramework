@@ -50,7 +50,7 @@ private:
 
 	static Mouse& Instance()
 	{
-		SE_CORE_ASSERT(_instance != nullptr && "Mouse was not instansiated")
+		Debug::Assert(_instance != nullptr && "Mouse was not instansiated");
 		return *_instance;
 	}
 
