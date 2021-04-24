@@ -32,9 +32,6 @@ struct DrawCommand
 
 struct SceneRendererCommon
 {
-	Shared<Shader> BloomBlurShader;
-	Shared<Shader> BloomBlendShader;
-
 	bool EnableBloom = false;
 	float BloomThreshold = 1.5f;
 
@@ -118,7 +115,7 @@ public:
 	static const Shared<Texture2D>& GetFinalColorBuffer();
 
 	// TODO: Temp
-	static uint32_t GetFinalColorBufferRendererID();
+	static Uint32 GetFinalColorBufferRendererID();
 	static void SetFocusPoint(const Vector2f& point);
 
 	static void SetViewportSize(Uint32 width, Uint32 height);

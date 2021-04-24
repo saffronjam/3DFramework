@@ -29,6 +29,8 @@ void CompositePass::Execute()
 	auto& geoBuffer = *_finalFramebuffer;
 	auto& compBuffer = *_outputFramebuffer;
 
+	Renderer::Begin(_outputFramebuffer);
+	
 	_shader->Bind();
 	_shader->SetFloat("u_Exposure", sceneInfo.SceneCamera.Camera.GetExposure());
 	_shader->SetInt("u_TextureSamples", geoBuffer.GetSpecification().Samples);
@@ -36,12 +38,14 @@ void CompositePass::Execute()
 	_shader->SetFloat2("u_FocusPoint", common.FocusPoint);
 	_shader->SetInt("u_TextureSamples", geoBuffer.GetSpecification().Samples);
 	_shader->SetFloat("u_BloomThreshold", common.BloomThreshold);
-	compBuffer.BindTexture();
+	geoBuffer.BindTexture();
 	Renderer::Submit([this]()
 	{
 		glBindTextureUnit(1, _finalFramebuffer->GetDepthAttachmentRendererID());
 	});
 	Renderer::SubmitFullscreenQuad(nullptr);
+
+	Renderer::End();
 }
 
 void CompositePass::OnViewportResize(Uint32 width, Uint32 height)

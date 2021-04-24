@@ -17,15 +17,13 @@ public:
 	Vector2f GetMousePosition() const;
 	Vector2f GetViewportSize() const;
 
-	Uint32 GetDockID() const { return _dockID; }
+	Uint32 GetDockID() const;
 
-	const Vector2f& GetTopLeft() const { return _topLeft; }
+	const Vector2f& GetTopLeft() const;
+	const Vector2f& GetBottomRight() const;
 
-	const Vector2f& GetBottomRight() const { return _bottomRight; }
-
-	bool IsHovered() const { return _hovered; }
-
-	bool IsFocused() const { return _focused; }
+	bool IsHovered() const;
+	bool IsFocused() const;
 
 public:
 	mutable EventSubscriberList<void> FinishedRender;
@@ -39,5 +37,7 @@ private:
 	Vector2f _bottomRight;
 	bool _hovered;
 	bool _focused;
+
+	Uint32 _oldWidth = 0, _oldHeight = 0;
 };
 }

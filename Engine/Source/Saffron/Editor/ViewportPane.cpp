@@ -71,7 +71,12 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	SceneRenderer::SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
+	if (_oldWidth != static_cast<Uint32>(viewportSize.x) || _oldHeight != static_cast<Uint32>(viewportSize.y))
+	{
+		SceneRenderer::SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
+		_oldWidth = viewportSize.x;
+		_oldHeight = viewportSize.y;
+	}
 }
 
 bool ViewportPane::InViewport(Vector2f positionNDC) const
@@ -95,5 +100,30 @@ Vector2f ViewportPane::GetMousePosition() const
 Vector2f ViewportPane::GetViewportSize() const
 {
 	return GetBottomRight() - GetTopLeft();
+}
+
+Uint32 ViewportPane::GetDockID() const
+{
+	return _dockID;
+}
+
+const Vector2f& ViewportPane::GetTopLeft() const
+{
+	return _topLeft;
+}
+
+const Vector2f& ViewportPane::GetBottomRight() const
+{
+	return _bottomRight;
+}
+
+bool ViewportPane::IsHovered() const
+{
+	return _hovered;
+}
+
+bool ViewportPane::IsFocused() const
+{
+	return _focused;
 }
 }

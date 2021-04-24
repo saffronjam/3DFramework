@@ -167,8 +167,8 @@ void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 	framebuffer->Bind();
 	if (clear)
 	{
-		const Vector4f& clearColor = framebuffer->GetSpecification().ClearColor;
-		Submit([=]()
+		const Vector4f clearColor = framebuffer->GetSpecification().ClearColor;
+		Submit([clearColor]()
 		{
 			RendererApi::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		});

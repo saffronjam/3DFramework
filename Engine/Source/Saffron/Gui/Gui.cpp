@@ -197,8 +197,6 @@ bool Gui::Property(const String& label, bool& value)
 	_itoa(inst.s_Counter++, inst.s_IDBuffer + 2, 16);
 	if (ImGui::Checkbox(inst.s_IDBuffer, &value)) modified = true;
 
-	SE_CORE_INFO("Button with id: {0}", inst.s_IDBuffer);
-
 	ImGui::PopItemWidth();
 	ImGui::NextColumn();
 

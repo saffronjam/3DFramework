@@ -98,7 +98,7 @@ void SceneRenderer::OnGuiRender()
 
 void SceneRenderer::BeginScene(const Scene* scene, const SceneRendererCamera& camera)
 {
-	auto& sceneInfo = Instance().GetSceneInfo();
+	auto& sceneInfo = GetSceneInfo();
 
 	SE_CORE_ASSERT(!sceneInfo.ActiveScene, "");
 
@@ -116,7 +116,7 @@ void SceneRenderer::BeginScene(const Scene* scene, const SceneRendererCamera& ca
 
 void SceneRenderer::EndScene()
 {
-	auto& sceneInfo = Instance().GetSceneInfo();
+	auto& sceneInfo = GetSceneInfo();
 
 	SE_CORE_ASSERT(sceneInfo.ActiveScene, "");
 

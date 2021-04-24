@@ -32,7 +32,7 @@ ShadowMapPass::ShadowMapPass(String name) :
 }
 
 void ShadowMapPass::Execute()
-{
+{	
 	auto& sceneInfo = SceneRenderer::GetSceneInfo();
 	auto& shadowMapMeshes = SceneRenderer::GetDrawCommands(RenderChannel::Shadow);
 	auto &smData = SceneRenderer::GetShadowMapData();

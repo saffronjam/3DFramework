@@ -15,7 +15,7 @@ GeometryPass::GeometryPass(String name) :
 	FramebufferSpecification specification;
 	specification.Attachments = { FramebufferTextureFormat::RGBA16F, FramebufferTextureFormat::RGBA16F, FramebufferTextureFormat::Depth };
 	specification.Samples = 8;
-	specification.ClearColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+	specification.ClearColor = { 1.0f, 0.1f, 0.1f, 1.0f };
 	_framebuffer = Framebuffer::Create(specification);
 
 	AddInput(CreateUnique<Stream::Input>("shadowMap0", _shadowMaps[0]));
