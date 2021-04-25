@@ -34,7 +34,7 @@ void CompositePass::Execute()
 	_shader->Bind();
 	_shader->SetFloat("u_Exposure", sceneInfo.SceneCamera.Camera.GetExposure());
 	_shader->SetInt("u_TextureSamples", geoBuffer.GetSpecification().Samples);
-	_shader->SetFloat2("u_ViewportSize", Vector2f(compBuffer.GetWidth(), compBuffer.GetHeight()));
+	_shader->SetFloat2("u_ViewportSize", Vector2(compBuffer.GetWidth(), compBuffer.GetHeight()));
 	_shader->SetFloat2("u_FocusPoint", common.FocusPoint);
 	_shader->SetInt("u_TextureSamples", geoBuffer.GetSpecification().Samples);
 	_shader->SetFloat("u_BloomThreshold", common.BloomThreshold);
@@ -48,7 +48,7 @@ void CompositePass::Execute()
 	Renderer::End();
 }
 
-void CompositePass::OnViewportResize(Uint32 width, Uint32 height)
+void CompositePass::OnViewportResize(uint width, uint height)
 {
 	_outputFramebuffer->Resize(width, height);
 }

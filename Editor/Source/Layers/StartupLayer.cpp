@@ -42,7 +42,7 @@ void StartupLayer::OnGuiRender()
 		ImGui::PopStyleVar(3);
 
 		const auto winSize = ImGui::GetWindowSize();
-		const Vector2f textureSize = {
+		const Vector2 textureSize = {
 			static_cast<float>(_textureStore["SelectorBG"]->GetWidth()),
 			static_cast<float>(_textureStore["SelectorBG"]->GetHeight())
 		};
@@ -83,7 +83,7 @@ void StartupLayer::OnGuiRender()
 
 				auto PutProjectItem = [this](const Shared<Project>& project)
 				{
-					OutputStringStream oss;
+					OStringStream oss;
 
 					ImGui::Text("");
 					Gui::SetFontSize(28);

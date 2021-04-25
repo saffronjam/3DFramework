@@ -8,13 +8,13 @@
 
 namespace Se
 {
-SceneCamera::SceneCamera(Uint32 width, Uint32 height, ProjectionMode projectionType)
+SceneCamera::SceneCamera(uint width, uint height, ProjectionMode projectionType)
 {
 	SceneCamera::SetViewportSize(width, height);
 }
 
 
-void SceneCamera::RenderFrustum(const Matrix4f& transform) const
+void SceneCamera::RenderFrustum(const Matrix4& transform) const
 {
 	const float nearClip = GetPerspectiveNearClip();
 	const float farClip = GetPerspectiveFarClip();
@@ -23,10 +23,10 @@ void SceneCamera::RenderFrustum(const Matrix4f& transform) const
 
 	auto [translation, rotation, scale] = Misc::GetTransformDecomposition(transform);
 
-	Vector3f& position = translation;
-	Vector3f forward = normalize(rotate(rotation, {0.0f, 0.0f, -1.0f}));
-	Vector3f right = normalize(cross(forward, {0.0f, 1.0f, 0.0f}));
-	Vector3f up = normalize(cross(right, forward));
+	Vector3& position = translation;
+	Vector3 forward = normalize(rotate(rotation, {0.0f, 0.0f, -1.0f}));
+	Vector3 right = normalize(cross(forward, {0.0f, 1.0f, 0.0f}));
+	Vector3 up = normalize(cross(right, forward));
 
 	float Hnear = 2.0f * std::tan(fov / 2) * nearClip;
 	float Wnear = Hnear * ratio;
@@ -34,18 +34,18 @@ void SceneCamera::RenderFrustum(const Matrix4f& transform) const
 	float Hfar = 2.0f * std::tan(fov / 2) * farClip;
 	float Wfar = Hfar * ratio;
 
-	Vector3f middleNearPlane = position + forward * nearClip;
-	Vector3f middleFarPlane = position + forward * farClip;
+	Vector3 middleNearPlane = position + forward * nearClip;
+	Vector3 middleFarPlane = position + forward * farClip;
 
-	Vector3f topRightNear = middleNearPlane + up * Hnear / 2.0f + right * Wnear / 2.0f;
-	Vector3f botRightNear = middleNearPlane - up * Hnear / 2.0f + right * Wnear / 2.0f;
-	Vector3f botLeftNear = middleNearPlane - up * Hnear / 2.0f - right * Wnear / 2.0f;
-	Vector3f topLeftNear = middleNearPlane + up * Hnear / 2.0f - right * Wnear / 2.0f;
+	Vector3 topRightNear = middleNearPlane + up * Hnear / 2.0f + right * Wnear / 2.0f;
+	Vector3 botRightNear = middleNearPlane - up * Hnear / 2.0f + right * Wnear / 2.0f;
+	Vector3 botLeftNear = middleNearPlane - up * Hnear / 2.0f - right * Wnear / 2.0f;
+	Vector3 topLeftNear = middleNearPlane + up * Hnear / 2.0f - right * Wnear / 2.0f;
 
-	Vector3f topRightFar = middleFarPlane + up * Hfar / 2.0f + right * Wfar / 2.0f;
-	Vector3f botRightFar = middleFarPlane - up * Hfar / 2.0f + right * Wfar / 2.0f;
-	Vector3f botLeftFar = middleFarPlane - up * Hfar / 2.0f - right * Wfar / 2.0f;
-	Vector3f topLeftFar = middleFarPlane + up * Hfar / 2.0f - right * Wfar / 2.0f;
+	Vector3 topRightFar = middleFarPlane + up * Hfar / 2.0f + right * Wfar / 2.0f;
+	Vector3 botRightFar = middleFarPlane - up * Hfar / 2.0f + right * Wfar / 2.0f;
+	Vector3 botLeftFar = middleFarPlane - up * Hfar / 2.0f - right * Wfar / 2.0f;
+	Vector3 topLeftFar = middleFarPlane + up * Hfar / 2.0f - right * Wfar / 2.0f;
 
 	auto orange = Gui::GetSaffronOrange();
 	auto orangeFade1 = Gui::GetSaffronOrange(0.5f);
@@ -89,7 +89,7 @@ void SceneCamera::SetOrthographic(float size, float nearClip, float farClip)
 	_orthographicFar = farClip;
 }
 
-void SceneCamera::SetViewportSize(Uint32 width, Uint32 height)
+void SceneCamera::SetViewportSize(uint width, uint height)
 {
 	Camera::SetViewportSize(width, height);
 	switch (_projectionMode)

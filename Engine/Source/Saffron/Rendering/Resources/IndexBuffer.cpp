@@ -5,7 +5,7 @@
 
 namespace Se
 {
-Shared<IndexBuffer> IndexBuffer::Create(Uint32 size)
+Shared<IndexBuffer> IndexBuffer::Create(uint size)
 {
 	switch (RendererApi::Current())
 	{
@@ -16,7 +16,7 @@ Shared<IndexBuffer> IndexBuffer::Create(Uint32 size)
 	return nullptr;
 }
 
-Shared<IndexBuffer> IndexBuffer::Create(void* data, Uint32 size)
+Shared<IndexBuffer> IndexBuffer::Create(void* data, uint size)
 {
 	switch (RendererApi::Current())
 	{

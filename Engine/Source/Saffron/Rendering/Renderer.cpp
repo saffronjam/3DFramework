@@ -23,9 +23,9 @@ struct RendererData
 	Shared<IndexBuffer> _fullscreenQuadIndexBuffer;
 	Shared<Pipeline> _fullscreenQuadPipeline;
 
-	static constexpr Uint32 MaxLines = 10000;
-	static constexpr Uint32 MaxLineVertices = MaxLines * 2;
-	static constexpr Uint32 MaxLineIndices = MaxLines * 2;
+	static constexpr uint MaxLines = 10000;
+	static constexpr uint MaxLineVertices = MaxLines * 2;
+	static constexpr uint MaxLineIndices = MaxLines * 2;
 	Shared<Pipeline> LinePipeline;
 	Shared<VertexBuffer> LineVertexBuffer;
 	Shared<IndexBuffer> LineIndexBuffer;
@@ -49,23 +49,23 @@ Renderer::Renderer() :
 	float width = 2, height = 2;
 	struct QuadVertex
 	{
-		Vector3f Position;
-		Vector2f TexCoord;
+		Vector3 Position;
+		Vector2 TexCoord;
 	};
 
 	auto* data = new QuadVertex[4];
 
-	data[0].Position = Vector3f(x, y, 0.1f);
-	data[0].TexCoord = Vector2f(0, 0);
+	data[0].Position = Vector3(x, y, 0.1f);
+	data[0].TexCoord = Vector2(0, 0);
 
-	data[1].Position = Vector3f(x + width, y, 0.1f);
-	data[1].TexCoord = Vector2f(1, 0);
+	data[1].Position = Vector3(x + width, y, 0.1f);
+	data[1].TexCoord = Vector2(1, 0);
 
-	data[2].Position = Vector3f(x + width, y + height, 0.1f);
-	data[2].TexCoord = Vector2f(1, 1);
+	data[2].Position = Vector3(x + width, y + height, 0.1f);
+	data[2].TexCoord = Vector2(1, 1);
 
-	data[3].Position = Vector3f(x, y + height, 0.1f);
-	data[3].TexCoord = Vector2f(0, 1);
+	data[3].Position = Vector3(x, y + height, 0.1f);
+	data[3].TexCoord = Vector2(0, 1);
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = {{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float2, "a_TexCoord"}};
@@ -87,7 +87,7 @@ void Renderer::OnGuiRender()
 
 	static Time CachedFrametime = Time::Zero();
 	static Time AverageFrameTimeCounter = Time::Zero();
-	static Uint32 _cachedFrameCounter = 0;
+	static uint _cachedFrameCounter = 0;
 	_cachedFrameCounter++;
 	if ((AverageFrameTimeCounter += ts).sec() > 1.0f)
 	{
@@ -167,7 +167,7 @@ void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 	framebuffer->Bind();
 	if (clear)
 	{
-		const Vector4f clearColor = framebuffer->GetSpecification().ClearColor;
+		const Vector4 clearColor = framebuffer->GetSpecification().ClearColor;
 		Submit([clearColor]()
 		{
 			RendererApi::Clear(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -184,7 +184,7 @@ void Renderer::End()
 	instData._activeFramebuffer = nullptr;
 }
 
-void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f& transform)
+void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4& transform)
 {
 	bool depthTest = true;
 	bool cullFace = true;
@@ -208,7 +208,7 @@ void Renderer::SubmitQuad(Shared<MaterialInstance> material, const Matrix4f& tra
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform, Shared<MaterialInstance> overrideMaterial)
+void Renderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4& transform, Shared<MaterialInstance> overrideMaterial)
 {
 	// auto material = overrideMaterial ? overrideMaterial : mesh->GetMaterialInstance();
 	// auto shader = material->GetShader();
@@ -283,7 +283,7 @@ void Renderer::SubmitFullscreenQuad(Shared<MaterialInstance> material)
 	DrawIndexed(6, PrimitiveType::Triangles, depthTest);
 }
 
-void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4f& transform, Shared<Shader> shader)
+void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4& transform, Shared<Shader> shader)
 {
 	mesh->_vertexBuffer->Bind();
 	mesh->_pipeline->Bind();
@@ -301,20 +301,20 @@ void Renderer::SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4f& transform
 	}
 }
 
-void Renderer::DrawAABB(const AABB& aabb, const Matrix4f& transform, const Vector4f& color)
+void Renderer::DrawAABB(const AABB& aabb, const Matrix4& transform, const Vector4& color)
 {
-	Vector4f min = {aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f};
-	Vector4f max = {aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f};
+	Vector4 min = {aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f};
+	Vector4 max = {aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f};
 
-	Vector4f corners[8] = {
-		transform * Vector4f{aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f},
-		transform * Vector4f{aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f},
-		transform * Vector4f{aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f},
-		transform * Vector4f{aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f},
-		transform * Vector4f{aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f},
-		transform * Vector4f{aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f},
-		transform * Vector4f{aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f},
-		transform * Vector4f{aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f}
+	Vector4 corners[8] = {
+		transform * Vector4{aabb.Min.x, aabb.Min.y, aabb.Max.z, 1.0f},
+		transform * Vector4{aabb.Min.x, aabb.Max.y, aabb.Max.z, 1.0f},
+		transform * Vector4{aabb.Max.x, aabb.Max.y, aabb.Max.z, 1.0f},
+		transform * Vector4{aabb.Max.x, aabb.Min.y, aabb.Max.z, 1.0f},
+		transform * Vector4{aabb.Min.x, aabb.Min.y, aabb.Min.z, 1.0f},
+		transform * Vector4{aabb.Min.x, aabb.Max.y, aabb.Min.z, 1.0f},
+		transform * Vector4{aabb.Max.x, aabb.Max.y, aabb.Min.z, 1.0f},
+		transform * Vector4{aabb.Max.x, aabb.Min.y, aabb.Min.z, 1.0f}
 	};
 
 	//for (uint32_t i = 0; i < 4; i++) Renderer2D::DrawLine(corners[i], corners[(i + 1) % 4], color);
@@ -324,7 +324,7 @@ void Renderer::DrawAABB(const AABB& aabb, const Matrix4f& transform, const Vecto
 	//for (uint32_t i = 0; i < 4; i++) Renderer2D::DrawLine(corners[i], corners[i + 4], color);
 }
 
-void Renderer::DrawAABB(Shared<Mesh> mesh, const Matrix4f& transform, const Vector4f& color)
+void Renderer::DrawAABB(Shared<Mesh> mesh, const Matrix4& transform, const Vector4& color)
 {
 	for (Submesh& submesh : mesh->_submeshes)
 	{

@@ -36,7 +36,7 @@ void EditorScene::OnUpdate()
 		{
 			Shared<SceneCamera> camera = _selectedEntity.GetComponent<CameraComponent>().Camera;
 
-			camera->SetViewportSize(static_cast<Uint32>(_viewportWidth), static_cast<Uint32>(_viewportHeight));
+			camera->SetViewportSize(static_cast<uint>(_viewportWidth), static_cast<uint>(_viewportHeight));
 			const glm::mat4 cameraViewMatrix = inverse(_selectedEntity.GetComponent<TransformComponent>().Transform);
 
 			//_miniTarget->SetCameraData({ camera.get(), cameraViewMatrix });
@@ -143,7 +143,7 @@ void EditorScene::SetSelectedEntity(Entity entity)
 	Scene::SetSelectedEntity(entity);
 }
 
-void EditorScene::SetViewportSize(Uint32 width, Uint32 height)
+void EditorScene::SetViewportSize(uint width, uint height)
 {
 	_editorCamera->SetProjectionMatrix(glm::perspectiveFov(glm::radians(45.0f), static_cast<float>(width),
 	                                                        static_cast<float>(height), 0.1f, 10000.0f));

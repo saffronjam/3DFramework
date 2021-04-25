@@ -13,7 +13,7 @@ public:
 
 	void Execute() override;
 
-	void OnViewportResize(Uint32 width, Uint32 height) override;
+	void OnViewportResize(uint width, uint height) override;
 
 private:
 	Shared<Framebuffer> _framebuffer;

@@ -15,7 +15,7 @@ static GLenum TextureTarget(bool multisampled)
 	return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
 
-static void CreateTextures(bool multisampled, RendererID* outID, Uint32 count)
+static void CreateTextures(bool multisampled, RendererID* outID, uint count)
 {
 	glCreateTextures(TextureTarget(multisampled), 1, outID);
 }
@@ -41,7 +41,7 @@ static GLenum DataType(GLenum format)
 	return 0;
 }
 
-static void AttachColorTexture(RendererID id, int samples, GLenum format, Uint32 width, Uint32 height, int index)
+static void AttachColorTexture(RendererID id, int samples, GLenum format, uint width, uint height, int index)
 {
 	bool multisampled = samples > 1;
 	if (multisampled)
@@ -62,8 +62,8 @@ static void AttachColorTexture(RendererID id, int samples, GLenum format, Uint32
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, TextureTarget(multisampled), id, 0);
 }
 
-static void AttachDepthTexture(RendererID id, int samples, GLenum format, GLenum attachmentType, Uint32 width,
-                               Uint32 height)
+static void AttachDepthTexture(RendererID id, int samples, GLenum format, GLenum attachmentType, uint width,
+                               uint height)
 {
 	bool multisampled = samples > 1;
 	if (multisampled)
@@ -117,7 +117,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer()
 	});
 }
 
-void OpenGLFramebuffer::Resize(Uint32 width, Uint32 height, bool forceRecreate)
+void OpenGLFramebuffer::Resize(uint width, uint height, bool forceRecreate)
 {
 	if (!forceRecreate && (_width == width && _height == height)) return;
 
@@ -344,7 +344,7 @@ void OpenGLFramebuffer::Clear()
 	});
 }
 
-void OpenGLFramebuffer::BindTexture(Uint32 attachmentIndex, Uint32 slot) const
+void OpenGLFramebuffer::BindTexture(uint attachmentIndex, uint slot) const
 {
 	Shared<const OpenGLFramebuffer> instance = this;
 	Renderer::Submit([instance, attachmentIndex, slot]()
@@ -353,12 +353,12 @@ void OpenGLFramebuffer::BindTexture(Uint32 attachmentIndex, Uint32 slot) const
 	});
 }
 
-Uint32 OpenGLFramebuffer::GetWidth() const
+uint OpenGLFramebuffer::GetWidth() const
 {
 	return _specification.Width;
 }
 
-Uint32 OpenGLFramebuffer::GetHeight() const
+uint OpenGLFramebuffer::GetHeight() const
 {
 	return _specification.Height;
 }

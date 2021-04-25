@@ -43,11 +43,11 @@ struct FramebufferAttachmentSpecification
 
 struct FramebufferSpecification
 {
-	Uint32 Width = 1280;
-	Uint32 Height = 720;
-	Vector4f ClearColor;
+	uint Width = 1280;
+	uint Height = 720;
+	Vector4 ClearColor;
 	FramebufferAttachmentSpecification Attachments;
-	Uint32 Samples = 1; // multisampling
+	uint Samples = 1; // multisampling
 
 	// TODO: Temp, needs scale
 	bool NoResize = false;
@@ -68,12 +68,12 @@ public:
 
 	virtual void Clear() = 0;
 
-	virtual void Resize(Uint32 width, Uint32 height, bool forceRecreate = false) = 0;
+	virtual void Resize(uint width, uint height, bool forceRecreate = false) = 0;
 
-	virtual void BindTexture(Uint32 attachmentIndex = 0, Uint32 slot = 0) const = 0;
+	virtual void BindTexture(uint attachmentIndex = 0, uint slot = 0) const = 0;
 
-	virtual Uint32 GetWidth() const = 0;
-	virtual Uint32 GetHeight() const = 0;
+	virtual uint GetWidth() const = 0;
+	virtual uint GetHeight() const = 0;
 
 	virtual RendererID GetRendererID() const = 0;
 	virtual RendererID GetColorAttachmentRendererID(int index = 0) const = 0;
@@ -87,7 +87,7 @@ public:
 class FramebufferPool final : public SingleTon<FramebufferPool>
 {
 public:
-	explicit FramebufferPool(Uint32 maxFBs = 32);
+	explicit FramebufferPool(uint maxFBs = 32);
 	~FramebufferPool();
 
 	Weak<Framebuffer> AllocateBuffer();

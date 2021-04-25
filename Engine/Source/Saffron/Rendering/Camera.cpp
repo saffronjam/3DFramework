@@ -4,13 +4,13 @@
 
 namespace Se
 {
-Camera::Camera(Matrix4f projectionMatrix) :
+Camera::Camera(Matrix4 projectionMatrix) :
 	_projectionMatrix(Move(projectionMatrix))
 {
 }
 
 
-void Camera::SetViewportSize(Uint32 width, Uint32 height)
+void Camera::SetViewportSize(uint width, uint height)
 {
 	_viewportWidth = width;
 	_viewportHeight = height;

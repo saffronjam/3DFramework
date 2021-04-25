@@ -27,7 +27,7 @@ public:
 	struct Properties
 	{
 		String Name;
-		Uint32 WindowWidth, WindowHeight;
+		uint WindowWidth, WindowHeight;
 	};
 
 public:
@@ -56,10 +56,9 @@ public:
 	void EraseLayer(Shared<Layer> layer);
 	void EraseOverlay(Shared<Layer> overlay);
 
-	void RenderGui();
-
 	Window& GetWindow();
 	const Window& GetWindow() const;
+	Shared<Renderer> GetRenderer() const;
 
 	void AddProject(const Shared<Project>& project);
 	void RemoveProject(const Shared<Project>& project);
@@ -80,7 +79,7 @@ protected:
 	Shared<BatchLoader> _preLoader;
 
 private:
-	Unique<Renderer> _renderer;
+	Shared<Renderer> _renderer;
 	Unique<SceneRenderer> _sceneRenderer;
 	Unique<ScriptEngine> _scriptEngine;
 

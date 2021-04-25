@@ -5,7 +5,7 @@
 
 namespace Se
 {
-Uint32 ShaderDataTypeSize(ShaderDataType type)
+uint ShaderDataTypeSize(ShaderDataType type)
 {
 	switch (type)
 	{
@@ -35,7 +35,7 @@ VertexBufferElement::VertexBufferElement(ShaderDataType type, const String& name
 {
 }
 
-Uint32 VertexBufferElement::GetComponentCount() const
+uint VertexBufferElement::GetComponentCount() const
 {
 	switch (Type)
 	{
@@ -66,7 +66,7 @@ VertexBufferLayout::VertexBufferLayout(const InitializerList<VertexBufferElement
 	CalculateOffsetsAndStride();
 }
 
-Uint32 VertexBufferLayout::GetStride() const
+uint VertexBufferLayout::GetStride() const
 {
 	return _stride;
 }
@@ -98,7 +98,7 @@ ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
 
 void VertexBufferLayout::CalculateOffsetsAndStride()
 {
-	Uint32 offset = 0;
+	uint offset = 0;
 	_stride = 0;
 	for (auto& element : _elements)
 	{
@@ -108,7 +108,7 @@ void VertexBufferLayout::CalculateOffsetsAndStride()
 	}
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(void* data, Uint32 size, VertexBufferUsage usage)
+Shared<VertexBuffer> VertexBuffer::Create(void* data, uint size, VertexBufferUsage usage)
 {
 	switch (RendererApi::Current())
 	{
@@ -119,7 +119,7 @@ Shared<VertexBuffer> VertexBuffer::Create(void* data, Uint32 size, VertexBufferU
 	return nullptr;
 }
 
-Shared<VertexBuffer> VertexBuffer::Create(Uint32 size, VertexBufferUsage usage)
+Shared<VertexBuffer> VertexBuffer::Create(uint size, VertexBufferUsage usage)
 {
 	switch (RendererApi::Current())
 	{

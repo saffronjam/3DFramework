@@ -13,7 +13,7 @@ class Project : public Managed
 public:
 	explicit Project(Filepath filepath);
 	Project(String name, DateTime lastOpened, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths);
-
+	
 	bool operator==(const Project& rhs) const { return _uuid == rhs._uuid; }
 
 	const Filepath& AddScene(Filepath filepath);

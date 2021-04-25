@@ -20,24 +20,17 @@
 
 namespace Se
 {
-typedef char Int8;
-typedef unsigned char Uint8;
+// Primitives
 
-// 16 bits integer types
-typedef short Int16;
-typedef unsigned short Uint16;
-
-// 32 bits integer types
-typedef int Int32;
-typedef unsigned int Uint32;
-
-// 64 bits integer types
+// Unsigned typedef
+typedef unsigned char ubyte;
+typedef unsigned char uchar;
+typedef unsigned short ushort;
+typedef unsigned int uint;
 #if defined(_MSC_VER)
-typedef __int64 Int64;
-typedef unsigned __int64 Uint64;
+typedef unsigned __int64 ulong;
 #else
-typedef long long Int64;
-typedef unsigned long long Uint64;
+typedef unsigned long long ulong;
 #endif
 
 template <typename T>
@@ -45,11 +38,11 @@ using ArrayList = std::vector<T>;
 template <typename Type, size_t size>
 using Array = std::array<Type, size>;
 template <typename Key, typename Value>
-using Map = std::map<Key, Value>;
+using TreeMap = std::map<Key, Value>;
 template <typename Key, typename Value>
 using MultiMap = std::multimap<Key, Value>;
 template <typename Key, typename Value>
-using UnorderedMap = std::unordered_map<Key, Value>;
+using HashMap = std::unordered_map<Key, Value>;
 template <typename T>
 using Set = std::set<T>;
 template <typename T>
@@ -81,11 +74,11 @@ using String = std::string;
 using WideString = std::wstring;
 using Filepath = std::filesystem::path;
 using DirectoryEntry = std::filesystem::directory_entry;
-using OutputStream = std::ofstream;
-using InputStream = std::ifstream;
+using OStream = std::ofstream;
+using IStream = std::ifstream;
 using StringStream = std::stringstream;
-using OutputStringStream = std::ostringstream;
-using InputStringStream = std::istringstream;
+using OStringStream = std::ostringstream;
+using IStringStream = std::istringstream;
 using Thread = std::thread;
 using Mutex = std::mutex;
 using ConditionVariable = std::condition_variable;

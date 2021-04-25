@@ -14,7 +14,7 @@ ShaderStruct::ShaderStruct(String name) :
 void ShaderStruct::AddField(ShaderUniformDeclaration* field)
 {
 	_size += field->GetSize();
-	Uint32 offset = 0;
+	uint offset = 0;
 	if (_fields.size())
 	{
 		ShaderUniformDeclaration* previous = _fields.back();
@@ -29,12 +29,12 @@ const String& ShaderStruct::GetName() const
 	return _name;
 }
 
-Uint32 ShaderStruct::GetSize() const
+uint ShaderStruct::GetSize() const
 {
 	return _size;
 }
 
-Uint32 ShaderStruct::GetOffset() const
+uint ShaderStruct::GetOffset() const
 {
 	return _offset;
 }
@@ -44,7 +44,7 @@ const ArrayList<ShaderUniformDeclaration*>& ShaderStruct::GetFields() const
 	return _fields;
 }
 
-void ShaderStruct::SetOffset(Uint32 offset)
+void ShaderStruct::SetOffset(uint offset)
 {
 	_offset = offset;
 }

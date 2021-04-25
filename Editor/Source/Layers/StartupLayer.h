@@ -23,7 +23,7 @@ public:
 	EventSubscriberList<const Shared<Project>&> ProjectSelected;
 
 private:
-	Map<String, Shared<Texture2D>> _textureStore;
+	TreeMap<String, Shared<Texture2D>> _textureStore;
 	Shared<Project> _selectedProject = nullptr;
 	DateTime _today;
 	Optional<Shared<Project>> _newProject;

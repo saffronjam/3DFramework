@@ -52,14 +52,14 @@ public:
 	                     PropertyFlag flags = PropertyFlag::None);
 	static bool Property(const String& label, float& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& label, Vector2f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector2f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
+	static bool Property(const String& label, Vector2& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector2& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& label, Vector3f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector3f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
+	static bool Property(const String& label, Vector3& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector3& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
-	static bool Property(const String& label, Vector4f& value, PropertyFlag flags);
-	static bool Property(const String& label, Vector4f& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
+	static bool Property(const String& label, Vector4& value, PropertyFlag flags);
+	static bool Property(const String& label, Vector4& value, float step = 0.1f, float min = 0.0f, float max = 0.0f,
 	                     PropertyFlag flags = PropertyFlag::None);
 
 	static void HelpMarker(const String& desc);
@@ -73,8 +73,8 @@ public:
 
 	static void ForceHideBarTab();
 
-	static Vector4f GetSaffronOrange(float opacity = 1.0f);
-	static Vector4f GetSaffronPurple(float opacity = 1.0f);
+	static Vector4 GetSaffronOrange(float opacity = 1.0f);
+	static Vector4 GetSaffronPurple(float opacity = 1.0f);
 
 private:
 	static void PushID();
@@ -85,11 +85,11 @@ private:
 
 private:
 	Style _currentStyle;
-	Map<int, ImFont*> _fonts;
+	TreeMap<int, ImFont*> _fonts;
 	Pair<int, ImFont*> _currentFont;
 
 	char s_IDBuffer[16];
-	Uint32 s_Counter = 0;
+	uint s_Counter = 0;
 
 	static constexpr const char* FontsLocation = "Assets/Fonts/";
 	static constexpr const char* FontsExtension = ".ttf";

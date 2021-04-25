@@ -40,7 +40,7 @@ Shared<Framebuffer> Framebuffer::Create(const FramebufferSpecification& spec)
 
 FramebufferPool* FramebufferPool::s_Instance = new FramebufferPool;
 
-FramebufferPool::FramebufferPool(Uint32 maxFBs /* = 32 */) :
+FramebufferPool::FramebufferPool(uint maxFBs /* = 32 */) :
 	SingleTon(this)
 {
 }

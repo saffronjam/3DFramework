@@ -18,7 +18,7 @@ struct SceneRendererOptions
 struct SceneRendererCamera
 {
 	Camera Camera;
-	Matrix4f ViewMatrix;
+	Matrix4 ViewMatrix;
 	float Near, Far;
 	float Fov;
 };
@@ -27,7 +27,7 @@ struct DrawCommand
 {
 	Shared<Mesh> Mesh;
 	Shared<MaterialInstance> Material;
-	Matrix4f Transform;
+	Matrix4 Transform;
 };
 
 struct SceneRendererCommon
@@ -35,7 +35,7 @@ struct SceneRendererCommon
 	bool EnableBloom = false;
 	float BloomThreshold = 1.5f;
 
-	Vector2f FocusPoint = {0.5f, 0.5f};
+	Vector2 FocusPoint = {0.5f, 0.5f};
 
 	// Grid
 	Shared<MaterialInstance> GridMaterial;
@@ -81,10 +81,10 @@ struct ShadowMapData
 {
 	float ShadowMapSize = 20.0f;
 	float LightDistance = 0.1f;
-	Matrix4f LightMatrices[4];
-	Matrix4f LightViewMatrix;
+	Matrix4 LightMatrices[4];
+	Matrix4 LightViewMatrix;
 	float CascadeSplitLambda = 0.91f;
-	Vector4f CascadeSplits;
+	Vector4 CascadeSplits;
 	float CascadeFarPlaneOffset = 15.0f, CascadeNearPlaneOffset = -15.0f;
 	bool ShowCascades = false;
 	bool SoftShadows = true;
@@ -105,9 +105,9 @@ public:
 	static void BeginScene(const class Scene* scene, const SceneRendererCamera& camera);
 	static void EndScene();
 
-	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform = Matrix4f(1.0f),
+	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4& transform = Matrix4(1.0f),
 	                       Shared<MaterialInstance> overrideMaterial = nullptr);
-	static void SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4f& transform = Matrix4f(1.0f));
+	static void SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4& transform = Matrix4(1.0f));
 
 	static Shared<class SceneEnvironment> CreateEnvironmentMap(const Filepath& filepath);
 
@@ -115,10 +115,10 @@ public:
 	static const Shared<Texture2D>& GetFinalColorBuffer();
 
 	// TODO: Temp
-	static Uint32 GetFinalColorBufferRendererID();
-	static void SetFocusPoint(const Vector2f& point);
+	static uint GetFinalColorBufferRendererID();
+	static void SetFocusPoint(const Vector2& point);
 
-	static void SetViewportSize(Uint32 width, Uint32 height);
+	static void SetViewportSize(uint width, uint height);
 
 	static SceneRendererOptions& GetOptions();
 	static ArrayList<DrawCommand>& GetDrawCommands(RenderChannel channel);
@@ -139,6 +139,6 @@ private:
 	ShadowMapData _smData;
 
 	Unique<RenderGraph> _renderGraph;
-	UnorderedMap<RenderChannel, ArrayList<DrawCommand>> _drawContainer;
+	HashMap<RenderChannel, ArrayList<DrawCommand>> _drawContainer;
 };
 }

@@ -18,6 +18,6 @@ public:
 
 private:
 	PipelineSpecification _specification;
-	Uint32 _vertexArrayRendererID = 0;
+	uint _vertexArrayRendererID = 0;
 };
 }

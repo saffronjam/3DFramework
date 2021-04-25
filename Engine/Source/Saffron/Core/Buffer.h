@@ -8,44 +8,44 @@ class Buffer
 {
 public:
 	Buffer();
-	Buffer(Uint8* data, Uint32 size);
+	Buffer(uchar* data, uint size);
 	template <typename T>
 	explicit Buffer(ArrayList<T>& container);
 	explicit Buffer(String& string);
 
-	static Buffer Copy(const void* data, Uint32 size);
+	static Buffer Copy(const void* data, uint size);
 	static Buffer Copy(const Buffer& buffer);
 	template <typename T>
 	static Buffer Copy(const ArrayList<T>& container);
 	static Buffer Copy(const String& string);
-	static Buffer Encapsulate(Uint8* data);
+	static Buffer Encapsulate(uchar* data);
 
-	void Allocate(Uint32 size);
+	void Allocate(uint size);
 	void ZeroInitialize();
 
 	template <typename T>
-	T& Read(Uint32 offset = 0);
+	T& Read(uint offset = 0);
 
-	void Write(void* data, Uint32 size, Uint32 offset = 0) const;
-	void Write(const void* data, Uint32 size, Uint32 offset) const;
+	void Write(void* data, uint size, uint offset = 0) const;
+	void Write(const void* data, uint size, uint offset) const;
 
 	void Destroy();
 	void Reset();
 
 	operator bool() const;
-	Uint8& operator[](int index);
-	Uint8 operator[](int index) const;
+	uchar& operator[](int index);
+	uchar operator[](int index) const;
 
 	template <typename T>
 	T* As();
 
-	Uint8* Data();
-	const Uint8* Data() const;
-	Uint32 Size() const;
+	uchar* Data();
+	const uchar* Data() const;
+	uint Size() const;
 
 private:
-	Uint8* _data;
-	Uint32 _size;
+	uchar* _data;
+	uint _size;
 };
 
 
@@ -63,7 +63,7 @@ Buffer Buffer::Copy(const ArrayList<T>& container)
 }
 
 template <typename T>
-T& Buffer::Read(Uint32 offset)
+T& Buffer::Read(uint offset)
 {
 	return *reinterpret_cast<T*>(_data + offset);
 }

@@ -28,13 +28,13 @@ public:
 	virtual ~ShaderUniformDeclaration() = default;
 
 	virtual const String& GetName() const = 0;
-	virtual Uint32 GetSize() const = 0;
-	virtual Uint32 GetCount() const = 0;
-	virtual Uint32 GetOffset() const = 0;
+	virtual uint GetSize() const = 0;
+	virtual uint GetCount() const = 0;
+	virtual uint GetOffset() const = 0;
 	virtual ShaderDomain GetDomain() const = 0;
 
 protected:
-	virtual void SetOffset(Uint32 offset) = 0;
+	virtual void SetOffset(uint offset) = 0;
 };
 
 using ShaderUniformList = ArrayList<ShaderUniformDeclaration*>;
@@ -47,8 +47,8 @@ class ShaderUniformBufferDeclaration : public Managed
 {
 public:
 	virtual const String& GetName() const = 0;
-	virtual Uint32 GetRegister() const = 0;
-	virtual Uint32 GetSize() const = 0;
+	virtual uint GetRegister() const = 0;
+	virtual uint GetSize() const = 0;
 	virtual const ShaderUniformList& GetUniformDeclarations() const = 0;
 
 	virtual ShaderUniformDeclaration* FindUniform(const String& name) = 0;
@@ -68,8 +68,8 @@ private:
 private:
 	String _name;
 	ArrayList<ShaderUniformDeclaration*> _fields;
-	Uint32 _size;
-	Uint32 _offset;
+	uint _size;
+	uint _offset;
 
 public:
 	explicit ShaderStruct(String name);
@@ -77,10 +77,10 @@ public:
 	void AddField(ShaderUniformDeclaration* field);
 
 	const String& GetName() const;
-	Uint32 GetSize() const;
-	Uint32 GetOffset() const;
+	uint GetSize() const;
+	uint GetOffset() const;
 	const ArrayList<ShaderUniformDeclaration*>& GetFields() const;
-	void SetOffset(Uint32 offset);
+	void SetOffset(uint offset);
 };
 
 using ShaderStructList = ArrayList<ShaderStruct*>;
@@ -95,8 +95,8 @@ public:
 	virtual ~ShaderResourceDeclaration() = default;
 
 	virtual const String& GetName() const = 0;
-	virtual Uint32 GetRegister() const = 0;
-	virtual Uint32 GetCount() const = 0;
+	virtual uint GetRegister() const = 0;
+	virtual uint GetCount() const = 0;
 };
 
 using ShaderResourceList = ArrayList<ShaderResourceDeclaration*>;

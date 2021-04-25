@@ -65,11 +65,11 @@ void ShadowMapPass::Execute()
 
 		Renderer::Begin(_shadowMaps[i]);
 
-		Matrix4f shadowMapVP = cascades[i].ViewProj;
+		Matrix4 shadowMapVP = cascades[i].ViewProj;
 		_shader->SetMat4("u_ViewProjection", shadowMapVP);
 
-		static Matrix4f scaleBiasMatrix = scale(Matrix4f(1.0f), {0.5f, 0.5f, 0.5f}) * translate(
-			Matrix4f(1.0f), {1, 1, 1});
+		static Matrix4 scaleBiasMatrix = scale(Matrix4(1.0f), {0.5f, 0.5f, 0.5f}) * translate(
+			Matrix4(1.0f), {1, 1, 1});
 		smData.LightMatrices[i] = scaleBiasMatrix * cascades[i].ViewProj;
 
 
@@ -83,11 +83,11 @@ void ShadowMapPass::Execute()
 	}
 }
 
-void ShadowMapPass::OnViewportResize(Uint32 width, Uint32 height)
+void ShadowMapPass::OnViewportResize(uint width, uint height)
 {
 }
 
-void ShadowMapPass::CalculateCascades(CascadeData* cascades, const Vector3f& lightDirection)
+void ShadowMapPass::CalculateCascades(CascadeData* cascades, const Vector3& lightDirection)
 {
 	auto& sceneInfo = SceneRenderer::GetSceneInfo();
 	auto &smData = SceneRenderer::GetShadowMapData();
@@ -113,7 +113,7 @@ void ShadowMapPass::CalculateCascades(CascadeData* cascades, const Vector3f& lig
 
 	// Calculate split depths based on view camera frustum
 	// Based on method presented in https://developer.nvidia.com/gpugems/GPUGems3/gpugems3_ch10.html
-	for (Uint32 i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+	for (uint i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
 	{
 		float p = (i + 1) / static_cast<float>(SHADOW_MAP_CASCADE_COUNT);
 		float log = minZ * std::pow(ratio, p);
@@ -132,54 +132,54 @@ void ShadowMapPass::CalculateCascades(CascadeData* cascades, const Vector3f& lig
 
 	// Calculate orthographic projection matrix for each cascade
 	float lastSplitDist = 0.0;
-	for (Uint32 i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
+	for (uint i = 0; i < SHADOW_MAP_CASCADE_COUNT; i++)
 	{
 		float splitDist = cascadeSplits[i];
 
-		Vector3f frustumCorners[8] = {
-			Vector3f(-1.0f, 1.0f, -1.0f), Vector3f(1.0f, 1.0f, -1.0f), Vector3f(1.0f, -1.0f, -1.0f),
-			Vector3f(-1.0f, -1.0f, -1.0f), Vector3f(-1.0f, 1.0f, 1.0f), Vector3f(1.0f, 1.0f, 1.0f),
-			Vector3f(1.0f, -1.0f, 1.0f), Vector3f(-1.0f, -1.0f, 1.0f),
+		Vector3 frustumCorners[8] = {
+			Vector3(-1.0f, 1.0f, -1.0f), Vector3(1.0f, 1.0f, -1.0f), Vector3(1.0f, -1.0f, -1.0f),
+			Vector3(-1.0f, -1.0f, -1.0f), Vector3(-1.0f, 1.0f, 1.0f), Vector3(1.0f, 1.0f, 1.0f),
+			Vector3(1.0f, -1.0f, 1.0f), Vector3(-1.0f, -1.0f, 1.0f),
 		};
 
 		// Project frustum corners into world space
-		Matrix4f invCam = inverse(viewProjection);
-		for (Uint32 i = 0; i < 8; i++)
+		Matrix4 invCam = inverse(viewProjection);
+		for (uint i = 0; i < 8; i++)
 		{
-			Vector4f invCorner = invCam * Vector4f(frustumCorners[i], 1.0f);
+			Vector4 invCorner = invCam * Vector4(frustumCorners[i], 1.0f);
 			frustumCorners[i] = invCorner / invCorner.w;
 		}
 
-		for (Uint32 i = 0; i < 4; i++)
+		for (uint i = 0; i < 4; i++)
 		{
-			Vector3f dist = frustumCorners[i + 4] - frustumCorners[i];
+			Vector3 dist = frustumCorners[i + 4] - frustumCorners[i];
 			frustumCorners[i + 4] = frustumCorners[i] + (dist * splitDist);
 			frustumCorners[i] = frustumCorners[i] + (dist * lastSplitDist);
 		}
 
 		// Get frustum center
-		Vector3f frustumCenter = Vector3f(0.0f);
-		for (Uint32 i = 0; i < 8; i++) frustumCenter += frustumCorners[i];
+		Vector3 frustumCenter = Vector3(0.0f);
+		for (uint i = 0; i < 8; i++) frustumCenter += frustumCorners[i];
 
 		frustumCenter /= 8.0f;
 
 		//frustumCenter *= 0.01f;
 
 		float radius = 0.0f;
-		for (Uint32 i = 0; i < 8; i++)
+		for (uint i = 0; i < 8; i++)
 		{
 			float distance = length(frustumCorners[i] - frustumCenter);
 			radius = glm::max(radius, distance);
 		}
 		radius = std::ceil(radius * 16.0f) / 16.0f;
 
-		Vector3f maxExtents(radius);
-		Vector3f minExtents = -maxExtents;
+		Vector3 maxExtents(radius);
+		Vector3 minExtents = -maxExtents;
 
-		Vector3f lightDir = -lightDirection;
-		Matrix4f lightViewMatrix = lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter,
-		                                  Vector3f(0.0f, 0.0f, 1.0f));
-		Matrix4f lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y,
+		Vector3 lightDir = -lightDirection;
+		Matrix4 lightViewMatrix = lookAt(frustumCenter - lightDir * -minExtents.z, frustumCenter,
+		                                  Vector3(0.0f, 0.0f, 1.0f));
+		Matrix4 lightOrthoMatrix = glm::ortho(minExtents.x, maxExtents.x, minExtents.y, maxExtents.y,
 		                                       0.0f + smData.CascadeNearPlaneOffset,
 		                                       maxExtents.z - minExtents.z + smData.CascadeFarPlaneOffset);
 

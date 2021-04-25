@@ -8,23 +8,23 @@ namespace Se
 class SceneCamera : public Camera
 {
 public:
-	enum class ProjectionMode : Int32 { Perspective = 0, Orthographic = 1 };
+	enum class ProjectionMode : int { Perspective = 0, Orthographic = 1 };
 
 public:
-	SceneCamera(Uint32 width = 1280, Uint32 height = 720, ProjectionMode projectionType = ProjectionMode::Perspective);
+	SceneCamera(uint width = 1280, uint height = 720, ProjectionMode projectionType = ProjectionMode::Perspective);
 
-	void RenderFrustum(const Matrix4f& transform) const;
+	void RenderFrustum(const Matrix4& transform) const;
 
 	void SetPerspective(float verticalFOV, float nearClip = 0.1f, float farClip = 2000.0f);
 	void SetOrthographic(float size, float nearClip = -1.0f, float farClip = 1.0f);
 
-	Pair<Uint32, Uint32> GetViewportSize() const { return {_viewportWidth, _viewportHeight}; }
+	Pair<uint, uint> GetViewportSize() const { return {_viewportWidth, _viewportHeight}; }
 
-	Uint32 GetViewportWidth() const { return _viewportWidth; }
+	uint GetViewportWidth() const { return _viewportWidth; }
 
-	Uint32 GetViewportHeith() const { return _viewportHeight; }
+	uint GetViewportHeith() const { return _viewportHeight; }
 
-	void SetViewportSize(Uint32 width, Uint32 height) override;
+	void SetViewportSize(uint width, uint height) override;
 
 	void SetPerspectiveVerticalFOV(float verticalFov) { _perspectiveFOV = glm::radians(verticalFov); }
 

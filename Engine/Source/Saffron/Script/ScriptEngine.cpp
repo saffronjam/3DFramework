@@ -1,442 +1,27 @@
 #include "SaffronPCH.h"
 
-#include <mono/jit/jit.h>
-#include <mono/metadata/threads.h>
-#include <mono/metadata/assembly.h>
-#include <mono/metadata/debug-helpers.h>
-#include <mono/metadata/attrdefs.h>
-
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
-#include "Saffron/Platform/Windows/OSWindow.h"
 #include "Saffron/Scene/EditorScene.h"
+#include "Saffron/Script/MonoApi.h"
 #include "Saffron/Script/ScriptEngine.h"
 #include "Saffron/Script/ScriptEngineRegistry.h"
 
 namespace Se
 {
-///////////////////////////////////////////////////////////////////////////
-/// Helper functions
-///////////////////////////////////////////////////////////////////////////
-
-static Uint32 GetFieldSize(FieldType type)
-{
-	switch (type)
-	{
-	case FieldType::Float:
-	case FieldType::Int:
-	case FieldType::UnsignedInt: return 4;
-		// case FieldType::String:   return 8; // TODO
-	case FieldType::Vec2: return 4 * 2;
-	case FieldType::Vec3: return 4 * 3;
-	case FieldType::Vec4: return 4 * 4;
-	default: Debug::Break("Unknown field type!");
-		return 0;
-	}
-}
-
-static FieldType GetSaffronFieldType(MonoType* monoType)
-{
-	const int type = mono_type_get_type(monoType);
-	switch (type)
-	{
-	case MONO_TYPE_R4: return FieldType::Float;
-	case MONO_TYPE_I4: return FieldType::Int;
-	case MONO_TYPE_U4: return FieldType::UnsignedInt;
-	case MONO_TYPE_STRING: return FieldType::String;
-	case MONO_TYPE_VALUETYPE:
-	{
-		char* name = mono_type_get_name(monoType);
-		if (strcmp(name, "Se.Vector2") == 0) return FieldType::Vec2;
-		if (strcmp(name, "Se.Vector3") == 0) return FieldType::Vec3;
-		return FieldType::Vec4;
-	}
-	default: return FieldType::None;
-	}
-}
-
-const char* FieldTypeToString(FieldType type)
-{
-	switch (type)
-	{
-	case FieldType::Float: return "Float";
-	case FieldType::Int: return "Int";
-	case FieldType::UnsignedInt: return "UnsignedInt";
-	case FieldType::String: return "String";
-	case FieldType::Vec2: return "Vec2";
-	case FieldType::Vec3: return "Vec3";
-	case FieldType::Vec4: return "Vec4";
-	default: return "Unknown";
-	}
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Mono declarations
-///////////////////////////////////////////////////////////////////////////
-
-static MonoDomain* s_MonoDomain = nullptr;
-static Filepath s_AssemblyFilepath;
-static Shared<Project> s_ProjectContext;
-static Shared<Scene> s_SceneContext;
-
-// Assembly images
-MonoImage* s_AppAssemblyImage = nullptr;
-MonoImage* s_CoreAssemblyImage = nullptr;
-
-static MonoAssembly* s_AppAssembly = nullptr;
-static MonoAssembly* s_CoreAssembly = nullptr;
-
-static EntityInstanceMap s_EntityInstanceMap;
-static Map<String, MonoClass*> s_ClassCacheMap;
-
-static MonoMethod* GetMethod(MonoImage* image, const String& methodDesc);
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Entity Script Class
-///////////////////////////////////////////////////////////////////////////
-
-struct EntityScriptClass
-{
-	String FullName;
-	String ClassName;
-	String NamespaceName;
-
-	MonoClass* Class = nullptr;
-	MonoMethod* OnCreateMethod = nullptr;
-	MonoMethod* OnDestroyMethod = nullptr;
-	MonoMethod* OnUpdateMethod = nullptr;
-
-	// Physics
-	MonoMethod* OnCollision2DBeginMethod = nullptr;
-	MonoMethod* OnCollision2DEndMethod = nullptr;
-	MonoMethod* OnCollision3DBeginMethod = nullptr;
-	MonoMethod* OnCollision3DEndMethod = nullptr;
-
-	void SyncClassMethods(MonoImage* image)
-	{
-		OnCreateMethod = GetMethod(image, FullName + ":OnCreate()");
-		OnUpdateMethod = GetMethod(image, FullName + ":OnUpdate(single)");
-
-		// Physics (Entity class)
-		OnCollision2DBeginMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DBegin(single)");
-		OnCollision2DEndMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision2DEnd(single)");
-		OnCollision3DBeginMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision3DBegin(single)");
-		OnCollision3DEndMethod = GetMethod(s_CoreAssemblyImage, "Se.Entity:OnCollision3DEnd(single)");
-	}
-
-	void SetScript(String moduleName)
-	{
-		FullName = Move(moduleName);
-		if (FullName.find('.') != String::npos)
-		{
-			NamespaceName = FullName.substr(0, FullName.find_last_of('.'));
-			ClassName = FullName.substr(FullName.find_last_of('.') + 1);
-		}
-		else
-		{
-			ClassName = FullName;
-		}
-	}
-};
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Mono functions / Setup procedures
-///////////////////////////////////////////////////////////////////////////
-
-static UnorderedMap<String, EntityScriptClass> s_EntityClassMap;
-
-MonoAssembly* LoadAssemblyFromFile(const char* filepath)
-{
-	if (filepath == nullptr)
-	{
-		return nullptr;
-	}
-
-	const HANDLE file = CreateFileA(filepath, FILE_READ_ACCESS, 0, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL,
-	                                nullptr);
-	if (file == INVALID_HANDLE_VALUE)
-	{
-		return nullptr;
-	}
-
-	const DWORD file_size = GetFileSize(file, nullptr);
-	if (file_size == INVALID_FILE_SIZE)
-	{
-		CloseHandle(file);
-		return nullptr;
-	}
-
-	void* file_data = malloc(file_size);
-	if (file_data == nullptr)
-	{
-		CloseHandle(file);
-		return nullptr;
-	}
-
-	DWORD read = 0;
-	const bool readResult = ReadFile(file, file_data, file_size, &read, nullptr);
-	if (!readResult)
-	{
-		free(file_data);
-		CloseHandle(file);
-		return nullptr;
-	}
-
-	MonoImageOpenStatus status;
-	MonoImage* image = mono_image_open_from_data_full(static_cast<char*>(file_data), file_size, true, &status, false);
-	if (status != MONO_IMAGE_OK)
-	{
-		return nullptr;
-	}
-	MonoAssembly* assemb = mono_assembly_load_from_full(image, filepath, &status, 0);
-	free(file_data);
-	CloseHandle(file);
-	mono_image_close(image);
-	return assemb;
-}
-
-static void InitMono()
-{
-	mono_set_assemblies_path(ScriptEngine::MonoPath);
-	mono_jit_init("Saffron");
-
-	char friendlyAppDomainName[] = "SaffronRuntime";
-	s_MonoDomain = mono_domain_create_appdomain(friendlyAppDomainName, nullptr);
-}
-
-static void ShutdownMono()
-{
-	mono_jit_cleanup(s_MonoDomain);
-}
-
-static MonoAssembly* LoadAssembly(const Filepath& path)
-{
-	MonoAssembly* assembly = LoadAssemblyFromFile(path.string().c_str());
-
-	if (!assembly) Log::CoreWarn("Could not load assembly: {0}", path.string());
-	else Log::CoreInfo("Successfully loaded assembly: {0}", path.string());
-
-	return assembly;
-}
-
-static MonoImage* GetAssemblyImage(MonoAssembly* assembly)
-{
-	MonoImage* image = mono_assembly_get_image(assembly);
-	if (!image) Log::CoreError("mono_assembly_get_image failed");
-
-	return image;
-}
-
-static MonoClass* GetClass(MonoImage* image, const EntityScriptClass& scriptClass)
-{
-	if (s_ClassCacheMap.find(scriptClass.FullName) == s_ClassCacheMap.end())
-	{
-		MonoClass* monoClass = mono_class_from_name(image, scriptClass.NamespaceName.c_str(),
-		                                            scriptClass.ClassName.c_str());
-		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
-		s_ClassCacheMap.emplace(scriptClass.FullName, monoClass);
-	}
-	return s_ClassCacheMap[scriptClass.FullName];
-}
-
-static MonoClass* GetClass(MonoImage* image, const String& namespaceName, const String& className)
-{
-	const String fullName = namespaceName.empty() ? className : namespaceName + "." + className;
-	if (s_ClassCacheMap.find(fullName) == s_ClassCacheMap.end())
-	{
-		MonoClass* monoClass = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
-		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
-		s_ClassCacheMap.emplace(fullName, monoClass);
-	}
-	return s_ClassCacheMap[fullName];
-}
-
-static MonoClass* GetClass(MonoImage* image, const String& fullName)
-{
-	String namespaceName, className;
-	if (fullName.find('.') != String::npos)
-	{
-		namespaceName = fullName.substr(0, fullName.find_last_of('.'));
-		className = fullName.substr(fullName.find_last_of('.') + 1);
-	}
-	else
-	{
-		className = fullName;
-	}
-	return GetClass(image, namespaceName, className);
-}
-
-static Uint32 Instantiate(EntityScriptClass& scriptClass)
-{
-	MonoObject* instance = mono_object_new(s_MonoDomain, scriptClass.Class);
-	if (!instance) Log::CoreWarn("mono_object_new failed");
-
-	mono_runtime_object_init(instance);
-	const Uint32 handle = mono_gchandle_new(instance, false);
-	return handle;
-}
-
-static MonoMethod* GetMethod(MonoImage* image, const String& methodDesc)
-{
-	MonoMethodDesc* desc = mono_method_desc_new(methodDesc.c_str(), NULL);
-	if (!desc) Log::CoreWarn("mono_method_desc_new failed");
-
-	MonoMethod* method = mono_method_desc_search_in_image(desc, image);
-	if (!method) Log::CoreWarn("mono_method_desc_search_in_image failed");
-
-	return method;
-}
-
-static MonoObject* CallMethod(MonoObject* object, MonoMethod* method, void** params = nullptr)
-{
-	MonoObject* pException = nullptr;
-	MonoObject* result = mono_runtime_invoke(method, object, params, &pException);
-	return result;
-}
-
-static void PrintClassMethods(MonoClass* monoClass)
-{
-	MonoMethod* iter;
-	void* ptr = nullptr;
-	while ((iter = mono_class_get_methods(monoClass, &ptr)) != nullptr)
-	{
-		printf("--------------------------------\n");
-		const char* name = mono_method_get_name(iter);
-		MonoMethodDesc* methodDesc = mono_method_desc_from_method(iter);
-
-		const char* paramNames = "";
-		mono_method_get_param_names(iter, &paramNames);
-
-		Log::CoreInfo("Name: {0}", name);
-		Log::CoreInfo("Full name: {0}", mono_method_full_name(iter, true));
-	}
-}
-
-static void PrintClassProperties(MonoClass* monoClass)
-{
-	MonoProperty* iter;
-	void* ptr = nullptr;
-	while ((iter = mono_class_get_properties(monoClass, &ptr)) != nullptr)
-	{
-		Log::CoreInfo("--------------------------------\n");
-		Log::CoreInfo("Name: {0}", mono_property_get_name(iter));
-	}
-}
-
-static MonoString* GetName()
-{
-	return mono_string_new(s_MonoDomain, "Hello!");
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Entity Instance
-///////////////////////////////////////////////////////////////////////////
-
-MonoObject* EntityInstance::GetInstance() const
-{
-	Debug::Assert(Handle, "Entity has not been instantiated!");;
-	return mono_gchandle_get_target(Handle);
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Public Field
-///////////////////////////////////////////////////////////////////////////
-
-PublicField::PublicField(String name, FieldType type) :
-	Name(Move(name)),
-	Type(type)
-{
-	_storedValueBuffer = AllocateBuffer(type);
-}
-
-PublicField::PublicField(PublicField&& other)
-{
-	Name = Move(other.Name);
-	Type = other.Type;
-	_entityInstance = other._entityInstance;
-	_monoClassField = other._monoClassField;
-	_storedValueBuffer = other._storedValueBuffer;
-
-	other._entityInstance = nullptr;
-	other._monoClassField = nullptr;
-	other._storedValueBuffer = nullptr;
-}
-
-PublicField::~PublicField()
-{
-	delete[] _storedValueBuffer;
-}
-
-void PublicField::CopyStoredValueToRuntime() const
-{
-	Debug::Assert(_entityInstance->GetInstance());;
-	mono_field_set_value(_entityInstance->GetInstance(), _monoClassField, _storedValueBuffer);
-}
-
-bool PublicField::IsRuntimeAvailable() const
-{
-	return _entityInstance->Handle != 0;
-}
-
-void PublicField::SetStoredValue(void* src) const
-{
-	const Uint32 size = GetFieldSize(Type);
-	memcpy(_storedValueBuffer, src, size);
-}
-
-Uint8* PublicField::AllocateBuffer(FieldType type)
-{
-	const Uint32 size = GetFieldSize(type);
-	auto* buffer = new Uint8[size];
-	memset(buffer, 0, size);
-	return buffer;
-}
-
-void PublicField::GetStoredValue_Internal(void* outValue) const
-{
-	const Uint32 size = GetFieldSize(Type);
-	memcpy(outValue, _storedValueBuffer, size);
-}
-
-void PublicField::GetRuntimeValue_Internal(void* outValue) const
-{
-	Debug::Assert(_entityInstance->GetInstance());;
-	mono_field_get_value(_entityInstance->GetInstance(), _monoClassField, outValue);
-}
-
-void PublicField::SetStoredValue_Internal(void* value) const
-{
-	const Uint32 size = GetFieldSize(Type);
-	memcpy(_storedValueBuffer, value, size);
-}
-
-void PublicField::SetRuntimeValue_Internal(void* value) const
-{
-	Debug::Assert(_entityInstance->GetInstance());;
-	mono_field_set_value(_entityInstance->GetInstance(), _monoClassField, value);
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Script Core
-///////////////////////////////////////////////////////////////////////////
-
-
 ScriptEngine::ScriptEngine() :
-	SingleTon(this)
+	SingleTon(this),
+	_scriptEngineRegistry(CreateUnique<ScriptEngineRegistry>())
 {
-	InitMono();
+	MonoApi::Initialize("Saffron", MonoPath);
+	_monoDomain = MonoApi::CreateDomain(FriendlyDomainName);
 }
 
 ScriptEngine::~ScriptEngine()
 {
-	s_SceneContext = nullptr;
-	s_EntityInstanceMap.clear();
+	_sceneContext = nullptr;
+	_entityInstanceMap.clear();
+	MonoApi::Shutdown(_monoDomain);
 }
 
 void ScriptEngine::OnUpdate()
@@ -446,10 +31,10 @@ void ScriptEngine::OnUpdate()
 void ScriptEngine::OnGuiRender()
 {
 	ImGui::Begin("Script Engine Debug");
-	for (auto& [sceneID, entityMap] : s_EntityInstanceMap)
+	for (auto& [sceneID, entityMap] : Instance()._entityInstanceMap)
 	{
-		bool opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<Uint64>(sceneID)), "Scene (%llx)",
-		                              static_cast<Uint64>(sceneID));
+		bool opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<ulong>(sceneID)), "Scene (%llx)",
+		                              static_cast<ulong>(sceneID));
 		if (opened)
 		{
 			Shared<Scene> scene = Scene::GetScene(sceneID);
@@ -458,8 +43,8 @@ void ScriptEngine::OnGuiRender()
 				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
 				String entityName = "Unnamed Entity";
 				if (entity.HasComponent<TagComponent>()) entityName = entity.GetComponent<TagComponent>().Tag;
-				opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<Uint64>(entityID)), "%s (%llx)",
-				                         entityName.c_str(), static_cast<Uint64>(entityID));
+				opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<ulong>(entityID)), "%s (%llx)",
+				                         entityName.c_str(), static_cast<ulong>(entityID));
 				if (opened)
 				{
 					for (auto& [moduleName, fieldMap] : entityInstanceData.ModuleFieldMap)
@@ -490,72 +75,70 @@ void ScriptEngine::OnGuiRender()
 
 void ScriptEngine::OnProjectChange(const Shared<Project>& project)
 {
-	if (s_ProjectContext)
+	if (Instance()._projectContext)
 	{
-		for (const auto& scene : s_ProjectContext->GetSceneCache())
+		for (const auto& scene : Instance()._projectContext->GetSceneCache())
 		{
 			auto uuid = scene->GetUUID();
-			if (s_EntityInstanceMap.find(uuid) != s_EntityInstanceMap.end())
+			if (Instance()._entityInstanceMap.find(uuid) != Instance()._entityInstanceMap.end())
 			{
-				s_EntityClassMap.clear();
-				s_EntityInstanceMap.at(uuid).clear();
-				s_EntityInstanceMap.erase(uuid);
+				Instance()._entityClassMap.clear();
+				Instance()._entityInstanceMap.at(uuid).clear();
+				Instance()._entityInstanceMap.erase(uuid);
 			}
 		}
-		s_ClassCacheMap.clear();
+		Instance()._classCacheMap.clear();
 	}
-	s_ProjectContext = project;
+	Instance()._projectContext = project;
 	if (project)
 	{
-		LoadRuntimeAssembly(ScriptsPath + s_ProjectContext->GetName() + ScriptsExtension);
+		LoadRuntimeAssembly(ScriptsPath + Instance()._projectContext->GetName() + ScriptsExtension);
 	}
 }
 
 void ScriptEngine::OnSceneChange(const Shared<Scene>& scene)
 {
-	s_SceneContext = scene;
+	Instance()._sceneContext = scene;
 }
 
 void ScriptEngine::LoadRuntimeAssembly(const Filepath& assemblyFilepath)
 {
 	MonoDomain* domain = nullptr;
 	bool cleanup = false;
-	if (s_MonoDomain)
+	if (Instance()._monoDomain)
 	{
-		domain = mono_domain_create_appdomain(const_cast<char*>(FriendlyDomainName), nullptr);
-		mono_domain_set(domain, false);
+		domain = MonoApi::CreateDomain(FriendlyDomainName);
+		MonoApi::SetActiveDomain(domain);
 		cleanup = true;
 	}
 
-	s_CoreAssembly = LoadAssembly(ScriptCoreScript);
-	s_CoreAssemblyImage = GetAssemblyImage(s_CoreAssembly);
+	Instance()._coreAssembly = MonoApi::LoadAssembly(ScriptCoreScript);
+	Instance()._coreImage = MonoApi::GetImage(Instance()._coreAssembly);
 
-	auto* appAssembly = LoadAssembly(assemblyFilepath);
-	auto* appAssemblyImage = GetAssemblyImage(appAssembly);
+	Instance()._appAssembly = MonoApi::LoadAssembly(assemblyFilepath);
+	Instance()._appImage = MonoApi::GetImage(Instance()._appAssembly);
+
 	ScriptEngineRegistry::RegisterAll();
 
 	if (cleanup)
 	{
-		mono_domain_unload(s_MonoDomain);
-		s_MonoDomain = domain;
+		MonoApi::UnloadDomain(Instance()._monoDomain);
+		Instance()._monoDomain = domain;
 	}
-
-	s_AppAssembly = appAssembly;
-	s_AppAssemblyImage = appAssemblyImage;
 }
 
 void ScriptEngine::ReloadAssembly(const Filepath& assemblyFilepath)
 {
-	s_AssemblyFilepath = ScriptsPath + assemblyFilepath.string() + ScriptsExtension;
-	LoadRuntimeAssembly(s_AssemblyFilepath);
-	s_ClassCacheMap.clear();
-	if (!s_EntityInstanceMap.empty())
+	Instance()._assemblyFilepath = ScriptsPath + assemblyFilepath.string() + ScriptsExtension;
+	LoadRuntimeAssembly(Instance()._assemblyFilepath);
+	Instance()._classCacheMap.clear();
+	if (!Instance()._entityInstanceMap.empty())
 	{
-		Shared<Scene> scene = GetCurrentSceneContext();
-		Debug::Assert(scene, "No active scene!");;
-		if (s_EntityInstanceMap.find(scene->GetUUID()) != s_EntityInstanceMap.end())
+		Shared<Scene> scene = GetSceneContext();
+		Debug::Assert(scene, "No active scene!");
+		if (Instance()._entityInstanceMap.find(scene->GetUUID()) != Instance()._entityInstanceMap.end())
 		{
-			auto& entityMap = s_EntityInstanceMap.at(scene->GetUUID());
+			auto& entityMap = Instance()._entityInstanceMap.at(scene->GetUUID());
 			for (auto& [entityID, entityInstanceData] : entityMap)
 			{
 				const auto& entityMap = scene->GetEntityMap();
@@ -569,21 +152,21 @@ void ScriptEngine::ReloadAssembly(const Filepath& assemblyFilepath)
 
 void ScriptEngine::SetSceneContext(const Shared<Scene>& scene)
 {
-	s_SceneContext = scene;
+	Instance()._sceneContext = scene;
 }
 
-const Shared<Scene>& ScriptEngine::GetCurrentSceneContext()
+const Shared<Scene>& ScriptEngine::GetSceneContext()
 {
-	return s_SceneContext;
+	return Instance()._sceneContext;
 }
 
 void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 {
-	Debug::Assert(s_EntityInstanceMap.find(dst) != s_EntityInstanceMap.end());;
-	Debug::Assert(s_EntityInstanceMap.find(src) != s_EntityInstanceMap.end());;
+	Debug::Assert(Instance()._entityInstanceMap.find(dst) != Instance()._entityInstanceMap.end());
+	Debug::Assert(Instance()._entityInstanceMap.find(src) != Instance()._entityInstanceMap.end());
 
-	auto& dstEntityMap = s_EntityInstanceMap.at(dst);
-	auto& srcEntityMap = s_EntityInstanceMap.at(src);
+	auto& dstEntityMap = Instance()._entityInstanceMap.at(dst);
+	auto& srcEntityMap = Instance()._entityInstanceMap.at(src);
 
 	for (auto& [entityID, entityInstanceData] : srcEntityMap)
 	{
@@ -592,9 +175,9 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 			auto& dstModuleFieldMap = dstEntityMap[entityID].ModuleFieldMap;
 			for (auto& [fieldName, field] : srcFieldMap)
 			{
-				Debug::Assert(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());;
+				Debug::Assert(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
 				auto& fieldMap = dstModuleFieldMap.at(moduleName);
-				Debug::Assert(fieldMap.find(fieldName) != fieldMap.end());;
+				Debug::Assert(fieldMap.find(fieldName) != fieldMap.end());
 				fieldMap.at(fieldName).SetStoredValue(field._storedValueBuffer);
 			}
 		}
@@ -611,7 +194,7 @@ void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
 	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
 	if (entityInstance.ScriptClass->OnCreateMethod)
 	{
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCreateMethod);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCreateMethod);
 	}
 }
 
@@ -621,7 +204,7 @@ void ScriptEngine::OnUpdateEntity(UUID sceneID, UUID entityID, Time ts)
 	if (entityInstance.ScriptClass->OnUpdateMethod)
 	{
 		void* args[] = {&ts};
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnUpdateMethod, args);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnUpdateMethod, args);
 	}
 }
 
@@ -637,7 +220,7 @@ void ScriptEngine::OnCollision2DBegin(UUID sceneID, UUID entityID)
 	{
 		float value = 5.0f;
 		void* args[] = {&value};
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DBeginMethod, args);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DBeginMethod, args);
 	}
 }
 
@@ -653,7 +236,7 @@ void ScriptEngine::OnCollision2DEnd(UUID sceneID, UUID entityID)
 	{
 		float value = 5.0f;
 		void* args[] = {&value};
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DEndMethod, args);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DEndMethod, args);
 	}
 }
 
@@ -669,7 +252,7 @@ void ScriptEngine::OnCollision3DBegin(UUID sceneID, UUID entityID)
 	{
 		float value = 5.0f;
 		void* args[] = {&value};
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DBeginMethod, args);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DBeginMethod, args);
 	}
 }
 
@@ -685,21 +268,21 @@ void ScriptEngine::OnCollision3DEnd(UUID sceneID, UUID entityID)
 	{
 		float value = 5.0f;
 		void* args[] = {&value};
-		CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DEndMethod, args);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DEndMethod, args);
 	}
 }
 
 void ScriptEngine::OnScriptComponentDestroyed(UUID sceneID, UUID entityID)
 {
-	Debug::Assert(s_EntityInstanceMap.find(sceneID) != s_EntityInstanceMap.end());;
-	auto& entityMap = s_EntityInstanceMap.at(sceneID);
-	Debug::Assert(entityMap.find(entityID) != entityMap.end());;
+	Debug::Assert(Instance()._entityInstanceMap.find(sceneID) != Instance()._entityInstanceMap.end());
+	auto& entityMap = Instance()._entityInstanceMap.at(sceneID);
+	Debug::Assert(entityMap.find(entityID) != entityMap.end());
 	entityMap.erase(entityID);
 }
 
 bool ScriptEngine::ModuleExists(const String& moduleName)
 {
-	MonoClass* monoClass = GetClass(s_AppAssemblyImage, moduleName);
+	MonoClass* monoClass = MonoApi::GetClass(Instance()._appImage, moduleName);
 	return monoClass != nullptr;
 }
 
@@ -716,20 +299,20 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 		return;
 	}
 
-	EntityScriptClass& scriptClass = s_EntityClassMap[moduleName];
+	EntityScriptClass& scriptClass = Instance()._entityClassMap[moduleName];
 	scriptClass.SetScript(moduleName);
 
-	scriptClass.Class = GetClass(s_AppAssemblyImage, scriptClass);
-	scriptClass.SyncClassMethods(s_AppAssemblyImage);
+	scriptClass.Class = Instance().GetClass(Instance()._appImage, scriptClass);
+	scriptClass.SyncClassMethods(Instance()._appImage);
 
-	EntityInstanceData& entityInstanceData = s_EntityInstanceMap[scene->GetUUID()][id];
+	EntityInstanceData& entityInstanceData = Instance()._entityInstanceMap[scene->GetUUID()][id];
 	EntityInstance& entityInstance = entityInstanceData.Instance;
 	entityInstance.ScriptClass = &scriptClass;
 	ScriptModuleFieldMap& moduleFieldMap = entityInstanceData.ModuleFieldMap;
 	auto& fieldMap = moduleFieldMap[moduleName];
 
 	// Save old fields
-	std::unordered_map<String, PublicField> oldFields;
+	HashMap<String, PublicField> oldFields;
 	oldFields.reserve(fieldMap.size());
 	for (auto& [fieldName, field] : fieldMap) oldFields.emplace(fieldName, Move(field));
 	fieldMap.clear();
@@ -738,17 +321,17 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 	{
 		MonoClassField* iter;
 		void* ptr = nullptr;
-		while ((iter = mono_class_get_fields(scriptClass.Class, &ptr)) != nullptr)
+		while ((iter = MonoApi::GetFields(scriptClass.Class, &ptr)) != nullptr)
 		{
-			const char* name = mono_field_get_name(iter);
-			const Uint32 flags = mono_field_get_flags(iter);
-			if ((flags & MONO_FIELD_ATTR_PUBLIC) == 0) continue;
+			const auto name = MonoApi::GetFieldName(iter);
+			const uint flags = MonoApi::GetFieldFlags(iter);
+			if (!MonoApi::IsPublic(flags)) continue;
 
-			MonoType* fieldType = mono_field_get_type(iter);
-			const FieldType saffronFieldType = GetSaffronFieldType(fieldType);
+			auto* monoFieldType = MonoApi::GetFieldType(iter);
+			const auto fieldType = MonoApi::GetSaffronPublicFieldType(monoFieldType);
 
 			// TODO: Attributes
-			MonoCustomAttrInfo* attr = mono_custom_attrs_from_field(scriptClass.Class, iter);
+			//auto* attr = MonoApi::GetCustomAttrInfo(scriptClass.Class, iter);
 
 			if (oldFields.find(name) != oldFields.end())
 			{
@@ -756,7 +339,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 			}
 			else
 			{
-				PublicField field = {name, saffronFieldType};
+				PublicField field(name, fieldType);
 				field._entityInstance = &entityInstance;
 				field._monoClassField = iter;
 				fieldMap.emplace(name, Move(field));
@@ -767,7 +350,7 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 
 void ScriptEngine::ShutdownScriptEntity(Entity entity, const String& moduleName)
 {
-	EntityInstanceData& entityInstanceData = GetEntityInstanceData(entity.GetSceneUUID(), entity.GetUUID());
+	EntityInstanceData& entityInstanceData = Instance().GetEntityInstanceData(entity.GetSceneUUID(), entity.GetUUID());
 	ScriptModuleFieldMap& moduleFieldMap = entityInstanceData.ModuleFieldMap;
 	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end()) moduleFieldMap.erase(moduleName);
 }
@@ -778,20 +361,20 @@ void ScriptEngine::InstantiateEntityClass(Entity entity)
 	UUID id = entity.GetComponent<IDComponent>().ID;
 	auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
 
-	EntityInstanceData& entityInstanceData = GetEntityInstanceData(scene->GetUUID(), id);
+	EntityInstanceData& entityInstanceData = Instance().GetEntityInstanceData(scene->GetUUID(), id);
 	EntityInstance& entityInstance = entityInstanceData.Instance;
-	Debug::Assert(entityInstance.ScriptClass);;
-	entityInstance.Handle = Instantiate(*entityInstance.ScriptClass);
+	Debug::Assert(entityInstance.ScriptClass);
+	entityInstance.Handle = MonoApi::Instantiate(Instance()._monoDomain, *entityInstance.ScriptClass);
 
-	MonoClass* entityClass = GetClass(s_CoreAssemblyImage, "Se", "Entity");
-	Debug::Assert(entityClass, "Failed to load entity class when checking for subclass");;
-	if (mono_class_is_subclass_of(entityInstance.ScriptClass->Class, entityClass, false))
+	MonoClass* entityClass = Instance().GetClass(Instance().GetCoreImage(), "Se", "Entity");
+	Debug::Assert(entityClass, "Failed to load entity class when checking for subclass");
+
+	if (MonoApi::IsSubclass(entityInstance.ScriptClass->Class, entityClass, false))
 	{
-		MonoProperty* entityIDProperty = mono_class_get_property_from_name(entityInstance.ScriptClass->Class, "ID");
-		mono_property_get_get_method(entityIDProperty);
-		MonoMethod* entityIDSetMethod = mono_property_get_set_method(entityIDProperty);
+		auto* entityIDProperty = MonoApi::GetProperty(entityInstance.ScriptClass->Class, "ID");
+		auto* entityIDSetMethod = MonoApi::GetSetter(entityIDProperty);
 		void* param[] = {&id};
-		CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
+		MonoApi::CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
 	}
 
 	// Set all public fields to appropriate values
@@ -803,34 +386,78 @@ void ScriptEngine::InstantiateEntityClass(Entity entity)
 	}
 
 	// Call OnCreate function (if exists)
-	OnCreateEntity(entity);
+	Instance().OnCreateEntity(entity);
 }
 
 EntityInstanceData& ScriptEngine::GetEntityInstanceData(UUID sceneID, UUID entityID)
 {
-	Debug::Assert(s_EntityInstanceMap.find(sceneID) != s_EntityInstanceMap.end(), "Invalid scene ID!");;
-	auto& entityIDMap = s_EntityInstanceMap.at(sceneID);
-	Debug::Assert(entityIDMap.find(entityID) != entityIDMap.end(), "Invalid entity ID!");;
+	Debug::Assert(Instance()._entityInstanceMap.find(sceneID) != Instance()._entityInstanceMap.end(),
+	              "Invalid scene ID!");
+	auto& entityIDMap = Instance()._entityInstanceMap.at(sceneID);
+	Debug::Assert(entityIDMap.find(entityID) != entityIDMap.end(), "Invalid entity ID!");
 	return entityIDMap.at(entityID);
 }
 
-MonoString* ScriptEngine::CreateMonoString(const char* string)
+MonoString* ScriptEngine::CreateMonoString(const String& string)
 {
-	return mono_string_new(s_MonoDomain, string);
+	return MonoApi::CreateString(Instance()._monoDomain, string);
 }
 
 void ScriptEngine::AttachThread()
 {
-	mono_thread_attach(s_MonoDomain);
+	MonoApi::AttachThread(_monoDomain);
 }
 
 void ScriptEngine::DetachThread()
 {
-	mono_thread_detach(mono_thread_current());
+	MonoApi::DetachThread();
+}
+
+MonoImage* ScriptEngine::GetCoreImage() const
+{
+	return _coreImage;
+}
+
+MonoImage* ScriptEngine::GetAppImage() const
+{
+	return _appImage;
+}
+
+MonoAssembly* ScriptEngine::GetCoreAssembly() const
+{
+	return _coreAssembly;
+}
+
+MonoAssembly* ScriptEngine::GetAppAssembly() const
+{
+	return _appAssembly;
+}
+
+MonoClass* ScriptEngine::GetClass(MonoImage* image, const EntityScriptClass& scriptClass)
+{
+	if (_classCacheMap.find(scriptClass.FullName) == _classCacheMap.end())
+	{
+		auto* monoClass = MonoApi::GetClass(image, scriptClass);
+		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
+		_classCacheMap.emplace(scriptClass.FullName, monoClass);
+	}
+	return _classCacheMap[scriptClass.FullName];
+}
+
+MonoClass* ScriptEngine::GetClass(MonoImage* image, const String& namespaceName, const String& className)
+{
+	const String fullName = namespaceName.empty() ? className : namespaceName + "." + className;
+	if (_classCacheMap.find(fullName) == _classCacheMap.end())
+	{
+		auto* monoClass = MonoApi::GetClass(image, namespaceName, className);
+		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
+		_classCacheMap.emplace(fullName, monoClass);
+	}
+	return _classCacheMap[fullName];
 }
 
 EntityInstanceMap& ScriptEngine::GetEntityInstanceMap()
 {
-	return s_EntityInstanceMap;
+	return Instance()._entityInstanceMap;
 }
 }

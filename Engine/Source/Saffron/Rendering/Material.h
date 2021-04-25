@@ -27,7 +27,7 @@ public:
 
 	void Bind();
 
-	Uint32 GetFlags() const;
+	uint GetFlags() const;
 	void SetFlag(MaterialFlag flag);
 
 	const Shared<Shader>& GetShader() const;
@@ -61,7 +61,7 @@ private:
 	Buffer _pSUniformStorageBuffer;
 	ArrayList<Shared<Texture>> _textures;
 
-	Uint32 _materialFlags{};
+	uint _materialFlags{};
 };
 
 template <typename T>
@@ -77,7 +77,7 @@ template <typename T>
 Shared<T> Material::GetResource(const String& name)
 {
 	auto decl = FindResourceDeclaration(name);
-	Uint32 slot = decl->GetRegister();
+	uint slot = decl->GetRegister();
 	Debug::Assert(slot < _textures.size(), "Texture slot is invalid!");;
 	return _textures[slot];
 }
@@ -109,7 +109,7 @@ public:
 
 	const String& GetName() const;
 	const Shared<Shader>& GetShader() const;
-	Uint32 GetFlags() const;
+	uint GetFlags() const;
 	bool GetFlag(MaterialFlag flag) const;
 
 	template <typename T>
@@ -164,7 +164,7 @@ Shared<T> MaterialInstance::GetResource(const String& name)
 {
 	const auto* decl = _material->FindResourceDeclaration(name);
 	Debug::Assert(decl, "Could not find uniform with name 'x'");;
-	const Uint32 slot = decl->GetRegister();
+	const uint slot = decl->GetRegister();
 	Debug::Assert(slot < _textures.size(), "Texture slot is invalid!");;
 	return Shared<T>(_textures[slot]);
 }
@@ -175,7 +175,7 @@ Shared<T> MaterialInstance::TryGetResource(const String& name)
 	const auto* decl = _material->FindResourceDeclaration(name);
 	if (!decl) return nullptr;
 
-	const Uint32 slot = decl->GetRegister();
+	const uint slot = decl->GetRegister();
 	if (slot >= _textures.size()) return nullptr;
 
 	return _textures[slot];

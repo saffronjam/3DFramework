@@ -5,7 +5,7 @@
 namespace Se
 {
 OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, Type type, const String& name,
-                                                               Uint32 count) :
+                                                               uint count) :
 	_domain(domain),
 	_type(type),
 	_struct(nullptr)
@@ -16,7 +16,7 @@ OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain doma
 }
 
 OpenGLShaderUniformDeclaration::OpenGLShaderUniformDeclaration(ShaderDomain domain, ShaderStruct* uniformStruct,
-                                                               const String& name, Uint32 count) :
+                                                               const String& name, uint count) :
 	_domain(domain),
 	_type(Type::Struct),
 	_struct(uniformStruct)
@@ -31,22 +31,22 @@ const String& OpenGLShaderUniformDeclaration::GetName() const
 	return _name;
 }
 
-Uint32 OpenGLShaderUniformDeclaration::GetSize() const
+uint OpenGLShaderUniformDeclaration::GetSize() const
 {
 	return _size;
 }
 
-Uint32 OpenGLShaderUniformDeclaration::GetCount() const
+uint OpenGLShaderUniformDeclaration::GetCount() const
 {
 	return _count;
 }
 
-Uint32 OpenGLShaderUniformDeclaration::GetOffset() const
+uint OpenGLShaderUniformDeclaration::GetOffset() const
 {
 	return _offset;
 }
 
-Uint32 OpenGLShaderUniformDeclaration::GetAbsoluteOffset() const
+uint OpenGLShaderUniformDeclaration::GetAbsoluteOffset() const
 {
 	return _struct ? _struct->GetOffset() + _offset : _offset;
 }
@@ -77,14 +77,14 @@ const ShaderStruct& OpenGLShaderUniformDeclaration::GetShaderUniformStruct() con
 	return *_struct;
 }
 
-void OpenGLShaderUniformDeclaration::SetOffset(Uint32 offset)
+void OpenGLShaderUniformDeclaration::SetOffset(uint offset)
 {
 	if (_type == Type::Struct) _struct->SetOffset(offset);
 
 	_offset = offset;
 }
 
-Uint32 OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
+uint OpenGLShaderUniformDeclaration::SizeOfUniformType(Type type)
 {
 	switch (type)
 	{
@@ -141,7 +141,7 @@ OpenGLShaderUniformBufferDeclaration::OpenGLShaderUniformBufferDeclaration(
 
 void OpenGLShaderUniformBufferDeclaration::PushUniform(OpenGLShaderUniformDeclaration* uniform)
 {
-	Uint32 offset = 0;
+	uint offset = 0;
 	if (_uniforms.size())
 	{
 		OpenGLShaderUniformDeclaration* previous = static_cast<OpenGLShaderUniformDeclaration*>(_uniforms.back());
@@ -157,12 +157,12 @@ const String& OpenGLShaderUniformBufferDeclaration::GetName() const
 	return _name;
 }
 
-Uint32 OpenGLShaderUniformBufferDeclaration::GetRegister() const
+uint OpenGLShaderUniformBufferDeclaration::GetRegister() const
 {
 	return _register;
 }
 
-Uint32 OpenGLShaderUniformBufferDeclaration::GetSize() const
+uint OpenGLShaderUniformBufferDeclaration::GetSize() const
 {
 	return _size;
 }
@@ -186,7 +186,7 @@ ShaderUniformDeclaration* OpenGLShaderUniformBufferDeclaration::FindUniform(cons
 	return nullptr;
 }
 
-OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, const String& name, Uint32 count) :
+OpenGLShaderResourceDeclaration::OpenGLShaderResourceDeclaration(Type type, const String& name, uint count) :
 	_name(name),
 	_count(count),
 	_type(type)
@@ -200,12 +200,12 @@ const String& OpenGLShaderResourceDeclaration::GetName() const
 	return _name;
 }
 
-Uint32 OpenGLShaderResourceDeclaration::GetRegister() const
+uint OpenGLShaderResourceDeclaration::GetRegister() const
 {
 	return _register;
 }
 
-Uint32 OpenGLShaderResourceDeclaration::GetCount() const
+uint OpenGLShaderResourceDeclaration::GetCount() const
 {
 	return _count;
 }

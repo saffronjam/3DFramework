@@ -15,44 +15,17 @@ namespace Se
 	RegisterFunctionBuffer.str("");\
 	RegisterFunctionBuffer.clear();
 
-UnorderedMap<MonoType*, Function<bool(Entity&)>> s_HasComponentFuncs;
-UnorderedMap<MonoType*, Function<void(Entity&)>> s_CreateComponentFuncs;
 
-extern MonoImage* s_CoreAssemblyImage;
-
-#define ComponentRegisterType(Type) \
-	{\
-		MonoType* type = mono_reflection_type_from_name(const_cast<char*>("Se." #Type), s_CoreAssemblyImage);\
-		if (type) {\
-			Uint32 id = mono_type_get_type(type);\
-			s_HasComponentFuncs[type] = [](Entity& entity) { return entity.HasComponent<Type>(); };\
-			s_CreateComponentFuncs[type] = [](Entity& entity) { entity.AddComponent<Type>(); };\
-		} else {\
-			Log::CoreError("No C# component class found for " #Type "!");\
-		}\
-	}
-
-static void InitComponentTypes()
+ScriptEngineRegistry::ScriptEngineRegistry() :
+	SingleTon(this)
 {
-	ComponentRegisterType(TagComponent);
-	ComponentRegisterType(TransformComponent);
-	ComponentRegisterType(MeshComponent);
-	ComponentRegisterType(ScriptComponent);
-	ComponentRegisterType(CameraComponent);
-	ComponentRegisterType(SpriteRendererComponent);
-	ComponentRegisterType(RigidBody2DComponent);
-	ComponentRegisterType(BoxCollider2DComponent);
-	ComponentRegisterType(CircleCollider2DComponent);
-	ComponentRegisterType(RigidBody3DComponent);
-	ComponentRegisterType(BoxCollider3DComponent);
-	ComponentRegisterType(SphereCollider3DComponent);
 }
 
 void ScriptEngineRegistry::RegisterAll()
 {
-	InitComponentTypes();
+	Instance().RegisterComponents();
 
-	OutputStringStream RegisterFunctionBuffer;
+	OStringStream RegisterFunctionBuffer;
 
 	ADD_INTERNAL_CALL_MONO(Entity, GetTransform);
 	ADD_INTERNAL_CALL_MONO(Entity, SetTransform);
@@ -132,5 +105,30 @@ void ScriptEngineRegistry::RegisterAll()
 
 	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, GetRadius);
 	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, SetRadius);
+}
+
+bool ScriptEngineRegistry::ExecuteHasComponent(MonoType* type, Entity& entity)
+{
+	return Instance()._hasComponentFuncs[type](entity);
+}
+
+void ScriptEngineRegistry::ExecuteCreateComponent(MonoType* type, Entity& entity)
+{
+	Instance()._createComponentFuncs[type](entity);
+}
+
+void ScriptEngineRegistry::RegisterComponents()
+{
+	RegisterComponent<TransformComponent>();
+	RegisterComponent<MeshComponent>();
+	RegisterComponent<ScriptComponent>();
+	RegisterComponent<CameraComponent>();
+	RegisterComponent<SpriteRendererComponent>();
+	RegisterComponent<RigidBody2DComponent>();
+	RegisterComponent<BoxCollider2DComponent>();
+	RegisterComponent<CircleCollider2DComponent>();
+	RegisterComponent<RigidBody3DComponent>();
+	RegisterComponent<BoxCollider3DComponent>();
+	RegisterComponent<SphereCollider3DComponent>();
 }
 }

@@ -13,7 +13,6 @@ static void OpenGLLogMessage(GLenum source, GLenum type, GLuint id, GLenum sever
 	switch (severity)
 	{
 	case GL_DEBUG_SEVERITY_HIGH: Log::CoreError("[OpenGL Debug HIGH] {0}", message);
-		Debug::Assert(false, "GL_DEBUG_SEVERITY_HIGH");;
 		break;
 	case GL_DEBUG_SEVERITY_MEDIUM: Log::CoreWarn("[OpenGL Debug MEDIUM] {0}", message);
 		break;
@@ -80,7 +79,7 @@ void RendererApi::SetClearColor(float r, float g, float b, float a)
 	glClearColor(r, g, b, a);
 }
 
-void RendererApi::DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest)
+void RendererApi::DrawIndexed(uint count, PrimitiveType type, bool depthTest)
 {
 	if (!depthTest)
 		glDisable(GL_DEPTH_TEST);

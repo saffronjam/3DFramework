@@ -14,15 +14,15 @@ public:
 
 	virtual void Bind() const = 0;
 
-	virtual void SetData(const void* buffer, Uint32 size, Uint32 offset = 0) = 0;
-	virtual void SetData(const Buffer& buffer, Uint32 offset = 0) = 0;
+	virtual void SetData(const void* buffer, uint size, uint offset = 0) = 0;
+	virtual void SetData(const Buffer& buffer, uint offset = 0) = 0;
 
-	virtual Uint32 GetCount() const = 0;
-	virtual Uint32 GetSize() const = 0;
+	virtual uint GetCount() const = 0;
+	virtual uint GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	static Shared<IndexBuffer> Create(Uint32 size);
-	static Shared<IndexBuffer> Create(void* data, Uint32 size = 0);
+	static Shared<IndexBuffer> Create(uint size);
+	static Shared<IndexBuffer> Create(void* data, uint size = 0);
 	static Shared<IndexBuffer> Create(const Buffer& buffer);
 };
 }

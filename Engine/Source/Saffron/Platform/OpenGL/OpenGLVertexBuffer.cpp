@@ -18,7 +18,7 @@ static GLenum OpenGLUsage(VertexBufferUsage usage)
 	return 0;
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, Uint32 size, VertexBufferUsage usage) :
+OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, uint size, VertexBufferUsage usage) :
 	_size(size),
 	_usage(usage)
 {
@@ -32,7 +32,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(void* data, Uint32 size, VertexBufferUsag
 	});
 }
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(Uint32 size, VertexBufferUsage usage) :
+OpenGLVertexBuffer::OpenGLVertexBuffer(uint size, VertexBufferUsage usage) :
 	_size(size),
 	_usage(usage)
 {
@@ -62,7 +62,7 @@ void OpenGLVertexBuffer::Bind() const
 	});
 }
 
-void OpenGLVertexBuffer::SetData(const void* data, Uint32 size, Uint32 offset)
+void OpenGLVertexBuffer::SetData(const void* data, uint size, uint offset)
 {
 	_localData = Buffer::Copy(data, size);
 	_size = size;
@@ -73,7 +73,7 @@ void OpenGLVertexBuffer::SetData(const void* data, Uint32 size, Uint32 offset)
 	});
 }
 
-void OpenGLVertexBuffer::SetData(const Buffer& buffer, Uint32 offset)
+void OpenGLVertexBuffer::SetData(const Buffer& buffer, uint offset)
 {
 	SetData(buffer.Data(), buffer.Size(), offset);
 }
@@ -88,7 +88,7 @@ void OpenGLVertexBuffer::SetLayout(const VertexBufferLayout& layout)
 	_layout = layout;
 }
 
-Uint32 OpenGLVertexBuffer::GetSize() const
+uint OpenGLVertexBuffer::GetSize() const
 {
 	return _size;
 }

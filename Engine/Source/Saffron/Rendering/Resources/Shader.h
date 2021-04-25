@@ -46,13 +46,13 @@ struct UniformBuffer
 	// this currently does not assume any alignment. This also has
 	// nothing to do with GL uniform buffers, this is simply a CPU-side
 	// buffer abstraction.
-	Uint8* Buffer;
+	uchar* Buffer;
 	ArrayList<UniformDecl> Uniforms;
 };
 
 struct UniformBufferBase
 {
-	virtual const Uint8* GetBuffer() const = 0;
+	virtual const uchar* GetBuffer() const = 0;
 	virtual const UniformDecl* GetUniforms() const = 0;
 	virtual unsigned int GetUniformCount() const = 0;
 };
@@ -60,12 +60,12 @@ struct UniformBufferBase
 template <unsigned int N, unsigned int U>
 struct UniformBufferDeclaration : UniformBufferBase
 {
-	Uint8 Buffer[N];
+	uchar Buffer[N];
 	UniformDecl Uniforms[U];
 	std::ptrdiff_t Cursor = 0;
 	int Index = 0;
 
-	const Uint8* GetBuffer() const override { return Buffer; }
+	const uchar* GetBuffer() const override { return Buffer; }
 
 	const UniformDecl* GetUniforms() const override { return Uniforms; }
 
@@ -85,27 +85,27 @@ struct UniformBufferDeclaration : UniformBufferBase
 	}
 
 	template <>
-	void Push(const String& name, const Vector3f& data)
+	void Push(const String& name, const Vector3& data)
 	{
 		Uniforms[Index++] = {UniformType::Float3, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector3f));
-		Cursor += sizeof(Vector3f);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector3));
+		Cursor += sizeof(Vector3);
 	}
 
 	template <>
-	void Push(const String& name, const Vector4f& data)
+	void Push(const String& name, const Vector4& data)
 	{
 		Uniforms[Index++] = {UniformType::Float4, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector4f));
-		Cursor += sizeof(Vector4f);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Vector4));
+		Cursor += sizeof(Vector4);
 	}
 
 	template <>
-	void Push(const String& name, const Matrix4f& data)
+	void Push(const String& name, const Matrix4& data)
 	{
 		Uniforms[Index++] = {UniformType::Matrix4x4, Cursor, name};
-		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Matrix4f));
-		Cursor += sizeof(Matrix4f);
+		memcpy(Buffer + Cursor, value_ptr(data), sizeof(Matrix4));
+		Cursor += sizeof(Matrix4);
 	}
 };
 
@@ -128,12 +128,12 @@ public:
 	virtual void SetFloat(const String& name, float value) = 0;
 	virtual void SetInt(const String& name, int value) = 0;
 	virtual void SetBool(const String& name, bool value) = 0;
-	virtual void SetFloat2(const String& name, const Vector2f& value) = 0;
-	virtual void SetFloat3(const String& name, const Vector3f& value) = 0;
-	virtual void SetMat4(const String& name, const Matrix4f& value) = 0;
-	virtual void SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind = true) = 0;
+	virtual void SetFloat2(const String& name, const Vector2& value) = 0;
+	virtual void SetFloat3(const String& name, const Vector3& value) = 0;
+	virtual void SetMat4(const String& name, const Matrix4& value) = 0;
+	virtual void SetMat4FromRenderThread(const String& name, const Matrix4& value, bool bind = true) = 0;
 
-	virtual void SetIntArray(const String& name, int* values, Uint32 size) = 0;
+	virtual void SetIntArray(const String& name, int* values, uint size) = 0;
 
 	virtual const String& GetName() const = 0;
 

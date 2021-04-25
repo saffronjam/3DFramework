@@ -8,23 +8,23 @@ namespace Se
 class OpenGLIndexBuffer : public IndexBuffer
 {
 public:
-	explicit OpenGLIndexBuffer(Uint32 size);
-	OpenGLIndexBuffer(void* data, Uint32 size);
+	explicit OpenGLIndexBuffer(uint size);
+	OpenGLIndexBuffer(void* data, uint size);
 	explicit OpenGLIndexBuffer(const Buffer& buffer);
 	virtual ~OpenGLIndexBuffer();
 
 	void Bind() const override;
 
-	void SetData(const void* data, Uint32 size, Uint32 offset = 0) override;
-	void SetData(const Buffer& buffer, Uint32 offset) override;
+	void SetData(const void* data, uint size, uint offset = 0) override;
+	void SetData(const Buffer& buffer, uint offset) override;
 
-	Uint32 GetCount() const override;
-	Uint32 GetSize() const override;
+	uint GetCount() const override;
+	uint GetSize() const override;
 	RendererID GetRendererID() const override;
 
 private:
 	RendererID _rendererID = 0;
-	Uint32 _size;
+	uint _size;
 
 	Buffer _localData;
 };

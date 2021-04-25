@@ -9,7 +9,7 @@ namespace Se
 /// Helper functions
 ////////////////////////////////////////////////////////////////
 
-static String ValueToMonthString(Int32 month)
+static String ValueToMonthString(int month)
 {
 	switch (month)
 	{
@@ -29,7 +29,7 @@ static String ValueToMonthString(Int32 month)
 	}
 }
 
-static String ValueToMonthShortString(Int32 month)
+static String ValueToMonthShortString(int month)
 {
 	switch (month)
 	{
@@ -49,7 +49,7 @@ static String ValueToMonthShortString(Int32 month)
 	}
 }
 
-static String ValueToWeekdayString(Int32 weekday)
+static String ValueToWeekdayString(int weekday)
 {
 	switch (weekday)
 	{
@@ -64,7 +64,7 @@ static String ValueToWeekdayString(Int32 weekday)
 	}
 }
 
-static String ValueToWeekdayShortString(Int32 weekday)
+static String ValueToWeekdayShortString(int weekday)
 {
 	switch (weekday)
 	{
@@ -138,14 +138,14 @@ String DateTime::MonthString(bool abbreviation) const
 
 String DateTime::TimeString() const
 {
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << std::setw(2) << std::setfill('0') << Hour() << ":" << std::setw(2) << std::setfill('0') << Minutes();
 	return oss.str();
 }
 
 String DateTime::ANSIDateString() const
 {
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << Year() << "-" << std::setw(2) << std::setfill('0') << Month() << "-" << std::setw(2) << std::setfill('0') <<
 		Day();
 	return oss.str();

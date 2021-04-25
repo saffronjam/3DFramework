@@ -4,104 +4,12 @@
 #include "Saffron/Core/Project.h"
 #include "Saffron/Core/Time.h"
 #include "Saffron/Scene/Scene.h"
-
-extern "C"
-{
-typedef struct _MonoObject MonoObject;
-typedef struct _MonoClassField MonoClassField;
-typedef struct _MonoString MonoString;
-}
+#include "Saffron/Script/EntityScriptClass.h"
+#include "Saffron/Script/ScriptEngineRegistry.h"
 
 namespace Se
 {
-///////////////////////////////////////////////////////////////////////////
-/// Forwards Declarations
-///////////////////////////////////////////////////////////////////////////
-
-struct EntityScriptClass;
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Field UniformType
-///////////////////////////////////////////////////////////////////////////
-
-enum class FieldType
-{
-	None = 0,
-	Float,
-	Int,
-	UnsignedInt,
-	String,
-	Vec2,
-	Vec3,
-	Vec4
-};
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Entity Instance
-///////////////////////////////////////////////////////////////////////////
-
-struct EntityInstance
-{
-	EntityScriptClass* ScriptClass = nullptr;
-
-	Uint32 Handle = 0;
-	Scene* SceneInstance = nullptr;
-
-	MonoObject* GetInstance() const;
-};
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Public Field
-///////////////////////////////////////////////////////////////////////////
-
-// TODO: This needs to somehow work for strings...
-struct PublicField
-{
-	String Name;
-	FieldType Type;
-
-	PublicField(String name, FieldType type);
-	PublicField(const PublicField&) = delete;
-	PublicField(PublicField&& other);
-	~PublicField();
-
-	void CopyStoredValueToRuntime() const;
-	bool IsRuntimeAvailable() const;
-
-	template <typename T>
-	T GetStoredValue() const;
-	template <typename T>
-	T GetRuntimeValue() const;
-
-	template <typename T>
-	void SetStoredValue(T value) const;
-	template <typename T>
-	void SetRuntimeValue(T value) const;
-	void SetStoredValue(void* src) const;
-
-private:
-	EntityInstance* _entityInstance{};
-	MonoClassField* _monoClassField{};
-	Uint8* _storedValueBuffer = nullptr;
-
-	Uint8* AllocateBuffer(FieldType type);
-	void SetStoredValue_Internal(void* value) const;
-	void GetStoredValue_Internal(void* outValue) const;
-	void SetRuntimeValue_Internal(void* value) const;
-	void GetRuntimeValue_Internal(void* outValue) const;
-
-	friend class ScriptEngine;
-};
-
-using ScriptModuleFieldMap = UnorderedMap<String, UnorderedMap<String, PublicField>>;
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Entity Instance Data
-///////////////////////////////////////////////////////////////////////////
+using ScriptModuleFieldMap = HashMap<String, HashMap<String, PublicField>>;
 
 struct EntityInstanceData
 {
@@ -109,12 +17,7 @@ struct EntityInstanceData
 	ScriptModuleFieldMap ModuleFieldMap;
 };
 
-using EntityInstanceMap = UnorderedMap<UUID, UnorderedMap<UUID, EntityInstanceData>>;
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Script Engine
-///////////////////////////////////////////////////////////////////////////
+using EntityInstanceMap = HashMap<UUID, HashMap<UUID, EntityInstanceData>>;
 
 class ScriptEngine : public SingleTon<ScriptEngine>
 {
@@ -126,29 +29,29 @@ public:
 	static void OnGuiRender();
 	static void OnProjectChange(const Shared<Project>& project);
 	static void OnSceneChange(const Shared<Scene>& scene);
-
+	 
 	static void LoadRuntimeAssembly(const Filepath& assemblyFilepath);
 	static void ReloadAssembly(const Filepath& assemblyFilepath);
 
 	static void SetSceneContext(const Shared<Scene>& scene);
-	static const Shared<Scene>& GetCurrentSceneContext();
+	static const Shared<Scene>& GetSceneContext();
 
 	static void CopyEntityScriptData(UUID dst, UUID src);
 
 	static void OnCreateEntity(Entity entity);
 	static void OnCreateEntity(UUID sceneID, UUID entityID);
 	static void OnUpdateEntity(UUID sceneID, UUID entityID, Time ts);
-
+	 
 	static void OnCollision2DBegin(Entity entity);
 	static void OnCollision2DBegin(UUID sceneID, UUID entityID);
 	static void OnCollision2DEnd(Entity entity);
 	static void OnCollision2DEnd(UUID sceneID, UUID entityID);
-
+	 
 	static void OnCollision3DBegin(Entity entity);
 	static void OnCollision3DBegin(UUID sceneID, UUID entityID);
 	static void OnCollision3DEnd(Entity entity);
 	static void OnCollision3DEnd(UUID sceneID, UUID entityID);
-
+	 
 	static void OnScriptComponentDestroyed(UUID sceneID, UUID entityID);
 
 	static bool ModuleExists(const String& moduleName);
@@ -159,15 +62,42 @@ public:
 	static EntityInstanceMap& GetEntityInstanceMap();
 	static EntityInstanceData& GetEntityInstanceData(UUID sceneID, UUID entityID);
 
-	static MonoString* CreateMonoString(const char* string);
+	static MonoString *CreateMonoString(const String& string);
+	
+	void AttachThread();
+	void DetachThread();
 
-	static void AttachThread();
-	static void DetachThread();
+	MonoImage* GetCoreImage() const;
+	MonoImage* GetAppImage() const;
+
+	MonoAssembly* GetCoreAssembly() const;
+	MonoAssembly* GetAppAssembly() const;
+
+private:
+	MonoClass *GetClass(MonoImage *image, const EntityScriptClass& scriptClass);
+	MonoClass *GetClass(MonoImage *image, const String &namespaceName, const String &className);
 
 public:
 	static constexpr const char* MonoPath = "../Engine/ThirdParty/mono/bin/Runtime";
 
 private:
+	Unique<ScriptEngineRegistry> _scriptEngineRegistry;
+	
+	MonoDomain* _monoDomain = nullptr;
+	Filepath _assemblyFilepath;
+	Shared<Project> _projectContext;
+	Shared<Scene> _sceneContext;
+
+	MonoImage* _coreImage = nullptr;
+	MonoImage* _appImage = nullptr;
+
+	MonoAssembly* _coreAssembly = nullptr;
+	MonoAssembly* _appAssembly = nullptr;
+
+	EntityInstanceMap _entityInstanceMap;
+	TreeMap<String, MonoClass*> _classCacheMap;
+	HashMap<String, EntityScriptClass> _entityClassMap;
+
 	static constexpr const char* ScriptsPath = "Assets/Scripts/";
 	static constexpr const char* ScriptsExtension = ".dll";
 

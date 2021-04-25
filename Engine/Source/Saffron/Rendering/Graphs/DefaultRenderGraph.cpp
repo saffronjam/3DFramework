@@ -13,7 +13,7 @@
 namespace Se
 {
 DefaultRenderGraph::DefaultRenderGraph()
-{
+{	
 	{
 		auto pass = CreateUnique<ShadowMapPass>("shadowMap");
 		AddPass(Move(pass));

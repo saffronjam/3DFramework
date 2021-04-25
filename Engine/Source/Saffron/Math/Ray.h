@@ -7,13 +7,13 @@ namespace Se
 {
 struct Ray
 {
-	Vector3f Origin{}, Direction{};
+	Vector3 Origin{}, Direction{};
 
-	Ray(const Vector3f& origin, const Vector3f& direction);
+	Ray(const Vector3& origin, const Vector3& direction);
 
 	static Ray Zero();
 
 	bool IntersectsAABB(const AABB& aabb, float& t) const;
-	bool IntersectsTriangle(const Vector3f& A, const Vector3f& B, const Vector3f& C, float& t) const;
+	bool IntersectsTriangle(const Vector3& A, const Vector3& B, const Vector3& C, float& t) const;
 };
 }

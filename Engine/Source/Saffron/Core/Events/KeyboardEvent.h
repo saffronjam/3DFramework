@@ -22,7 +22,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Key: " << static_cast<int>(_key);
 		return oss.str();
 	}
@@ -48,7 +48,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Key: " << static_cast<int>(_key);
 		return oss.str();
 	}
@@ -74,7 +74,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Key: " << static_cast<int>(_key);
 		return oss.str();
 	}
@@ -91,21 +91,21 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryKeyboard | CategoryInput);
 
 public:
-	explicit TextInputEvent(Uint8 character) :
+	explicit TextInputEvent(uchar character) :
 		_character(character)
 	{
 	}
 
-	Uint8 GetCharacter() const { return _character; }
+	uchar GetCharacter() const { return _character; }
 
 	String ToString() const override
 	{
-		StringStream ss;
+		OStringStream ss;
 		ss << GetName() << static_cast<int>(_character);
 		return ss.str();
 	}
 
 private:
-	Uint8 _character;
+	uchar _character;
 };
 }

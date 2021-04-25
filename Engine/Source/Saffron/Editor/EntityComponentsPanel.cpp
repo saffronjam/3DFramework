@@ -25,7 +25,7 @@ static void DrawComponent(const String& name, Entity entity, UIFunction uiFuncti
 
 		auto& component = entity.GetComponent<T>();
 		const bool open = ImGui::TreeNodeEx(
-			reinterpret_cast<void*>(static_cast<Uint32>(entity) | typeid(T).hash_code()),
+			reinterpret_cast<void*>(static_cast<uint>(entity) | typeid(T).hash_code()),
 			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, name.c_str());
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
@@ -251,7 +251,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 						{
 							ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(10, 10));
 
-							auto& albedoColor = materialInstance->Get<Vector3f>("u_AlbedoColor");
+							auto& albedoColor = materialInstance->Get<Vector3>("u_AlbedoColor");
 							bool useAlbedoMap = materialInstance->Get<float>("u_AlbedoTexToggle");
 							auto albedoMap = materialInstance->TryGetResource<Texture2D>("u_AlbedoTexture");
 							ImGui::Image(
@@ -855,7 +855,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	});
 }
 
-bool EntityComponentsPanel::DrawVec3Control(const String& label, Vector3f& value, float resetValue, float columnWidth)
+bool EntityComponentsPanel::DrawVec3Control(const String& label, Vector3& value, float resetValue, float columnWidth)
 {
 	bool modified = false;
 

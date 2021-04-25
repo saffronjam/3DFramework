@@ -113,8 +113,8 @@ void PhysicsWorld2D::OnUpdate()
 {
 	const Time ts = Global::Timer::GetStep();
 
-	const Int32 velocityIterations = 6;
-	const Int32 positionIterations = 2;
+	const int velocityIterations = 6;
+	const int positionIterations = 2;
 	_nativeWorld->Step(ts.sec(), velocityIterations, positionIterations);
 
 	{
@@ -151,9 +151,9 @@ void PhysicsWorld2D::OnUpdate()
 
 			const auto& position = body->GetPosition();
 			const auto decomposition = Misc::GetTransformDecomposition(transform);
-			const Vector3f rotation = eulerAngles(decomposition.Rotation);
+			const Vector3 rotation = eulerAngles(decomposition.Rotation);
 
-			transform = translate(Vector3f{position.x, position.y, transform[3].z}) * toMat4(Quaternion({
+			transform = translate(Vector3{position.x, position.y, transform[3].z}) * toMat4(Quaternion({
 				rotation.x, rotation.y, body->GetAngle()
 			})) * scale(decomposition.Scale);
 		}
@@ -180,7 +180,7 @@ void PhysicsWorld2D::OnStart()
 		{
 			auto view = _scene->GetEntityRegistry().view<RigidBody2DComponent>();
 			_physicsBodyEntityBuffer = new Entity[view.size()];
-			Uint32 physicsBodyEntityBufferIndex = 0;
+			uint physicsBodyEntityBufferIndex = 0;
 			for (auto entityHandle : view)
 			{
 				Entity entity = {entityHandle, _scene};
@@ -194,7 +194,7 @@ void PhysicsWorld2D::OnStart()
 				bodyDef.position.Set(transform[3].x, transform[3].y);
 
 				const auto decomposition = Misc::GetTransformDecomposition(transform);
-				Vector3f rotation = eulerAngles(decomposition.Rotation);
+				Vector3 rotation = eulerAngles(decomposition.Rotation);
 				bodyDef.angle = rotation.z;
 
 				b2Body* body = _nativeWorld->CreateBody(&bodyDef);
@@ -284,13 +284,13 @@ void PhysicsWorld2D::OnStop()
 	}
 }
 
-Vector2f PhysicsWorld2D::GetGravity() const
+Vector2 PhysicsWorld2D::GetGravity() const
 {
 	const b2Vec2 b2Gravity = _nativeWorld->GetGravity();
-	return Vector2f(b2Gravity.x, b2Gravity.y);
+	return Vector2(b2Gravity.x, b2Gravity.y);
 }
 
-void PhysicsWorld2D::SetGravity(const Vector2f& gravity)
+void PhysicsWorld2D::SetGravity(const Vector2& gravity)
 {
 	_nativeWorld->SetGravity(b2Vec2{gravity.x, gravity.y});
 }

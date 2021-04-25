@@ -75,7 +75,7 @@ void BloomBlurPass::Execute()
 	}
 }
 
-void BloomBlurPass::OnViewportResize(Uint32 width, Uint32 height)
+void BloomBlurPass::OnViewportResize(uint width, uint height)
 {
 	_verticalFb->Resize(width, height);
 	_horiontalFb->Resize(width, height);

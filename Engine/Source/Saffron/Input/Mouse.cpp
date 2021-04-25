@@ -67,23 +67,23 @@ bool Mouse::GetScroll(MouseWheelCode mouseWheelCode)
 	return Instance()._mouseWheelScrolls[static_cast<int>(mouseWheelCode)];
 }
 
-Vector2f Mouse::GetPosition()
+Vector2 Mouse::GetPosition()
 {
 	return Instance()._position;
 }
 
-Vector2f Mouse::GetPositionNDC()
+Vector2 Mouse::GetPositionNDC()
 {
 	const ImVec2 mousePos = ImGui::GetMousePos();
 	return {mousePos.x, mousePos.y};
 }
 
-Vector2f Mouse::GetSwipe()
+Vector2 Mouse::GetSwipe()
 {
-	Vector2f swipe = Instance()._position - Instance()._lastPosition;
+	Vector2 swipe = Instance()._position - Instance()._lastPosition;
 	if (length2(swipe) > 10000.0f)
 	{
-		swipe = Vector2f(0);
+		swipe = Vector2(0);
 	}
 	return swipe;
 }

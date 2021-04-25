@@ -63,7 +63,7 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	{
 		double x, y;
 		glfwGetCursorPos(_nativeWindow, &x, &y);
-		PushEvent<MouseMovedEvent>(Vector2f(x, y));
+		PushEvent<MouseMovedEvent>(Vector2(x, y));
 	}
 	{
 		glfwSetWindowPos(_nativeWindow, static_cast<int>(_position.x), static_cast<int>(_position.y));
@@ -285,7 +285,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetCursorPosCallback(_nativeWindow, [](GLFWwindow* window, double xpos, double ypos)
 	{
 		auto* pWnd = static_cast<WindowsWindow*>(glfwGetWindowUserPointer(window));
-		pWnd->PushEvent<MouseMovedEvent>(Vector2f(xpos, ypos));
+		pWnd->PushEvent<MouseMovedEvent>(Vector2(xpos, ypos));
 	});
 	glfwSetCursorEnterCallback(_nativeWindow, [](GLFWwindow* window, int enter)
 	{
@@ -303,7 +303,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetWindowPosCallback(_nativeWindow, [](GLFWwindow* window, int xpos, int ypos)
 	{
 		auto* pWnd = static_cast<WindowsWindow*>(glfwGetWindowUserPointer(window));
-		pWnd->PushEvent<WindowMovedEvent>(Vector2f(xpos, ypos));
+		pWnd->PushEvent<WindowMovedEvent>(Vector2(xpos, ypos));
 	});
 	glfwSetWindowFocusCallback(_nativeWindow, [](GLFWwindow* window, int focus)
 	{

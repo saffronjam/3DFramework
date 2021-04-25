@@ -12,15 +12,15 @@ public:
 
 	void OnGuiRender(bool* open = nullptr, UUID uuid = 0);
 
-	bool InViewport(Vector2f positionNDC) const;
+	bool InViewport(Vector2 positionNDC) const;
 
-	Vector2f GetMousePosition() const;
-	Vector2f GetViewportSize() const;
+	Vector2 GetMousePosition() const;
+	Vector2 GetViewportSize() const;
 
-	Uint32 GetDockID() const;
+	uint GetDockID() const;
 
-	const Vector2f& GetTopLeft() const;
-	const Vector2f& GetBottomRight() const;
+	const Vector2& GetTopLeft() const;
+	const Vector2& GetBottomRight() const;
 
 	bool IsHovered() const;
 	bool IsFocused() const;
@@ -31,13 +31,13 @@ public:
 private:
 	String _windowTitle;
 	Shared<Texture> _fallbackTexture;
-	Uint32 _dockID = 0;
+	uint _dockID = 0;
 
-	Vector2f _topLeft;
-	Vector2f _bottomRight;
+	Vector2 _topLeft;
+	Vector2 _bottomRight;
 	bool _hovered;
 	bool _focused;
 
-	Uint32 _oldWidth = 0, _oldHeight = 0;
+	uint _oldWidth = 0, _oldHeight = 0;
 };
 }

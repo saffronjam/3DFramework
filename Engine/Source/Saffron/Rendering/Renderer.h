@@ -15,11 +15,11 @@ class ShaderLibrary;
 
 struct LineVertex
 {
-	Vector3f Position;
-	Vector4f Color;
+	Vector3 Position;
+	Vector4 Color;
 };
 
-class Renderer : public SingleTon<Renderer>
+class Renderer : public SingleTon<Renderer>, public Managed
 {
 public:
 	Renderer();
@@ -60,14 +60,14 @@ public:
 	static void Begin(Shared<Framebuffer> framebuffer, bool clear = true);
 	static void End();
 
-	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4f& transform = Matrix4f(1.0f));
+	static void SubmitQuad(Shared<MaterialInstance> material, const Matrix4& transform = Matrix4(1.0f));
 	static void SubmitFullscreenQuad(Shared<MaterialInstance> material);
-	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform,
+	static void SubmitMesh(Shared<Mesh> mesh, const Matrix4& transform,
 	                       Shared<MaterialInstance> overrideMaterial = nullptr);
-	static void SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4f& transform, Shared<Shader> shader);
+	static void SubmitMeshWithShader(Shared<Mesh> mesh, const Matrix4& transform, Shared<Shader> shader);
 
-	static void DrawAABB(const AABB& aabb, const Matrix4f& transform, const Vector4f& color = Vector4f(1.0f));
-	static void DrawAABB(Shared<Mesh> mesh, const Matrix4f& transform, const Vector4f& color = Vector4f(1.0f));
+	static void DrawAABB(const AABB& aabb, const Matrix4& transform, const Vector4& color = Vector4(1.0f));
+	static void DrawAABB(Shared<Mesh> mesh, const Matrix4& transform, const Vector4& color = Vector4(1.0f));
 
 private:
 	static RenderCommandQueue& GetRenderCommandQueue();

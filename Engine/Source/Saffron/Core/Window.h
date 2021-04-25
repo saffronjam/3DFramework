@@ -15,8 +15,8 @@ class Window : public Managed
 public:
 	struct Properties
 	{
-		explicit Properties(String title = "Saffron Engine", Uint32 width = 1280, Uint32 height = 720,
-		                    const Vector2f position = {100.0f, 100.0f},
+		explicit Properties(String title = "Saffron Engine", uint width = 1280, uint height = 720,
+		                    const Vector2 position = {100.0f, 100.0f},
 		                    AntiAliasing antiAliasing = AntiAliasing::Sample8) :
 			Title(Move(title)),
 			Width(width),
@@ -27,9 +27,9 @@ public:
 		}
 
 		String Title;
-		Uint32 Width;
-		Uint32 Height;
-		Vector2f Position;
+		uint Width;
+		uint Height;
+		Vector2 Position;
 		AntiAliasing AntiAliasing;
 	};
 
@@ -50,9 +50,9 @@ public:
 	void PushEvent(Params&&...params);
 	void HandleBufferedEvents();
 
-	virtual Uint32 GetWidth() const;
-	virtual Uint32 GetHeight() const;
-	virtual const Vector2f& GetPosition() const;
+	virtual uint GetWidth() const;
+	virtual uint GetHeight() const;
+	virtual const Vector2& GetPosition() const;
 	virtual void* GetNativeWindow() const = 0;
 
 	// Window attributes
@@ -102,8 +102,8 @@ public:
 
 protected:
 	String _title;
-	Vector2f _position;
-	Uint32 _width, _height;
+	Vector2 _position;
+	uint _width, _height;
 	AntiAliasing _antiAliasing;
 
 private:

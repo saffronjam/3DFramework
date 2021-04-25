@@ -14,16 +14,16 @@ using EntityMap = std::unordered_map<UUID, Entity>;
 
 struct Light
 {
-	Vector3f Direction = {0.0f, 0.0f, 0.0f};
-	Vector3f Radiance = {0.0f, 0.0f, 0.0f};
+	Vector3 Direction = {0.0f, 0.0f, 0.0f};
+	Vector3 Radiance = {0.0f, 0.0f, 0.0f};
 
 	float Multiplier = 1.0f;
 };
 
 struct DirectionalLight
 {
-	Vector3f Direction = {0.0f, 0.0f, 0.0f};
-	Vector3f Radiance = {0.0f, 0.0f, 0.0f};
+	Vector3 Direction = {0.0f, 0.0f, 0.0f};
+	Vector3 Radiance = {0.0f, 0.0f, 0.0f};
 	float Multiplier = 0.0f;
 
 	// C++ only
@@ -76,7 +76,7 @@ public:
 
 	virtual void SetSelectedEntity(Entity entity) { _selectedEntity = entity; }
 
-	virtual void SetViewportSize(Uint32 width, Uint32 height);
+	virtual void SetViewportSize(uint width, uint height);
 
 	UUID GetUUID() const { return _sceneID; }
 
@@ -124,7 +124,7 @@ protected:
 	Entity _sceneEntity;
 	Entity _selectedEntity;
 
-	Uint32 _viewportWidth = 0, _viewportHeight = 0;
+	uint _viewportWidth = 0, _viewportHeight = 0;
 
 	bool _radiancePrefilter = false;
 	float _envMapRotation = 0.0f;

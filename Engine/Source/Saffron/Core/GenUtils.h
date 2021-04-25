@@ -11,10 +11,34 @@ public:
 	static WideString ToWide(const String& narrow);
 	static String ToNarrow(const String& wide);
 
+	template <class Class>
+	static Pair<String, String> NamespaceAndClassString();
+
 private:
 	template <class Iter>
 	static void SplitStringIter(const String& s, const String& delim, Iter out);
 };
+
+template <class Class>
+Pair<String, String> GenUtils::NamespaceAndClassString()
+{
+	const char* fullname = typeid(Class).name();
+	auto result = SplitString(fullname, "::");
+
+	Debug::Assert(!result.empty() || result.size() < 2,
+	              "Failed to parse namespace + class string. Should have been <opt. namespace>::<class> but got: {0}",
+	              fullname);
+
+	if (result.size() == 1)
+	{
+		return CreatePair(String(""), result.front());
+	}
+	if (result.size() == 2)
+	{
+		return CreatePair(result.front(), result.back());
+	}
+	return {};
+}
 
 template <class Iter>
 void GenUtils::SplitStringIter(const String& s, const String& delim, Iter out)

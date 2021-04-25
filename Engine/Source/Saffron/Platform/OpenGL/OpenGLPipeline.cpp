@@ -51,7 +51,7 @@ void OpenGLPipeline::Bind()
 		glBindVertexArray(instance->_vertexArrayRendererID);
 
 		const auto& layout = instance->_specification.Layout;
-		Uint32 attribIndex = 0;
+		uint attribIndex = 0;
 		for (const auto& element : layout)
 		{
 			auto glBaseType = ShaderDataTypeToOpenGLBaseType(element.Type);

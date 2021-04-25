@@ -27,11 +27,11 @@ namespace Se
 
 struct Vertex
 {
-	Vector3f Position;
-	Vector3f Normal;
-	Vector3f Tangent;
-	Vector3f Binormal;
-	Vector2f TexCoord;
+	Vector3 Position;
+	Vector3 Normal;
+	Vector3 Tangent;
+	Vector3 Binormal;
+	Vector2 TexCoord;
 };
 
 
@@ -41,16 +41,16 @@ struct Vertex
 
 struct AnimatedVertex
 {
-	Vector3f Position{};
-	Vector3f Normal{};
-	Vector3f Tangent{};
-	Vector3f Binormal{};
-	Vector2f TexCoord{};
+	Vector3 Position{};
+	Vector3 Normal{};
+	Vector3 Tangent{};
+	Vector3 Binormal{};
+	Vector2 TexCoord{};
 
-	Uint32 IDs[4] = {0, 0, 0, 0};
+	uint IDs[4] = {0, 0, 0, 0};
 	float Weights[4]{0.0f, 0.0f, 0.0f, 0.0f};
 
-	void AddBoneData(Uint32 BoneID, float Weight);
+	void AddBoneData(uint BoneID, float Weight);
 };
 
 static const int NumAttributes = 5;
@@ -62,10 +62,10 @@ static const int NumAttributes = 5;
 
 struct Index
 {
-	Uint32 V1, V2, V3;
+	uint V1, V2, V3;
 };
 
-static_assert(sizeof(Index) == 3 * sizeof(Uint32));
+static_assert(sizeof(Index) == 3 * sizeof(uint));
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -74,8 +74,8 @@ static_assert(sizeof(Index) == 3 * sizeof(Uint32));
 
 struct BoneInfo
 {
-	Matrix4f BoneOffset;
-	Matrix4f FinalTransformation;
+	Matrix4 BoneOffset;
+	Matrix4 FinalTransformation;
 };
 
 
@@ -85,12 +85,12 @@ struct BoneInfo
 
 struct VertexBoneData
 {
-	Uint32 IDs[4]{};
+	uint IDs[4]{};
 	float Weights[4]{};
 
 	VertexBoneData();
 
-	void AddBoneData(Uint32 BoneID, float Weight);
+	void AddBoneData(uint BoneID, float Weight);
 };
 
 struct Triangle
@@ -108,12 +108,12 @@ struct Triangle
 class Submesh
 {
 public:
-	Uint32 BaseVertex{};
-	Uint32 BaseIndex{};
-	Uint32 MaterialIndex{};
-	Uint32 IndexCount{};
+	uint BaseVertex{};
+	uint BaseIndex{};
+	uint MaterialIndex{};
+	uint IndexCount{};
 
-	Matrix4f Transform{};
+	Matrix4 Transform{};
 	AABB BoundingBox;
 
 	String NodeName, MeshName;
@@ -130,10 +130,10 @@ public:
 	ArrayList<Submesh>& GetSubmeshes();
 	const ArrayList<Submesh>& GetSubmeshes() const;
 
-	const Matrix4f& GetLocalTransform() const;
-	void SetLocalTransform(Matrix4f localTransform);
+	const Matrix4& GetLocalTransform() const;
+	void SetLocalTransform(Matrix4 localTransform);
 
-	ArrayList<AABB> GetBoundingBoxes(const Matrix4f& transform = Matrix4f(1));
+	ArrayList<AABB> GetBoundingBoxes(const Matrix4& transform = Matrix4(1));
 	Shared<Shader> GetMeshShader() const;
 
 	Shared<Material> GetMaterial() const;
@@ -141,29 +141,29 @@ public:
 	const ArrayList<Shared<Texture2D>>& GetTextures() const;
 
 	const Filepath& GetFilepath() const;
-	ArrayList<Triangle> GetTriangleCache(Uint32 index) const;
+	ArrayList<Triangle> GetTriangleCache(uint index) const;
 
 private:
 	void BoneTransform(float time);
-	void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& ParentTransform);
-	void TraverseNodes(aiNode* node, const Matrix4f& parentTransform = Matrix4f(1.0f), Uint32 level = 0);
+	void ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4& ParentTransform);
+	void TraverseNodes(aiNode* node, const Matrix4& parentTransform = Matrix4(1.0f), uint level = 0);
 
 	const aiNodeAnim* FindNodeAnim(const aiAnimation* animation, const String& nodeName);
-	Uint32 FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
-	Uint32 FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
-	Uint32 FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
-	Vector3f InterpolateTranslation(float animationTime, const aiNodeAnim* nodeAnim);
+	uint FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim);
+	uint FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim);
+	uint FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim);
+	Vector3 InterpolateTranslation(float animationTime, const aiNodeAnim* nodeAnim);
 	glm::quat InterpolateRotation(float animationTime, const aiNodeAnim* nodeAnim);
-	Vector3f InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim);
+	Vector3 InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim);
 
 private:
 	ArrayList<Submesh> _submeshes;
 
 	Unique<Assimp::Importer> _importer;
 
-	Matrix4f _inverseTransform{};
+	Matrix4 _inverseTransform{};
 
-	Uint32 _boneCount = 0;
+	uint _boneCount = 0;
 	ArrayList<BoneInfo> _boneInfo;
 
 	Shared<Pipeline> _pipeline;
@@ -173,8 +173,8 @@ private:
 	ArrayList<Vertex> _staticVertices;
 	ArrayList<AnimatedVertex> _animatedVertices;
 	ArrayList<Index> _indices;
-	UnorderedMap<String, Uint32> _boneMapping;
-	ArrayList<Matrix4f> _boneTransforms;
+	HashMap<String, uint> _boneMapping;
+	ArrayList<Matrix4> _boneTransforms;
 	const aiScene* _scene;
 
 	// Materials
@@ -183,9 +183,9 @@ private:
 	ArrayList<Shared<Texture2D>> _textures;
 	ArrayList<Shared<Texture2D>> _normalMaps;
 	ArrayList<Shared<MaterialInstance>> _materials;
-	Matrix4f _localTransform;
+	Matrix4 _localTransform;
 
-	UnorderedMap<Uint32, ArrayList<Triangle>> _triangleCache;
+	HashMap<uint, ArrayList<Triangle>> _triangleCache;
 
 	// Animation
 	bool _isAnimated = false;

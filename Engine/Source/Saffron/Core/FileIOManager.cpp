@@ -73,17 +73,17 @@ size_t FileIOManager::GetFileSize(const Filepath& filepath)
 	return 0ull;
 }
 
-size_t FileIOManager::Write(const Uint8* data, size_t size, const Filepath& filepath, bool overwrite)
+size_t FileIOManager::Write(const uchar* data, size_t size, const Filepath& filepath, bool overwrite)
 {
 	const bool fileExists = FileExists(filepath);
 	if (!fileExists || fileExists && overwrite)
 	{
-		OutputStream ofstream;
+		OStream ofstream;
 		ofstream.open(filepath);
 		if (ofstream.good())
 		{
 			const auto start = ofstream.tellp();
-			ofstream.write(reinterpret_cast<const Int8*>(data), size);
+			ofstream.write(reinterpret_cast<const char*>(data), size);
 			return ofstream.tellp() - start;
 		}
 		Log::CoreWarn("Failed to open file: " + filepath.string());
@@ -115,10 +115,10 @@ bool FileIOManager::Copy(const Filepath& source, const Filepath& destination)
 	return static_cast<bool>(errorCode);
 }
 
-size_t FileIOManager::Read(const Filepath& filepath, OutputStringStream& destination)
+size_t FileIOManager::Read(const Filepath& filepath, OStringStream& destination)
 {
 	String data;
-	InputStream is(filepath);
+	IStream is(filepath);
 
 	size_t fileSize = 0ull;
 	if (is.is_open())
@@ -138,7 +138,7 @@ size_t FileIOManager::Read(const Filepath& filepath, OutputStringStream& destina
 
 ArrayList<char> FileIOManager::ReadBinary(const Filepath& filepath)
 {
-	InputStream is(filepath, std::ios::binary);
+	IStream is(filepath, std::ios::binary);
 
 	ArrayList<char> data;
 	if (is.is_open())

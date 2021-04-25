@@ -45,7 +45,7 @@ private:
 private:
 	Mutex _mutex;
 	InstrumentationSession* _currentSession;
-	OutputStream _outputStream;
+	OStream _outputStream;
 };
 
 class InstrumentationTimer : public Timer

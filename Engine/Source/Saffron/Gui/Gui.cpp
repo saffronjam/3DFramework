@@ -289,12 +289,12 @@ bool Gui::Property(const String& label, float& value, float step, float min, flo
 	return changed;
 }
 
-bool Gui::Property(const String& label, Vector2f& value, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector2& value, PropertyFlag flags)
 {
 	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector2f& value, float step, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector2& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -317,12 +317,12 @@ bool Gui::Property(const String& label, Vector2f& value, float step, float min, 
 	return changed;
 }
 
-bool Gui::Property(const String& label, Vector3f& value, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector3& value, PropertyFlag flags)
 {
 	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector3f& value, float step, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector3& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -347,12 +347,12 @@ bool Gui::Property(const String& label, Vector3f& value, float step, float min, 
 	return changed;
 }
 
-bool Gui::Property(const String& label, Vector4f& value, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector4& value, PropertyFlag flags)
 {
 	return Property(label, value, 0.1f, 0.0f, 0.0f, flags);
 }
 
-bool Gui::Property(const String& label, Vector4f& value, float step, float min, float max, PropertyFlag flags)
+bool Gui::Property(const String& label, Vector4& value, float step, float min, float max, PropertyFlag flags)
 {
 	auto& inst = Instance();
 
@@ -462,12 +462,12 @@ void Gui::ForceHideBarTab()
 	}
 }
 
-Vector4f Gui::GetSaffronOrange(float opacity)
+Vector4 Gui::GetSaffronOrange(float opacity)
 {
 	return {0.89f, 0.46f, 0.16f, opacity};
 }
 
-Vector4f Gui::GetSaffronPurple(float opacity)
+Vector4 Gui::GetSaffronPurple(float opacity)
 {
 	return {0.29f, 0.13f, 0.42f, opacity};
 }
@@ -596,27 +596,27 @@ void Gui::ApplyStyle(Style style)
 		//const Vector3f mainLessVibrant = { 0.89f, 0.39f, 0.02f };
 
 		// Main Purple
-		const Vector3f mainVibrant = {0.29f, 0.13f, 0.42f};
-		const Vector3f mainVibrantDark = {0.19f, 0.15f, 0.23f};
-		const Vector3f mainLessVibrant = {0.33f, 0.18f, 0.48f};
+		const Vector3 mainVibrant = {0.29f, 0.13f, 0.42f};
+		const Vector3 mainVibrantDark = {0.19f, 0.15f, 0.23f};
+		const Vector3 mainLessVibrant = {0.33f, 0.18f, 0.48f};
 
-		const Vector4f mainNoTint = {mainVibrant, 1.00f}; //3	Main no tint
-		const Vector4f mainTint1 = {mainVibrant, 0.95f}; //9	Main tinted1
-		const Vector4f mainTint2 = {mainVibrant, 0.80f}; //8	Main tinted2
-		const Vector4f mainTint3 = {mainVibrant, 0.67f}; //2	Main tinted3
-		const Vector4f mainTint4 = {mainVibrant, 0.40f}; //1	Main tinted4
-		const Vector4f mainTint5 = {mainVibrant, 0.35f}; //13	Main tinted5
+		const Vector4 mainNoTint = {mainVibrant, 1.00f}; //3	Main no tint
+		const Vector4 mainTint1 = {mainVibrant, 0.95f}; //9	Main tinted1
+		const Vector4 mainTint2 = {mainVibrant, 0.80f}; //8	Main tinted2
+		const Vector4 mainTint3 = {mainVibrant, 0.67f}; //2	Main tinted3
+		const Vector4 mainTint4 = {mainVibrant, 0.40f}; //1	Main tinted4
+		const Vector4 mainTint5 = {mainVibrant, 0.35f}; //13	Main tinted5
 
-		const Vector4f mainDark = {mainVibrantDark, 1.00f}; //4	Main dark1 no tint
+		const Vector4 mainDark = {mainVibrantDark, 1.00f}; //4	Main dark1 no tint
 
-		const Vector4f mainLessVibrantNoTint = {mainLessVibrant, 1.00f}; //6	Less blue no tint
-		const Vector4f mainLessVibrantTint1 = {mainLessVibrant, 0.60f}; //14 Less blue tinted1
+		const Vector4 mainLessVibrantNoTint = {mainLessVibrant, 1.00f}; //6	Less blue no tint
+		const Vector4 mainLessVibrantTint1 = {mainLessVibrant, 0.60f}; //14 Less blue tinted1
 
-		const Vector4f coMain = {1.00f, 0.43f, 0.35f, 1.00f}; //10	2ndMain no tint
-		const Vector4f coMainDark = {0.90f, 0.70f, 0.00f, 1.00f}; //11	3rdMain no tint
-		const Vector4f coMainRed = {1.00f, 0.60f, 0.00f, 1.00f}; //12	Co3rdMain 
+		const Vector4 coMain = {1.00f, 0.43f, 0.35f, 1.00f}; //10	2ndMain no tint
+		const Vector4 coMainDark = {0.90f, 0.70f, 0.00f, 1.00f}; //11	3rdMain no tint
+		const Vector4 coMainRed = {1.00f, 0.60f, 0.00f, 1.00f}; //12	Co3rdMain 
 
-		const auto ToImVec4 = [](const Vector4f& vector)
+		const auto ToImVec4 = [](const Vector4& vector)
 		{
 			return ImVec4{vector.x, vector.y, vector.z, vector.w};
 		};

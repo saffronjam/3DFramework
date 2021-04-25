@@ -31,23 +31,23 @@ struct TagComponent
 
 struct TransformComponent
 {
-	Matrix4f Transform;
+	Matrix4 Transform;
 
 	TransformComponent() :
 		Transform(1)
 	{
 	}
 
-	TransformComponent(Matrix4f transform) :
+	TransformComponent(Matrix4 transform) :
 		Transform(Move(transform))
 	{
 	}
 
 	TransformComponent(const TransformComponent& other) = default;
 
-	operator Matrix4f&() { return Transform; }
+	operator Matrix4&() { return Transform; }
 
-	operator const Matrix4f&() const { return Transform; }
+	operator const Matrix4&() const { return Transform; }
 };
 
 struct MeshComponent
@@ -116,7 +116,7 @@ struct CameraComponent
 		Camera(Shared<SceneCamera>::Create()),
 		CameraMesh(Shared<Mesh>::Create("Camera.fbx"))
 	{
-		CameraMesh->GetMaterial()->Set<Vector3f>("u_AlbedoColor", {0.0f, 0.0f, 0.45});
+		CameraMesh->GetMaterial()->Set<Vector3>("u_AlbedoColor", {0.0f, 0.0f, 0.45});
 	}
 
 	CameraComponent(const CameraComponent& other) = default;
@@ -126,7 +126,7 @@ struct CameraComponent
 
 struct SpriteRendererComponent
 {
-	Vector4f Color = {1.0f, 1.0f, 1.0f, 1.0f};
+	Vector4 Color = {1.0f, 1.0f, 1.0f, 1.0f};
 	Shared<Texture2D> Texture;
 	float TilingFactor = 1.0f;
 
@@ -149,7 +149,7 @@ struct RigidBody2DComponent
 
 struct Collider2DComponent
 {
-	Vector2f Offset = {0.0f, 0.0f};
+	Vector2 Offset = {0.0f, 0.0f};
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
@@ -161,7 +161,7 @@ struct Collider2DComponent
 
 struct BoxCollider2DComponent : Collider2DComponent
 {
-	Vector2f Size = {1.0f, 1.0f};
+	Vector2 Size = {1.0f, 1.0f};
 
 	BoxCollider2DComponent() = default;
 	BoxCollider2DComponent(const BoxCollider2DComponent& other) = default;
@@ -189,7 +189,7 @@ struct RigidBody3DComponent
 
 struct Collider3DComponent
 {
-	Vector3f Offset = {0.0f, 0.0f, 0.0f};
+	Vector3 Offset = {0.0f, 0.0f, 0.0f};
 
 	float Density = 1.0f;
 	float Friction = 1.0f;
@@ -202,7 +202,7 @@ struct Collider3DComponent
 
 struct BoxCollider3DComponent : Collider3DComponent
 {
-	Vector3f Size = {1.0f, 1.0f, 1.0f};
+	Vector3 Size = {1.0f, 1.0f, 1.0f};
 
 	BoxCollider3DComponent() = default;
 	BoxCollider3DComponent(const BoxCollider3DComponent& other) = default;
@@ -222,7 +222,7 @@ struct SphereCollider3DComponent : Collider3DComponent
 
 struct DirectionalLightComponent
 {
-	Vector3f Radiance = {1.0f, 1.0f, 1.0f};
+	Vector3 Radiance = {1.0f, 1.0f, 1.0f};
 	float Intensity = 1.0f;
 	bool CastShadows = true;
 	bool SoftShadows = true;

@@ -111,9 +111,9 @@ Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
 	return Buffer::Copy(result.c_str(), result.length() * sizeof(String::value_type));
 }
 
-UnorderedMap<GLenum, String> OpenGLShader::PreProcess(const Buffer& source)
+HashMap<GLenum, String> OpenGLShader::PreProcess(const Buffer& source)
 {
-	UnorderedMap<GLenum, String> shaderSources;
+	HashMap<GLenum, String> shaderSources;
 
 	String data(reinterpret_cast<const char*>(source.Data()), source.Size());
 
@@ -208,7 +208,7 @@ String GetBlock(const char* str, const char** outPosition)
 	if (!end) return str;
 
 	if (outPosition) *outPosition = end;
-	Uint32 length = end - str + 1;
+	uint length = end - str + 1;
 	return String(str, length);
 }
 
@@ -218,7 +218,7 @@ String GetStatement(const char* str, const char** outPosition)
 	if (!end) return str;
 
 	if (outPosition) *outPosition = end;
-	Uint32 length = end - str + 1;
+	uint length = end - str + 1;
 	return String(str, length);
 }
 
@@ -279,7 +279,7 @@ ShaderStruct* OpenGLShader::FindStruct(const String& name)
 void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 {
 	ArrayList<String> tokens = Tokenize(statement);
-	Uint32 index = 0;
+	uint index = 0;
 
 	index++; // "uniform"
 	String typeString = tokens[index++];
@@ -355,7 +355,7 @@ void OpenGLShader::ParseUniformStruct(const String& block, ShaderDomain domain)
 {
 	ArrayList<String> tokens = Tokenize(block);
 
-	Uint32 index = 0;
+	uint index = 0;
 	index++; // struct
 	String name = tokens[index++];
 	ShaderStruct* uniformStruct = new ShaderStruct(name);
@@ -370,7 +370,7 @@ void OpenGLShader::ParseUniformStruct(const String& block, ShaderDomain domain)
 		// Strip ; from name if present
 		if (const char* s = strstr(name.c_str(), ";")) name = String(name.c_str(), s - name.c_str());
 
-		Uint32 count = 1;
+		uint count = 1;
 		const char* namestr = name.c_str();
 		if (const char* s = strstr(namestr, "["))
 		{
@@ -493,7 +493,7 @@ void OpenGLShader::ResolveUniforms()
 		}
 	}
 
-	Uint32 sampler = 0;
+	uint sampler = 0;
 	for (size_t i = 0; i < _resources.size(); i++)
 	{
 		OpenGLShaderResourceDeclaration* resource = static_cast<OpenGLShaderResourceDeclaration*>(_resources[i]);
@@ -509,9 +509,9 @@ void OpenGLShader::ResolveUniforms()
 		else if (resource->GetCount() > 1)
 		{
 			resource->_register = sampler;
-			Uint32 count = resource->GetCount();
+			uint count = resource->GetCount();
 			int* samplers = new int[count];
-			for (Uint32 s = 0; s < count; s++) samplers[s] = sampler++;
+			for (uint s = 0; s < count; s++) samplers[s] = sampler++;
 			UploadUniformIntArray(resource->GetName(), samplers, count);
 			delete[] samplers;
 		}
@@ -644,7 +644,7 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 
 	Debug::Assert(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
-	Uint32 offset = uniform->GetOffset();
+	uint offset = uniform->GetOffset();
 	switch (uniform->GetType())
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool: UploadUniformFloat(
@@ -657,19 +657,19 @@ void OpenGLShader::ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform,
 	                                                                   *(int32_t*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			uniform->GetLocation(), *(Vector2f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector2*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			uniform->GetLocation(), *(Vector3f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector3*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			uniform->GetLocation(), *(Vector4f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector4*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(uniform->GetLocation(),
-	                                                                   *(Matrix3f*)&buffer.Data()[offset]);
+	                                                                   *(Matrix3*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(uniform->GetLocation(),
-	                                                                   *(Matrix4f*)&buffer.Data()[offset]);
+	                                                                   *(Matrix4*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
@@ -681,7 +681,7 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 {
 	//Debug::Assert(uniform->GetLocation() != -1, "Uniform has invalid location!");
 
-	Uint32 offset = uniform->GetOffset();
+	uint offset = uniform->GetOffset();
 	switch (uniform->GetType())
 	{
 	case OpenGLShaderUniformDeclaration::Type::Bool: UploadUniformFloat(
@@ -694,19 +694,19 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 	                                                                   *(int32_t*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			uniform->GetLocation(), *(Vector2f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector2*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			uniform->GetLocation(), *(Vector3f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector3*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			uniform->GetLocation(), *(Vector4f*)&buffer.Data()[offset]);
+			uniform->GetLocation(), *(Vector4*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(uniform->GetLocation(),
-	                                                                   *(Matrix3f*)&buffer.Data()[offset]);
+	                                                                   *(Matrix3*)&buffer.Data()[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4Array(
-			uniform->GetLocation(), *(Matrix4f*)&buffer.Data()[offset], uniform->GetCount());
+			uniform->GetLocation(), *(Matrix4*)&buffer.Data()[offset], uniform->GetCount());
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Struct: UploadUniformStruct(uniform, buffer.Data(), offset);
 		break;
@@ -714,7 +714,7 @@ void OpenGLShader::ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uni
 	}
 }
 
-void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, Uint8* data, int32_t offset)
+void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, uchar* data, int32_t offset)
 {
 	switch (field.GetType())
 	{
@@ -725,17 +725,17 @@ void OpenGLShader::ResolveAndSetUniformField(const OpenGLShaderUniformDeclaratio
 	case OpenGLShaderUniformDeclaration::Type::Int32: UploadUniformInt(field.GetLocation(), *(int32_t*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec2: UploadUniformFloat2(
-			field.GetLocation(), *(Vector2f*)&data[offset]);
+			field.GetLocation(), *(Vector2*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec3: UploadUniformFloat3(
-			field.GetLocation(), *(Vector3f*)&data[offset]);
+			field.GetLocation(), *(Vector3*)&data[offset]);
 		break;
 	case OpenGLShaderUniformDeclaration::Type::Vec4: UploadUniformFloat4(
-			field.GetLocation(), *(Vector4f*)&data[offset]);
+			field.GetLocation(), *(Vector4*)&data[offset]);
 		break;
-	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(field.GetLocation(), *(Matrix3f*)&data[offset]);
+	case OpenGLShaderUniformDeclaration::Type::Mat3: UploadUniformMat3(field.GetLocation(), *(Matrix3*)&data[offset]);
 		break;
-	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(field.GetLocation(), *(Matrix4f*)&data[offset]);
+	case OpenGLShaderUniformDeclaration::Type::Mat4: UploadUniformMat4(field.GetLocation(), *(Matrix4*)&data[offset]);
 		break;
 	default: Debug::Assert(false, "Unknown uniform type!");
 	}
@@ -760,7 +760,7 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		case UniformType::Float3:
 		{
 			const String& name = decl.Name;
-			Vector3f& values = *(Vector3f*)(uniformBuffer.GetBuffer() + decl.Offset);
+			Vector3& values = *(Vector3*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformFloat3(name, values);
@@ -769,7 +769,7 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		case UniformType::Float4:
 		{
 			const String& name = decl.Name;
-			Vector4f& values = *(Vector4f*)(uniformBuffer.GetBuffer() + decl.Offset);
+			Vector4& values = *(Vector4*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformFloat4(name, values);
@@ -778,7 +778,7 @@ void OpenGLShader::UploadUniformBuffer(const UniformBufferBase& uniformBuffer)
 		case UniformType::Matrix4x4:
 		{
 			const String& name = decl.Name;
-			Matrix4f& values = *(Matrix4f*)(uniformBuffer.GetBuffer() + decl.Offset);
+			Matrix4& values = *(Matrix4*)(uniformBuffer.GetBuffer() + decl.Offset);
 			Renderer::Submit([=]()
 			{
 				UploadUniformMat4(name, values);
@@ -812,7 +812,7 @@ void OpenGLShader::SetBool(const String& name, bool value)
 	});
 }
 
-void OpenGLShader::SetFloat2(const String& name, const Vector2f& value)
+void OpenGLShader::SetFloat2(const String& name, const Vector2& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -820,7 +820,7 @@ void OpenGLShader::SetFloat2(const String& name, const Vector2f& value)
 	});
 }
 
-void OpenGLShader::SetFloat3(const String& name, const Vector3f& value)
+void OpenGLShader::SetFloat3(const String& name, const Vector3& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -828,7 +828,7 @@ void OpenGLShader::SetFloat3(const String& name, const Vector3f& value)
 	});
 }
 
-void OpenGLShader::SetMat4(const String& name, const Matrix4f& value)
+void OpenGLShader::SetMat4(const String& name, const Matrix4& value)
 {
 	Renderer::Submit([=]()
 	{
@@ -836,7 +836,7 @@ void OpenGLShader::SetMat4(const String& name, const Matrix4f& value)
 	});
 }
 
-void OpenGLShader::SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind)
+void OpenGLShader::SetMat4FromRenderThread(const String& name, const Matrix4& value, bool bind)
 {
 	if (bind)
 	{
@@ -849,7 +849,7 @@ void OpenGLShader::SetMat4FromRenderThread(const String& name, const Matrix4f& v
 	}
 }
 
-void OpenGLShader::SetIntArray(const String& name, int* values, Uint32 size)
+void OpenGLShader::SetIntArray(const String& name, int* values, uint size)
 {
 	Renderer::Submit([=]()
 	{
@@ -857,52 +857,52 @@ void OpenGLShader::SetIntArray(const String& name, int* values, Uint32 size)
 	});
 }
 
-void OpenGLShader::UploadUniformInt(Uint32 location, int32_t value)
+void OpenGLShader::UploadUniformInt(uint location, int32_t value)
 {
 	glUniform1i(location, value);
 }
 
-void OpenGLShader::UploadUniformIntArray(Uint32 location, int32_t* values, int32_t count)
+void OpenGLShader::UploadUniformIntArray(uint location, int32_t* values, int32_t count)
 {
 	glUniform1iv(location, count, values);
 }
 
-void OpenGLShader::UploadUniformFloat(Uint32 location, float value)
+void OpenGLShader::UploadUniformFloat(uint location, float value)
 {
 	glUniform1f(location, value);
 }
 
-void OpenGLShader::UploadUniformFloat2(Uint32 location, const Vector2f& value)
+void OpenGLShader::UploadUniformFloat2(uint location, const Vector2& value)
 {
 	glUniform2f(location, value.x, value.y);
 }
 
-void OpenGLShader::UploadUniformFloat3(Uint32 location, const Vector3f& value)
+void OpenGLShader::UploadUniformFloat3(uint location, const Vector3& value)
 {
 	glUniform3f(location, value.x, value.y, value.z);
 }
 
-void OpenGLShader::UploadUniformFloat4(Uint32 location, const Vector4f& value)
+void OpenGLShader::UploadUniformFloat4(uint location, const Vector4& value)
 {
 	glUniform4f(location, value.x, value.y, value.z, value.w);
 }
 
-void OpenGLShader::UploadUniformMat3(Uint32 location, const Matrix3f& value)
+void OpenGLShader::UploadUniformMat3(uint location, const Matrix3& value)
 {
 	glUniformMatrix3fv(location, 1, GL_FALSE, value_ptr(value));
 }
 
-void OpenGLShader::UploadUniformMat4(Uint32 location, const Matrix4f& value)
+void OpenGLShader::UploadUniformMat4(uint location, const Matrix4& value)
 {
 	glUniformMatrix4fv(location, 1, GL_FALSE, value_ptr(value));
 }
 
-void OpenGLShader::UploadUniformMat4Array(Uint32 location, const Matrix4f& values, Uint32 count)
+void OpenGLShader::UploadUniformMat4Array(uint location, const Matrix4& values, uint count)
 {
 	glUniformMatrix4fv(location, count, GL_FALSE, value_ptr(values));
 }
 
-void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, Uint8* buffer, Uint32 offset)
+void OpenGLShader::UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, uchar* buffer, uint offset)
 {
 	const ShaderStruct& s = uniform->GetShaderUniformStruct();
 	const auto& fields = s.GetFields();
@@ -920,7 +920,7 @@ void OpenGLShader::UploadUniformInt(const String& name, int32_t value)
 	glUniform1i(location, value);
 }
 
-void OpenGLShader::UploadUniformIntArray(const String& name, int32_t* values, Uint32 count)
+void OpenGLShader::UploadUniformIntArray(const String& name, int32_t* values, uint count)
 {
 	int32_t location = GetUniformLocation(name);
 	glUniform1iv(location, count, values);
@@ -935,7 +935,7 @@ void OpenGLShader::UploadUniformFloat(const String& name, float value)
 	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& values)
+void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2& values)
 {
 	glUseProgram(_rendererID);
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
@@ -945,7 +945,7 @@ void OpenGLShader::UploadUniformFloat2(const String& name, const Vector2f& value
 }
 
 
-void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& values)
+void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3& values)
 {
 	glUseProgram(_rendererID);
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
@@ -954,7 +954,7 @@ void OpenGLShader::UploadUniformFloat3(const String& name, const Vector3f& value
 	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& values)
+void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4& values)
 {
 	glUseProgram(_rendererID);
 	auto location = glGetUniformLocation(_rendererID, name.c_str());
@@ -963,7 +963,7 @@ void OpenGLShader::UploadUniformFloat4(const String& name, const Vector4f& value
 	else SE_LOG_UNIFORM("Uniform '{0}' not found!", name);
 }
 
-void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4f& values)
+void OpenGLShader::UploadUniformMat4(const String& name, const Matrix4& values)
 {
 	glUseProgram(_rendererID);
 	auto location = glGetUniformLocation(_rendererID, name.c_str());

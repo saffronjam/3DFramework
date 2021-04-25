@@ -12,12 +12,12 @@ class UUID
 {
 public:
 	UUID();
-	UUID(Uint64 uuid);
+	UUID(ulong uuid);
 	UUID(const UUID& other);
 
-	operator Uint64() { return _uuid; }
+	operator ulong() { return _uuid; }
 
-	operator const Uint64() const { return _uuid; }
+	operator const ulong() const { return _uuid; }
 
 	bool operator==(const UUID& other) const
 	{
@@ -27,7 +27,7 @@ public:
 	static UUID Null() { return UUID(0ull); }
 
 private:
-	Uint64 _uuid;
+	ulong _uuid;
 };
 }
 
@@ -38,7 +38,7 @@ struct hash<Se::UUID>
 {
 	std::size_t operator()(const Se::UUID& uuid) const
 	{
-		return hash<Se::Uint64>()(static_cast<Se::Uint64>(uuid));
+		return hash<Se::ulong>()(static_cast<Se::ulong>(uuid));
 	}
 };
 }

@@ -44,7 +44,7 @@ void Instrumentor::EndSession()
 
 void Instrumentor::WriteProfile(const ProfileResult& result)
 {
-	StringStream json;
+	OStringStream json;
 
 	json << std::setprecision(3) << std::fixed;
 	json << R"(,{)";

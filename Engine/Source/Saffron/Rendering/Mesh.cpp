@@ -29,9 +29,9 @@ namespace Se
 /// Helper functions
 ////////////////////////////////////////////////////////////////////////
 
-Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix)
+Matrix4 Mat4FromAssimpMat4(const aiMatrix4x4& matrix)
 {
-	Matrix4f result;
+	Matrix4 result;
 	//the a,b,c,d in assimp is the row ; the 1,2,3,4 is the column
 	result[0][0] = matrix.a1;
 	result[1][0] = matrix.a2;
@@ -53,10 +53,10 @@ Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix)
 }
 
 // TODO: Remove this unused function
-static String LevelToSpaces(Uint32 level)
+static String LevelToSpaces(uint level)
 {
 	String result;
-	for (Uint32 i = 0; i < level; i++) result += "--";
+	for (uint i = 0; i < level; i++) result += "--";
 	return result;
 }
 
@@ -64,7 +64,7 @@ static String LevelToSpaces(Uint32 level)
 /// Helper Structs
 ////////////////////////////////////////////////////////////////////////
 
-static const Uint32 s_MeshImportFlags = aiProcess_CalcTangentSpace | // Create binormals/tangents just in case
+static const uint s_MeshImportFlags = aiProcess_CalcTangentSpace | // Create binormals/tangents just in case
 	aiProcess_Triangulate | // Make sure we're triangles
 	aiProcess_SortByPType | // Split meshes by primitive type
 	aiProcess_GenNormals | // Make sure we have legit normals
@@ -93,7 +93,7 @@ struct LogStream : Assimp::LogStream
 /// Animated Vertex
 ////////////////////////////////////////////////////////////////////////
 
-void AnimatedVertex::AddBoneData(Uint32 BoneID, float Weight)
+void AnimatedVertex::AddBoneData(uint BoneID, float Weight)
 {
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -122,7 +122,7 @@ VertexBoneData::VertexBoneData()
 	memset(Weights, 0, sizeof Weights);
 }
 
-void VertexBoneData::AddBoneData(Uint32 BoneID, float Weight)
+void VertexBoneData::AddBoneData(uint BoneID, float Weight)
 {
 	for (size_t i = 0; i < 4; i++)
 	{
@@ -167,8 +167,8 @@ Mesh::Mesh(Filepath filepath) :
 	// _materialInstance = Shared<MaterialInstance>::Create(_baseMaterial);
 	//_inverseTransform = Matrix4f(0);// glm::inverse(Mat4FromAssimpMat4(scene->mRootNode->mTransformation));
 
-	Uint32 vertexCount = 0;
-	Uint32 indexCount = 0;
+	uint vertexCount = 0;
+	uint indexCount = 0;
 
 	_submeshes.reserve(scene->mNumMeshes);
 	for (size_t m = 0; m < scene->mNumMeshes; m++)
@@ -248,7 +248,7 @@ Mesh::Mesh(Filepath filepath) :
 			_indices.push_back(index);
 
 			if (!_isAnimated)
-				_triangleCache[static_cast<Uint32>(m)].emplace_back(_staticVertices[index.V1 + submesh.BaseVertex],
+				_triangleCache[static_cast<uint>(m)].emplace_back(_staticVertices[index.V1 + submesh.BaseVertex],
 				                                                     _staticVertices[index.V2 + submesh.BaseVertex],
 				                                                     _staticVertices[index.V3 + submesh.BaseVertex]);
 		}
@@ -303,7 +303,7 @@ Mesh::Mesh(Filepath filepath) :
 
 		_textures.resize(scene->mNumMaterials);
 		_materials.resize(scene->mNumMaterials);
-		for (Uint32 i = 0; i < scene->mNumMaterials; i++)
+		for (uint i = 0; i < scene->mNumMaterials; i++)
 		{
 			auto* aiMaterial = scene->mMaterials[i];
 			auto aiMaterialName = aiMaterial->GetName();
@@ -313,7 +313,7 @@ Mesh::Mesh(Filepath filepath) :
 
 			SE_MESH_LOG("  {0} (Index = {1})", aiMaterialName.data, i);
 			aiString aiTexPath;
-			Uint32 textureCount = aiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
+			uint textureCount = aiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
 			SE_MESH_LOG("    TextureCount = {0}", textureCount);
 
 			aiColor3D aiColor;
@@ -347,12 +347,12 @@ Mesh::Mesh(Filepath filepath) :
 				{
 					Log::CoreError("Could not load texture: {0}", texturePath);
 					// Fallback to albedo color
-					mi->Set("u_AlbedoColor", Vector3f{aiColor.r, aiColor.g, aiColor.b});
+					mi->Set("u_AlbedoColor", Vector3{aiColor.r, aiColor.g, aiColor.b});
 				}
 			}
 			else
 			{
-				mi->Set("u_AlbedoColor", Vector3f{aiColor.r, aiColor.g, aiColor.b});
+				mi->Set("u_AlbedoColor", Vector3{aiColor.r, aiColor.g, aiColor.b});
 				SE_MESH_LOG("    No albedo map");
 			}
 
@@ -440,7 +440,7 @@ Mesh::Mesh(Filepath filepath) :
 #endif
 
 			bool metalnessTextureFound = false;
-			for (Uint32 i = 0; i < aiMaterial->mNumProperties; i++)
+			for (uint i = 0; i < aiMaterial->mNumProperties; i++)
 			{
 				auto* prop = aiMaterial->mProperties[i];
 
@@ -498,7 +498,7 @@ Mesh::Mesh(Filepath filepath) :
 
 				if (prop->mType == aiPTI_String)
 				{
-					Uint32 strLength = *reinterpret_cast<Uint32*>(prop->mData);
+					uint strLength = *reinterpret_cast<uint*>(prop->mData);
 					String str(prop->mData + 4, strLength);
 
 					String key = prop->mKey.data;
@@ -544,7 +544,7 @@ Mesh::Mesh(Filepath filepath) :
 	if (_isAnimated)
 	{
 		_vertexBuffer = VertexBuffer::Create(_animatedVertices.data(),
-		                                      static_cast<Uint32>(_animatedVertices.size() * sizeof(AnimatedVertex)));
+		                                      static_cast<uint>(_animatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -555,7 +555,7 @@ Mesh::Mesh(Filepath filepath) :
 	else
 	{
 		_vertexBuffer = VertexBuffer::Create(_staticVertices.data(),
-		                                      static_cast<Uint32>(_staticVertices.size() * sizeof(Vertex)));
+		                                      static_cast<uint>(_staticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -563,7 +563,7 @@ Mesh::Mesh(Filepath filepath) :
 		};
 	}
 
-	_indexBuffer = IndexBuffer::Create(_indices.data(), static_cast<Uint32>(_indices.size() * sizeof(Index)));
+	_indexBuffer = IndexBuffer::Create(_indices.data(), static_cast<uint>(_indices.size() * sizeof(Index)));
 
 	PipelineSpecification pipelineSpecification;
 	pipelineSpecification.Layout = vertexLayout;
@@ -638,12 +638,12 @@ const ArrayList<Submesh>& Mesh::GetSubmeshes() const
 	return _submeshes;
 }
 
-const Matrix4f& Mesh::GetLocalTransform() const
+const Matrix4& Mesh::GetLocalTransform() const
 {
 	return _localTransform;
 }
 
-void Mesh::SetLocalTransform(Matrix4f localTransform)
+void Mesh::SetLocalTransform(Matrix4 localTransform)
 {
 	_localTransform = Move(localTransform);
 }
@@ -673,12 +673,12 @@ const Filepath& Mesh::GetFilepath() const
 	return _filepath;
 }
 
-ArrayList<Triangle> Mesh::GetTriangleCache(Uint32 index) const
+ArrayList<Triangle> Mesh::GetTriangleCache(uint index) const
 {
 	return _triangleCache.at(index);
 }
 
-ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f& transform)
+ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4& transform)
 {
 	ArrayList<AABB> ret;
 	for (const auto& submesh : GetSubmeshes())
@@ -692,50 +692,50 @@ ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4f& transform)
 
 void Mesh::BoneTransform(float time)
 {
-	ReadNodeHierarchy(time, _scene->mRootNode, Matrix4f(1.0f));
+	ReadNodeHierarchy(time, _scene->mRootNode, Matrix4(1.0f));
 	_boneTransforms.resize(_boneCount);
 	for (size_t i = 0; i < _boneCount; i++) _boneTransforms[i] = _boneInfo[i].FinalTransformation;
 }
 
-void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4f& parentTransform)
+void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Matrix4& parentTransform)
 {
 	const String name(pNode->mName.data);
 	const aiAnimation* animation = _scene->mAnimations[0];
-	Matrix4f nodeTransform(Mat4FromAssimpMat4(pNode->mTransformation));
+	Matrix4 nodeTransform(Mat4FromAssimpMat4(pNode->mTransformation));
 	const aiNodeAnim* nodeAnim = FindNodeAnim(animation, name);
 
 	if (nodeAnim)
 	{
-		const Vector3f translation = InterpolateTranslation(AnimationTime, nodeAnim);
-		const Matrix4f translationMatrix = translate(Matrix4f(1.0f),
-		                                             Vector3f(translation.x, translation.y, translation.z));
+		const Vector3 translation = InterpolateTranslation(AnimationTime, nodeAnim);
+		const Matrix4 translationMatrix = translate(Matrix4(1.0f),
+		                                             Vector3(translation.x, translation.y, translation.z));
 
 		const glm::quat rotation = InterpolateRotation(AnimationTime, nodeAnim);
-		const Matrix4f rotationMatrix = toMat4(rotation);
+		const Matrix4 rotationMatrix = toMat4(rotation);
 
-		const Vector3f scale = InterpolateScale(AnimationTime, nodeAnim);
-		const Matrix4f scaleMatrix = glm::scale(Matrix4f(1.0f), Vector3f(scale.x, scale.y, scale.z));
+		const Vector3 scale = InterpolateScale(AnimationTime, nodeAnim);
+		const Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), Vector3(scale.x, scale.y, scale.z));
 
 		nodeTransform = translationMatrix * rotationMatrix * scaleMatrix;
 	}
 
-	const Matrix4f transform = parentTransform * nodeTransform;
+	const Matrix4 transform = parentTransform * nodeTransform;
 
 	if (_boneMapping.find(name) != _boneMapping.end())
 	{
-		const Uint32 BoneIndex = _boneMapping[name];
+		const uint BoneIndex = _boneMapping[name];
 		_boneInfo[BoneIndex].FinalTransformation = _inverseTransform * transform * _boneInfo[BoneIndex].BoneOffset;
 	}
 
-	for (Uint32 i = 0; i < pNode->mNumChildren; i++) ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], transform);
+	for (uint i = 0; i < pNode->mNumChildren; i++) ReadNodeHierarchy(AnimationTime, pNode->mChildren[i], transform);
 }
 
-void Mesh::TraverseNodes(aiNode* node, const Matrix4f& parentTransform, Uint32 level)
+void Mesh::TraverseNodes(aiNode* node, const Matrix4& parentTransform, uint level)
 {
-	const Matrix4f transform = parentTransform * Mat4FromAssimpMat4(node->mTransformation);
-	for (Uint32 i = 0; i < node->mNumMeshes; i++)
+	const Matrix4 transform = parentTransform * Mat4FromAssimpMat4(node->mTransformation);
+	for (uint i = 0; i < node->mNumMeshes; i++)
 	{
-		const Uint32 mesh = node->mMeshes[i];
+		const uint mesh = node->mMeshes[i];
 		auto& submesh = _submeshes[mesh];
 		submesh.NodeName = node->mName.C_Str();
 		submesh.Transform = transform;
@@ -743,12 +743,12 @@ void Mesh::TraverseNodes(aiNode* node, const Matrix4f& parentTransform, Uint32 l
 
 	// SE_MESH_LOG("{0} {1}", LevelToSpaces(level), node->mName.C_Str());
 
-	for (Uint32 i = 0; i < node->mNumChildren; i++) TraverseNodes(node->mChildren[i], transform, level + 1);
+	for (uint i = 0; i < node->mNumChildren; i++) TraverseNodes(node->mChildren[i], transform, level + 1);
 }
 
-Uint32 Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
-	for (Uint32 i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++)
+	for (uint i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++)
 	{
 		if (AnimationTime < static_cast<float>(pNodeAnim->mPositionKeys[i + 1].mTime)) return i;
 	}
@@ -756,11 +756,11 @@ Uint32 Mesh::FindPosition(float AnimationTime, const aiNodeAnim* pNodeAnim)
 	return 0;
 }
 
-Uint32 Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	Debug::Assert(pNodeAnim->mNumRotationKeys > 0);;
 
-	for (Uint32 i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
+	for (uint i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++)
 	{
 		if (AnimationTime < static_cast<float>(pNodeAnim->mRotationKeys[i + 1].mTime)) return i;
 	}
@@ -770,7 +770,7 @@ Uint32 Mesh::FindRotation(float AnimationTime, const aiNodeAnim* pNodeAnim)
 
 const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* animation, const String& nodeName)
 {
-	for (Uint32 i = 0; i < animation->mNumChannels; i++)
+	for (uint i = 0; i < animation->mNumChannels; i++)
 	{
 		const aiNodeAnim* nodeAnim = animation->mChannels[i];
 		if (String(nodeAnim->mNodeName.data) == nodeName) return nodeAnim;
@@ -778,11 +778,11 @@ const aiNodeAnim* Mesh::FindNodeAnim(const aiAnimation* animation, const String&
 	return nullptr;
 }
 
-Uint32 Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
+uint Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 {
 	Debug::Assert(pNodeAnim->mNumScalingKeys > 0);;
 
-	for (Uint32 i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++)
+	for (uint i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++)
 	{
 		if (AnimationTime < static_cast<float>(pNodeAnim->mScalingKeys[i + 1].mTime)) return i;
 	}
@@ -790,7 +790,7 @@ Uint32 Mesh::FindScaling(float AnimationTime, const aiNodeAnim* pNodeAnim)
 	return 0;
 }
 
-Vector3f Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim* nodeAnim)
+Vector3 Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	if (nodeAnim->mNumPositionKeys == 1)
 	{
@@ -799,8 +799,8 @@ Vector3f Mesh::InterpolateTranslation(float animationTime, const aiNodeAnim* nod
 		return {v.x, v.y, v.z};
 	}
 
-	const Uint32 PositionIndex = FindPosition(animationTime, nodeAnim);
-	const Uint32 NextPositionIndex = PositionIndex + 1;
+	const uint PositionIndex = FindPosition(animationTime, nodeAnim);
+	const uint NextPositionIndex = PositionIndex + 1;
 	Debug::Assert(NextPositionIndex < nodeAnim->mNumPositionKeys);;
 	const float DeltaTime = static_cast<float>(nodeAnim->mPositionKeys[NextPositionIndex].mTime - nodeAnim->
 		mPositionKeys[PositionIndex].mTime);
@@ -824,8 +824,8 @@ glm::quat Mesh::InterpolateRotation(float animationTime, const aiNodeAnim* nodeA
 		return glm::quat(v.w, v.x, v.y, v.z);
 	}
 
-	const Uint32 RotationIndex = FindRotation(animationTime, nodeAnim);
-	const Uint32 NextRotationIndex = RotationIndex + 1;
+	const uint RotationIndex = FindRotation(animationTime, nodeAnim);
+	const uint NextRotationIndex = RotationIndex + 1;
 	Debug::Assert(NextRotationIndex < nodeAnim->mNumRotationKeys);;
 	const float DeltaTime = static_cast<float>(nodeAnim->mRotationKeys[NextRotationIndex].mTime - nodeAnim->
 		mRotationKeys[RotationIndex].mTime);
@@ -841,7 +841,7 @@ glm::quat Mesh::InterpolateRotation(float animationTime, const aiNodeAnim* nodeA
 }
 
 
-Vector3f Mesh::InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim)
+Vector3 Mesh::InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim)
 {
 	if (nodeAnim->mNumScalingKeys == 1)
 	{
@@ -850,8 +850,8 @@ Vector3f Mesh::InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim)
 		return {v.x, v.y, v.z};
 	}
 
-	const Uint32 index = FindScaling(animationTime, nodeAnim);
-	const Uint32 nextIndex = index + 1;
+	const uint index = FindScaling(animationTime, nodeAnim);
+	const uint nextIndex = index + 1;
 	Debug::Assert(nextIndex < nodeAnim->mNumScalingKeys);;
 	const float deltaTime = static_cast<float>(nodeAnim->mScalingKeys[nextIndex].mTime - nodeAnim->mScalingKeys[index].
 		mTime);

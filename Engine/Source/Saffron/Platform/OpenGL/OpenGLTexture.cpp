@@ -27,7 +27,7 @@ static GLenum SaffronToOpenGLTextureFormat(TextureFormat format)
 // Texture2D
 //////////////////////////////////////////////////////////////////////////////////
 
-OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, Uint32 width, Uint32 height, TextureWrap wrap) :
+OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint width, uint height, TextureWrap wrap) :
 	_format(format),
 	_wrap(wrap),
 	_width(width),
@@ -65,7 +65,7 @@ OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
 	if (stbi_is_hdr(filepathString.c_str()))
 	{
 		Log::CoreInfo("Loading HDR texture {0}, srgb={1}", filepathString.c_str(), srgb);
-		_imageData = Buffer(reinterpret_cast<Uint8*>(stbi_loadf(filepathString.c_str(), &width, &height, &channels, 0)), filesize);
+		_imageData = Buffer(reinterpret_cast<uchar*>(stbi_loadf(filepathString.c_str(), &width, &height, &channels, 0)), filesize);
 		_isHDR = true;
 		_format = TextureFormat::Float16;
 	}
@@ -143,7 +143,7 @@ bool OpenGLTexture2D::operator==(const Texture& other) const
 	return _rendererID == other.GetRendererID();
 }
 
-void OpenGLTexture2D::Bind(Uint32 slot) const
+void OpenGLTexture2D::Bind(uint slot) const
 {
 	Shared<const OpenGLTexture2D> instance = this;
 	Renderer::Submit([instance, slot]()
@@ -157,12 +157,12 @@ TextureFormat OpenGLTexture2D::GetFormat() const
 	return _format;
 }
 
-Uint32 OpenGLTexture2D::GetWidth() const
+uint OpenGLTexture2D::GetWidth() const
 {
 	return _width;
 }
 
-Uint32 OpenGLTexture2D::GetHeight() const
+uint OpenGLTexture2D::GetHeight() const
 {
 	return _height;
 }
@@ -184,7 +184,7 @@ void OpenGLTexture2D::Unlock()
 	});
 }
 
-void OpenGLTexture2D::Resize(Uint32 width, Uint32 height)
+void OpenGLTexture2D::Resize(uint width, uint height)
 {
 	Debug::Assert(_locked, "Texture must be locked!");
 
@@ -215,7 +215,7 @@ bool OpenGLTexture2D::Loaded() const
 	return _loaded;
 }
 
-Uint32 OpenGLTexture2D::GetMipLevelCount() const
+uint OpenGLTexture2D::GetMipLevelCount() const
 {
 	return CalculateMipMapCount(_width, _height);
 }
@@ -224,13 +224,13 @@ Uint32 OpenGLTexture2D::GetMipLevelCount() const
 // TextureCube
 //////////////////////////////////////////////////////////////////////////////////
 
-OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, Uint32 width, Uint32 height)
+OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, uint width, uint height)
 {
 	_width = width;
 	_height = height;
 	_format = format;
 
-	Uint32 levels = CalculateMipMapCount(width, height);
+	uint levels = CalculateMipMapCount(width, height);
 	Shared<OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, levels]() mutable
 	{
@@ -261,8 +261,8 @@ OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
 	_height = height;
 	_format = TextureFormat::RGB;
 
-	Uint32 faceWidth = _width / 4;
-	Uint32 faceHeight = _height / 3;
+	uint faceWidth = _width / 4;
+	uint faceHeight = _height / 3;
 	Debug::Assert(faceWidth == faceHeight, "Non-square faces!");
 
 	std::array<uint8_t*, 6> faces;
@@ -364,12 +364,12 @@ TextureFormat OpenGLTextureCube::GetFormat() const
 	return _format;
 }
 
-Uint32 OpenGLTextureCube::GetWidth() const
+uint OpenGLTextureCube::GetWidth() const
 {
 	return _width;
 }
 
-Uint32 OpenGLTextureCube::GetHeight() const
+uint OpenGLTextureCube::GetHeight() const
 {
 	return _height;
 }
@@ -384,7 +384,7 @@ RendererID OpenGLTextureCube::GetRendererID() const
 	return _rendererID;
 }
 
-void OpenGLTextureCube::Bind(Uint32 slot) const
+void OpenGLTextureCube::Bind(uint slot) const
 {
 	Shared<const OpenGLTextureCube> instance = this;
 	Renderer::Submit([instance, slot]()
@@ -393,7 +393,7 @@ void OpenGLTextureCube::Bind(Uint32 slot) const
 	});
 }
 
-Uint32 OpenGLTextureCube::GetMipLevelCount() const
+uint OpenGLTextureCube::GetMipLevelCount() const
 {
 	return CalculateMipMapCount(_width, _height);
 }

@@ -11,7 +11,7 @@ RenderGraph::RenderGraph()
 	AddGlobalInput(CreateUnique<Stream::Input>("backBuffer", _backBuffer));
 }
 
-void RenderGraph::OnViewportResize(Uint32 width, Uint32 height)
+void RenderGraph::OnViewportResize(uint width, uint height)
 {
 	for (auto& pass : _passes)
 	{

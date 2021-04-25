@@ -23,7 +23,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Button: " << static_cast<int>(_button);
 		return oss.str();
 	}
@@ -49,7 +49,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Button: " << static_cast<int>(_button);
 		return oss.str();
 	}
@@ -78,7 +78,7 @@ public:
 
 	String ToString() const override
 	{
-		StringStream ss;
+		OStringStream ss;
 		ss << GetName() << " Offset: " << _offset;
 		return ss.str();
 	}
@@ -96,22 +96,22 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseMovedEvent(const Vector2f& position) :
+	explicit MouseMovedEvent(const Vector2& position) :
 		_position(position)
 	{
 	}
 
-	const Vector2f& GetPosition() const { return _position; }
+	const Vector2& GetPosition() const { return _position; }
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Position: " << _position.x << ", " << _position.y;
 		return oss.str();
 	}
 
 private:
-	Vector2f _position;
+	Vector2 _position;
 };
 
 class MouseMovedRawEvent : public Event
@@ -122,22 +122,22 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryMouse | CategoryInput);
 
 public:
-	explicit MouseMovedRawEvent(const Vector2f& delta) :
+	explicit MouseMovedRawEvent(const Vector2& delta) :
 		_delta(delta)
 	{
 	}
 
-	const Vector2f& GetDelta() const { return _delta; }
+	const Vector2& GetDelta() const { return _delta; }
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Position: " << _delta.x << ", " << _delta.y;
 		return oss.str();
 	}
 
 private:
-	Vector2f _delta;
+	Vector2 _delta;
 };
 
 class CursorEnteredEvent : public Event

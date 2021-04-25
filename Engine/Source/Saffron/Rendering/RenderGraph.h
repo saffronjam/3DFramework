@@ -17,7 +17,7 @@ public:
 
 	virtual void Execute() = 0;
 
-	void OnViewportResize(Uint32 width, Uint32 height);
+	void OnViewportResize(uint width, uint height);
 
 	void AddPass(Unique<RenderPass> pass);
 	void AddInput(const Stream::Input& input);

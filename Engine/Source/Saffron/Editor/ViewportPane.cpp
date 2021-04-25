@@ -24,7 +24,7 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << _windowTitle << "##" << uuid;
 
 	ImGui::Begin(oss.str().c_str(), open, ImGuiWindowFlags_NoFocusOnAppearing);
@@ -71,24 +71,24 @@ void ViewportPane::OnGuiRender(bool* open, UUID uuid)
 	ImGui::End();
 	ImGui::PopStyleVar();
 
-	if (_oldWidth != static_cast<Uint32>(viewportSize.x) || _oldHeight != static_cast<Uint32>(viewportSize.y))
+	if (_oldWidth != static_cast<uint>(viewportSize.x) || _oldHeight != static_cast<uint>(viewportSize.y))
 	{
-		SceneRenderer::SetViewportSize(static_cast<Uint32>(viewportSize.x), static_cast<Uint32>(viewportSize.y));
+		SceneRenderer::SetViewportSize(static_cast<uint>(viewportSize.x), static_cast<uint>(viewportSize.y));
 		_oldWidth = viewportSize.x;
 		_oldHeight = viewportSize.y;
 	}
 }
 
-bool ViewportPane::InViewport(Vector2f positionNDC) const
+bool ViewportPane::InViewport(Vector2 positionNDC) const
 {
 	positionNDC.x -= _topLeft.x;
 	positionNDC.y -= _topLeft.y;
 	return positionNDC.x < _bottomRight.x && positionNDC.y < _bottomRight.y;
 }
 
-Vector2f ViewportPane::GetMousePosition() const
+Vector2 ViewportPane::GetMousePosition() const
 {
-	Vector2f position = Mouse::GetPositionNDC();
+	Vector2 position = Mouse::GetPositionNDC();
 	position.x -= _topLeft.x;
 	position.y -= _topLeft.y;
 	const auto viewportWidth = _bottomRight.x - _topLeft.x;
@@ -97,22 +97,22 @@ Vector2f ViewportPane::GetMousePosition() const
 	return {position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f};
 }
 
-Vector2f ViewportPane::GetViewportSize() const
+Vector2 ViewportPane::GetViewportSize() const
 {
 	return GetBottomRight() - GetTopLeft();
 }
 
-Uint32 ViewportPane::GetDockID() const
+uint ViewportPane::GetDockID() const
 {
 	return _dockID;
 }
 
-const Vector2f& ViewportPane::GetTopLeft() const
+const Vector2& ViewportPane::GetTopLeft() const
 {
 	return _topLeft;
 }
 
-const Vector2f& ViewportPane::GetBottomRight() const
+const Vector2& ViewportPane::GetBottomRight() const
 {
 	return _bottomRight;
 }

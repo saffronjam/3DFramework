@@ -26,8 +26,8 @@ public:
 	void OnStart();
 	void OnStop();
 
-	Vector3f GetGravity() const;
-	void SetGravity(const Vector3f& gravity);
+	Vector3 GetGravity() const;
+	void SetGravity(const Vector3& gravity);
 
 private:
 	reactphysics3d::PhysicsWorld* _nativeWorld;

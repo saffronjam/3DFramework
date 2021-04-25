@@ -19,13 +19,13 @@ public:
 	bool operator ==(const RenderPass& rhs) const;
 
 	virtual void Execute() = 0;
-	virtual void OnViewportResize(Uint32 width, Uint32 height) = 0;
+	virtual void OnViewportResize(uint width, uint height) = 0;
 
 	const String& GetName() const;
 	void SetStreamLinkage(const String& outputName, const String& inputName);
 
-	const UnorderedMap<String, Unique<Stream::Input>>& GetInputs() const;
-	const UnorderedMap<String, Unique<Stream::Output>>& GetOutputs() const;
+	const HashMap<String, Unique<Stream::Input>>& GetInputs() const;
+	const HashMap<String, Unique<Stream::Output>>& GetOutputs() const;
 	const Stream::Input& GetInput(const String& name) const;
 	const Stream::Output& GetOutput(const String& name) const;
 
@@ -41,7 +41,7 @@ private:
 	UUID _uuid;
 	String _name;
 
-	UnorderedMap<String, Unique<Stream::Input>> _inputs;
-	UnorderedMap<String, Unique<Stream::Output>> _outputs;
+	HashMap<String, Unique<Stream::Input>> _inputs;
+	HashMap<String, Unique<Stream::Output>> _outputs;
 };
 }

@@ -6,7 +6,7 @@
 namespace Se
 {
 ArrayList<Function<void()>> Run::_laterFunctions;
-Map<Run::Handle, Run::PeriodicFunction> Run::_periodicFunctions;
+TreeMap<Run::Handle, Run::PeriodicFunction> Run::_periodicFunctions;
 
 void Run::Execute()
 {

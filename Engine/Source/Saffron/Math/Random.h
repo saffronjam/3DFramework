@@ -40,9 +40,9 @@ public:
 		return distribution(s_Engine);
 	}
 
-	static Vector3f Vector3()
+	static Vector3 Vector3()
 	{
-		return Vector3f{Real(0.0f, 1.0f), Real(0.0f, 1.0f), Real(0.0f, 1.0f)};
+		return Se::Vector3{Real(0.0f, 1.0f), Real(0.0f, 1.0f), Real(0.0f, 1.0f)};
 	}
 };
 

@@ -28,7 +28,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " " << _width << "x" << _height;
 		return oss.str();
 	}
@@ -45,22 +45,22 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowMovedEvent(const Vector2f& position) :
+	explicit WindowMovedEvent(const Vector2& position) :
 		_position(position)
 	{
 	}
 
-	const Vector2f& GetPosition() const { return _position; }
+	const Vector2& GetPosition() const { return _position; }
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Position: " << _position.x << ", " << _position.y;
 		return oss.str();
 	}
 
 private:
-	Vector2f _position;
+	Vector2 _position;
 };
 
 class WindowGainedFocusEvent : public Event
@@ -113,7 +113,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Paths: ";
 		for (const auto& filepath : _filepaths)
 		{
@@ -143,7 +143,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Title: " << _title;
 		return oss.str();
 	}
@@ -169,7 +169,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Filepath: " << _filepath;
 		return oss.str();
 	}
@@ -195,7 +195,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Minimize Restored: " << _restored;
 		return oss.str();
 	}
@@ -222,7 +222,7 @@ public:
 
 	String ToString() const override
 	{
-		OutputStringStream oss;
+		OStringStream oss;
 		oss << GetName() << " Maximize Restored: " << _restored;
 		return oss.str();
 	}

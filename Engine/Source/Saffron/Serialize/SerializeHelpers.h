@@ -12,9 +12,9 @@
 namespace YAML
 {
 template <>
-struct convert<Se::Vector2f>
+struct convert<Se::Vector2>
 {
-	static Node encode(const Se::Vector2f& rhs)
+	static Node encode(const Se::Vector2& rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -22,7 +22,7 @@ struct convert<Se::Vector2f>
 		return node;
 	}
 
-	static bool decode(const Node& node, Se::Vector2f& rhs)
+	static bool decode(const Node& node, Se::Vector2& rhs)
 	{
 		if (!node.IsSequence() || node.size() != 2) return false;
 
@@ -33,9 +33,9 @@ struct convert<Se::Vector2f>
 };
 
 template <>
-struct convert<Se::Vector3f>
+struct convert<Se::Vector3>
 {
-	static Node encode(const Se::Vector3f& rhs)
+	static Node encode(const Se::Vector3& rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -44,7 +44,7 @@ struct convert<Se::Vector3f>
 		return node;
 	}
 
-	static bool decode(const Node& node, Se::Vector3f& rhs)
+	static bool decode(const Node& node, Se::Vector3& rhs)
 	{
 		if (!node.IsSequence() || node.size() != 3) return false;
 
@@ -56,9 +56,9 @@ struct convert<Se::Vector3f>
 };
 
 template <>
-struct convert<Se::Vector4f>
+struct convert<Se::Vector4>
 {
-	static Node encode(const Se::Vector4f& rhs)
+	static Node encode(const Se::Vector4& rhs)
 	{
 		Node node;
 		node.push_back(rhs.x);
@@ -68,7 +68,7 @@ struct convert<Se::Vector4f>
 		return node;
 	}
 
-	static bool decode(const Node& node, Se::Vector4f& rhs)
+	static bool decode(const Node& node, Se::Vector4& rhs)
 	{
 		if (!node.IsSequence() || node.size() != 4) return false;
 
@@ -106,9 +106,9 @@ struct convert<Se::Quaternion>
 };
 
 template <>
-struct convert<Se::Matrix4f>
+struct convert<Se::Matrix4>
 {
-	static Node encode(const Se::Matrix4f& rhs)
+	static Node encode(const Se::Matrix4& rhs)
 	{
 		Node node;
 		const auto* valuePtr = value_ptr(rhs);
@@ -119,7 +119,7 @@ struct convert<Se::Matrix4f>
 		return node;
 	}
 
-	static bool decode(const Node& node, Se::Matrix4f& rhs)
+	static bool decode(const Node& node, Se::Matrix4& rhs)
 	{
 		if (!node.IsSequence() || node.size() != 16) return false;
 
@@ -142,21 +142,21 @@ namespace Se
 /// YAML - Operator overloading
 ///////////////////////////////////////////////////////////////////////////
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const Vector2f& v)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Vector2& v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const Vector3f& v)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Vector3& v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << YAML::EndSeq;
 	return out;
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const Vector4f& v)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Vector4& v)
 {
 	out << YAML::Flow;
 	out << YAML::BeginSeq << v.x << v.y << v.z << v.w << YAML::EndSeq;
@@ -170,7 +170,7 @@ YAML::Emitter& operator<<(YAML::Emitter& out, const Quaternion& v)
 	return out;
 }
 
-YAML::Emitter& operator<<(YAML::Emitter& out, const Matrix4f& m)
+YAML::Emitter& operator<<(YAML::Emitter& out, const Matrix4& m)
 {
 	out << YAML::Flow;
 	const auto* valuePtr = value_ptr(m);

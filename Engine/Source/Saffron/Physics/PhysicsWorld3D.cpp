@@ -144,7 +144,7 @@ void PhysicsWorld3D::OnUpdate()
 			const auto& bodyPosition = bodyTransform.getPosition();
 			const auto& bodyQuatRotation = bodyTransform.getOrientation();
 
-			transform = translate(Vector3f{bodyPosition.x, bodyPosition.y, bodyPosition.z}) * toMat4(Quaternion{
+			transform = translate(Vector3{bodyPosition.x, bodyPosition.y, bodyPosition.z}) * toMat4(Quaternion{
 				bodyQuatRotation.x, bodyQuatRotation.y, bodyQuatRotation.z, bodyQuatRotation.w
 			}) * glm::scale(scale);
 		}
@@ -171,7 +171,7 @@ void PhysicsWorld3D::OnStart()
 		{
 			auto view = _scene->GetEntityRegistry().view<RigidBody3DComponent>();
 			_physicsBodyEntityBuffer = new Entity[view.size()];
-			Uint32 physicsBodyEntityBufferIndex = 0;
+			uint physicsBodyEntityBufferIndex = 0;
 			for (auto entityHandle : view)
 			{
 				Entity entity = {entityHandle, _scene};
@@ -278,13 +278,13 @@ void PhysicsWorld3D::OnStop()
 	}
 }
 
-Vector3f PhysicsWorld3D::GetGravity() const
+Vector3 PhysicsWorld3D::GetGravity() const
 {
 	const auto& gravity = _nativeWorld->getGravity();
 	return {gravity.x, gravity.y, gravity.z};
 }
 
-void PhysicsWorld3D::SetGravity(const Vector3f& gravity)
+void PhysicsWorld3D::SetGravity(const Vector3& gravity)
 {
 	_nativeWorld->setGravity({gravity.x, gravity.y, gravity.z});
 }

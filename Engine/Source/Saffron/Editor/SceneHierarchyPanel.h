@@ -25,8 +25,8 @@ private:
 
 	void DrawEntityNode(Entity entity);
 	void DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUID) const;
-	void MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4f& parentTransform = Matrix4f(1.0f),
-	                       Uint32 level = 0) const;
+	void MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4& parentTransform = Matrix4(1.0f),
+	                       uint level = 0) const;
 
 public:
 	mutable EventSubscriberList<Entity> EntityDeleted;

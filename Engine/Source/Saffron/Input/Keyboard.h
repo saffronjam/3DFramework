@@ -43,9 +43,9 @@ public:
 	static EventSubscriberList<const TextInputEvent&> TextInput;
 
 private:
-	UnorderedMap<KeyCode, bool> _keyboardState;
-	UnorderedMap<KeyCode, bool> _prevKeyboardState;
-	UnorderedMap<KeyCode, bool> _keyboardRepeatedState;
+	HashMap<KeyCode, bool> _keyboardState;
+	HashMap<KeyCode, bool> _prevKeyboardState;
+	HashMap<KeyCode, bool> _keyboardRepeatedState;
 	String _text;
 
 	bool _repeatEnabled = true;

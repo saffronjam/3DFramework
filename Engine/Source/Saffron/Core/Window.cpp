@@ -66,17 +66,17 @@ void Window::HandleBufferedEvents()
 	_events.clear();
 }
 
-Uint32 Window::GetWidth() const
+uint Window::GetWidth() const
 {
 	return _width;
 }
 
-Uint32 Window::GetHeight() const
+uint Window::GetHeight() const
 {
 	return _height;
 }
 
-const Vector2f& Window::GetPosition() const
+const Vector2& Window::GetPosition() const
 {
 	return _position;
 }

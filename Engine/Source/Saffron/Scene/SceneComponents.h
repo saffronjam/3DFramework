@@ -45,7 +45,7 @@ struct EditorCameraComponent
 	{
 	}
 
-	EditorCameraComponent(Matrix4f projectionMatrix) :
+	EditorCameraComponent(Matrix4 projectionMatrix) :
 		Camera(Shared<EditorCamera>::Create(projectionMatrix))
 	{
 	}

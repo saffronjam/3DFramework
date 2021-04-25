@@ -33,14 +33,14 @@ void AppSerializer::Serialize(const Filepath& filepath) const
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
-	OutputStream fout(filepath);
+	OStream fout(filepath);
 	fout << out.c_str();
 }
 
 bool AppSerializer::Deserialize(const Filepath& filepath)
 {
-	InputStream stream(filepath);
-	StringStream strStream;
+	IStream stream(filepath);
+	OStringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node data = YAML::Load(strStream.str());

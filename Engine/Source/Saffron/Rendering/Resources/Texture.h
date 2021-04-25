@@ -27,18 +27,18 @@ class Texture : public Resource
 public:
 	virtual ~Texture() = default;
 
-	virtual void Bind(Uint32 slot = 0) const = 0;
+	virtual void Bind(uint slot = 0) const = 0;
 
 	virtual TextureFormat GetFormat() const = 0;
 
-	virtual Uint32 GetWidth() const = 0;
-	virtual Uint32 GetHeight() const = 0;
-	virtual Uint32 GetMipLevelCount() const = 0;
+	virtual uint GetWidth() const = 0;
+	virtual uint GetHeight() const = 0;
+	virtual uint GetMipLevelCount() const = 0;
 
 	virtual RendererID GetRendererID() const = 0;
 
-	static Uint32 GetBPP(TextureFormat format);
-	static Uint32 CalculateMipMapCount(Uint32 width, Uint32 height);
+	static uint GetBPP(TextureFormat format);
+	static uint CalculateMipMapCount(uint width, uint height);
 
 	virtual bool operator==(const Texture& other) const = 0;
 
@@ -52,14 +52,14 @@ public:
 	virtual void Lock() = 0;
 	virtual void Unlock() = 0;
 
-	virtual void Resize(Uint32 width, Uint32 height) = 0;
+	virtual void Resize(uint width, uint height) = 0;
 	virtual Buffer& GetWriteableBuffer() = 0;
 
 	virtual bool Loaded() const = 0;
 
 	virtual const Filepath& GetFilepath() const = 0;
 
-	static Shared<Texture2D> Create(TextureFormat format, Uint32 width, Uint32 height,
+	static Shared<Texture2D> Create(TextureFormat format, uint width, uint height,
 	                                TextureWrap wrap = TextureWrap::Clamp);
 	static Shared<Texture2D> Create(Filepath filepath, bool sRGB = false);
 };
@@ -69,7 +69,7 @@ class TextureCube : public Texture
 public:
 	virtual const Filepath& GetFilepath() const = 0;
 
-	static Shared<TextureCube> Create(TextureFormat format, Uint32 width, Uint32 height);
+	static Shared<TextureCube> Create(TextureFormat format, uint width, uint height);
 	static Shared<TextureCube> Create(Filepath filepath);
 };
 }

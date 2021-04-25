@@ -34,6 +34,6 @@ public:
 
 private:
 	static ArrayList<Function<void()>> _laterFunctions;
-	static Map<Handle, PeriodicFunction> _periodicFunctions;
+	static TreeMap<Handle, PeriodicFunction> _periodicFunctions;
 };
 }

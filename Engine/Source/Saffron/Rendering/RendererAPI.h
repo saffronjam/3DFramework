@@ -5,7 +5,7 @@
 
 namespace Se
 {
-using RendererID = Uint32;
+using RendererID = uint;
 
 enum class RendererApiType
 {
@@ -33,7 +33,7 @@ public:
 	static void Shutdown();
 
 	static void Clear(float r, float g, float b, float a);
-	static void DrawIndexed(Uint32 count, PrimitiveType type, bool depthTest = true);
+	static void DrawIndexed(uint count, PrimitiveType type, bool depthTest = true);
 
 	static RendererCapabilities& GetCapabilities() { return _sCapabilities; }
 

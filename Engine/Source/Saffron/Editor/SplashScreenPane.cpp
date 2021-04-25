@@ -21,7 +21,7 @@ void SplashScreenPane::OnGuiRender()
 	ImGui::SetNextWindowPos(viewport->Pos);
 	ImGui::SetNextWindowSize(viewport->Size);
 
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << "Loading Screen##";
 	ImGui::Begin(oss.str().c_str(), nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize);
 

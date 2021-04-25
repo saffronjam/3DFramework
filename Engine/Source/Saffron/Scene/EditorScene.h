@@ -22,7 +22,7 @@ public:
 	const Filepath& GetFilepath() const { return _filepath; }
 
 	void SetSelectedEntity(Entity entity) override;
-	void SetViewportSize(Uint32 width, Uint32 height) override;
+	void SetViewportSize(uint width, uint height) override;
 
 	void Save() const;
 

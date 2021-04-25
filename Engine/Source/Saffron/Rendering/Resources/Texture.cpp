@@ -6,7 +6,7 @@
 
 namespace Se
 {
-Uint32 Texture::GetBPP(TextureFormat format)
+uint Texture::GetBPP(TextureFormat format)
 {
 	switch (format)
 	{
@@ -16,15 +16,15 @@ Uint32 Texture::GetBPP(TextureFormat format)
 	return 0;
 }
 
-Uint32 Texture::CalculateMipMapCount(Uint32 width, Uint32 height)
+uint Texture::CalculateMipMapCount(uint width, uint height)
 {
-	Uint32 levels = 1;
+	uint levels = 1;
 	while ((width | height) >> levels) levels++;
 
 	return levels;
 }
 
-Shared<Texture2D> Texture2D::Create(TextureFormat format, Uint32 width, Uint32 height, TextureWrap wrap)
+Shared<Texture2D> Texture2D::Create(TextureFormat format, uint width, uint height, TextureWrap wrap)
 {
 	switch (RendererApi::Current())
 	{
@@ -46,7 +46,7 @@ Shared<Texture2D> Texture2D::Create(Filepath filepath, bool sRGB)
 	return nullptr;
 }
 
-Shared<TextureCube> TextureCube::Create(TextureFormat format, Uint32 width, Uint32 height)
+Shared<TextureCube> TextureCube::Create(TextureFormat format, uint width, uint height)
 {
 	switch (RendererApi::Current())
 	{

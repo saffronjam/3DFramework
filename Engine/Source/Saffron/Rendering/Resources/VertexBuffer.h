@@ -23,20 +23,20 @@ enum class ShaderDataType
 	Bool
 };
 
-static Uint32 ShaderDataTypeSize(ShaderDataType type);
+static uint ShaderDataTypeSize(ShaderDataType type);
 
 struct VertexBufferElement
 {
 	String Name;
 	ShaderDataType Type;
-	Uint32 Size;
-	Uint32 Offset;
+	uint Size;
+	uint Offset;
 	bool Normalized;
 
 	VertexBufferElement() = default;
 	VertexBufferElement(ShaderDataType type, const String& name, bool normalized = false);
 
-	Uint32 GetComponentCount() const;
+	uint GetComponentCount() const;
 };
 
 class VertexBufferLayout
@@ -45,7 +45,7 @@ public:
 	VertexBufferLayout();
 	VertexBufferLayout(const InitializerList<VertexBufferElement>& elements);
 
-	Uint32 GetStride() const;
+	uint GetStride() const;
 	const ArrayList<VertexBufferElement>& GetElements() const;
 
 	ArrayList<VertexBufferElement>::iterator begin();
@@ -58,7 +58,7 @@ private:
 
 private:
 	ArrayList<VertexBufferElement> _elements;
-	Uint32 _stride = 0;
+	uint _stride = 0;
 };
 
 enum class VertexBufferUsage
@@ -75,8 +75,8 @@ public:
 
 	virtual void Bind() const = 0;
 
-	virtual void SetData(const void* buffer, Uint32 size, Uint32 offset = 0) = 0;
-	virtual void SetData(const Buffer& buffer, Uint32 offset = 0) = 0;
+	virtual void SetData(const void* buffer, uint size, uint offset = 0) = 0;
+	virtual void SetData(const Buffer& buffer, uint offset = 0) = 0;
 
 	virtual const VertexBufferLayout& GetLayout() const = 0;
 	virtual void SetLayout(const VertexBufferLayout& layout) = 0;
@@ -84,7 +84,7 @@ public:
 	virtual unsigned int GetSize() const = 0;
 	virtual RendererID GetRendererID() const = 0;
 
-	static Shared<VertexBuffer> Create(void* data, Uint32 size, VertexBufferUsage usage = VertexBufferUsage::Static);
-	static Shared<VertexBuffer> Create(Uint32 size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
+	static Shared<VertexBuffer> Create(void* data, uint size, VertexBufferUsage usage = VertexBufferUsage::Static);
+	static Shared<VertexBuffer> Create(uint size, VertexBufferUsage usage = VertexBufferUsage::Dynamic);
 };
 }

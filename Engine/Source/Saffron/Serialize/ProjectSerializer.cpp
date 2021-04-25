@@ -56,7 +56,7 @@ void ProjectSerializer::Serialize(const Filepath& filepath) const
 
 	out << YAML::BeginMap;
 	out << YAML::Key << "Project" << _project.GetName();
-	out << YAML::Key << "UUID" << YAML::Value << static_cast<Uint64>(_project.GetUUID());
+	out << YAML::Key << "UUID" << YAML::Value << static_cast<ulong>(_project.GetUUID());
 	out << YAML::Key << "LastOpened" << YAML::Value << _project.LastOpened();
 
 	out << YAML::Key << "ProjectFilepath" << YAML::Value << _project.GetProjectFilepath().string();
@@ -73,14 +73,14 @@ void ProjectSerializer::Serialize(const Filepath& filepath) const
 
 	out << YAML::EndMap;
 
-	OutputStream fout(filepath);
+	OStream fout(filepath);
 	fout << out.c_str();
 }
 
 bool ProjectSerializer::Deserialize(const Filepath& filepath)
 {
-	InputStream stream(filepath);
-	StringStream strStream;
+	IStream stream(filepath);
+	OStringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node project = YAML::Load(strStream.str());
@@ -116,7 +116,7 @@ bool ProjectSerializer::Deserialize(const Filepath& filepath)
 			sceneFilepaths.push_back(sceneFilepathNode.as<String>());
 		}
 	}
-	_project._uuid = project["UUID"].as<Uint64>();
+	_project._uuid = project["UUID"].as<ulong>();
 	_project._name = project["Project"].as<String>();
 	_project._lastOpened = project["LastOpened"].as<DateTime>();
 	_project._projectFolderpath = project["ProjectFolderpath"].as<String>();

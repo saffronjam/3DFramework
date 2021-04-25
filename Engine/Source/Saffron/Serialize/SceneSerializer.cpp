@@ -53,7 +53,7 @@ void SceneSerializer::Serialize(const Filepath& filepath) const
 	out << YAML::EndSeq;
 	out << YAML::EndMap;
 
-	OutputStream fout(filepath);
+	OStream fout(filepath);
 	fout << out.c_str();
 }
 
@@ -65,8 +65,8 @@ void SceneSerializer::SerializeRuntime(const Filepath& filepath) const
 
 bool SceneSerializer::Deserialize(const Filepath& filepath)
 {
-	InputStream stream(filepath);
-	StringStream strStream;
+	IStream stream(filepath);
+	OStringStream strStream;
 	strStream << stream.rdbuf();
 
 	YAML::Node data = YAML::Load(strStream.str());
@@ -83,8 +83,8 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 		if (lightNode)
 		{
 			auto& light = _scene.GetLight();
-			light.Direction = lightNode["Direction"].as<Vector3f>();
-			light.Radiance = lightNode["Radiance"].as<Vector3f>();
+			light.Direction = lightNode["Direction"].as<Vector3>();
+			light.Radiance = lightNode["Radiance"].as<Vector3>();
 			light.Multiplier = lightNode["Multiplier"].as<float>();
 		}
 	}
@@ -101,19 +101,19 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 		auto projectionMatrix = editorCamera["ProjectionMatrix"];
 		if (projectionMatrix)
 		{
-			camera->SetProjectionMatrix(projectionMatrix.as<Matrix4f>());
+			camera->SetProjectionMatrix(projectionMatrix.as<Matrix4>());
 		}
 
 		auto position = editorCamera["Position"];
 		if (position)
 		{
-			camera->SetPosition(position.as<Vector3f>());
+			camera->SetPosition(position.as<Vector3>());
 		}
 
 		auto rotation = editorCamera["Rotation"];
 		if (rotation)
 		{
-			camera->SetRotation(rotation.as<Vector3f>());
+			camera->SetRotation(rotation.as<Vector3>());
 		}
 	}
 
@@ -123,7 +123,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 	{
 		for (auto entity : entities)
 		{
-			auto uuid = entity["Entity"].as<Uint64>();
+			auto uuid = entity["Entity"].as<ulong>();
 
 			String name;
 			auto tagComponent = entity["TagComponent"];
@@ -136,9 +136,9 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			{
 				// Entities always have transforms
 				auto& transform = deserializedEntity.GetComponent<TransformComponent>().Transform;
-				auto translation = transformComponent["Position"].as<Vector3f>();
+				auto translation = transformComponent["Position"].as<Vector3>();
 				auto rotation = transformComponent["Rotation"].as<Quaternion>();
-				auto scale = transformComponent["Scale"].as<Vector3f>();
+				auto scale = transformComponent["Scale"].as<Vector3>();
 
 				transform = Math::ComposeMatrix(translation, rotation, scale);
 			}
@@ -158,7 +158,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 						{
 							// TODO: Look over overwritten variables
 							auto name = field["Name"].as<String>();
-							FieldType type = static_cast<FieldType>(field["Type"].as<Uint32>());
+							FieldType type = static_cast<FieldType>(field["Type"].as<uint>());
 							EntityInstanceData& data = ScriptEngine::GetEntityInstanceData(_scene.GetUUID(), uuid);
 							auto& moduleFieldMap = data.ModuleFieldMap;
 							auto& publicFields = moduleFieldMap[moduleName];
@@ -177,10 +177,10 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 							}
 							case FieldType::Int:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Int32>());
+								publicFields.at(name).SetStoredValue(dataNode.as<int>());
 								break;
 							}
-							case FieldType::UnsignedInt:
+							case FieldType::Uint:
 							{
 								publicFields.at(name).SetStoredValue(dataNode.as<uint32_t>());
 								break;
@@ -192,17 +192,17 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 							}
 							case FieldType::Vec2:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector2f>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector2>());
 								break;
 							}
 							case FieldType::Vec3:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector3f>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector3>());
 								break;
 							}
 							case FieldType::Vec4:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector4f>());
+								publicFields.at(name).SetStoredValue(dataNode.as<Vector4>());
 								break;
 							}
 							default: break;
@@ -217,9 +217,9 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			{
 				auto& component = deserializedEntity.AddComponent<MeshComponent>();
 				auto meshPath = meshComponent["AssetPath"].as<String>();
-				auto translation = meshComponent["Position"].as<Vector3f>();
+				auto translation = meshComponent["Position"].as<Vector3>();
 				auto rotation = meshComponent["Rotation"].as<Quaternion>();
-				auto scale = meshComponent["Scale"].as<Vector3f>();
+				auto scale = meshComponent["Scale"].as<Vector3>();
 				component.Mesh = Shared<Mesh>::Create(meshPath);
 				component.Mesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
 			}
@@ -228,9 +228,9 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (cameraComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<CameraComponent>();
-				auto translation = cameraComponent["Position"].as<Vector3f>();
+				auto translation = cameraComponent["Position"].as<Vector3>();
 				auto rotation = cameraComponent["Rotation"].as<Quaternion>();
-				auto scale = cameraComponent["Scale"].as<Vector3f>();
+				auto scale = cameraComponent["Scale"].as<Vector3>();
 				component.Camera = Shared<SceneCamera>::Create();
 				component.Primary = cameraComponent["Primary"].as<bool>();
 				component.DrawMesh = cameraComponent["DrawMesh"].as<bool>();
@@ -242,7 +242,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (directionalLightComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<DirectionalLightComponent>();
-				component.Radiance = directionalLightComponent["Radiance"].as<Vector3f>();
+				component.Radiance = directionalLightComponent["Radiance"].as<Vector3>();
 				component.CastShadows = directionalLightComponent["CastShadows"].as<bool>();
 				component.SoftShadows = directionalLightComponent["SoftShadows"].as<bool>();
 				component.LightSize = directionalLightComponent["LightSize"].as<float>();
@@ -262,7 +262,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (spriteRendererComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<SpriteRendererComponent>();
-				component.Color = spriteRendererComponent["Color"].as<Vector4f>();
+				component.Color = spriteRendererComponent["Color"].as<Vector4>();
 				component.TilingFactor = spriteRendererComponent["TilingFactor"].as<float>();
 			}
 
@@ -281,8 +281,8 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (boxCollider2DComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<BoxCollider2DComponent>();
-				component.Offset = boxCollider2DComponent["Offset"].as<Vector2f>();
-				component.Size = boxCollider2DComponent["Size"].as<Vector2f>();
+				component.Offset = boxCollider2DComponent["Offset"].as<Vector2>();
+				component.Size = boxCollider2DComponent["Size"].as<Vector2>();
 				component.Density = boxCollider2DComponent["Density"]
 					                    ? boxCollider2DComponent["Density"].as<float>()
 					                    : 1.0f;
@@ -298,7 +298,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (circleCollider2DComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<CircleCollider2DComponent>();
-				component.Offset = circleCollider2DComponent["Offset"].as<Vector2f>();
+				component.Offset = circleCollider2DComponent["Offset"].as<Vector2>();
 				component.Radius = circleCollider2DComponent["Radius"].as<float>();
 				component.Density = circleCollider2DComponent["Density"]
 					                    ? circleCollider2DComponent["Density"].as<float>()
@@ -323,8 +323,8 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (boxCollider3DComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<BoxCollider3DComponent>();
-				component.Offset = boxCollider3DComponent["Offset"].as<Vector3f>();
-				component.Size = boxCollider3DComponent["Size"].as<Vector3f>();
+				component.Offset = boxCollider3DComponent["Offset"].as<Vector3>();
+				component.Size = boxCollider3DComponent["Size"].as<Vector3>();
 				component.Density = boxCollider3DComponent["Density"]
 					                    ? boxCollider3DComponent["Density"].as<float>()
 					                    : 1.0f;
@@ -340,7 +340,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			if (sphereCollider3DComponent)
 			{
 				auto& component = deserializedEntity.AddComponent<SphereCollider3DComponent>();
-				component.Offset = sphereCollider3DComponent["Offset"].as<Vector3f>();
+				component.Offset = sphereCollider3DComponent["Offset"].as<Vector3>();
 				component.Radius = sphereCollider3DComponent["Radius"].as<float>();
 				component.Density = sphereCollider3DComponent["Density"]
 					                    ? sphereCollider3DComponent["Density"].as<float>()
@@ -406,15 +406,15 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity) con
 				{
 				case FieldType::Int: emitter << field.GetStoredValue<int>();
 					break;
-				case FieldType::UnsignedInt: emitter << field.GetStoredValue<uint32_t>();
+				case FieldType::Uint: emitter << field.GetStoredValue<uint32_t>();
 					break;
 				case FieldType::Float: emitter << field.GetStoredValue<float>();
 					break;
-				case FieldType::Vec2: emitter << field.GetStoredValue<Vector2f>();
+				case FieldType::Vec2: emitter << field.GetStoredValue<Vector2>();
 					break;
-				case FieldType::Vec3: emitter << field.GetStoredValue<Vector3f>();
+				case FieldType::Vec3: emitter << field.GetStoredValue<Vector3>();
 					break;
-				case FieldType::Vec4: emitter << field.GetStoredValue<Vector4f>();
+				case FieldType::Vec4: emitter << field.GetStoredValue<Vector4>();
 					break;
 				default: emitter << "Invalid value";
 				}
@@ -548,7 +548,7 @@ void SceneSerializer::SerializeEditorCamera(YAML::Emitter& emitter) const
 	emitter << YAML::Key << "EditorCamera" << YAML::Value;
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Position" << YAML::Value << camera->GetPosition();
-	emitter << YAML::Key << "Rotation" << YAML::Value << Vector3f(camera->GetPitch(), camera->GetYaw(),
+	emitter << YAML::Key << "Rotation" << YAML::Value << Vector3(camera->GetPitch(), camera->GetYaw(),
 	                                                              camera->GetRoll());
 	emitter << YAML::Key << "PerspectiveMatrix" << YAML::Value << camera->GetProjectionMatrix();
 	emitter << YAML::EndMap;

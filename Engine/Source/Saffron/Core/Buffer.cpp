@@ -9,19 +9,19 @@ Buffer::Buffer() :
 {
 }
 
-Buffer::Buffer(Uint8* data, Uint32 size) :
+Buffer::Buffer(uchar* data, uint size) :
 	_data(data),
 	_size(size)
 {
 }
 
 Buffer::Buffer(String& string) :
-	_data(reinterpret_cast<Uint8*>(string.data())),
+	_data(reinterpret_cast<uchar*>(string.data())),
 	_size(string.length())
 {
 }
 
-Buffer Buffer::Copy(const void* data, Uint32 size)
+Buffer Buffer::Copy(const void* data, uint size)
 {
 	Buffer buffer;
 	buffer.Allocate(size);
@@ -39,7 +39,7 @@ Buffer Buffer::Copy(const String& string)
 	return Copy(string.data(), string.length() * sizeof(String::value_type));
 }
 
-Buffer Buffer::Encapsulate(Uint8* data)
+Buffer Buffer::Encapsulate(uchar* data)
 {
 	Buffer buffer;
 	buffer._data = data;
@@ -47,7 +47,7 @@ Buffer Buffer::Encapsulate(Uint8* data)
 	return buffer;
 }
 
-void Buffer::Allocate(Uint32 size)
+void Buffer::Allocate(uint size)
 {
 	if (_data)
 	{
@@ -57,7 +57,7 @@ void Buffer::Allocate(Uint32 size)
 
 	if (size == 0) return;
 
-	_data = new Uint8[size];
+	_data = new uchar[size];
 	_size = size;
 }
 
@@ -66,13 +66,13 @@ void Buffer::ZeroInitialize()
 	if (_data) memset(_data, 0, _size);
 }
 
-void Buffer::Write(void* data, Uint32 size, Uint32 offset) const
+void Buffer::Write(void* data, uint size, uint offset) const
 {
 	Debug::Assert(offset + size <= _size, "Buffer overflow");;
 	memcpy(_data + offset, data, size);
 }
 
-void Buffer::Write(const void* data, Uint32 size, Uint32 offset) const
+void Buffer::Write(const void* data, uint size, uint offset) const
 {
 	Debug::Assert(offset + size <= _size, "Buffer overflow");;
 	memcpy(_data + offset, data, size);
@@ -98,27 +98,27 @@ Buffer::operator bool() const
 	return _data;
 }
 
-Uint8& Buffer::operator[](int index)
+uchar& Buffer::operator[](int index)
 {
 	return _data[index];
 }
 
-Uint8 Buffer::operator[](int index) const
+uchar Buffer::operator[](int index) const
 {
 	return _data[index];
 }
 
-Uint8* Buffer::Data()
+uchar* Buffer::Data()
 {
 	return _data;
 }
 
-const Uint8* Buffer::Data() const
+const uchar* Buffer::Data() const
 {
 	return _data;
 }
 
-Uint32 Buffer::Size() const
+uint Buffer::Size() const
 {
 	return _size;
 }

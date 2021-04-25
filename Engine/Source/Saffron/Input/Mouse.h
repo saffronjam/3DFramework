@@ -18,9 +18,9 @@ public:
 	static bool IsDown(MouseButtonCode mouseButtonCode);
 
 	static bool GetScroll(MouseWheelCode mouseWheelCode);
-	static Vector2f GetPosition();
-	static Vector2f GetPositionNDC();
-	static Vector2f GetSwipe();
+	static Vector2 GetPosition();
+	static Vector2 GetPositionNDC();
+	static Vector2 GetSwipe();
 
 	static bool IsCursorEnabled();
 	static void EnableCursor();
@@ -69,8 +69,8 @@ public:
 	static EventSubscriberList<const CursorLeftEvent&> CursorLeft;
 
 private:
-	UnorderedMap<MouseButtonCode, bool> _mouseState;
-	UnorderedMap<MouseButtonCode, bool> _prevMouseState;
+	HashMap<MouseButtonCode, bool> _mouseState;
+	HashMap<MouseButtonCode, bool> _prevMouseState;
 	Array<int, static_cast<size_t>(MouseWheelCode::Count)> _mouseWheelScrolls = {};
 
 	bool _cursorEnabled = true;
@@ -79,8 +79,8 @@ private:
 	bool _inWindow = true;
 	bool _rawInput = false;
 
-	Vector2f _position;
-	Vector2f _lastPosition;
+	Vector2 _position;
+	Vector2 _lastPosition;
 
 	static Mouse* _instance;
 };

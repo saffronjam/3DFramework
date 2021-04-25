@@ -10,12 +10,12 @@ struct RenderChannel
 	static RenderChannel Shadow;
 	static RenderChannel Outline;
 
-	Uint64 Value;
+	ulong Value;
 
-	RenderChannel(Uint64 value);
+	RenderChannel(ulong value);
 
-	Uint64 operator &(const RenderChannel& rhs) const;
-	Uint64 operator |(const RenderChannel& rhs) const;
+	ulong operator &(const RenderChannel& rhs) const;
+	ulong operator |(const RenderChannel& rhs) const;
 	bool operator==(const RenderChannel& rhs) const;
 	bool operator!=(const RenderChannel& rhs) const;
 };
@@ -28,7 +28,7 @@ struct hash<Se::RenderChannel>
 {
 	std::size_t operator()(const Se::RenderChannel& renderChannel) const noexcept
 	{
-		return hash<Se::Uint64>()(renderChannel.Value);
+		return hash<Se::ulong>()(renderChannel.Value);
 	}
 };
 }

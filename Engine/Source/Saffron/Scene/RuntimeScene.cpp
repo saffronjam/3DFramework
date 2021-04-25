@@ -11,7 +11,7 @@
 namespace Se
 {
 template <typename T>
-static void CopyComponent(EntityRegistry& dstRegistry, EntityRegistry& srcRegistry, const Map<UUID, Entity>& entityMap)
+static void CopyComponent(EntityRegistry& dstRegistry, EntityRegistry& srcRegistry, const TreeMap<UUID, Entity>& entityMap)
 {
 	auto components = srcRegistry.view<T>();
 	for (auto entityHandle : components)
@@ -35,7 +35,7 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	_skybox = copyFrom->GetSkybox();
 
 	auto& otherRegistry = copyFrom->GetEntityRegistry();
-	Map<UUID, Entity> entityMap;
+	TreeMap<UUID, Entity> entityMap;
 	auto idComponents = otherRegistry.view<IDComponent>();
 	for (auto entityHandle : idComponents)
 	{

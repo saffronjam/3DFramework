@@ -9,7 +9,7 @@
 
 namespace Se
 {
-Matrix4f Mat4FromAssimpMat4(const aiMatrix4x4& matrix);
+Matrix4 Mat4FromAssimpMat4(const aiMatrix4x4& matrix);
 
 SceneHierarchyPanel::SceneHierarchyPanel(const Shared<Scene>& context) :
 	_context(context)
@@ -95,7 +95,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 		if (scriptComponent)
 		{
 			ImGui::NextColumn();
-			OutputStringStream oss;
+			OStringStream oss;
 			for (const auto& scriptName : scriptPanel->GetScriptStats()) { oss << scriptName.Class << '\0'; }
 			oss << '\0';
 			ImGui::Combo("##EntityCreateScriptComboOption", &scriptChosen, oss.str().c_str());
@@ -223,7 +223,7 @@ void SceneHierarchyPanel::OnCreateDirectionalLight()
 {
 	auto newEntity = _context->CreateEntity("Directional Light");
 	newEntity.AddComponent<DirectionalLightComponent>();
-	newEntity.GetComponent<TransformComponent>().Transform = toMat4(Quaternion(radians(Vector3f{80.0f, 10.0f, 0.0f})));
+	newEntity.GetComponent<TransformComponent>().Transform = toMat4(Quaternion(radians(Vector3{80.0f, 10.0f, 0.0f})));
 	NewSelection.Invoke(newEntity);
 }
 
@@ -289,7 +289,7 @@ void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 
 void SceneHierarchyPanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUID) const
 {
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << "Mesh##" << entityUUID;
 
 	// Mesh Hierarchy
@@ -301,11 +301,11 @@ void SceneHierarchyPanel::DrawMeshNode(const Shared<Mesh>& mesh, UUID& entityUUI
 	}
 }
 
-void SceneHierarchyPanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4f& parentTransform,
-                                            Uint32 level) const
+void SceneHierarchyPanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* node, const Matrix4& parentTransform,
+                                            uint level) const
 {
-	const Matrix4f localTransform = Mat4FromAssimpMat4(node->mTransformation);
-	const Matrix4f transform = parentTransform * localTransform;
+	const Matrix4 localTransform = Mat4FromAssimpMat4(node->mTransformation);
+	const Matrix4 transform = parentTransform * localTransform;
 
 	if (ImGui::TreeNode(node->mName.C_Str()))
 	{
@@ -322,7 +322,7 @@ void SceneHierarchyPanel::MeshNodeHierarchy(const Shared<Mesh>& mesh, aiNode* no
 			ImGui::Text("  Scale: %.2f, %.2f, %.2f", scale.x, scale.y, scale.z);
 		}
 
-		for (Uint32 i = 0; i < node->mNumChildren; i++)
+		for (uint i = 0; i < node->mNumChildren; i++)
 			MeshNodeHierarchy(mesh, node->mChildren[i], transform, level + 1);
 
 		ImGui::TreePop();

@@ -28,15 +28,15 @@ public:
 	template <typename T>
 	void RemoveComponent();
 
-	Matrix4f& Transform() { return GetComponent<TransformComponent>(); }
+	Matrix4& Transform() { return GetComponent<TransformComponent>(); }
 
-	const Matrix4f& Transform() const { return GetComponent<TransformComponent>(); }
+	const Matrix4& Transform() const { return GetComponent<TransformComponent>(); }
 
-	operator Uint32() const { return static_cast<Uint32>(_handle); }
+	operator uint() const { return static_cast<uint>(_handle); }
 
 	operator entt::entity() const { return _handle; }
 
-	operator bool() const { return static_cast<Uint32>(_handle) && _scene; }
+	operator bool() const { return static_cast<uint>(_handle) && _scene; }
 
 	bool operator==(const Entity& other) const;
 	bool operator!=(const Entity& other) const;

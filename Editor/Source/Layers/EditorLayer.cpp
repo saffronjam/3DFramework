@@ -85,36 +85,14 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 				float snapValues[3] = {snapValue, snapValue, snapValue};
 
 				ImGuizmo::SetDrawlist();
-				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);
-
-
-				static float bounds[] = {-0.5f, -0.5f, -0.5f, 0.5f, 0.5f, 0.5f};
-				float* boundsPtr;
-				if (_selectedEntity.HasComponent<MeshComponent>())
-				{
-					auto boundingBoxes = _selectedEntity.GetComponent<MeshComponent>().Mesh->GetBoundingBoxes(
-						_selectedEntity.GetComponent<TransformComponent>().Transform);
-					auto& first = boundingBoxes.front();
-					bounds[0] = first.Min.x;
-					bounds[1] = first.Min.y;
-					bounds[2] = first.Min.z;
-					bounds[3] = first.Max.x;
-					bounds[4] = first.Max.y;
-					bounds[5] = first.Max.z;
-					boundsPtr = bounds;
-				}
-				else
-				{
-					boundsPtr = nullptr;
-				}
+				ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportSize.x, viewportSize.y);				
 
 				if (_selectionMode == SelectionMode::Entity)
 				{
 					ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
 					                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
 					                     static_cast<ImGuizmo::OPERATION>(_gizmoType), ImGuizmo::WORLD,
-					                     glm::value_ptr(entityTransform), nullptr, snap ? snapValues : nullptr,
-					                     boundsPtr);
+					                     glm::value_ptr(entityTransform), nullptr, snap ? snapValues : nullptr);
 				}
 				else
 				{
@@ -123,8 +101,7 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 					ImGuizmo::Manipulate(glm::value_ptr(editorCamera->GetViewMatrix()),
 					                     glm::value_ptr(editorCamera->GetProjectionMatrix()),
 					                     static_cast<ImGuizmo::OPERATION>(_gizmoType), ImGuizmo::WORLD,
-					                     glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr,
-					                     boundsPtr);
+					                     glm::value_ptr(transformBase), nullptr, snap ? snapValues : nullptr);
 
 					modelEntity.GetComponent<TransformComponent>().Transform = glm::inverse(entityTransform) *
 						transformBase;
@@ -322,14 +299,14 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 			auto raycast = [&selections, &rayResult](Entity entity, const Shared<Mesh>& mesh)
 			{
 				const auto& submeshes = mesh->GetSubmeshes();
-				for (Uint32 i = 0; i < submeshes.size(); i++)
+				for (uint i = 0; i < submeshes.size(); i++)
 				{
 					const auto& submesh = submeshes[i];
 					Ray ray = {
-						glm::inverse(entity.Transform() * mesh->GetLocalTransform() * submesh.Transform) * Vector4f(
+						glm::inverse(entity.Transform() * mesh->GetLocalTransform() * submesh.Transform) * Vector4(
 							rayResult.first, 1.0f),
 						glm::inverse(
-							Matrix3f(entity.Transform()) * Matrix3f(submesh.Transform) * Matrix3f(
+							Matrix3(entity.Transform()) * Matrix3(submesh.Transform) * Matrix3(
 								mesh->GetLocalTransform())) * rayResult.second
 					};
 
@@ -621,9 +598,9 @@ Shared<Scene> EditorLayer::GetActiveScene() const
 }
 
 
-Pair<Vector3f, Vector3f> EditorLayer::CastRay(float mx, float my) const
+Pair<Vector3, Vector3> EditorLayer::CastRay(float mx, float my) const
 {
-	const Vector4f mouseClipPos = {mx, my, -1.0f, 1.0f};
+	const Vector4 mouseClipPos = {mx, my, -1.0f, 1.0f};
 
 	auto scene = GetActiveScene();
 	if (scene->GetEntity().HasComponent<EditorCameraComponent>())
@@ -633,9 +610,9 @@ Pair<Vector3f, Vector3f> EditorLayer::CastRay(float mx, float my) const
 		const auto inverseProj = glm::inverse(editorCamera->GetProjectionMatrix());
 		const auto inverseView = glm::inverse(glm::mat3(editorCamera->GetViewMatrix()));
 
-		const Vector4f ray = inverseProj * mouseClipPos;
-		const Vector3f rayPos = editorCamera->GetPosition();
-		const Vector3f rayDir = inverseView * Vector3f(ray);
+		const Vector4 ray = inverseProj * mouseClipPos;
+		const Vector3 rayPos = editorCamera->GetPosition();
+		const Vector3 rayDir = inverseView * Vector3(ray);
 
 		return {rayPos, rayDir};
 	}

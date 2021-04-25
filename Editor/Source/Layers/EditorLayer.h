@@ -24,9 +24,7 @@ public:
 
 public:
 	explicit EditorLayer(const Shared<Project>& project);
-
-	~EditorLayer() override = default;
-
+	
 	void OnAttach(Shared<BatchLoader>& loader) override;
 	void OnDetach() override;
 
@@ -47,7 +45,7 @@ public:
 	void LoadProjectScene(const Filepath& filepath);
 
 private:
-	Pair<Vector3f, Vector3f> CastRay(float mx, float my) const;
+	Pair<Vector3, Vector3> CastRay(float mx, float my) const;
 	Ray CastMouseRay() const;
 
 	void OnGuiRenderMenuBar();
@@ -98,7 +96,7 @@ private:
 	ArrayList<Shared<MaterialInstance>> _metalSphereMaterialInstances, _dielectricSphereMaterialInstances;
 
 	// Editor resources
-	Map<String, Shared<Texture2D>> _texStore;
+	TreeMap<String, Shared<Texture2D>> _texStore;
 
 	Shared<AssetPanel> _assetPanel;
 	Shared<EntityComponentsPanel> _entityPanel;

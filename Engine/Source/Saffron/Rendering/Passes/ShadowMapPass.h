@@ -11,8 +11,8 @@ class ShadowMapPass : public RenderPass
 private:
 	struct CascadeData
 	{
-		Matrix4f ViewProj;
-		Matrix4f View;
+		Matrix4 ViewProj;
+		Matrix4 View;
 		float SplitDepth;
 	};
 
@@ -25,10 +25,10 @@ public:
 	explicit ShadowMapPass(String name);
 
 	void Execute() override;
-	void OnViewportResize(Uint32 width, Uint32 height) override;
+	void OnViewportResize(uint width, uint height) override;
 
 private:
-	void CalculateCascades(CascadeData* cascades, const Vector3f& lightDirection);
+	void CalculateCascades(CascadeData* cascades, const Vector3& lightDirection);
 
 private:
 	Array<Shared<Framebuffer>, 4> _shadowMaps;

@@ -68,7 +68,7 @@ void GeometryPass::Execute()
 	auto& sceneCamera = sceneInfo.SceneCamera;
 
 	const auto viewProjection = sceneCamera.Camera.GetProjectionMatrix() * sceneCamera.ViewMatrix;
-	const Vector3f cameraPosition = inverse(sceneInfo.SceneCamera.ViewMatrix)[3]; // TODO: Negate instead
+	const Vector3 cameraPosition = inverse(sceneInfo.SceneCamera.ViewMatrix)[3]; // TODO: Negate instead
 
 	// Skybox
 	const auto& skyboxShader = sceneInfo.SkyboxMaterial->GetShader();
@@ -255,8 +255,8 @@ void GeometryPass::Execute()
 	{
 		common.GridMaterial->Set("u_ViewProjection", viewProjection);
 		Renderer::SubmitQuad(common.GridMaterial,
-		                     rotate(Matrix4f(1.0f), glm::radians(90.0f), Vector3f(1.0f, 0.0f, 0.0f)) * scale(
-			                     Matrix4f(1.0f), Vector3f(16.0f)));
+		                     rotate(Matrix4(1.0f), glm::radians(90.0f), Vector3(1.0f, 0.0f, 0.0f)) * scale(
+			                     Matrix4(1.0f), Vector3(16.0f)));
 	}
 
 	if (options.ShowBoundingBoxes)
@@ -269,7 +269,7 @@ void GeometryPass::Execute()
 	Renderer::End();
 }
 
-void GeometryPass::OnViewportResize(Uint32 width, Uint32 height)
+void GeometryPass::OnViewportResize(uint width, uint height)
 {
 	_framebuffer->Resize(width, height);
 }

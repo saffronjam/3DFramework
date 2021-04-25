@@ -6,7 +6,7 @@
 namespace Se
 {
 // TODO: Implement as a GUI interface
-static Uint64 s_GuiID = 0;
+static ulong s_GuiID = 0;
 
 EditorTerminal::EditorTerminal()
 {
@@ -23,7 +23,7 @@ void EditorTerminal::Clear()
 
 void EditorTerminal::OnGuiRender()
 {
-	OutputStringStream oss;
+	OStringStream oss;
 	oss << "Terminal##" << s_GuiID++;
 
 	if (!ImGui::Begin("Terminal"))

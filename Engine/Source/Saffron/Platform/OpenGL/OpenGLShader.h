@@ -29,12 +29,12 @@ public:
 	void SetInt(const String& name, int value) override;
 	void SetBool(const String& name, bool value) override;
 	void SetFloat(const String& name, float value) override;
-	void SetFloat2(const String& name, const Vector2f& value) override;
-	void SetFloat3(const String& name, const Vector3f& value) override;
-	void SetMat4(const String& name, const Matrix4f& value) override;
-	void SetMat4FromRenderThread(const String& name, const Matrix4f& value, bool bind = true) override;
+	void SetFloat2(const String& name, const Vector2& value) override;
+	void SetFloat3(const String& name, const Vector3& value) override;
+	void SetMat4(const String& name, const Matrix4& value) override;
+	void SetMat4FromRenderThread(const String& name, const Matrix4& value, bool bind = true) override;
 
-	void SetIntArray(const String& name, int* values, Uint32 size) override;
+	void SetIntArray(const String& name, int* values, uint size) override;
 
 	const String& GetName() const override { return _name; }
 
@@ -42,7 +42,7 @@ private:
 	void Load(const Buffer& source);
 
 	Buffer ReadShaderFromFile(const Filepath& filepath) const;
-	UnorderedMap<GLenum, String> PreProcess(const Buffer& source);
+	HashMap<GLenum, String> PreProcess(const Buffer& source);
 	void Parse();
 	void ParseUniform(const String& statement, ShaderDomain domain);
 	void ParseUniformStruct(const String& block, ShaderDomain domain);
@@ -58,29 +58,29 @@ private:
 	void ResolveAndSetUniforms(const Shared<OpenGLShaderUniformBufferDeclaration>& decl, Buffer buffer);
 	void ResolveAndSetUniform(OpenGLShaderUniformDeclaration* uniform, Buffer buffer);
 	void ResolveAndSetUniformArray(OpenGLShaderUniformDeclaration* uniform, Buffer buffer);
-	void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, Uint8* data, int32_t offset);
+	void ResolveAndSetUniformField(const OpenGLShaderUniformDeclaration& field, uchar* data, int32_t offset);
 
-	void UploadUniformInt(Uint32 location, int32_t value);
-	void UploadUniformIntArray(Uint32 location, int32_t* values, int32_t count);
-	void UploadUniformFloat(Uint32 location, float value);
-	void UploadUniformFloat2(Uint32 location, const Vector2f& value);
-	void UploadUniformFloat3(Uint32 location, const Vector3f& value);
-	void UploadUniformFloat4(Uint32 location, const Vector4f& value);
-	void UploadUniformMat3(Uint32 location, const Matrix3f& values);
-	void UploadUniformMat4(Uint32 location, const Matrix4f& values);
-	void UploadUniformMat4Array(Uint32 location, const Matrix4f& values, Uint32 count);
+	void UploadUniformInt(uint location, int32_t value);
+	void UploadUniformIntArray(uint location, int32_t* values, int32_t count);
+	void UploadUniformFloat(uint location, float value);
+	void UploadUniformFloat2(uint location, const Vector2& value);
+	void UploadUniformFloat3(uint location, const Vector3& value);
+	void UploadUniformFloat4(uint location, const Vector4& value);
+	void UploadUniformMat3(uint location, const Matrix3& values);
+	void UploadUniformMat4(uint location, const Matrix4& values);
+	void UploadUniformMat4Array(uint location, const Matrix4& values, uint count);
 
-	void UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, Uint8* buffer, Uint32 offset);
+	void UploadUniformStruct(OpenGLShaderUniformDeclaration* uniform, uchar* buffer, uint offset);
 
 	void UploadUniformInt(const String& name, int32_t value);
-	void UploadUniformIntArray(const String& name, int32_t* values, Uint32 count);
+	void UploadUniformIntArray(const String& name, int32_t* values, uint count);
 
 	void UploadUniformFloat(const String& name, float value);
-	void UploadUniformFloat2(const String& name, const Vector2f& value);
-	void UploadUniformFloat3(const String& name, const Vector3f& value);
-	void UploadUniformFloat4(const String& name, const Vector4f& value);
+	void UploadUniformFloat2(const String& name, const Vector2& value);
+	void UploadUniformFloat3(const String& name, const Vector3& value);
+	void UploadUniformFloat4(const String& name, const Vector4& value);
 
-	void UploadUniformMat4(const String& name, const Matrix4f& value);
+	void UploadUniformMat4(const String& name, const Matrix4& value);
 
 	const ShaderUniformBufferList& GetVSRendererUniforms() const override;
 	const ShaderUniformBufferList& GetPSRendererUniforms() const override;
@@ -98,7 +98,7 @@ private:
 	bool _isCompute = false;
 
 	String _name;
-	UnorderedMap<GLenum, String> _shaderSource;
+	HashMap<GLenum, String> _shaderSource;
 
 	ArrayList<ShaderReloadedCallback> _shaderReloadedCallbacks;
 

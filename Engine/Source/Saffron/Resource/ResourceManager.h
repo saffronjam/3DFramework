@@ -28,7 +28,7 @@ private:
 	void SyncCache();
 
 private:
-	Map<size_t, Shared<Resource>> _memory;
+	TreeMap<size_t, Shared<Resource>> _memory;
 	ArrayList<Shared<Resource>> _returnCache;
 	bool _needCacheSync = true;
 };

@@ -22,8 +22,8 @@ public:
 	void OnStart();
 	void OnStop();
 
-	Vector2f GetGravity() const;
-	void SetGravity(const Vector2f& gravity);
+	Vector2 GetGravity() const;
+	void SetGravity(const Vector2& gravity);
 
 private:
 	b2World* _nativeWorld;

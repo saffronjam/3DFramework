@@ -10,11 +10,11 @@
 namespace Se
 {
 EditorCamera::EditorCamera() :
-	EditorCamera(Matrix4f(1))
+	EditorCamera(Matrix4(1))
 {
 }
 
-EditorCamera::EditorCamera(Matrix4f projectionMatrix) :
+EditorCamera::EditorCamera(Matrix4 projectionMatrix) :
 	Camera(Move(projectionMatrix))
 {
 	Reset();
@@ -32,7 +32,7 @@ void EditorCamera::OnUpdate()
 		{
 			if (Keyboard::IsDown(KeyCode::LAlt))
 			{
-				const Vector2f swipe = Mouse::GetSwipe() * ts.sec() * 0.7f;
+				const Vector2 swipe = Mouse::GetSwipe() * ts.sec() * 0.7f;
 
 				//if ( Input::IsMouseButtonPressed(SE_BUTTON_MIDDLE) )
 				//	MousePan(swipe);
@@ -85,7 +85,7 @@ void EditorCamera::OnUpdate()
 
 			if (Mouse::IsDown(MouseButtonCode::Right))
 			{
-				const Vector2f swipe = Mouse::GetSwipe() * ts.sec() * 0.3f;
+				const Vector2 swipe = Mouse::GetSwipe() * ts.sec() * 0.3f;
 
 				_yaw += swipe.x;
 				_pitch -= swipe.y;
@@ -129,17 +129,17 @@ bool EditorCamera::IsEnabled() const
 	return _enabled;
 }
 
-const Matrix4f& EditorCamera::GetViewMatrix() const
+const Matrix4& EditorCamera::GetViewMatrix() const
 {
 	return _viewMatrix;
 }
 
-Matrix4f EditorCamera::GetViewProjection() const
+Matrix4 EditorCamera::GetViewProjection() const
 {
 	return _projectionMatrix * _viewMatrix;
 }
 
-const Vector3f& EditorCamera::GetPosition() const
+const Vector3& EditorCamera::GetPosition() const
 {
 	return _position;
 }
@@ -160,13 +160,13 @@ float EditorCamera::GetRoll() const
 }
 
 
-void EditorCamera::SetPosition(const Vector3f& position)
+void EditorCamera::SetPosition(const Vector3& position)
 {
 	_position = position;
 	UpdateCameraView();
 }
 
-void EditorCamera::SetRotation(const Vector3f& rotation)
+void EditorCamera::SetRotation(const Vector3& rotation)
 {
 	_pitch = rotation.x;
 	_yaw = rotation.y;
@@ -174,17 +174,17 @@ void EditorCamera::SetRotation(const Vector3f& rotation)
 	UpdateCameraView();
 }
 
-Vector3f EditorCamera::GetUpDirection() const
+Vector3 EditorCamera::GetUpDirection() const
 {
 	return _up;
 }
 
-Vector3f EditorCamera::GetRightDirection() const
+Vector3 EditorCamera::GetRightDirection() const
 {
 	return _right;
 }
 
-Vector3f EditorCamera::GetForwardDirection() const
+Vector3 EditorCamera::GetForwardDirection() const
 {
 	return _forward;
 }
@@ -209,7 +209,7 @@ bool EditorCamera::OnMouseScroll(const MouseWheelScrolledEvent& event)
 
 void EditorCamera::UpdateCameraView()
 {
-	Vector3f front;
+	Vector3 front;
 	front.x = std::cos(_yaw) * std::cos(_pitch);
 	front.y = std::sin(_pitch);
 	front.z = std::sin(_yaw) * std::cos(_pitch);

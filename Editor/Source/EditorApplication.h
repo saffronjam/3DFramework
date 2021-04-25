@@ -10,7 +10,12 @@ namespace Se
 class EditorApplication : public App {
 public:
     explicit EditorApplication(const Properties &props);
-
+	~EditorApplication()
+	{
+		_startupLayer.Reset();
+		_editorLayer.Reset();
+	}
+	
     void OnInit() override;
 
     void OnUpdate() override;

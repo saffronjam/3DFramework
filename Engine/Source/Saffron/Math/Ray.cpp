@@ -4,7 +4,7 @@
 
 namespace Se
 {
-Ray::Ray(const Vector3f& origin, const Vector3f& direction) :
+Ray::Ray(const Vector3& origin, const Vector3& direction) :
 	Origin(origin),
 	Direction(direction)
 {
@@ -17,15 +17,15 @@ Ray Ray::Zero()
 
 bool Ray::IntersectsAABB(const AABB& aabb, float& t) const
 {
-	Vector3f dirfrac;
+	Vector3 dirfrac;
 	// r.dir is unit direction vector of ray
 	dirfrac.x = 1.0f / Direction.x;
 	dirfrac.y = 1.0f / Direction.y;
 	dirfrac.z = 1.0f / Direction.z;
 	// lb is the corner of AABB with minimal coordinates - left bottom, rt is maximal corner
 	// r.org is origin of ray
-	const Vector3f& lb = aabb.Min;
-	const Vector3f& rt = aabb.Max;
+	const Vector3& lb = aabb.Min;
+	const Vector3& rt = aabb.Max;
 	const float t1 = (lb.x - Origin.x) * dirfrac.x;
 	const float t2 = (rt.x - Origin.x) * dirfrac.x;
 	const float t3 = (lb.y - Origin.y) * dirfrac.y;
@@ -56,15 +56,15 @@ bool Ray::IntersectsAABB(const AABB& aabb, float& t) const
 	return true;
 }
 
-bool Ray::IntersectsTriangle(const Vector3f& A, const Vector3f& B, const Vector3f& C, float& t) const
+bool Ray::IntersectsTriangle(const Vector3& A, const Vector3& B, const Vector3& C, float& t) const
 {
-	const Vector3f E1 = B - A;
-	const Vector3f E2 = C - A;
-	const Vector3f N = cross(E1, E2);
+	const Vector3 E1 = B - A;
+	const Vector3 E2 = C - A;
+	const Vector3 N = cross(E1, E2);
 	const float det = -dot(Direction, N);
 	const float invdet = 1.0f / det;
-	const Vector3f AO = Origin - A;
-	const Vector3f DAO = cross(AO, Direction);
+	const Vector3 AO = Origin - A;
+	const Vector3 DAO = cross(AO, Direction);
 	const float u = dot(E2, DAO) * invdet;
 	const float v = -dot(E1, DAO) * invdet;
 	t = dot(AO, N) * invdet;

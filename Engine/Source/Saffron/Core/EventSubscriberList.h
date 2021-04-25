@@ -22,7 +22,7 @@ public:
 	void operator -=(CancellationToken token);
 
 private:
-	UnorderedMap<CancellationToken, Handler> _subscribers;
+	HashMap<CancellationToken, Handler> _subscribers;
 };
 
 template <>
@@ -42,7 +42,7 @@ public:
 	void operator -=(CancellationToken token);
 
 private:
-	UnorderedMap<CancellationToken, Handler> _subscribers;
+	HashMap<CancellationToken, Handler> _subscribers;
 };
 
 template <typename EventArgs>

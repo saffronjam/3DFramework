@@ -125,7 +125,7 @@ void SceneRenderer::EndScene()
 	FlushDrawList();
 }
 
-void SceneRenderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform, Shared<MaterialInstance> overrideMaterial)
+void SceneRenderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4& transform, Shared<MaterialInstance> overrideMaterial)
 {
 	auto& drawContaier = Instance()._drawContainer;
 	// TODO: Culling, sorting, etc.
@@ -133,7 +133,7 @@ void SceneRenderer::SubmitMesh(Shared<Mesh> mesh, const Matrix4f& transform, Sha
 	drawContaier.at(RenderChannel::Shadow).push_back({mesh, overrideMaterial, transform});
 }
 
-void SceneRenderer::SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4f& transform)
+void SceneRenderer::SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4& transform)
 {
 	auto& drawContaier = Instance()._drawContainer;
 	drawContaier.at(RenderChannel::Outline).push_back({mesh, nullptr, transform});
@@ -144,8 +144,8 @@ static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIr
 
 Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Filepath& filepath)
 {
-	const Uint32 cubemapSize = 2048;
-	const Uint32 irradianceMapSize = 32;
+	const uint cubemapSize = 2048;
+	const uint irradianceMapSize = 32;
 
 	Shared<TextureCube> envUnfiltered = TextureCube::Create(TextureFormat::Float16, cubemapSize, cubemapSize);
 	if (!equirectangularConversionShader) equirectangularConversionShader = Shader::Create("EquirectangularToCubeMap");
@@ -236,17 +236,17 @@ const RenderPass& SceneRenderer::GetFinalRenderPass()
 	return output;
 }
 
-Uint32 SceneRenderer::GetFinalColorBufferRendererID()
+uint SceneRenderer::GetFinalColorBufferRendererID()
 {
 	return Instance()._renderGraph->GetOutput()->GetColorAttachmentRendererID();
 }
 
-void SceneRenderer::SetFocusPoint(const Vector2f& point)
+void SceneRenderer::SetFocusPoint(const Vector2& point)
 {
 	Instance()._common.FocusPoint = point;
 }
 
-void SceneRenderer::SetViewportSize(Uint32 width, Uint32 height)
+void SceneRenderer::SetViewportSize(uint width, uint height)
 {
 	Instance()._renderGraph->OnViewportResize(width, height);
 }

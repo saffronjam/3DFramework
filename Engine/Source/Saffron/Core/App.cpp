@@ -34,7 +34,7 @@ App::App(const Properties& properties) :
 
 	Run::Execute();
 
-	_renderer = CreateUnique<Renderer>();
+	_renderer = Shared<Renderer>::Create();
 	_sceneRenderer = CreateUnique<SceneRenderer>();
 
 	_scriptEngine = CreateUnique<ScriptEngine>();
@@ -47,12 +47,12 @@ App::App(const Properties& properties) :
 
 	_preLoader->Started += []
 	{
-		ScriptEngine::AttachThread();
+		ScriptEngine::Instance().AttachThread();
 		return false;
 	};
 	_preLoader->Finished += []
 	{
-		ScriptEngine::DetachThread();
+		ScriptEngine::Instance().DetachThread();
 		return false;
 	};
 
@@ -107,18 +107,6 @@ void App::EraseOverlay(Shared<Layer> overlay)
 	_layerStack.EraseOverlay(overlay);
 }
 
-void App::RenderGui()
-{
-	_gui->Begin();
-
-	for (auto& layer : _layerStack)
-	{
-		layer->OnGuiRender();
-	}
-
-	_gui->End();
-}
-
 Window& App::GetWindow()
 {
 	return *_window;
@@ -127,6 +115,11 @@ Window& App::GetWindow()
 const Window& App::GetWindow() const
 {
 	return *_window;
+}
+
+Shared<Renderer> App::GetRenderer() const
+{
+	return _renderer;
 }
 
 void App::Run()
@@ -142,25 +135,35 @@ void App::Run()
 
 		Global::Timer::Mark();
 
+		_gui->Begin();
 		if (!_minimized)
 		{
 			for (auto& layer : _layerStack)
 			{
 				layer->OnUpdate();
 			}
-			Renderer::Submit([this]() { RenderGui(); });
+			Renderer::Submit([this]()
+			{
+				for (auto& layer : _layerStack)
+				{
+					layer->OnGuiRender();
+				}
+			});
 
 			Renderer::WaitAndRender();
 		}
 
-		ScriptEngine::OnUpdate();
+		ScriptEngine::Instance().OnUpdate();
 
-		_window->OnUpdate();
 		_keyboard->OnUpdate();
 		_mouse->OnUpdate();
-		_window->HandleBufferedEvents();
 		OnUpdate();
+		_gui->End();
+
+		_window->OnUpdate();
 		Run::Execute();
+
+		_window->HandleBufferedEvents();
 	}
 
 	_layerStack.Clear();

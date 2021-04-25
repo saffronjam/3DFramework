@@ -16,8 +16,8 @@ Material::Material(const Shared<Shader>& shader) :
 
 	AllocateStorage();
 
-	_materialFlags |= static_cast<Uint32>(MaterialFlag::DepthTest);
-	_materialFlags |= static_cast<Uint32>(MaterialFlag::Blend);
+	_materialFlags |= static_cast<uint>(MaterialFlag::DepthTest);
+	_materialFlags |= static_cast<uint>(MaterialFlag::Blend);
 }
 
 void Material::Bind()
@@ -31,14 +31,14 @@ void Material::Bind()
 	BindTextures();
 }
 
-Uint32 Material::GetFlags() const
+uint Material::GetFlags() const
 {
 	return _materialFlags;
 }
 
 void Material::SetFlag(MaterialFlag flag)
 {
-	_materialFlags |= static_cast<Uint32>(flag);
+	_materialFlags |= static_cast<uint>(flag);
 }
 
 const Shared<Shader>& Material::GetShader() const
@@ -49,7 +49,7 @@ const Shared<Shader>& Material::GetShader() const
 void Material::Set(const String& name, const Shared<Texture>& texture)
 {
 	ShaderResourceDeclaration* decl = FindResourceDeclaration(name);
-	const Uint32 slot = decl->GetRegister();
+	const uint slot = decl->GetRegister();
 	if (_textures.size() <= slot) _textures.resize(static_cast<size_t>(slot) + 1);
 	_textures[slot] = texture;
 }
@@ -107,7 +107,7 @@ bool Material::OnShaderReloaded()
 
 void Material::BindTextures()
 {
-	Uint32 TextureIndex = 0;
+	uint TextureIndex = 0;
 	for (auto& texture : _textures)
 	{
 		if (texture) texture->Bind(TextureIndex);
@@ -177,7 +177,7 @@ void MaterialInstance::Bind()
 
 	_material->BindTextures();
 
-	Uint32 TextureIndex = 0;
+	uint TextureIndex = 0;
 	for (auto& texture : _textures)
 	{
 		if (texture) texture->Bind(TextureIndex);
@@ -195,14 +195,14 @@ const Shared<Shader>& MaterialInstance::GetShader() const
 	return _material->_shader;
 }
 
-Uint32 MaterialInstance::GetFlags() const
+uint MaterialInstance::GetFlags() const
 {
 	return _material->_materialFlags;
 }
 
 bool MaterialInstance::GetFlag(MaterialFlag flag) const
 {
-	return static_cast<Uint32>(flag) & _material->_materialFlags;
+	return static_cast<uint>(flag) & _material->_materialFlags;
 }
 
 void MaterialInstance::Set(const String& name, const Shared<Texture>& texture)
@@ -213,7 +213,7 @@ void MaterialInstance::Set(const String& name, const Shared<Texture>& texture)
 		Log::CoreWarn("Cannot find material property: ", name);
 		return;
 	}
-	const Uint32 slot = decl->GetRegister();
+	const uint slot = decl->GetRegister();
 	if (_textures.size() <= slot) _textures.resize(static_cast<size_t>(slot) + 1);
 	_textures[slot] = texture;
 }
@@ -279,11 +279,11 @@ void MaterialInstance::SetFlag(MaterialFlag flag, bool value)
 {
 	if (value)
 	{
-		_material->_materialFlags |= static_cast<Uint32>(flag);
+		_material->_materialFlags |= static_cast<uint>(flag);
 	}
 	else
 	{
-		_material->_materialFlags &= ~static_cast<Uint32>(flag);
+		_material->_materialFlags &= ~static_cast<uint>(flag);
 	}
 }
 }

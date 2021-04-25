@@ -29,12 +29,12 @@ void RenderPass::SetStreamLinkage(const String& outputName, const String& inputN
 	input.SetDerived(Move(inputSplit[0]), Move(inputSplit[1]));
 }
 
-const UnorderedMap<String, Unique<Stream::Input>>& RenderPass::GetInputs() const
+const HashMap<String, Unique<Stream::Input>>& RenderPass::GetInputs() const
 {
 	return _inputs;
 }
 
-const UnorderedMap<String, Unique<Stream::Output>>& RenderPass::GetOutputs() const
+const HashMap<String, Unique<Stream::Output>>& RenderPass::GetOutputs() const
 {
 	return _outputs;
 }

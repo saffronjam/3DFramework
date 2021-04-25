@@ -38,7 +38,7 @@ void RenderCommandQueue::Execute()
 {
 	//Log::CoreTrace("Executing {} commands", _commandBuffer.size());
 
-	Uint8* buffer = _commandBuffer;
+	uchar* buffer = _commandBuffer;
 
 	for (uint32_t i = 0; i < _commandCount; i++)
 	{

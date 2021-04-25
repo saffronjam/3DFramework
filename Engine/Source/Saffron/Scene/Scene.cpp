@@ -16,7 +16,7 @@ namespace Se
 /// Statics
 ///////////////////////////////////////////////////////////////////////////
 
-UnorderedMap<UUID, Scene*> _activeScenes;
+HashMap<UUID, Scene*> _activeScenes;
 
 ///////////////////////////////////////////////////////////////////////////
 /// Helper functions
@@ -103,7 +103,7 @@ Entity Scene::CreateEntity(String name)
 	auto& idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = {};
 
-	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
+	entity.AddComponent<TransformComponent>(Matrix4(1.0f));
 	if (!name.empty()) entity.AddComponent<TagComponent>(Move(name));
 
 	_entityIDMap[idComponent.ID] = entity;
@@ -116,7 +116,7 @@ Entity Scene::CreateEntity(UUID uuid, const String& name)
 	auto& idComponent = entity.AddComponent<IDComponent>();
 	idComponent.ID = uuid;
 
-	entity.AddComponent<TransformComponent>(Matrix4f(1.0f));
+	entity.AddComponent<TransformComponent>(Matrix4(1.0f));
 	if (!name.empty()) entity.AddComponent<TagComponent>(name);
 
 	Debug::Assert(_entityIDMap.find(uuid) == _entityIDMap.end());;
@@ -144,7 +144,7 @@ Entity Scene::GetEntity(const String& tag)
 	return Entity::Null();
 }
 
-void Scene::SetViewportSize(Uint32 width, Uint32 height)
+void Scene::SetViewportSize(uint width, uint height)
 {
 	_viewportWidth = width;
 	_viewportHeight = height;

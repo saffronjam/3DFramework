@@ -6,7 +6,7 @@ namespace Se
 {
 struct AABB
 {
-	Vector3f Min, Max;
+	Vector3 Min, Max;
 
 	AABB() :
 		Min(0.0f),
@@ -14,7 +14,7 @@ struct AABB
 	{
 	}
 
-	AABB(const Vector3f& min, const Vector3f& max) :
+	AABB(const Vector3& min, const Vector3& max) :
 		Min(min),
 		Max(max)
 	{

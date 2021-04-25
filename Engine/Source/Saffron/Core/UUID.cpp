@@ -5,7 +5,7 @@
 
 namespace Se
 {
-static RandomGenerator<Uint64> sRandom(0, std::numeric_limits<Uint64>::max());
+static RandomGenerator<ulong> sRandom(0, std::numeric_limits<ulong>::max());
 
 
 UUID::UUID() :
@@ -13,7 +13,7 @@ UUID::UUID() :
 {
 }
 
-UUID::UUID(Uint64 uuid) :
+UUID::UUID(ulong uuid) :
 	_uuid(uuid)
 {
 }

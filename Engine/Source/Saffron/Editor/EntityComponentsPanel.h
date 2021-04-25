@@ -23,13 +23,13 @@ private:
 	void OnGuiRenderMeshDebug();
 
 	void DrawComponents(Entity entity);
-	static bool DrawVec3Control(const String& label, Vector3f& value, float resetValue = 0.0f,
+	static bool DrawVec3Control(const String& label, Vector3& value, float resetValue = 0.0f,
 	                            float columnWidth = 100.0f);
 
 private:
 	Shared<Scene> _context;
 	Entity _selectionContext;
 
-	Map<String, Shared<Texture2D>> _texStore;
+	TreeMap<String, Shared<Texture2D>> _texStore;
 };
 }
