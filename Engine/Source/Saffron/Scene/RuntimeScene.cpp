@@ -74,7 +74,7 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	if (copyFrom->GetEntity().HasComponent<PhysicsWorld3DComponent>())
 	{
 		auto& copyFromWorld = copyFrom->GetEntity().GetComponent<PhysicsWorld3DComponent>().World;
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.SetGravity(copyFromWorld.GetGravity());
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.SetGravity(copyFromWorld.GetGravity());
 	}
 
 	_debugCamera = _sceneEntity.AddComponent<EditorCameraComponent>(
@@ -108,7 +108,7 @@ void RuntimeScene::OnUpdate()
 	}
 	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnUpdate();
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnUpdate();
 	}
 }
 
@@ -204,7 +204,7 @@ void RuntimeScene::OnGuiRender()
 	}
 	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
 	}
 
 	_debugCamera->OnGuiRender();
@@ -233,7 +233,7 @@ void RuntimeScene::OnStart()
 	}
 	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStart();
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStart();
 	}
 }
 
@@ -245,7 +245,7 @@ void RuntimeScene::OnStop()
 	}
 	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStop();
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnStop();
 	}
 }
 

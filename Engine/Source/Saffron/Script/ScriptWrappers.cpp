@@ -1,7 +1,6 @@
 #include "SaffronPCH.h"
 
 #include <box2d/box2d.h>
-#include <reactphysics3d/reactphysics3d.h>
 #include <mono/jit/jit.h>
 
 #include "Saffron/Input/Keyboard.h"
@@ -230,10 +229,10 @@ void Saffron_RigidBody3DComponent_ApplyLinearImpulse(ulong entityID, Vector3* im
 	Debug::Assert(impulse && offset);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
-	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
-	body->applyForceAtLocalPosition(*reinterpret_cast<const reactphysics3d::Vector3*>(impulse),
-	                                body->getLocalCenterOfMass() + *reinterpret_cast<const reactphysics3d::Vector3*>(
-		                                offset));
+	//auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
+	//body->applyForceAtLocalPosition(*reinterpret_cast<const reactphysics3d::Vector3*>(impulse),
+	//                                body->getLocalCenterOfMass() + *reinterpret_cast<const reactphysics3d::Vector3*>(
+	//	                                offset));
 }
 
 void Saffron_RigidBody3DComponent_GetLinearVelocity(ulong entityID, Vector3* outVelocity)
@@ -241,9 +240,9 @@ void Saffron_RigidBody3DComponent_GetLinearVelocity(ulong entityID, Vector3* out
 	Debug::Assert(outVelocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
-	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
-	const auto& velocity = body->getLinearVelocity();
-	*outVelocity = {velocity.x, velocity.y, velocity.z};
+	//auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
+	//const auto& velocity = body->getLinearVelocity();
+	//*outVelocity = {velocity.x, velocity.y, velocity.z};
 }
 
 void Saffron_RigidBody3DComponent_SetLinearVelocity(ulong entityID, Vector3* velocity)
@@ -251,8 +250,8 @@ void Saffron_RigidBody3DComponent_SetLinearVelocity(ulong entityID, Vector3* vel
 	Debug::Assert(velocity);;
 	const Entity entity = GetEntityFromActiveScene(entityID);
 	auto& component = GetComponentWithCheck<RigidBody3DComponent>(entity);
-	auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
-	body->setLinearVelocity({velocity->x, velocity->y, velocity->z});
+	//auto* body = static_cast<reactphysics3d::RigidBody*>(component.RuntimeBody);
+	//body->setLinearVelocity({velocity->x, velocity->y, velocity->z});
 }
 
 void Saffron_Collider3DComponent_GetOffset(ulong entityID, Vector3* offset)

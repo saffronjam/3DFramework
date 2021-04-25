@@ -131,7 +131,7 @@ void EditorScene::OnGuiRender()
 	}
 	if (_sceneEntity.HasComponent<PhysicsWorld3DComponent>())
 	{
-		_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
+		//_sceneEntity.GetComponent<PhysicsWorld3DComponent>().World.OnGuiRender();
 	}
 
 	_editorCamera->OnGuiRender();

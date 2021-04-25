@@ -30,8 +30,7 @@ struct PhysicsWorld3DComponent
 {
 	PhysicsWorld3D World;
 
-	PhysicsWorld3DComponent(Scene& scene) :
-		World(scene)
+	PhysicsWorld3DComponent(Scene& scene)
 	{
 	}
 };

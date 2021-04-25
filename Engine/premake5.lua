@@ -55,7 +55,6 @@ project "Saffron"
 		"ThirdParty/glm/include",
 		"ThirdParty/imgui",
 		"ThirdParty/mono/include",
-		"ThirdParty/reactphysics3d/include",
 		"ThirdParty/spdlog/include",
 		"ThirdParty/stb/include",
 		"ThirdParty/yaml-cpp/include",
@@ -69,7 +68,6 @@ project "Saffron"
         "GLFW",
 		"ImGui",
 		"opengl32.lib",
-		"reactphysics3d",
 		"yaml-cpp",
 	}
 	

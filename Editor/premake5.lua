@@ -35,7 +35,6 @@ project "Editor"
 		ThirdPartyLocation .. "glm/include",
 		ThirdPartyLocation .. "imgui",
 		ThirdPartyLocation .. "mono/include",
-		ThirdPartyLocation .. "reactphysics3d/include",
 		ThirdPartyLocation .. "spdlog/include",
 		ThirdPartyLocation .. "stb/include",
 		ThirdPartyLocation .. "yaml-cpp/include",
