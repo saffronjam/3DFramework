@@ -253,7 +253,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			{
 				Filepath environmentFilepath = skyLightComponent["EnvironmentAssetPath"].as<String>();
 				auto& component = deserializedEntity.AddComponent<SkylightComponent>(
-					SceneEnvironment::Load(environmentFilepath));
+					SceneEnvironment::Create(environmentFilepath));
 				component.Intensity = skyLightComponent["Intensity"].as<float>();
 				component.Angle = skyLightComponent["Angle"].as<float>();
 			}

@@ -11,10 +11,10 @@ class ResourceManager : public Managed
 public:
 	static Shared<Resource>& Get(Shared<Resource> resource);
 	static Shared<Resource>& Get(size_t identifer);
-	static bool Exists(Shared<Resource> resource);
-	static bool Exists(size_t identifier);
-	static void Emplace(Shared<Resource> resource);
-	static void Emplace(Shared<Resource> resource, size_t identifier);
+	static bool Contains(Shared<Resource> resource);
+	static bool Contains(size_t identifier);
+	static void Add(Shared<Resource> resource);
+	static void Add(Shared<Resource> resource, size_t identifier);
 	static const ArrayList<Shared<Resource>>& GetAll();
 	static void Clear();
 
@@ -28,7 +28,7 @@ private:
 	void SyncCache();
 
 private:
-	TreeMap<size_t, Shared<Resource>> _memory;
+	HashMap<ulong, Shared<Resource>> _memory;
 	ArrayList<Shared<Resource>> _returnCache;
 	bool _needCacheSync = true;
 };

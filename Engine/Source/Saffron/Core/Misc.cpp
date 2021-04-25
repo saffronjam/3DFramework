@@ -15,14 +15,4 @@ Misc::TransformDecomposition Misc::GetTransformDecomposition(const Matrix4& tran
 
 	return {translation, orientation, scale};
 }
-
-size_t Misc::HashFilepath(const Filepath& filepath)
-{
-	return std::hash<String>{}(filepath.string());
-}
-
-size_t Misc::HashString(const String& string)
-{
-	return std::hash<String>{}(string);
-}
 }

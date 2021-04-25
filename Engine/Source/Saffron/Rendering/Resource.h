@@ -12,6 +12,10 @@ public:
 
 	virtual ~Resource() = default;
 
-	virtual size_t GetResourceID() { return 0; }
+	virtual ulong GetResourceID() { return 0; }
+
+protected:
+	static ulong HashFilepath(const Filepath& filepath);
+	static ulong HashString(const String& string);
 };
 }

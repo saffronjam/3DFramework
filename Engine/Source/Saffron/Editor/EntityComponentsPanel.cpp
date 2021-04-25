@@ -134,7 +134,7 @@ void EntityComponentsPanel::OnGuiRenderProperties()
 			{
 				if (ImGui::Button("Skylight"))
 				{
-					_selectionContext.AddComponent<SkylightComponent>(SceneEnvironment::Load("birchwood_4k.hdr"));
+					_selectionContext.AddComponent<SkylightComponent>(SceneEnvironment::Create("birchwood_4k.hdr"));
 					ImGui::CloseCurrentPopup();
 				}
 			}
@@ -696,7 +696,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 			const auto filepath = FileIOManager::OpenFile(FileIOManager::Filter{".hdr", {".hdr"}});
 			if (!filepath.empty())
 			{
-				slc.SceneEnvironment = SceneEnvironment::Load(filepath);
+				slc.SceneEnvironment = SceneEnvironment::Create(filepath);
 			}
 		}
 		ImGui::Columns(1);

@@ -25,9 +25,9 @@ void Shader::OnGuiRender()
 	ImGui::End();
 }
 
-size_t Shader::GetResourceID()
+ulong Shader::GetResourceID()
 {
-	return _filepath.empty() ? 0ull : Misc::HashFilepath(_filepath);
+	return _filepath.empty() ? 0ull : HashFilepath(_filepath);
 }
 
 Shared<Shader> Shader::Create(Filepath filepath)
@@ -36,8 +36,8 @@ Shared<Shader> Shader::Create(Filepath filepath)
 
 	Filepath fullFilepath = ShaderLocation + Move(filepath).string() + ShaderExtension;
 
-	const size_t filepathHash = Misc::HashFilepath(fullFilepath);
-	if (ResourceManager::Exists(filepathHash))
+	const ulong filepathHash = HashFilepath(fullFilepath);
+	if (ResourceManager::Contains(filepathHash))
 	{
 		return ResourceManager::Get(filepathHash);
 	}
@@ -54,7 +54,7 @@ Shared<Shader> Shader::Create(Filepath filepath)
 
 	if (result)
 	{
-		ResourceManager::Emplace(result);
+		ResourceManager::Add(result);
 	}
 
 	return result;

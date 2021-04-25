@@ -154,7 +154,7 @@ void SceneHierarchyPanel::OnCreateEntity(bool viewModal, const Shared<ScriptPane
 				}
 				if (skylightComponent)
 				{
-					newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("pink_sunrise_4k.hdr"));
+					newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Create("pink_sunrise_4k.hdr"));
 					cameraComponent = false;
 				}
 				if (scriptComponent)
@@ -230,7 +230,7 @@ void SceneHierarchyPanel::OnCreateDirectionalLight()
 void SceneHierarchyPanel::OnCreateSkylight()
 {
 	auto newEntity = _context->CreateEntity("Sky Light");
-	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Load("pink_sunrise_4k.hdr"));
+	newEntity.AddComponent<SkylightComponent>(SceneEnvironment::Create("pink_sunrise_4k.hdr"));
 	NewSelection.Invoke(newEntity);
 }
 

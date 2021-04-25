@@ -61,7 +61,7 @@ static void CopyComponentIfExists(entt::entity dst, entt::entity src, entt::regi
 ///////////////////////////////////////////////////////////////////////////
 
 Scene::Scene() :
-	_fallbackSceneEnvironment(SceneEnvironment::Load("pink_sunrise_4k.hdr")),
+	_fallbackSceneEnvironment(SceneEnvironment::Create("pink_sunrise_4k.hdr")),
 	_sceneEntity(_entityRegistry.create(), this),
 	_viewportWidth(100),
 	_viewportHeight(100)

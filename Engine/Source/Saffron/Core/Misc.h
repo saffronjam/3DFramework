@@ -16,8 +16,6 @@ public:
 
 public:
 	static TransformDecomposition GetTransformDecomposition(const Matrix4& transform);
-	static size_t HashFilepath(const Filepath& filepath);
-	static size_t HashString(const String& string);
 
 	template <typename T>
 	static T Clamped(const T& value, const T& lower, const T& upper)

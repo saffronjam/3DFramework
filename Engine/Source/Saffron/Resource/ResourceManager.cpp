@@ -13,24 +13,24 @@ Shared<Resource>& ResourceManager::Get(size_t identifer)
 	return GetInstance()->_memory.at(identifer);
 }
 
-bool ResourceManager::Exists(Shared<Resource> resource)
+bool ResourceManager::Contains(Shared<Resource> resource)
 {
-	return Exists(resource->GetResourceID());
+	return Contains(resource->GetResourceID());
 }
 
-bool ResourceManager::Exists(size_t identifier)
+bool ResourceManager::Contains(size_t identifier)
 {
 	auto& instance = GetInstance();
 	return instance->_memory.find(identifier) != instance->_memory.end();
 }
 
-void ResourceManager::Emplace(Shared<Resource> resource)
+void ResourceManager::Add(Shared<Resource> resource)
 {
 	auto& instance = GetInstance();
 	instance->_memory.emplace(resource->GetResourceID(), resource);
 }
 
-void ResourceManager::Emplace(Shared<Resource> resource, size_t identifier)
+void ResourceManager::Add(Shared<Resource> resource, size_t identifier)
 {
 	auto& instance = GetInstance();
 	instance->_memory.emplace(identifier, resource);

@@ -119,7 +119,7 @@ public:
 	virtual void Reload() = 0;
 	virtual void Bind() = 0;
 
-	size_t GetResourceID() override;
+	ulong GetResourceID() override;
 
 	virtual RendererID GetRendererID() const = 0;
 	virtual void UploadUniformBuffer(const UniformBufferBase& uniformBuffer) = 0;

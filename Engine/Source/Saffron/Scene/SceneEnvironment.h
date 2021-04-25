@@ -5,23 +5,23 @@
 
 namespace Se
 {
-class SceneEnvironment : public Managed
+class SceneEnvironment : public Resource
 {
 public:
 	SceneEnvironment(Filepath filepath, const Shared<TextureCube>& radianceMap,
 	                 const Shared<TextureCube>& irradianceMap);
 
-	const Filepath& GetFilepath() const { return _filePath; }
+	const Filepath& GetFilepath() const;
 
-	const Shared<TextureCube>& GetRadianceMap() const { return _radianceMap; }
+	const Shared<TextureCube>& GetRadianceMap() const;
+	const Shared<TextureCube>& GetIrradianceMap() const;
 
-	const Shared<TextureCube>& GetIrradianceMap() const { return _irradianceMap; }
+	float GetIntensity() const;
+	void SetIntensity(float intensity);
 
-	float GetIntensity() const { return _intensity; }
+	ulong GetResourceID() override;
 
-	void SetIntensity(float intensity) { _intensity = intensity; }
-
-	static Shared<SceneEnvironment> Load(Filepath filepath);
+	static Shared<SceneEnvironment> Create(Filepath filepath);
 
 private:
 	Filepath _filePath;
