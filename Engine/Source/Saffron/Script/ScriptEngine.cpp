@@ -315,7 +315,10 @@ void ScriptEngine::CreateScriptEntity(Entity entity)
 	// Save old fields
 	HashMap<String, PublicField> oldFields;
 	oldFields.reserve(fieldMap.size());
-	for (auto& [fieldName, field] : fieldMap) oldFields.emplace(fieldName, Move(field));
+	for (auto& [fieldName, field] : fieldMap)
+	{
+		oldFields.emplace(fieldName, Move(field));
+	}
 	fieldMap.clear();
 
 	// Retrieve public fields (TODO: cache these fields if the module is used more than once)

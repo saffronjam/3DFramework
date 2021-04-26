@@ -78,14 +78,14 @@ struct LogStream : Assimp::LogStream
 	{
 		if (Assimp::DefaultLogger::isNullLogger())
 		{
-			Assimp::DefaultLogger::create("", Assimp::Logger::VERBOSE);
-			Assimp::DefaultLogger::get()->attachStream(new LogStream, Assimp::Logger::Err | Assimp::Logger::Warn);
+			Assimp::DefaultLogger::create("", Assimp::Logger::NORMAL);
+			Assimp::DefaultLogger::get()->attachStream(new LogStream, Assimp::Logger::Err /*| Assimp::Logger::Warn*/);
 		}
 	}
 
 	void write(const char* message) override
 	{
-		Log::CoreError("Assimp error: {0}", message);
+		Log::CoreWarn(Log::Fmt::OnCyan + Log::Fmt::Black + "Assimp Warning" + Log::Fmt::Warn + " {0}", message);
 	}
 };
 
@@ -158,6 +158,7 @@ Mesh::Mesh(Filepath filepath) :
 	if (!scene || !scene->HasMeshes())
 	{
 		Log::CoreError("Failed to load mesh file: {0}", fpStr);
+		return;
 	}
 
 	_scene = scene;
@@ -206,9 +207,8 @@ Mesh::Mesh(Filepath filepath) :
 					vertex.Binormal = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
 				}
 
-				if (mesh->HasTextureCoords(0)) vertex.TexCoord = {
-					mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y
-				};
+				if (mesh->HasTextureCoords(0))
+					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
 
 				_animatedVertices.push_back(vertex);
 			}
@@ -236,9 +236,8 @@ Mesh::Mesh(Filepath filepath) :
 					vertex.Binormal = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
 				}
 
-				if (mesh->HasTextureCoords(0)) vertex.TexCoord = {
-					mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y
-				};
+				if (mesh->HasTextureCoords(0))
+					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
 
 				_staticVertices.push_back(vertex);
 			}
@@ -543,6 +542,8 @@ Mesh::Mesh(Filepath filepath) :
 			}
 		}
 		SE_MESH_LOG("------------------------");
+
+		SuccessfulLoad();
 	}
 
 	VertexBufferLayout vertexLayout;
@@ -681,6 +682,16 @@ const Filepath& Mesh::GetFilepath() const
 ArrayList<Triangle> Mesh::GetTriangleCache(uint index) const
 {
 	return _triangleCache.at(index);
+}
+
+Shared<Mesh> Mesh::Create(Filepath filepath)
+{
+	auto mesh = Shared<Mesh>::Create(Move(filepath));
+	if (!mesh->IsLoaded())
+	{
+		return ResourceManager::GetFallback("CubeMesh");
+	}
+	return mesh;
 }
 
 ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4& transform)

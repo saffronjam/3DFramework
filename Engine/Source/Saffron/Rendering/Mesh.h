@@ -8,6 +8,7 @@
 #include "Saffron/Rendering/Resources/Pipeline.h"
 #include "Saffron/Rendering/Resources/Shader.h"
 #include "Saffron/Rendering/Resources/VertexBuffer.h"
+#include "Saffron/Rendering/Resource.h"
 
 struct aiNode;
 struct aiAnimation;
@@ -119,7 +120,7 @@ public:
 	String NodeName, MeshName;
 };
 
-class Mesh : public Managed
+class Mesh : public Resource
 {
 public:
 	explicit Mesh(Filepath filepath);
@@ -142,6 +143,8 @@ public:
 
 	const Filepath& GetFilepath() const;
 	ArrayList<Triangle> GetTriangleCache(uint index) const;
+
+	static Shared<Mesh> Create(Filepath filepath);
 
 private:
 	void BoneTransform(float time);

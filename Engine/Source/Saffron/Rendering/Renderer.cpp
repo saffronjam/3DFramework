@@ -116,6 +116,11 @@ void Renderer::OnGuiRender()
 	ImGui::End();
 }
 
+void Renderer::LoadRequiredAssets()
+{
+	ResourceManager::AddFallback(Mesh::Create("Cube1m.fbx"), "CubeMesh");
+}
+
 void Renderer::Clear()
 {
 	Submit([]()
@@ -178,8 +183,7 @@ void Renderer::Begin(Shared<Framebuffer> framebuffer, bool clear)
 void Renderer::End()
 {
 	auto& instData = *Instance()._data;
-	Debug::Assert(instData._activeFramebuffer,
-	               "No active render pass! Have you called Renderer::EndRenderPass twice?");
+	Debug::Assert(instData._activeFramebuffer, "No active render pass! Have you called Renderer::EndRenderPass twice?");
 	instData._activeFramebuffer->Unbind();
 	instData._activeFramebuffer = nullptr;
 }

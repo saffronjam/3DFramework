@@ -12,7 +12,7 @@ void Shader::OnGuiRender()
 {
 	ImGui::Begin("Shaders");
 
-	ResourceManager::ForEach<Shader>([](auto& shader)
+	ResourceManager::ForEachResource<Shader>([](auto& shader)
 	{
 		if (ImGui::TreeNode(shader.GetName().c_str()))
 		{
@@ -25,7 +25,7 @@ void Shader::OnGuiRender()
 	ImGui::End();
 }
 
-ulong Shader::GetResourceID()
+ulong Shader::GetResourceID() const
 {
 	return _filepath.empty() ? 0ull : HashFilepath(_filepath);
 }

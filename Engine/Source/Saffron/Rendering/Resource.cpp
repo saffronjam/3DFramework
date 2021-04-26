@@ -4,6 +4,31 @@
 
 namespace Se
 {
+bool Resource::IsLoaded() const
+{
+	return _loaded;
+}
+
+void Resource::MarkAsFallback()
+{
+	_isFallback = true;
+}
+
+void Resource::UnmarkAsFallback()
+{
+	_isFallback = false;
+}
+
+bool Resource::IsFallback() const
+{
+	return _isFallback;
+}
+
+void Resource::SuccessfulLoad()
+{
+	_loaded = true;
+}
+
 ulong Resource::HashFilepath(const Filepath& filepath)
 {
 	return HashString(filepath.string());

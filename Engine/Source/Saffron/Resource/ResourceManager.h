@@ -1,45 +1,56 @@
 #pragma once
 
-#include "Saffron/Core/Managed.h"
+#include "Saffron/Base.h"
 #include "Saffron/Core/Memory.h"
 #include "Saffron/Rendering/Resource.h"
 
 namespace Se
 {
-class ResourceManager : public Managed
+class ResourceManager : public SingleTon<ResourceManager>
 {
 public:
-	static Shared<Resource>& Get(Shared<Resource> resource);
-	static Shared<Resource>& Get(size_t identifer);
-	static bool Contains(Shared<Resource> resource);
-	static bool Contains(size_t identifier);
+	ResourceManager();
+
+	static const Shared<Resource>& Get(const Shared<Resource>& resource);
+	static const Shared<Resource>& Get(ulong identifier);
+	static const Shared<Resource>& GetFallback(const String& identifier);
+
+	static bool Contains(const Shared<Resource>& resource);
+	static bool Contains(ulong identifier);
+	static bool ContainsFallback(const String& identifier);
+
 	static void Add(Shared<Resource> resource);
-	static void Add(Shared<Resource> resource, size_t identifier);
+	static void Add(Shared<Resource> resource, ulong identifier);
+	static void AddFallback(Shared<Resource> resource, String identifier);
+
 	static const ArrayList<Shared<Resource>>& GetAll();
 	static void Clear();
 
 	template <class ResourceType>
-	static void ForEach(Function<void(ResourceType&)> function);
+	static void ForEachResource(Function<void(ResourceType&)> function);
 	template <class ResourceType>
-	static void ForEach(Function<void(ResourceType&)> function, Function<bool(ResourceType&)> condition);
+	static void ForEachResource(Function<void(ResourceType&)> function, Function<bool(ResourceType&)> condition);
 
 private:
-	static Shared<ResourceManager>& GetInstance();
 	void SyncCache();
 
 private:
-	HashMap<ulong, Shared<Resource>> _memory;
-	ArrayList<Shared<Resource>> _returnCache;
+	HashMap<ulong, Shared<Resource>> _resources;
+	HashMap<String, Shared<Resource>> _fallbacks;
+	
+	ArrayList<Shared<Resource>> _resourceReturnCache;
 	bool _needCacheSync = true;
 };
 
 template <class ResourceType>
-void ResourceManager::ForEach(Function<void(ResourceType&)> function)
+void ResourceManager::ForEachResource(Function<void(ResourceType&)> function)
 {
-	auto instance = GetInstance();
-	ResourceType* dyncastResource = nullptr;
+	static_assert(std::is_base_of<Resource, ResourceType>::value, "ResourceType was not base of Resource");
+	
+	auto& instance = Instance();
+	Shared<ResourceType> dyncastResource = nullptr;
 
-	for (auto iter = instance->_memory.begin(); iter != instance->_memory.end(); ++iter)
+	for (auto iter = instance._resources.begin(); iter != instance._resources.end(); ++iter)
 	{
 		if ((dyncastResource = dynamic_cast<ResourceType*>(iter->second.Raw())))
 		{
@@ -49,14 +60,16 @@ void ResourceManager::ForEach(Function<void(ResourceType&)> function)
 }
 
 template <class ResourceType>
-void ResourceManager::ForEach(Function<void(ResourceType&)> function, Function<bool(ResourceType&)> condition)
+void ResourceManager::ForEachResource(Function<void(ResourceType&)> function, Function<bool(ResourceType&)> condition)
 {
-	auto instance = GetInstance();
+	static_assert(std::is_base_of<ResourceType, Resource>::value, "ResourceType was not base of Resource");
+	
+	auto &instance = Instance();
 	ResourceType* dyncastResource = nullptr;
 
-	for (auto iter = instance->_memory.begin(); iter != instance->_memory.end(); ++iter)
+	for (auto iter = instance._resources.begin(); iter != instance._resources.end(); ++iter)
 	{
-		if ((dyncastResource = dynamic_cast<ResourceType*>(iter->second.get())))
+		if ((dyncastResource = dynamic_cast<ResourceType*>(iter->second.Raw())))
 		{
 			if (condition(*dyncastResource))
 			{

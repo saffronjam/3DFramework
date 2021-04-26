@@ -220,7 +220,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 				auto translation = meshComponent["Position"].as<Vector3>();
 				auto rotation = meshComponent["Rotation"].as<Quaternion>();
 				auto scale = meshComponent["Scale"].as<Vector3>();
-				component.Mesh = Shared<Mesh>::Create(meshPath);
+				component.Mesh = Mesh::Create(meshPath);
 				component.Mesh->SetLocalTransform(Math::ComposeMatrix(translation, rotation, scale));
 			}
 

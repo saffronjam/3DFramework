@@ -25,6 +25,75 @@ public:
 		};
 	};
 
+	struct Fmt
+	{
+#pragma region Misc
+		//@{
+		/** Misc */
+		inline static const String Reset = "\033[m";
+		inline static const String Bold = "\033[1m";
+		inline static const String Dark = "\033[2m";
+		inline static const String Underline = "\033[4m";
+		inline static const String Blink = "\033[5m";
+		inline static const String Reverse = "\033[7m";
+		inline static const String Concealed = "\033[8m";
+		inline static const String ClearLine = "\033[K";
+		//@}
+#pragma endregion
+
+#pragma region Foreground
+		//@{
+		/** Foreground colors */
+		inline static const String Black = "\033[30m";
+		inline static const String Red = "\033[31m";
+		inline static const String Green = "\033[32m";
+		inline static const String Yellow = "\033[33m";
+		inline static const String Blue = "\033[34m";
+		inline static const String Magenta = "\033[35m";
+		inline static const String Cyan = "\033[36m";
+		inline static const String White = "\033[37m";
+		inline static const String BrightBlack = "\u001b[30;1m";
+		inline static const String BrightRed = "\u001b[31;1m";
+		inline static const String BrightGreen = "\u001b[32;1m";
+		inline static const String BrightYellow =" \u001b[33;1m";
+		inline static const String BrightBlue = "\u001b[34;1m";
+		inline static const String BrightMagenta = "\u001b[35;1m";
+		inline static const String BrightCyan = "\u001b[36;1m";
+		inline static const String BrightWhite = "\u001b[37;1m";
+		//@}
+#pragma endregion
+
+#pragma region Background
+		//@{
+		/** Background colors */
+		inline static const String OnBlack = "\033[40m";
+		inline static const String OnRed = "\033[41m";
+		inline static const String OnGreen = "\033[42m";
+		inline static const String OnYellow = "\033[43m";
+		inline static const String OnBlue = "\033[44m";
+		inline static const String OnMagenta = "\033[45m";
+		inline static const String OnCyan = "\033[46m";
+		inline static const String OnWhite = "\033[47m";
+		//@}
+#pragma endregion
+
+#pragma region Bold Colors
+		//@{
+		/** Bold colors */
+		inline static const String YellowBold = "\033[33m\033[1m";
+		inline static const String RedBold = "\033[31m\033[1m";
+		inline static const String BoldOnRed = "\033[1m\033[41m";
+		//@}
+#pragma endregion
+
+#pragma region Presets
+		inline static const String Debug = OnBlack + Cyan;
+		inline static const String Info = OnBlack + Green;
+		inline static const String Warn = OnBlack + BrightYellow;
+		inline static const String Error = OnBlack + Red;
+#pragma endregion
+	};
+
 public:
 	static void Init();
 

@@ -40,7 +40,7 @@ void SceneEnvironment::SetIntensity(float intensity)
 	_intensity = intensity;
 }
 
-ulong SceneEnvironment::GetResourceID()
+ulong SceneEnvironment::GetResourceID() const
 {
 	return HashFilepath(_filePath);
 }

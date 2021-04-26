@@ -19,7 +19,7 @@ public:
 	float GetIntensity() const;
 	void SetIntensity(float intensity);
 
-	ulong GetResourceID() override;
+	ulong GetResourceID() const override;
 
 	static Shared<SceneEnvironment> Create(Filepath filepath);
 

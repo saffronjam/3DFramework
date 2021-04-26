@@ -15,6 +15,8 @@
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 
+#include "Saffron/Resource/ResourceManager.h"
+
 #include "Saffron/Script/ScriptEngine.h"
 
 namespace Se
@@ -83,6 +85,8 @@ private:
 	Unique<SceneRenderer> _sceneRenderer;
 	Unique<ScriptEngine> _scriptEngine;
 
+	Unique<ResourceManager> _resourceManager;
+	
 	Shared<Window> _window;
 	Unique<Gui> _gui;
 	Unique<FileIOManager> _fileIOManager;

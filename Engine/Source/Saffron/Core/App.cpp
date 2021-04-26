@@ -33,10 +33,13 @@ App::App(const Properties& properties) :
 	_window->HandleBufferedEvents();
 
 	Run::Execute();
+	
+	_resourceManager = CreateUnique<ResourceManager>();
 
 	_renderer = Shared<Renderer>::Create();
+	_renderer->LoadRequiredAssets();
 	_sceneRenderer = CreateUnique<SceneRenderer>();
-
+	
 	_scriptEngine = CreateUnique<ScriptEngine>();
 	_fileIOManager = CreateUnique<FileIOManager>(_window);
 
