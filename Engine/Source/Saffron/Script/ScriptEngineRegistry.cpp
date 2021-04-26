@@ -36,6 +36,7 @@ void ScriptEngineRegistry::RegisterAll()
 	ADD_INTERNAL_CALL_MONO(MeshComponent, GetMesh);
 	ADD_INTERNAL_CALL_MONO(MeshComponent, SetMesh);
 
+	ADD_INTERNAL_CALL_MONO(Input, IsKeyDown);
 	ADD_INTERNAL_CALL_MONO(Input, IsKeyPressed);
 	ADD_INTERNAL_CALL_MONO(Input, IsMouseButtonPressed);
 

@@ -52,12 +52,12 @@ namespace Script
                 movementForce *= 0.4f;
             }
 
-            if (Input.IsKeyPressed(KeyCode.D))
+            if (Input.IsKeyDown(KeyCode.D))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(movementForce, 0), new Vector2(), true);
-            else if (Input.IsKeyPressed(KeyCode.A))
+            else if (Input.IsKeyDown(KeyCode.A))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(-movementForce, 0), new Vector2(), true);
 
-            if (Colliding && Input.IsKeyPressed(KeyCode.Space))
+            if (Colliding && Input.IsKeyDown(KeyCode.Space))
                 m_PhysicsBody.ApplyLinearImpulse(new Vector2(0, JumpForce), new Vector2(0, 0), true);
 
             if (m_CollisionCounter > 0)

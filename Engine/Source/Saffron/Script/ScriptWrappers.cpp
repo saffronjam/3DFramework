@@ -61,6 +61,11 @@ bool Saffron_Input_IsKeyPressed(KeyCode key)
 	return Keyboard::IsPressed(key);
 }
 
+bool Saffron_Input_IsKeyDown(KeyCode key)
+{
+	return Keyboard::IsDown(key);
+}
+
 bool Saffron_Input_IsMouseButtonPressed(MouseButtonCode mouseButton)
 {
 	return Mouse::IsPressed(mouseButton);

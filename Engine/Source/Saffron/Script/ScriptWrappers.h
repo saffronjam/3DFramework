@@ -21,6 +21,7 @@ namespace Script
 ///////////////////////////////////////////////////////////////
 
 bool Saffron_Input_IsKeyPressed(KeyCode key);
+bool Saffron_Input_IsKeyDown(KeyCode key);
 bool Saffron_Input_IsMouseButtonPressed(MouseButtonCode mouseButton);
 
 
