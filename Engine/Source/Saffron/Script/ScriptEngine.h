@@ -9,15 +9,8 @@
 
 namespace Se
 {
-using ScriptModuleFieldMap = HashMap<String, HashMap<String, PublicField>>;
 
-struct EntityInstanceData
-{
-	EntityInstance Instance;
-	ScriptModuleFieldMap ModuleFieldMap;
-};
-
-using EntityInstanceMap = HashMap<UUID, HashMap<UUID, EntityInstanceData>>;
+using EntityInstanceMap = HashMap<UUID, HashMap<UUID, EntityInstance>>;
 
 class ScriptEngine : public SingleTon<ScriptEngine>
 {
@@ -55,12 +48,13 @@ public:
 	static void OnScriptComponentDestroyed(UUID sceneID, UUID entityID);
 
 	static bool ModuleExists(const String& moduleName);
-	static void InitScriptEntity(Entity entity);
-	static void ShutdownScriptEntity(Entity entity, const String& moduleName);
-	static void InstantiateEntityClass(Entity entity);
+	
+	static void CreateScriptEntity(Entity entity);
+	static void DeleteScriptEntity(Entity entity, const String& moduleName);
+	static void InstantiateScriptEntity(Entity entity);
 
 	static EntityInstanceMap& GetEntityInstanceMap();
-	static EntityInstanceData& GetEntityInstanceData(UUID sceneID, UUID entityID);
+	static EntityInstance& GetEntityInstance(UUID sceneID, UUID entityID);
 
 	static MonoString *CreateMonoString(const String& string);
 	
@@ -104,37 +98,4 @@ private:
 	static constexpr const char* FriendlyDomainName = "Saffron Runtime";
 	static constexpr const char* ScriptCoreScript = "Assets/Scripts/ScriptCore.dll";
 };
-
-
-///////////////////////////////////////////////////////////////////////////
-/// Public Field
-///////////////////////////////////////////////////////////////////////////
-
-template <typename T>
-T PublicField::GetStoredValue() const
-{
-	T value;
-	GetStoredValue_Internal(&value);
-	return value;
-}
-
-template <typename T>
-T PublicField::GetRuntimeValue() const
-{
-	T value;
-	GetRuntimeValue_Internal(&value);
-	return value;
-}
-
-template <typename T>
-void PublicField::SetStoredValue(T value) const
-{
-	SetStoredValue_Internal(&value);
-}
-
-template <typename T>
-void PublicField::SetRuntimeValue(T value) const
-{
-	SetRuntimeValue_Internal(&value);
-}
 }

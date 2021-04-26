@@ -24,9 +24,9 @@ static void DrawComponent(const String& name, Entity entity, UIFunction uiFuncti
 		bool removeComponent = false;
 
 		auto& component = entity.GetComponent<T>();
-		const bool open = ImGui::TreeNodeEx(
-			reinterpret_cast<void*>(static_cast<uint>(entity) | typeid(T).hash_code()),
-			ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap, name.c_str());
+		const bool open = ImGui::TreeNodeEx(reinterpret_cast<void*>(static_cast<uint>(entity) | typeid(T).hash_code()),
+		                                    ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_AllowItemOverlap,
+		                                    name.c_str());
 		ImGui::SameLine();
 		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
 		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(0, 0, 0, 0));
@@ -84,8 +84,7 @@ void EntityComponentsPanel::SetContext(const Shared<Scene>& context)
 		// Try and find same entity in new scene
 		const auto& entityMap = _context->GetEntityMap();
 		const UUID selectedEntityUUID = _selectionContext.GetUUID();
-		if (entityMap.find(selectedEntityUUID) != entityMap.end()) _selectionContext = entityMap.
-			at(selectedEntityUUID);
+		if (entityMap.find(selectedEntityUUID) != entityMap.end()) _selectionContext = entityMap.at(selectedEntityUUID);
 	}
 }
 
@@ -283,8 +282,8 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 							}
 							ImGui::SameLine();
 							ImGui::BeginGroup();
-							if (ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap)) materialInstance->Set<float>(
-								"u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##AlbedoMap", &useAlbedoMap))
+								materialInstance->Set<float>("u_AlbedoTexToggle", useAlbedoMap ? 1.0f : 0.0f);
 
 							/*if (ImGui::Checkbox("sRGB##AlbedoMap", &_albedoInput.sRGB))
 							{
@@ -331,8 +330,8 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##NormalMap", &useNormalMap)) materialInstance->Set<float>(
-								"u_NormalTexToggle", useNormalMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##NormalMap", &useNormalMap))
+								materialInstance->Set<float>("u_NormalTexToggle", useNormalMap ? 1.0f : 0.0f);
 						}
 					}
 					{
@@ -372,8 +371,8 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##MetalnessMap", &useMetalnessMap)) materialInstance->Set<float>(
-								"u_MetalnessTexToggle", useMetalnessMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##MetalnessMap", &useMetalnessMap))
+								materialInstance->Set<float>("u_MetalnessTexToggle", useMetalnessMap ? 1.0f : 0.0f);
 							ImGui::SameLine();
 							ImGui::SliderFloat("Value##MetalnessInput", &metalnessValue, 0.0f, 1.0f);
 						}
@@ -415,8 +414,8 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 							}
 							ImGui::SameLine();
-							if (ImGui::Checkbox("Use##RoughnessMap", &useRoughnessMap)) materialInstance->Set<float>(
-								"u_RoughnessTexToggle", useRoughnessMap ? 1.0f : 0.0f);
+							if (ImGui::Checkbox("Use##RoughnessMap", &useRoughnessMap))
+								materialInstance->Set<float>("u_RoughnessTexToggle", useRoughnessMap ? 1.0f : 0.0f);
 							ImGui::SameLine();
 							ImGui::SliderFloat("Value##RoughnessInput", &roughnessValue, 0.0f, 1.0f);
 						}
@@ -445,8 +444,8 @@ void EntityComponentsPanel::OnGuiRenderMeshDebug()
 		{
 			if (ImGui::CollapsingHeader("Animation"))
 			{
-				if (ImGui::Button(mesh->_animationPlaying ? "Pause" : "Play")) mesh->_animationPlaying = !mesh->
-					_animationPlaying;
+				if (ImGui::Button(mesh->_animationPlaying ? "Pause" : "Play"))
+					mesh->_animationPlaying = !mesh->_animationPlaying;
 
 				ImGui::SliderFloat("##AnimationTime", &mesh->_animationTime, 0.0f,
 				                   static_cast<float>(mesh->_scene->mAnimations[0]->mDuration));
@@ -467,7 +466,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 
 	auto id = entity.GetComponent<IDComponent>().ID;
 
-	ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
+	const ImVec2 contentRegionAvailable = ImGui::GetContentRegionAvail();
 
 	if (entity.HasComponent<TagComponent>())
 	{
@@ -487,86 +486,10 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	ImGui::SameLine();
 	ImGui::TextDisabled("%llx", id);
 	float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-	ImVec2 textSize = ImGui::CalcTextSize("Add Component");
+	const ImVec2 textSize = ImGui::CalcTextSize("Add Component");
 	ImGui::SameLine(contentRegionAvailable.x - (textSize.x + GImGui->Style.FramePadding.y));
 	if (ImGui::Button("Add Component")) ImGui::OpenPopup("AddComponentPanel");
 
-	if (ImGui::BeginPopup("AddComponentPanel"))
-	{
-		if (!_selectionContext.HasComponent<CameraComponent>())
-		{
-			if (ImGui::Button("Camera"))
-			{
-				_selectionContext.AddComponent<CameraComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<MeshComponent>())
-		{
-			if (ImGui::Button("Mesh"))
-			{
-				_selectionContext.AddComponent<MeshComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<DirectionalLightComponent>())
-		{
-			if (ImGui::Button("Directional Light"))
-			{
-				_selectionContext.AddComponent<DirectionalLightComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<SkylightComponent>())
-		{
-			if (ImGui::Button("Sky Light"))
-			{
-				_selectionContext.AddComponent<SkylightComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<ScriptComponent>())
-		{
-			if (ImGui::Button("Script"))
-			{
-				_selectionContext.AddComponent<ScriptComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<SpriteRendererComponent>())
-		{
-			if (ImGui::Button("Sprite Renderer"))
-			{
-				_selectionContext.AddComponent<SpriteRendererComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<RigidBody2DComponent>())
-		{
-			if (ImGui::Button("Rigidbody 2D"))
-			{
-				_selectionContext.AddComponent<RigidBody2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<BoxCollider2DComponent>())
-		{
-			if (ImGui::Button("Box Collider 2D"))
-			{
-				_selectionContext.AddComponent<BoxCollider2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		if (!_selectionContext.HasComponent<CircleCollider2DComponent>())
-		{
-			if (ImGui::Button("Circle Collider 2D"))
-			{
-				_selectionContext.AddComponent<CircleCollider2DComponent>();
-				ImGui::CloseCurrentPopup();
-			}
-		}
-		ImGui::EndPopup();
-	}
 
 	DrawComponent<TransformComponent>("Transform", entity, [](auto& component)
 	{
@@ -574,7 +497,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 
 		bool updateTransform = false;
 		updateTransform |= DrawVec3Control("Translation", translation);
-		glm::vec3 rotation = glm::degrees(glm::eulerAngles(rotationQuat));
+		Vector3 rotation = glm::degrees(glm::eulerAngles(rotationQuat));
 		updateTransform |= DrawVec3Control("Rotation", rotation);
 		updateTransform |= DrawVec3Control("Scale", scale, 1.0f);
 
@@ -709,33 +632,33 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	DrawComponent<ScriptComponent>("Script", entity, [=](ScriptComponent& sc) mutable
 	{
 		Gui::BeginPropertyGrid();
-		std::string oldName = sc.ModuleName;
+		const auto oldName = sc.ModuleName;
 		if (Gui::Property("Module Name", sc.ModuleName, !ScriptEngine::ModuleExists(sc.ModuleName)))
 			// TODO: no live edit
 		{
 			// Shutdown old script
-			if (ScriptEngine::ModuleExists(oldName)) ScriptEngine::ShutdownScriptEntity(entity, oldName);
+			if (ScriptEngine::ModuleExists(oldName)) ScriptEngine::DeleteScriptEntity(entity, oldName);
 
-			if (ScriptEngine::ModuleExists(sc.ModuleName)) ScriptEngine::InitScriptEntity(entity);
+			if (ScriptEngine::ModuleExists(sc.ModuleName)) ScriptEngine::CreateScriptEntity(entity);
 		}
 
 		// Public Fields
 		if (ScriptEngine::ModuleExists(sc.ModuleName))
 		{
-			EntityInstanceData& entityInstanceData = ScriptEngine::GetEntityInstanceData(entity.GetSceneUUID(), id);
-			auto& moduleFieldMap = entityInstanceData.ModuleFieldMap;
+			EntityInstance& entityInstance = ScriptEngine::GetEntityInstance(entity.GetSceneUUID(), id);
+			auto& moduleFieldMap = entityInstance.ModuleFieldMap;
 			if (moduleFieldMap.find(sc.ModuleName) != moduleFieldMap.end())
 			{
 				auto& publicFields = moduleFieldMap.at(sc.ModuleName);
 				for (auto& [name, field] : publicFields)
 				{
-					bool isRuntime = dynamic_cast<RuntimeScene*>(_context.Raw()) && field.IsRuntimeAvailable();
+					const bool isRuntime = dynamic_cast<RuntimeScene*>(_context.Raw()) && field.IsRuntimeAvailable();
 					switch (field.Type)
 					{
 					case FieldType::Int:
 					{
 						int value = isRuntime ? field.GetRuntimeValue<int>() : field.GetStoredValue<int>();
-						if (Gui::Property(field.Name.c_str(), value))
+						if (Gui::Property(field.Name, value))
 						{
 							if (isRuntime) field.SetRuntimeValue(value);
 							else field.SetStoredValue(value);
@@ -745,7 +668,7 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 					case FieldType::Float:
 					{
 						float value = isRuntime ? field.GetRuntimeValue<float>() : field.GetStoredValue<float>();
-						if (Gui::Property(field.Name.c_str(), value, 0.2f))
+						if (Gui::Property(field.Name, value, 0.2f))
 						{
 							if (isRuntime) field.SetRuntimeValue(value);
 							else field.SetStoredValue(value);
@@ -754,10 +677,10 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 					}
 					case FieldType::Vec2:
 					{
-						glm::vec2 value = isRuntime
-							                  ? field.GetRuntimeValue<glm::vec2>()
-							                  : field.GetStoredValue<glm::vec2>();
-						if (Gui::Property(field.Name.c_str(), value, 0.2f))
+						Vector2 value = isRuntime
+							                  ? field.GetRuntimeValue<Vector2>()
+							                  : field.GetStoredValue<Vector2>();
+						if (Gui::Property(field.Name, value, 0.2f))
 						{
 							if (isRuntime) field.SetRuntimeValue(value);
 							else field.SetStoredValue(value);
@@ -766,10 +689,10 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 					}
 					case FieldType::Vec3:
 					{
-						glm::vec3 value = isRuntime
-							                  ? field.GetRuntimeValue<glm::vec3>()
-							                  : field.GetStoredValue<glm::vec3>();
-						if (Gui::Property(field.Name.c_str(), value, 0.2f))
+						Vector3 value = isRuntime
+							                  ? field.GetRuntimeValue<Vector3>()
+							                  : field.GetStoredValue<Vector3>();
+						if (Gui::Property(field.Name, value, 0.2f))
 						{
 							if (isRuntime) field.SetRuntimeValue(value);
 							else field.SetStoredValue(value);
@@ -778,10 +701,10 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 					}
 					case FieldType::Vec4:
 					{
-						glm::vec4 value = isRuntime
-							                  ? field.GetRuntimeValue<glm::vec4>()
-							                  : field.GetStoredValue<glm::vec4>();
-						if (Gui::Property(field.Name.c_str(), value, 0.2f))
+						Vector4 value = isRuntime
+							                  ? field.GetRuntimeValue<Vector4>()
+							                  : field.GetStoredValue<Vector4>();
+						if (Gui::Property(field.Name, value, 0.2f))
 						{
 							if (isRuntime) field.SetRuntimeValue(value);
 							else field.SetStoredValue(value);

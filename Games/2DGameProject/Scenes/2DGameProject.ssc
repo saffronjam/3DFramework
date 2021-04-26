@@ -1,6 +1,6 @@
 Scene: Scene Name
 Environment:
-  AssetPath: pink_sunrise_4k.hdr
+  AssetPath: SceneEnvs/pink_sunrise_4k.hdr
   Light:
     Direction: [-0.787, -0.73299998, 1]
     Radiance: [1, 1, 1]
@@ -8,15 +8,15 @@ Environment:
 EditorCamera:
   Position: [-31.2263374, 18.4840126, 30.4813004]
   Rotation: [-0.368395656, 30.3034363, 0]
-  PerspectiveMatrix: [1.63732123, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00001991, -1, 0, 0, -0.200001985, 0]
+  PerspectiveMatrix: [1.44016194, 0, 0, 0, 0, 2.41421342, 0, 0, 0, 0, -1.00001991, -1, 0, 0, -0.200001985, 0]
 Entities:
   - Entity: 13760463465752139492
     TagComponent:
       Tag: Directional Light
     TransformComponent:
       Position: [0, 0, 0]
-      Rotation: [0.421898246, 0.871274173, -0.0881967396, 0.234743625]
-      Scale: [0.999999762, 0.999999523, 0.999999881]
+      Rotation: [0.421898365, 0.871274114, -0.0881967843, 0.23474361]
+      Scale: [0.999999762, 0.999999523, 0.999999821]
     DirectionalLightComponent:
       Radiance: [1, 1, 1]
       CastShadows: true
@@ -243,7 +243,7 @@ Entities:
     TransformComponent:
       Position: [-29.6808929, 29.7597198, 0]
       Rotation: [0.707106769, 0, 0, 0.707106769]
-      Scale: [58.4132423, 4.47940922, 4.48000002]
+      Scale: [58.4132271, 4.47940731, 4.48000002]
     MeshComponent:
       AssetPath: Cube1m.fbx
       Position: [0, 0, 0]
@@ -280,16 +280,25 @@ Entities:
           Type: 1
           Data: 100
         - Name: MaxSpeed
-          Type: 6
-          Data: [7, 10, -0.00181062799]
+          Type: 5
+          Data: [7, 10]
         - Name: JumpForce
           Type: 1
-          Data: 1000
+          Data: 5
     MeshComponent:
       AssetPath: Sphere1m.fbx
       Position: [0, 0, 0]
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
+    RigidBody2DComponent:
+      BodyType: 1
+      FixedRotation: false
+    CircleCollider2DComponent:
+      Offset: [0, 0]
+      Radius: 0.5
+      Density: 1
+      Friction: 1
+      DrawBounding: false
     RigidBody3DComponent:
       BodyType: 1
     SphereCollider3DComponent:

@@ -38,7 +38,7 @@ void ScriptEngine::OnGuiRender()
 		if (opened)
 		{
 			Shared<Scene> scene = Scene::GetScene(sceneID);
-			for (auto& [entityID, entityInstanceData] : entityMap)
+			for (auto& [entityID, entityInstance] : entityMap)
 			{
 				Entity entity = scene->GetScene(sceneID)->GetEntityMap().at(entityID);
 				String entityName = "Unnamed Entity";
@@ -47,7 +47,7 @@ void ScriptEngine::OnGuiRender()
 				                         entityName.c_str(), static_cast<ulong>(entityID));
 				if (opened)
 				{
-					for (auto& [moduleName, fieldMap] : entityInstanceData.ModuleFieldMap)
+					for (auto& [moduleName, fieldMap] : entityInstance.ModuleFieldMap)
 					{
 						opened = ImGui::TreeNode(moduleName.c_str());
 						if (opened)
@@ -139,12 +139,12 @@ void ScriptEngine::ReloadAssembly(const Filepath& assemblyFilepath)
 		if (Instance()._entityInstanceMap.find(scene->GetUUID()) != Instance()._entityInstanceMap.end())
 		{
 			auto& entityMap = Instance()._entityInstanceMap.at(scene->GetUUID());
-			for (auto& [entityID, entityInstanceData] : entityMap)
+			for (auto& [entityID, entityInstance] : entityMap)
 			{
 				const auto& entityMap = scene->GetEntityMap();
 				Debug::Assert(entityMap.find(entityID) != entityMap.end(),
 				              "Invalid entity ID or entity doesn't exist in scene!");
-				InitScriptEntity(entityMap.at(entityID));
+				CreateScriptEntity(entityMap.at(entityID));
 			}
 		}
 	}
@@ -162,13 +162,15 @@ const Shared<Scene>& ScriptEngine::GetSceneContext()
 
 void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 {
-	Debug::Assert(Instance()._entityInstanceMap.find(dst) != Instance()._entityInstanceMap.end());
-	Debug::Assert(Instance()._entityInstanceMap.find(src) != Instance()._entityInstanceMap.end());
+	auto& sceneMap = GetEntityInstanceMap();
 
-	auto& dstEntityMap = Instance()._entityInstanceMap.at(dst);
-	auto& srcEntityMap = Instance()._entityInstanceMap.at(src);
+	Debug::Assert(sceneMap.find(dst) != sceneMap.end());
+	Debug::Assert(sceneMap.find(src) != sceneMap.end());
 
-	for (auto& [entityID, entityInstanceData] : srcEntityMap)
+	auto& dstEntityMap = sceneMap.at(dst);
+	auto& srcEntityMap = sceneMap.at(src);
+
+	for (auto& [entityID, entityInstance] : srcEntityMap)
 	{
 		for (auto& [moduleName, srcFieldMap] : srcEntityMap[entityID].ModuleFieldMap)
 		{
@@ -178,7 +180,7 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 				Debug::Assert(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
 				auto& fieldMap = dstModuleFieldMap.at(moduleName);
 				Debug::Assert(fieldMap.find(fieldName) != fieldMap.end());
-				fieldMap.at(fieldName).SetStoredValue(field._storedValueBuffer);
+				fieldMap.at(fieldName).SetStoredValue(static_cast<void*>(field._storedValueBuffer));
 			}
 		}
 	}
@@ -191,7 +193,7 @@ void ScriptEngine::OnCreateEntity(Entity entity)
 
 void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnCreateMethod)
 	{
 		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCreateMethod);
@@ -200,7 +202,7 @@ void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
 
 void ScriptEngine::OnUpdateEntity(UUID sceneID, UUID entityID, Time ts)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnUpdateMethod)
 	{
 		void* args[] = {&ts};
@@ -215,7 +217,7 @@ void ScriptEngine::OnCollision2DBegin(Entity entity)
 
 void ScriptEngine::OnCollision2DBegin(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnCollision2DBeginMethod)
 	{
 		float value = 5.0f;
@@ -231,7 +233,7 @@ void ScriptEngine::OnCollision2DEnd(Entity entity)
 
 void ScriptEngine::OnCollision2DEnd(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnCollision2DEndMethod)
 	{
 		float value = 5.0f;
@@ -247,7 +249,7 @@ void ScriptEngine::OnCollision3DBegin(Entity entity)
 
 void ScriptEngine::OnCollision3DBegin(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnCollision3DBeginMethod)
 	{
 		float value = 5.0f;
@@ -263,7 +265,7 @@ void ScriptEngine::OnCollision3DEnd(Entity entity)
 
 void ScriptEngine::OnCollision3DEnd(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstanceData(sceneID, entityID).Instance;
+	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
 	if (entityInstance.ScriptClass->OnCollision3DEndMethod)
 	{
 		float value = 5.0f;
@@ -286,7 +288,7 @@ bool ScriptEngine::ModuleExists(const String& moduleName)
 	return monoClass != nullptr;
 }
 
-void ScriptEngine::InitScriptEntity(Entity entity)
+void ScriptEngine::CreateScriptEntity(Entity entity)
 {
 	Scene* scene = entity.GetScene();
 	const UUID id = entity.GetComponent<IDComponent>().ID;
@@ -305,10 +307,9 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 	scriptClass.Class = Instance().GetClass(Instance()._appImage, scriptClass);
 	scriptClass.SyncClassMethods(Instance()._appImage);
 
-	EntityInstanceData& entityInstanceData = Instance()._entityInstanceMap[scene->GetUUID()][id];
-	EntityInstance& entityInstance = entityInstanceData.Instance;
+	EntityInstance& entityInstance = Instance()._entityInstanceMap[scene->GetUUID()][id];
 	entityInstance.ScriptClass = &scriptClass;
-	ScriptModuleFieldMap& moduleFieldMap = entityInstanceData.ModuleFieldMap;
+	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
 	auto& fieldMap = moduleFieldMap[moduleName];
 
 	// Save old fields
@@ -348,22 +349,24 @@ void ScriptEngine::InitScriptEntity(Entity entity)
 	}
 }
 
-void ScriptEngine::ShutdownScriptEntity(Entity entity, const String& moduleName)
+void ScriptEngine::DeleteScriptEntity(Entity entity, const String& moduleName)
 {
-	EntityInstanceData& entityInstanceData = Instance().GetEntityInstanceData(entity.GetSceneUUID(), entity.GetUUID());
-	ScriptModuleFieldMap& moduleFieldMap = entityInstanceData.ModuleFieldMap;
-	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end()) moduleFieldMap.erase(moduleName);
+	EntityInstance& entityInstance = GetEntityInstance(entity.GetSceneUUID(), entity.GetUUID());
+	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
+	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
+	{
+		moduleFieldMap.erase(moduleName);
+	}
 }
 
-void ScriptEngine::InstantiateEntityClass(Entity entity)
+void ScriptEngine::InstantiateScriptEntity(Entity entity)
 {
 	Scene* scene = entity.GetScene();
 	UUID id = entity.GetComponent<IDComponent>().ID;
 	auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
 
-	EntityInstanceData& entityInstanceData = Instance().GetEntityInstanceData(scene->GetUUID(), id);
-	EntityInstance& entityInstance = entityInstanceData.Instance;
-	Debug::Assert(entityInstance.ScriptClass);
+	EntityInstance& entityInstance = GetEntityInstance(scene->GetUUID(), id);
+	Debug::Assert(entityInstance.ScriptClass != nullptr);
 	entityInstance.Handle = MonoApi::Instantiate(Instance()._monoDomain, *entityInstance.ScriptClass);
 
 	MonoClass* entityClass = Instance().GetClass(Instance().GetCoreImage(), "Se", "Entity");
@@ -378,22 +381,24 @@ void ScriptEngine::InstantiateEntityClass(Entity entity)
 	}
 
 	// Set all public fields to appropriate values
-	ScriptModuleFieldMap& moduleFieldMap = entityInstanceData.ModuleFieldMap;
+	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
 	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
 	{
 		auto& publicFields = moduleFieldMap.at(moduleName);
-		for (auto& [name, field] : publicFields) field.CopyStoredValueToRuntime();
+		for (auto& [name, field] : publicFields)
+		{
+			field.CopyStoredValueToRuntime();
+		}
 	}
 
 	// Call OnCreate function (if exists)
 	Instance().OnCreateEntity(entity);
 }
 
-EntityInstanceData& ScriptEngine::GetEntityInstanceData(UUID sceneID, UUID entityID)
+EntityInstance& ScriptEngine::GetEntityInstance(UUID sceneID, UUID entityID)
 {
-	Debug::Assert(Instance()._entityInstanceMap.find(sceneID) != Instance()._entityInstanceMap.end(),
-	              "Invalid scene ID!");
-	auto& entityIDMap = Instance()._entityInstanceMap.at(sceneID);
+	Debug::Assert(GetEntityInstanceMap().find(sceneID) != GetEntityInstanceMap().end(), "Invalid scene ID!");
+	auto& entityIDMap = GetEntityInstanceMap().at(sceneID);
 	Debug::Assert(entityIDMap.find(entityID) != entityIDMap.end(), "Invalid entity ID!");
 	return entityIDMap.at(entityID);
 }

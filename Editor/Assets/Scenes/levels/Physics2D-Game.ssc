@@ -1,6 +1,6 @@
 Scene: Scene Name
 Environment:
-  AssetPath: assets\env\pink_sunrise_4k.hdr
+  AssetPath: pink_sunrise_4k.hdr
   Light:
     Direction: [-0.787, -0.73299998, 1]
     Radiance: [1, 1, 1]
@@ -14,7 +14,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
-      AssetPath: Assets/meshes/Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody3DComponent:
       BodyType: 1
     BoxCollider3DComponent:
@@ -30,7 +30,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -63,7 +63,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [1200, 1, 5]
     MeshComponent:
-      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Assets\Meshes\Cube1m.fbx
+      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -99,7 +99,7 @@ Entities:
           Type: 1
           Data: 1000
     MeshComponent:
-      AssetPath: assets\meshes\Sphere1m.fbx
+      AssetPath: Sphere1m.fbx
     RigidBody3DComponent:
       BodyType: 1
     SphereCollider3DComponent:
@@ -115,7 +115,7 @@ Entities:
       Rotation: [0.707106769, 0, 0, 0.707106769]
       Scale: [58.4133682, 4.47942495, 4.48000002]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -132,7 +132,7 @@ Entities:
       Rotation: [0.977883637, 0, 0, -0.209149569]
       Scale: [4.4799962, 4.47999668, 4.48000002]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 1
       FixedRotation: false
@@ -149,7 +149,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -166,7 +166,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [3.00000024, 0.300000012, 1]
     MeshComponent:
-      AssetPath: assets\meshes\Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody2DComponent:
       BodyType: 0
       FixedRotation: false
@@ -183,7 +183,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [10, 1, 10]
     MeshComponent:
-      AssetPath: Assets/meshes/Cube1m.fbx
+      AssetPath: Cube1m.fbx
     RigidBody3DComponent:
       BodyType: 0
     BoxCollider3DComponent:
@@ -199,7 +199,7 @@ Entities:
       Rotation: [1, 0, 0, 0]
       Scale: [1, 1, 1]
     MeshComponent:
-      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Assets\Meshes\Sphere1m.fbx
+      AssetPath: C:\Users\ownem\source\repos\SaffronEngine\ExampleApp\Sphere1m.fbx
     RigidBody3DComponent:
       BodyType: 0
     SphereCollider3DComponent:

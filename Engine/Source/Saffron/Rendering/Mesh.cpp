@@ -153,9 +153,12 @@ Mesh::Mesh(Filepath filepath) :
 
 	_importer = std::make_unique<Assimp::Importer>();
 
-	const aiScene* scene = _importer->ReadFile(_filepath.string().c_str(), s_MeshImportFlags);
+	const auto fpStr = _filepath.string();
+	const aiScene* scene = _importer->ReadFile(fpStr.c_str(), s_MeshImportFlags);
 	if (!scene || !scene->HasMeshes())
-		Log::CoreError("Failed to load mesh file: {0}", _filepath.string());
+	{
+		Log::CoreError("Failed to load mesh file: {0}", fpStr);
+	}
 
 	_scene = scene;
 
@@ -203,8 +206,9 @@ Mesh::Mesh(Filepath filepath) :
 					vertex.Binormal = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
 				}
 
-				if (mesh->HasTextureCoords(0))
-					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
+				if (mesh->HasTextureCoords(0)) vertex.TexCoord = {
+					mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y
+				};
 
 				_animatedVertices.push_back(vertex);
 			}
@@ -232,8 +236,9 @@ Mesh::Mesh(Filepath filepath) :
 					vertex.Binormal = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
 				}
 
-				if (mesh->HasTextureCoords(0))
-					vertex.TexCoord = {mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y};
+				if (mesh->HasTextureCoords(0)) vertex.TexCoord = {
+					mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y
+				};
 
 				_staticVertices.push_back(vertex);
 			}
@@ -249,8 +254,8 @@ Mesh::Mesh(Filepath filepath) :
 
 			if (!_isAnimated)
 				_triangleCache[static_cast<uint>(m)].emplace_back(_staticVertices[index.V1 + submesh.BaseVertex],
-				                                                     _staticVertices[index.V2 + submesh.BaseVertex],
-				                                                     _staticVertices[index.V3 + submesh.BaseVertex]);
+				                                                  _staticVertices[index.V2 + submesh.BaseVertex],
+				                                                  _staticVertices[index.V3 + submesh.BaseVertex]);
 		}
 	}
 
@@ -544,7 +549,7 @@ Mesh::Mesh(Filepath filepath) :
 	if (_isAnimated)
 	{
 		_vertexBuffer = VertexBuffer::Create(_animatedVertices.data(),
-		                                      static_cast<uint>(_animatedVertices.size() * sizeof(AnimatedVertex)));
+		                                     static_cast<uint>(_animatedVertices.size() * sizeof(AnimatedVertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -555,7 +560,7 @@ Mesh::Mesh(Filepath filepath) :
 	else
 	{
 		_vertexBuffer = VertexBuffer::Create(_staticVertices.data(),
-		                                      static_cast<uint>(_staticVertices.size() * sizeof(Vertex)));
+		                                     static_cast<uint>(_staticVertices.size() * sizeof(Vertex)));
 		vertexLayout = {
 			{ShaderDataType::Float3, "a_Position"}, {ShaderDataType::Float3, "a_Normal"},
 			{ShaderDataType::Float3, "a_Tangent"}, {ShaderDataType::Float3, "a_Binormal"},
@@ -708,7 +713,7 @@ void Mesh::ReadNodeHierarchy(float AnimationTime, const aiNode* pNode, const Mat
 	{
 		const Vector3 translation = InterpolateTranslation(AnimationTime, nodeAnim);
 		const Matrix4 translationMatrix = translate(Matrix4(1.0f),
-		                                             Vector3(translation.x, translation.y, translation.z));
+		                                            Vector3(translation.x, translation.y, translation.z));
 
 		const glm::quat rotation = InterpolateRotation(AnimationTime, nodeAnim);
 		const Matrix4 rotationMatrix = toMat4(rotation);

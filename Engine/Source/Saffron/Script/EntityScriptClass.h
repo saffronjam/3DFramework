@@ -28,12 +28,15 @@ struct EntityScriptClass
 	void SetScript(String moduleName);
 };
 
+using ScriptModuleFieldMap = HashMap<String, HashMap<String, PublicField>>;
+
 struct EntityInstance
 {
 	EntityScriptClass* ScriptClass = nullptr;
 
 	uint Handle = 0;
 	Scene* SceneInstance = nullptr;
+	ScriptModuleFieldMap ModuleFieldMap;
 
 	MonoObject* GetInstance() const;
 };

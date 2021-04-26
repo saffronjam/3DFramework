@@ -90,12 +90,14 @@ void PublicField::GetStoredValue_Internal(void* outValue) const
 {
 	const uint size = GetSize(Type);
 	memcpy(outValue, _storedValueBuffer, size);
+
+	auto* test = reinterpret_cast<Vector2*>(_storedValueBuffer);
 }
 
 void PublicField::GetRuntimeValue_Internal(void* outValue) const
 {
 	Debug::Assert(_entityInstance->GetInstance());;
-	MonoApi::SetFieldValue(_entityInstance->GetInstance(), _monoClassField, outValue);
+	MonoApi::GetFieldValue(_entityInstance->GetInstance(), _monoClassField, outValue);
 }
 
 void PublicField::SetStoredValue_Internal(void* value) const

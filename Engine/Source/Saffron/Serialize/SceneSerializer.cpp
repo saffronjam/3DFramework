@@ -159,8 +159,8 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 							// TODO: Look over overwritten variables
 							auto name = field["Name"].as<String>();
 							FieldType type = static_cast<FieldType>(field["Type"].as<uint>());
-							EntityInstanceData& data = ScriptEngine::GetEntityInstanceData(_scene.GetUUID(), uuid);
-							auto& moduleFieldMap = data.ModuleFieldMap;
+							EntityInstance& instance = ScriptEngine::GetEntityInstance(_scene.GetUUID(), uuid);
+							auto& moduleFieldMap = instance.ModuleFieldMap;
 							auto& publicFields = moduleFieldMap[moduleName];
 							if (publicFields.find(name) == publicFields.end())
 							{
@@ -388,8 +388,8 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity) con
 		auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
 		emitter << YAML::Key << "ModuleName" << YAML::Value << moduleName;
 
-		EntityInstanceData& data = ScriptEngine::GetEntityInstanceData(entity.GetSceneUUID(), uuid);
-		const auto& moduleFieldMap = data.ModuleFieldMap;
+		EntityInstance& instance = ScriptEngine::GetEntityInstance(entity.GetSceneUUID(), uuid);
+		const auto& moduleFieldMap = instance.ModuleFieldMap;
 		if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
 		{
 			const auto& fields = moduleFieldMap.at(moduleName);
@@ -426,7 +426,7 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity) con
 
 	BEGIN_YAML_COMPONENT_MAP(MeshComponent);
 		auto meshComponent = entity.GetComponent<MeshComponent>();
-		emitter << YAML::Key << "AssetPath" << YAML::Value << meshComponent.Mesh->GetFilepath().string();
+		emitter << YAML::Key << "AssetPath" << YAML::Value << meshComponent.Mesh->GetFilepath().filename().string();
 		const auto [translation, rotation, scale] = Misc::GetTransformDecomposition(
 			meshComponent.Mesh->GetLocalTransform());
 		emitter << YAML::Key << "Position" << YAML::Value << translation;
@@ -549,7 +549,7 @@ void SceneSerializer::SerializeEditorCamera(YAML::Emitter& emitter) const
 	emitter << YAML::BeginMap;
 	emitter << YAML::Key << "Position" << YAML::Value << camera->GetPosition();
 	emitter << YAML::Key << "Rotation" << YAML::Value << Vector3(camera->GetPitch(), camera->GetYaw(),
-	                                                              camera->GetRoll());
+	                                                             camera->GetRoll());
 	emitter << YAML::Key << "PerspectiveMatrix" << YAML::Value << camera->GetProjectionMatrix();
 	emitter << YAML::EndMap;
 }

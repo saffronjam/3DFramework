@@ -11,7 +11,8 @@
 namespace Se
 {
 template <typename T>
-static void CopyComponent(EntityRegistry& dstRegistry, EntityRegistry& srcRegistry, const TreeMap<UUID, Entity>& entityMap)
+static void CopyComponent(EntityRegistry& dstRegistry, EntityRegistry& srcRegistry,
+                          const TreeMap<UUID, Entity>& entityMap)
 {
 	auto components = srcRegistry.view<T>();
 	for (auto entityHandle : components)
@@ -59,7 +60,7 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	CopyComponent<RigidBody3DComponent>(_entityRegistry, otherRegistry, entityMap);
 	CopyComponent<BoxCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
 	CopyComponent<SphereCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
-
+	
 	const auto& entityInstanceMap = ScriptEngine::GetEntityInstanceMap();
 	if (entityInstanceMap.find(GetUUID()) != entityInstanceMap.end())
 	{
@@ -222,7 +223,7 @@ void RuntimeScene::OnStart()
 			auto component = entity.GetComponent<ScriptComponent>();
 			if (ScriptEngine::ModuleExists(component.ModuleName))
 			{
-				ScriptEngine::InstantiateEntityClass(entity);
+				ScriptEngine::InstantiateScriptEntity(entity);
 			}
 		}
 	}

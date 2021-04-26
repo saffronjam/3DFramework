@@ -197,7 +197,7 @@ private:
 	Filepath _filepath;
 
 	static constexpr const char* MeshesFolder = "Assets/Meshes/";
-
+	
 	friend class Renderer;
 	friend class EntityComponentsPanel;
 	friend class SceneHierarchyPanel;

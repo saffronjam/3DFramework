@@ -16,7 +16,7 @@ public:
 
 public:
 	static TransformDecomposition GetTransformDecomposition(const Matrix4& transform);
-
+	
 	template <typename T>
 	static T Clamped(const T& value, const T& lower, const T& upper)
 	{

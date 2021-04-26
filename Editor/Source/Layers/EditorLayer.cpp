@@ -504,7 +504,7 @@ void EditorLayer::OnProjectChange(const Shared<Project>& project)
 }
 
 void EditorLayer::OnWantProjectSelector()
-{
+{	
 	WantProjectSelector.Invoke();
 }
 
@@ -764,22 +764,22 @@ void EditorLayer::OnGuiRenderToolbar()
 	ImGui::Separator();
 	ImGui::SameLine();
 
-	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerGameButton"]->GetRendererID()),
-	                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint))
-	{
-		if (_sceneState == SceneState::Edit)
-			scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
-				EditorCamera::ControllerStyle::Game);
-	}
-	ImGui::SameLine();
-	if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerMayaButton"]->GetRendererID()),
-	                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint))
-	{
-		if (_sceneState == SceneState::Edit)
-			scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
-				EditorCamera::ControllerStyle::Maya);
-	}
+	//ImGui::SameLine();
+	//if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerGameButton"]->GetRendererID()),
+	//                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerWASDTint))
+	//{
+	//	if (_sceneState == SceneState::Edit)
+	//		scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
+	//			EditorCamera::ControllerStyle::Game);
+	//}
+	//ImGui::SameLine();
+	//if (ImGui::ImageButton(reinterpret_cast<ImTextureID>(_texStore["ControllerMayaButton"]->GetRendererID()),
+	//                       ImVec2(32, 32), ImVec2(0, 0), ImVec2(1, 1), -1, ImVec4(0, 0, 0, 0), ControllerMayaTint))
+	//{
+	//	if (_sceneState == SceneState::Edit)
+	//		scene->GetEntity().GetComponent<EditorCameraComponent>().Camera->SetControllerStyle(
+	//			EditorCamera::ControllerStyle::Maya);
+	//}
 
 	ImGui::End();
 	ImGui::PopStyleColor(3);

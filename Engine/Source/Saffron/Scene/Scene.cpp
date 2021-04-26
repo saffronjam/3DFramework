@@ -31,7 +31,7 @@ void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity)
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
 	Debug::Assert(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());;
-	ScriptEngine::InitScriptEntity(scene->_entityIDMap.at(entityID));
+	ScriptEngine::CreateScriptEntity(scene->_entityIDMap.at(entityID));
 }
 
 void OnScriptComponentDestroy(EntityRegistry& registry, EntityHandle entity)

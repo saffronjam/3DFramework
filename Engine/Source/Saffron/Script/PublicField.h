@@ -44,7 +44,7 @@ struct PublicField
 	static uint GetSize(FieldType type);
 	static String GetString(FieldType type);
 
-private:
+public:
 	struct EntityInstance* _entityInstance{};
 	MonoClassField* _monoClassField{};
 	uchar* _storedValueBuffer = nullptr;
@@ -57,4 +57,32 @@ private:
 
 	friend class ScriptEngine;
 };
+
+template <typename T>
+T PublicField::GetStoredValue() const
+{
+	T value;
+	GetStoredValue_Internal(&value);
+	return value;
+}
+
+template <typename T>
+T PublicField::GetRuntimeValue() const
+{
+	T value;
+	GetRuntimeValue_Internal(&value);
+	return value;
+}
+
+template <typename T>
+void PublicField::SetStoredValue(T value) const
+{
+	SetStoredValue_Internal(&value);
+}
+
+template <typename T>
+void PublicField::SetRuntimeValue(T value) const
+{
+	SetRuntimeValue_Internal(&value);
+}
 }

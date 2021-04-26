@@ -118,7 +118,7 @@ void PhysicsWorld2D::OnUpdate()
 	_nativeWorld->Step(ts.sec(), velocityIterations, positionIterations);
 
 	{
-		auto view = _scene->GetEntityRegistry().view<RigidBody2DComponent>();
+		auto view = _scene->GetEntityRegistry().view<RigidBody2DComponent, TagComponent>();
 		for (auto entityHandle : view)
 		{
 			Entity entity = {entityHandle, _scene};
@@ -127,7 +127,8 @@ void PhysicsWorld2D::OnUpdate()
 			auto& rigidBody2D = entity.GetComponent<RigidBody2DComponent>();
 			auto* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
 
-
+			auto tag = entity.GetComponent<TagComponent>().Tag;
+			
 			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
 				auto& component = entity.GetComponent<BoxCollider2DComponent>();
