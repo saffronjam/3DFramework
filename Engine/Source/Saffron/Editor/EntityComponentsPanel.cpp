@@ -272,7 +272,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 								if (ImGui::IsItemClicked())
 								{
-									const Filepath filepath = FileIOManager::OpenFile();
+									const Path filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
 										albedoMap = Texture2D::Create(filepath.string(), true/*_albedoInput.sRGB*/);
@@ -321,7 +321,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 								if (ImGui::IsItemClicked())
 								{
-									const Filepath filepath = FileIOManager::OpenFile();
+									const Path filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
 										normalMap = Texture2D::Create(filepath.string());
@@ -362,7 +362,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 								if (ImGui::IsItemClicked())
 								{
-									const Filepath filepath = FileIOManager::OpenFile();
+									const Path filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
 										metalnessMap = Texture2D::Create(filepath.string());
@@ -405,7 +405,7 @@ void EntityComponentsPanel::OnGuiRenderMaterial()
 								}
 								if (ImGui::IsItemClicked())
 								{
-									const Filepath filepath = FileIOManager::OpenFile();
+									const Path filepath = FileIOManager::OpenFile();
 									if (!filepath.empty())
 									{
 										roughnessMap = Texture2D::Create(filepath.string());
@@ -632,86 +632,81 @@ void EntityComponentsPanel::DrawComponents(Entity entity)
 	DrawComponent<ScriptComponent>("Script", entity, [=](ScriptComponent& sc) mutable
 	{
 		Gui::BeginPropertyGrid();
-		const auto oldName = sc.ModuleName;
-		if (Gui::Property("Module Name", sc.ModuleName, !ScriptEngine::ModuleExists(sc.ModuleName)))
+		const auto oldName = sc.Fullname;
+		if (Gui::Property("Module Name", sc.Fullname, !ScriptEngine::ModuleExists(sc.Fullname)))
 			// TODO: no live edit
 		{
 			// Shutdown old script
-			if (ScriptEngine::ModuleExists(oldName)) ScriptEngine::DeleteScriptEntity(entity, oldName);
+			if (ScriptEngine::ModuleExists(oldName)) ScriptEngine::Instance().DeleteScriptEntity(entity);
 
-			if (ScriptEngine::ModuleExists(sc.ModuleName)) ScriptEngine::CreateScriptEntity(entity);
+			if (ScriptEngine::ModuleExists(sc.Fullname)) ScriptEngine::Instance().CreateScriptEntity(entity);
 		}
 
 		// Public Fields
-		if (ScriptEngine::ModuleExists(sc.ModuleName))
+		if (ScriptEngine::ModuleExists(sc.Fullname))
 		{
-			EntityInstance& entityInstance = ScriptEngine::GetEntityInstance(entity.GetSceneUUID(), id);
-			auto& moduleFieldMap = entityInstance.ModuleFieldMap;
-			if (moduleFieldMap.find(sc.ModuleName) != moduleFieldMap.end())
+			auto& scriptEntity = ScriptEngine::Instance().GetScriptEntity(entity.GetSceneUUID(), id);
+			auto& fields = ScriptEngine::Instance().GetFieldMap(sc.NamespaceName, sc.Name);
+			for (auto& field : fields)
 			{
-				auto& publicFields = moduleFieldMap.at(sc.ModuleName);
-				for (auto& [name, field] : publicFields)
+				const bool isRuntime = dynamic_cast<RuntimeScene*>(_context.Raw()) && field.IsRuntimeAvailable();
+				const auto& fieldName = field.GetMonoField().GetName();
+				switch (field.GetMonoField().GetFieldType())
 				{
-					const bool isRuntime = dynamic_cast<RuntimeScene*>(_context.Raw()) && field.IsRuntimeAvailable();
-					switch (field.Type)
+				case Mono::FieldType::Int:
+				{
+					int value = isRuntime ? field.GetRuntimeValue<int>() : field.GetStoredValue<int>();
+					if (Gui::Property(fieldName, value))
 					{
-					case FieldType::Int:
+						if (isRuntime) field.SetRuntimeValue(value);
+						else field.SetStoredValue(value);
+					}
+					break;
+				}
+				case Mono::FieldType::Float:
+				{
+					float value = isRuntime ? field.GetRuntimeValue<float>() : field.GetStoredValue<float>();
+					if (Gui::Property(fieldName, value, 0.2f))
 					{
-						int value = isRuntime ? field.GetRuntimeValue<int>() : field.GetStoredValue<int>();
-						if (Gui::Property(field.Name, value))
-						{
-							if (isRuntime) field.SetRuntimeValue(value);
-							else field.SetStoredValue(value);
-						}
-						break;
+						if (isRuntime) field.SetRuntimeValue(value);
+						else field.SetStoredValue(value);
 					}
-					case FieldType::Float:
+					break;
+				}
+				case Mono::FieldType::Vec2:
+				{
+					Vector2 value = isRuntime ? field.GetRuntimeValue<Vector2>() : field.GetStoredValue<Vector2>();
+					if (Gui::Property(fieldName, value, 0.2f))
 					{
-						float value = isRuntime ? field.GetRuntimeValue<float>() : field.GetStoredValue<float>();
-						if (Gui::Property(field.Name, value, 0.2f))
-						{
-							if (isRuntime) field.SetRuntimeValue(value);
-							else field.SetStoredValue(value);
-						}
-						break;
+						if (isRuntime) field.SetRuntimeValue(value);
+						else field.SetStoredValue(value);
 					}
-					case FieldType::Vec2:
+					break;
+				}
+				case Mono::FieldType::Vec3:
+				{
+					Vector3 value = isRuntime ? field.GetRuntimeValue<Vector3>() : field.GetStoredValue<Vector3>();
+					if (Gui::Property(fieldName, value, 0.2f))
 					{
-						Vector2 value = isRuntime
-							                  ? field.GetRuntimeValue<Vector2>()
-							                  : field.GetStoredValue<Vector2>();
-						if (Gui::Property(field.Name, value, 0.2f))
-						{
-							if (isRuntime) field.SetRuntimeValue(value);
-							else field.SetStoredValue(value);
-						}
-						break;
+						if (isRuntime) field.SetRuntimeValue(value);
+						else field.SetStoredValue(value);
 					}
-					case FieldType::Vec3:
+					break;
+				}
+				case Mono::FieldType::Vec4:
+				{
+					Vector4 value = isRuntime ? field.GetRuntimeValue<Vector4>() : field.GetStoredValue<Vector4>();
+					if (Gui::Property(fieldName, value, 0.2f))
 					{
-						Vector3 value = isRuntime
-							                  ? field.GetRuntimeValue<Vector3>()
-							                  : field.GetStoredValue<Vector3>();
-						if (Gui::Property(field.Name, value, 0.2f))
-						{
-							if (isRuntime) field.SetRuntimeValue(value);
-							else field.SetStoredValue(value);
-						}
-						break;
+						if (isRuntime) field.SetRuntimeValue(value);
+						else field.SetStoredValue(value);
 					}
-					case FieldType::Vec4:
-					{
-						Vector4 value = isRuntime
-							                  ? field.GetRuntimeValue<Vector4>()
-							                  : field.GetStoredValue<Vector4>();
-						if (Gui::Property(field.Name, value, 0.2f))
-						{
-							if (isRuntime) field.SetRuntimeValue(value);
-							else field.SetStoredValue(value);
-						}
-						break;
-					}
-					}
+					break;
+				}
+				case Mono::FieldType::None: break;
+				case Mono::FieldType::Uint: break;
+				case Mono::FieldType::String: break;
+				default: ;
 				}
 			}
 		}

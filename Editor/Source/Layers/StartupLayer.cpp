@@ -244,9 +244,9 @@ void StartupLayer::OnGuiRender()
 			}
 
 			ImGui::Columns(3, "ProjectTemplateSelector", false);
-			const Filepath templateScenesDirectory = "Templates/Scenes";
+			const Path templateScenesDirectory = "Templates/Scenes";
 			const auto templateSceneFilepaths = FileIOManager::GetFiles(templateScenesDirectory, ".ssc");
-			static Filepath templateSceneChoice;
+			static Path templateSceneChoice;
 			for (int i = 0; i < 3 && i < templateSceneFilepaths.size(); i++)
 			{
 				if (ImGui::Button(templateSceneFilepaths[i].path().stem().string().c_str()))
@@ -268,7 +268,7 @@ void StartupLayer::OnGuiRender()
 				FileIOManager::Copy(templateSceneChoice, projectStartupSceneFilepath);
 
 				_newProject = Shared<Project>::Create(projectName, DateTime{}, projectFilepath,
-				                                       ArrayList<Filepath>{projectStartupSceneFilepath});
+				                                       List<Path>{projectStartupSceneFilepath});
 
 				ProjectSerializer serializer(*_newProject.value());
 				serializer.Serialize(projectFilepath);

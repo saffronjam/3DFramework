@@ -28,7 +28,7 @@ const char* FormatFilter(const FileIOManager::Filter& filter)
 	return buffer;
 }
 
-Filepath FileIOManager::OpenFile(const Filter& filter)
+Path FileIOManager::OpenFile(const Filter& filter)
 {
 	Debug::Assert(Instance()._window, "FileIOManager was not initialized");;
 
@@ -51,10 +51,10 @@ Filepath FileIOManager::OpenFile(const Filter& filter)
 	{
 		return ofn.lpstrFile;
 	}
-	return Filepath();
+	return Path();
 }
 
-Filepath FileIOManager::SaveFile(const Filter& filter)
+Path FileIOManager::SaveFile(const Filter& filter)
 {
 	Debug::Assert(Instance()._window, "FileIOManager was not initialized");;
 
@@ -79,6 +79,6 @@ Filepath FileIOManager::SaveFile(const Filter& filter)
 	{
 		return ofn.lpstrFile;
 	}
-	return Filepath();
+	return Path();
 }
 }

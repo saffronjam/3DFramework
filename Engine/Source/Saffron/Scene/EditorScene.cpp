@@ -10,7 +10,7 @@
 
 namespace Se
 {
-EditorScene::EditorScene(Filepath filepath) :
+EditorScene::EditorScene(Path filepath) :
 	_filepath(Move(filepath))
 {
 	_editorCamera = _sceneEntity.AddComponent<EditorCameraComponent>(

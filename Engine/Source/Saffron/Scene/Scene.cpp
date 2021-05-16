@@ -31,7 +31,7 @@ void OnScriptComponentConstruct(EntityRegistry& registry, EntityHandle entity)
 
 	const auto entityID = registry.get<IDComponent>(entity).ID;
 	Debug::Assert(scene->_entityIDMap.find(entityID) != scene->_entityIDMap.end());;
-	ScriptEngine::CreateScriptEntity(scene->_entityIDMap.at(entityID));
+	ScriptEngine::Instance().CreateScriptEntity(scene->_entityIDMap.at(entityID));
 }
 
 void OnScriptComponentDestroy(EntityRegistry& registry, EntityHandle entity)
@@ -189,7 +189,7 @@ void Scene::ShowPhysicsBodyBoundingBoxes(bool show)
 	//SceneRenderer::GetOptions().ShowPhysicsBodyBoundingBoxes = show;
 }
 
-bool Scene::IsValidFilepath(const Filepath& filepath)
+bool Scene::IsValidFilepath(const Path& filepath)
 {
 	return !filepath.empty() && filepath.extension() == ".ssc" && FileIOManager::FileExists(filepath);
 }

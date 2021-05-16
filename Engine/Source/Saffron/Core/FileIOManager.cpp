@@ -15,14 +15,14 @@ FileIOManager::FileIOManager(const Shared<Window>& window) :
 {
 }
 
-ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath& directoryPath, const String& extension)
+List<DirEntry> FileIOManager::GetFiles(const Path& directoryPath, const String& extension)
 {
-	ArrayList<DirectoryEntry> output;
+	List<DirEntry> output;
 
 	try
 	{
 		std::copy_if(fs::directory_iterator(directoryPath), fs::directory_iterator{}, std::back_inserter(output),
-		             [&](const DirectoryEntry& entry)
+		             [&](const DirEntry& entry)
 		             {
 			             return entry.path().extension() == extension;
 		             });
@@ -36,7 +36,7 @@ ArrayList<DirectoryEntry> FileIOManager::GetFiles(const Filepath& directoryPath,
 	return output;
 }
 
-size_t FileIOManager::GetFileCount(const Filepath& directoryPath, const String& extension)
+size_t FileIOManager::GetFileCount(const Path& directoryPath, const String& extension)
 {
 	// Return early if no extension is given
 	if (extension.empty())
@@ -47,7 +47,7 @@ size_t FileIOManager::GetFileCount(const Filepath& directoryPath, const String& 
 	try
 	{
 		return std::count_if(fs::directory_iterator(directoryPath), fs::directory_iterator{},
-		                     [&](const DirectoryEntry& entry)
+		                     [&](const DirEntry& entry)
 		                     {
 			                     return entry.path().extension() == extension;
 		                     });
@@ -60,7 +60,7 @@ size_t FileIOManager::GetFileCount(const Filepath& directoryPath, const String& 
 	return 0;
 }
 
-size_t FileIOManager::GetFileSize(const Filepath& filepath)
+size_t FileIOManager::GetFileSize(const Path& filepath)
 {
 	try
 	{
@@ -73,7 +73,7 @@ size_t FileIOManager::GetFileSize(const Filepath& filepath)
 	return 0ull;
 }
 
-size_t FileIOManager::Write(const uchar* data, size_t size, const Filepath& filepath, bool overwrite)
+size_t FileIOManager::Write(const uchar* data, size_t size, const Path& filepath, bool overwrite)
 {
 	const bool fileExists = FileExists(filepath);
 	if (!fileExists || fileExists && overwrite)
@@ -91,31 +91,31 @@ size_t FileIOManager::Write(const uchar* data, size_t size, const Filepath& file
 	return 0;
 }
 
-size_t FileIOManager::Write(const Buffer buffer, const Filepath& filepath, bool overwrite)
+size_t FileIOManager::Write(const Buffer buffer, const Path& filepath, bool overwrite)
 {
 	return Write(buffer.Data(), buffer.Size(), filepath, overwrite);
 }
 
-bool FileIOManager::CreateDirectories(const Filepath& filepath)
+bool FileIOManager::CreateDirectories(const Path& filepath)
 {
 	std::error_code errorCode;
 	return create_directories(filepath, errorCode);
 }
 
-bool FileIOManager::FileExists(const Filepath& filepath)
+bool FileIOManager::FileExists(const Path& filepath)
 {
 	std::error_code errorCode;
 	return exists(filepath, errorCode);
 }
 
-bool FileIOManager::Copy(const Filepath& source, const Filepath& destination)
+bool FileIOManager::Copy(const Path& source, const Path& destination)
 {
 	std::error_code errorCode;
 	copy_file(source, destination, errorCode);
 	return static_cast<bool>(errorCode);
 }
 
-size_t FileIOManager::Read(const Filepath& filepath, OStringStream& destination)
+size_t FileIOManager::Read(const Path& filepath, OStringStream& destination)
 {
 	String data;
 	IStream is(filepath);
@@ -136,11 +136,11 @@ size_t FileIOManager::Read(const Filepath& filepath, OStringStream& destination)
 	return fileSize;
 }
 
-ArrayList<char> FileIOManager::ReadBinary(const Filepath& filepath)
+List<char> FileIOManager::ReadBinary(const Path& filepath)
 {
 	IStream is(filepath, std::ios::binary);
 
-	ArrayList<char> data;
+	List<char> data;
 	if (is.is_open())
 	{
 		data.reserve(GetFileSize(filepath));

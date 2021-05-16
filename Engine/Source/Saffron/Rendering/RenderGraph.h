@@ -37,12 +37,12 @@ private:
 	void LinkInputs(const RenderPass& renderPass);
 
 protected:
-	ArrayList<Unique<RenderPass>> _passes;
+	List<Unique<RenderPass>> _passes;
 
-	ArrayList<Stream::Input> _inputs;
-	ArrayList<Stream::Output> _outputs;
-	ArrayList<Unique<Stream::Input>> _globalInputs;
-	ArrayList<Unique<Stream::Output>> _globalOutputs;
+	List<Stream::Input> _inputs;
+	List<Stream::Output> _outputs;
+	List<Unique<Stream::Input>> _globalInputs;
+	List<Unique<Stream::Output>> _globalOutputs;
 	
 	Shared<Framebuffer> _backBuffer;
 };

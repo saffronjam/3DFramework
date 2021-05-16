@@ -106,7 +106,7 @@ public:
 	void ShowMeshBoundingBoxes(bool show);
 	void ShowPhysicsBodyBoundingBoxes(bool show);
 
-	static bool IsValidFilepath(const Filepath& filepath);
+	static bool IsValidFilepath(const Path& filepath);
 
 protected:
 	UUID _sceneID;

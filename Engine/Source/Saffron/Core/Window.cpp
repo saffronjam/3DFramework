@@ -91,7 +91,7 @@ const String& Window::GetTitle() const
 	return _title;
 }
 
-void Window::SetWindowIcon(Filepath filepath)
+void Window::SetWindowIcon(Path filepath)
 {
 	PushEvent<WindowNewIconEvent>(Move(filepath));
 }

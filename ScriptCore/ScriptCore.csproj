@@ -49,6 +49,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Source\Saffron\Core\Log.cs" />
     <Compile Include="Source\Saffron\Entity.cs" />
     <Compile Include="Source\Saffron\Input.cs" />
     <Compile Include="Source\Saffron\KeyCodes.cs" />

@@ -69,7 +69,7 @@ public:
 	static void SetStyle(Style style);
 	static void SetFontSize(int size);
 
-	static Font* AddFont(const Filepath& filepath, int size);
+	static Font* AddFont(const Path& filepath, int size);
 
 	static void ForceHideBarTab();
 

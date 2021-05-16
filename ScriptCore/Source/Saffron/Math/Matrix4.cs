@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Se
+namespace Saffron
 {
     [StructLayout(LayoutKind.Explicit)]
     public struct Matrix4

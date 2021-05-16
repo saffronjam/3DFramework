@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Saffron/Base.h"
 #include "Saffron/Rendering/Camera.h"
 #include "Saffron/Rendering/Mesh.h"
 #include "Saffron/Rendering/RenderChannel.h"
@@ -109,7 +110,7 @@ public:
 	                       Shared<MaterialInstance> overrideMaterial = nullptr);
 	static void SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4& transform = Matrix4(1.0f));
 
-	static Shared<class SceneEnvironment> CreateEnvironmentMap(const Filepath& filepath);
+	static Shared<class SceneEnvironment> CreateEnvironmentMap(const Path& filepath);
 
 	static const RenderPass& GetFinalRenderPass();
 	static const Shared<Texture2D>& GetFinalColorBuffer();
@@ -121,7 +122,7 @@ public:
 	static void SetViewportSize(uint width, uint height);
 
 	static SceneRendererOptions& GetOptions();
-	static ArrayList<DrawCommand>& GetDrawCommands(RenderChannel channel);
+	static List<DrawCommand>& GetDrawCommands(RenderChannel channel);
 	static SceneRendererCommon& GetCommon();
 	static SceneRendererStats& GetStats();
 	static SceneInfo& GetSceneInfo();
@@ -139,6 +140,6 @@ private:
 	ShadowMapData _smData;
 
 	Unique<RenderGraph> _renderGraph;
-	HashMap<RenderChannel, ArrayList<DrawCommand>> _drawContainer;
+	HashMap<RenderChannel, List<DrawCommand>> _drawContainer;
 };
 }

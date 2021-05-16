@@ -30,7 +30,7 @@ public:
 private:
 	String _name;
 
-	ArrayList<Pair<Function<void()>, String>> _queue;
+	List<Pair<Function<void()>, String>> _queue;
 	Atomic<float> _progress = 0.0f;
 	Atomic<const String*> _status = nullptr;
 	Atomic<bool> _running = false, _shouldExit = false;

@@ -85,7 +85,7 @@ struct LogStream : Assimp::LogStream
 
 	void write(const char* message) override
 	{
-		Log::CoreWarn(Log::Fmt::OnCyan + Log::Fmt::Black + "Assimp Warning" + Log::Fmt::Warn + " {0}", message);
+		Log::CoreWarn(Log::Fmt::OnCyan + Log::Fmt::Black + " Assimp Warning " + Log::Fmt::Warn + " {0}", message);
 	}
 };
 
@@ -143,7 +143,7 @@ void VertexBoneData::AddBoneData(uint BoneID, float Weight)
 /// Mesh
 ////////////////////////////////////////////////////////////////////////
 
-Mesh::Mesh(Filepath filepath) :
+Mesh::Mesh(Path filepath) :
 	_localTransform(1),
 	_filepath(MeshesFolder + Move(filepath).string())
 {
@@ -335,7 +335,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (hasAlbedoMap)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = _filepath;
+				Path path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -365,7 +365,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = _filepath;
+				Path path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -392,7 +392,7 @@ Mesh::Mesh(Filepath filepath) :
 			if (aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS)
 			{
 				// TODO: Temp - this should be handled by Saffron's filesystem
-				Filepath path = _filepath;
+				Path path = _filepath;
 				auto parentPath = path.parent_path();
 				parentPath /= String(aiTexPath.data);
 				String texturePath = parentPath.string();
@@ -511,7 +511,7 @@ Mesh::Mesh(Filepath filepath) :
 						metalnessTextureFound = true;
 
 						// TODO: Temp - this should be handled by Saffron's filesystem
-						Filepath path = _filepath;
+						Path path = _filepath;
 						auto parentPath = path.parent_path();
 						parentPath /= str;
 						String texturePath = parentPath.string();
@@ -634,12 +634,12 @@ void Mesh::DumpVertexBuffer()
 	SE_MESH_LOG("------------------------------------------------------");
 }
 
-ArrayList<Submesh>& Mesh::GetSubmeshes()
+List<Submesh>& Mesh::GetSubmeshes()
 {
 	return _submeshes;
 }
 
-const ArrayList<Submesh>& Mesh::GetSubmeshes() const
+const List<Submesh>& Mesh::GetSubmeshes() const
 {
 	return _submeshes;
 }
@@ -664,27 +664,27 @@ Shared<Material> Mesh::GetMaterial() const
 	return _baseMaterial;
 }
 
-ArrayList<Shared<MaterialInstance>> Mesh::GetMaterials() const
+List<Shared<MaterialInstance>> Mesh::GetMaterials() const
 {
 	return _materials;
 }
 
-const ArrayList<Shared<Texture2D>>& Mesh::GetTextures() const
+const List<Shared<Texture2D>>& Mesh::GetTextures() const
 {
 	return _textures;
 }
 
-const Filepath& Mesh::GetFilepath() const
+const Path& Mesh::GetFilepath() const
 {
 	return _filepath;
 }
 
-ArrayList<Triangle> Mesh::GetTriangleCache(uint index) const
+List<Triangle> Mesh::GetTriangleCache(uint index) const
 {
 	return _triangleCache.at(index);
 }
 
-Shared<Mesh> Mesh::Create(Filepath filepath)
+Shared<Mesh> Mesh::Create(Path filepath)
 {
 	auto mesh = Shared<Mesh>::Create(Move(filepath));
 	if (!mesh->IsLoaded())
@@ -694,9 +694,9 @@ Shared<Mesh> Mesh::Create(Filepath filepath)
 	return mesh;
 }
 
-ArrayList<AABB> Mesh::GetBoundingBoxes(const Matrix4& transform)
+List<AABB> Mesh::GetBoundingBoxes(const Matrix4& transform)
 {
-	ArrayList<AABB> ret;
+	List<AABB> ret;
 	for (const auto& submesh : GetSubmeshes())
 	{
 		const auto& aabb = submesh.BoundingBox;

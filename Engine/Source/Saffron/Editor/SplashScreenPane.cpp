@@ -8,7 +8,7 @@ namespace Se
 {
 SplashScreenPane::SplashScreenPane(const Shared<BatchLoader>& batchLoader) :
 	_batchLoader(batchLoader),
-	_texture(Texture2D::Create(Filepath("Editor/Saffron.png"))),
+	_texture(Texture2D::Create(Path("Editor/Saffron.png"))),
 	_finalizingStatus("Finalizing")
 {
 }

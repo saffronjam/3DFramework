@@ -6,7 +6,7 @@
 
 namespace Se
 {
-ScriptPanel::ScriptPanel(Filepath path) :
+ScriptPanel::ScriptPanel(Path path) :
 	_scriptFolderPath(Move(path))
 {
 	SyncScriptPaths();
@@ -51,7 +51,7 @@ void ScriptPanel::SyncScriptPaths()
 
 	_scriptStats.clear();
 	auto rawPaths = FileIOManager::GetFiles(_scriptFolderPath, ".cs");
-	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirectoryEntry& entry) mutable
+	std::for_each(rawPaths.begin(), rawPaths.end(), [&](const DirEntry& entry) mutable
 	{
 		_scriptStats.emplace_back("Script", entry.path().stem().string(), entry.path());
 	});

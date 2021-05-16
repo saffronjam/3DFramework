@@ -33,7 +33,7 @@ public:
 	static void Remove(Handle handle);
 
 private:
-	static ArrayList<Function<void()>> _laterFunctions;
+	static List<Function<void()>> _laterFunctions;
 	static TreeMap<Handle, PeriodicFunction> _periodicFunctions;
 };
 }

@@ -47,7 +47,7 @@ struct UniformBuffer
 	// nothing to do with GL uniform buffers, this is simply a CPU-side
 	// buffer abstraction.
 	uchar* Buffer;
-	ArrayList<UniformDecl> Uniforms;
+	List<UniformDecl> Uniforms;
 };
 
 struct UniformBufferBase
@@ -140,7 +140,7 @@ public:
 	// Represents a complete shader program stored in a single file.
 	// Note: currently for simplicity this is simply a string filepath, however
 	//       in the future this will be an asset object + metadata
-	static Shared<Shader> Create(Filepath filepath);
+	static Shared<Shader> Create(Path filepath);
 	static Shared<Shader> Create(const Buffer& source);
 
 	virtual void SetVSMaterialUniformBuffer(Buffer buffer) = 0;
@@ -161,7 +161,7 @@ public:
 	mutable EventSubscriberList<void> Reloaded;
 
 protected:
-	Filepath _filepath;
+	Path _filepath;
 
 private:
 	static constexpr const char* ShaderLocation = "Assets/Shaders/";

@@ -23,18 +23,19 @@ namespace Se
 // Primitives
 
 // Unsigned typedef
-typedef unsigned char ubyte;
-typedef unsigned char uchar;
-typedef unsigned short ushort;
-typedef unsigned int uint;
+using wchar = wchar_t;
+using ubyte = unsigned char;
+using uchar = unsigned char;
+using ushort = unsigned short;
+using uint = unsigned int;
 #if defined(_MSC_VER)
-typedef unsigned __int64 ulong;
+using ulong = unsigned __int64;
 #else
-typedef unsigned long long ulong;
+using ulong = unsigned long long;
 #endif
 
 template <typename T>
-using ArrayList = std::vector<T>;
+using List = std::vector<T>;
 template <typename Type, size_t size>
 using Array = std::array<Type, size>;
 template <typename Key, typename Value>
@@ -44,9 +45,9 @@ using MultiMap = std::multimap<Key, Value>;
 template <typename Key, typename Value>
 using HashMap = std::unordered_map<Key, Value>;
 template <typename T>
-using Set = std::set<T>;
+using TreeSet = std::set<T>;
 template <typename T>
-using UnorderedSet = std::unordered_set<T>;
+using HashSet = std::unordered_set<T>;
 template <class FunctionType>
 using Function = std::function<FunctionType>;
 template <class... Types>
@@ -71,9 +72,9 @@ template <typename T>
 using Weak = std::weak_ptr<T>;
 
 using String = std::string;
-using WideString = std::wstring;
-using Filepath = std::filesystem::path;
-using DirectoryEntry = std::filesystem::directory_entry;
+using WString = std::wstring;
+using Path = std::filesystem::path;
+using DirEntry = std::filesystem::directory_entry;
 using OStream = std::ofstream;
 using IStream = std::ifstream;
 using StringStream = std::stringstream;
@@ -96,20 +97,7 @@ constexpr auto CreatePair(FirstClass&& first, SecondClass&& second) noexcept
 	return Mypair(std::forward<FirstClass>(first), std::forward<SecondClass>(second));
 }
 
-//template <class PtrClassTo, class PtrClassFrom>
-//constexpr Shared<PtrClassTo> DynamicPointerCast(Shared<PtrClassFrom>& ptr) noexcept
-//{
-//	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
-//}
-//
-//template <class PtrClassTo, class PtrClassFrom>
-//constexpr Shared<PtrClassTo> DynamicPointerCast(const Shared<PtrClassFrom>& ptr) noexcept
-//{
-//	return std::dynamic_pointer_cast<PtrClassTo>(ptr);
-//}
-
 // Memory
-
 template <typename T, typename ... Args>
 constexpr Unique<T> CreateUnique(Args&& ... args)
 {
@@ -121,13 +109,4 @@ constexpr Unique<T> CreateUnique(Args&& ... args)
 //{
 //	return std::make_shared<T>(std::forward<Args>(args)...);
 //}
-
-
-template <typename T>
-constexpr Unique<T> CreateUniqueFromDonor(T* donor)
-{
-	Unique<T> unique;
-	unique.reset(donor);
-	return unique;
-}
 }

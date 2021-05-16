@@ -11,7 +11,7 @@ class OpenGLShader : public Shader
 {
 public:
 	OpenGLShader() = default;
-	OpenGLShader(const Filepath& filepath);
+	OpenGLShader(const Path& filepath);
 	static Shared<OpenGLShader> Create(const Buffer& source);
 
 	void Reload() override;
@@ -41,7 +41,7 @@ public:
 private:
 	void Load(const Buffer& source);
 
-	Buffer ReadShaderFromFile(const Filepath& filepath) const;
+	Buffer ReadShaderFromFile(const Path& filepath) const;
 	HashMap<GLenum, String> PreProcess(const Buffer& source);
 	void Parse();
 	void ParseUniform(const String& statement, ShaderDomain domain);
@@ -100,7 +100,7 @@ private:
 	String _name;
 	HashMap<GLenum, String> _shaderSource;
 
-	ArrayList<ShaderReloadedCallback> _shaderReloadedCallbacks;
+	List<ShaderReloadedCallback> _shaderReloadedCallbacks;
 
 	ShaderUniformBufferList _vSRendererUniformBuffers;
 	ShaderUniformBufferList _pSRendererUniformBuffers;

@@ -50,7 +50,7 @@ ProjectSerializer::ProjectSerializer(Project& project) :
 {
 }
 
-void ProjectSerializer::Serialize(const Filepath& filepath) const
+void ProjectSerializer::Serialize(const Path& filepath) const
 {
 	YAML::Emitter out;
 
@@ -77,7 +77,7 @@ void ProjectSerializer::Serialize(const Filepath& filepath) const
 	fout << out.c_str();
 }
 
-bool ProjectSerializer::Deserialize(const Filepath& filepath)
+bool ProjectSerializer::Deserialize(const Path& filepath)
 {
 	IStream stream(filepath);
 	OStringStream strStream;
@@ -107,7 +107,7 @@ bool ProjectSerializer::Deserialize(const Filepath& filepath)
 		return false;
 	}
 
-	ArrayList<Filepath> sceneFilepaths;
+	List<Path> sceneFilepaths;
 	for (const auto& sceneRef : project["Scenes"])
 	{
 		const auto& sceneFilepathNode = sceneRef["SceneFilepath"];

@@ -39,6 +39,15 @@ public:
 	void Run();
 	void Exit();
 
+
+	static void TestStatic()
+	{
+	}
+
+	void TestNormal()
+	{
+	}
+
 	virtual void OnInit()
 	{
 	}
@@ -65,7 +74,7 @@ public:
 	void AddProject(const Shared<Project>& project);
 	void RemoveProject(const Shared<Project>& project);
 
-	const ArrayList<Shared<Project>>& GetRecentProjectList() const;
+	const List<Shared<Project>>& GetRecentProjectList() const;
 	const Shared<Project>& GetActiveProject() const;
 	void SetActiveProject(const Shared<Project>& project);
 
@@ -86,7 +95,7 @@ private:
 	Unique<ScriptEngine> _scriptEngine;
 
 	Unique<ResourceManager> _resourceManager;
-	
+
 	Shared<Window> _window;
 	Unique<Gui> _gui;
 	Unique<FileIOManager> _fileIOManager;
@@ -98,7 +107,7 @@ private:
 	Unique<Mouse> _mouse;
 	Unique<Keyboard> _keyboard;
 
-	mutable ArrayList<Shared<Project>> _recentProjectList;
+	mutable List<Shared<Project>> _recentProjectList;
 	Shared<Project> _activeProject = nullptr;
 };
 

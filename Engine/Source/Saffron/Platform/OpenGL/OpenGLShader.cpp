@@ -22,7 +22,7 @@ constexpr void LogUniform(const String& message, Arg&& arg, Args&& ... args)
 #define SE_LOG_UNIFORM
 #endif
 
-OpenGLShader::OpenGLShader(const Filepath& filepath)
+OpenGLShader::OpenGLShader(const Path& filepath)
 {
 	_filepath = Move(filepath);
 
@@ -91,7 +91,7 @@ void OpenGLShader::Bind()
 	});
 }
 
-Buffer OpenGLShader::ReadShaderFromFile(const Filepath& filepath) const
+Buffer OpenGLShader::ReadShaderFromFile(const Path& filepath) const
 {
 	String result;
 	std::ifstream in(filepath, std::ios::in | std::ios::binary);
@@ -166,12 +166,12 @@ const char* FindToken(const String& string, const String& token)
 	return FindToken(string.c_str(), token);
 }
 
-ArrayList<String> SplitString(const String& string, const String& delimiters)
+List<String> SplitString(const String& string, const String& delimiters)
 {
 	size_t start = 0;
 	size_t end = string.find_first_of(delimiters);
 
-	ArrayList<String> result;
+	List<String> result;
 
 	while (end <= String::npos)
 	{
@@ -187,17 +187,17 @@ ArrayList<String> SplitString(const String& string, const String& delimiters)
 	return result;
 }
 
-ArrayList<String> SplitString(const String& string, const char delimiter)
+List<String> SplitString(const String& string, const char delimiter)
 {
 	return SplitString(string, String(1, delimiter));
 }
 
-ArrayList<String> Tokenize(const String& string)
+List<String> Tokenize(const String& string)
 {
 	return SplitString(string, " \t\n\r");
 }
 
-ArrayList<String> GetLines(const String& string)
+List<String> GetLines(const String& string)
 {
 	return SplitString(string, "\n");
 }
@@ -278,7 +278,7 @@ ShaderStruct* OpenGLShader::FindStruct(const String& name)
 
 void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 {
-	ArrayList<String> tokens = Tokenize(statement);
+	List<String> tokens = Tokenize(statement);
 	uint index = 0;
 
 	index++; // "uniform"
@@ -353,7 +353,7 @@ void OpenGLShader::ParseUniform(const String& statement, ShaderDomain domain)
 
 void OpenGLShader::ParseUniformStruct(const String& block, ShaderDomain domain)
 {
-	ArrayList<String> tokens = Tokenize(block);
+	List<String> tokens = Tokenize(block);
 
 	uint index = 0;
 	index++; // struct
@@ -542,7 +542,7 @@ GLenum OpenGLShader::ShaderTypeFromString(const String& type)
 
 void OpenGLShader::CompileAndUploadShader()
 {
-	ArrayList<GLuint> shaderRendererIDs;
+	List<GLuint> shaderRendererIDs;
 
 	GLuint program = glCreateProgram();
 	for (auto& kv : _shaderSource)
@@ -564,7 +564,7 @@ void OpenGLShader::CompileAndUploadShader()
 			glGetShaderiv(shaderRendererID, GL_INFO_LOG_LENGTH, &maxLength);
 
 			// The maxLength includes the NULL character
-			ArrayList<GLchar> infoLog(maxLength);
+			List<GLchar> infoLog(maxLength);
 			glGetShaderInfoLog(shaderRendererID, maxLength, &maxLength, &infoLog[0]);
 
 			Log::CoreError("Shader compilation failed ({0}):\n{1}", _filepath, &infoLog[0]);
@@ -591,7 +591,7 @@ void OpenGLShader::CompileAndUploadShader()
 		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
 
 		// The maxLength includes the NULL character
-		ArrayList<GLchar> infoLog(maxLength);
+		List<GLchar> infoLog(maxLength);
 		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
 		Log::CoreError("Shader linking failed ({0}):\n{1}", _filepath, &infoLog[0]);
 

@@ -22,9 +22,9 @@ public:
 	Shared<Layer> Front();
 	Shared<Layer> Back();
 
-	ArrayList<Shared<Layer>>::iterator begin() { return _layers.begin(); }
+	List<Shared<Layer>>::iterator begin() { return _layers.begin(); }
 
-	ArrayList<Shared<Layer>>::iterator end() { return _layers.end(); }
+	List<Shared<Layer>>::iterator end() { return _layers.end(); }
 
 public:
 	EventSubscriberList<Shared<Layer>> PushedLayer;
@@ -33,7 +33,7 @@ public:
 	EventSubscriberList<Shared<Layer>> PoppedOverlay;
 
 private:
-	ArrayList<Shared<Layer>> _layers;
+	List<Shared<Layer>> _layers;
 	unsigned int _layerInsertIndex = 0;
 };
 }

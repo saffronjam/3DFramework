@@ -58,7 +58,7 @@ public:
 	// Window attributes
 	void SetTitle(String title);
 	const String& GetTitle() const;
-	void SetWindowIcon(Filepath filepath);
+	void SetWindowIcon(Path filepath);
 	virtual void SetVSync(bool enabled) = 0;
 	virtual bool IsVSync() const = 0;
 
@@ -107,7 +107,7 @@ protected:
 	AntiAliasing _antiAliasing;
 
 private:
-	ArrayList<Shared<Event>> _events;
+	List<Shared<Event>> _events;
 };
 
 template <typename T, typename...Params>

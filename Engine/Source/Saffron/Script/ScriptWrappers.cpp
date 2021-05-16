@@ -6,7 +6,7 @@
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Entity/Entity.h"
-#include "Saffron/Script/ScriptEngineRegistry.h"
+#include "Saffron/Script/ScriptRegistry.h"
 #include "Saffron/Script/ScriptWrappers.h"
 
 namespace Se
@@ -93,15 +93,15 @@ void Saffron_Entity_SetTransform(ulong entityID, Matrix4* inTransform)
 void Saffron_Entity_CreateComponent(ulong entityID, void* type)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
-	MonoType* monoType = mono_reflection_type_get_type(static_cast<MonoReflectionType*>(type));
-	ScriptEngineRegistry::ExecuteCreateComponent(monoType, entity);
+	Mono::Type monoType(static_cast<MonoReflectionType*>(type));
+	ScriptRegistry::Instance().CreateComponent(monoType, entity);
 }
 
 bool Saffron_Entity_HasComponent(ulong entityID, void* type)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
-	MonoType* monoType = mono_reflection_type_get_type(static_cast<MonoReflectionType*>(type));
-	const bool result = ScriptEngineRegistry::ExecuteHasComponent(monoType, entity);
+	const Mono::Type monoType(static_cast<MonoReflectionType*>(type));
+	const bool result = ScriptRegistry::Instance().HasComponent(monoType, entity);
 	return result;
 }
 
@@ -488,7 +488,7 @@ MonoString* Saffron_ScriptComponent_GetModuleName(ulong entityID)
 {
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& scriptComponent = entity.GetComponent<ScriptComponent>();
-	return ScriptEngine::CreateMonoString(scriptComponent.ModuleName);
+	return reinterpret_cast<MonoString*>(Mono::Domain::GetCurrentDomain().CreateString("test").GetInternalPtr());
 }
 
 void Saffron_ScriptComponent_SetModuleName(ulong entityID, MonoString* moduleName)
@@ -496,7 +496,7 @@ void Saffron_ScriptComponent_SetModuleName(ulong entityID, MonoString* moduleNam
 	Debug::Assert(moduleName);
 	Entity entity = GetEntityFromActiveScene(entityID);
 	auto& scriptComponent = entity.GetComponent<ScriptComponent>();
-	scriptComponent.ModuleName = mono_string_to_utf8(moduleName);
+	scriptComponent.Fullname = mono_string_to_utf8(moduleName);
 }
 }
 }

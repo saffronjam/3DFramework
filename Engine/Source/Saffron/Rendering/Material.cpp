@@ -12,7 +12,7 @@ namespace Se
 Material::Material(const Shared<Shader>& shader) :
 	_shader(shader)
 {
-	_shader->Reloaded += SE_BIND_EVENT_FN(Material::OnShaderReloaded);
+	_shader->Reloaded += SE_FUNCTION(Material::OnShaderReloaded);
 
 	AllocateStorage();
 

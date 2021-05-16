@@ -1,23 +1,34 @@
 ﻿#include "SaffronPCH.h"
 
-#include "Saffron/Debug/Instrumentor.h"
+#include "Instrumentor.h"
 
-namespace Se
+#include <iostream>
+#include <ostream>
+#include <sstream>
+#include <iomanip>
+
+#ifndef ENABLE_PROFILE
+static bool wroteErrorMessage = false;
+#endif
+
+void Instrumentor::BeginSession(const std::string& name, const std::string& filepath)
 {
-void Instrumentor::BeginSession(const String& name, const String& filepath)
-{
+#ifndef ENABLE_PROFILE
+	if (!wroteErrorMessage)
+	{
+		std::cerr <<
+			"Tried to start instrumentor session with profiling disabled. Define 'ENABLE_PROFILE' to enable profiling"
+			<< std::endl;
+		wroteErrorMessage = true;
+	}
+	return;
+#endif
+
 	std::lock_guard lock(_mutex);
 	if (_currentSession)
 	{
-		// If there is already a current session, then close it before beginning new one.
-		// Subsequent profiling output meant for the original session will end up in the
-		// newly opened session instead.  That's better than having badly formatted
-		// profiling output.
-		if (Log::IsInitialized()) // Edge case: BeginSession() might be before Log::Init()
-		{
-			Log::CoreError("Instrumentor::BeginSession('{0}') when session '{1}' already open.", name,
-			               _currentSession->Name);
-		}
+		std::cerr << "Tried to start session '" << name << "' when '" << _currentSession->Name << "' was already open."
+			<< std::endl;
 		InternalEndSession();
 	}
 	_outputStream.open(filepath);
@@ -29,10 +40,7 @@ void Instrumentor::BeginSession(const String& name, const String& filepath)
 	}
 	else
 	{
-		if (Log::IsInitialized()) // Edge case: BeginSession() might be before Log::Init()
-		{
-			Log::CoreError("Instrumentor could not open results file '{0}'.", filepath);
-		}
+		std::cerr << "Instrumentor could not open results file '" << filepath << "'." << std::endl;
 	}
 }
 
@@ -44,17 +52,27 @@ void Instrumentor::EndSession()
 
 void Instrumentor::WriteProfile(const ProfileResult& result)
 {
-	OStringStream json;
+#ifndef ENABLE_PROFILE
+	if (!wroteErrorMessage)
+	{
+		std::cerr << "Tried to write profile with profiling disabled. Define 'ENABLE_PROFILE' to enable profiling" <<
+			std::endl;
+		wroteErrorMessage = true;
+	}
+	return;
+#endif
 
-	json << std::setprecision(3) << std::fixed;
+	std::ostringstream json;
+
+	json << std::setprecision(20) << std::fixed;
 	json << R"(,{)";
 	json << R"("cat":"function",)";
-	json << R"("dur":)" << result.ElapsedTime.us() << R"(,)";
+	json << R"("dur":)" << static_cast<double>(result.ElapsedTime.count()) / 1000.0f << R"(,)";
 	json << R"("name":")" << result.Name << R"(",)";
 	json << R"("ph":"X",)";
 	json << R"("pid":0,)";
 	json << R"("tid":)" << result.ThreadID << ",";
-	json << R"("ts":)" << result.Start.time_since_epoch().count();
+	json << R"("ts":)" << static_cast<double>(result.Start.count()) / 1000.0f;
 	json << R"(})";
 
 	std::lock_guard lock(_mutex);
@@ -104,28 +122,68 @@ void Instrumentor::InternalEndSession()
 	}
 }
 
+void Profiler::BeginSession(const std::string& name, const std::string& filepath)
+{
+#ifdef ENABLE_PROFILE
+	Instrumentor::Get().BeginSession(name, filepath);
+#endif
+}
+
+void Profiler::EndSession()
+{
+#ifdef ENABLE_PROFILE
+	Instrumentor::Get().EndSession();
+#endif
+}
+
+void Profiler::Function(const char* functionName)
+{
+#ifdef ENABLE_PROFILE
+	Scope(functionName);
+#endif
+}
+
+InstrumentationTimer Profiler::Scope(const char* name)
+{
+	return InstrumentationTimer(name);
+}
+
 InstrumentationTimer::InstrumentationTimer(const char* name) :
-	Timer(name),
+	_name(name),
 	_stopped(false)
 {
+	_last = std::chrono::high_resolution_clock::now();
 }
 
 InstrumentationTimer::~InstrumentationTimer()
 {
-	if (!_stopped) Stop();
+#ifdef ENABLE_PROFILE
+	if (!_stopped)
+	{
+		Stop();
+	}
+#endif
 }
 
 void InstrumentationTimer::Stop()
 {
+#ifdef ENABLE_PROFILE
 	try
 	{
-		Instrumentor::Get().WriteProfile(ProfileResult{_name, GetStart(), Peek(), std::this_thread::get_id()});
+		using step = std::chrono::nanoseconds;
+
+		const auto endTimepoint = std::chrono::high_resolution_clock::now();
+		const auto highResStart = ProfileResult::Duration{_last.time_since_epoch()};
+		const auto elapsedTime = std::chrono::time_point_cast<step>(endTimepoint).time_since_epoch() -
+			std::chrono::time_point_cast<step>(_last).time_since_epoch();
+
+		Instrumentor::Get().WriteProfile(ProfileResult{_name, highResStart, elapsedTime, std::this_thread::get_id()});
 
 		_stopped = true;
 	}
 	catch (...)
 	{
-		Log::CoreWarn("Failed to stop instrumentor timer");
+		std::cerr << "Failed to stop instrumentor timer" << std::endl;
 	}
-}
+#endif
 }

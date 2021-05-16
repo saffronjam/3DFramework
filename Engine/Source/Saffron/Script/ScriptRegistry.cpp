@@ -1,27 +1,25 @@
 #include "SaffronPCH.h"
 
-#include <mono/jit/jit.h>
+#include <monopp/InternalCall.h>
 
 #include "Saffron/Entity/EntityComponents.h"
 #include "Saffron/Entity/Entity.h"
-#include "Saffron/Script/ScriptEngine.h"
-#include "Saffron/Script/ScriptEngineRegistry.h"
+#include "Saffron/Script/ScriptRegistry.h"
 #include "Saffron/Script/ScriptWrappers.h"
 
 namespace Se
 {
-#define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Se." << #className << "::" << #functionName << "_Native";\
-	mono_add_internal_call(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
+#define ADD_INTERNAL_CALL_MONO(className, functionName) RegisterFunctionBuffer << "Saffron." << #className << "::" << #functionName << "_Native";\
+	Mono::AddInternalCall(RegisterFunctionBuffer.str().c_str(), Script::Saffron_ ## className ## _ ## functionName);\
 	RegisterFunctionBuffer.str("");\
 	RegisterFunctionBuffer.clear();
 
-
-ScriptEngineRegistry::ScriptEngineRegistry() :
+ScriptRegistry::ScriptRegistry() :
 	SingleTon(this)
 {
 }
 
-void ScriptEngineRegistry::RegisterAll()
+void ScriptRegistry::RegisterAll()
 {
 	Instance().RegisterComponents();
 
@@ -108,17 +106,24 @@ void ScriptEngineRegistry::RegisterAll()
 	ADD_INTERNAL_CALL_MONO(SphereCollider3DComponent, SetRadius);
 }
 
-bool ScriptEngineRegistry::ExecuteHasComponent(MonoType* type, Entity& entity)
+auto ScriptRegistry::HasComponent(const Mono::Type& type, Entity& entity) -> bool
 {
-	return Instance()._hasComponentFuncs[type](entity);
+	if (_hasComponentFuncs.find(type) == _hasComponentFuncs.end())
+	{
+		return _hasComponentFuncs[type](entity);
+	}
+	return false;
 }
 
-void ScriptEngineRegistry::ExecuteCreateComponent(MonoType* type, Entity& entity)
+void ScriptRegistry::CreateComponent(const Mono::Type& type, Entity& entity)
 {
-	Instance()._createComponentFuncs[type](entity);
+	if (_createComponentFuncs.find(type) == _createComponentFuncs.end())
+	{
+		_createComponentFuncs[type](entity);
+	}
 }
 
-void ScriptEngineRegistry::RegisterComponents()
+void ScriptRegistry::RegisterComponents()
 {
 	RegisterComponent<TransformComponent>();
 	RegisterComponent<MeshComponent>();

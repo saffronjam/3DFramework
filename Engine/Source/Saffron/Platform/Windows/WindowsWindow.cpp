@@ -56,8 +56,10 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	}
 
 	Log::CoreInfo("Creating Window \"{0}\" ({1:d}x{2:d})", _title, _width, _height);
-
+		
+	Profiler::BeginSession("Test", "results.json");
 	SetupGLFWCallbacks();
+	Profiler::EndSession();
 
 	// Initialization events
 	{
@@ -83,13 +85,13 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	// FIXME: GLFW doesn't have this.
 	_imGuiMouseCursors[ImGuiMouseCursor_Hand] = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
 
-	Resized += SE_BIND_EVENT_FN(WindowsWindow::OnResize);
-	Moved += SE_BIND_EVENT_FN(WindowsWindow::OnMove);
-	GainedFocus += SE_BIND_EVENT_FN(WindowsWindow::OnGainFocus);
-	LostFocus += SE_BIND_EVENT_FN(WindowsWindow::OnLostFocus);
-	Closed += SE_BIND_EVENT_FN(WindowsWindow::OnClose);
-	NewTitle += SE_BIND_EVENT_FN(WindowsWindow::OnNewTitle);
-	NewIcon += SE_BIND_EVENT_FN(WindowsWindow::OnNewIcon);
+	Resized += SE_FUNCTION(WindowsWindow::OnResize);
+	Moved += SE_FUNCTION(WindowsWindow::OnMove);
+	GainedFocus += SE_FUNCTION(WindowsWindow::OnGainFocus);
+	LostFocus += SE_FUNCTION(WindowsWindow::OnLostFocus);
+	Closed += SE_FUNCTION(WindowsWindow::OnClose);
+	NewTitle += SE_FUNCTION(WindowsWindow::OnNewTitle);
+	NewIcon += SE_FUNCTION(WindowsWindow::OnNewIcon);
 }
 
 WindowsWindow::~WindowsWindow()
@@ -256,9 +258,10 @@ bool WindowsWindow::OnNewIcon(const WindowNewIconEvent& event)
 
 void WindowsWindow::SetupGLFWCallbacks()
 {
-	SE_PROFILE_FUNCTION();
+	Profiler::Function(PF_FUNC_SIG);
 
 	glfwSetWindowUserPointer(_nativeWindow, this);
+
 
 	// ----- Keyboard events -----
 	glfwSetKeyCallback(_nativeWindow, [](GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -274,8 +277,8 @@ void WindowsWindow::SetupGLFWCallbacks()
 	{
 		auto* pWnd = static_cast<WindowsWindow*>(glfwGetWindowUserPointer(window));
 		if (action == GLFW_PRESS) pWnd->PushEvent<MouseButtonPressedEvent>(static_cast<MouseButtonCode>(button));
-		else if (action == GLFW_RELEASE)
-			pWnd->PushEvent<MouseButtonReleasedEvent>(static_cast<MouseButtonCode>(button));
+		else if (action == GLFW_RELEASE) pWnd->PushEvent<MouseButtonReleasedEvent
+		>(static_cast<MouseButtonCode>(button));
 	});
 	glfwSetScrollCallback(_nativeWindow, [](GLFWwindow* window, double xoffset, double yoffset)
 	{
@@ -319,7 +322,7 @@ void WindowsWindow::SetupGLFWCallbacks()
 	glfwSetDropCallback(_nativeWindow, [](GLFWwindow* window, int count, const char** paths)
 	{
 		auto* pWnd = static_cast<WindowsWindow*>(glfwGetWindowUserPointer(window));
-		ArrayList<Filepath> filepaths(count);
+		List<Path> filepaths(count);
 		for (int i = 0; i < count; i++)
 		{
 			filepaths[i] = paths[i];

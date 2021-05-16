@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Se
+namespace Saffron
 {
     [StructLayout(LayoutKind.Sequential)]
     public struct Vector2

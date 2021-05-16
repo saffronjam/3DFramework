@@ -28,29 +28,22 @@ public:
 	template <typename T>
 	void RemoveComponent();
 
-	Matrix4& Transform() { return GetComponent<TransformComponent>(); }
+	Matrix4& Transform();
+	const Matrix4& Transform() const;
 
-	const Matrix4& Transform() const { return GetComponent<TransformComponent>(); }
-
-	operator uint() const { return static_cast<uint>(_handle); }
-
-	operator entt::entity() const { return _handle; }
-
-	operator bool() const { return static_cast<uint>(_handle) && _scene; }
+	operator uint() const;
+	operator EntityHandle() const;
+	operator bool() const;
 
 	bool operator==(const Entity& other) const;
 	bool operator!=(const Entity& other) const;
 	bool operator<(const Entity& other) const;
 
-	UUID GetUUID() { return GetComponent<IDComponent>().ID; }
-
+	UUID GetUUID();
 	UUID GetSceneUUID() const;
-
-	Scene* GetScene() { return _scene; }
-
-	const Scene* GetScene() const { return _scene; }
-
-	EntityHandle GetHandle() const { return _handle; }
+	Scene* GetScene();
+	const Scene* GetScene() const;
+	EntityHandle GetHandle() const;
 
 	Entity Copy(Optional<Scene*> separateScene = {});
 

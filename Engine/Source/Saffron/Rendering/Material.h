@@ -55,11 +55,11 @@ private:
 	Buffer& GetUniformBufferTarget(ShaderUniformDeclaration* uniformDeclaration);
 private:
 	Shared<Shader> _shader;
-	UnorderedSet<MaterialInstance*> _materialInstances;
+	HashSet<MaterialInstance*> _materialInstances;
 
 	Buffer _vSUniformStorageBuffer;
 	Buffer _pSUniformStorageBuffer;
-	ArrayList<Shared<Texture>> _textures;
+	List<Shared<Texture>> _textures;
 
 	uint _materialFlags{};
 };
@@ -139,7 +139,7 @@ private:
 
 	Buffer _vSUniformStorageBuffer;
 	Buffer _pSUniformStorageBuffer;
-	ArrayList<Shared<Texture>> _textures;
+	List<Shared<Texture>> _textures;
 
 	// TODO: This is temporary; come up with a proper system to track overrides
 	std::unordered_set<String> _overriddenValues;

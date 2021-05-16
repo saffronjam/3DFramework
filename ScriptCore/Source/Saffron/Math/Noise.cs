@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Se
+namespace Saffron
 {
     public static class Noise
     {

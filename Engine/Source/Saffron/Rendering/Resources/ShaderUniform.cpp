@@ -39,7 +39,7 @@ uint ShaderStruct::GetOffset() const
 	return _offset;
 }
 
-const ArrayList<ShaderUniformDeclaration*>& ShaderStruct::GetFields() const
+const List<ShaderUniformDeclaration*>& ShaderStruct::GetFields() const
 {
 	return _fields;
 }

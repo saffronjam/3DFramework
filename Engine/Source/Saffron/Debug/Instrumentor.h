@@ -1,22 +1,51 @@
 ﻿#pragma once
 
-#include "Saffron/Core/Timer.h"
-#include "Saffron/Core/TypeDefs.h"
+#include <string>
+#include <chrono>
+#include <mutex>
+#include <thread>
+#include <ostream>
+#include <fstream>
 
-namespace Se
-{
+#define ENABLE_PROFILE
+#ifdef ENABLE_PROFILE
+// Resolve which function signature macro will be used
+#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+#define PF_FUNC_SIG __PRETTY_FUNCTION__
+#elif defined(__DMC__) && (__DMC__ >= 0x810)
+#define PF_FUNC_SIG __PRETTY_FUNCTION__
+#elif (defined(__FUNCSIG__) || (_MSC_VER))
+#define PF_FUNC_SIG __FUNCSIG__
+#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+#define PF_FUNC_SIG __FUNCTION__
+#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+#define PF_FUNC_SIG __FUNC__
+#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+#define PF_FUNC_SIG __func__
+#elif defined(__cplusplus) && (__cplusplus >= 201103)
+#define PF_FUNC_SIG __func__
+#else
+#define PF_FUNC_SIG "PF_FUNC_SIG unknown!"
+#endif
+#else
+#define PF_FUNC_SIG ""
+#endif
+
+
 struct ProfileResult
 {
-	String Name;
+	using Duration = std::chrono::duration<double, std::nano>;
 
-	Timer::TimePoint Start;
-	Time ElapsedTime;
-	Thread::id ThreadID;
+	std::string Name;
+
+	Duration Start;
+	std::chrono::nanoseconds ElapsedTime;
+	std::thread::id ThreadID;
 };
 
 struct InstrumentationSession
 {
-	String Name;
+	std::string Name;
 };
 
 class Instrumentor
@@ -25,7 +54,7 @@ public:
 	Instrumentor(const Instrumentor&) = delete;
 	Instrumentor(Instrumentor&&) = delete;
 
-	void BeginSession(const String& name, const String& filepath = "results.json");
+	void BeginSession(const std::string& name, const std::string& filepath = "results.json");
 	void EndSession();
 
 	void WriteProfile(const ProfileResult& result);
@@ -43,13 +72,16 @@ private:
 	void InternalEndSession();
 
 private:
-	Mutex _mutex;
+	std::mutex _mutex;
 	InstrumentationSession* _currentSession;
-	OStream _outputStream;
+	std::ofstream _outputStream;
 };
 
-class InstrumentationTimer : public Timer
+
+class InstrumentationTimer
 {
+	using TimePoint = std::chrono::time_point<std::chrono::high_resolution_clock>;
+
 public:
 	explicit InstrumentationTimer(const char* name);
 	~InstrumentationTimer();
@@ -57,71 +89,18 @@ public:
 	void Stop();
 
 private:
+	const char* _name;
+	TimePoint _last;
 	bool _stopped;
 };
 
-namespace InstrumentorUtils
+class Profiler
 {
-template <size_t N>
-struct ChangeResult
-{
-	char Data[N];
+public:
+	static void BeginSession(const std::string& name, const std::string& filepath = "results.json");
+	static void EndSession();
+
+	// Use PF_FUNC_SIG to generate function name automatically
+	static void Function(const char* functionName);
+	static InstrumentationTimer Scope(const char* name);
 };
-
-template <size_t N, size_t K>
-constexpr auto CleanupOutputString(const char (&expr)[N], const char (&remove)[K])
-{
-	ChangeResult<N> result = {};
-
-	size_t srcIndex = 0;
-	size_t dstIndex = 0;
-	while (srcIndex < N)
-	{
-		size_t matchIndex = 0;
-		while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex])
-			matchIndex++;
-		if (matchIndex == K - 1) srcIndex += matchIndex;
-		result.Data[dstIndex++] = expr[srcIndex] == '"' ? '\'' : expr[srcIndex];
-		srcIndex++;
-	}
-	return result;
-}
-}
-}
-
-#define SE_PROFILE 1
-#if SE_PROFILE
-// Resolve which function signature macro will be used. Note that this only
-// is resolved when the (pre)compiler starts, so the syntax highlighting
-// could mark the wrong one in your editor!
-#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
-#define SE_FUNC_SIG __PRETTY_FUNCTION__
-#elif defined(__DMC__) && (__DMC__ >= 0x810)
-#define SE_FUNC_SIG __PRETTY_FUNCTION__
-#elif (defined(__FUNCSIG__) || (_MSC_VER))
-#define SE_FUNC_SIG __FUNCSIG__
-#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
-#define SE_FUNC_SIG __FUNCTION__
-#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
-#define SE_FUNC_SIG __FUNC__
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
-#define SE_FUNC_SIG __func__
-#elif defined(__cplusplus) && (__cplusplus >= 201103)
-#define SE_FUNC_SIG __func__
-#else
-#define SE_FUNC_SIG "SE_FUNC_SIG unknown!"
-#endif
-
-#define SE_PROFILE_BEGIN_SESSION(name, filepath) ::Se::Instrumentor::Instance().BeginSession(name, filepath)
-#define SE_PROFILE_END_SESSION() ::Se::Instrumentor::Instance().EndSession()
-#define SE_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Se::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-											   ::Se::InstrumentationTimer timer##line(fixedName##line.Data)
-#define SE_PROFILE_SCOPE_LINE(name, line) SE_PROFILE_SCOPE_LINE2(name, line)
-#define SE_PROFILE_SCOPE(name) SE_PROFILE_SCOPE_LINE(name, __LINE__)
-#define SE_PROFILE_FUNCTION() SE_PROFILE_SCOPE(SE_FUNC_SIG)
-#else
-#define SE_PROFILE_BEGIN_SESSION(name, filepath)
-#define SE_PROFILE_END_SESSION()
-#define SE_PROFILE_SCOPE(name)
-#define SE_PROFILE_FUNCTION()
-#endif

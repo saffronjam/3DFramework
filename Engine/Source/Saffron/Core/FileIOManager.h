@@ -14,7 +14,7 @@ public:
 	struct Filter
 	{
 		String Description;
-		ArrayList<String> Extensions{};
+		List<String> Extensions{};
 
 		static Filter Empty();
 
@@ -25,7 +25,7 @@ public:
 		{
 		}
 
-		Filter(String description, ArrayList<String> extensions) :
+		Filter(String description, List<String> extensions) :
 			Description(Move(description)),
 			Extensions(Move(extensions))
 		{
@@ -36,24 +36,24 @@ public:
 	explicit FileIOManager(const Shared<Window>& window);
 
 	// Implemented per platform
-	static Filepath OpenFile(const Filter& filter = Filter::Empty());
-	static Filepath SaveFile(const Filter& filter = Filter::Empty());
+	static Path OpenFile(const Filter& filter = Filter::Empty());
+	static Path SaveFile(const Filter& filter = Filter::Empty());
 
-	static ArrayList<DirectoryEntry> GetFiles(const Filepath& directoryPath, const String& extension = "");
-	static size_t GetFileCount(const Filepath& directoryPath, const String& extension = "");
-	static size_t GetFileSize(const Filepath& filepath);
+	static List<DirEntry> GetFiles(const Path& directoryPath, const String& extension = "");
+	static size_t GetFileCount(const Path& directoryPath, const String& extension = "");
+	static size_t GetFileSize(const Path& filepath);
 
-	static size_t Write(const uchar* data, size_t size, const Filepath& filepath, bool overwrite = true);
-	static size_t Write(Buffer buffer, const Filepath& filepath, bool overwrite = true);
+	static size_t Write(const uchar* data, size_t size, const Path& filepath, bool overwrite = true);
+	static size_t Write(Buffer buffer, const Path& filepath, bool overwrite = true);
 
-	static bool CreateDirectories(const Filepath& filepath);
+	static bool CreateDirectories(const Path& filepath);
 
-	static bool FileExists(const Filepath& filepath);
+	static bool FileExists(const Path& filepath);
 
-	static bool Copy(const Filepath& source, const Filepath& destination);
+	static bool Copy(const Path& source, const Path& destination);
 
-	static size_t Read(const Filepath& filepath, OStringStream& destination);
-	static ArrayList<char> ReadBinary(const Filepath& filepath);
+	static size_t Read(const Path& filepath, OStringStream& destination);
+	static List<char> ReadBinary(const Path& filepath);
 
 private:
 	const Shared<Window>& _window;

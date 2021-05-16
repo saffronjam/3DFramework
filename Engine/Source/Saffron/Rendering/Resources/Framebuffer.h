@@ -38,7 +38,7 @@ struct FramebufferAttachmentSpecification
 	FramebufferAttachmentSpecification() = default;
 	FramebufferAttachmentSpecification(const InitializerList<FramebufferTextureSpecification>& attachments);
 
-	ArrayList<FramebufferTextureSpecification> Attachments;
+	List<FramebufferTextureSpecification> Attachments;
 };
 
 struct FramebufferSpecification
@@ -93,14 +93,14 @@ public:
 	Weak<Framebuffer> AllocateBuffer();
 	void Add(const Shared<Framebuffer>& framebuffer);
 
-	ArrayList<Shared<Framebuffer>>& GetAll() { return _pool; }
+	List<Shared<Framebuffer>>& GetAll() { return _pool; }
 
-	const ArrayList<Shared<Framebuffer>>& GetAll() const { return _pool; }
+	const List<Shared<Framebuffer>>& GetAll() const { return _pool; }
 
 	static FramebufferPool* GetGlobal() { return s_Instance; }
 
 private:
-	ArrayList<Shared<Framebuffer>> _pool;
+	List<Shared<Framebuffer>> _pool;
 
 	static FramebufferPool* s_Instance;
 };

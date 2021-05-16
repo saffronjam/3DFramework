@@ -57,19 +57,19 @@ public:
 
 	virtual bool Loaded() const = 0;
 
-	virtual const Filepath& GetFilepath() const = 0;
+	virtual const Path& GetFilepath() const = 0;
 
 	static Shared<Texture2D> Create(TextureFormat format, uint width, uint height,
 	                                TextureWrap wrap = TextureWrap::Clamp);
-	static Shared<Texture2D> Create(Filepath filepath, bool sRGB = false);
+	static Shared<Texture2D> Create(Path filepath, bool sRGB = false);
 };
 
 class TextureCube : public Texture
 {
 public:
-	virtual const Filepath& GetFilepath() const = 0;
+	virtual const Path& GetFilepath() const = 0;
 
 	static Shared<TextureCube> Create(TextureFormat format, uint width, uint height);
-	static Shared<TextureCube> Create(Filepath filepath);
+	static Shared<TextureCube> Create(Path filepath);
 };
 }

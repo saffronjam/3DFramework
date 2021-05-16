@@ -2,10 +2,11 @@
 
 #include <yaml-cpp/yaml.h>
 
-#include "Saffron/Math/SaffronMath.h"
+#include "Saffron/Core/GenUtils.h"
 #include "Saffron/Core/Misc.h"
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Entity/EntityComponents.h"
+#include "Saffron/Math/SaffronMath.h"
 #include "Saffron/Serialize/SceneSerializer.h"
 #include "Saffron/Serialize/SerializeHelpers.h"
 #include "Saffron/Script/ScriptEngine.h"
@@ -33,7 +34,7 @@ SceneSerializer::SceneSerializer(Scene& scene) :
 {
 }
 
-void SceneSerializer::Serialize(const Filepath& filepath) const
+void SceneSerializer::Serialize(const Path& filepath) const
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
@@ -57,13 +58,13 @@ void SceneSerializer::Serialize(const Filepath& filepath) const
 	fout << out.c_str();
 }
 
-void SceneSerializer::SerializeRuntime(const Filepath& filepath) const
+void SceneSerializer::SerializeRuntime(const Path& filepath) const
 {
 	// TODO: Implement
 	Debug::Assert(false);;
 }
 
-bool SceneSerializer::Deserialize(const Filepath& filepath)
+bool SceneSerializer::Deserialize(const Path& filepath)
 {
 	IStream stream(filepath);
 	OStringStream strStream;
@@ -157,52 +158,63 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 						for (auto field : storedFields)
 						{
 							// TODO: Look over overwritten variables
-							auto name = field["Name"].as<String>();
-							FieldType type = static_cast<FieldType>(field["Type"].as<uint>());
-							EntityInstance& instance = ScriptEngine::GetEntityInstance(_scene.GetUUID(), uuid);
-							auto& moduleFieldMap = instance.ModuleFieldMap;
-							auto& publicFields = moduleFieldMap[moduleName];
-							if (publicFields.find(name) == publicFields.end())
+							auto fieldName = field["Name"].as<String>();
+							auto type = static_cast<Mono::FieldType>(field["Type"].as<int>());
+
+							auto split = GenUtils::SplitString(moduleName, ".");
+							if (split.size() > 2)
 							{
-								PublicField pf = {name, type};
-								publicFields.emplace(name, Move(pf));
+								Log::CoreWarn("Invalid module name from file: {}", moduleName);
+								continue;
+							}
+							const auto namespaceName = split.size() == 1 ? "" : Move(split[0]);
+							const auto className = split.size() == 1 ? Move(split[0]) : Move(split[1]);
+
+							auto& fields = ScriptEngine::Instance().GetFieldMap(namespaceName, className);
+							const auto it = std::find_if(fields.begin(), fields.end(), [&fieldName](const Field& lField)
+							{
+								return lField.GetMonoField().GetName() == fieldName;
+							});
+							if (it == fields.end())
+							{
+								continue;
 							}
 							auto dataNode = field["Data"];
 							switch (type)
 							{
-							case FieldType::Float:
+							case Mono::FieldType::Float:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<float>());
+								it->SetStoredValue(dataNode.as<float>());
 								break;
 							}
-							case FieldType::Int:
+							case Mono::FieldType::Int:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<int>());
+								it->SetStoredValue(dataNode.as<int>());
 								break;
 							}
-							case FieldType::Uint:
+							case Mono::FieldType::Uint:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<uint32_t>());
+								it->SetStoredValue(dataNode.as<uint>());
 								break;
 							}
-							case FieldType::String:
+							case Mono::FieldType::String:
 							{
-								Debug::Break("Unimplemented");
+								Debug::Break("Not implemented");
 								break;
 							}
-							case FieldType::Vec2:
+							case Mono::FieldType::Vec2:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector2>());
+								it->SetStoredValue(dataNode.as<Vector2>());
 								break;
 							}
-							case FieldType::Vec3:
+							case Mono::FieldType::Vec3:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector3>());
+								it->SetStoredValue(dataNode.as<Vector3>());
 								break;
 							}
-							case FieldType::Vec4:
+							case Mono::FieldType::Vec4:
 							{
-								publicFields.at(name).SetStoredValue(dataNode.as<Vector4>());
+								it->SetStoredValue(dataNode.as<Vector4>());
 								break;
 							}
 							default: break;
@@ -251,7 +263,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 			auto skyLightComponent = entity["SkylightComponent"];
 			if (skyLightComponent)
 			{
-				Filepath environmentFilepath = skyLightComponent["EnvironmentAssetPath"].as<String>();
+				Path environmentFilepath = skyLightComponent["EnvironmentAssetPath"].as<String>();
 				auto& component = deserializedEntity.AddComponent<SkylightComponent>(
 					SceneEnvironment::Create(environmentFilepath));
 				component.Intensity = skyLightComponent["Intensity"].as<float>();
@@ -357,7 +369,7 @@ bool SceneSerializer::Deserialize(const Filepath& filepath)
 	return true;
 }
 
-bool SceneSerializer::DeserializeRuntime(const Filepath& filepath)
+bool SceneSerializer::DeserializeRuntime(const Path& filepath)
 {
 	// Not implemented
 	Debug::Assert(false);;
@@ -385,43 +397,43 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity) con
 		END_YAML_COMPONENT_MAP();
 
 	BEGIN_YAML_COMPONENT_MAP(ScriptComponent);
-		auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
+		auto& moduleName = entity.GetComponent<ScriptComponent>().Fullname;
 		emitter << YAML::Key << "ModuleName" << YAML::Value << moduleName;
 
-		EntityInstance& instance = ScriptEngine::GetEntityInstance(entity.GetSceneUUID(), uuid);
-		const auto& moduleFieldMap = instance.ModuleFieldMap;
-		if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
-		{
-			const auto& fields = moduleFieldMap.at(moduleName);
-			emitter << YAML::Key << "StoredFields" << YAML::Value;
-			emitter << YAML::BeginSeq;
-			for (const auto& [name, field] : fields)
-			{
-				emitter << YAML::BeginMap; // Field
-				emitter << YAML::Key << "Name" << YAML::Value << name;
-				emitter << YAML::Key << "Type" << YAML::Value << static_cast<uint32_t>(field.Type);
-				emitter << YAML::Key << "Data" << YAML::Value;
+		//ScriptEntityInstance& instance = ScriptEngine::GetScriptEntity(entity.GetSceneUUID(), uuid);
+		//const auto& moduleFieldMap = instance.ModuleFieldMap;
+		//if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
+		//{
+		//	const auto& fields = moduleFieldMap.at(moduleName);
+		//	emitter << YAML::Key << "StoredFields" << YAML::Value;
+		//	emitter << YAML::BeginSeq;
+		//	for (const auto& [name, field] : fields)
+		//	{
+		//		emitter << YAML::BeginMap; // Field
+		//		emitter << YAML::Key << "Name" << YAML::Value << name;
+		//		emitter << YAML::Key << "Type" << YAML::Value << static_cast<uint32_t>(field.Type);
+		//		emitter << YAML::Key << "Data" << YAML::Value;
 
-				switch (field.Type)
-				{
-				case FieldType::Int: emitter << field.GetStoredValue<int>();
-					break;
-				case FieldType::Uint: emitter << field.GetStoredValue<uint32_t>();
-					break;
-				case FieldType::Float: emitter << field.GetStoredValue<float>();
-					break;
-				case FieldType::Vec2: emitter << field.GetStoredValue<Vector2>();
-					break;
-				case FieldType::Vec3: emitter << field.GetStoredValue<Vector3>();
-					break;
-				case FieldType::Vec4: emitter << field.GetStoredValue<Vector4>();
-					break;
-				default: emitter << "Invalid value";
-				}
-				emitter << YAML::EndMap; // Field
-			}
-			emitter << YAML::EndSeq;
-		}
+		//		switch (field.Type)
+		//		{
+		//		case FieldType::Int: emitter << field.GetStoredValue<int>();
+		//			break;
+		//		case FieldType::Uint: emitter << field.GetStoredValue<uint32_t>();
+		//			break;
+		//		case FieldType::Float: emitter << field.GetStoredValue<float>();
+		//			break;
+		//		case FieldType::Vec2: emitter << field.GetStoredValue<Vector2>();
+		//			break;
+		//		case FieldType::Vec3: emitter << field.GetStoredValue<Vector3>();
+		//			break;
+		//		case FieldType::Vec4: emitter << field.GetStoredValue<Vector4>();
+		//			break;
+		//		default: emitter << "Invalid value";
+		//		}
+		//		emitter << YAML::EndMap; // Field
+		//	}
+		//	emitter << YAML::EndSeq;
+		//}
 		END_YAML_COMPONENT_MAP();
 
 	BEGIN_YAML_COMPONENT_MAP(MeshComponent);
@@ -465,8 +477,8 @@ void SceneSerializer::SerializeEntity(YAML::Emitter& emitter, Entity entity) con
 	BEGIN_YAML_COMPONENT_MAP(SpriteRendererComponent);
 		auto& spriteRendererComponent = entity.GetComponent<SpriteRendererComponent>();
 		emitter << YAML::Key << "Color" << YAML::Value << spriteRendererComponent.Color;
-		if (spriteRendererComponent.Texture)
-			emitter << YAML::Key << "TextureAssetPath" << YAML::Value << "path/to/asset";
+		if (spriteRendererComponent.Texture) emitter << YAML::Key << "TextureAssetPath" << YAML::Value <<
+			"path/to/asset";
 		emitter << YAML::Key << "TilingFactor" << YAML::Value << spriteRendererComponent.TilingFactor;
 		END_YAML_COMPONENT_MAP();
 

@@ -12,18 +12,18 @@ public:
 		String Full;
 		String Namespace;
 		String Class;
-		Filepath Path;
+		Path Filepath;
 
-		ScriptStat(String namespaceName, String className, Filepath path) :
+		ScriptStat(String namespaceName, String className, Path path) :
 			Full(namespaceName + className),
 			Namespace(Move(namespaceName)),
 			Class(Move(className)),
-			Path(Move(path))
+			Filepath(Move(path))
 		{
 		}
 
 		ScriptStat(const ScriptStat& stat) :
-			ScriptStat(stat.Namespace, stat.Class, stat.Path)
+			ScriptStat(stat.Namespace, stat.Class, stat.Filepath)
 		{
 		}
 	};
@@ -36,18 +36,18 @@ public:
 
 public:
 	ScriptPanel() = default;
-	ScriptPanel(Filepath path);
+	ScriptPanel(Path path);
 
 	void OnGuiRender();
 	void SyncScriptPaths();
 
-	void SetAssetFolderpath(Filepath folderpath) { _scriptFolderPath = Move(folderpath); }
+	void SetAssetFolderpath(Path folderpath) { _scriptFolderPath = Move(folderpath); }
 
-	const ArrayList<ScriptStat>& GetScriptStats() const { return _scriptStats; }
+	const List<ScriptStat>& GetScriptStats() const { return _scriptStats; }
 
 private:
-	Filepath _scriptFolderPath;
-	ArrayList<ScriptStat> _scriptStats;
+	Path _scriptFolderPath;
+	List<ScriptStat> _scriptStats;
 	Mutex _filepathMutex;
 };
 }

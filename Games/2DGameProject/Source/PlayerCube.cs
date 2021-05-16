@@ -3,25 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Se;
+using Saffron;
 
 namespace Script
 {
-    class PlayerCube : Entity
+    public class PlayerCube : Entity
     {
         public float HorizontalForce = 10.0f;
         public float JumpForce = 10.0f;
+        public Vector2 TestVec = new Vector2(1);
 
         private RigidBody2DComponent m_PhysicsBody;
         private MaterialInstance m_MeshMaterial;
 
-        int m_CollisionCounter = 0;
+        private int m_CollisionCounter = 0;
 
         public Vector2 MaxSpeed = new Vector2();
 
         private bool Colliding => m_CollisionCounter > 0;
 
-        void OnCreate()
+        public override void OnCreate()
         {
             m_PhysicsBody = GetComponent<RigidBody2DComponent>();
 
@@ -29,21 +30,23 @@ namespace Script
             m_MeshMaterial = meshComponent.Mesh.GetMaterial(0);
             m_MeshMaterial.Set("u_Metalness", 0.0f);
 
+            m_MeshMaterial.Set("u_AlbedoColor", new Vector3(1.0f, 0.0f, 0.0f));
+
             AddCollision2DBeginCallback(OnPlayerCollisionBegin);
             AddCollision2DEndCallback(OnPlayerCollisionEnd);
         }
 
-        void OnPlayerCollisionBegin(float value)
+        public void OnPlayerCollisionBegin(float value)
         {
             m_CollisionCounter++;
         }
 
-        void OnPlayerCollisionEnd(float value)
+        public void OnPlayerCollisionEnd(float value)
         {
             m_CollisionCounter--;
         }
 
-        void OnUpdate(float ts)
+        public override void OnUpdate(float dt)
         {
             var movementForce = HorizontalForce;
 

@@ -11,8 +11,8 @@ class EditorSerializer
 public:
 	EditorSerializer(Layer& editorLayer);
 
-	void Serialize(const Filepath& filepath) const;
-	bool Deserialize(const Filepath& filepath);
+	void Serialize(const Path& filepath) const;
+	bool Deserialize(const Path& filepath);
 
 private:
 	Layer& _editorLayer;

@@ -37,7 +37,7 @@ protected:
 	virtual void SetOffset(uint offset) = 0;
 };
 
-using ShaderUniformList = ArrayList<ShaderUniformDeclaration*>;
+using ShaderUniformList = List<ShaderUniformDeclaration*>;
 
 /////////////////////////////////////////
 /// Shader Uniform Buffer Declaration ///
@@ -54,7 +54,7 @@ public:
 	virtual ShaderUniformDeclaration* FindUniform(const String& name) = 0;
 };
 
-using ShaderUniformBufferList = ArrayList<ShaderUniformBufferDeclaration*>;
+using ShaderUniformBufferList = List<ShaderUniformBufferDeclaration*>;
 
 /////////////////////
 /// Shader struct ///
@@ -67,7 +67,7 @@ private:
 
 private:
 	String _name;
-	ArrayList<ShaderUniformDeclaration*> _fields;
+	List<ShaderUniformDeclaration*> _fields;
 	uint _size;
 	uint _offset;
 
@@ -79,11 +79,11 @@ public:
 	const String& GetName() const;
 	uint GetSize() const;
 	uint GetOffset() const;
-	const ArrayList<ShaderUniformDeclaration*>& GetFields() const;
+	const List<ShaderUniformDeclaration*>& GetFields() const;
 	void SetOffset(uint offset);
 };
 
-using ShaderStructList = ArrayList<ShaderStruct*>;
+using ShaderStructList = List<ShaderStruct*>;
 
 ///////////////////////////////////
 /// Shader Resource UniformDecl ///
@@ -99,5 +99,5 @@ public:
 	virtual uint GetCount() const = 0;
 };
 
-using ShaderResourceList = ArrayList<ShaderResourceDeclaration*>;
+using ShaderResourceList = List<ShaderResourceDeclaration*>;
 }

@@ -18,6 +18,6 @@ protected:
 
 private:
 	ImGuiTextBuffer _textBuffer;
-	ArrayList<int> _lineOffsets;
+	List<int> _lineOffsets;
 };
 }

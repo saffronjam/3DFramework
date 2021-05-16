@@ -6,7 +6,7 @@
 
 namespace Se
 {
-SceneEnvironment::SceneEnvironment(Filepath filepath, const Shared<TextureCube>& radianceMap,
+SceneEnvironment::SceneEnvironment(Path filepath, const Shared<TextureCube>& radianceMap,
                                    const Shared<TextureCube>& irradianceMap) :
 	_filePath(Move(filepath)),
 	_radianceMap(radianceMap),
@@ -15,7 +15,7 @@ SceneEnvironment::SceneEnvironment(Filepath filepath, const Shared<TextureCube>&
 {
 }
 
-const Filepath& SceneEnvironment::GetFilepath() const
+const Path& SceneEnvironment::GetFilepath() const
 {
 	return _filePath;
 }
@@ -45,9 +45,9 @@ ulong SceneEnvironment::GetResourceID() const
 	return HashFilepath(_filePath);
 }
 
-Shared<SceneEnvironment> SceneEnvironment::Create(Filepath filepath)
+Shared<SceneEnvironment> SceneEnvironment::Create(Path filepath)
 {
-	const Filepath fullFilepath = SceneEnvsFolder + Move(filepath).string();
+	const Path fullFilepath = SceneEnvsFolder + Move(filepath).string();
 
 	const ulong filepathHash = HashFilepath(fullFilepath);
 	if (ResourceManager::Contains(filepathHash))

@@ -142,7 +142,7 @@ void SceneRenderer::SubmitSelectedMesh(Shared<Mesh> mesh, const Matrix4& transfo
 
 static Shared<Shader> equirectangularConversionShader, envFilteringShader, envIrradianceShader;
 
-Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Filepath& filepath)
+Shared<SceneEnvironment> SceneRenderer::CreateEnvironmentMap(const Path& filepath)
 {
 	const uint cubemapSize = 2048;
 	const uint irradianceMapSize = 32;
@@ -218,9 +218,9 @@ void SceneRenderer::ResetDrawContainer()
 {
 	auto& drawContainer = Instance()._drawContainer;
 	drawContainer.clear();
-	drawContainer.insert(CreatePair(RenderChannel::Main, ArrayList<DrawCommand>{}));
-	drawContainer.insert(CreatePair(RenderChannel::Shadow, ArrayList<DrawCommand>{}));
-	drawContainer.insert(CreatePair(RenderChannel::Outline, ArrayList<DrawCommand>{}));
+	drawContainer.insert(CreatePair(RenderChannel::Main, List<DrawCommand>{}));
+	drawContainer.insert(CreatePair(RenderChannel::Shadow, List<DrawCommand>{}));
+	drawContainer.insert(CreatePair(RenderChannel::Outline, List<DrawCommand>{}));
 }
 
 const Shared<Texture2D>& SceneRenderer::GetFinalColorBuffer()
@@ -256,7 +256,7 @@ SceneRendererOptions& SceneRenderer::GetOptions()
 	return Instance()._options;
 }
 
-ArrayList<DrawCommand>& SceneRenderer::GetDrawCommands(RenderChannel channel)
+List<DrawCommand>& SceneRenderer::GetDrawCommands(RenderChannel channel)
 {
 	return Instance()._drawContainer.at(channel);
 }

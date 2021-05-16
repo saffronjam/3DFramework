@@ -12,18 +12,18 @@ public:
 		String Full;
 		String Stem;
 		String Type;
-		Filepath Path;
+		Path Filepath;
 
-		AssetStat(String stem, String type, Filepath path) :
+		AssetStat(String stem, String type, Path path) :
 			Full(stem + type),
 			Stem(Move(stem)),
 			Type(Move(type)),
-			Path(Move(path))
+			Filepath(Move(path))
 		{
 		}
 
 		AssetStat(const AssetStat& stat) :
-			AssetStat(stat.Stem, stat.Type, stat.Path)
+			AssetStat(stat.Stem, stat.Type, stat.Filepath)
 		{
 		}
 	};
@@ -36,18 +36,18 @@ public:
 
 public:
 	AssetPanel() = default;
-	AssetPanel(Filepath path);
+	AssetPanel(Path path);
 
 	void OnGuiRender();
 	void SyncAssetPaths();
 
-	void SetAssetFolderpath(Filepath folderpath) { _assetFolderPath = Move(folderpath); }
+	void SetAssetFolderpath(Path folderpath) { _assetFolderPath = Move(folderpath); }
 
-	const ArrayList<AssetStat>& GetAssetStats() const { return _assetStats; }
+	const List<AssetStat>& GetAssetStats() const { return _assetStats; }
 
 private:
-	Filepath _assetFolderPath;
-	ArrayList<AssetStat> _assetStats;
+	Path _assetFolderPath;
+	List<AssetStat> _assetStats;
 	Mutex _filepathMutex;
 };
 }

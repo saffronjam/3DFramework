@@ -11,12 +11,12 @@ class Project : public Managed
 {
 	friend class ProjectSerializer;
 public:
-	explicit Project(Filepath filepath);
-	Project(String name, DateTime lastOpened, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths);
+	explicit Project(Path filepath);
+	Project(String name, DateTime lastOpened, Path projectFilepath, List<Path> sceneFilepaths);
 	
 	bool operator==(const Project& rhs) const { return _uuid == rhs._uuid; }
 
-	const Filepath& AddScene(Filepath filepath);
+	const Path& AddScene(Path filepath);
 	const Shared<EditorScene>& AddCachedScene(const Shared<EditorScene>& editorScene);
 
 	const DateTime& LastOpened() const { return _lastOpened; }
@@ -27,32 +27,32 @@ public:
 
 	const String& GetName() const { return _name; }
 
-	const Filepath& GetProjectFolderpath() const { return _projectFolderpath; }
+	const Path& GetProjectFolderpath() const { return _projectFolderpath; }
 
-	const Filepath& GetProjectFilepath() const { return _projectFilepath; }
+	const Path& GetProjectFilepath() const { return _projectFilepath; }
 
-	const ArrayList<Filepath>& GetSceneFilepaths() const { return _sceneFilepaths; }
+	const List<Path>& GetSceneFilepaths() const { return _sceneFilepaths; }
 
-	const ArrayList<Shared<EditorScene>>& GetSceneCache() const;
-	const Filepath GetFullSceneFilepath(const Filepath& relativeFilepath);
-	Optional<Shared<EditorScene>> GetCachedScene(const Filepath& filepath);
+	const List<Shared<EditorScene>>& GetSceneCache() const;
+	const Path GetFullSceneFilepath(const Path& relativeFilepath);
+	Optional<Shared<EditorScene>> GetCachedScene(const Path& filepath);
 
 	bool IsValid() const;
-	bool IsValidSceneFilepath(const Filepath& filepath);
-	static bool IsValidProjectFilepath(const Filepath& filepath);
+	bool IsValidSceneFilepath(const Path& filepath);
+	static bool IsValidProjectFilepath(const Path& filepath);
 
 private:
-	Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFolderpath, Filepath projectFilepath,
-	        ArrayList<Filepath> sceneFilepaths);
+	Project(UUID uuid, String name, DateTime lastOpened, Path projectFolderpath, Path projectFilepath,
+	        List<Path> sceneFilepaths);
 
 private:
 	UUID _uuid;
 	String _name;
 	DateTime _lastOpened;
 
-	Filepath _projectFolderpath;
-	Filepath _projectFilepath;
-	ArrayList<Filepath> _sceneFilepaths;
-	ArrayList<Shared<EditorScene>> _sceneCache;
+	Path _projectFolderpath;
+	Path _projectFilepath;
+	List<Path> _sceneFilepaths;
+	List<Shared<EditorScene>> _sceneCache;
 };
 }

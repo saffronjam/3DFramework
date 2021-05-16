@@ -67,38 +67,38 @@ struct MeshComponent
 
 struct ScriptComponent
 {
-	String ModuleName;
 	String NamespaceName;
-	String ClassName;
+	String Name;
+	String Fullname;
 
 	ScriptComponent() = default;
 	ScriptComponent(const ScriptComponent& other) = default;
 
 	explicit ScriptComponent(String moduleName) :
-		ModuleName(Move(moduleName))
+		Fullname(Move(moduleName))
 	{
-		if (ModuleName.find('.') != String::npos)
+		if (Fullname.find('.') != String::npos)
 		{
-			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
-			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
+			NamespaceName = Fullname.substr(0, Fullname.find_last_of('.'));
+			Name = Fullname.substr(Fullname.find_last_of('.') + 1);
 		}
 		else
 		{
-			ClassName = ModuleName;
+			Name = Fullname;
 		}
 	}
 
 	void ChangeModule(String moduleName)
 	{
-		ModuleName = Move(moduleName);
-		if (ModuleName.find('.') != String::npos)
+		Fullname = Move(moduleName);
+		if (Fullname.find('.') != String::npos)
 		{
-			NamespaceName = ModuleName.substr(0, ModuleName.find_last_of('.'));
-			ClassName = ModuleName.substr(ModuleName.find_last_of('.') + 1);
+			NamespaceName = Fullname.substr(0, Fullname.find_last_of('.'));
+			Name = Fullname.substr(Fullname.find_last_of('.') + 1);
 		}
 		else
 		{
-			ClassName = ModuleName;
+			Name = Fullname;
 		}
 	}
 };

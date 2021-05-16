@@ -115,9 +115,9 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			return false;
 		};
 
-		_scenePanel->EntityDeleted += SE_BIND_EVENT_FN(OnEntityDeleted);
-		_scenePanel->EntityCopied += SE_BIND_EVENT_FN(OnEntityCopied);
-		_scenePanel->ViewInModelSpace += SE_BIND_EVENT_FN(EditorLayer::OnNewModelSpaceView);
+		_scenePanel->EntityDeleted += SE_FUNCTION(OnEntityDeleted);
+		_scenePanel->EntityCopied += SE_FUNCTION(OnEntityCopied);
+		_scenePanel->ViewInModelSpace += SE_FUNCTION(EditorLayer::OnNewModelSpaceView);
 		_scenePanel->NewSelection += [this](Entity entity)
 		{
 			OnEntityUnselected(_selectedEntity);
@@ -125,9 +125,9 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			return false;
 		};
 
-		Keyboard::Pressed += SE_BIND_EVENT_FN(EditorLayer::OnKeyboardPress);
-		Mouse::ButtonPressed += SE_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed);
-		App::Instance().GetWindow().DroppedFiles += SE_BIND_EVENT_FN(EditorLayer::OnWindowDropFiles);
+		Keyboard::Pressed += SE_FUNCTION(EditorLayer::OnKeyboardPress);
+		Mouse::ButtonPressed += SE_FUNCTION(EditorLayer::OnMouseButtonPressed);
+		App::Instance().GetWindow().DroppedFiles += SE_FUNCTION(EditorLayer::OnWindowDropFiles);
 	}, "Setting Up System Callbacks");
 }
 
@@ -295,7 +295,7 @@ bool EditorLayer::OnMouseButtonPressed(const MouseButtonPressedEvent& event)
 				float Distance = 0.0f;
 			};
 
-			ArrayList<Selection> selections;
+			List<Selection> selections;
 			auto raycast = [&selections, &rayResult](Entity entity, const Shared<Mesh>& mesh)
 			{
 				const auto& submeshes = mesh->GetSubmeshes();
@@ -380,7 +380,7 @@ bool EditorLayer::OnWindowDropFiles(const WindowDroppedFilesEvent& event)
 
 void EditorLayer::PromptNewScene()
 {
-	const Filepath filepath = FileIOManager::SaveFile({"Saffron Scene (*.ssc)", {"*.ssc"}});
+	const Path filepath = FileIOManager::SaveFile({"Saffron Scene (*.ssc)", {"*.ssc"}});
 
 	if (!filepath.empty())
 	{
@@ -406,12 +406,12 @@ void EditorLayer::PromptNewScene()
 
 void EditorLayer::PromptNewProject()
 {
-	const Filepath filepath = FileIOManager::SaveFile({"Saffron Scene (*.spr)", {"*.spr"}});
+	const Path filepath = FileIOManager::SaveFile({"Saffron Scene (*.spr)", {"*.spr"}});
 }
 
 void EditorLayer::PromptImportScene()
 {
-	const Filepath filepath = FileIOManager::OpenFile({"Saffron Scene (*.ssc)", {"*.ssc"}});
+	const Path filepath = FileIOManager::OpenFile({"Saffron Scene (*.ssc)", {"*.ssc"}});
 	if (Scene::IsValidFilepath(filepath))
 	{
 		const auto& retFilepath = _project->AddScene(Move(filepath));
@@ -421,7 +421,7 @@ void EditorLayer::PromptImportScene()
 
 void EditorLayer::PromptOpenProject()
 {
-	const Filepath filepath = FileIOManager::OpenFile({"Saffron Scene (*.spr)", {"*.spr"}});
+	const Path filepath = FileIOManager::OpenFile({"Saffron Scene (*.spr)", {"*.spr"}});
 	if (Project::IsValidProjectFilepath(filepath))
 	{
 		auto newProject = Shared<Project>::Create(filepath);
@@ -449,7 +449,7 @@ void EditorLayer::SaveActiveScene() const
 	_editorScene->Save();
 }
 
-void EditorLayer::LoadProjectScene(const Filepath& filepath)
+void EditorLayer::LoadProjectScene(const Path& filepath)
 {
 	if (!_project->IsValidSceneFilepath(filepath))
 	{

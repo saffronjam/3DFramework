@@ -9,11 +9,11 @@ EditorSerializer::EditorSerializer(Layer& editorLayer) :
 {
 }
 
-void EditorSerializer::Serialize(const Filepath& filepath) const
+void EditorSerializer::Serialize(const Path& filepath) const
 {
 }
 
-bool EditorSerializer::Deserialize(const Filepath& filepath)
+bool EditorSerializer::Deserialize(const Path& filepath)
 {
 	return true;
 }

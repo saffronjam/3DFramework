@@ -29,7 +29,7 @@ void Resource::SuccessfulLoad()
 	_loaded = true;
 }
 
-ulong Resource::HashFilepath(const Filepath& filepath)
+ulong Resource::HashFilepath(const Path& filepath)
 {
 	return HashString(filepath.string());
 }

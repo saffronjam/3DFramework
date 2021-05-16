@@ -67,6 +67,7 @@ project "Saffron"
 		"Glad",
         "GLFW",
 		"ImGui",
+		"mono",
 		"opengl32.lib",
 		"yaml-cpp",
 	}

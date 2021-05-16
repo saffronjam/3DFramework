@@ -10,8 +10,8 @@ class AppSerializer
 public:
 	AppSerializer(App& application);
 
-	void Serialize(const Filepath& filepath) const;
-	bool Deserialize(const Filepath& filepath);
+	void Serialize(const Path& filepath) const;
+	bool Deserialize(const Path& filepath);
 
 private:
 	App& _application;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Se
+namespace Saffron
 {
     public class Entity
     {
@@ -20,8 +20,14 @@ namespace Se
             ID = id;
         }
 
-        ~Entity()
+        public virtual void OnCreate()
         {
+
+        }
+
+        public virtual void OnUpdate(float dt)
+        {
+
         }
 
         public T CreateComponent<T>() where T : Component, new()
@@ -56,8 +62,7 @@ namespace Se
 
         public Matrix4 GetTransform()
         {
-            GetTransform_Native(ID, out var mat4Instance);
-            return mat4Instance;
+            return Transform_Native(ID);
         }
 
         public void SetTransform(Matrix4 transform)
@@ -112,7 +117,7 @@ namespace Se
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern bool HasComponent_Native(ulong entityID, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void GetTransform_Native(ulong entityID, out Matrix4 matrix);
+        private static extern Matrix4 Transform_Native(ulong entityID);
         [MethodImpl(MethodImplOptions.InternalCall)]
         private static extern void SetTransform_Native(ulong entityID, ref Matrix4 matrix);
         [MethodImpl(MethodImplOptions.InternalCall)]

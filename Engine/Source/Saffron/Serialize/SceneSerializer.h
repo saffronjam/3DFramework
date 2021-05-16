@@ -15,11 +15,11 @@ class SceneSerializer
 public:
 	explicit SceneSerializer(Scene& scene);
 
-	void Serialize(const Filepath& filepath) const;
-	void SerializeRuntime(const Filepath& filepath) const;
+	void Serialize(const Path& filepath) const;
+	void SerializeRuntime(const Path& filepath) const;
 
-	bool Deserialize(const Filepath& filepath);
-	bool DeserializeRuntime(const Filepath& filepath);
+	bool Deserialize(const Path& filepath);
+	bool DeserializeRuntime(const Path& filepath);
 
 private:
 	void SerializeEntity(YAML::Emitter& emitter, Entity entity) const;

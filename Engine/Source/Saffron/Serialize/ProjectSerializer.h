@@ -10,8 +10,8 @@ class ProjectSerializer
 public:
 	explicit ProjectSerializer(Project& project);
 
-	void Serialize(const Filepath& filepath) const;
-	bool Deserialize(const Filepath& filepath);
+	void Serialize(const Path& filepath) const;
+	bool Deserialize(const Path& filepath);
 
 private:
 	Project& _project;

@@ -71,27 +71,27 @@ uint VertexBufferLayout::GetStride() const
 	return _stride;
 }
 
-const ArrayList<VertexBufferElement>& VertexBufferLayout::GetElements() const
+const List<VertexBufferElement>& VertexBufferLayout::GetElements() const
 {
 	return _elements;
 }
 
-ArrayList<VertexBufferElement>::iterator VertexBufferLayout::begin()
+List<VertexBufferElement>::iterator VertexBufferLayout::begin()
 {
 	return _elements.begin();
 }
 
-ArrayList<VertexBufferElement>::iterator VertexBufferLayout::end()
+List<VertexBufferElement>::iterator VertexBufferLayout::end()
 {
 	return _elements.end();
 }
 
-ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::begin() const
+List<VertexBufferElement>::const_iterator VertexBufferLayout::begin() const
 {
 	return _elements.begin();
 }
 
-ArrayList<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
+List<VertexBufferElement>::const_iterator VertexBufferLayout::end() const
 {
 	return _elements.end();
 }

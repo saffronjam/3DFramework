@@ -18,7 +18,7 @@ public:
 
 protected:
 	void SuccessfulLoad();
-	static ulong HashFilepath(const Filepath& filepath);
+	static ulong HashFilepath(const Path& filepath);
 	static ulong HashString(const String& string);
 
 private:

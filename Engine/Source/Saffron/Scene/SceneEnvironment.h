@@ -8,10 +8,10 @@ namespace Se
 class SceneEnvironment : public Resource
 {
 public:
-	SceneEnvironment(Filepath filepath, const Shared<TextureCube>& radianceMap,
+	SceneEnvironment(Path filepath, const Shared<TextureCube>& radianceMap,
 	                 const Shared<TextureCube>& irradianceMap);
 
-	const Filepath& GetFilepath() const;
+	const Path& GetFilepath() const;
 
 	const Shared<TextureCube>& GetRadianceMap() const;
 	const Shared<TextureCube>& GetIrradianceMap() const;
@@ -21,10 +21,10 @@ public:
 
 	ulong GetResourceID() const override;
 
-	static Shared<SceneEnvironment> Create(Filepath filepath);
+	static Shared<SceneEnvironment> Create(Path filepath);
 
 private:
-	Filepath _filePath;
+	Path _filePath;
 	Shared<TextureCube> _radianceMap;
 	Shared<TextureCube> _irradianceMap;
 	float _intensity;

@@ -61,7 +61,7 @@ RuntimeScene::RuntimeScene(Shared<Scene> copyFrom)
 	CopyComponent<BoxCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
 	CopyComponent<SphereCollider3DComponent>(_entityRegistry, otherRegistry, entityMap);
 	
-	const auto& entityInstanceMap = ScriptEngine::GetEntityInstanceMap();
+	const auto& entityInstanceMap = ScriptEngine::Instance().GetEntityInstanceMap();
 	if (entityInstanceMap.find(GetUUID()) != entityInstanceMap.end())
 	{
 		ScriptEngine::CopyEntityScriptData(GetUUID(), copyFrom->GetUUID());
@@ -91,9 +91,10 @@ void RuntimeScene::OnUpdate()
 	{
 		const UUID entityID = _entityRegistry.get<IDComponent>(entityHandle).ID;
 		Entity entity = {entityHandle, this};
-		if (ScriptEngine::ModuleExists(entity.GetComponent<ScriptComponent>().ModuleName))
+		auto &sc = entity.GetComponent<ScriptComponent>();
+		if (ScriptEngine::ModuleExists(sc.NamespaceName, sc.Name))
 		{
-			ScriptEngine::OnUpdateEntity(_sceneID, entityID, ts);
+			ScriptEngine::Instance().OnUpdateEntity(_sceneID, entityID, ts);
 		}
 	}
 
@@ -220,10 +221,10 @@ void RuntimeScene::OnStart()
 		for (auto eent : view)
 		{
 			Entity entity = {eent, this};
-			auto component = entity.GetComponent<ScriptComponent>();
-			if (ScriptEngine::ModuleExists(component.ModuleName))
+			auto sc = entity.GetComponent<ScriptComponent>();
+			if (ScriptEngine::ModuleExists(sc.NamespaceName, sc.Name))
 			{
-				ScriptEngine::InstantiateScriptEntity(entity);
+				ScriptEngine::Instance().InstantiateScriptEntity(entity);
 			}
 		}
 	}

@@ -46,18 +46,18 @@ public:
 	VertexBufferLayout(const InitializerList<VertexBufferElement>& elements);
 
 	uint GetStride() const;
-	const ArrayList<VertexBufferElement>& GetElements() const;
+	const List<VertexBufferElement>& GetElements() const;
 
-	ArrayList<VertexBufferElement>::iterator begin();
-	ArrayList<VertexBufferElement>::iterator end();
-	ArrayList<VertexBufferElement>::const_iterator begin() const;
-	ArrayList<VertexBufferElement>::const_iterator end() const;
+	List<VertexBufferElement>::iterator begin();
+	List<VertexBufferElement>::iterator end();
+	List<VertexBufferElement>::const_iterator begin() const;
+	List<VertexBufferElement>::const_iterator end() const;
 
 private:
 	void CalculateOffsetsAndStride();
 
 private:
-	ArrayList<VertexBufferElement> _elements;
+	List<VertexBufferElement> _elements;
 	uint _stride = 0;
 };
 

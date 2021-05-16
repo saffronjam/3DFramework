@@ -439,7 +439,7 @@ void Gui::SetFontSize(int size)
 	ImGui::SetCurrentFont(candidate);
 }
 
-Font* Gui::AddFont(const Filepath& filepath, int size)
+Font* Gui::AddFont(const Path& filepath, int size)
 {
 	const String fullFilepath = FontsLocation + filepath.string() + FontsExtension;
 	auto* newFont = ImGui::GetIO().Fonts->AddFontFromFileTTF(fullFilepath.c_str(), static_cast<float>(size));

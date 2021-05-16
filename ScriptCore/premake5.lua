@@ -1,5 +1,4 @@
 project "ScriptCore"
-	location "ScriptCore"
 	kind "SharedLib"
 	language "C#"
 

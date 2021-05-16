@@ -19,7 +19,7 @@ EditorCamera::EditorCamera(Matrix4 projectionMatrix) :
 {
 	Reset();
 
-	Mouse::WheelScrolled += SE_BIND_EVENT_FN(EditorCamera::OnMouseScroll);
+	Mouse::WheelScrolled += SE_FUNCTION(EditorCamera::OnMouseScroll);
 }
 
 void EditorCamera::OnUpdate()

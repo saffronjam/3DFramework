@@ -57,7 +57,7 @@
     <Compile Include="Source\Sink.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\ScriptCore\ScriptCore\ScriptCore.csproj">
+    <ProjectReference Include="..\..\ScriptCore\ScriptCore.csproj">
       <Project>{43DDC966-2F95-0BB4-989C-E40F8473A6A4}</Project>
       <Name>ScriptCore</Name>
     </ProjectReference>

@@ -10,7 +10,7 @@ class OpenGLTexture2D : public Texture2D
 {
 public:
 	OpenGLTexture2D(TextureFormat format, uint width, uint height, TextureWrap wrap);
-	OpenGLTexture2D(Filepath filepath, bool srgb);
+	OpenGLTexture2D(Path filepath, bool srgb);
 	virtual ~OpenGLTexture2D();
 
 	bool operator==(const Texture& other) const override;
@@ -30,7 +30,7 @@ public:
 	void Resize(uint width, uint height) override;
 	Buffer& GetWriteableBuffer() override;
 
-	const Filepath& GetFilepath() const override;
+	const Path& GetFilepath() const override;
 	RendererID GetRendererID() const override;
 
 	bool Loaded() const override;
@@ -47,14 +47,14 @@ private:
 	bool _locked = false;
 	bool _loaded = false;
 
-	Filepath _filePath;
+	Path _filePath;
 };
 
 class OpenGLTextureCube : public TextureCube
 {
 public:
 	OpenGLTextureCube(TextureFormat format, uint width, uint height);
-	explicit OpenGLTextureCube(Filepath filepath);
+	explicit OpenGLTextureCube(Path filepath);
 	virtual ~OpenGLTextureCube();
 
 	bool operator==(const Texture& other) const override;
@@ -70,7 +70,7 @@ public:
 	// not present mips in data
 	uint GetMipLevelCount() const override;
 	
-	const Filepath& GetFilepath() const override;
+	const Path& GetFilepath() const override;
 	RendererID GetRendererID() const override;
 
 
@@ -81,6 +81,6 @@ private:
 
 	unsigned char* _imageData;
 
-	Filepath _filePath;
+	Path _filePath;
 };
 }

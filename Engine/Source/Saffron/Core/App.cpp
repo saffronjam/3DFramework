@@ -26,7 +26,7 @@ App::App(const Properties& properties) :
 {
 	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 
-	_window->Closed += SE_BIND_EVENT_FN(App::OnWindowClose);
+	_window->Closed += SE_FUNCTION(App::OnWindowClose);
 	_window->SetVSync(false);
 	_window->Maximize();
 	_window->SetWindowIcon("Editor/Saffron_windowIcon.png");
@@ -200,7 +200,7 @@ void App::RemoveProject(const Shared<Project>& project)
 	                         _recentProjectList.end());
 }
 
-const ArrayList<Shared<Project>>& App::GetRecentProjectList() const
+const List<Shared<Project>>& App::GetRecentProjectList() const
 {
 	std::sort(_recentProjectList.begin(), _recentProjectList.end(), [](const auto& first, const auto& second)
 	{

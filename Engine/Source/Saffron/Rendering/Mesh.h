@@ -123,28 +123,28 @@ public:
 class Mesh : public Resource
 {
 public:
-	explicit Mesh(Filepath filepath);
+	explicit Mesh(Path filepath);
 
 	void OnUpdate();
 	void DumpVertexBuffer();
 
-	ArrayList<Submesh>& GetSubmeshes();
-	const ArrayList<Submesh>& GetSubmeshes() const;
+	List<Submesh>& GetSubmeshes();
+	const List<Submesh>& GetSubmeshes() const;
 
 	const Matrix4& GetLocalTransform() const;
 	void SetLocalTransform(Matrix4 localTransform);
 
-	ArrayList<AABB> GetBoundingBoxes(const Matrix4& transform = Matrix4(1));
+	List<AABB> GetBoundingBoxes(const Matrix4& transform = Matrix4(1));
 	Shared<Shader> GetMeshShader() const;
 
 	Shared<Material> GetMaterial() const;
-	ArrayList<Shared<MaterialInstance>> GetMaterials() const;
-	const ArrayList<Shared<Texture2D>>& GetTextures() const;
+	List<Shared<MaterialInstance>> GetMaterials() const;
+	const List<Shared<Texture2D>>& GetTextures() const;
 
-	const Filepath& GetFilepath() const;
-	ArrayList<Triangle> GetTriangleCache(uint index) const;
+	const Path& GetFilepath() const;
+	List<Triangle> GetTriangleCache(uint index) const;
 
-	static Shared<Mesh> Create(Filepath filepath);
+	static Shared<Mesh> Create(Path filepath);
 
 private:
 	void BoneTransform(float time);
@@ -160,35 +160,35 @@ private:
 	Vector3 InterpolateScale(float animationTime, const aiNodeAnim* nodeAnim);
 
 private:
-	ArrayList<Submesh> _submeshes;
+	List<Submesh> _submeshes;
 
 	Unique<Assimp::Importer> _importer;
 
 	Matrix4 _inverseTransform{};
 
 	uint _boneCount = 0;
-	ArrayList<BoneInfo> _boneInfo;
+	List<BoneInfo> _boneInfo;
 
 	Shared<Pipeline> _pipeline;
 	Shared<VertexBuffer> _vertexBuffer;
 	Shared<IndexBuffer> _indexBuffer;
 
-	ArrayList<Vertex> _staticVertices;
-	ArrayList<AnimatedVertex> _animatedVertices;
-	ArrayList<Index> _indices;
+	List<Vertex> _staticVertices;
+	List<AnimatedVertex> _animatedVertices;
+	List<Index> _indices;
 	HashMap<String, uint> _boneMapping;
-	ArrayList<Matrix4> _boneTransforms;
+	List<Matrix4> _boneTransforms;
 	const aiScene* _scene;
 
 	// Materials
 	Shared<Shader> _meshShader;
 	Shared<Material> _baseMaterial;
-	ArrayList<Shared<Texture2D>> _textures;
-	ArrayList<Shared<Texture2D>> _normalMaps;
-	ArrayList<Shared<MaterialInstance>> _materials;
+	List<Shared<Texture2D>> _textures;
+	List<Shared<Texture2D>> _normalMaps;
+	List<Shared<MaterialInstance>> _materials;
 	Matrix4 _localTransform;
 
-	HashMap<uint, ArrayList<Triangle>> _triangleCache;
+	HashMap<uint, List<Triangle>> _triangleCache;
 
 	// Animation
 	bool _isAnimated = false;
@@ -197,7 +197,7 @@ private:
 	float _timeMultiplier = 1.0f;
 	bool _animationPlaying = true;
 
-	Filepath _filepath;
+	Path _filepath;
 
 	static constexpr const char* MeshesFolder = "Assets/Meshes/";
 	

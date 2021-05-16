@@ -14,7 +14,7 @@ AppSerializer::AppSerializer(App& application) :
 {
 }
 
-void AppSerializer::Serialize(const Filepath& filepath) const
+void AppSerializer::Serialize(const Path& filepath) const
 {
 	YAML::Emitter out;
 	out << YAML::BeginMap;
@@ -37,7 +37,7 @@ void AppSerializer::Serialize(const Filepath& filepath) const
 	fout << out.c_str();
 }
 
-bool AppSerializer::Deserialize(const Filepath& filepath)
+bool AppSerializer::Deserialize(const Path& filepath)
 {
 	IStream stream(filepath);
 	OStringStream strStream;
@@ -61,7 +61,7 @@ bool AppSerializer::Deserialize(const Filepath& filepath)
 				continue;
 			}
 
-			Filepath projectFilepath = recentProjectFilepathNode.as<String>();
+			Path projectFilepath = recentProjectFilepathNode.as<String>();
 			if (!FileIOManager::FileExists(projectFilepath))
 			{
 				continue;

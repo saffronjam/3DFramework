@@ -104,12 +104,12 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowDroppedFilesEvent(ArrayList<Filepath> filepaths) :
+	explicit WindowDroppedFilesEvent(List<Path> filepaths) :
 		_filepaths(Move(filepaths))
 	{
 	}
 
-	const ArrayList<Filepath>& GetFilepaths() const { return _filepaths; }
+	const List<Path>& GetFilepaths() const { return _filepaths; }
 
 	String ToString() const override
 	{
@@ -123,7 +123,7 @@ public:
 	}
 
 private:
-	ArrayList<Filepath> _filepaths;
+	List<Path> _filepaths;
 };
 
 class WindowNewTitleEvent : public Event
@@ -160,12 +160,12 @@ public:
 	EVENT_CLASS_CATEGORY(CategoryWindow);
 
 public:
-	explicit WindowNewIconEvent(Filepath filepath) :
+	explicit WindowNewIconEvent(Path filepath) :
 		_filepath(Move(filepath))
 	{
 	}
 
-	const Filepath& GetFilepath() const { return _filepath; }
+	const Path& GetFilepath() const { return _filepath; }
 
 	String ToString() const override
 	{
@@ -175,7 +175,7 @@ public:
 	}
 
 private:
-	Filepath _filepath;
+	Path _filepath;
 };
 
 class WindowMinimizedEvent : public Event

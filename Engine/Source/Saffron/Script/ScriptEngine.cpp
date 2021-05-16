@@ -1,27 +1,43 @@
 #include "SaffronPCH.h"
 
+#include <monopp/MonoCpp.h>
+
 #include "Saffron/Entity/Entity.h"
 #include "Saffron/Gui/Gui.h"
 #include "Saffron/Scene/EditorScene.h"
-#include "Saffron/Script/MonoApi.h"
 #include "Saffron/Script/ScriptEngine.h"
-#include "Saffron/Script/ScriptEngineRegistry.h"
+#include "Saffron/Script/ScriptRegistry.h"
+#include "Saffron/Core/GenUtils.h"
 
 namespace Se
 {
 ScriptEngine::ScriptEngine() :
 	SingleTon(this),
-	_scriptEngineRegistry(CreateUnique<ScriptEngineRegistry>())
+	_scriptEngineRegistry(CreateUnique<ScriptRegistry>())
 {
-	MonoApi::Initialize("Saffron", MonoPath);
-	_monoDomain = MonoApi::CreateDomain(FriendlyDomainName);
+#ifdef SE_DEBUG
+	Mono::Initialize(MonoPath, ScriptsPath, "", "Saffron", true);
+#else
+	Mono::Initialize(ScriptsPath, "", "Saffron", false)
+#endif
+
+	_monoDomain = CreateUnique<Mono::Domain>(FriendlyDomainName);
+	Mono::Domain::SetCurrentDomain(*_monoDomain);
+
+	_coreAssembly = Mono::Assembly(*_monoDomain, ScriptCoreScript);
+
+	const auto& entityType = GetOrLoadCoreModule("Saffron", "Entity");
+	ScriptEntity::OnCreateMethod = entityType.GetMethod("OnCreate()");
+	ScriptEntity::OnUpdateMethod = entityType.GetMethod("OnUpdate(single)");
+	ScriptEntity::IdProperty = entityType.GetProperty("ID");
+	ScriptEntity::OnCollision2DBeginMethod = entityType.GetMethod("OnCollision2DBegin(single)");
+	ScriptEntity::OnCollision2DEndMethod = entityType.GetMethod("OnCollision2DEnd(single)");
 }
 
 ScriptEngine::~ScriptEngine()
 {
 	_sceneContext = nullptr;
-	_entityInstanceMap.clear();
-	MonoApi::Shutdown(_monoDomain);
+	_scriptEntities.clear();
 }
 
 void ScriptEngine::OnUpdate()
@@ -31,7 +47,7 @@ void ScriptEngine::OnUpdate()
 void ScriptEngine::OnGuiRender()
 {
 	ImGui::Begin("Script Engine Debug");
-	for (auto& [sceneID, entityMap] : Instance()._entityInstanceMap)
+	for (auto& [sceneID, entityMap] : Instance()._scriptEntities)
 	{
 		bool opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<ulong>(sceneID)), "Scene (%llx)",
 		                              static_cast<ulong>(sceneID));
@@ -45,17 +61,17 @@ void ScriptEngine::OnGuiRender()
 				if (entity.HasComponent<TagComponent>()) entityName = entity.GetComponent<TagComponent>().Tag;
 				opened = ImGui::TreeNode(reinterpret_cast<void*>(static_cast<ulong>(entityID)), "%s (%llx)",
 				                         entityName.c_str(), static_cast<ulong>(entityID));
-				if (opened)
+				/*if (opened)
 				{
-					for (auto& [moduleName, fieldMap] : entityInstance.ModuleFieldMap)
+					for (auto& [name, field] : entityInstance.Fields)
 					{
-						opened = ImGui::TreeNode(moduleName.c_str());
+						opened = ImGui::TreeNode(name.c_str());
 						if (opened)
 						{
 							for (auto& [fieldName, field] : fieldMap)
 							{
 								opened = ImGui::TreeNodeEx(static_cast<void*>(&field), ImGuiTreeNodeFlags_Leaf,
-								                           fieldName.c_str());
+														   fieldName.c_str());
 								if (opened)
 								{
 									ImGui::TreePop();
@@ -65,7 +81,7 @@ void ScriptEngine::OnGuiRender()
 						}
 					}
 					ImGui::TreePop();
-				}
+				}*/
 			}
 			ImGui::TreePop();
 		}
@@ -80,14 +96,14 @@ void ScriptEngine::OnProjectChange(const Shared<Project>& project)
 		for (const auto& scene : Instance()._projectContext->GetSceneCache())
 		{
 			auto uuid = scene->GetUUID();
-			if (Instance()._entityInstanceMap.find(uuid) != Instance()._entityInstanceMap.end())
+			if (Instance()._scriptEntities.find(uuid) != Instance()._scriptEntities.end())
 			{
-				Instance()._entityClassMap.clear();
-				Instance()._entityInstanceMap.at(uuid).clear();
-				Instance()._entityInstanceMap.erase(uuid);
+				Instance()._modules.clear();
+				Instance()._scriptEntities.at(uuid).clear();
+				Instance()._scriptEntities.erase(uuid);
 			}
 		}
-		Instance()._classCacheMap.clear();
+		Instance()._modules.clear();
 	}
 	Instance()._projectContext = project;
 	if (project)
@@ -101,50 +117,36 @@ void ScriptEngine::OnSceneChange(const Shared<Scene>& scene)
 	Instance()._sceneContext = scene;
 }
 
-void ScriptEngine::LoadRuntimeAssembly(const Filepath& assemblyFilepath)
+void ScriptEngine::LoadRuntimeAssembly(const Path& assemblyFilepath)
 {
-	MonoDomain* domain = nullptr;
-	bool cleanup = false;
-	if (Instance()._monoDomain)
-	{
-		domain = MonoApi::CreateDomain(FriendlyDomainName);
-		MonoApi::SetActiveDomain(domain);
-		cleanup = true;
-	}
+	auto& domain = *Instance()._monoDomain;
+	auto& coreAssembly = Instance()._coreAssembly;
+	auto& appAssembly = Instance()._appAssembly;
 
-	Instance()._coreAssembly = MonoApi::LoadAssembly(ScriptCoreScript);
-	Instance()._coreImage = MonoApi::GetImage(Instance()._coreAssembly);
+	coreAssembly = domain.GetAssembly(ScriptCoreScript, true);
+	appAssembly = domain.GetAssembly(assemblyFilepath.string(), true);
 
-	Instance()._appAssembly = MonoApi::LoadAssembly(assemblyFilepath);
-	Instance()._appImage = MonoApi::GetImage(Instance()._appAssembly);
-
-	ScriptEngineRegistry::RegisterAll();
-
-	if (cleanup)
-	{
-		MonoApi::UnloadDomain(Instance()._monoDomain);
-		Instance()._monoDomain = domain;
-	}
+	ScriptRegistry::Instance().RegisterAll();
 }
 
-void ScriptEngine::ReloadAssembly(const Filepath& assemblyFilepath)
+void ScriptEngine::ReloadAssembly(const Path& assemblyFilepath)
 {
 	Instance()._assemblyFilepath = ScriptsPath + assemblyFilepath.string() + ScriptsExtension;
 	LoadRuntimeAssembly(Instance()._assemblyFilepath);
-	Instance()._classCacheMap.clear();
-	if (!Instance()._entityInstanceMap.empty())
+	Instance()._modules.clear();
+	if (!Instance()._scriptEntities.empty())
 	{
-		Shared<Scene> scene = GetSceneContext();
+		auto scene = GetSceneContext();
 		Debug::Assert(scene, "No active scene!");
-		if (Instance()._entityInstanceMap.find(scene->GetUUID()) != Instance()._entityInstanceMap.end())
+		if (Instance()._scriptEntities.find(scene->GetUUID()) != Instance()._scriptEntities.end())
 		{
-			auto& entityMap = Instance()._entityInstanceMap.at(scene->GetUUID());
+			auto& entityMap = Instance()._scriptEntities.at(scene->GetUUID());
 			for (auto& [entityID, entityInstance] : entityMap)
 			{
 				const auto& entityMap = scene->GetEntityMap();
 				Debug::Assert(entityMap.find(entityID) != entityMap.end(),
 				              "Invalid entity ID or entity doesn't exist in scene!");
-				CreateScriptEntity(entityMap.at(entityID));
+				Instance().CreateScriptEntity(entityMap.at(entityID));
 			}
 		}
 	}
@@ -155,14 +157,14 @@ void ScriptEngine::SetSceneContext(const Shared<Scene>& scene)
 	Instance()._sceneContext = scene;
 }
 
-const Shared<Scene>& ScriptEngine::GetSceneContext()
+auto ScriptEngine::GetSceneContext() -> const Shared<Scene>&
 {
 	return Instance()._sceneContext;
 }
 
 void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 {
-	auto& sceneMap = GetEntityInstanceMap();
+	auto& sceneMap = Instance().GetEntityInstanceMap();
 
 	Debug::Assert(sceneMap.find(dst) != sceneMap.end());
 	Debug::Assert(sceneMap.find(src) != sceneMap.end());
@@ -170,20 +172,20 @@ void ScriptEngine::CopyEntityScriptData(UUID dst, UUID src)
 	auto& dstEntityMap = sceneMap.at(dst);
 	auto& srcEntityMap = sceneMap.at(src);
 
-	for (auto& [entityID, entityInstance] : srcEntityMap)
-	{
-		for (auto& [moduleName, srcFieldMap] : srcEntityMap[entityID].ModuleFieldMap)
-		{
-			auto& dstModuleFieldMap = dstEntityMap[entityID].ModuleFieldMap;
-			for (auto& [fieldName, field] : srcFieldMap)
-			{
-				Debug::Assert(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
-				auto& fieldMap = dstModuleFieldMap.at(moduleName);
-				Debug::Assert(fieldMap.find(fieldName) != fieldMap.end());
-				fieldMap.at(fieldName).SetStoredValue(static_cast<void*>(field._storedValueBuffer));
-			}
-		}
-	}
+	//for (auto& [entityID, entityInstance] : srcEntityMap)
+	//{
+	//	for (auto& [moduleName, srcFieldMap] : srcEntityMap[entityID].ModuleFieldMap)
+	//	{
+	//		auto& dstModuleFieldMap = dstEntityMap[entityID].ModuleFieldMap;
+	//		for (auto& [fieldName, field] : srcFieldMap)
+	//		{
+	//			Debug::Assert(dstModuleFieldMap.find(moduleName) != dstModuleFieldMap.end());
+	//			auto& fieldMap = dstModuleFieldMap.at(moduleName);
+	//			Debug::Assert(fieldMap.find(fieldName) != fieldMap.end());
+	//			fieldMap.at(fieldName).SetStoredValue(static_cast<void*>(field._storedValueBuffer));
+	//		}
+	//	}
+	//}
 }
 
 void ScriptEngine::OnCreateEntity(Entity entity)
@@ -193,279 +195,236 @@ void ScriptEngine::OnCreateEntity(Entity entity)
 
 void ScriptEngine::OnCreateEntity(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnCreateMethod)
-	{
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCreateMethod);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+
+	GetInvoker<void()>(ScriptEntity::OnCreateMethod, entity.GetMonoObject())();
 }
 
 void ScriptEngine::OnUpdateEntity(UUID sceneID, UUID entityID, Time ts)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnUpdateMethod)
-	{
-		void* args[] = {&ts};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnUpdateMethod, args);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+	GetInvoker<void(float)>(ScriptEntity::OnCollision2DBeginMethod, entity.GetMonoObject())(ts.sec());
 }
 
 void ScriptEngine::OnCollision2DBegin(Entity entity)
 {
-	OnCollision2DBegin(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision2DBegin(entity.GetSceneUUID(), entity.GetUUID());
 }
 
 void ScriptEngine::OnCollision2DBegin(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnCollision2DBeginMethod)
-	{
-		float value = 5.0f;
-		void* args[] = {&value};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DBeginMethod, args);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+	float value = 5.0f;
+	GetInvoker<void(float)>(ScriptEntity::OnCollision2DBeginMethod, entity.GetMonoObject())(value);
 }
 
 void ScriptEngine::OnCollision2DEnd(Entity entity)
 {
-	OnCollision2DEnd(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision2DEnd(entity.GetSceneUUID(), entity.GetUUID());
 }
 
 void ScriptEngine::OnCollision2DEnd(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnCollision2DEndMethod)
-	{
-		float value = 5.0f;
-		void* args[] = {&value};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision2DEndMethod, args);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+	float value = 5.0f;
+	GetInvoker<void(float)>(ScriptEntity::OnCollision2DEndMethod, entity.GetMonoObject())(value);
 }
 
 void ScriptEngine::OnCollision3DBegin(Entity entity)
 {
-	OnCollision3DBegin(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision3DBegin(entity.GetSceneUUID(), entity.GetUUID());
 }
 
 void ScriptEngine::OnCollision3DBegin(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnCollision3DBeginMethod)
-	{
-		float value = 5.0f;
-		void* args[] = {&value};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DBeginMethod, args);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+	float value = 5.0f;
+	GetInvoker<void(float)>(ScriptEntity::OnCollision3DBeginMethod, entity.GetMonoObject())(value);
 }
 
 void ScriptEngine::OnCollision3DEnd(Entity entity)
 {
-	OnCollision3DEnd(entity.GetSceneUUID(), entity.GetComponent<IDComponent>().ID);
+	OnCollision3DEnd(entity.GetSceneUUID(), entity.GetUUID());
 }
 
 void ScriptEngine::OnCollision3DEnd(UUID sceneID, UUID entityID)
 {
-	EntityInstance& entityInstance = GetEntityInstance(sceneID, entityID);
-	if (entityInstance.ScriptClass->OnCollision3DEndMethod)
-	{
-		float value = 5.0f;
-		void* args[] = {&value};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityInstance.ScriptClass->OnCollision3DEndMethod, args);
-	}
+	auto& entity = GetScriptEntity(sceneID, entityID);
+	float value = 5.0f;
+	GetInvoker<void(float)>(ScriptEntity::OnCollision3DEndMethod, entity.GetMonoObject())(value);
 }
 
 void ScriptEngine::OnScriptComponentDestroyed(UUID sceneID, UUID entityID)
 {
-	Debug::Assert(Instance()._entityInstanceMap.find(sceneID) != Instance()._entityInstanceMap.end());
-	auto& entityMap = Instance()._entityInstanceMap.at(sceneID);
+	Debug::Assert(Instance()._scriptEntities.find(sceneID) != Instance()._scriptEntities.end());
+	auto& entityMap = Instance()._scriptEntities.at(sceneID);
 	Debug::Assert(entityMap.find(entityID) != entityMap.end());
 	entityMap.erase(entityID);
 }
 
-bool ScriptEngine::ModuleExists(const String& moduleName)
+auto ScriptEngine::ModuleExists(const String& fullname) -> bool
 {
-	MonoClass* monoClass = MonoApi::GetClass(Instance()._appImage, moduleName);
-	return monoClass != nullptr;
+	auto strings = GenUtils::SplitString(fullname, ".");
+	if (strings.size() == 1)
+	{
+		return ModuleExists("", strings[0]);
+	}
+	if (strings.size() == 2)
+	{
+		return ModuleExists(strings[0], strings[1]);
+	}
+	Debug::Break("Empty module");
+	return false;
+}
+
+auto ScriptEngine::ModuleExists(const String& namespaceName, const String& name) -> bool
+{
+	return Instance().GetAppAssembly().TypeExists(namespaceName, name);
 }
 
 void ScriptEngine::CreateScriptEntity(Entity entity)
 {
-	Scene* scene = entity.GetScene();
-	const UUID id = entity.GetComponent<IDComponent>().ID;
-	auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
-	if (moduleName.empty()) return;
-
-	if (!ModuleExists(moduleName))
+	auto& sc = entity.GetComponent<ScriptComponent>();
+	if (sc.Name.empty() || sc.Fullname.empty())
 	{
-		Log::CoreError("Entity references non-existent script module '{0}'", moduleName);
+		Log::CoreWarn("Script component was found empty when constructing a script entity");
 		return;
 	}
 
-	EntityScriptClass& scriptClass = Instance()._entityClassMap[moduleName];
-	scriptClass.SetScript(moduleName);
+	const auto& module = GetOrLoadModule(sc.NamespaceName, sc.Name);
 
-	scriptClass.Class = Instance().GetClass(Instance()._appImage, scriptClass);
-	scriptClass.SyncClassMethods(Instance()._appImage);
+	auto& scene = *entity.GetScene();
 
-	EntityInstance& entityInstance = Instance()._entityInstanceMap[scene->GetUUID()][id];
-	entityInstance.ScriptClass = &scriptClass;
-	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
-	auto& fieldMap = moduleFieldMap[moduleName];
+	auto& sceneContainer = _scriptEntities[scene.GetUUID()];
+	auto [pair, didEmplace] = sceneContainer.emplace(entity.GetUUID(), Move(ScriptEntity(module, scene)));
+	auto& scriptEntity = pair->second;
 
-	// Save old fields
-	HashMap<String, PublicField> oldFields;
-	oldFields.reserve(fieldMap.size());
-	for (auto& [fieldName, field] : fieldMap)
+	const auto& fullname = module.GetFullname();
+	const auto it = _moduleFieldMaps.find(fullname);
+	if (it == _moduleFieldMaps.end())
 	{
-		oldFields.emplace(fieldName, Move(field));
-	}
-	fieldMap.clear();
-
-	// Retrieve public fields (TODO: cache these fields if the module is used more than once)
-	{
-		MonoClassField* iter;
-		void* ptr = nullptr;
-		while ((iter = MonoApi::GetFields(scriptClass.Class, &ptr)) != nullptr)
+		const auto& fields = module.GetFields();
+		for (const auto& monoField : fields)
 		{
-			const auto name = MonoApi::GetFieldName(iter);
-			const uint flags = MonoApi::GetFieldFlags(iter);
-			if (!MonoApi::IsPublic(flags)) continue;
-
-			auto* monoFieldType = MonoApi::GetFieldType(iter);
-			const auto fieldType = MonoApi::GetSaffronPublicFieldType(monoFieldType);
-
-			// TODO: Attributes
-			//auto* attr = MonoApi::GetCustomAttrInfo(scriptClass.Class, iter);
-
-			if (oldFields.find(name) != oldFields.end())
+			if (monoField.GetVisibility() == Mono::Visibility::Public)
 			{
-				fieldMap.emplace(name, Move(oldFields.at(name)));
-			}
-			else
-			{
-				PublicField field(name, fieldType);
-				field._entityInstance = &entityInstance;
-				field._monoClassField = iter;
-				fieldMap.emplace(name, Move(field));
+				_moduleFieldMaps[fullname].emplace_back(scriptEntity, monoField);
 			}
 		}
 	}
 }
 
-void ScriptEngine::DeleteScriptEntity(Entity entity, const String& moduleName)
+void ScriptEngine::DeleteScriptEntity(Entity entity)
 {
-	EntityInstance& entityInstance = GetEntityInstance(entity.GetSceneUUID(), entity.GetUUID());
-	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
-	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
-	{
-		moduleFieldMap.erase(moduleName);
-	}
+	auto& scene = *entity.GetScene();
+	Instance()._scriptEntities.at(scene.GetUUID()).erase(entity.GetUUID());
 }
 
 void ScriptEngine::InstantiateScriptEntity(Entity entity)
 {
-	Scene* scene = entity.GetScene();
-	UUID id = entity.GetComponent<IDComponent>().ID;
-	auto& moduleName = entity.GetComponent<ScriptComponent>().ModuleName;
+	auto* scene = entity.GetScene();
+	auto id = entity.GetUUID();
 
-	EntityInstance& entityInstance = GetEntityInstance(scene->GetUUID(), id);
-	Debug::Assert(entityInstance.ScriptClass != nullptr);
-	entityInstance.Handle = MonoApi::Instantiate(Instance()._monoDomain, *entityInstance.ScriptClass);
+	Debug::Assert(entity.HasComponent<ScriptComponent>(),
+	              "Tried to instansiate entity without a script component. Add a script component to entity ({0}:{1}) to resolve this.",
+	              id, entity.GetComponent<TagComponent>().Tag);
 
-	MonoClass* entityClass = Instance().GetClass(Instance().GetCoreImage(), "Se", "Entity");
-	Debug::Assert(entityClass, "Failed to load entity class when checking for subclass");
+	auto& moduleName = entity.GetComponent<ScriptComponent>().Fullname;
 
-	if (MonoApi::IsSubclass(entityInstance.ScriptClass->Class, entityClass, false))
+	auto& scriptEntity = Instance().GetScriptEntity(scene->GetUUID(), id);
+	Debug::Assert(scriptEntity.Valid(), "Entity was not valid: ({0}:{1})", id, entity.GetComponent<TagComponent>().Tag);
+	scriptEntity.CreateNewObject();
+
+	const auto idInvoker = Mono::CreatePropertyInvoker<ulong>(ScriptEntity::IdProperty);
+	idInvoker.SetValue(scriptEntity.GetMonoObject(), entity.GetUUID());
+
+	auto& publicFields = Instance()._moduleFieldMaps.at(moduleName);
+	for (auto& field : publicFields)
 	{
-		auto* entityIDProperty = MonoApi::GetProperty(entityInstance.ScriptClass->Class, "ID");
-		auto* entityIDSetMethod = MonoApi::GetSetter(entityIDProperty);
-		void* param[] = {&id};
-		MonoApi::CallMethod(entityInstance.GetInstance(), entityIDSetMethod, param);
-	}
-
-	// Set all public fields to appropriate values
-	ScriptModuleFieldMap& moduleFieldMap = entityInstance.ModuleFieldMap;
-	if (moduleFieldMap.find(moduleName) != moduleFieldMap.end())
-	{
-		auto& publicFields = moduleFieldMap.at(moduleName);
-		for (auto& [name, field] : publicFields)
-		{
-			field.CopyStoredValueToRuntime();
-		}
+		field.CopyStoredValueToRuntime();
 	}
 
 	// Call OnCreate function (if exists)
 	Instance().OnCreateEntity(entity);
 }
 
-EntityInstance& ScriptEngine::GetEntityInstance(UUID sceneID, UUID entityID)
+auto ScriptEngine::GetScriptEntity(UUID sceneID, UUID entityID) -> ScriptEntity&
 {
 	Debug::Assert(GetEntityInstanceMap().find(sceneID) != GetEntityInstanceMap().end(), "Invalid scene ID!");
-	auto& entityIDMap = GetEntityInstanceMap().at(sceneID);
-	Debug::Assert(entityIDMap.find(entityID) != entityIDMap.end(), "Invalid entity ID!");
-	return entityIDMap.at(entityID);
+	auto& entities = GetEntityInstanceMap().at(sceneID);
+
+	Debug::Assert(entities.find(entityID) != entities.end(), "Invalid entity ID!");
+	return entities.at(entityID);
 }
 
-MonoString* ScriptEngine::CreateMonoString(const String& string)
+auto ScriptEngine::GetScriptEntity(UUID sceneID, UUID entityID) const -> const ScriptEntity&
 {
-	return MonoApi::CreateString(Instance()._monoDomain, string);
+	return const_cast<ScriptEngine&>(*this).GetScriptEntity(sceneID, entityID);
+}
+
+auto ScriptEngine::GetFieldMap(const String& namespaceName, const String& name) -> List<Field>&
+{
+	Debug::Assert(ModuleExists(namespaceName, name), "Module did not exist: {0}.{1}", namespaceName, name);
+	return _moduleFieldMaps.at(namespaceName + "." + name);
+}
+
+auto ScriptEngine::GetFieldMap(const String& namespaceName, const String& name) const -> const List<Field>&
+{
+	return const_cast<ScriptEngine&>(*this).GetFieldMap(namespaceName, name);
 }
 
 void ScriptEngine::AttachThread()
 {
-	MonoApi::AttachThread(_monoDomain);
+	_monoDomain->AttachThread();
 }
 
 void ScriptEngine::DetachThread()
 {
-	MonoApi::DetachThread();
+	_monoDomain->DetachThread();
 }
 
-MonoImage* ScriptEngine::GetCoreImage() const
+auto ScriptEngine::GetCoreAssembly() -> const Mono::Assembly&
 {
-	return _coreImage;
+	return Instance()._coreAssembly;
 }
 
-MonoImage* ScriptEngine::GetAppImage() const
+auto ScriptEngine::GetAppAssembly() -> const Mono::Assembly&
 {
-	return _appImage;
+	return Instance()._appAssembly;
 }
 
-MonoAssembly* ScriptEngine::GetCoreAssembly() const
+auto ScriptEngine::GetEntityType() -> const Mono::Type&
 {
-	return _coreAssembly;
+	return Instance()._coreModules.at("Saffron.Entity");
 }
 
-MonoAssembly* ScriptEngine::GetAppAssembly() const
+auto ScriptEngine::GetOrLoadModule(const String& namespaceName, const String& name) const -> const Mono::Type&
 {
-	return _appAssembly;
-}
-
-MonoClass* ScriptEngine::GetClass(MonoImage* image, const EntityScriptClass& scriptClass)
-{
-	if (_classCacheMap.find(scriptClass.FullName) == _classCacheMap.end())
+	const auto concat = namespaceName + "." + name;
+	const auto it = _modules.find(concat);
+	if (it == _modules.end())
 	{
-		auto* monoClass = MonoApi::GetClass(image, scriptClass);
-		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
-		_classCacheMap.emplace(scriptClass.FullName, monoClass);
+		const auto [pair, didEmplace] = _modules.emplace(concat, _appAssembly.GetType(namespaceName, name));
+		return pair->second;
 	}
-	return _classCacheMap[scriptClass.FullName];
+	return it->second;
 }
 
-MonoClass* ScriptEngine::GetClass(MonoImage* image, const String& namespaceName, const String& className)
+auto ScriptEngine::GetOrLoadCoreModule(const String& namespaceName, const String& name) const -> const Mono::Type&
 {
-	const String fullName = namespaceName.empty() ? className : namespaceName + "." + className;
-	if (_classCacheMap.find(fullName) == _classCacheMap.end())
+	const auto concat = namespaceName + "." + name;
+	const auto it = _coreModules.find(concat);
+	if (it == _coreModules.end())
 	{
-		auto* monoClass = MonoApi::GetClass(image, namespaceName, className);
-		if (!monoClass) Log::CoreWarn("mono_class_from_name failed");
-		_classCacheMap.emplace(fullName, monoClass);
+		const auto [pair, didEmplace] = _coreModules.emplace(concat, _coreAssembly.GetType(namespaceName, name));
+		auto fields = pair->second.GetFields();
+		return pair->second;
 	}
-	return _classCacheMap[fullName];
+	return it->second;
 }
 
-EntityInstanceMap& ScriptEngine::GetEntityInstanceMap()
+auto ScriptEngine::GetEntityInstanceMap() -> HashMap<UUID, HashMap<UUID, ScriptEntity>>&
 {
-	return Instance()._entityInstanceMap;
+	return Instance()._scriptEntities;
 }
 }

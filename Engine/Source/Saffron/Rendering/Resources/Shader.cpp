@@ -30,11 +30,11 @@ ulong Shader::GetResourceID() const
 	return _filepath.empty() ? 0ull : HashFilepath(_filepath);
 }
 
-Shared<Shader> Shader::Create(Filepath filepath)
+Shared<Shader> Shader::Create(Path filepath)
 {
 	Shared<Shader> result;
 
-	Filepath fullFilepath = ShaderLocation + Move(filepath).string() + ShaderExtension;
+	Path fullFilepath = ShaderLocation + Move(filepath).string() + ShaderExtension;
 
 	const ulong filepathHash = HashFilepath(fullFilepath);
 	if (ResourceManager::Contains(filepathHash))

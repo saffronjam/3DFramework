@@ -56,7 +56,7 @@ OpenGLTexture2D::OpenGLTexture2D(TextureFormat format, uint width, uint height, 
 	_imageData.Allocate(width * height * GetBPP(_format));
 }
 
-OpenGLTexture2D::OpenGLTexture2D(Filepath filepath, bool srgb) :
+OpenGLTexture2D::OpenGLTexture2D(Path filepath, bool srgb) :
 	_filePath(TexturesLocation + Move(filepath).string())
 {
 	const auto filesize = FileIOManager::GetFileSize(_filePath);
@@ -200,7 +200,7 @@ Buffer& OpenGLTexture2D::GetWriteableBuffer()
 	return _imageData;
 }
 
-const Filepath& OpenGLTexture2D::GetFilepath() const
+const Path& OpenGLTexture2D::GetFilepath() const
 {
 	return _filePath;
 }
@@ -250,7 +250,7 @@ OpenGLTextureCube::OpenGLTextureCube(TextureFormat format, uint width, uint heig
 
 // TODO: Revisit this, as currently env maps are being loaded as equirectangular 2D images
 //       so this is an old path
-OpenGLTextureCube::OpenGLTextureCube(Filepath filepath) :
+OpenGLTextureCube::OpenGLTextureCube(Path filepath) :
 	_filePath(Move(filepath))
 {
 	int width, height, channels;
@@ -374,7 +374,7 @@ uint OpenGLTextureCube::GetHeight() const
 	return _height;
 }
 
-const Filepath& OpenGLTextureCube::GetFilepath() const
+const Path& OpenGLTextureCube::GetFilepath() const
 {
 	return _filePath;
 }

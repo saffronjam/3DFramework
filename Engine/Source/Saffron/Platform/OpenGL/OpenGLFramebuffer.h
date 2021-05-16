@@ -31,10 +31,10 @@ private:
 	FramebufferSpecification _specification;
 	RendererID _rendererID = 0;
 
-	ArrayList<RendererID> _colorAttachments;
+	List<RendererID> _colorAttachments;
 	RendererID _depthAttachment;
 
-	ArrayList<FramebufferTextureFormat> _colorAttachmentFormats;
+	List<FramebufferTextureFormat> _colorAttachmentFormats;
 	FramebufferTextureFormat _depthAttachmentFormat = FramebufferTextureFormat::None;
 
 	uint _width = 0, _height = 0;

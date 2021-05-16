@@ -35,7 +35,7 @@ Shared<Texture2D> Texture2D::Create(TextureFormat format, uint width, uint heigh
 	return nullptr;
 }
 
-Shared<Texture2D> Texture2D::Create(Filepath filepath, bool sRGB)
+Shared<Texture2D> Texture2D::Create(Path filepath, bool sRGB)
 {
 	switch (RendererApi::Current())
 	{
@@ -57,7 +57,7 @@ Shared<TextureCube> TextureCube::Create(TextureFormat format, uint width, uint h
 	return nullptr;
 }
 
-Shared<TextureCube> TextureCube::Create(Filepath filepath)
+Shared<TextureCube> TextureCube::Create(Path filepath)
 {
 	switch (RendererApi::Current())
 	{

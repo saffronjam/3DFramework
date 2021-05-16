@@ -23,7 +23,7 @@ public:
 	static void Add(Shared<Resource> resource, ulong identifier);
 	static void AddFallback(Shared<Resource> resource, String identifier);
 
-	static const ArrayList<Shared<Resource>>& GetAll();
+	static const List<Shared<Resource>>& GetAll();
 	static void Clear();
 
 	template <class ResourceType>
@@ -38,7 +38,7 @@ private:
 	HashMap<ulong, Shared<Resource>> _resources;
 	HashMap<String, Shared<Resource>> _fallbacks;
 	
-	ArrayList<Shared<Resource>> _resourceReturnCache;
+	List<Shared<Resource>> _resourceReturnCache;
 	bool _needCacheSync = true;
 };
 

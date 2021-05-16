@@ -7,8 +7,8 @@ namespace Se
 class GenUtils
 {
 public:
-	static ArrayList<String> SplitString(const String& input, const String& delim);
-	static WideString ToWide(const String& narrow);
+	static List<String> SplitString(const String& input, const String& delim);
+	static WString ToWide(const String& narrow);
 	static String ToNarrow(const String& wide);
 
 	template <class Class>

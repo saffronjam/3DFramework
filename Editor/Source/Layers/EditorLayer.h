@@ -42,7 +42,7 @@ public:
 
 	void SaveActiveProject() const;
 	void SaveActiveScene() const;
-	void LoadProjectScene(const Filepath& filepath);
+	void LoadProjectScene(const Path& filepath);
 
 private:
 	Pair<Vector3, Vector3> CastRay(float mx, float my) const;
@@ -81,7 +81,7 @@ private:
 	Shared<EditorScene> _editorScene;
 	Shared<RuntimeScene> _runtimeScene;
 	Shared<ViewportPane> _mainViewportPane;
-	ArrayList<bool> _dockedModelSpaceScene;
+	List<bool> _dockedModelSpaceScene;
 	mutable Shared<Scene> _lastFocusedScene;
 	Shared<Scene> _cachedActiveScene;
 
@@ -93,7 +93,7 @@ private:
 	Shared<Material> _sphereBaseMaterial;
 
 	Shared<Material> _meshMaterial;
-	ArrayList<Shared<MaterialInstance>> _metalSphereMaterialInstances, _dielectricSphereMaterialInstances;
+	List<Shared<MaterialInstance>> _metalSphereMaterialInstances, _dielectricSphereMaterialInstances;
 
 	// Editor resources
 	TreeMap<String, Shared<Texture2D>> _texStore;

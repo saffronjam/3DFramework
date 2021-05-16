@@ -10,13 +10,13 @@ public:
 	Buffer();
 	Buffer(uchar* data, uint size);
 	template <typename T>
-	explicit Buffer(ArrayList<T>& container);
+	explicit Buffer(List<T>& container);
 	explicit Buffer(String& string);
 
 	static Buffer Copy(const void* data, uint size);
 	static Buffer Copy(const Buffer& buffer);
 	template <typename T>
-	static Buffer Copy(const ArrayList<T>& container);
+	static Buffer Copy(const List<T>& container);
 	static Buffer Copy(const String& string);
 	static Buffer Encapsulate(uchar* data);
 
@@ -50,14 +50,14 @@ private:
 
 
 template <typename T>
-Buffer::Buffer(ArrayList<T>& container)
+Buffer::Buffer(List<T>& container)
 {
 	_data = container.data();
 	_size = container.size() * sizeof(T);
 }
 
 template <typename T>
-Buffer Buffer::Copy(const ArrayList<T>& container)
+Buffer Buffer::Copy(const List<T>& container)
 {
 	return Copy(container.data(), container.size() * sizeof(T));
 }

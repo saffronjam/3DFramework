@@ -7,7 +7,7 @@ namespace Se
 class EditorScene : public Scene
 {
 public:
-	explicit EditorScene(Filepath filepath);
+	explicit EditorScene(Path filepath);
 
 	void OnUpdate() override;
 	void OnRender() override;
@@ -19,7 +19,7 @@ public:
 
 	const Shared<EditorCamera>& GetEditorCamera() const { return _editorCamera; }
 
-	const Filepath& GetFilepath() const { return _filepath; }
+	const Path& GetFilepath() const { return _filepath; }
 
 	void SetSelectedEntity(Entity entity) override;
 	void SetViewportSize(uint width, uint height) override;
@@ -28,6 +28,6 @@ public:
 
 private:
 	Shared<EditorCamera> _editorCamera;
-	Filepath _filepath;
+	Path _filepath;
 };
 }

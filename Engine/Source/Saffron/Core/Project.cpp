@@ -7,7 +7,7 @@
 
 namespace Se
 {
-Project::Project(Filepath filepath)
+Project::Project(Path filepath)
 {
 	const auto invalidateThis = [this]
 	{
@@ -32,7 +32,7 @@ Project::Project(Filepath filepath)
 	}
 }
 
-Project::Project(String name, DateTime lastOpened, Filepath projectFilepath, ArrayList<Filepath> sceneFilepaths) :
+Project::Project(String name, DateTime lastOpened, Path projectFilepath, List<Path> sceneFilepaths) :
 	_name(std::move(name)),
 	_lastOpened(lastOpened),
 	_projectFilepath(std::move(projectFilepath)),
@@ -40,7 +40,7 @@ Project::Project(String name, DateTime lastOpened, Filepath projectFilepath, Arr
 {
 }
 
-const Filepath& Project::AddScene(Filepath filepath)
+const Path& Project::AddScene(Path filepath)
 {
 	auto candidateSceneFilepath = "res/Scenes/" + filepath.stem().string() + filepath.extension().string();
 
@@ -59,8 +59,8 @@ const Shared<EditorScene>& Project::AddCachedScene(const Shared<EditorScene>& ed
 	return _sceneCache.back();
 }
 
-Project::Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFolderpath, Filepath projectFilepath,
-                 ArrayList<Filepath> sceneFilepaths) :
+Project::Project(UUID uuid, String name, DateTime lastOpened, Path projectFolderpath, Path projectFilepath,
+                 List<Path> sceneFilepaths) :
 	_uuid(uuid),
 	_name(Move(name)),
 	_lastOpened(lastOpened),
@@ -71,17 +71,17 @@ Project::Project(UUID uuid, String name, DateTime lastOpened, Filepath projectFo
 {
 }
 
-const ArrayList<Shared<EditorScene>>& Project::GetSceneCache() const
+const List<Shared<EditorScene>>& Project::GetSceneCache() const
 {
 	return _sceneCache;
 }
 
-const Filepath Project::GetFullSceneFilepath(const Filepath& relativeFilepath)
+const Path Project::GetFullSceneFilepath(const Path& relativeFilepath)
 {
 	return _projectFolderpath.string() + relativeFilepath.string();
 }
 
-Optional<Shared<EditorScene>> Project::GetCachedScene(const Filepath& filepath)
+Optional<Shared<EditorScene>> Project::GetCachedScene(const Path& filepath)
 {
 	return std::nullopt;
 }
@@ -105,12 +105,12 @@ bool Project::IsValid() const
 	return correctData && correctOnDisk;
 }
 
-bool Project::IsValidProjectFilepath(const Filepath& filepath)
+bool Project::IsValidProjectFilepath(const Path& filepath)
 {
 	return !filepath.empty() && filepath.extension() == ".spr" && FileIOManager::FileExists(filepath);
 }
 
-bool Project::IsValidSceneFilepath(const Filepath& filepath)
+bool Project::IsValidSceneFilepath(const Path& filepath)
 {
 	return !filepath.empty() && filepath.extension() == ".ssc" &&
 		FileIOManager::FileExists(GetFullSceneFilepath(filepath)) && std::find(

@@ -63,7 +63,7 @@ void ResourceManager::AddFallback(Shared<Resource> resource, String identifier)
 	Instance()._fallbacks.emplace(Move(identifier), Move(resource));
 }
 
-const ArrayList<Shared<Resource>>& ResourceManager::GetAll()
+const List<Shared<Resource>>& ResourceManager::GetAll()
 {
 	auto& instance = Instance();
 	if (instance._needCacheSync)

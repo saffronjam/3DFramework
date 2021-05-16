@@ -26,10 +26,12 @@ public:
 
 		// TODO: improve these if checks
 		if (a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(
-			a.GetComponent<ScriptComponent>().ModuleName)) ScriptEngine::OnCollision2DBegin(a);
+			a.GetComponent<ScriptComponent>().NamespaceName, a.GetComponent<ScriptComponent>().Name))
+			ScriptEngine::Instance().OnCollision2DBegin(a);
 
 		if (b.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(
-			b.GetComponent<ScriptComponent>().ModuleName)) ScriptEngine::OnCollision2DBegin(b);
+			b.GetComponent<ScriptComponent>().NamespaceName, b.GetComponent<ScriptComponent>().Name))
+			ScriptEngine::Instance().OnCollision2DBegin(b);
 	}
 
 	/// Called when two fixtures cease to touch.
@@ -40,10 +42,12 @@ public:
 
 		// TODO: improve these if checks
 		if (a.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(
-			a.GetComponent<ScriptComponent>().ModuleName)) ScriptEngine::OnCollision2DEnd(a);
+			a.GetComponent<ScriptComponent>().NamespaceName, a.GetComponent<ScriptComponent>().Name))
+			ScriptEngine::Instance().OnCollision2DEnd(a);
 
 		if (b.HasComponent<ScriptComponent>() && ScriptEngine::ModuleExists(
-			b.GetComponent<ScriptComponent>().ModuleName)) ScriptEngine::OnCollision2DEnd(b);
+			b.GetComponent<ScriptComponent>().NamespaceName, b.GetComponent<ScriptComponent>().Name))
+			ScriptEngine::Instance().OnCollision2DEnd(b);
 	}
 
 	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold) override
@@ -128,7 +132,7 @@ void PhysicsWorld2D::OnUpdate()
 			auto* body = static_cast<b2Body*>(rigidBody2D.RuntimeBody);
 
 			auto tag = entity.GetComponent<TagComponent>().Tag;
-			
+
 			if (entity.HasComponent<BoxCollider2DComponent>())
 			{
 				auto& component = entity.GetComponent<BoxCollider2DComponent>();
