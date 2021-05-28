@@ -21,12 +21,12 @@ Mouse::Mouse()
 	_instance = this;
 
 	const auto& window = App::Instance().GetWindow();
-	window.MouseButtonPressed += SE_FUNCTION(Mouse::OnMouseButtonPressed);
-	window.MouseButtonReleased += SE_FUNCTION(Mouse::OnMouseButtonReleased);
-	window.MouseWheelScrolled += SE_FUNCTION(Mouse::OnMouseWheelScrolled);
-	window.MouseMoved += SE_FUNCTION(Mouse::OnMouseMoved);
-	window.CursorEntered += SE_FUNCTION(Mouse::OnCursorEntered);
-	window.CursorLeft += SE_FUNCTION(Mouse::OnCursorLeft);
+	window.MouseButtonPressed += SE_EV_FUNCTION(Mouse::OnMouseButtonPressed);
+	window.MouseButtonReleased += SE_EV_FUNCTION(Mouse::OnMouseButtonReleased);
+	window.MouseWheelScrolled += SE_EV_FUNCTION(Mouse::OnMouseWheelScrolled);
+	window.MouseMoved += SE_EV_FUNCTION(Mouse::OnMouseMoved);
+	window.CursorEntered += SE_EV_FUNCTION(Mouse::OnCursorEntered);
+	window.CursorLeft += SE_EV_FUNCTION(Mouse::OnCursorLeft);
 
 	FreeCursor();
 	ShowCursor();

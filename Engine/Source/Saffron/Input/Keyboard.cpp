@@ -18,10 +18,10 @@ Keyboard::Keyboard()
 	_instance = this;
 
 	const auto& window = App::Instance().GetWindow();
-	window.KeyPressed += SE_FUNCTION(OnKeyPressed);
-	window.KeyReleased += SE_FUNCTION(OnKeyReleased);
-	window.KeyRepeated += SE_FUNCTION(OnKeyRepeated);
-	window.TextInput += SE_FUNCTION(OnTextInput);
+	window.KeyPressed += SE_EV_FUNCTION(OnKeyPressed);
+	window.KeyReleased += SE_EV_FUNCTION(OnKeyReleased);
+	window.KeyRepeated += SE_EV_FUNCTION(OnKeyRepeated);
+	window.TextInput += SE_EV_FUNCTION(OnTextInput);
 }
 
 void Keyboard::OnUpdate()

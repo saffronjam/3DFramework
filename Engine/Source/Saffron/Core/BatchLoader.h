@@ -8,20 +8,44 @@ class BatchLoader : public Managed
 {
 public:
 	explicit BatchLoader(String name);
-	~BatchLoader();
+	virtual ~BatchLoader();
+
+	SE_FUNCTION();
+
+	void MyTestFunction(int parameter1, float parameter2)
+	{
+	}
+
+	SE_FUNCTION();
+
+	void MyTestFunction2(double parameter1, char parameter2)
+	{
+	}
+
+	class MySubClass
+	{
+		SE_FUNCTION();
+		auto   eyo  (  int   testing   )  ->  int;
+
+		class MySecondSubClass
+		{
+			SE_FUNCTION();
+			  auto eyo   (  int   testing   )  ->  int   ;
+		};
+	};
+
 
 	void Submit(Function<void()> function, String shortDescription);
 	void Execute();
 	void ForceExit();
 	void Reset();
 
-	float GetProgress() const { return _progress; }
+	auto GetProgress() const -> float;
+	auto GetStatus() const -> const String*;
 
-	const String* GetStatus() const { return _status; }
+	auto IsFinished() const -> bool;
 
-	bool IsFinished() const { return _progress >= 100.0f; }
-
-	Mutex& GetExecutionMutex() { return _executionMutex; }
+	auto GetExecutionMutex() -> Mutex&;
 
 public:
 	mutable EventSubscriberList<void> Started;

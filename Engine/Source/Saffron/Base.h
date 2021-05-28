@@ -20,3 +20,7 @@
 #include "Saffron/Core/UUID.h"
 #include "Saffron/Debug/Debug.h"
 //#include "Saffron/Script/ScriptRegistry.h"
+
+#ifndef SE_FUNCTION
+#define SE_FUNCTION()
+#endif

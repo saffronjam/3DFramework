@@ -115,9 +115,9 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			return false;
 		};
 
-		_scenePanel->EntityDeleted += SE_FUNCTION(OnEntityDeleted);
-		_scenePanel->EntityCopied += SE_FUNCTION(OnEntityCopied);
-		_scenePanel->ViewInModelSpace += SE_FUNCTION(EditorLayer::OnNewModelSpaceView);
+		_scenePanel->EntityDeleted += SE_EV_FUNCTION(OnEntityDeleted);
+		_scenePanel->EntityCopied += SE_EV_FUNCTION(OnEntityCopied);
+		_scenePanel->ViewInModelSpace += SE_EV_FUNCTION(EditorLayer::OnNewModelSpaceView);
 		_scenePanel->NewSelection += [this](Entity entity)
 		{
 			OnEntityUnselected(_selectedEntity);
@@ -125,9 +125,9 @@ void EditorLayer::OnAttach(Shared<BatchLoader>& loader)
 			return false;
 		};
 
-		Keyboard::Pressed += SE_FUNCTION(EditorLayer::OnKeyboardPress);
-		Mouse::ButtonPressed += SE_FUNCTION(EditorLayer::OnMouseButtonPressed);
-		App::Instance().GetWindow().DroppedFiles += SE_FUNCTION(EditorLayer::OnWindowDropFiles);
+		Keyboard::Pressed += SE_EV_FUNCTION(EditorLayer::OnKeyboardPress);
+		Mouse::ButtonPressed += SE_EV_FUNCTION(EditorLayer::OnMouseButtonPressed);
+		App::Instance().GetWindow().DroppedFiles += SE_EV_FUNCTION(EditorLayer::OnWindowDropFiles);
 	}, "Setting Up System Callbacks");
 }
 

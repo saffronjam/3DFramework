@@ -85,13 +85,13 @@ WindowsWindow::WindowsWindow(const Properties& props) :
 	// FIXME: GLFW doesn't have this.
 	_imGuiMouseCursors[ImGuiMouseCursor_Hand] = glfwCreateStandardCursor(GLFW_HAND_CURSOR);
 
-	Resized += SE_FUNCTION(WindowsWindow::OnResize);
-	Moved += SE_FUNCTION(WindowsWindow::OnMove);
-	GainedFocus += SE_FUNCTION(WindowsWindow::OnGainFocus);
-	LostFocus += SE_FUNCTION(WindowsWindow::OnLostFocus);
-	Closed += SE_FUNCTION(WindowsWindow::OnClose);
-	NewTitle += SE_FUNCTION(WindowsWindow::OnNewTitle);
-	NewIcon += SE_FUNCTION(WindowsWindow::OnNewIcon);
+	Resized += SE_EV_FUNCTION(WindowsWindow::OnResize);
+	Moved += SE_EV_FUNCTION(WindowsWindow::OnMove);
+	GainedFocus += SE_EV_FUNCTION(WindowsWindow::OnGainFocus);
+	LostFocus += SE_EV_FUNCTION(WindowsWindow::OnLostFocus);
+	Closed += SE_EV_FUNCTION(WindowsWindow::OnClose);
+	NewTitle += SE_EV_FUNCTION(WindowsWindow::OnNewTitle);
+	NewIcon += SE_EV_FUNCTION(WindowsWindow::OnNewIcon);
 }
 
 WindowsWindow::~WindowsWindow()

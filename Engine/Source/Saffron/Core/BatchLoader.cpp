@@ -75,4 +75,24 @@ void BatchLoader::Reset()
 	_progress = 0.0f;
 	_shouldExit = false;
 }
+
+auto BatchLoader::GetProgress() const -> float
+{
+	return _progress;
+}
+
+auto BatchLoader::GetStatus() const -> const String*
+{
+	return _status;
+}
+
+auto BatchLoader::IsFinished() const -> bool
+{
+	return _progress >= 100.0f;
+}
+
+auto BatchLoader::GetExecutionMutex() -> Mutex&
+{
+	return _executionMutex;
+}
 }

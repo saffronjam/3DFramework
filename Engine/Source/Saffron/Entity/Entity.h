@@ -28,7 +28,10 @@ public:
 	template <typename T>
 	void RemoveComponent();
 
-	Matrix4& Transform();
+	SE_FUNCTION();
+	auto test(int parm = 4, double test ) -> void;
+
+	auto Transform() -> Matrix4&;
 	const Matrix4& Transform() const;
 
 	operator uint() const;
@@ -39,13 +42,14 @@ public:
 	bool operator!=(const Entity& other) const;
 	bool operator<(const Entity& other) const;
 
-	UUID GetUUID();
-	UUID GetSceneUUID() const;
-	Scene* GetScene();
+	auto GetUUID() -> UUID;
+	auto GetSceneUUID() const -> UUID;
+	auto GetScene() -> Scene*;
+
 	const Scene* GetScene() const;
 	EntityHandle GetHandle() const;
 
-	Entity Copy(Optional<Scene*> separateScene = {});
+	auto Copy(Optional<Scene*> separateScene = {}) -> Entity;
 
 	static Entity Null() { return {entt::null, nullptr}; }
 

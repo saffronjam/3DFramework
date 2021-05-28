@@ -26,7 +26,7 @@ App::App(const Properties& properties) :
 {
 	_window = Window::Create(Window::Properties(properties.Name, properties.WindowWidth, properties.WindowHeight));
 
-	_window->Closed += SE_FUNCTION(App::OnWindowClose);
+	_window->Closed += SE_EV_FUNCTION(App::OnWindowClose);
 	_window->SetVSync(false);
 	_window->Maximize();
 	_window->SetWindowIcon("Editor/Saffron_windowIcon.png");
