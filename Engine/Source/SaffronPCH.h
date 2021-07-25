@@ -26,7 +26,3 @@
 #include <tuple>
 #include <string>
 #include <initializer_list>
-
-#include "Saffron/Debug/Instrumentor.h"
-#include "Saffron/Core/Log.h"
-#include "Saffron/Core/Timer.h"

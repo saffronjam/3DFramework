@@ -4,6 +4,8 @@
 //
 #pragma once
 
-#ifdef SAFFRON_ENTRY_POINT
-#include <Saffron/EntryPoint.h>
+#include "Saffron/Common/App.h"
+
+#ifdef SE_ENTRY_POINT
+#include <Saffron/Core/EntryPoint.h>
 #endif
