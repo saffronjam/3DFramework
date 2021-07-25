@@ -1,6 +1,0 @@
-{
-    "files.associations": {
-        "*.sc": "glsl",
-        "sstream": "cpp"
-    }
-}

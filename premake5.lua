@@ -1,63 +1,84 @@
--- ----------------------------------------------------
--- ----------------------------------------------------
--- --------- Saffron Engine Project Generator ---------
--- ----------------------------------------------------
--- ----------------------------------------------------
+---@diagnostic disable: undefined-global
 
+local ProjectName = "Fractals"
 
--- --------------------------------------
--- Saffron Workspace
--- --------------------------------------
+local function GetBasePath()
+	return debug.getinfo(1).source:match("@?(.*/)")
+end
 
 workspace "Saffron"
 	architecture "x64"
-	
-	configurations 
-	{ 
-		"Debug", 
+
+	configurations {
+		"Debug",
 		"Release",
 		"Dist"
 	}
 
-	flags
-	{
+	flags {
 		"MultiProcessorCompile"
 	}
 
-	startproject "Editor"
+    location (WrkLoc)
 
-outputDirectory = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
+	startproject (ProjectName)
 
--- --------------------------------------
--- Engine
--- --------------------------------------
+local SaffronEngine2D = require("ThirdParty.SaffronEngine2D.premake5")
 
-group "Engine"
+project (ProjectName)
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++20"
+	staticruntime "On"
 
-group "Engine/Dependencies"
-	-- include "Engine/ThirdParty/assimp/premake5"
-	include "Engine/ThirdParty/Box2D/premake5"
-	-- include "Engine/ThirdParty/entt/premake5"
-	include "Engine/ThirdParty/FastNoise/premake5"
-	include "Engine/ThirdParty/Glad/premake5"
-	include "Engine/ThirdParty/GLFW/premake5"
-	-- include "Engine/ThirdParty/glm/premake5"
-	include "Engine/ThirdParty/ImGui/premake5"
-	include "Engine/ThirdParty/mono/premake5"
-	-- include "Engine/ThirdParty/spdlog/premake5"
-	-- include "Engine/ThirdParty/stb/premake5"
-	include "Engine/ThirdParty/yaml-cpp/premake5"
-group "Engine"
-	include "Engine/premake5"
-	include "ScriptCore/premake5"
-	include "ScriptGenerator/premake5"
-group "Games"
-	include "Games/2DGameProject/premake5"
-group ""
+	objdir (OutObj)
+	location (OutLoc)
 
-include "Editor/premake5"
+    filter "configurations:Debug or Release"
+	    targetdir (OutBin)
+        SaffronEngine2D.PreBuild("Debug", OutBin, PrjLoc)
+        SaffronEngine2D.PostBuild("Debug", OutBin, PrjLoc)
 
+        SaffronEngine2D.PreBuild("Release", OutBin, PrjLoc)
+        SaffronEngine2D.PostBuild("Release", OutBin, PrjLoc)
 
+    filter "configurations:Dist"
+        targetdir (OutBinDist)
+        SaffronEngine2D.PreBuild("Dist", OutBinDist, PrjLoc)
+        SaffronEngine2D.PostBuild("Dist", OutBinDist, PrjLoc)
 
+    filter "configurations:Debug or Release or Dist"
 
+    files {
+        "Source/**.h",
+		"Source/**.c",
+		"Source/**.hpp",
+		"Source/**.cpp",
+		"Assets/Shaders/**.*",
+    }
 
+    vpaths {
+        ["Shaders"] = { "Assets/Shaders/**.*" }
+    }
+
+    includedirs {
+        "Source",
+    }
+    
+    SaffronEngine2D.Include()
+    SaffronEngine2D.Link()
+    SaffronEngine2D.AddDefines()
+
+    local from = GetBasePath() .. AstFol
+    CopyAssetsToOutput("Debug", from, OutBin .. AstFol, PrjLoc .. AstFol)
+    CopyAssetsToOutput("Release", from, OutBin  .. AstFol, PrjLoc .. AstFol)
+    CopyAssetsToOutput("Dist", from, OutBinDist  .. AstFol, PrjLoc .. AstFol)
+
+    filter "configurations:Debug"
+        symbols "On"
+
+    filter "configurations:Release"
+        optimize "On"
+
+    filter "configurations:Dist"
+        optimize "On"

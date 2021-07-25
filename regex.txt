@@ -1,5 +1,0 @@
-Shared<(?<Var>.*)>::Create
-CreateShared<${Var}>
-
-([a-zA-Z]*)
-_\L$1$2 m_([a-zA-Z])

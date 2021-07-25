@@ -42,7 +42,7 @@ RelWithDebInfo
 
 # Executables
 *.exe
-!Programs/*/Bin/*.exe
+!ThirdParty/Premake/Bin/premake5.exe
 *.out
 *.app
 
@@ -53,4 +53,4 @@ Engine/bin/
 .vs/
 Bin/
 Bin-Int/
-!Programs/*/Bin/
+!ThirdParty/Premake/Bin/premake5.exe
