@@ -16,11 +16,14 @@ class SubscriberList
 	using Action = std::function<void(Args ...)>;
 
 public:
+	auto operator +=(const Event& event) -> Uuid;
+	auto operator +=(const Action& action) -> Uuid;
+	void operator -=(Uuid uuid);
+
 	void Invoke(Args ... args);
 
-	Uuid Subscribe(const Event& event);
-	Uuid Subscribe(const Action& action);
-
+	auto Subscribe(const Event& event) -> Uuid;
+	auto Subscribe(const Action& action) -> Uuid;
 	void Unsubscribe(Uuid uuid);
 
 private:
@@ -34,16 +37,37 @@ class SubscriberList<void>
 	using Action = std::function<void()>;
 
 public:
+	auto operator +=(const Event& event) -> Uuid;
+	auto operator +=(const Action& action) -> Uuid;
+	void operator -=(Uuid uuid);
+
 	void Invoke();
 
 	auto Subscribe(const Event& event) -> Uuid;
 	auto Subscribe(const Action& action) -> Uuid;
-
 	void Unsubscribe(Uuid uuid);
 
 private:
 	std::optional<std::map<Uuid, Event>> _subscribers;
 };
+
+template <typename ... Args>
+auto SubscriberList<Args...>::operator+=(const Event& event) -> Uuid
+{
+	return Subscribe(event);
+}
+
+template <typename ... Args>
+auto SubscriberList<Args...>::operator+=(const Action& action) -> Uuid
+{
+	return Subscribe(action);
+}
+
+template <typename ... Args>
+void SubscriberList<Args...>::operator-=(Uuid uuid)
+{
+	Unsubscribe(uuid);
+}
 
 template <typename ... Args>
 void SubscriberList<Args...>::Invoke(Args ... args)

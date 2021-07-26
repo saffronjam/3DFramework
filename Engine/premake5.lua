@@ -17,7 +17,8 @@ end
 
 local function RequireAll()
     local result = {}
-    -- result["ImGui"]  = require("ThirdParty.imgui.premake5")
+    result["DirectX"] = require("ThirdParty.DirectX.premake5")
+    result["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
     return result
 end
 

@@ -28,8 +28,8 @@ WindowsWindow::WindowsWindow(const WindowSpec& spec) :
 	RegisterClassEx(&wc);
 
 	RECT wr = {};
-	wr.left = 100;
-	wr.top = 100;
+	wr.left = spec.Position.x;
+	wr.top = spec.Position.y;
 	wr.right = wr.left + spec.Width;
 	wr.bottom = wr.top + spec.Height;
 
@@ -41,6 +41,21 @@ WindowsWindow::WindowsWindow(const WindowSpec& spec) :
 
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
 	Log::Info("Creating Window {}", spec.Title);
+}
+
+void WindowsWindow::OnUpdate()
+{
+	MSG msg;
+	while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+}
+
+auto WindowsWindow::NativeHandle() const -> void*
+{
+	return _hWnd;
 }
 
 auto CALLBACK WindowsWindow::WndSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
@@ -63,7 +78,6 @@ auto CALLBACK WindowsWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 	return userWindow->HandleWin32Message(hWnd, msg, wParam, lParam);
 }
 
-
 auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
 	//if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
@@ -81,17 +95,17 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	case WM_CLOSE:
 	{
 		PostQuitMessage(0);
-		PushEvent({ EventType::Closed });
+		PushEvent({EventType::Closed});
 		return 0;
 	}
 	case WM_SETFOCUS:
 	{
-		PushEvent({ EventType::GainedFocus });
+		PushEvent({EventType::GainedFocus});
 		break;
 	}
 	case WM_KILLFOCUS:
 	{
-		PushEvent({ EventType::LostFocus });
+		PushEvent({EventType::LostFocus});
 		break;
 	}
 	case WM_ACTIVATE:

@@ -4,6 +4,21 @@
 
 namespace Se
 {
+auto SubscriberList<void>::operator+=(const Event& event) -> Uuid
+{
+	return Subscribe(event);
+}
+
+auto SubscriberList<void>::operator+=(const Action& action) -> Uuid
+{
+	return Subscribe(action);
+}
+
+void SubscriberList<void>::operator-=(Uuid uuid)
+{
+	return Unsubscribe(uuid);
+}
+
 void SubscriberList<void>::Invoke()
 {
 	if (!_subscribers.has_value())

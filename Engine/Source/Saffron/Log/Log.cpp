@@ -15,11 +15,11 @@ Log::Log()
 
 void Log::Info(const std::string& string)
 {
-	std::cout << string << '\n';
+	std::cout << "[Info] " << string << '\n';
 }
 
 void Log::Debug(const std::string& string)
 {
-	std::cerr << string << '\n';
+	std::cerr << "[Debug] " << string << '\n';
 }
 }

@@ -11,6 +11,10 @@ class WindowsWindow : public Window
 public:
 	explicit WindowsWindow(const WindowSpec& spec);
 
+	void OnUpdate() override;
+
+	auto NativeHandle() const -> void* override;
+
 private:
 	static auto WndSetup(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
 	static auto WndProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam) -> LRESULT;

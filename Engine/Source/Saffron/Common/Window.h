@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
-#include "Saffron/Input/Codes.h"
 #include "Saffron/Event/Event.h"
 
 namespace Se
@@ -11,6 +10,7 @@ struct WindowSpec
 	uint Width = 1280;
 	uint Height = 720;
 	std::string Title;
+	Vector2 Position;
 };
 
 class Window
@@ -18,8 +18,15 @@ class Window
 public:
 	explicit Window(const WindowSpec& spec);
 
+	virtual void OnUpdate();
+
 	void PushEvent(const Event& event);
 	void DispatchEvents();
+
+	auto Width() const -> uint;
+	auto Height() const -> uint;
+
+	virtual auto NativeHandle() const -> void* = 0;
 
 	static auto Create(const WindowSpec& spec) -> std::unique_ptr<Window>;
 

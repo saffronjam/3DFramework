@@ -3,6 +3,8 @@
 #include "Saffron/Common/Uuid.h"
 #include "Saffron/Math/Random.h"
 
+#undef max
+
 namespace Se
 {
 static RandomGenerator<ulong> sRandom(0, std::numeric_limits<ulong>::max());

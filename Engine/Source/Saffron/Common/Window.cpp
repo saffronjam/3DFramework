@@ -1,15 +1,16 @@
 ﻿#include "SaffronPCH.h"
 
-#include <Windows.h>
-
 #include "Saffron/Common/Window.h"
-#include "Saffron/Input/Codes.h"
 #include "Saffron/Platform/Windows/WindowsWindow.h"
 
 namespace Se
 {
 Window::Window(const WindowSpec& spec) :
 	_spec(spec)
+{
+}
+
+void Window::OnUpdate()
 {
 }
 
@@ -86,6 +87,17 @@ void Window::DispatchEvents()
 		}
 		}
 	}
+	_events.clear();
+}
+
+auto Window::Width() const -> uint
+{
+	return _spec.Width;
+}
+
+auto Window::Height() const -> uint
+{
+	return _spec.Height;
 }
 
 auto Window::Create(const WindowSpec& spec) -> std::unique_ptr<Window>
