@@ -16,15 +16,14 @@ project (ProjectName)
     filter "configurations:Debug or Release"
 	    targetdir (OutBin)
         Engine.PreBuild("Debug", OutBin, PrjLoc)
-        Engine.PostBuild("Debug", OutBin, PrjLoc)
-
+        Engine.PostBuild(ProjectName, "Debug", OutBin, PrjLoc)
         Engine.PreBuild("Release", OutBin, PrjLoc)
-        Engine.PostBuild("Release", OutBin, PrjLoc)
+        Engine.PostBuild(ProjectName, "Release", OutBin, PrjLoc)
 
     filter "configurations:Dist"
         targetdir (OutBinDist)
         Engine.PreBuild("Dist", OutBinDist, PrjLoc)
-        Engine.PostBuild("Dist", OutBinDist, PrjLoc)
+        Engine.PostBuild(ProjectName, "Dist", OutBinDist, PrjLoc)
 
     filter "configurations:Debug or Release or Dist"
 
@@ -49,9 +48,9 @@ project (ProjectName)
     Engine.AddDefines()
 
     local from = GetBasePath() .. AstFol
-    CopyAssetsToOutput("Debug", from, OutBin .. AstFol, PrjLoc .. AstFol)
-    CopyAssetsToOutput("Release", from, OutBin  .. AstFol, PrjLoc .. AstFol)
-    CopyAssetsToOutput("Dist", from, OutBinDist  .. AstFol, PrjLoc .. AstFol)
+    Utils.CopyAssetsToOutput("Debug", from, OutBin .. AstFol, PrjLoc .. AstFol)
+    Utils.CopyAssetsToOutput("Release", from, OutBin  .. AstFol, PrjLoc .. AstFol)
+    Utils.CopyAssetsToOutput("Dist", from, OutBinDist  .. AstFol, PrjLoc .. AstFol)
 
     filter "configurations:Debug"
         symbols "On"

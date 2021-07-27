@@ -1,6 +1,11 @@
 #include "SaffronPCH.h"
 
+#include <imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+
 #include "Saffron/Platform/Windows/WindowsWindow.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 namespace Se
 {
@@ -80,10 +85,10 @@ auto CALLBACK WindowsWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM 
 
 auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
-	//if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-	//{
-	//	return true;
-	//}
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+	{
+		return true;
+	}
 
 	switch (msg)
 	{

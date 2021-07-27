@@ -8,7 +8,8 @@ namespace Se
 App::App(const AppSpec& spec) :
 	SingleTon(this),
 	_window(Window::Create(spec.WindowSpec)),
-	_renderer(std::make_unique<Renderer>(*_window))
+	_renderer(std::make_unique<Renderer>(*_window)),
+	_ui(std::make_unique<Ui>())
 {
 	_window->Closed.Subscribe([this] { OnClosed(); });
 }
@@ -17,10 +18,21 @@ void App::Run()
 {
 	while (_running)
 	{
-		_window->OnUpdate();
 		_window->DispatchEvents();
 
+		_renderer->DrawTestTriangle();
+		
+		RendererApi::Clear();
+		
+		_ui->Begin();
+
+		ImGui::ShowDemoWindow();		
+
+		_ui->End();
+		
 		RendererApi::Present();
+		
+		_window->OnUpdate();
 	}
 }
 

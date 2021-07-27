@@ -5,6 +5,7 @@
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
 #include "Saffron/Rendering/Renderer.h"
+#include "Saffron/Ui/Ui.h"
 
 namespace Se
 {
@@ -31,6 +32,7 @@ private:
 
 	std::unique_ptr<class Window> _window;
 	std::unique_ptr<Renderer> _renderer;
+	std::unique_ptr<Ui> _ui;
 };
 
 std::unique_ptr<App> CreateApp();

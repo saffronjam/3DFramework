@@ -24,10 +24,7 @@ public:
 
 	void Execute();
 
-	static void ThrowIfBad(
-		HRESULT hResult,
-		const std::source_location location = std::source_location::current()
-	) noexcept(!ConfDebug)
+	static void ThrowIfBad(HRESULT hResult, const std::source_location location = std::source_location::current())
 	{
 		if (BadHResult(hResult))
 		{
@@ -40,14 +37,18 @@ public:
 	}
 
 	static auto Device() -> ID3D11Device&;
-	static auto Context()->ID3D11DeviceContext&;
+	static auto Context() -> ID3D11DeviceContext&;
 	static auto SwapChain() -> IDXGISwapChain&;
+	static auto Target() -> ID3D11RenderTargetView&;
+
+	void DrawTestTriangle();
 
 private:
-	ComPtr<ID3D11Device> _device;
-	ComPtr<IDXGISwapChain> _swapChain;
-	ComPtr<ID3D11DeviceContext> _context;
+	ComPtr<ID3D11Device> _device{};
+	ComPtr<IDXGISwapChain> _swapChain{};
+	ComPtr<ID3D11DeviceContext> _context{};
+	ComPtr<ID3D11RenderTargetView> _mainTarget{};
 
-	std::vector<RenderFn> _submitions;
+	std::vector<RenderFn> _submitions{};
 };
 }

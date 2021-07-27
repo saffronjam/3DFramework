@@ -3,8 +3,11 @@
 Inspect = require('inspect')
 Utils = require('utils')
 
-OutBin     = _MAIN_SCRIPT_DIR .. "/Build/Bin/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
-OutObj     = _MAIN_SCRIPT_DIR .. "/Build/Obj/%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/%{prj.name}/"
+CfgSys     = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}/"
+CmnBin     = _MAIN_SCRIPT_DIR .. "/Build/Bin/" .. CfgSys
+CmnObj     = _MAIN_SCRIPT_DIR .. "/Build/Obj/" .. CfgSys
+OutBin     = CmnBin .. "%{prj.name}/"
+OutObj     = CmnObj .. "%{prj.name}/"
 OutBinDist = _MAIN_SCRIPT_DIR .. "/Example/%{cfg.system}/"
 OutLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
 PrjLoc     = _MAIN_SCRIPT_DIR .. "/Build/"
@@ -19,6 +22,7 @@ local function RequireAll()
     local result = {}
     result["DirectX"] = require("ThirdParty.DirectX.premake5")
     result["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
+    result["ImGui"] = require("ThirdParty.imgui.premake5")
     return result
 end
 
@@ -66,7 +70,7 @@ module.Project = "SaffronEngine2D"
 module.Include = function ()
     includedirs {
         GetBasePath() .. "Source"
-    }    
+    }
     -- Include third parties
     IncludeAll()
 end
@@ -78,22 +82,25 @@ module.Link = function ()
 end
 
 module.PreBuild = function (Configuration, BinaryOutputDir, ProjectDir)
-    disablewarnings { 
+    disablewarnings {
         "4244",
         "4267"
     }
     PreBuildAll(Configuration, BinaryOutputDir, ProjectDir)
 end
 
-module.PostBuild = function (Configuration, BinaryOutputDir, ProjectDir)    
-	filter ("configurations:" .. Configuration)
-	    local resFrom = GetBasePath() .. AstFol
-        local resBinTo = BinaryOutputDir .. AstFol
-        local resProjTo = ProjectDir .. AstFol
-        postbuildcommands {
-            Utils.CopyCmd(resFrom, resBinTo),
-            Utils.CopyCmd(resFrom, resProjTo),
-        }
+module.PostBuild = function (Project, Configuration, BinaryOutputDir, ProjectDir)
+    local resFrom = GetBasePath() .. AstFol
+    local shrBinFrom = Utils.ProjectBin(module.Project) .. "Shaders/"
+
+    local resBinTo = BinaryOutputDir .. AstFol
+    local resPrjTo = ProjectDir .. AstFol
+    local shrBinTo = resBinTo .. "Shaders/"
+    local shrPrjTo = resPrjTo .. "Shaders/"
+
+    Utils.CopyAssetsToOutput(Configuration, resFrom, resBinTo, resPrjTo);
+    Utils.CopyAssetsToOutput(Configuration, shrBinFrom, shrBinTo, shrPrjTo);
+
     PostBuildAll(Configuration, BinaryOutputDir, ProjectDir)
 end
 
@@ -143,6 +150,11 @@ project (module.Project)
 		"Source/**.c",
 		"Source/**.hpp",
 		"Source/**.cpp",
+		"Assets/Shaders/**.hlsl",
+    }
+
+    vpaths {
+        ["Engine/Shaders"] = { "Assets/Shaders/**.*" }
     }
 
     disablewarnings {
@@ -164,6 +176,17 @@ project (module.Project)
         optimize "On"
     filter "configurations:Dist"
         optimize "On"
+
+
+    filter { "files:**_p.hlsl" }
+        shadermodel "5.0"
+        shadertype "Pixel"
+        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
+
+    filter { "files:**_v.hlsl" }
+        shadermodel "5.0"
+        shadertype "Vertex"
+        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
 
 group ""
 

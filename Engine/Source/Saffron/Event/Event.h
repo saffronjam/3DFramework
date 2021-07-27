@@ -40,71 +40,70 @@ enum class EventType
 	Count //!< Keep last -- the total number of event types
 };
 
+////////////////////////////////////////////////////////////
+/// \brief Size events parameters (Resized)
+////////////////////////////////////////////////////////////
+struct SizeEvent
+{
+	unsigned int Width; //!< New Width, in pixels
+	unsigned int Height; //!< New Height, in pixels
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Keyboard event parameters (KeyPressed, KeyReleased)
+////////////////////////////////////////////////////////////
+struct KeyEvent
+{
+	KeyCode Code; //!< Code of the key that has been pressed
+	bool Alt; //!< Is the Alt key pressed?
+	bool Control; //!< Is the Control key pressed?
+	bool Shift; //!< Is the Shift key pressed?
+	bool System; //!< Is the System key pressed?
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Text event parameters (TextEntered)
+////////////////////////////////////////////////////////////
+struct TextEvent
+{
+	uint Unicode; //!< UTF-32 Unicode value of the character
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Mouse move event parameters (MouseMoved)
+////////////////////////////////////////////////////////////
+struct MouseMoveEvent
+{
+	int x; //!< X position of the mouse pointer, relative to the left of the owner window
+	int y; //!< Y position of the mouse pointer, relative to the top of the owner window
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Mouse buttons events parameters
+///        (MouseButtonPressed, MouseButtonReleased)
+////////////////////////////////////////////////////////////
+struct MouseButtonEvent
+{
+	MouseButtonCode Button; //!< Code of the Button that has been pressed
+	int x; //!< X position of the mouse pointer, relative to the left of the owner window
+	int y; //!< Y position of the mouse pointer, relative to the top of the owner window
+};
+
+////////////////////////////////////////////////////////////
+/// \brief Mouse Wheel events parameters (MouseWheelScrolled)
+////////////////////////////////////////////////////////////
+struct MouseWheelScrollEvent
+{
+	MouseWheelCode Wheel; //!< Which Wheel (for mice with multiple ones)
+	float Delta;
+	//!< Wheel offset (positive is up/left, negative is down/right). High-precision mice may use non-integral offsets.
+	int x; //!< X position of the mouse pointer, relative to the left of the owner window
+	int y; //!< Y position of the mouse pointer, relative to the top of the owner window
+};
+
 class Event
 {
 public:
-	////////////////////////////////////////////////////////////
-	/// \brief Size events parameters (Resized)
-	////////////////////////////////////////////////////////////
-	struct SizeEvent
-	{
-		unsigned int Width; //!< New Width, in pixels
-		unsigned int Height; //!< New Height, in pixels
-	};
-
-	////////////////////////////////////////////////////////////
-	/// \brief Keyboard event parameters (KeyPressed, KeyReleased)
-	////////////////////////////////////////////////////////////
-	struct KeyEvent
-	{
-		KeyCode Code; //!< Code of the key that has been pressed
-		bool Alt; //!< Is the Alt key pressed?
-		bool Control; //!< Is the Control key pressed?
-		bool Shift; //!< Is the Shift key pressed?
-		bool System; //!< Is the System key pressed?
-	};
-
-	////////////////////////////////////////////////////////////
-	/// \brief Text event parameters (TextEntered)
-	////////////////////////////////////////////////////////////
-	struct TextEvent
-	{
-		uint Unicode; //!< UTF-32 Unicode value of the character
-	};
-
-	////////////////////////////////////////////////////////////
-	/// \brief Mouse move event parameters (MouseMoved)
-	////////////////////////////////////////////////////////////
-	struct MouseMoveEvent
-	{
-		int x; //!< X position of the mouse pointer, relative to the left of the owner window
-		int y; //!< Y position of the mouse pointer, relative to the top of the owner window
-	};
-
-	////////////////////////////////////////////////////////////
-	/// \brief Mouse buttons events parameters
-	///        (MouseButtonPressed, MouseButtonReleased)
-	////////////////////////////////////////////////////////////
-	struct MouseButtonEvent
-	{
-		MouseButtonCode Button; //!< Code of the Button that has been pressed
-		int x; //!< X position of the mouse pointer, relative to the left of the owner window
-		int y; //!< Y position of the mouse pointer, relative to the top of the owner window
-	};
-
-	////////////////////////////////////////////////////////////
-	/// \brief Mouse Wheel events parameters (MouseWheelScrolled)
-	////////////////////////////////////////////////////////////
-	struct MouseWheelScrollEvent
-	{
-		MouseWheelCode Wheel; //!< Which Wheel (for mice with multiple ones)
-		float Delta;
-		//!< Wheel offset (positive is up/left, negative is down/right). High-precision mice may use non-integral offsets.
-		int x; //!< X position of the mouse pointer, relative to the left of the owner window
-		int y; //!< Y position of the mouse pointer, relative to the top of the owner window
-	};
-
-
 	////////////////////////////////////////////////////////////
 	// Member data
 	////////////////////////////////////////////////////////////
