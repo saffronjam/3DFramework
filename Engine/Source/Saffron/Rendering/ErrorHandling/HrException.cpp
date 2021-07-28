@@ -6,6 +6,11 @@
 
 namespace Se
 {
+auto HrException::What() const -> std::string
+{
+	return Formatted<HrException>();
+}
+
 auto HrException::Type() const -> const char*
 {
 	return "HResult Exception";

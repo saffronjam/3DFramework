@@ -2,13 +2,13 @@
 
 #include <Windows.h>
 #include <d3d11.h>
+#include <d3dcompiler.h>
 
 #include "Saffron/Common/App.h"
 #include "Saffron/Rendering/Renderer.h"
-
-#include <d3dcompiler.h>
-
 #include "Saffron/Rendering/ErrorHandling/HrException.h"
+#include "Saffron/Rendering/ErrorHandling/DxgiInfoException.h"
+#include "Saffron/ErrorHandling/ExceptionHelpers.h"
 
 namespace Se
 {
@@ -17,83 +17,57 @@ Renderer::Renderer(const Window& window) :
 {
 	constexpr auto debug = [] { return Configuration == AppConfiguration::Debug; }();
 
-	uint swapCreateFlags = 0;
-
-	if constexpr (debug)
+	CreateDeviceAndContext();
+	CreateFactory();
+	CreateSwapChain(window);
+	CreateMainTarget(window);
+	
+	if constexpr (ConfDebug)
 	{
-		swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		_dxgiInfoQueue = std::make_unique<DxgiInfoManager>();
 	}
-
-
-	DXGI_SWAP_CHAIN_DESC sd = {};
-	sd.BufferCount = 1;
-	sd.BufferDesc.Width = window.Width();
-	sd.BufferDesc.Height = window.Height();
-	sd.BufferDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-	sd.BufferDesc.RefreshRate.Numerator = 0;
-	sd.BufferDesc.RefreshRate.Denominator = 0;
-	sd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-	sd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-	sd.Flags = 0;
-	sd.OutputWindow = static_cast<HWND>(window.NativeHandle());
-	sd.SampleDesc.Count = 1;
-	sd.SampleDesc.Quality = 0;
-	sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	sd.Windowed = true;
-
-	const auto result = D3D11CreateDeviceAndSwapChain(
-		nullptr,
-		D3D_DRIVER_TYPE_HARDWARE,
-		nullptr,
-		swapCreateFlags,
-		nullptr,
-		0,
-		D3D11_SDK_VERSION,
-		&sd,
-		&_swapChain,
-		&_device,
-		nullptr,
-		&_context
-	);
-
-	Debug::Assert(GoodHResult(result), "Failed to create Device and SwapChain");
-
-	D3D11_VIEWPORT vp;
-	vp.Width = window.Width();
-	vp.Height = window.Height();
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 0.0f;
-	vp.TopLeftX = 0.0f;
-	vp.TopLeftY = 0.0f;
-
-	_context->RSSetViewports(1, &vp);
-
-	ID3D11Resource* backBuffer = nullptr;
-	auto hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Resource), reinterpret_cast<void**>(&backBuffer));
-	hr = _device->CreateRenderTargetView(backBuffer, nullptr, &_mainTarget);
-	Debug::Assert(GoodHResult(hr), "Failed to create main RenderTargetView");
 }
 
 void Renderer::Execute()
 {
 	if constexpr (ConfDebug)
 	{
-		Log::Info("Executing {} submitions", _submitions.size());
+		//Log::Info("Executing {} submitions", _submitions.size());
 	}
 
 	for (auto& submition : _submitions)
 	{
 		try
 		{
-			submition();
+			if constexpr (ConfDebug)
+			{
+				_dxgiInfoQueue->Begin();
+				submition.Fn();
+				const auto result = _dxgiInfoQueue->End();
+				if (result.size() > 0)
+				{
+					throw DxgiInfoException(std::move(result), submition.Location);
+				}
+			}
+			else
+			{
+				submition.Fn();
+			}
 		}
 		catch (const HrException& e)
 		{
 			MessageBoxA(
 				static_cast<HWND>(App::Instance().Window().NativeHandle()),
-				e.Type(),
 				e.What().c_str(),
+				e.Type(),
+				MB_OK | MB_ICONEXCLAMATION
+			);
+		} catch (const SaffronException& e)
+		{
+			MessageBoxA(
+				static_cast<HWND>(App::Instance().Window().NativeHandle()),
+				e.What().c_str(),
+				e.Type(),
 				MB_OK | MB_ICONEXCLAMATION
 			);
 		}
@@ -120,7 +94,6 @@ auto Renderer::Target() -> ID3D11RenderTargetView&
 {
 	return *Instance()._mainTarget.Get();
 }
-
 
 void Renderer::DrawTestTriangle()
 {
@@ -155,7 +128,7 @@ void Renderer::DrawTestTriangle()
 
 	// Load Pixel shader and bind it
 	ComPtr<ID3D11PixelShader> pixelShader;
-	ThrowIfBad(D3DReadFileToBlob(L"Shaders/PixelShader.pixel.cso", &blob));
+	ThrowIfBad(D3DReadFileToBlob(L"Assets/Shaders/PixelShader_p.cso", &blob));
 	ThrowIfBad(_device->CreatePixelShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &pixelShader));
 
 
@@ -164,9 +137,9 @@ void Renderer::DrawTestTriangle()
 
 	// Load Vertex shader and bind it
 	ComPtr<ID3D11VertexShader> vertexShader;
-	ThrowIfBad(D3DReadFileToBlob(L"Shaders/VertexShader.vertex.cso", &blob));
+	ThrowIfBad(D3DReadFileToBlob(L"Assets/Shaders/VertexShader_v.cso", &blob));
 
-	ThrowIfBad(_device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));;;
+	ThrowIfBad(_device->CreateVertexShader(blob->GetBufferPointer(), blob->GetBufferSize(), nullptr, &vertexShader));
 
 	_context->VSSetShader(vertexShader.Get(), nullptr, 0u);
 
@@ -208,6 +181,99 @@ void Renderer::DrawTestTriangle()
 	// Set primitive topology
 	_context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+
+	_dxgiInfoQueue->Begin();
 	_context->Draw(static_cast<UINT>(std::size(vertices)), 0);
+	const auto result = _dxgiInfoQueue->End();
+
+	if (!result.empty())
+	{
+		throw SaffronException(result[0], std::source_location::current());
+	}
+	
+}
+
+void Renderer::CreateDeviceAndContext()
+{
+	uint swapCreateFlags = 0;
+
+	if constexpr (ConfDebug)
+	{
+		swapCreateFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	}
+	
+	const auto hr = D3D11CreateDevice(
+		nullptr,
+		D3D_DRIVER_TYPE_HARDWARE,
+		nullptr,
+		swapCreateFlags,
+		nullptr,
+		0,
+		D3D11_SDK_VERSION,
+		&_device,
+		nullptr,
+		&_context
+	);
+	ThrowIfBad(hr);
+}
+
+void Renderer::CreateFactory()
+{
+	const auto hr = CreateDXGIFactory2(0, __uuidof(_factory), &_factory);
+	ThrowIfBad(hr);
+}
+
+void Renderer::CreateSwapChain(const Window& window)
+{
+	DXGI_SWAP_CHAIN_DESC1 sd = {0};
+	sd.BufferCount = 2;
+	sd.Width = window.Width();
+	sd.Height = window.Height();
+	sd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	sd.Scaling = DXGI_SCALING_NONE;
+	sd.Stereo = false;
+	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+	sd.Flags = 0;
+	sd.SampleDesc.Count = 1;
+	sd.SampleDesc.Quality = 0;
+	sd.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+	sd.AlphaMode = DXGI_ALPHA_MODE_IGNORE;
+
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC fd = {0};
+	fd.RefreshRate.Numerator = 0;
+	fd.RefreshRate.Denominator = 0;
+	fd.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	fd.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	fd.Windowed = true;
+
+	const auto hr = _factory->CreateSwapChainForHwnd(
+		_device.Get(),
+		static_cast<HWND>(window.NativeHandle()),
+		&sd,
+		&fd,
+		nullptr,
+		&_swapChain
+	);
+	ThrowIfBad(hr);
+}
+
+void Renderer::CreateMainTarget(const Window& window)
+{
+	D3D11_VIEWPORT vp;
+	vp.Width = window.Width();
+	vp.Height = window.Height();
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 0.0f;
+	vp.TopLeftX = 0.0f;
+	vp.TopLeftY = 0.0f;
+
+	_context->RSSetViewports(1, &vp);
+
+	ComPtr<ID3D11Resource> backBuffer;
+	auto hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
+	ThrowIfBad(hr);
+
+	hr = _device->CreateRenderTargetView(backBuffer.Get(), nullptr, &_mainTarget);
+	ThrowIfBad(hr);
 }
 }

@@ -12,6 +12,11 @@ namespace Se
 class SaffronException : public std::exception
 {
 public:
+	explicit SaffronException(std::source_location location) :
+		_location(std::move(location))
+	{
+	}
+
 	SaffronException(std::string message, std::source_location location) :
 		_location(std::move(location)),
 		_message(std::move(message))

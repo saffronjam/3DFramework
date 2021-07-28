@@ -20,18 +20,23 @@ void App::Run()
 	{
 		_window->DispatchEvents();
 
-		_renderer->DrawTestTriangle();
-		
-		RendererApi::Clear();
-		
-		_ui->Begin();
 
-		ImGui::ShowDemoWindow();		
+		Renderer::Submit(
+			[this]
+			{
+				RendererApi::Clear();
+				
+				_renderer->DrawTestTriangle();
+				
+				_ui->Begin();
+				ImGui::ShowDemoWindow();
+				_ui->End();
+				
+				RendererApi::Present();
+			}
+		);
+		_renderer->Execute();
 
-		_ui->End();
-		
-		RendererApi::Present();
-		
 		_window->OnUpdate();
 	}
 }

@@ -6,12 +6,15 @@ module.Project = "DirectX"
 module.Link = function ()
 	filter "configurations:Debug"
 		links {
-			"D3D11.lib"
+			"D3D11.lib",
+			"dxguid.lib",
+			"dxgi.lib"
 		}
 
 	filter "configurations:Release or Dist"
 		links {
-			"D3D11.lib"
+			"D3D11.lib",
+			"dxgi.lib",
 		}
 end
 

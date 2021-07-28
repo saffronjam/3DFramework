@@ -15,10 +15,7 @@ public:
 	{
 	}
 
-	auto What() const -> std::string override
-	{
-		return Formatted<HrException>();
-	}
+	auto What() const -> std::string override;
 
 	auto Type() const -> const char* override;
 
@@ -30,14 +27,4 @@ private:
 	char _hResultMessageBuffer[256] = {};
 	std::string _messageBuffer;
 };
-
-constexpr bool GoodHResult(long hResult)
-{
-	return hResult >= 0;
-}
-
-constexpr bool BadHResult(long hResult)
-{
-	return !GoodHResult(hResult);
-}
 }
