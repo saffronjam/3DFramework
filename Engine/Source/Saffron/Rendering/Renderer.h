@@ -5,12 +5,28 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
+#include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
+
+
+#include "Bindables/InputLayout.h"
+#include "Bindables/VertexBuffer.h";
+#include "VertexLayout.h"
+#include "Bindables/PixelShader.h"
+#include "Bindables/VertexShader.h"
 
 namespace Se
 {
 using HRESULT = long;
-using RenderFn = std::function<void()>;
+
+struct RendererPackage
+{
+	ID3D11Device& Device;
+	IDXGISwapChain1& SwapChain;
+	ID3D11DeviceContext& Context;
+};
+
+using RenderFn = std::function<void(const RendererPackage& package)>;
 
 class Renderer : public SingleTon<Renderer>
 {
@@ -29,12 +45,12 @@ public:
 #ifdef SE_DEBUG
 	static void Submit(RenderFn fn, std::source_location location = std::source_location::current())
 	{
-		Instance()._submitions.emplace_back(Submition{std::move(fn), location});
+		Instance()._submitingContainer->emplace_back(Submition{std::move(fn), location});
 	}
 #else
 	static void Submit(RenderFn fn)
 	{
-		Instance()._submitions.emplace_back(std::move(fn));
+		Instance()._submitingContainer->.emplace_back(std::move(fn));
 	}
 #endif
 
@@ -60,8 +76,20 @@ private:
 	ComPtr<ID3D11RenderTargetView> _mainTarget{};
 	ComPtr<IDXGIFactory2> _factory{};
 
-	std::vector<Submition> _submitions;
+	std::vector<Submition> _submitionsPrimary;
+	std::vector<Submition> _submitionsSecondary;
+	std::vector<Submition>* _executingContainer = &_submitionsPrimary;
+	std::vector<Submition>* _submitingContainer = &_submitionsSecondary;
 
+	std::unique_ptr<BindableStore> _bindableStore;
+
+	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
+
+
+	std::shared_ptr<InputLayout> _layout;
+	std::shared_ptr<VertexShader> _vertexShader;
+	std::shared_ptr<PixelShader> _pixelShader;
+	std::shared_ptr<VertexBuffer> _vertexBuffer;
 };
 }

@@ -22,19 +22,28 @@ void App::Run()
 
 
 		Renderer::Submit(
-			[this]
+			[this](const RendererPackage& package)
 			{
 				RendererApi::Clear();
-				
-				_renderer->DrawTestTriangle();
-				
 				_ui->Begin();
+			}
+		);
+
+		
+		_renderer->DrawTestTriangle();
+
+
+		Renderer::Submit(
+			[this](const RendererPackage& package)
+			{
 				ImGui::ShowDemoWindow();
 				_ui->End();
-				
 				RendererApi::Present();
 			}
 		);
+
+
+		
 		_renderer->Execute();
 
 		_window->OnUpdate();

@@ -14,6 +14,8 @@
 #include "Saffron/Log/Log.h"
 #include "Saffron/Math/Math.h"
 
+#include <memory>
+
 #ifndef SE_FUNCTION
 #define SE_FUNCTION()
 #endif

@@ -45,7 +45,7 @@ auto DxgiInfoManager::End() -> std::vector<std::string>
 	std::vector<std::string> result;
 	result.reserve(messages);
 
-	for (int i = 0; i < messages; i++)
+	for (int i = _startIndex; i < messages; i++)
 	{
 		size_t messageLength = 0;
 		if (BadHResult(_queue->GetMessage(DXGI_DEBUG_ALL, i, nullptr, &messageLength)))
