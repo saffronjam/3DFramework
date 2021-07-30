@@ -9,11 +9,7 @@
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
 
 
-#include "Bindables/InputLayout.h"
-#include "Bindables/VertexBuffer.h";
-#include "VertexLayout.h"
-#include "Bindables/PixelShader.h"
-#include "Bindables/VertexShader.h"
+#include "Bindables.h"
 
 namespace Se
 {
@@ -86,10 +82,12 @@ private:
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 
-
+	std::shared_ptr<Framebuffer> _framebuffer;
 	std::shared_ptr<InputLayout> _layout;
 	std::shared_ptr<VertexShader> _vertexShader;
 	std::shared_ptr<PixelShader> _pixelShader;
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
+
+	std::shared_ptr<Texture> tex = Texture::Create(100, 100);
 };
 }

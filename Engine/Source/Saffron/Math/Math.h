@@ -11,6 +11,8 @@ using Vector4 = DirectX::SimpleMath::Vector4;
 using Matrix = DirectX::SimpleMath::Matrix;
 using Quaternion = DirectX::SimpleMath::Quaternion;
 
+using Color = DirectX::SimpleMath::Color;
+
 class Math
 {
 public:

@@ -44,6 +44,7 @@ Renderer::Renderer(const Window& window) :
 	storage.Add(Vertex{0.5f, -0.5f});
 	storage.Add(Vertex{-0.5f, -0.5f});
 
+	_framebuffer = Framebuffer::Create({window.Width(), window.Height(), {ImageFormat::RGBA}});
 	_vertexBuffer = VertexBuffer::Create(storage);
 	_vertexShader = VertexShader::Create("VertexShader_v");
 	_pixelShader = PixelShader::Create("PixelShader_p");
@@ -141,12 +142,31 @@ void Renderer::DrawTestTriangle()
 	_vertexShader->Bind();
 	_pixelShader->Bind();
 	_layout->Bind();
+	_framebuffer->Bind();
 
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
 			// Specify output target
-			_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
+			//_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
+
+			D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+			renderTargetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+			ComPtr<ID3D11RenderTargetView> renderTargetView;
+
+			auto& nonConst = const_cast<ID3D11Texture2D&>(tex->NativeTexture());
+			auto hr = package.Device.CreateRenderTargetView(&nonConst, &renderTargetViewDesc, &renderTargetView);
+
+			/*tex->Bind();
+
+			package.Context.OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);*/
+
+			ImGui::Begin("Image");
+			ImGui::Image((void*)(&tex->NativeShaderResourceView()), {100, 100});
+			ImGui::End();
 
 
 			const auto& window = App::Instance().Window();
@@ -166,7 +186,49 @@ void Renderer::DrawTestTriangle()
 
 
 			_context->Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
-			const auto result = _dxgiInfoQueue->End();
+		}
+	);
+
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
+			// Specify output target
+			_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
+
+			D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+			renderTargetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			renderTargetViewDesc.Texture2D.MipSlice = 0;
+
+			ComPtr<ID3D11RenderTargetView> renderTargetView;
+
+			auto& nonConst = const_cast<ID3D11Texture2D&>(tex->NativeTexture());
+			auto hr = package.Device.CreateRenderTargetView(&nonConst, &renderTargetViewDesc, &renderTargetView);
+
+			/*tex->Bind();
+
+			package.Context.OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);*/
+
+			ImGui::Begin("Image");
+			ImGui::Image((void*)(&_framebuffer->Target().ShaderView()), { 100, 100 });
+			ImGui::End();
+
+
+			const auto& window = App::Instance().Window();
+
+			// Configure viewport
+			D3D11_VIEWPORT vp;
+			vp.TopLeftX = 0;
+			vp.TopLeftY = 0;
+			vp.Width = static_cast<FLOAT>(window.Width());
+			vp.Height = static_cast<FLOAT>(window.Height());
+			vp.MinDepth = 0;
+			vp.MaxDepth = 1;
+			_context->RSSetViewports(1u, &vp);
+
+			// Set primitive topology
+			_context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			
 		}
 	);
 }
@@ -237,13 +299,7 @@ void Renderer::CreateSwapChain(const Window& window)
 
 void Renderer::CreateMainTarget(const Window& window)
 {
-	D3D11_VIEWPORT vp;
-	vp.Width = window.Width();
-	vp.Height = window.Height();
-	vp.MinDepth = 0.0f;
-	vp.MaxDepth = 0.0f;
-	vp.TopLeftX = 0.0f;
-	vp.TopLeftY = 0.0f;
+	D3D11_VIEWPORT vp{0.0f, 0.0f, window.Width(), window.Height(), 0.0f, 0.0f,};
 
 	_context->RSSetViewports(1, &vp);
 

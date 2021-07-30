@@ -5,8 +5,6 @@
 #include <sstream>
 #include <filesystem>
 
-#include "Saffron/Base.h"
-
 namespace Se
 {
 class SaffronException : public std::exception

@@ -7,6 +7,8 @@
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Ui/Ui.h"
 
+#include "Saffron/Rendering/Bindables.h"
+
 namespace Se
 {
 struct AppSpec

@@ -20,6 +20,6 @@ protected:
 	void SetInitializer(std::function<void()> initializer);
 
 private:
-	std::optional<std::function<void()>> _initializer;
+	std::optional<std::vector<std::function<void()>>> _initializer;
 };
 }

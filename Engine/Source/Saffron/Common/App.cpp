@@ -43,7 +43,6 @@ void App::Run()
 		);
 
 
-		
 		_renderer->Execute();
 
 		_window->OnUpdate();
