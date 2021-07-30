@@ -17,7 +17,8 @@ namespace Se
 {
 Renderer::Renderer(const Window& window) :
 	SingleTon(this),
-	_bindableStore(std::make_unique<BindableStore>())
+	_bindableStore(std::make_unique<BindableStore>()),
+	_viewport(window.Width(), window.Height())
 {
 	constexpr auto debug = [] { return Configuration == AppConfiguration::Debug; }();
 
@@ -144,47 +145,14 @@ void Renderer::DrawTestTriangle()
 	_layout->Bind();
 	_framebuffer->Bind();
 
+	const auto& window = App::Instance().Window();
+
+	_viewport.Bind();
+	_topology.Bind();
+
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
-			// Specify output target
-			//_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
-
-			D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-			renderTargetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-			ComPtr<ID3D11RenderTargetView> renderTargetView;
-
-			auto& nonConst = const_cast<ID3D11Texture2D&>(tex->NativeTexture());
-			auto hr = package.Device.CreateRenderTargetView(&nonConst, &renderTargetViewDesc, &renderTargetView);
-
-			/*tex->Bind();
-
-			package.Context.OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);*/
-
-			ImGui::Begin("Image");
-			ImGui::Image((void*)(&tex->NativeShaderResourceView()), {100, 100});
-			ImGui::End();
-
-
-			const auto& window = App::Instance().Window();
-
-			// Configure viewport
-			D3D11_VIEWPORT vp;
-			vp.TopLeftX = 0;
-			vp.TopLeftY = 0;
-			vp.Width = static_cast<FLOAT>(window.Width());
-			vp.Height = static_cast<FLOAT>(window.Height());
-			vp.MinDepth = 0;
-			vp.MaxDepth = 1;
-			_context->RSSetViewports(1u, &vp);
-
-			// Set primitive topology
-			_context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-
 			_context->Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
 		}
 	);
@@ -195,40 +163,9 @@ void Renderer::DrawTestTriangle()
 			// Specify output target
 			_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
 
-			D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
-			renderTargetViewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-			renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			renderTargetViewDesc.Texture2D.MipSlice = 0;
-
-			ComPtr<ID3D11RenderTargetView> renderTargetView;
-
-			auto& nonConst = const_cast<ID3D11Texture2D&>(tex->NativeTexture());
-			auto hr = package.Device.CreateRenderTargetView(&nonConst, &renderTargetViewDesc, &renderTargetView);
-
-			/*tex->Bind();
-
-			package.Context.OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);*/
-
 			ImGui::Begin("Image");
-			ImGui::Image((void*)(&_framebuffer->Target().ShaderView()), { 100, 100 });
+			ImGui::Image((void*)(&_framebuffer->Target().ShaderView()), {150, 150});
 			ImGui::End();
-
-
-			const auto& window = App::Instance().Window();
-
-			// Configure viewport
-			D3D11_VIEWPORT vp;
-			vp.TopLeftX = 0;
-			vp.TopLeftY = 0;
-			vp.Width = static_cast<FLOAT>(window.Width());
-			vp.Height = static_cast<FLOAT>(window.Height());
-			vp.MinDepth = 0;
-			vp.MaxDepth = 1;
-			_context->RSSetViewports(1u, &vp);
-
-			// Set primitive topology
-			_context->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			
 		}
 	);
 }

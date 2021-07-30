@@ -33,7 +33,8 @@ public:
 	void Bind() override;
 
 	void Resize(uint width, uint height);
-
+	void Clear();
+	
 	auto Target() const -> const Image&;
 
 	static auto Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>;

@@ -103,12 +103,34 @@ void Framebuffer::Resize(uint width, uint height)
 	);
 }
 
-auto Framebuffer::Target() const -> const Image&
+void Framebuffer::Clear()
+{
+	const auto inst = ShareThisAs<Framebuffer>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			for (auto& view : inst->_nativeRenderTargetViews)
+			{
+				package.Context.ClearRenderTargetView(view, reinterpret_cast<const float*>(&inst->_clearColor));
+			}
+
+			if (inst->_depthStencilAttachmentFormat != ImageFormat::None)
+			{
+				// TODO: Clear depth attachment
+				/*package.Context.ClearDepthStencilView(
+					&inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>(),
+				);*/
+			}
+		}
+	);
+}
+
+const Image& Framebuffer::Target() const
 {
 	return *_colorAttachments.front();
 }
 
-auto Framebuffer::Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>
+std::shared_ptr<Framebuffer> Framebuffer::Create(const FramebufferSpec& spec)
 {
 	return BindableStore::Add<Framebuffer>(spec);
 }

@@ -87,6 +87,8 @@ private:
 	std::shared_ptr<VertexShader> _vertexShader;
 	std::shared_ptr<PixelShader> _pixelShader;
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
+	Viewport _viewport;
+	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;
 
 	std::shared_ptr<Texture> tex = Texture::Create(100, 100);
 };
