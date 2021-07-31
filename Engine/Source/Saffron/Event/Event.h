@@ -13,25 +13,25 @@ enum class EventType
 	Closed,
 	//!< The window requested to be closed (no data)
 	Resized,
-	//!< The window was resized (data in event.size)
+	//!< The window was resized (data in event.Size)
 	LostFocus,
 	//!< The window lost the focus (no data)
 	GainedFocus,
 	//!< The window gained the focus (no data)
 	TextEntered,
-	//!< A character was entered (data in event.text)
+	//!< A character was entered (data in event.Text)
 	KeyPressed,
 	//!< A key was pressed (data in event.key)
 	KeyReleased,
 	//!< A key was released (data in event.key)
 	MouseWheelScrolled,
-	//!< The mouse Wheel was scrolled (data in event.mouseWheelScroll)
+	//!< The mouse Wheel was scrolled (data in event.MouseWheelScroll)
 	MouseButtonPressed,
-	//!< A mouse Button was pressed (data in event.mouseButton)
+	//!< A mouse Button was pressed (data in event.MouseButton)
 	MouseButtonReleased,
-	//!< A mouse Button was released (data in event.mouseButton)
+	//!< A mouse Button was released (data in event.MouseButton)
 	MouseMoved,
-	//!< The mouse cursor moved (data in event.mouseMove)
+	//!< The mouse cursor moved (data in event.MouseMove)
 	MouseEntered,
 	//!< The mouse cursor entered the area of the window (no data)
 	MouseLeft,
@@ -45,8 +45,8 @@ enum class EventType
 ////////////////////////////////////////////////////////////
 struct SizeEvent
 {
-	unsigned int Width; //!< New Width, in pixels
-	unsigned int Height; //!< New Height, in pixels
+	uint Width; //!< New Width, in pixels
+	uint Height; //!< New Height, in pixels
 };
 
 ////////////////////////////////////////////////////////////
@@ -111,13 +111,13 @@ public:
 
 	union
 	{
-		SizeEvent size; //!< Size event parameters (Event::Resized)
-		KeyEvent key; //!< Key event parameters (Event::KeyPressed, Event::KeyReleased)
-		TextEvent text; //!< Text event parameters (Event::TextEntered)
-		MouseMoveEvent mouseMove; //!< Mouse move event parameters (Event::MouseMoved)
-		MouseButtonEvent mouseButton;
+		SizeEvent Size; //!< Size event parameters (Event::Resized)
+		KeyEvent Key; //!< Key event parameters (Event::KeyPressed, Event::KeyReleased)
+		TextEvent Text; //!< Text event parameters (Event::TextEntered)
+		MouseMoveEvent MouseMove; //!< Mouse move event parameters (Event::MouseMoved)
+		MouseButtonEvent MouseButton;
 		//!< Mouse Button event parameters (Event::MouseButtonPressed, Event::MouseButtonReleased)
-		MouseWheelScrollEvent mouseWheelScroll; //!< Mouse Wheel event parameters (Event::MouseWheelScrolled)
+		MouseWheelScrollEvent MouseWheelScroll; //!< Mouse Wheel event parameters (Event::MouseWheelScrolled)
 	};
 };
 }

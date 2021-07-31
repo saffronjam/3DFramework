@@ -32,7 +32,7 @@ void VertexStorage::Add(VertexType type)
 
 	Debug::Assert(
 		VertexByteSize == _layout.ByteSize(),
-		"VertexType size did not match size in VertexLayout specification"
+		"VertexType Size did not match Size in VertexLayout specification"
 	);
 
 	const size_t before = _data.size();

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <map>
+
 #include "Saffron/Base.h"
 #include "Saffron/Rendering/Stream/Input.h"
 #include "Saffron/Rendering/Stream/Output.h"
@@ -14,17 +16,20 @@ public:
 
 	virtual void Execute() = 0;
 
+	void Connect(const Output& output, const std::string& inside);
+	void Connect(const std::shared_ptr<Framebuffer>& output, const std::string& inside);
+
 	auto Name() const -> const std::string&;
-	auto Inputs() const -> const std::vector<Input>&;
-	auto Outputs() const -> const std::vector<Output>&;
+	auto Inputs() const -> const std::map<std::string, Input>&;
+	auto Outputs() const -> const std::map<std::string, Output>&;
 
 protected:
-	void RegisterInput(std::string name, std::shared_ptr<Framebuffer>& framebuffer);
-	void RegisterOutput(std::string name, const std::shared_ptr<Framebuffer>& framebuffer);
+	void RegisterInput(const std::string& name, std::shared_ptr<Framebuffer>& framebuffer);
+	void RegisterOutput(const std::string& name, const std::shared_ptr<Framebuffer>& framebuffer);
 
 private:
 	std::string _name;
-	std::vector<Input> _inputs;
-	std::vector<Output> _outputs;
+	std::map<std::string, Input> _inputs;
+	std::map<std::string, Output> _outputs;
 };
 }

@@ -8,6 +8,7 @@
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
 
+#include "Saffron/Rendering/Bindables/BackBuffer.h"
 
 #include "Bindables.h"
 
@@ -55,7 +56,7 @@ public:
 	static auto Device() -> ID3D11Device&;
 	static auto Context() -> ID3D11DeviceContext&;
 	static auto SwapChain() -> IDXGISwapChain&;
-	static auto Target() -> ID3D11RenderTargetView&;
+	static auto BackBufferPtr() -> const std::shared_ptr<BackBuffer>&;
 
 	void DrawTestTriangle();
 
@@ -63,14 +64,14 @@ private:
 	void CreateDeviceAndContext();
 	void CreateFactory();
 	void CreateSwapChain(const Window& window);
-	void CreateMainTarget(const Window& window);
 
 private:
 	ComPtr<ID3D11Device> _device{};
 	ComPtr<IDXGISwapChain1> _swapChain{};
 	ComPtr<ID3D11DeviceContext> _context{};
-	ComPtr<ID3D11RenderTargetView> _mainTarget{};
 	ComPtr<IDXGIFactory2> _factory{};
+
+	std::shared_ptr<class BackBuffer> _backbuffer;
 
 	std::vector<Submition> _submitionsPrimary;
 	std::vector<Submition> _submitionsSecondary;
@@ -82,11 +83,11 @@ private:
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 
-	std::shared_ptr<Framebuffer> _framebuffer;
 	std::shared_ptr<InputLayout> _layout;
 	std::shared_ptr<VertexShader> _vertexShader;
 	std::shared_ptr<PixelShader> _pixelShader;
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
+	std::shared_ptr<Framebuffer> _framebuffer;
 	Viewport _viewport;
 	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;
 

@@ -12,18 +12,17 @@ namespace Se
 template <typename ... Args>
 class SubscriberList
 {
+public:
 	using Event = std::function<bool(Args ...)>;
 	using Action = std::function<void(Args ...)>;
 
 public:
 	auto operator +=(const Event& event) -> Uuid;
-	auto operator +=(const Action& action) -> Uuid;
 	void operator -=(Uuid uuid);
 
-	void Invoke(Args ... args);
+	void Invoke(Args&& ... args);
 
 	auto Subscribe(const Event& event) -> Uuid;
-	auto Subscribe(const Action& action) -> Uuid;
 	void Unsubscribe(Uuid uuid);
 
 private:
@@ -34,17 +33,14 @@ template <>
 class SubscriberList<void>
 {
 	using Event = std::function<bool()>;
-	using Action = std::function<void()>;
 
 public:
 	auto operator +=(const Event& event) -> Uuid;
-	auto operator +=(const Action& action) -> Uuid;
 	void operator -=(Uuid uuid);
 
 	void Invoke();
 
 	auto Subscribe(const Event& event) -> Uuid;
-	auto Subscribe(const Action& action) -> Uuid;
 	void Unsubscribe(Uuid uuid);
 
 private:
@@ -58,19 +54,13 @@ auto SubscriberList<Args...>::operator+=(const Event& event) -> Uuid
 }
 
 template <typename ... Args>
-auto SubscriberList<Args...>::operator+=(const Action& action) -> Uuid
-{
-	return Subscribe(action);
-}
-
-template <typename ... Args>
 void SubscriberList<Args...>::operator-=(Uuid uuid)
 {
 	Unsubscribe(uuid);
 }
 
 template <typename ... Args>
-void SubscriberList<Args...>::Invoke(Args ... args)
+void SubscriberList<Args...>::Invoke(Args&& ... args)
 {
 	if (!_subscribers.has_value())
 	{
@@ -79,7 +69,7 @@ void SubscriberList<Args...>::Invoke(Args ... args)
 
 	for (auto& subscriber : *_subscribers | std::views::values)
 	{
-		if (subscriber(std::forward(args...)))
+		if (subscriber(std::forward<Args>(args)...))
 		{
 			break;
 		}
@@ -96,23 +86,6 @@ Uuid SubscriberList<Args...>::Subscribe(const Event& event)
 
 	const Uuid uuid;
 	_subscribers->emplace(uuid, event);
-	return uuid;
-}
-
-template <typename ... Args>
-Uuid SubscriberList<Args...>::Subscribe(const Action& action)
-{
-	if (!_subscribers.has_value())
-	{
-		_subscribers = std::make_optional<decltype(_subscribers)>();
-	}
-
-	const Uuid uuid;
-	_subscribers->emplace(uuid, [action](Args ...)
-	{
-		action();
-		return false;
-	});
 	return uuid;
 }
 

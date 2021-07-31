@@ -5,7 +5,7 @@
 
 namespace Se
 {
-Image::Image(const ImageSpec& spec) :
+Image::Image(const ImageSpec& spec, uint* initialData) :
 	_spec(spec)
 {
 	auto& device = Renderer::Device();
@@ -44,12 +44,12 @@ Image::Image(const ImageSpec& spec) :
 	td.CPUAccessFlags = 0;
 
 	D3D11_SUBRESOURCE_DATA sd = {};
-	if (spec.InitialData != nullptr)
+	if (initialData != nullptr)
 	{
-		sd.pSysMem = spec.InitialData;
+		sd.pSysMem = initialData;
 	}
 
-	auto hr = device.CreateTexture2D(&td, spec.InitialData ? &sd : nullptr, &_nativeTexture);
+	auto hr = device.CreateTexture2D(&td, initialData ? &sd : nullptr, &_nativeTexture);
 	ThrowIfBad(hr);
 
 	if (depthStencil)
@@ -80,22 +80,63 @@ Image::Image(const ImageSpec& spec) :
 
 		hr = device.CreateShaderResourceView(_nativeTexture.Get(), &srvd, &_nativeShaderResourceView);
 		ThrowIfBad(hr);
-		ThrowIfBad(hr);
 	}
 }
 
 auto Image::ShaderView() -> ID3D11ShaderResourceView&
 {
+	Debug::Assert(_nativeShaderResourceView != nullptr, "No shader view for Image");
 	return *_nativeShaderResourceView.Get();
 }
 
 auto Image::ShaderView() const -> const ID3D11ShaderResourceView&
 {
-	return *_nativeShaderResourceView.Get();
+	return const_cast<Image&>(*this).ShaderView();
+}
+
+auto Image::Width() const -> uint
+{
+	return _spec.Height;
+}
+
+auto Image::Height() const -> uint
+{
+	return _spec.Width;
+}
+
+auto Image::Format() const -> ImageFormat
+{
+	return _spec.Format;
 }
 
 auto Image::Create(const ImageSpec& spec) -> std::shared_ptr<Image>
 {
 	return std::make_shared<Image>(spec);
+}
+
+auto Image::CreateFromBackBuffer() -> std::shared_ptr<Image>
+{
+	auto result = std::unique_ptr<Image>(new Image);
+
+	auto& device = Renderer::Device();
+	auto& swapChain = Renderer::SwapChain();
+
+	auto hr = swapChain.GetBuffer(0, __uuidof(ID3D11Texture2D), &result->_nativeTexture);
+	ThrowIfBad(hr);
+
+	ComPtr<ID3D11RenderTargetView> renderTargetView;
+	hr = device.CreateRenderTargetView(result->_nativeTexture.Get(), nullptr, &renderTargetView);
+	ThrowIfBad(hr);
+	result->_nativeRenderView = renderTargetView;
+
+	D3D11_TEXTURE2D_DESC td;
+	result->_nativeTexture->GetDesc(&td);
+	auto& spec = result->_spec;
+	spec.Width = td.Width;
+	spec.Height = td.Height;
+	spec.Format = Utils::ToSaffronFormat(td.Format);
+	spec.Usage = ImageUsage_RenderTarget;
+
+	return result;
 }
 }

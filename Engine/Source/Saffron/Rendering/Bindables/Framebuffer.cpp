@@ -125,12 +125,24 @@ void Framebuffer::Clear()
 	);
 }
 
-const Image& Framebuffer::Target() const
+auto Framebuffer::TargetByIndex(uint index) const -> const Image&
+{
+	Debug::Assert(index < _colorAttachments.size(), "Target index out of bounds");
+	return *_colorAttachments[index];
+}
+
+const Image& Framebuffer::FinalTarget() const
 {
 	return *_colorAttachments.front();
 }
 
-std::shared_ptr<Framebuffer> Framebuffer::Create(const FramebufferSpec& spec)
+auto Framebuffer::DepthTarget() const -> const Image&
+{
+	Debug::Assert(_depthStencilAttachmentFormat != ImageFormat::None, "No depth attachment in framebuffer");
+	return *_depthStencilAttachment;
+}
+
+auto Framebuffer::Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>
 {
 	return BindableStore::Add<Framebuffer>(spec);
 }

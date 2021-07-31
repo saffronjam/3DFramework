@@ -25,7 +25,8 @@ Renderer::Renderer(const Window& window) :
 	CreateDeviceAndContext();
 	CreateFactory();
 	CreateSwapChain(window);
-	CreateMainTarget(window);
+
+	_backbuffer = BackBuffer::Create(window);
 
 	if constexpr (ConfDebug)
 	{
@@ -56,7 +57,7 @@ void Renderer::Execute()
 {
 	if constexpr (ConfDebug)
 	{
-		//Log::Info("Executing {} submitions", _submitions.size());
+		//Log::Info("Executing {} submitions", _submitions.Size());
 	}
 
 	std::swap(_submitingContainer, _executingContainer);
@@ -132,9 +133,9 @@ auto Renderer::SwapChain() -> IDXGISwapChain&
 	return *Instance()._swapChain.Get();
 }
 
-auto Renderer::Target() -> ID3D11RenderTargetView&
+auto Renderer::BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&
 {
-	return *Instance()._mainTarget.Get();
+	return Instance()._backbuffer;
 }
 
 void Renderer::DrawTestTriangle()
@@ -143,7 +144,7 @@ void Renderer::DrawTestTriangle()
 	_vertexShader->Bind();
 	_pixelShader->Bind();
 	_layout->Bind();
-	_framebuffer->Bind();
+	_backbuffer->Bind();
 
 	const auto& window = App::Instance().Window();
 
@@ -153,18 +154,13 @@ void Renderer::DrawTestTriangle()
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
-			_context->Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
-		}
-	);
+			package.Context.Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
 
-	Renderer::Submit(
-		[this](const RendererPackage& package)
-		{
 			// Specify output target
-			_context->OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
+			//package.Context.OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
 
 			ImGui::Begin("Image");
-			ImGui::Image((void*)(&_framebuffer->Target().ShaderView()), {150, 150});
+			//ImGui::Image((void*)(&_mainTarget->FinalTarget().ShaderView()), {150, 150});
 			ImGui::End();
 		}
 	);
@@ -206,7 +202,7 @@ void Renderer::CreateSwapChain(const Window& window)
 	sd.BufferCount = 2;
 	sd.Width = window.Width();
 	sd.Height = window.Height();
-	sd.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	sd.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 	sd.Scaling = DXGI_SCALING_NONE;
 	sd.Stereo = false;
 	sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -231,20 +227,6 @@ void Renderer::CreateSwapChain(const Window& window)
 		nullptr,
 		&_swapChain
 	);
-	ThrowIfBad(hr);
-}
-
-void Renderer::CreateMainTarget(const Window& window)
-{
-	D3D11_VIEWPORT vp{0.0f, 0.0f, window.Width(), window.Height(), 0.0f, 0.0f,};
-
-	_context->RSSetViewports(1, &vp);
-
-	ComPtr<ID3D11Resource> backBuffer;
-	auto hr = _swapChain->GetBuffer(0, __uuidof(ID3D11Resource), &backBuffer);
-	ThrowIfBad(hr);
-
-	hr = _device->CreateRenderTargetView(backBuffer.Get(), nullptr, &_mainTarget);
 	ThrowIfBad(hr);
 }
 }

@@ -31,10 +31,10 @@ public:
 	static auto Create(const WindowSpec& spec) -> std::unique_ptr<Window>;
 
 public:
-	SubscriberList<void> Closed;
-	SubscriberList<void> Resized;
-	SubscriberList<void> LostFocus;
-	SubscriberList<void> GainedFocus;
+	mutable SubscriberList<void> Closed;
+	mutable SubscriberList<const SizeEvent&> Resized;
+	mutable SubscriberList<void> LostFocus;
+	mutable SubscriberList<void> GainedFocus;
 
 protected:
 	WindowSpec _spec;

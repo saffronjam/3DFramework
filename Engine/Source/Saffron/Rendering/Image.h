@@ -36,14 +36,12 @@ struct ImageSpec
 	uint Width, Height;
 	ImageUsage Usage;
 	ImageFormat Format;
-	uint* InitialData = nullptr;
-	uint InitialDataSize = 0;
 };
 
 class Image
 {
 public:
-	explicit Image(const ImageSpec& spec);
+	explicit Image(const ImageSpec& spec, uint* initialData = nullptr);
 
 	template <typename T>
 	auto RenderViewAs() -> T&;
@@ -52,15 +50,22 @@ public:
 	auto ShaderView() -> ID3D11ShaderResourceView&;
 	auto ShaderView() const -> const ID3D11ShaderResourceView&;
 
+	auto Width() const -> uint;
+	auto Height() const -> uint;
+	auto Format() const -> ImageFormat;
+
 	static auto Create(const ImageSpec& spec) -> std::shared_ptr<Image>;
+	static auto CreateFromBackBuffer() -> std::shared_ptr<Image>;
+
+private:
+	Image() = default;
 
 private:
 	ComPtr<ID3D11Texture2D> _nativeTexture;
-
 	ComPtr<ID3D11View> _nativeRenderView;
 	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView;
 
-	ImageSpec _spec;
+	ImageSpec _spec{};
 };
 
 template <typename T>
@@ -82,11 +87,31 @@ inline auto ToDxgiTextureFormat(ImageFormat format) -> DXGI_FORMAT
 	switch (format)
 	{
 	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case ImageFormat::RG16f: return DXGI_FORMAT_R16G16_FLOAT;
+	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+	case ImageFormat::Depth32f: return DXGI_FORMAT_D32_FLOAT;
 	case ImageFormat::None: return static_cast<DXGI_FORMAT>(0);
 	default: break;
 	}
 	Debug::Break("Image format not supported");
 	return static_cast<DXGI_FORMAT>(0);
+}
+
+inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
+{
+	switch (format)
+	{
+	case DXGI_FORMAT_R8G8B8A8_UNORM: return ImageFormat::RGBA;
+	case DXGI_FORMAT_R16G16B16A16_FLOAT: return ImageFormat::RGBA16f;
+	case DXGI_FORMAT_R32G32B32A32_FLOAT: return ImageFormat::RGBA32f;
+	case DXGI_FORMAT_R16G16_FLOAT: return ImageFormat::RG16f;
+	case DXGI_FORMAT_D24_UNORM_S8_UINT: return ImageFormat::Depth24Stencil8;
+	default: break;
+	}
+	Debug::Break("Dxgi format not supported");
+	return ImageFormat::None;
 }
 
 inline auto ToD3D11BindFlag(ImageUsage usage) -> uint

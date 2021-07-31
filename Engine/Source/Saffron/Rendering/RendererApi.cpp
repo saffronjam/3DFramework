@@ -11,7 +11,7 @@ namespace Se
 {
 void RendererApi::Clear(const Vector4& color)
 {
-	Renderer::Context().ClearRenderTargetView(&Renderer::Target(), reinterpret_cast<const FLOAT*>(&color));
+	//Renderer::Context().ClearRenderTargetView(&Renderer::BackBufferView(), reinterpret_cast<const FLOAT*>(&color));
 }
 
 void RendererApi::Present()

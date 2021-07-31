@@ -32,7 +32,7 @@ void Window::DispatchEvents()
 		}
 		case EventType::Resized:
 		{
-			Resized.Invoke();
+			Resized.Invoke(event.Size);
 			break;
 		}
 		case EventType::LostFocus:

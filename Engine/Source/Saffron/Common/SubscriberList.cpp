@@ -9,11 +9,6 @@ auto SubscriberList<void>::operator+=(const Event& event) -> Uuid
 	return Subscribe(event);
 }
 
-auto SubscriberList<void>::operator+=(const Action& action) -> Uuid
-{
-	return Subscribe(action);
-}
-
 void SubscriberList<void>::operator-=(Uuid uuid)
 {
 	return Unsubscribe(uuid);
@@ -44,22 +39,6 @@ auto SubscriberList<void>::Subscribe(const Event& event) -> Uuid
 
 	const Uuid uuid;
 	_subscribers->emplace(uuid, event);
-	return uuid;
-}
-
-auto SubscriberList<void>::Subscribe(const Action& action) -> Uuid
-{
-	if (!_subscribers.has_value())
-	{
-		_subscribers = std::make_optional<std::map<Uuid, Event>>();
-	}
-
-	const Uuid uuid;
-	_subscribers->emplace(uuid, [action]()
-	{
-		action();
-		return false;
-	});
 	return uuid;
 }
 

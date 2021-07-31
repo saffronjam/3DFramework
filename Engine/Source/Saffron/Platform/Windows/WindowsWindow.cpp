@@ -309,18 +309,18 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		//{
 		//	break;
 		//}
-		//UINT size = 0;
-		//// first get the size of the input data
-		//if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &size,
+		//UINT Size = 0;
+		//// first get the Size of the input data
+		//if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &Size,
 		//                    sizeof(RAWINPUTHEADER)) == -1)
 		//{
 		//	// bail msg processing if error
 		//	break;
 		//}
-		//_rawInputBuffer.resize(size);
+		//_rawInputBuffer.resize(Size);
 		//// read in the input data
-		//if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, _rawInputBuffer.data(), &size,
-		//                    sizeof(RAWINPUTHEADER)) != size)
+		//if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, _rawInputBuffer.data(), &Size,
+		//                    sizeof(RAWINPUTHEADER)) != Size)
 		//{
 		//	// bail msg processing if error
 		//	break;

@@ -11,7 +11,11 @@ App::App(const AppSpec& spec) :
 	_renderer(std::make_unique<Renderer>(*_window)),
 	_ui(std::make_unique<Ui>())
 {
-	_window->Closed.Subscribe([this] { OnClosed(); });
+	_window->Closed += [this]
+	{
+		OnClosed();
+		return false;
+	};
 }
 
 void App::Run()
@@ -29,7 +33,7 @@ void App::Run()
 			}
 		);
 
-		
+
 		_renderer->DrawTestTriangle();
 
 

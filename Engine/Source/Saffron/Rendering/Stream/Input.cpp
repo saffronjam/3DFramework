@@ -19,6 +19,11 @@ void Input::Connect(const Output& output)
 	_framebufferRef = output.Target();
 }
 
+void Input::Connect(const std::shared_ptr<Framebuffer>& output)
+{
+	_framebufferRef = output;
+}
+
 auto Input::Name() const -> const std::string&
 {
 	return _name;

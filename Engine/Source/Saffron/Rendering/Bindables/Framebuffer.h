@@ -32,17 +32,22 @@ public:
 
 	void Bind() override;
 
-	void Resize(uint width, uint height);
+	virtual void Resize(uint width, uint height);
 	void Clear();
-	
-	auto Target() const -> const Image&;
+
+	auto TargetByIndex(uint index) const -> const Image&;
+	auto FinalTarget() const -> const Image&;
+	auto DepthTarget() const -> const Image&;
 
 	static auto Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>;
 
-private:
+protected:
+	Framebuffer() = default;
+
+protected:
 	uint _width = 0, _height = 0;
 	Color _clearColor;
-
+	
 	std::vector<ImageFormat> _colorAttachmentFormats;
 	ImageFormat _depthStencilAttachmentFormat = ImageFormat::None;
 

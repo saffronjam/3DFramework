@@ -16,6 +16,7 @@ public:
 	Input(std::string name, RenderPass& source, std::shared_ptr<Framebuffer>& framebufferRef);
 
 	void Connect(const Output& output);
+	void Connect(const std::shared_ptr<Framebuffer>& output);
 
 	auto Name() const -> const std::string&;
 
