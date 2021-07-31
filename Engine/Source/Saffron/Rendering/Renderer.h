@@ -5,9 +5,9 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
+#include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
-
 #include "Saffron/Rendering/Bindables/BackBuffer.h"
 
 #include "Bindables.h"
@@ -53,10 +53,14 @@ public:
 
 	void Execute();
 
+	void BeginFrame();
+	void EndFrame();
+
 	static auto Device() -> ID3D11Device&;
 	static auto Context() -> ID3D11DeviceContext&;
 	static auto SwapChain() -> IDXGISwapChain&;
-	static auto BackBufferPtr() -> const std::shared_ptr<BackBuffer>&;
+	static auto BackBuffer() -> BackBuffer&;
+	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
 	void DrawTestTriangle();
 
@@ -72,17 +76,19 @@ private:
 	ComPtr<IDXGIFactory2> _factory{};
 
 	std::shared_ptr<class BackBuffer> _backbuffer;
+	std::unique_ptr<BindableStore> _bindableStore;
+	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
+	// Submitions	
 	std::vector<Submition> _submitionsPrimary;
 	std::vector<Submition> _submitionsSecondary;
 	std::vector<Submition>* _executingContainer = &_submitionsPrimary;
 	std::vector<Submition>* _submitingContainer = &_submitionsSecondary;
 
-	std::unique_ptr<BindableStore> _bindableStore;
-
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 
+	// Temporary
 	std::shared_ptr<InputLayout> _layout;
 	std::shared_ptr<VertexShader> _vertexShader;
 	std::shared_ptr<PixelShader> _pixelShader;
@@ -90,7 +96,5 @@ private:
 	std::shared_ptr<Framebuffer> _framebuffer;
 	Viewport _viewport;
 	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;
-
-	std::shared_ptr<Texture> tex = Texture::Create(100, 100);
 };
 }

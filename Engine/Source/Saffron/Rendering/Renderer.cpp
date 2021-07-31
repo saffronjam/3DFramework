@@ -60,9 +60,6 @@ void Renderer::Execute()
 		//Log::Info("Executing {} submitions", _submitions.Size());
 	}
 
-	std::swap(_submitingContainer, _executingContainer);
-	_submitingContainer->clear();
-
 	auto package = RendererPackage{*_device.Get(), *_swapChain.Get(), *_context.Get()};
 
 	for (auto& submition : *_executingContainer)
@@ -118,6 +115,28 @@ void Renderer::Execute()
 	}
 }
 
+void Renderer::BeginFrame()
+{
+	_backbuffer->Bind();
+	_backbuffer->Clear();
+}
+
+void Renderer::EndFrame()
+{
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
+			_backbuffer->Bind();
+			package.SwapChain.Present(1, 0);
+		}
+	);
+
+	std::swap(_submitingContainer, _executingContainer);
+
+	Execute();
+	_executingContainer->clear();
+}
+
 auto Renderer::Device() -> ID3D11Device&
 {
 	return *Instance()._device.Get();
@@ -133,6 +152,11 @@ auto Renderer::SwapChain() -> IDXGISwapChain&
 	return *Instance()._swapChain.Get();
 }
 
+auto Renderer::BackBuffer() -> Se::BackBuffer&
+{
+	return *Instance()._backbuffer;
+}
+
 auto Renderer::BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&
 {
 	return Instance()._backbuffer;
@@ -144,23 +168,25 @@ void Renderer::DrawTestTriangle()
 	_vertexShader->Bind();
 	_pixelShader->Bind();
 	_layout->Bind();
-	_backbuffer->Bind();
-
-	const auto& window = App::Instance().Window();
-
 	_viewport.Bind();
 	_topology.Bind();
+
+
+	_framebuffer->Bind();
 
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
 			package.Context.Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
+		}
+	);
 
-			// Specify output target
-			//package.Context.OMSetRenderTargets(1u, _mainTarget.GetAddressOf(), nullptr);
-
+	_backbuffer->Bind();
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
 			ImGui::Begin("Image");
-			//ImGui::Image((void*)(&_mainTarget->FinalTarget().ShaderView()), {150, 150});
+			ImGui::Image((void*)(&_framebuffer->FinalTarget().ShaderView()), {150, 150});
 			ImGui::End();
 		}
 	);

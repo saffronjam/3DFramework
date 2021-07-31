@@ -12,8 +12,8 @@ public:
 	Ui();
 	~Ui() override;
 
-	void Begin();
-	void End();
+	void BeginFrame();
+	void EndFrame();
 
 private:
 };

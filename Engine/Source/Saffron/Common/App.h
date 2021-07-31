@@ -29,8 +29,10 @@ public:
 	auto Window() const -> const class Window&;
 
 private:
-	bool _running = true;
+	void RenderUi();
 
+private:
+	bool _running = true;
 
 	std::unique_ptr<class Window> _window;
 	std::unique_ptr<Renderer> _renderer;

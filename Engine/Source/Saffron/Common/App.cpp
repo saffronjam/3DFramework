@@ -24,32 +24,21 @@ void App::Run()
 	{
 		_window->DispatchEvents();
 
-
-		Renderer::Submit(
-			[this](const RendererPackage& package)
-			{
-				RendererApi::Clear();
-				_ui->Begin();
-			}
-		);
-
+		_renderer->BeginFrame();
+		_ui->BeginFrame();
 
 		_renderer->DrawTestTriangle();
-
 
 		Renderer::Submit(
 			[this](const RendererPackage& package)
 			{
 				ImGui::ShowDemoWindow();
-				_ui->End();
-				RendererApi::Present();
 			}
 		);
-
-
-		_renderer->Execute();
-
 		_window->OnUpdate();
+
+		_ui->EndFrame();
+		_renderer->EndFrame();
 	}
 }
 

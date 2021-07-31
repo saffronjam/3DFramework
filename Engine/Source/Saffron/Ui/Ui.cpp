@@ -19,7 +19,7 @@ Ui::Ui() :
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
 	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
 	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-	
+
 	const auto& app = App::Instance();
 	const auto hwnd = static_cast<HWND>(app.Window().NativeHandle());
 	ImGui_ImplWin32_Init(hwnd);
@@ -33,23 +33,36 @@ Ui::~Ui()
 	ImGui::DestroyContext();
 }
 
-void Ui::Begin()
+void Ui::BeginFrame()
 {
-	ImGui_ImplDX11_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
+			ImGui_ImplDX11_NewFrame();
+			ImGui_ImplWin32_NewFrame();
+			ImGui::NewFrame();
+		}
+	);
 }
 
-void Ui::End()
+void Ui::EndFrame()
 {
-	auto& app = App::Instance();
-	auto& io = ImGui::GetIO();
-	io.DisplaySize = ImVec2(static_cast<float>(app.Window().Width()), static_cast<float>(app.Window().Height()));
+	Renderer::BackBuffer().Bind();
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
+			auto& app = App::Instance();
+			auto& io = ImGui::GetIO();
+			io.DisplaySize = ImVec2(
+				static_cast<float>(app.Window().Width()),
+				static_cast<float>(app.Window().Height())
+			);
 
-
-	ImGui::Render();
-	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-	ImGui::UpdatePlatformWindows();
-	ImGui::RenderPlatformWindowsDefault();
+			ImGui::Render();
+			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+	);
 }
 }
