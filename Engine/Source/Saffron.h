@@ -10,6 +10,9 @@
 
 #include "Saffron/Event/Event.h"
 
+#include "Saffron/Graphics/Camera.h"
+#include "Saffron/Graphics/EditorCamera.h"
+
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 

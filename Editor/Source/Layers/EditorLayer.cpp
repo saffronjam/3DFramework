@@ -15,22 +15,23 @@ void EditorLayer::OnAttach()
 
 	struct Vertex
 	{
-		float x, y;
+		float x, y, z;
 	};
 
-	const VertexLayout layout({ElementType::Position2D});
+	const VertexLayout layout({ElementType::Position3D});
 
 	VertexStorage storage(layout);
 
-	storage.Add(Vertex{0.0f, 0.5f});
-	storage.Add(Vertex{0.5f, -0.5f});
-	storage.Add(Vertex{-0.5f, -0.5f});
+	storage.Add(Vertex{0.0f, 0.5f, 0.0f});
+	storage.Add(Vertex{0.5f, -0.5f, 0.0f});
+	storage.Add(Vertex{-0.5f, -0.5f, 0.0f});
 
 	_framebuffer = Framebuffer::Create({window.Width(), window.Height(), {ImageFormat::RGBA}});
 	_vertexBuffer = VertexBuffer::Create(storage);
-	_vertexShader = VertexShader::Create("VertexShader_v");
-	_pixelShader = PixelShader::Create("PixelShader_p");
+	_vertexShader = VertexShader::Create("Transform_v");
+	_pixelShader = PixelShader::Create("Transform_p");
 	_layout = InputLayout::Create(layout, _vertexShader);
+	_mvpCBuffer = MvpCBuffer::Create({Matrix::Identity, _camera.View(), _camera.Projection()});
 
 	_framebuffer->Resized += [this](const SizeEvent& event)
 	{
@@ -49,8 +50,11 @@ void EditorLayer::OnDetach()
 {
 }
 
-void EditorLayer::OnUpdate(TimeSpan dt)
+void EditorLayer::OnUpdate(TimeSpan ts)
 {
+	_camera.OnUpdate(ts);
+	_mvpCBuffer->UpdateMatrix({Matrix::Identity, _camera.View(), _camera.Projection()});
+
 	_framebuffer->Bind();
 	_vertexBuffer->Bind();
 	_vertexShader->Bind();
@@ -58,6 +62,23 @@ void EditorLayer::OnUpdate(TimeSpan dt)
 	_layout->Bind();
 	_topology.Bind();
 	_viewport.Bind();
+	_mvpCBuffer->Bind();
+	
+	Renderer::Submit(
+		[this](const RendererPackage& package)
+		{
+			D3D11_RASTERIZER_DESC rd = {};
+			rd.FillMode = D3D11_FILL_SOLID;
+			rd.CullMode = D3D11_CULL_NONE;
+
+
+			ComPtr<ID3D11RasterizerState> _nativeRasterizer;
+			package.Device.CreateRasterizerState(&rd, &_nativeRasterizer);
+
+			package.Context.RSSetState(_nativeRasterizer.Get());
+		}
+	);
+
 
 	Renderer::Submit(
 		[this](const RendererPackage& package)
@@ -73,6 +94,8 @@ void EditorLayer::OnUi()
 	_dockSpacePanel.Begin();
 
 	_viewportPanel.OnUi();
+
+	_camera.OnUi();
 
 	ImGui::ShowDemoWindow();
 

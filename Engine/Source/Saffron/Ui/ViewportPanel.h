@@ -17,6 +17,8 @@ public:
 
 	void SetImage(const std::shared_ptr<Image>& image);
 
+	auto MousePosition(bool normalized = false) const -> Vector2;
+
 public:
 	SubscriberList<const SizeEvent&> Resized;
 

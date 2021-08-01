@@ -11,6 +11,13 @@ namespace Se
 Mouse::Mouse() :
 	SingleTon(this)
 {
+	for (int i = 0; i < static_cast<int>(MouseButtonCode::Count); i++)
+	{
+		_buttonStates[i] = false;
+		_prevButtonStates[i] = false;
+	}
+
+
 	auto& win = App::Instance().Window();
 	win.MouseWheelScrolled += SE_EV_ACTION(Mouse::OnScroll);
 	win.MouseButtonPressed += SE_EV_ACTION(Mouse::OnButtonPress);
@@ -77,11 +84,7 @@ auto Mouse::CursorPosition(bool normalized) -> const Vector2&
 	{
 		return inst._mousePosition;
 	}
-
-	const ImVec2 imMousePosition = ImGui::GetMousePos();
-	inst._mousePosition.x = imMousePosition.x;
-	inst._mousePosition.y = imMousePosition.y;
-	return inst._mousePosition;
+	return inst._mousePositionNDC;
 }
 
 auto Mouse::Swipe() -> const Vector2&
@@ -110,7 +113,6 @@ void Mouse::OnButtonPress(const MouseButtonEvent& event)
 	auto& inst = Instance();
 
 	inst._buttonStates[static_cast<int>(event.Button)] = true;
-	inst.Pressed.Invoke(event);
 }
 
 void Mouse::OnButtonRelease(const MouseButtonEvent& event)
@@ -118,7 +120,6 @@ void Mouse::OnButtonRelease(const MouseButtonEvent& event)
 	auto& inst = Instance();
 
 	inst._buttonStates[static_cast<int>(event.Button)] = false;
-	inst.Released.Invoke(event);
 }
 
 void Mouse::OnMove(const MouseMoveEvent& event)
@@ -127,12 +128,12 @@ void Mouse::OnMove(const MouseMoveEvent& event)
 
 	if (!inst._inWindow && IsAnyButtonDown() || inst._inWindow)
 	{
-		const auto oldPosition = inst._mousePosition;
-		inst._mousePosition = Vector2(event.x, event.y);
-		inst._mouseSwipe = inst._mousePosition - oldPosition;
+		const auto newPos = Vector2(event.x, event.y);
+		inst._mouseSwipe = inst._mousePosition - newPos;
+		inst._mousePosition = newPos;
+		const auto& win = App::Instance().Window();
+		inst._mousePositionNDC = Vector2(newPos.x / win.Width() * 2.0f - 1.0f, newPos.y / win.Height() * 2.0f - 1.0f);
 	}
-
-	inst.Moved.Invoke(event);
 }
 
 void Mouse::OnCursorEnter()
@@ -140,7 +141,6 @@ void Mouse::OnCursorEnter()
 	auto& inst = Instance();
 
 	inst._inWindow = true;
-	inst.Entered.Invoke();
 }
 
 void Mouse::OnCursorLeave()
@@ -148,7 +148,6 @@ void Mouse::OnCursorLeave()
 	auto& inst = Instance();
 
 	inst._inWindow = false;
-	inst.Left.Invoke();
 }
 
 void Mouse::OnScroll(const MouseWheelScrollEvent& event)
@@ -163,7 +162,5 @@ void Mouse::OnScroll(const MouseWheelScrollEvent& event)
 	{
 		inst._verticalScrollBuffer += event.Delta;
 	}
-
-	inst.Scrolled.Invoke(event);
 }
 }

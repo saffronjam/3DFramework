@@ -36,4 +36,5 @@ void Log::Debug(const std::string& string, const Args&... args)
 class UsrLog
 {
 };
+
 }

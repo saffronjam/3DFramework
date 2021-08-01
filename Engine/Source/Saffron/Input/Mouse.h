@@ -34,15 +34,7 @@ private:
 	static void OnCursorEnter();
 	static void OnCursorLeave();
 	static void OnScroll(const MouseWheelScrollEvent& event);
-
-public:
-	SubscriberList<const MouseWheelScrollEvent&> Scrolled;
-	SubscriberList<const MouseButtonEvent&> Pressed;
-	SubscriberList<const MouseButtonEvent&> Released;
-	SubscriberList<const MouseMoveEvent&> Moved;
-	SubscriberList<void> Entered;
-	SubscriberList<void> Left;
-
+	
 private:
 	std::array<bool, static_cast<int>(MouseButtonCode::Count)> _buttonStates;
 	std::array<bool, static_cast<int>(MouseButtonCode::Count)> _prevButtonStates;

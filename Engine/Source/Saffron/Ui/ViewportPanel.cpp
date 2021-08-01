@@ -2,6 +2,8 @@
 
 #include "Saffron/Ui/ViewportPanel.h"
 
+#include "Saffron/Input/Mouse.h"
+
 namespace Se
 {
 static int counter = 0;
@@ -54,5 +56,20 @@ void ViewportPanel::OnUi()
 void ViewportPanel::SetImage(const std::shared_ptr<Image>& image)
 {
 	_image = image;
+}
+
+auto ViewportPanel::MousePosition(bool normalized) const -> Vector2
+{
+	auto position = Mouse::CursorPosition(true);
+	position.x -= _topLeft.x;
+	position.y -= _topLeft.y;
+
+	if (normalized)
+	{
+		const auto viewportWidth = _bottomRight.x - _topLeft.x;
+		const auto viewportHeight = _bottomRight.y - _topLeft.y;
+		return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
+	}
+	return position;
 }
 }

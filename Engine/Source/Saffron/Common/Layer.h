@@ -10,7 +10,7 @@ public:
 	virtual ~Layer() = default;
 	virtual void OnAttach() = 0;
 	virtual void OnDetach() = 0;
-	virtual void OnUpdate(TimeSpan dt) = 0;
+	virtual void OnUpdate(TimeSpan ts) = 0;
 	virtual void OnUi() = 0;
 };
 }

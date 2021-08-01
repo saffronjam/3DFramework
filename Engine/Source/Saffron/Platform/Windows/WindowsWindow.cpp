@@ -210,14 +210,14 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 				PushEvent({.Type=EventType::MouseEntered});
 			}
 			const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
-			PushEvent({.Type=EventType::MouseEntered, .MouseMove={x, y}});
+			PushEvent({.Type=EventType::MouseMoved, .MouseMove={x, y}});
 		}
 		else
 		{
 			if (wParam & (MK_LBUTTON | MK_RBUTTON))
 			{
 				const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
-				PushEvent({.Type = EventType::MouseEntered, .MouseMove = {x, y}});
+				PushEvent({.Type = EventType::MouseMoved, .MouseMove = {x, y}});
 			}
 			else
 			{
