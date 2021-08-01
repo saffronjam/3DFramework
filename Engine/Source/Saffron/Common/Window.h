@@ -17,6 +17,7 @@ class Window
 {
 public:
 	explicit Window(const WindowSpec& spec);
+	virtual ~Window() = default;
 
 	virtual void OnUpdate();
 
@@ -31,10 +32,24 @@ public:
 	static auto Create(const WindowSpec& spec) -> std::unique_ptr<Window>;
 
 public:
+	// Window events
 	mutable SubscriberList<void> Closed;
 	mutable SubscriberList<const SizeEvent&> Resized;
 	mutable SubscriberList<void> LostFocus;
 	mutable SubscriberList<void> GainedFocus;
+
+	// Keyboard events
+	mutable SubscriberList<const TextEvent&> TextEntered;
+	mutable SubscriberList<const KeyEvent&> KeyPressed;
+	mutable SubscriberList<const KeyEvent&> KeyReleased;
+
+	// Mouse events
+	mutable SubscriberList<const MouseWheelScrollEvent&> MouseWheelScrolled;
+	mutable SubscriberList<const MouseButtonEvent&> MouseButtonPressed;
+	mutable SubscriberList<const MouseButtonEvent&> MouseButtonReleased;
+	mutable SubscriberList<const MouseMoveEvent&> MouseMoved;
+	mutable SubscriberList<void> MouseEntered;
+	mutable SubscriberList<void> MouseLeft;
 
 protected:
 	WindowSpec _spec;

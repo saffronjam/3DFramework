@@ -11,6 +11,7 @@
 #include "Saffron/Core/Config.h"
 #include "Saffron/Core/TypeDefs.h"
 #include "Saffron/Core/Macros.h"
+#include "Saffron/ErrorHandling/SaffronException.h"
 #include "Saffron/Log/Log.h"
 #include "Saffron/Math/Math.h"
 

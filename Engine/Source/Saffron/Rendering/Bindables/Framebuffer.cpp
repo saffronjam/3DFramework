@@ -99,6 +99,7 @@ void Framebuffer::Resize(uint width, uint height)
 
 			_width = width;
 			_height = height;
+			Resized.Invoke({ _width, _height });
 		}
 	);
 }
@@ -133,13 +134,23 @@ auto Framebuffer::TargetByIndex(uint index) const -> const Image&
 
 const Image& Framebuffer::FinalTarget() const
 {
-	return *_colorAttachments.front();
+	return *FinalTargetPtr();
+}
+
+auto Framebuffer::FinalTargetPtr() const -> const std::shared_ptr<Image>&
+{
+	return _colorAttachments.front();
 }
 
 auto Framebuffer::DepthTarget() const -> const Image&
 {
+	return *DepthTargetPtr();
+}
+
+auto Framebuffer::DepthTargetPtr() const -> const std::shared_ptr<Image>&
+{
 	Debug::Assert(_depthStencilAttachmentFormat != ImageFormat::None, "No depth attachment in framebuffer");
-	return *_depthStencilAttachment;
+	return _depthStencilAttachment;
 }
 
 auto Framebuffer::Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>

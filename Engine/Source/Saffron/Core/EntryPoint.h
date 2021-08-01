@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <memory>
 #include <Windows.h>
 
@@ -15,8 +16,8 @@ int main(int argc, char** argv)
 {
 	try
 	{
-		std::unique_ptr<Se::App> app = Se::CreateApp();
-		Se::Debug::Assert(app.get(), "Client App is null!");;
+		auto app = Se::CreateApp();
+		Se::Debug::Assert(app.get(), "Client App is null!");
 		app->Run();
 	}
 	catch (const Se::SaffronException& e)

@@ -10,6 +10,7 @@ class WindowsWindow : public Window
 {
 public:
 	explicit WindowsWindow(const WindowSpec& spec);
+	~WindowsWindow() noexcept override;
 
 	void OnUpdate() override;
 
@@ -28,5 +29,7 @@ private:
 namespace Utils
 {
 KeyCode VKToKeyCode(unsigned char vkKey);
+Vector2 LParamToPointPosition(LPARAM lParam);
+int WParamToMouseWheelDelta(WPARAM wParam);
 }
 }

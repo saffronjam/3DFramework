@@ -3,6 +3,7 @@
 #include <d3d11_4.h>
 
 #include "Saffron/Base.h"
+#include "Saffron/Event/Event.h"
 #include "Saffron/Rendering/Bindable.h"
 #include "Saffron/Rendering/Image.h"
 
@@ -22,7 +23,7 @@ struct FramebufferSpec
 {
 	uint Width, Height;
 	FramebufferAttachmentSpec AttachmentSpec;
-	Color ClearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+	Color ClearColor = {0.0f, 0.0f, 0.0f, 1.0f};
 };
 
 class Framebuffer : public Bindable
@@ -37,17 +38,22 @@ public:
 
 	auto TargetByIndex(uint index) const -> const Image&;
 	auto FinalTarget() const -> const Image&;
+	auto FinalTargetPtr() const -> const std::shared_ptr<Image>&;
 	auto DepthTarget() const -> const Image&;
+	auto DepthTargetPtr() const -> const std::shared_ptr<Image>&;
 
 	static auto Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>;
 
 protected:
 	Framebuffer() = default;
 
+public:
+	mutable SubscriberList<const SizeEvent&> Resized;
+
 protected:
 	uint _width = 0, _height = 0;
 	Color _clearColor;
-	
+
 	std::vector<ImageFormat> _colorAttachmentFormats;
 	ImageFormat _depthStencilAttachmentFormat = ImageFormat::None;
 

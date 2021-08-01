@@ -17,8 +17,7 @@ namespace Se
 {
 Renderer::Renderer(const Window& window) :
 	SingleTon(this),
-	_bindableStore(std::make_unique<BindableStore>()),
-	_viewport(window.Width(), window.Height())
+	_bindableStore(std::make_unique<BindableStore>())
 {
 	constexpr auto debug = [] { return Configuration == AppConfiguration::Debug; }();
 
@@ -32,25 +31,6 @@ Renderer::Renderer(const Window& window) :
 	{
 		_dxgiInfoQueue = std::make_unique<DxgiInfoManager>();
 	}
-
-	struct Vertex
-	{
-		float x, y;
-	};
-
-	const VertexLayout layout({ElementType::Position2D});
-
-	VertexStorage storage(layout);
-
-	storage.Add(Vertex{0.0f, 0.5f});
-	storage.Add(Vertex{0.5f, -0.5f});
-	storage.Add(Vertex{-0.5f, -0.5f});
-
-	_framebuffer = Framebuffer::Create({window.Width(), window.Height(), {ImageFormat::RGBA}});
-	_vertexBuffer = VertexBuffer::Create(storage);
-	_vertexShader = VertexShader::Create("VertexShader_v");
-	_pixelShader = PixelShader::Create("PixelShader_p");
-	_layout = InputLayout::Create(layout, _vertexShader);
 }
 
 void Renderer::Execute()
@@ -62,6 +42,7 @@ void Renderer::Execute()
 
 	auto package = RendererPackage{*_device.Get(), *_swapChain.Get(), *_context.Get()};
 
+	std::swap(_submitingContainer, _executingContainer);
 	for (auto& submition : *_executingContainer)
 	{
 		try
@@ -113,6 +94,7 @@ void Renderer::Execute()
 			);
 		}
 	}
+	_executingContainer->clear();
 }
 
 void Renderer::BeginFrame()
@@ -126,15 +108,11 @@ void Renderer::EndFrame()
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
-			_backbuffer->Bind();
 			package.SwapChain.Present(1, 0);
 		}
 	);
 
-	std::swap(_submitingContainer, _executingContainer);
-
 	Execute();
-	_executingContainer->clear();
 }
 
 auto Renderer::Device() -> ID3D11Device&
@@ -162,34 +140,9 @@ auto Renderer::BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&
 	return Instance()._backbuffer;
 }
 
-void Renderer::DrawTestTriangle()
+void Renderer::CleanDebugInfo()
 {
-	_vertexBuffer->Bind();
-	_vertexShader->Bind();
-	_pixelShader->Bind();
-	_layout->Bind();
-	_viewport.Bind();
-	_topology.Bind();
-
-
-	_framebuffer->Bind();
-
-	Renderer::Submit(
-		[this](const RendererPackage& package)
-		{
-			package.Context.Draw(static_cast<UINT>(_vertexBuffer->VertexCount()), 0);
-		}
-	);
-
-	_backbuffer->Bind();
-	Renderer::Submit(
-		[this](const RendererPackage& package)
-		{
-			ImGui::Begin("Image");
-			ImGui::Image((void*)(&_framebuffer->FinalTarget().ShaderView()), {150, 150});
-			ImGui::End();
-		}
-	);
+	_dxgiInfoQueue->Begin();
 }
 
 void Renderer::CreateDeviceAndContext()

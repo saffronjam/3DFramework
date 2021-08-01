@@ -62,6 +62,7 @@ void Ui::EndFrame()
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
+			Renderer::Instance().CleanDebugInfo();
 		}
 	);
 }

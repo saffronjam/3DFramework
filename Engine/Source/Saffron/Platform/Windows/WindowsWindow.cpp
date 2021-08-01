@@ -1,9 +1,12 @@
 #include "SaffronPCH.h"
 
+#include "Saffron/Platform/Windows/WindowsWindow.h"
+
 #include <imgui_impl_dx11.h>
 #include <imgui_impl_win32.h>
 
-#include "Saffron/Platform/Windows/WindowsWindow.h"
+#include "Saffron/Input/Mouse.h"
+#include "Saffron/Input/Keyboard.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -40,12 +43,29 @@ WindowsWindow::WindowsWindow(const WindowSpec& spec) :
 
 	AdjustWindowRect(&wr, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, false);
 
-	_hWnd = CreateWindowEx(0, wstringName.c_str(), wstringName.c_str(), WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
-	                       CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top, nullptr, nullptr,
-	                       _hInstance, this);
+	_hWnd = CreateWindowEx(
+		0,
+		wstringName.c_str(),
+		wstringName.c_str(),
+		WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+		CW_USEDEFAULT,
+		CW_USEDEFAULT,
+		wr.right - wr.left,
+		wr.bottom - wr.top,
+		nullptr,
+		nullptr,
+		_hInstance,
+		this
+	);
 
 	ShowWindow(_hWnd, SW_SHOWDEFAULT);
 	Log::Info("Creating Window {}", spec.Title);
+}
+
+WindowsWindow::~WindowsWindow() noexcept
+{
+	SetWindowLongPtr(_hWnd, GWLP_USERDATA, 0ll);
+	UnregisterClassA(_spec.Title.c_str(), _hInstance);
 }
 
 void WindowsWindow::OnUpdate()
@@ -80,7 +100,12 @@ auto CALLBACK WindowsWindow::WndSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM
 auto CALLBACK WindowsWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
 {
 	auto* userWindow = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	return userWindow->HandleWin32Message(hWnd, msg, wParam, lParam);
+	if (userWindow != nullptr)
+	[[likely]]
+	{
+		return userWindow->HandleWin32Message(hWnd, msg, wParam, lParam);
+	}
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) -> LRESULT
@@ -132,46 +157,41 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	}
 
 		/*********** KEYBOARD MESSAGES ***********/
+
+		// SysKey + Keydown include every key + ALT key and F10 etc.
 	case WM_KEYDOWN:
-		// syskey commands need to be handled to track ALT key (VK_MENU) and F10
 	case WM_SYSKEYDOWN:
 	{
-		// stifle this keyboard message if imgui wants to capture
-		/*if ( imio.WantCaptureKeyboard )
+		// Filter repeat
+		if (lParam & 0x40000000)
 		{
-		break;
-		}*/
-		if (lParam & 0x40000000) // filter autorepeat
-		{
-			//PushEvent<KeyRepeatedEvent>(Utils::VKToKeyCode(static_cast<unsigned char>(wParam)));
+			// Key repeated event not yet supported
 		}
 		else
+		[[likely]]
 		{
-			//PushEvent<KeyPressedEvent>(Utils::VKToKeyCode(static_cast<unsigned char>(wParam)));
+			const auto key = Utils::VKToKeyCode(static_cast<unsigned char>(wParam));
+			if (key != KeyCode::Unknown)
+			{
+				PushEvent({.Type = EventType::KeyPressed, .Key = {key}});
+			}
 		}
 		break;
 	}
 	case WM_KEYUP:
 	case WM_SYSKEYUP:
 	{
-		// stifle this keyboard message if imgui wants to capture
-		/*if ( imio.WantCaptureKeyboard )
+		const auto key = Utils::VKToKeyCode(static_cast<unsigned char>(wParam));
+		if (key != KeyCode::Unknown)
 		{
-		break;
-		}*/
-
-		//PushEvent<KeyReleasedEvent>(Utils::VKToKeyCode(static_cast<unsigned char>(wParam)));
+			PushEvent({.Type = EventType::KeyReleased, .Key = {key}});
+		}
 		break;
 	}
 	case WM_CHAR:
 	{
-		// stifle this keyboard message if imgui wants to capture
-		/*if ( imio.WantCaptureKeyboard )
-		{
-		break;
-		}*/
-
-		//PushEvent<TextEvent>(static_cast<Uint8>(wParam));
+		const auto text = static_cast<uint>(static_cast<uchar>(wParam));
+		PushEvent({.Type = EventType::TextEntered, .Text = {text}});
 		break;
 	}
 		/*********** END KEYBOARD MESSAGES ***********/
@@ -179,125 +199,97 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		/************* MOUSE MESSAGES ****************/
 	case WM_MOUSEMOVE:
 	{
-		//const auto point = Win32PointToVec(lParam);
-		//// cursorless exclusive gets first dibs
-		//if (!Mouse::IsCursorEnabled())
-		//{
-		//	if (!Mouse::InWindow())
-		//	{
-		//		SetCapture(hWnd);
-		//		PushEvent<CursorEnteredEvent>();
-		//		HideCursor();
-		//	}
-		//	break;
-		//}
-		// stifle this mouse message if imgui wants to capture
-		/*if ( imio.WantCaptureMouse )
-		{
-			break;
-		}*/
+		const auto point = Utils::LParamToPointPosition(lParam);
 
-		/*if (point.x >= 0 && point.x<_width && point.y >= 0 && point.y < _height)
+		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		if (screenRect.Contains(point))
+		{
+			if (!Mouse::IsCursorInWindow())
 			{
-				if (!Mouse::InWindow())
-				{
-					SetCapture(hWnd);
-					PushEvent<CursorEnteredEvent>();
-				}
-				PushEvent<MouseMovedEvent>(point);
+				SetCapture(hWnd);
+				PushEvent({.Type=EventType::MouseEntered});
+			}
+			const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+			PushEvent({.Type=EventType::MouseEntered, .MouseMove={x, y}});
+		}
+		else
+		{
+			if (wParam & (MK_LBUTTON | MK_RBUTTON))
+			{
+				const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+				PushEvent({.Type = EventType::MouseEntered, .MouseMove = {x, y}});
 			}
 			else
 			{
-				if (wParam & (MK_LBUTTON | MK_RBUTTON))
-				{
-					PushEvent<MouseMovedEvent>(Vector2(point.x, point.y));
-				}
-				else
-				{
-					ReleaseCapture();
-					PushEvent<CursorLeftEvent>();
-				}
-			}*/
+				ReleaseCapture();
+				PushEvent({.Type=EventType::MouseLeft});
+			}
+		}
 		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
 		SetForegroundWindow(hWnd);
-		/*if (!Mouse::IsCursorEnabled())
-		{
-			ConfineCursor();
-			HideCursor();
-		}*/
-		// stifle this mouse message if imgui wants to capture
-		//if ( imio.WantCaptureMouse )
-		//{
-		//	break;
-		//}
-		/*const auto point = Win32PointToVec(lParam);
-		PushEvent<MouseButtonPressedEvent>(MouseButtonCode::Left);
-		PushEvent<MouseMovedEvent>(point);*/
+
+		const auto point = Utils::LParamToPointPosition(lParam);
+		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+		PushEvent({.Type = EventType::MouseButtonPressed, .MouseButton = {MouseButtonCode::Left, x, y}});
 		break;
 	}
 	case WM_RBUTTONDOWN:
 	{
-		// stifle this mouse message if imgui wants to capture
-		//if ( imio.WantCaptureMouse )
-		//{
-		//	break;
-		//}
-		/*const auto point = Win32PointToVec(lParam);
-		PushEvent<MouseButtonPressedEvent>(MouseButtonCode::Right);
-		PushEvent<MouseMovedEvent>(point);*/
+		SetForegroundWindow(hWnd);
+
+		const auto point = Utils::LParamToPointPosition(lParam);
+		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+		PushEvent({.Type = EventType::MouseButtonPressed, .MouseButton = {MouseButtonCode::Right, x, y}});
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
-		// stifle this mouse message if imgui wants to capture
-		//if ( imio.WantCaptureMouse )
-		//{
-		//	break;
-		//}
+		SetForegroundWindow(hWnd);
 
-		//const auto point = Win32PointToVec(lParam);
-		//PushEvent<MouseButtonReleasedEvent>(MouseButtonCode::Left);
-		//PushEvent<MouseMovedEvent>(point);
-		//// release mouse if outside of window
-		//if (point.x<0 || point.x >= _width || point.y<0 || point.y >= _height)
-		//{
-		//	ReleaseCapture();
-		//	PushEvent<CursorLeftEvent>();
-		//}
+		const auto point = Utils::LParamToPointPosition(lParam);
+		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+		PushEvent({.Type = EventType::MouseButtonReleased, .MouseButton = {MouseButtonCode::Left, x, y}});
+
+		// Release mouse if outside of window
+		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		if (!screenRect.Contains(point))
+		{
+			ReleaseCapture();
+			PushEvent({.Type = EventType::MouseLeft});
+		}
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
-		// stifle this mouse message if imgui wants to capture
-		//if ( imio.WantCaptureMouse )
-		//{
-		//	break;
-		//}
-		//const auto point = Win32PointToVec(lParam);
-		//PushEvent<MouseButtonReleasedEvent>(MouseButtonCode::Right);
-		//PushEvent<MouseMovedEvent>(point);
-		//// release mouse if outside of window
-		//if (point.x<0 || point.x >= _width || point.y<0 || point.y >= _height)
-		//{
-		//	ReleaseCapture();
-		//	PushEvent<CursorLeftEvent>();
-		//}
+		SetForegroundWindow(hWnd);
+
+		const auto point = Utils::LParamToPointPosition(lParam);
+		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+		PushEvent({.Type = EventType::MouseButtonReleased, .MouseButton = {MouseButtonCode::Right, x, y}});
+
+		// Release mouse if outside of window
+		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		if (!screenRect.Contains(point))
+		{
+			ReleaseCapture();
+			PushEvent({.Type = EventType::MouseLeft});
+		}
 		break;
 	}
 	case WM_MOUSEWHEEL:
 	{
-		// stifle this mouse message if imgui wants to capture
-		//if ( imio.WantCaptureMouse )
-		//{
-		//	break;
-		//}
-		/*const auto point = Win32PointToVec(lParam);
-		const int delta = GET_WHEEL_DELTA_WPARAM(wParam);
-		PushEvent<MouseWheelScrolledEvent>(MouseWheelCode::VerticalWheel, delta);
-		PushEvent<MouseMovedEvent>(point);*/
+		const auto point = Utils::LParamToPointPosition(lParam);
+		const int delta = Utils::WParamToMouseWheelDelta(wParam);
+		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
+		PushEvent(
+			{
+				.Type=EventType::MouseWheelScrolled,
+				.MouseWheelScroll ={MouseWheelCode::VerticalWheel, static_cast<float>(delta), x, y}
+			}
+		);
 		break;
 	}
 		/************** END MOUSE MESSAGES **************/
@@ -343,11 +335,11 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 namespace Utils
 {
-KeyCode Utils::VKToKeyCode(unsigned char vkkey)
+KeyCode Utils::VKToKeyCode(unsigned char vkKey)
 {
-	if (static_cast<int>(vkkey) > 0x30 && static_cast<int>(vkkey) < 0x5A)
+	if (static_cast<int>(vkKey) >= 0x30 && static_cast<int>(vkKey) <= 0x5A)
 	{
-		switch (vkkey)
+		switch (vkKey)
 		{
 		case 'A': return KeyCode::A;
 		case 'B': return KeyCode::B;
@@ -388,7 +380,7 @@ KeyCode Utils::VKToKeyCode(unsigned char vkkey)
 		}
 	}
 
-	switch (vkkey)
+	switch (vkKey)
 	{
 	case VK_ESCAPE: return KeyCode::Escape;
 	case VK_LCONTROL: return KeyCode::LControl;
@@ -456,6 +448,17 @@ KeyCode Utils::VKToKeyCode(unsigned char vkkey)
 	case VK_PAUSE: return KeyCode::Pause;
 	default: return KeyCode::Unknown;
 	}
+}
+
+Vector2 LParamToPointPosition(LPARAM lParam)
+{
+	const auto [x, y] = MAKEPOINTS(lParam);
+	return {static_cast<float>(x), static_cast<float>(y)};
+}
+
+int WParamToMouseWheelDelta(WPARAM wParam)
+{
+	return GET_WHEEL_DELTA_WPARAM(wParam);
 }
 }
 }

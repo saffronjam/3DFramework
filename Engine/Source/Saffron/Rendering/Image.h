@@ -9,7 +9,6 @@ namespace Se
 enum class ImageFormat
 {
 	None = 0,
-	RGB,
 	RGBA,
 	RGBA16f,
 	RGBA32f,
@@ -41,7 +40,7 @@ struct ImageSpec
 class Image
 {
 public:
-	explicit Image(const ImageSpec& spec, uint* initialData = nullptr);
+	explicit Image(const ImageSpec& spec, const uint* initialData = nullptr);
 
 	template <typename T>
 	auto RenderViewAs() -> T&;
@@ -95,8 +94,7 @@ inline auto ToDxgiTextureFormat(ImageFormat format) -> DXGI_FORMAT
 	case ImageFormat::None: return static_cast<DXGI_FORMAT>(0);
 	default: break;
 	}
-	Debug::Break("Image format not supported");
-	return static_cast<DXGI_FORMAT>(0);
+	throw SaffronException("Image format not supported");
 }
 
 inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
@@ -110,8 +108,7 @@ inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
 	case DXGI_FORMAT_D24_UNORM_S8_UINT: return ImageFormat::Depth24Stencil8;
 	default: break;
 	}
-	Debug::Break("Dxgi format not supported");
-	return ImageFormat::None;
+	throw SaffronException("Dxgi format not supported");
 }
 
 inline auto ToD3D11BindFlag(ImageUsage usage) -> uint
@@ -123,8 +120,7 @@ inline auto ToD3D11BindFlag(ImageUsage usage) -> uint
 	case ImageUsage_ShaderResource: return D3D11_BIND_SHADER_RESOURCE;
 	default: break;
 	}
-	Debug::Break("Image usage not supported");
-	return 0;
+	throw SaffronException("Image usage not supported");
 }
 }
 }

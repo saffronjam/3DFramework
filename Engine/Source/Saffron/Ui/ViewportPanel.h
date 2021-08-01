@@ -1,0 +1,32 @@
+﻿#pragma once
+
+#include "Saffron/Base.h"
+#include "Saffron/Event/Event.h"
+#include "Saffron/Rendering/Image.h"
+#include "Saffron/Ui/Ui.h"
+
+namespace Se
+{
+class ViewportPanel
+{
+public:
+	explicit ViewportPanel(const std::string& title, const std::weak_ptr<Image>& image);
+	explicit ViewportPanel(const std::string& title);
+
+	void OnUi();
+
+	void SetImage(const std::shared_ptr<Image>& image);
+
+public:
+	SubscriberList<const SizeEvent&> Resized;
+
+private:
+	std::weak_ptr<Image> _image;
+	std::string _title;
+	std::shared_ptr<Image> _fallback;
+
+	Vector2 _topLeft = {0.0f, 0.0f};
+	Vector2 _bottomRight = {0.0f, 0.0f};
+	Vector2 _viewportSize = {0.0f, 0.0f};
+};
+}

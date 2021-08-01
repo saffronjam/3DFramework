@@ -62,7 +62,7 @@ public:
 	static auto BackBuffer() -> BackBuffer&;
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
-	void DrawTestTriangle();
+	void CleanDebugInfo();
 
 private:
 	void CreateDeviceAndContext();
@@ -87,14 +87,5 @@ private:
 
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
-
-	// Temporary
-	std::shared_ptr<InputLayout> _layout;
-	std::shared_ptr<VertexShader> _vertexShader;
-	std::shared_ptr<PixelShader> _pixelShader;
-	std::shared_ptr<VertexBuffer> _vertexBuffer;
-	std::shared_ptr<Framebuffer> _framebuffer;
-	Viewport _viewport;
-	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;
 };
 }

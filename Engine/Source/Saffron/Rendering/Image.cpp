@@ -1,11 +1,12 @@
 ﻿#include "SaffronPCH.h"
 
+#include "Saffron/ErrorHandling/SaffronException.h"
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/Image.h"
 
 namespace Se
 {
-Image::Image(const ImageSpec& spec, uint* initialData) :
+Image::Image(const ImageSpec& spec, const uint* initialData) :
 	_spec(spec)
 {
 	auto& device = Renderer::Device();
@@ -29,6 +30,11 @@ Image::Image(const ImageSpec& spec, uint* initialData) :
 	if (shaderResource)
 	{
 		bindFlags |= Utils::ToD3D11BindFlag(ImageUsage_ShaderResource);
+	}
+
+	if (bindFlags == 0)
+	{
+		throw SaffronException("Image must have a usage specified");
 	}
 
 	D3D11_TEXTURE2D_DESC td = {};

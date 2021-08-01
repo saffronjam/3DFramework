@@ -47,38 +47,47 @@ void Window::DispatchEvents()
 		}
 		case EventType::TextEntered:
 		{
+			TextEntered.Invoke(event.Text);
 			break;
 		}
 		case EventType::KeyPressed:
 		{
+			KeyPressed.Invoke(event.Key);
 			break;
 		}
 		case EventType::KeyReleased:
 		{
+			KeyReleased.Invoke(event.Key);
 			break;
 		}
 		case EventType::MouseWheelScrolled:
 		{
+			MouseWheelScrolled.Invoke(event.MouseWheelScroll);
 			break;
 		}
 		case EventType::MouseButtonPressed:
 		{
+			MouseButtonPressed.Invoke(event.MouseButton);
 			break;
 		}
 		case EventType::MouseButtonReleased:
 		{
+			MouseButtonReleased.Invoke(event.MouseButton);
 			break;
 		}
 		case EventType::MouseMoved:
 		{
+			MouseMoved.Invoke(event.MouseMove);
 			break;
 		}
 		case EventType::MouseEntered:
 		{
+			MouseEntered.Invoke();
 			break;
 		}
 		case EventType::MouseLeft:
 		{
+			MouseLeft.Invoke();
 			break;
 		}
 		case EventType::Count:

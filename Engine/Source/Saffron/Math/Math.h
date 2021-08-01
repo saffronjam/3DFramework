@@ -17,5 +17,8 @@ using Rect = DirectX::SimpleMath::Rectangle;
 class Math
 {
 public:
+	static constexpr float Pi = static_cast<float>(M_PI);
+
+	
 };
 }

@@ -16,9 +16,9 @@ BackBuffer::BackBuffer(const Window& window)
 			Renderer::Submit(
 				[inst, &window](const RendererPackage& package)
 				{
-					window.Resized += [inst]<typename SizeEvent>(SizeEvent&& sizeEvent)
+					window.Resized += [inst](const SizeEvent& event)
 					{
-						inst->OnWindowResize(std::forward<SizeEvent>(sizeEvent));
+						inst->OnWindowResize(event);
 						return false;
 					};
 
