@@ -88,12 +88,12 @@ auto Texture::NativeTexture() const -> const ID3D11Texture2D&
 	return *_nativeTexture.Get();
 }
 
-auto Texture::NativeShaderResourceView() -> ID3D11ShaderResourceView&
+auto Texture::NativeShaderView() -> ID3D11ShaderResourceView&
 {
 	return *_nativeShaderResourceView.Get();
 }
 
-auto Texture::NativeShaderResourceView() const -> const ID3D11ShaderResourceView&
+auto Texture::NativeShaderView() const -> const ID3D11ShaderResourceView&
 {
 	return *_nativeShaderResourceView.Get();
 }

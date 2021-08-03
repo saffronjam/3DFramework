@@ -21,8 +21,8 @@ public:
 
 	auto NativeTexture() -> ID3D11Texture2D&;
 	auto NativeTexture() const -> const ID3D11Texture2D&;
-	auto NativeShaderResourceView() -> ID3D11ShaderResourceView&;
-	auto NativeShaderResourceView() const -> const ID3D11ShaderResourceView&;
+	auto NativeShaderView() -> ID3D11ShaderResourceView&;
+	auto NativeShaderView() const -> const ID3D11ShaderResourceView&;
 
 	static auto Create(
 		uint width,

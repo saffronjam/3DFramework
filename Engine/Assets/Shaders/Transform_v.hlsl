@@ -7,7 +7,7 @@ struct VS_OUTPUT
 
 static matrix Identity = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
 
-VS_OUTPUT main(float3 pos : Position3D)
+VS_OUTPUT main(float3 pos : Position)
 {
 	VS_OUTPUT output;
 

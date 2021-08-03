@@ -6,7 +6,8 @@
 
 namespace Se
 {
-VertexElement::VertexElement(ElementType type) :
+VertexElement::VertexElement(std::string name, ElementType type) :
+	_name(std::move(name)),
 	_type(type)
 {
 }
@@ -16,9 +17,9 @@ auto VertexElement::Type() const -> ElementType
 	return _type;
 }
 
-auto VertexElement::Name() const -> const char*
+auto VertexElement::Name() const -> const std::string&
 {
-	return Bridge<Bridge::VertexElementNameLookUp>(_type);
+	return _name;
 }
 
 auto VertexElement::Format() const -> DXGI_FORMAT
@@ -66,9 +67,36 @@ VertexLayout::VertexLayout(std::initializer_list<VertexElement> elements) :
 	uint offset = 0;
 	for (const auto& element : _elements)
 	{
-		_descs.emplace_back(element.Name(), 0, element.Format(), 0, offset, D3D11_INPUT_PER_VERTEX_DATA, 0);
+		_descs.emplace_back(element.Name().c_str(), 0, element.Format(), 0, offset, D3D11_INPUT_PER_VERTEX_DATA, 0);
 		offset += element.ByteSize();
 	}
+}
+
+VertexLayout::VertexLayout(const VertexLayout& other) :
+	_elements(other._elements),
+	_descs(other._descs),
+	_byteSize(other._byteSize),
+	_code(other._code)
+{
+	for (int i = 0; i < _descs.size(); i ++)
+	{
+		_descs[i].SemanticName = _elements[i].Name().c_str();
+	}
+}
+
+auto VertexLayout::operator=(const VertexLayout& other) -> VertexLayout&
+{
+	_elements = other._elements;
+	_descs = other._descs;
+	_byteSize = other._byteSize;
+	_code = other._code;
+
+	for (int i = 0; i < _descs.size(); i++)
+	{
+		_descs[i].SemanticName = _elements[i].Name().c_str();
+	}
+
+	return *this;
 }
 
 auto VertexLayout::Descs() const -> const std::vector<D3D11_INPUT_ELEMENT_DESC>&

@@ -9,19 +9,19 @@ namespace Se
 {
 enum class ElementType
 {
-	Position2D,
-	Position3D,
+	Float2,
+	Float3,
 	Count
 };
 
 class VertexElement
 {
 public:
-	VertexElement(ElementType type);
+	VertexElement(std::string name, ElementType type);
 
 	auto Type() const -> ElementType;
 
-	auto Name() const -> const char*;
+	auto Name() const -> const std::string&;
 	auto Format() const -> DXGI_FORMAT;
 	auto ByteSize() const -> uint;
 	auto Code() const -> const char*;
@@ -31,13 +31,13 @@ public:
 	{
 		switch (type)
 		{
-		case ElementType::Position2D:
+		case ElementType::Float2:
 		{
-			return Executor<ElementType::Position2D>::Exec(std::forward<Args>(args)...);
+			return Executor<ElementType::Float2>::Exec(std::forward<Args>(args)...);
 		}
-		case ElementType::Position3D:
+		case ElementType::Float3:
 		{
-			return Executor<ElementType::Position3D>::Exec(std::forward<Args>(args)...);
+			return Executor<ElementType::Float3>::Exec(std::forward<Args>(args)...);
 		}
 		default:
 		{
@@ -48,6 +48,7 @@ public:
 	}
 
 private:
+	std::string _name;
 	ElementType _type;
 };
 
@@ -57,27 +58,24 @@ struct InputLayoutElementMap
 };
 
 template <>
-struct InputLayoutElementMap<ElementType::Position2D>
+struct InputLayoutElementMap<ElementType::Float2>
 {
-	static constexpr const char* Name = "Position2D";
 	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32_FLOAT;
 	static constexpr size_t ByteSize = 8ull;
-	static constexpr const char* Code = "P2";
+	static constexpr const char* Code = "F2";
 };
 
 template <>
-struct InputLayoutElementMap<ElementType::Position3D>
+struct InputLayoutElementMap<ElementType::Float3>
 {
-	static constexpr const char* Name = "Position3D";
 	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	static constexpr size_t ByteSize = 12ull;
-	static constexpr const char* Code = "P3";
+	static constexpr const char* Code = "F3";
 };
 
 template <>
 struct InputLayoutElementMap<ElementType::Count>
 {
-	static constexpr const char* Name = "Invalid";
 	static constexpr DXGI_FORMAT Format = static_cast<DXGI_FORMAT>(0);
 	static constexpr size_t ByteSize = 0ull;
 	static constexpr const char* Code = "??";
@@ -85,15 +83,6 @@ struct InputLayoutElementMap<ElementType::Count>
 
 namespace Bridge
 {
-template <ElementType Type, typename ... Args>
-struct VertexElementNameLookUp
-{
-	static constexpr auto Exec()
-	{
-		return InputLayoutElementMap<Type>::Name;
-	}
-};
-
 template <ElementType Type, typename ... Args>
 struct VertexElementFormatLookUp
 {
@@ -127,6 +116,8 @@ class VertexLayout
 {
 public:
 	VertexLayout(std::initializer_list<VertexElement> elements);
+	VertexLayout(const VertexLayout& other);
+	auto operator =(const VertexLayout& other) -> VertexLayout&;
 
 	auto Descs() const -> const std::vector<D3D11_INPUT_ELEMENT_DESC>&;
 	auto Code() const -> const std::string&;

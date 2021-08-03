@@ -22,11 +22,8 @@ private:
 
 	// Temporary
 	std::shared_ptr<Framebuffer> _framebuffer;
-	std::shared_ptr<InputLayout> _layout;
-	std::shared_ptr<VertexShader> _vertexShader;
-	std::shared_ptr<PixelShader> _pixelShader;
-	std::shared_ptr<VertexBuffer> _vertexBuffer;
 	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	std::shared_ptr<Mesh> _mesh;
 
 	Viewport _viewport;
 	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;

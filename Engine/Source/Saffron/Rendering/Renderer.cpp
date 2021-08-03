@@ -17,10 +17,9 @@ namespace Se
 {
 Renderer::Renderer(const Window& window) :
 	SingleTon(this),
-	_bindableStore(std::make_unique<BindableStore>())
+	_bindableStore(std::make_unique<BindableStore>()),
+	_meshStore(std::make_unique<MeshStore>())
 {
-	constexpr auto debug = [] { return Configuration == AppConfiguration::Debug; }();
-
 	CreateDeviceAndContext();
 	CreateFactory();
 	CreateSwapChain(window);

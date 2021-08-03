@@ -23,6 +23,7 @@ local function RequireAll()
     result["DirectX"] = require("ThirdParty.DirectX.premake5")
     result["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
     result["ImGui"] = require("ThirdParty.imgui.premake5")
+    result["Assimp"] = require("ThirdParty.assimp.premake5")
     return result
 end
 

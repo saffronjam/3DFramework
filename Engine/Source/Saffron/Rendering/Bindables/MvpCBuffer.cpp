@@ -28,7 +28,7 @@ MvpCBuffer::MvpCBuffer(const std::array<Matrix, 3>& mvp) :
 					{
 						matrices[i] = inst->_mvp[i].Transpose();
 					}
-					
+
 					D3D11_BUFFER_DESC bd = {};
 					bd.Usage = D3D11_USAGE_DYNAMIC;
 					bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -36,7 +36,7 @@ MvpCBuffer::MvpCBuffer(const std::array<Matrix, 3>& mvp) :
 					bd.MiscFlags = 0;
 					bd.ByteWidth = sizeof(matrices);
 					bd.StructureByteStride = 0;
-					
+
 					D3D11_SUBRESOURCE_DATA sd = {};
 					sd.pSysMem = matrices.data();
 
@@ -78,8 +78,14 @@ void MvpCBuffer::Bind()
 
 void MvpCBuffer::UpdateMatrix(const std::array<Matrix, 3>& mvp)
 {
-	_mvp = mvp;
-	_dirty = true;
+	const auto inst = ShareThisAs<MvpCBuffer>();
+	Renderer::Submit(
+		[inst, mvp](const RendererPackage& package)
+		{
+			inst->_mvp = mvp;
+			inst->_dirty = true;
+		}
+	);
 }
 
 auto MvpCBuffer::Create() -> std::shared_ptr<MvpCBuffer>

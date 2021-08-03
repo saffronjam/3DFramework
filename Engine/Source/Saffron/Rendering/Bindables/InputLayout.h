@@ -29,5 +29,6 @@ public:
 
 private:
 	ComPtr<ID3D11InputLayout> _nativeLayout{};
+	VertexLayout _vertexLayout;
 };
 }

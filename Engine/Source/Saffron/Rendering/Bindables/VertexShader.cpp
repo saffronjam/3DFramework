@@ -25,8 +25,11 @@ VertexShader::VertexShader(std::filesystem::path path) :
 					auto fullpath = BasePath;
 					fullpath += inst->_path.replace_extension();
 					fullpath += Extension;
-					D3DReadFileToBlob(fullpath.c_str(), &inst->_byteCode);
-					const auto hr = package.Device.CreateVertexShader(
+
+					auto hr = D3DReadFileToBlob(fullpath.c_str(), &inst->_byteCode);
+					ThrowIfBad(hr);
+
+					hr = package.Device.CreateVertexShader(
 						inst->_byteCode->GetBufferPointer(),
 						inst->_byteCode->GetBufferSize(),
 						nullptr,
@@ -52,6 +55,10 @@ void VertexShader::Bind()
 
 auto VertexShader::ByteCode() -> ID3DBlob&
 {
+	if (_byteCode == nullptr)
+	{
+		throw SaffronException(std::format("No byte code in vertex shader: {}", _path));
+	}
 	return *_byteCode.Get();
 }
 

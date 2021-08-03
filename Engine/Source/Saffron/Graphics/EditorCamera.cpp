@@ -25,32 +25,32 @@ void EditorCamera::OnUpdate(TimeSpan ts)
 {
 	if (Keyboard::IsKeyDown(KeyCode::W))
 	{
-		_position += _forward * ts.Sec() * 5.0f;
+		_position += _forward * ts.Sec() * 15.0f;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::S))
 	{
-		_position -= _forward * ts.Sec() * 5.0f;
+		_position -= _forward * ts.Sec() * 15.0f;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::D))
 	{
-		_position += _right * ts.Sec() * 5.0f;
+		_position += _right * ts.Sec() * 15.0f;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::A))
 	{
-		_position -= _right * ts.Sec() * 5.0f;
+		_position -= _right * ts.Sec() * 15.0f;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::Q))
 	{
-		_position -= _worldUp * ts.Sec() * 5.0f;
+		_position -= _worldUp * ts.Sec() * 15.0f;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::E))
 	{
-		_position += _worldUp * ts.Sec() * 5.0f;
+		_position += _worldUp * ts.Sec() * 15.0f;
 	}
 
 	if (Mouse::IsButtonDown(MouseButtonCode::Right))
 	{
-		const Vector2 swipe = Mouse::Swipe() * ts.Sec() * 0.9f;
+		const Vector2 swipe = Mouse::Swipe() * ts.Sec() * 1.5f;
 
 		_yaw -= swipe.x;
 		_pitch += swipe.y;

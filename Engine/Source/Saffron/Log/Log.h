@@ -12,11 +12,11 @@ public:
 	template <typename ... Args>
 	static void Info(const std::string& string, const Args& ... args);
 	static void Info(const std::string& string);
-	
+
 	template <typename ... Args>
 	static void Debug(const std::string& string, const Args& ... args);
 	static void Debug(const std::string& string);
-	
+
 private:
 	static Log* _instance;
 };
@@ -36,5 +36,15 @@ void Log::Debug(const std::string& string, const Args&... args)
 class UsrLog
 {
 };
-
 }
+
+#include "filesystem"
+
+template <>
+struct std::formatter<std::filesystem::path> : std::formatter<std::string>
+{
+	auto format(std::filesystem::path p, std::format_context& ctx)
+	{
+		return formatter<string>::format(std::format("{}", p.string()), ctx);
+	}
+};

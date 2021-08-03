@@ -1,16 +1,16 @@
 #pragma once
 
-#include <source_location>
 #include <d3d11_4.h>
+#include <source_location>
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
-#include "Saffron/Rendering/RenderGraph.h"
+#include "Saffron/Graphics/Mesh.h"
+#include "Saffron/Graphics/MeshStore.h"
 #include "Saffron/Rendering/BindableStore.h"
-#include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
+#include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/Bindables/BackBuffer.h"
-
-#include "Bindables.h"
+#include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
 
 namespace Se
 {
@@ -50,6 +50,18 @@ public:
 		Instance()._submitingContainer->.emplace_back(std::move(fn));
 	}
 #endif
+	static void SubmitMesh(const std::shared_ptr<Mesh>& mesh)
+	{
+		Renderer::Submit(
+			[mesh](const RendererPackage& package)
+			{
+				for (const auto& submesh : mesh->SubMeshes())
+				{
+					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
+				};
+			}
+		);
+	}
 
 	void Execute();
 
@@ -77,6 +89,7 @@ private:
 
 	std::shared_ptr<class BackBuffer> _backbuffer;
 	std::unique_ptr<BindableStore> _bindableStore;
+	std::unique_ptr<MeshStore> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
 	// Submitions	
