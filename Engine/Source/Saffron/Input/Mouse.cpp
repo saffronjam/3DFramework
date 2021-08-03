@@ -9,7 +9,7 @@
 namespace Se
 {
 Mouse::Mouse() :
-	SingleTon(this)
+	Singleton(this)
 {
 	for (int i = 0; i < static_cast<int>(MouseButtonCode::Count); i++)
 	{

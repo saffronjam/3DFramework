@@ -65,7 +65,7 @@ void MvpCBuffer::Bind()
 				D3D11_MAPPED_SUBRESOURCE mr = {};
 				const auto hr = package.Context.Map(inst->_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
 				ThrowIfBad(hr);
-
+		
 				std::memcpy(mr.pData, matrices.data(), sizeof(matrices));
 
 				package.Context.Unmap(inst->_nativeBuffer.Get(), 0);

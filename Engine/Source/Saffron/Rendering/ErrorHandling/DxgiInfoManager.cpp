@@ -8,7 +8,7 @@
 namespace Se
 {
 DxgiInfoManager::DxgiInfoManager() :
-	SingleTon(this)
+	Singleton(this)
 {
 	using DXGIGetDebugInterface = HRESULT(WINAPI*)(REFIID, void**);
 

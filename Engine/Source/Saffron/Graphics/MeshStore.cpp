@@ -23,7 +23,7 @@ const uint MeshStore::DefaultImportFlags = aiProcess_CalcTangentSpace | // Creat
 	aiProcess_JoinIdenticalVertices | aiProcess_ValidateDataStructure; // Validation
 
 MeshStore::MeshStore() :
-	SingleTon(this)
+	Singleton(this)
 {
 	_importer = new Assimp::Importer();
 }
@@ -111,6 +111,18 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 			}
 
 			meshFaces.emplace_back(MeshFace{face.mIndices[0], face.mIndices[1], face.mIndices[2]});
+		}
+
+		// Normals
+		if (aiSubmesh->HasNormals())
+		{
+			for (int normalIndex = 0; normalIndex < subMesh.VertexCount; normalIndex++)
+			{
+				const auto& v = aiSubmesh->mVertices[normalIndex];
+
+				// We know that vertices has been added in previous loops
+				meshVertices[normalIndex].Normal = Vector3{v.x, v.y, v.z};
+			}
 		}
 	}
 

@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class Ui : public SingleTon<Ui>
+class Ui : public Singleton<Ui>
 {
 public:
 	Ui();

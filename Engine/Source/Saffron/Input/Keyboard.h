@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class Keyboard : public SingleTon<Keyboard>
+class Keyboard : public Singleton<Keyboard>
 {
 public:
 	Keyboard();

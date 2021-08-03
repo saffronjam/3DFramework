@@ -7,7 +7,7 @@
 namespace Se
 {
 Keyboard::Keyboard() :
-	SingleTon(this)
+	Singleton(this)
 {
 	for (int i = 0; i < _keyStates.size(); i++)
 	{

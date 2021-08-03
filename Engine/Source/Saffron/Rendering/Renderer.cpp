@@ -16,7 +16,7 @@
 namespace Se
 {
 Renderer::Renderer(const Window& window) :
-	SingleTon(this),
+	Singleton(this),
 	_bindableStore(std::make_unique<BindableStore>()),
 	_meshStore(std::make_unique<MeshStore>())
 {

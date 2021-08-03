@@ -9,20 +9,30 @@ namespace Se
 static int counter = 0;
 
 ViewportPanel::ViewportPanel(const std::string& title, const std::weak_ptr<Image>& image) :
-	_title(title + "##Viewport#" + std::to_string(counter++)),
-	_fallback(Image::Create(ImageSpec{100, 100, ImageUsage_ShaderResource, ImageFormat::RGBA}))
+	_image(image),
+	_title(title + "##" + std::to_string(counter++))
 {
 }
 
-ViewportPanel::ViewportPanel(const std::string& title) :
-	_title(std::move(title)),
-	_fallback(Image::Create(ImageSpec{100, 100, ImageUsage_ShaderResource, ImageFormat::RGBA}))
+ViewportPanel::ViewportPanel(const std::string& title):
+	_title(title + "##" + std::to_string(counter++))
+{
+}
+
+ViewportPanel::ViewportPanel() :
+	_title(std::string("Viewport") + "##" + std::to_string(counter++))
 {
 }
 
 void ViewportPanel::OnUi()
 {
-	Image& toUse = _image.expired() ? *_fallback : *_image.lock();
+	auto toUse = _image.expired() ? _fallback : _image.lock();
+
+	if (toUse == nullptr)
+	{
+		Debug::Assert("Null image in viewport panel");
+		return;
+	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
 
@@ -47,7 +57,7 @@ void ViewportPanel::OnUi()
 	}
 	_viewportSize = viewportSize;
 
-	ImGui::Image(&toUse.ShaderView(), {_viewportSize.x, _viewportSize.y});
+	ImGui::Image(&toUse->ShaderView(), {_viewportSize.x, _viewportSize.y});
 
 	ImGui::End();
 	ImGui::PopStyleVar();
@@ -68,7 +78,7 @@ auto ViewportPanel::MousePosition(bool normalized) const -> Vector2
 	{
 		const auto viewportWidth = _bottomRight.x - _topLeft.x;
 		const auto viewportHeight = _bottomRight.y - _topLeft.y;
-		return { position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f };
+		return {position.x / viewportWidth * 2.0f - 1.0f, (position.y / viewportHeight * 2.0f - 1.0f) * -1.0f};
 	}
 	return position;
 }

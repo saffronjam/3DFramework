@@ -6,7 +6,7 @@
 
 namespace Se
 {
-class DxgiInfoManager : public SingleTon<DxgiInfoManager>
+class DxgiInfoManager : public Singleton<DxgiInfoManager>
 {
 public:
 	DxgiInfoManager();

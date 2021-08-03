@@ -12,7 +12,7 @@ template <typename T, typename ... Args> concept HasIdentifier = requires(T& t, 
 	t.Identifier(std::forward<Args>(args)...);
 };
 
-class BindableStore : public SingleTon<BindableStore>
+class BindableStore : public Singleton<BindableStore>
 {
 public:
 	BindableStore();
@@ -30,14 +30,14 @@ public:
 
 			const auto fullIdentifier = oss.str();
 			const auto tryFind = Instance()._storage.find(fullIdentifier);
-			if (tryFind == inst._storage.end() || tryFind->second.expired())
+			if (tryFind == inst._storage.end())
 			{
 				auto newResource = std::make_shared<T>(std::forward<Args>(args)...);
 				newResource->Initialize();
 				inst._storage.emplace(fullIdentifier, newResource);
 				return newResource;
 			}
-			return std::static_pointer_cast<T>(tryFind->second.lock());
+			return std::static_pointer_cast<T>(tryFind->second);
 		}
 		else
 		{
@@ -49,6 +49,6 @@ public:
 
 
 private:
-	std::unordered_map<std::string, std::weak_ptr<Bindable>> _storage;
+	std::unordered_map<std::string, std::shared_ptr<Bindable>> _storage;
 };
 }

@@ -10,7 +10,7 @@
 namespace Se
 {
 Ui::Ui() :
-	SingleTon(this)
+	Singleton(this)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();

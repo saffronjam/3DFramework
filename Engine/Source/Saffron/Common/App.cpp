@@ -6,7 +6,7 @@
 namespace Se
 {
 App::App(const AppSpec& spec) :
-	SingleTon(this),
+	Singleton(this),
 	_window(Window::Create(spec.WindowSpec)),
 	_renderer(std::make_unique<Renderer>(*_window)),
 	_ui(std::make_unique<Ui>()),
@@ -48,7 +48,7 @@ void App::Run()
 				}
 			}
 		);
-
+		
 		_timer.Restart();
 		_window->OnUpdate();
 		_ui->EndFrame();
@@ -78,7 +78,7 @@ void App::OnUi()
 	ImGui::Text("Frame time");
 	ImGui::NextColumn();
 	ImGui::Text("%.12f ms", _timer.FrameTime().Ms());
-	ImGui::NextColumn();	
+	ImGui::NextColumn();
 	ImGui::NextColumn();
 	const auto frameTime = _timer.FrameTime().Sec();
 	if (frameTime == 0.0f)

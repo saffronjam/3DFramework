@@ -39,6 +39,7 @@ public:
 	auto TargetByIndex(uint index) const -> const Image&;
 	auto FinalTarget() const -> const Image&;
 	auto FinalTargetPtr() const -> const std::shared_ptr<Image>&;
+	auto DepthTarget() -> Image&;
 	auto DepthTarget() const -> const Image&;
 	auto DepthTargetPtr() const -> const std::shared_ptr<Image>&;
 

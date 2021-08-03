@@ -25,7 +25,7 @@ struct RendererPackage
 
 using RenderFn = std::function<void(const RendererPackage& package)>;
 
-class Renderer : public SingleTon<Renderer>
+class Renderer : public Singleton<Renderer>
 {
 private:
 	struct Submition
@@ -40,9 +40,9 @@ public:
 	explicit Renderer(const Window& window);
 
 #ifdef SE_DEBUG
-	static void Submit(RenderFn fn, std::source_location location = std::source_location::current())
+	static void Submit(const RenderFn &fn, std::source_location location = std::source_location::current())
 	{
-		Instance()._submitingContainer->emplace_back(Submition{std::move(fn), location});
+		Instance()._submitingContainer->emplace_back(Submition{fn, location});
 	}
 #else
 	static void Submit(RenderFn fn)

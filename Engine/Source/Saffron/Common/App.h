@@ -11,11 +11,6 @@
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Ui/Ui.h"
 
-// TEMP
-#include "Saffron/Rendering/Bindables.h"
-#include "Saffron/Ui/DockSpacePanel.h"
-#include "Saffron/Ui/ViewportPanel.h"
-
 namespace Se
 {
 struct AppSpec
@@ -23,7 +18,7 @@ struct AppSpec
 	WindowSpec WindowSpec;
 };
 
-class App : public SingleTon<App>
+class App : public Singleton<App>
 {
 public:
 	explicit App(const AppSpec& spec);

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <string>
+
 #include "Saffron/Base.h"
 #include "Saffron/Event/Event.h"
 #include "Saffron/Rendering/Image.h"
@@ -12,6 +14,7 @@ class ViewportPanel
 public:
 	explicit ViewportPanel(const std::string& title, const std::weak_ptr<Image>& image);
 	explicit ViewportPanel(const std::string& title);
+	explicit ViewportPanel();
 
 	void OnUi();
 
@@ -24,8 +27,8 @@ public:
 
 private:
 	std::weak_ptr<Image> _image;
-	std::string _title;
 	std::shared_ptr<Image> _fallback;
+	std::string _title;
 
 	Vector2 _topLeft = {0.0f, 0.0f};
 	Vector2 _bottomRight = {0.0f, 0.0f};

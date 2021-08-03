@@ -8,7 +8,7 @@
 
 #include <memory>
 
-#include "Saffron/Common/SingleTon.h"
+#include "Saffron/Common/Singleton.h"
 #include "Saffron/Common/SubscriberList.h"
 #include "Saffron/Common/TimeSpan.h"
 #include "Saffron/Core/Config.h"

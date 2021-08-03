@@ -3,6 +3,7 @@ cbuffer MvpBuffer : register(b0) { matrix Model; matrix View; matrix Projection;
 struct VS_OUTPUT
 {
 	float4 Position : SV_POSITION;
+	float3 Normal : Normal;
 };
 
 VS_OUTPUT main(
@@ -21,5 +22,7 @@ VS_OUTPUT main(
 	pos4 = mul(pos4, Projection);
 	output.Position = pos4;
 
+	output.Normal = normal;
+	
 	return output;
 }

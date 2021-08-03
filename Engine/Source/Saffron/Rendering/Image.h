@@ -25,9 +25,9 @@ using ImageUsage = uint;
 
 enum ImageUsageFlags : uint
 {
-	ImageUsage_DepthStencil = 0,
-	ImageUsage_RenderTarget = 1 << 0,
-	ImageUsage_ShaderResource = 1 << 1
+	ImageUsage_DepthStencil = 1 << 0,
+	ImageUsage_RenderTarget = 1 << 1,
+	ImageUsage_ShaderResource = 1 << 2
 };
 
 struct ImageSpec
@@ -89,13 +89,52 @@ inline auto ToDxgiTextureFormat(ImageFormat format) -> DXGI_FORMAT
 	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
 	case ImageFormat::RG16f: return DXGI_FORMAT_R16G16_FLOAT;
-	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
-	case ImageFormat::Depth32f: return DXGI_FORMAT_D32_FLOAT;
-	case ImageFormat::None: return static_cast<DXGI_FORMAT>(0);
+	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_R24G8_TYPELESS;
+	case ImageFormat::Depth32f: return DXGI_FORMAT_R32_TYPELESS;
 	default: break;
 	}
 	throw SaffronException("Image format not supported");
 }
+
+inline auto ToDxgiDepthStencilFormat(ImageFormat format) -> DXGI_FORMAT
+{
+	switch (format)
+	{
+	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+	case ImageFormat::Depth32f: return DXGI_FORMAT_D32_FLOAT;
+	default: break;
+	}
+	throw SaffronException("Image format not supported");
+}
+
+inline auto ToDxgiRenderTargetFormat(ImageFormat format) -> DXGI_FORMAT
+{
+	switch (format)
+	{
+	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case ImageFormat::RG16f: return DXGI_FORMAT_R16G16_FLOAT;
+	default: break;
+	}
+	throw SaffronException("Image format not supported");
+}
+
+inline auto ToDxgiShaderResourceFormat(ImageFormat format) -> DXGI_FORMAT
+{
+	switch (format)
+	{
+	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case ImageFormat::RG16f: return DXGI_FORMAT_R16G16_FLOAT;
+	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_R24_UNORM_X8_TYPELESS;
+	case ImageFormat::Depth32f: return DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS;
+	default: break;
+	}
+	throw SaffronException("Image format not supported");
+}
+
 
 inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
 {

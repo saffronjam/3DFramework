@@ -12,7 +12,7 @@ namespace Se
 {
 class Mesh;
 
-class MeshStore : public SingleTon<MeshStore>
+class MeshStore : public Singleton<MeshStore>
 {
 public:
 	MeshStore();

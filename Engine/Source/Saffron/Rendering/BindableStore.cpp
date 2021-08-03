@@ -5,7 +5,7 @@
 namespace Se
 {
 BindableStore::BindableStore() :
-	SingleTon(this)
+	Singleton(this)
 {
 }
 }

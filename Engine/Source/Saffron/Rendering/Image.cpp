@@ -62,12 +62,22 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 
 	if (depthStencil)
 	{
+		D3D11_DEPTH_STENCIL_VIEW_DESC dsd = {};
+		dsd.Format = Utils::ToDxgiDepthStencilFormat(_spec.Format);
+		dsd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		dsd.Texture2D.MipSlice = 0;
+
+		ComPtr<ID3D11DepthStencilView> depthStencilView;
+		hr = device.CreateDepthStencilView(_nativeTexture.Get(), &dsd, &depthStencilView);
+		ThrowIfBad(hr);
+
+		_nativeRenderView = depthStencilView;
 		ThrowIfBad(hr);
 	}
 	else if (renderTarget)
 	{
 		D3D11_RENDER_TARGET_VIEW_DESC rd = {};
-		rd.Format = td.Format;
+		rd.Format = Utils::ToDxgiRenderTargetFormat(_spec.Format);
 		rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		rd.Texture2D.MipSlice = 0;
 
@@ -81,7 +91,7 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 	if (shaderResource || true)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
-		srvd.Format = td.Format;
+		srvd.Format = Utils::ToDxgiShaderResourceFormat(_spec.Format);
 		srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		srvd.Texture2D.MipLevels = td.MipLevels;
 		srvd.Texture2D.MostDetailedMip = 0;

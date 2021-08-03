@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include "Saffron/Rendering/Bindables/DepthStencil.h"
 #include "Saffron/Rendering/Bindables/Framebuffer.h"
 #include "Saffron/Rendering/Bindables/IndexBuffer.h"
 #include "Saffron/Rendering/Bindables/InputLayout.h"

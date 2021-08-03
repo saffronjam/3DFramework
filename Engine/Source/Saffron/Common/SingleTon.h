@@ -6,11 +6,11 @@
 namespace Se
 {
 template <class Class>
-class SingleTon : public NonCopyable
+class Singleton : public NonCopyable
 {
 public:
-	explicit SingleTon(Class* instance);
-	virtual ~SingleTon();
+	explicit Singleton(Class* instance);
+	virtual ~Singleton();
 
 	static auto Instance() -> Class&;
 
@@ -19,25 +19,25 @@ protected:
 };
 
 template <class Class>
-SingleTon<Class>::SingleTon(Class* instance)
+Singleton<Class>::Singleton(Class* instance)
 {
 	Debug::Assert(_instance == nullptr, std::string(typeid(Class).name()) + " was already instansiated");
 	_instance = instance;
 }
 
 template <class Class>
-SingleTon<Class>::~SingleTon()
+Singleton<Class>::~Singleton()
 {
 	_instance = nullptr;
 }
 
 template <class Class>
-auto SingleTon<Class>::Instance() -> Class&
+auto Singleton<Class>::Instance() -> Class&
 {
 	Debug::Assert(_instance != nullptr, std::string(typeid(Class).name()) + " was not instansiated");
 	return *_instance;
 }
 
 template <class Class>
-Class* SingleTon<Class>::_instance = nullptr;
+Class* Singleton<Class>::_instance = nullptr;
 }

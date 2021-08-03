@@ -5,7 +5,7 @@
 
 namespace Se
 {
-class Mouse : public SingleTon<Mouse>
+class Mouse : public Singleton<Mouse>
 {
 public:
 	Mouse();

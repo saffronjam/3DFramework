@@ -99,7 +99,7 @@ void Framebuffer::Resize(uint width, uint height)
 
 			_width = width;
 			_height = height;
-			Resized.Invoke({ _width, _height });
+			Resized.Invoke({_width, _height});
 		}
 	);
 }
@@ -117,10 +117,12 @@ void Framebuffer::Clear()
 
 			if (inst->_depthStencilAttachmentFormat != ImageFormat::None)
 			{
-				// TODO: Clear depth attachment
-				/*package.Context.ClearDepthStencilView(
+				package.Context.ClearDepthStencilView(
 					&inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>(),
-				);*/
+					D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+					1.0f,
+					0
+				);
 			}
 		}
 	);
@@ -140,6 +142,11 @@ const Image& Framebuffer::FinalTarget() const
 auto Framebuffer::FinalTargetPtr() const -> const std::shared_ptr<Image>&
 {
 	return _colorAttachments.front();
+}
+
+auto Framebuffer::DepthTarget() -> Image&
+{
+	return *DepthTargetPtr();
 }
 
 auto Framebuffer::DepthTarget() const -> const Image&
