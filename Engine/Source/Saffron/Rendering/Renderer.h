@@ -9,6 +9,7 @@
 #include "Saffron/Graphics/MeshStore.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
+#include "Saffron/Rendering/RenderState.h"
 #include "Saffron/Rendering/Bindables/BackBuffer.h"
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
 
@@ -40,7 +41,7 @@ public:
 	explicit Renderer(const Window& window);
 
 #ifdef SE_DEBUG
-	static void Submit(const RenderFn &fn, std::source_location location = std::source_location::current())
+	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current())
 	{
 		Instance()._submitingContainer->emplace_back(Submition{fn, location});
 	}
@@ -50,18 +51,7 @@ public:
 		Instance()._submitingContainer->.emplace_back(std::move(fn));
 	}
 #endif
-	static void SubmitMesh(const std::shared_ptr<Mesh>& mesh)
-	{
-		Renderer::Submit(
-			[mesh](const RendererPackage& package)
-			{
-				for (const auto& submesh : mesh->SubMeshes())
-				{
-					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
-				};
-			}
-		);
-	}
+	static void SubmitMesh(const std::shared_ptr<Mesh>& mesh);
 
 	void Execute();
 
@@ -74,12 +64,20 @@ public:
 	static auto BackBuffer() -> BackBuffer&;
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
+	static void SetRenderState(RenderState state);
+
+	static void BindTransform();
+	static void SetTransform(const Matrix& model);
+	static void SetTransform(const Matrix& view, const Matrix& projection);
+	static void SetTransform(const Mvp& mvp);
+
 	void CleanDebugInfo();
 
 private:
 	void CreateDeviceAndContext();
 	void CreateFactory();
 	void CreateSwapChain(const Window& window);
+	void CreateRenderState();
 
 private:
 	ComPtr<ID3D11Device> _device{};
@@ -87,7 +85,17 @@ private:
 	ComPtr<ID3D11DeviceContext> _context{};
 	ComPtr<IDXGIFactory2> _factory{};
 
+	// Render state
+	RenderState _submittedState;
+	RenderState _requestedState = RenderState::Default;
+	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
+	ComPtr<ID3D11RasterizerState> _nativeRasterizerState;
+	ComPtr<ID3D11SamplerState> _nativeSamplerState;
+
 	std::shared_ptr<class BackBuffer> _backbuffer;
+	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	Mvp _mvp;
+
 	std::unique_ptr<BindableStore> _bindableStore;
 	std::unique_ptr<MeshStore> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
@@ -101,4 +109,10 @@ private:
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 };
+
+namespace Utils
+{
+D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state);
+D3D11_FILTER ToD3D11Filter(ulong state);
+}
 }

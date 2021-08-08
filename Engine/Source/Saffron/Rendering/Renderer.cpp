@@ -10,9 +10,6 @@
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoException.h"
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
 
-
-#include "Saffron/Rendering/Bindables/InputLayout.h"
-
 namespace Se
 {
 Renderer::Renderer(const Window& window) :
@@ -25,11 +22,32 @@ Renderer::Renderer(const Window& window) :
 	CreateSwapChain(window);
 
 	_backbuffer = BackBuffer::Create(window);
+	_mvpCBuffer = MvpCBuffer::Create();
 
 	if constexpr (ConfDebug)
 	{
 		_dxgiInfoQueue = std::make_unique<DxgiInfoManager>();
 	}
+}
+
+void Renderer::SubmitMesh(const std::shared_ptr<Mesh>& mesh)
+{
+	Renderer::Submit(
+		[mesh](const RendererPackage& package)
+		{
+			auto& inst = Instance();
+
+			auto& mvpCBuffer = Instance()._mvpCBuffer;
+			mvpCBuffer->Bind();
+			for (const auto& submesh : mesh->SubMeshes())
+			{
+				SetTransform(mesh->Transform() * submesh.Transform);
+				mvpCBuffer->UpdateTransform(inst._mvp);
+				mvpCBuffer->UploadTransform();
+				package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
+			};
+		}
+	);
 }
 
 void Renderer::Execute()
@@ -98,8 +116,25 @@ void Renderer::Execute()
 
 void Renderer::BeginFrame()
 {
+	if (_requestedState != _submittedState)
+	{
+		CreateRenderState();
+		_submittedState = _requestedState;
+	}
+
 	_backbuffer->Bind();
 	_backbuffer->Clear();
+
+	Renderer::Submit(
+		[](const RendererPackage& package)
+		{
+			auto& inst = Instance();
+
+			package.Context.OMSetDepthStencilState(inst._nativeDepthStencilState.Get(), 1);
+			package.Context.RSSetState(inst._nativeRasterizerState.Get());
+			package.Context.PSSetSamplers(0, 1, inst._nativeSamplerState.GetAddressOf());
+		}
+	);
 }
 
 void Renderer::EndFrame()
@@ -137,6 +172,48 @@ auto Renderer::BackBuffer() -> Se::BackBuffer&
 auto Renderer::BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&
 {
 	return Instance()._backbuffer;
+}
+
+void Renderer::SetRenderState(RenderState state)
+{
+	Instance()._requestedState = state;
+	Renderer::Submit(
+		[](const RendererPackage& package)
+		{
+			auto& inst = Instance();
+			if (inst._requestedState != inst._submittedState)
+			{
+				inst.CreateRenderState();
+				inst._submittedState = inst._requestedState;
+			}
+		}
+	);
+}
+
+void Renderer::BindTransform()
+{
+	Instance()._mvpCBuffer->Bind();
+}
+
+void Renderer::SetTransform(const Matrix& model)
+{
+	auto& inst = Instance();
+	inst._mvp.Model = model;
+	inst._mvp.ModelViewProjection = model * inst._mvp.ViewProjection;
+}
+
+void Renderer::SetTransform(const Matrix& view, const Matrix& projection)
+{
+	auto& inst = Instance();
+	inst._mvp.ViewProjection = view * projection;
+	inst._mvp.ModelViewProjection = inst._mvp.Model * view * projection;
+}
+
+void Renderer::SetTransform(const Mvp& mvp)
+{
+	auto& inst = Instance();
+	inst._mvp = mvp;
+	inst._mvpCBuffer->UpdateTransform(inst._mvp);
 }
 
 void Renderer::CleanDebugInfo()
@@ -206,5 +283,103 @@ void Renderer::CreateSwapChain(const Window& window)
 		&_swapChain
 	);
 	ThrowIfBad(hr);
+}
+
+void Renderer::CreateRenderState()
+{
+	// Depth stencil
+
+	D3D11_DEPTH_STENCIL_DESC dsd = {};
+
+	if (_requestedState & RenderState::DepthTest_Less || _requestedState & RenderState::DepthTest_LessEqual ||
+		_requestedState & RenderState::DepthTest_Equal || _requestedState & RenderState::DepthTest_GreterEqual ||
+		_requestedState & RenderState::DepthTest_Greter || _requestedState & RenderState::DepthTest_NotEqual ||
+		_requestedState & RenderState::DepthTest_Never || _requestedState & RenderState::DepthTest_Always)
+	{
+		dsd.DepthEnable = true;
+		dsd.DepthFunc = Utils::ToD3D11CompFunc(_requestedState);
+		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	}
+	else
+	{
+		dsd.DepthEnable = false;
+		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+	}
+
+	auto hr = _device->CreateDepthStencilState(&dsd, &_nativeDepthStencilState);
+	ThrowIfBad(hr);
+
+
+	// Rasterizer
+
+	D3D11_RASTERIZER_DESC rd = {};
+
+	if (_requestedState & RenderState::Rasterizer_CullBack)
+	{
+		rd.CullMode = D3D11_CULL_BACK;
+	}
+	else if (_requestedState & RenderState::Rasterizer_CullBack)
+	{
+		rd.CullMode = D3D11_CULL_FRONT;
+	}
+	else
+	{
+		rd.CullMode = D3D11_CULL_NONE;
+	}
+
+	if (_requestedState & RenderState::Rasterizer_Wireframe)
+	{
+		rd.FillMode = D3D11_FILL_WIREFRAME;
+	}
+	else
+	{
+		rd.FillMode = D3D11_FILL_SOLID;
+	}
+
+	hr = _device->CreateRasterizerState(&rd, &_nativeRasterizerState);
+	ThrowIfBad(hr);
+
+
+	// Sampler
+
+	D3D11_SAMPLER_DESC sd = {};
+
+	sd.Filter = Utils::ToD3D11Filter(_requestedState);
+	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	if (_requestedState & RenderState::Sampler_Anisotropic)
+	{
+		sd.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
+	}
+
+	hr = _device->CreateSamplerState(&sd, &_nativeSamplerState);
+	ThrowIfBad(hr);
+}
+
+namespace Utils
+{
+D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state)
+{
+	if (state & RenderState::DepthTest_Less) return D3D11_COMPARISON_LESS;
+	if (state & RenderState::DepthTest_LessEqual) return D3D11_COMPARISON_LESS_EQUAL;
+	if (state & RenderState::DepthTest_Equal) return D3D11_COMPARISON_EQUAL;
+	if (state & RenderState::DepthTest_GreterEqual) return D3D11_COMPARISON_GREATER_EQUAL;
+	if (state & RenderState::DepthTest_Greter) return D3D11_COMPARISON_GREATER;
+	if (state & RenderState::DepthTest_NotEqual) return D3D11_COMPARISON_NOT_EQUAL;
+	if (state & RenderState::DepthTest_Never) return D3D11_COMPARISON_NEVER;
+	if (state & RenderState::DepthTest_Always) return D3D11_COMPARISON_ALWAYS;
+
+	throw SaffronException("Invalid state. Could not convert to D3D11_COMPARISON_FUNC.");
+}
+
+D3D11_FILTER ToD3D11Filter(ulong state)
+{
+	if (state & RenderState::Sampler_Anisotropic) return D3D11_FILTER_ANISOTROPIC;
+	if (state & RenderState::Sampler_Bilinear) return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	if (state & RenderState::Sampler_Point) return D3D11_FILTER_MIN_MAG_MIP_POINT;
+
+	throw SaffronException("Invalid filter. Could not convert to D3D11_FILTER.");
+}
 }
 }

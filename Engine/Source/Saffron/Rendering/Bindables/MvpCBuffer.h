@@ -7,22 +7,30 @@
 
 namespace Se
 {
+struct Mvp
+{
+	Matrix Model;
+	Matrix ViewProjection;
+	Matrix ModelViewProjection;
+};
+
 class MvpCBuffer : public Bindable
 {
 public:
 	MvpCBuffer();
-	explicit MvpCBuffer(const std::array<Matrix, 3>& mvp);
+	explicit MvpCBuffer(const Mvp& mvp);
 
 	void Bind() override;
 
-	void UpdateMatrix(const std::array<Matrix, 3>& mvp);
-
+	void UpdateTransform(const Mvp& mvp);
+	void UploadTransform();
+	
 	static auto Create() -> std::shared_ptr<MvpCBuffer>;
-	static auto Create(const std::array<Matrix, 3>& mvp) -> std::shared_ptr<MvpCBuffer>;
+	static auto Create(const Mvp& mvp) -> std::shared_ptr<MvpCBuffer>;
 
 private:
 	ComPtr<ID3D11Buffer> _nativeBuffer;
-	std::array<Matrix, 3> _mvp;
+	Mvp _mvp;
 	bool _dirty = false;
 };
 }

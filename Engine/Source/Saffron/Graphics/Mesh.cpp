@@ -15,11 +15,30 @@ void Mesh::Bind()
 	_inputLayout->Bind();
 	_vertexShader->Bind();
 	_pixelShader->Bind();
+	for (auto& texture : _textures)
+	{
+		texture->Bind();
+	}
 }
 
 auto Mesh::SubMeshes() const -> const std::vector<SubMesh>&
 {
 	return _subMeshes;
+}
+
+auto Mesh::Textures() const -> const std::vector<std::shared_ptr<Texture>>&
+{
+	return _textures;
+}
+
+auto Mesh::Transform() -> Matrix&
+{
+	return _transform;
+}
+
+auto Mesh::Transform() const -> const Matrix&
+{
+	return _transform;
 }
 
 auto Mesh::Create(const std::filesystem::path& path) -> std::shared_ptr<Mesh>

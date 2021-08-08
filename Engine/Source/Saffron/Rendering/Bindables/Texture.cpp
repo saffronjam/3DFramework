@@ -4,8 +4,6 @@
 
 #include <DirectXTK/WICTextureLoader.h>
 
-#include "imgui.h"
-
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
 #include "Saffron/Rendering/Renderer.h"
 
@@ -57,6 +55,41 @@ Texture::Texture(uint width, uint height, ImageFormat format, uint slot) :
 	);
 }
 
+Texture::Texture(const std::filesystem::path& path, uint slot) :
+	_slot(slot),
+	_path(std::make_optional(path))
+{
+	SetInitializer(
+		[this]
+		{
+			const auto inst = ShareThisAs<Texture>();
+			Renderer::Submit(
+				[inst](const RendererPackage& package)
+				{
+					// Load from disk
+					ComPtr<ID3D11Resource> texture;
+					const auto hr = DirectX::CreateWICTextureFromFile(
+						&package.Device,
+						inst->_path->c_str(),
+						&texture,
+						&inst->_nativeShaderResourceView
+					);
+					ThrowIfBad(hr);
+					texture->QueryInterface(__uuidof(ID3D11Texture2D), &inst->_nativeTexture);
+
+					// Fetch texture info
+					D3D11_TEXTURE2D_DESC td;
+					inst->_nativeTexture->GetDesc(&td);
+
+					inst->_format = Utils::ToSaffronFormat(td.Format);
+					inst->_width = td.Width;
+					inst->_height = td.Height;
+				}
+			);
+		}
+	);
+}
+
 void Texture::Bind()
 {
 	const auto inst = ShareThisAs<Texture>();
@@ -78,22 +111,22 @@ auto Texture::Height() const -> uint
 	return _height;
 }
 
-auto Texture::NativeTexture() -> ID3D11Texture2D&
+auto Texture::NativeHandle() -> ID3D11Texture2D&
 {
 	return *_nativeTexture.Get();
 }
 
-auto Texture::NativeTexture() const -> const ID3D11Texture2D&
+auto Texture::NativeHandle() const -> const ID3D11Texture2D&
 {
 	return *_nativeTexture.Get();
 }
 
-auto Texture::NativeShaderView() -> ID3D11ShaderResourceView&
+auto Texture::ShaderView() -> ID3D11ShaderResourceView&
 {
 	return *_nativeShaderResourceView.Get();
 }
 
-auto Texture::NativeShaderView() const -> const ID3D11ShaderResourceView&
+auto Texture::ShaderView() const -> const ID3D11ShaderResourceView&
 {
 	return *_nativeShaderResourceView.Get();
 }
@@ -103,4 +136,8 @@ auto Texture::Create(uint width, uint height, ImageFormat format, uint slot) -> 
 	return BindableStore::Add<Texture>(width, height, format, slot);
 }
 
+auto Texture::Create(const std::filesystem::path& path, uint slot) -> std::shared_ptr<Texture>
+{
+	return BindableStore::Add<Texture>(path, slot);
+}
 }

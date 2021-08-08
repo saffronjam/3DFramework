@@ -52,9 +52,15 @@ void VertexStorage::Add(std::vector<VertexType> container)
 		VertexByteSize == _layout.ByteSize(),
 		"VertexType Size did not match Size in VertexLayout specification"
 	);
-	
+
 	const size_t before = _data.size();
 	const size_t byteSize = VertexByteSize * container.size();
+	if (byteSize == 0)
+	{
+		Log::Info("No vertices given in VertexStorage::Add");
+		return;
+	}
+
 	_data.resize(before + byteSize);
 
 	std::memcpy(&_data[before], container.data(), byteSize);

@@ -12,80 +12,57 @@ MvpCBuffer::MvpCBuffer() :
 {
 }
 
-MvpCBuffer::MvpCBuffer(const std::array<Matrix, 3>& mvp) :
+MvpCBuffer::MvpCBuffer(const Mvp& mvp) :
 	_mvp(mvp)
 {
-	SetInitializer(
-		[this]
-		{
-			const auto inst = ShareThisAs<MvpCBuffer>();
-			Renderer::Submit(
-				[inst](const RendererPackage& package)
-				{
-					// Since Hlsl in column major
-					std::array<Matrix, 3> matrices;
-					for (int i = 0; i < matrices.size(); i++)
-					{
-						matrices[i] = inst->_mvp[i].Transpose();
-					}
+	// Since Hlsl in column major
+	Mvp transposed{_mvp.Model.Transpose(), _mvp.ViewProjection.Transpose(), _mvp.ModelViewProjection.Transpose()};
 
-					D3D11_BUFFER_DESC bd = {};
-					bd.Usage = D3D11_USAGE_DYNAMIC;
-					bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-					bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-					bd.MiscFlags = 0;
-					bd.ByteWidth = sizeof(matrices);
-					bd.StructureByteStride = 0;
+	D3D11_BUFFER_DESC bd;
+	bd.Usage = D3D11_USAGE_DYNAMIC;
+	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	bd.MiscFlags = 0;
+	bd.ByteWidth = sizeof Mvp;
+	bd.StructureByteStride = 0;
 
-					D3D11_SUBRESOURCE_DATA sd = {};
-					sd.pSysMem = matrices.data();
+	D3D11_SUBRESOURCE_DATA sd = {};
+	sd.pSysMem = &transposed;
 
-					package.Device.CreateBuffer(&bd, &sd, &inst->_nativeBuffer);
-				}
-			);
-		}
-	);
+	const auto hr = Renderer::Device().CreateBuffer(&bd, &sd, &_nativeBuffer);
+	ThrowIfBad(hr);
 }
 
 void MvpCBuffer::Bind()
 {
-	const auto inst = ShareThisAs<MvpCBuffer>();
-	Renderer::Submit(
-		[inst](const RendererPackage& package)
-		{
-			if (inst->_dirty)
-			{
-				// Since Hlsl in column major
-				std::array<Matrix, 3> matrices;
-				for (int i = 0; i < matrices.size(); i++)
-				{
-					matrices[i] = inst->_mvp[i].Transpose();
-				}
+	if (_dirty)
+	{
+		UploadTransform();
+	}
 
-				D3D11_MAPPED_SUBRESOURCE mr = {};
-				const auto hr = package.Context.Map(inst->_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
-				ThrowIfBad(hr);
-		
-				std::memcpy(mr.pData, matrices.data(), sizeof(matrices));
-
-				package.Context.Unmap(inst->_nativeBuffer.Get(), 0);
-				inst->_dirty = false;
-			}
-			package.Context.VSSetConstantBuffers(0, 1, inst->_nativeBuffer.GetAddressOf());
-		}
-	);
+	Renderer::Context().VSSetConstantBuffers(0, 1, _nativeBuffer.GetAddressOf());
 }
 
-void MvpCBuffer::UpdateMatrix(const std::array<Matrix, 3>& mvp)
+void MvpCBuffer::UpdateTransform(const Mvp& mvp)
 {
-	const auto inst = ShareThisAs<MvpCBuffer>();
-	Renderer::Submit(
-		[inst, mvp](const RendererPackage& package)
-		{
-			inst->_mvp = mvp;
-			inst->_dirty = true;
-		}
-	);
+	_mvp = mvp;
+	_dirty = true;
+}
+
+void MvpCBuffer::UploadTransform()
+{
+	// Since Hlsl in column major
+	Mvp transposed{_mvp.Model.Transpose(), _mvp.ViewProjection.Transpose(), _mvp.ModelViewProjection.Transpose()};
+
+	D3D11_MAPPED_SUBRESOURCE mr = {};
+	const auto hr = Renderer::Context().Map(_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+	ThrowIfBad(hr);
+
+	std::memcpy(mr.pData, &transposed, sizeof Mvp);
+
+	Renderer::Context().Unmap(_nativeBuffer.Get(), 0);
+
+	_dirty = false;
 }
 
 auto MvpCBuffer::Create() -> std::shared_ptr<MvpCBuffer>
@@ -93,7 +70,7 @@ auto MvpCBuffer::Create() -> std::shared_ptr<MvpCBuffer>
 	return BindableStore::Add<MvpCBuffer>();
 }
 
-auto MvpCBuffer::Create(const std::array<Matrix, 3>& mvp) -> std::shared_ptr<MvpCBuffer>
+auto MvpCBuffer::Create(const Mvp& mvp) -> std::shared_ptr<MvpCBuffer>
 {
 	return BindableStore::Add<MvpCBuffer>(mvp);
 }

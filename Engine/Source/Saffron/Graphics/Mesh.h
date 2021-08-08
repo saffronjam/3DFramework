@@ -47,6 +47,9 @@ public:
 	void Bind();
 
 	auto SubMeshes() const -> const std::vector<SubMesh>&;
+	auto Textures() const -> const std::vector<std::shared_ptr<Texture>>&;
+	auto Transform() -> Matrix&;
+	auto Transform() const -> const Matrix&;
 
 	static auto Create(const std::filesystem::path& path) -> std::shared_ptr<Mesh>;
 
@@ -59,6 +62,10 @@ private:
 	std::shared_ptr<InputLayout> _inputLayout;
 	std::shared_ptr<VertexShader> _vertexShader;
 	std::shared_ptr<PixelShader> _pixelShader;
+
 	std::vector<SubMesh> _subMeshes;
+	std::vector<std::shared_ptr<Texture>> _textures;
+
+	Matrix _transform;
 };
 }

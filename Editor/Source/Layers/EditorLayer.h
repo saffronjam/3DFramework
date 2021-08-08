@@ -22,8 +22,6 @@ private:
 
 	// Temporary
 	std::shared_ptr<Framebuffer> _framebuffer;
-	std::shared_ptr<DepthStencil> _depthStencil;
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
 	std::shared_ptr<Mesh> _mesh;
 
 	Viewport _viewport;

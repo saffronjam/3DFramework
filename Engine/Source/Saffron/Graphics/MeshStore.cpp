@@ -33,6 +33,14 @@ MeshStore::~MeshStore()
 	delete _importer;
 }
 
+auto stripFirstDir(const std::filesystem::path path) -> std::filesystem::path
+{
+	const auto relPath = path.relative_path();
+	if (relPath.empty()) return {};
+	return relPath.lexically_relative(*relPath.begin());
+}
+
+
 auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mesh>
 {
 	auto fullpath = BasePath;
@@ -61,12 +69,15 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 	}
 
 	const auto meshCount = scene->mNumMeshes;
+	const auto textureCount = scene->mNumTextures;
 
 	std::vector<MeshVertex> meshVertices;
 	std::vector<MeshFace> meshFaces;
-	std::vector<SubMesh> _subMeshes;
+	std::vector<SubMesh> subMeshes;
+	std::vector<std::shared_ptr<Texture>> textures;
 
-	_subMeshes.reserve(meshCount);
+	subMeshes.reserve(meshCount);
+	textures.reserve(textureCount);
 
 	uint vertexCount = 0;
 	uint indexCount = 0;
@@ -86,7 +97,7 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 		subMesh.VertexCount = aiSubmesh->mNumVertices;
 		subMesh.IndexCount = aiSubmesh->mNumFaces * 3;
 		subMesh.MeshName = aiSubmesh->mName.C_Str();
-		_subMeshes.emplace_back(subMesh);
+		subMeshes.emplace_back(subMesh);
 
 		vertexCount += subMesh.VertexCount;
 		indexCount += subMesh.IndexCount;
@@ -124,6 +135,43 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 				meshVertices[normalIndex].Normal = Vector3{v.x, v.y, v.z};
 			}
 		}
+
+		// TexCoords
+		if (aiSubmesh->HasTextureCoords(0))
+		{
+			for (int texCoordIndex = 0; texCoordIndex < subMesh.VertexCount; texCoordIndex++)
+			{
+				const auto& v = aiSubmesh->mTextureCoords[0][texCoordIndex];
+				
+				// We know that vertices has been added in previous loops
+				meshVertices[texCoordIndex].TexCoord = Vector2{v.x, 1.0f - v.y};
+			}
+		}
+
+		// Tangent and bitangents
+		if (aiSubmesh->HasTangentsAndBitangents())
+		{
+			for (int tangentIndex = 0; tangentIndex < subMesh.VertexCount; tangentIndex++)
+			{
+				const auto& v = aiSubmesh->mTangents[tangentIndex];
+
+				// We know that vertices has been added in previous loops
+				meshVertices[tangentIndex].Tangent = Vector3{v.x, v.y, v.z};
+			}
+		}
+	}
+
+	auto texBasePath = fullpath;
+	texBasePath.remove_filename();
+	for (int textureIndex = 0; textureIndex < textureCount; textureIndex++)
+	{
+		auto* const aiTexture = scene->mTextures[textureIndex];
+		const std::filesystem::path texPath = std::filesystem::path(aiTexture->mFilename.C_Str()).filename();
+
+		auto texFullpath = texBasePath;
+		texFullpath += texPath;
+		auto texture = Texture::Create(texFullpath, textureIndex);
+		textures.emplace_back(std::move(texture));
 	}
 
 	const auto layout = MeshVertex::VertexLayout();
@@ -145,7 +193,8 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 	newMesh->_vertexBuffer = std::move(vb);
 	newMesh->_indexBuffer = std::move(ib);
 	newMesh->_inputLayout = std::move(il);
-	newMesh->_subMeshes = std::move(_subMeshes);
+	newMesh->_subMeshes = std::move(subMeshes);
+	newMesh->_textures = std::move(textures);
 
 	return newMesh;
 }

@@ -1,9 +1,12 @@
-cbuffer MvpBuffer : register(b0) { matrix Model; matrix View; matrix Projection;}
+cbuffer MvpBuffer : register(b0) { matrix Model; matrix Vp; matrix Mvp; }
 
 struct VS_OUTPUT
 {
-	float4 Position : SV_POSITION;
-	float3 Normal : Normal;
+	float4 position : SV_POSITION;
+	float3 normal : Normal;
+	float2 texCoord : TexCoord;
+	float3 tangent : Tangent;
+	float3 binormal : Binormal;
 };
 
 VS_OUTPUT main(
@@ -17,12 +20,12 @@ VS_OUTPUT main(
 	VS_OUTPUT output;
 
 	float4 pos4 = float4(position, 1.0);
-	pos4 = mul(pos4, Model);
-	pos4 = mul(pos4, View);
-	pos4 = mul(pos4, Projection);
-	output.Position = pos4;
-
-	output.Normal = normal;
+	pos4 = mul(pos4, Mvp);
+	output.position = pos4;
+	output.normal = normal;
+	output.texCoord = texCoord;
+	output.tangent = tangent;
+	output.binormal = binormal;
 	
 	return output;
 }
