@@ -13,8 +13,7 @@ void Mesh::Bind()
 	_vertexBuffer->Bind();
 	_indexBuffer->Bind();
 	_inputLayout->Bind();
-	_vertexShader->Bind();
-	_pixelShader->Bind();
+	_shader->Bind();
 	for (auto& texture : _textures)
 	{
 		texture->Bind();

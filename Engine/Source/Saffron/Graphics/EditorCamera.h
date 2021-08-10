@@ -16,6 +16,7 @@ public:
 
 	void Reset();
 
+	auto Data() const -> CameraData override;	
 	auto View() const -> const Matrix&;
 
 private:

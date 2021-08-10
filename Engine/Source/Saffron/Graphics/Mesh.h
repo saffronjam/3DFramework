@@ -51,6 +51,8 @@ public:
 	auto Transform() -> Matrix&;
 	auto Transform() const -> const Matrix&;
 
+	void SetShader(const std::shared_ptr<Shader>&);
+	
 	static auto Create(const std::filesystem::path& path) -> std::shared_ptr<Mesh>;
 
 private:
@@ -60,8 +62,7 @@ private:
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
 	std::shared_ptr<IndexBuffer> _indexBuffer;
 	std::shared_ptr<InputLayout> _inputLayout;
-	std::shared_ptr<VertexShader> _vertexShader;
-	std::shared_ptr<PixelShader> _pixelShader;
+	std::shared_ptr<Shader> _shader;
 
 	std::vector<SubMesh> _subMeshes;
 	std::vector<std::shared_ptr<Texture>> _textures;

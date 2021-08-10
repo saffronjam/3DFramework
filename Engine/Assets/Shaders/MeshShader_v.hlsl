@@ -1,31 +1,53 @@
-cbuffer MvpBuffer : register(b0) { matrix Model; matrix Vp; matrix Mvp; }
+#include "Common_i.hlsl"
 
-struct VS_OUTPUT
+struct VsInput
 {
-	float4 position : SV_POSITION;
-	float3 normal : Normal;
-	float2 texCoord : TexCoord;
-	float3 tangent : Tangent;
-	float3 binormal : Binormal;
+	float3 Position : Position;
+	float3 Normal : Normal;
+	float3 Tangent : Tangent;
+	float3 Binormal : Binormal;
+	float2 TexCoord : TexCoord;
 };
 
-VS_OUTPUT main(
-	float3 position : Position,
-	float3 normal : Normal,
-	float3 tangent : Tangent,
-	float3 binormal : Binormal,
-	float2 texCoord : TexCoord
-)
+struct VsOutput
 {
-	VS_OUTPUT output;
+	float4 Position : SV_POSITION;
+	float3 Normal : Normal;
+	float2 TexCoord : TexCoord;
+	float3 Tangent : Tangent;
+	float3 Binormal : Binormal;
 
-	float4 pos4 = float4(position, 1.0);
+	float3 LightPos[MAX_LIGHTS] : LightPos;
+};
+
+VsOutput main(VsInput input)
+{
+	VsOutput output;
+
+	float4 pos4 = float4(input.Position, 1.0f);
 	pos4 = mul(pos4, Mvp);
-	output.position = pos4;
-	output.normal = normal;
-	output.texCoord = texCoord;
-	output.tangent = tangent;
-	output.binormal = binormal;
+	output.Position = pos4;
+	output.Normal = normalize(input.Normal);
+	output.TexCoord = input.TexCoord;
+	output.Tangent = input.Tangent;
+	output.Binormal = input.Binormal;
+
+	if(nPointLights >= 1)
+	{
+		output.LightPos[0] = mul(float4(PointLights[0].Position, 1.0f), Model);
+	}
+	if (nPointLights >= 2)
+	{
+		output.LightPos[1] = mul(float4(PointLights[1].Position, 1.0f), Model);
+	}
+	if (nPointLights >= 3)
+	{
+		output.LightPos[2] = mul(float4(PointLights[2].Position, 1.0f), Model);
+	}
+	if (nPointLights >= 4)
+	{
+		output.LightPos[3] = mul(float4(PointLights[3].Position, 1.0f), Model);
+	}
 	
 	return output;
 }

@@ -8,10 +8,12 @@
 
 namespace Se
 {
+struct SceneCommon;
+
 class RenderPass
 {
 public:
-	explicit RenderPass(std::string name);
+	explicit RenderPass(std::string name, struct SceneCommon& sceneCommon);
 	virtual ~RenderPass() = default;
 
 	virtual void Execute() = 0;
@@ -20,15 +22,27 @@ public:
 	void Connect(const std::shared_ptr<Framebuffer>& output, const std::string& inside);
 
 	auto Name() const -> const std::string&;
+	auto Inputs() -> std::map<std::string, Input>&;
 	auto Inputs() const -> const std::map<std::string, Input>&;
 	auto Outputs() const -> const std::map<std::string, Output>&;
+
+	void LinkInput(const std::string& input, const std::string& provider);
+
+	virtual void SetViewportSize(uint width, uint height)
+	{
+	}
 
 protected:
 	void RegisterInput(const std::string& name, std::shared_ptr<Framebuffer>& framebuffer);
 	void RegisterOutput(const std::string& name, const std::shared_ptr<Framebuffer>& framebuffer);
 
+protected:
+	auto SceneCommon() -> struct SceneCommon&;
+	auto SceneCommon() const -> const struct SceneCommon&;
+
 private:
 	std::string _name;
+	struct SceneCommon& _sceneCommon;
 	std::map<std::string, Input> _inputs;
 	std::map<std::string, Output> _outputs;
 };

@@ -100,6 +100,11 @@ void EditorCamera::Reset()
 {
 }
 
+auto EditorCamera::Data() const -> CameraData
+{
+	return {View(), Projection()};
+}
+
 auto EditorCamera::View() const -> const Matrix&
 {
 	return _view;

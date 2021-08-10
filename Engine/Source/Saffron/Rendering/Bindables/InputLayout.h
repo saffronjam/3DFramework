@@ -8,23 +8,23 @@
 
 namespace Se
 {
-class VertexShader;
+class Shader;
 
 class InputLayout : public Bindable
 {
 public:
-	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<VertexShader>& vertexShader);
+	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader);
 
 	void Bind() override;
 
-	static std::string Identifier(VertexLayout vertexLayout, const std::shared_ptr<VertexShader>& vertexShader)
+	static std::string Identifier(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader)
 	{
 		return vertexLayout.Code();
 	}
 
 	static auto Create(
 		VertexLayout vertexLayout,
-		const std::shared_ptr<VertexShader>& vertexShader
+		const std::shared_ptr<Shader>& vertexShader
 	) -> std::shared_ptr<InputLayout>;
 
 private:

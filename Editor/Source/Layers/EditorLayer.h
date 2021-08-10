@@ -19,13 +19,7 @@ public:
 
 private:
 	EditorCamera _camera;
-
-	// Temporary
-	std::shared_ptr<Framebuffer> _framebuffer;
-	std::shared_ptr<Mesh> _mesh;
-
-	Viewport _viewport;
-	PrimitiveTopology _topology = PrimitiveTopologyType::TriangleList;
+	Scene _scene;
 		
 	// Ui
 	DockSpacePanel _dockSpacePanel;

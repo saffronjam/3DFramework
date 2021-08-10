@@ -3,7 +3,7 @@
 #include <d3d11_4.h>
 
 #include "Saffron/Base.h"
-#include "Saffron/Rendering/Bindable.h"
+#include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 
 namespace Se
 {
@@ -14,23 +14,15 @@ struct Mvp
 	Matrix ModelViewProjection;
 };
 
-class MvpCBuffer : public Bindable
+class MvpCBuffer : public ConstantBuffer<Mvp, false>
 {
 public:
 	MvpCBuffer();
 	explicit MvpCBuffer(const Mvp& mvp);
 
-	void Bind() override;
+	void UploadData() override;
 
-	void UpdateTransform(const Mvp& mvp);
-	void UploadTransform();
-	
 	static auto Create() -> std::shared_ptr<MvpCBuffer>;
 	static auto Create(const Mvp& mvp) -> std::shared_ptr<MvpCBuffer>;
-
-private:
-	ComPtr<ID3D11Buffer> _nativeBuffer;
-	Mvp _mvp;
-	bool _dirty = false;
 };
 }

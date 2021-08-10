@@ -7,9 +7,8 @@
 
 namespace Se
 {
-Input::Input(std::string name, RenderPass& source, std::shared_ptr<Framebuffer>& framebufferRef) :
+Input::Input(std::string name, std::shared_ptr<Framebuffer>& framebufferRef) :
 	_name(std::move(name)),
-	_source(source),
 	_framebufferRef(framebufferRef)
 {
 }
@@ -27,5 +26,15 @@ void Input::Connect(const std::shared_ptr<Framebuffer>& output)
 auto Input::Name() const -> const std::string&
 {
 	return _name;
+}
+
+auto Input::Provider() const -> const std::string&
+{
+	return _provider;
+}
+
+void Input::SetProvider(const std::string& provider)
+{
+	_provider = provider;
 }
 }

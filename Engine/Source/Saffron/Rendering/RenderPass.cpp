@@ -2,10 +2,13 @@
 
 #include "Saffron/Rendering/RenderPass.h"
 
+#include "SceneRenderer.h"
+
 namespace Se
 {
-RenderPass::RenderPass(std::string name) :
-	_name(std::move(name))
+RenderPass::RenderPass(std::string name, struct SceneCommon& sceneCommon) :
+	_name(std::move(name)),
+	_sceneCommon(sceneCommon)
 {
 }
 
@@ -42,6 +45,11 @@ auto RenderPass::Name() const -> const std::string&
 	return _name;
 }
 
+auto RenderPass::Inputs() -> std::map<std::string, Input>&
+{
+	return _inputs;
+}
+
 auto RenderPass::Inputs() const -> const std::map<std::string, Input>&
 {
 	return _inputs;
@@ -52,13 +60,41 @@ auto RenderPass::Outputs() const -> const std::map<std::string, Output>&
 	return _outputs;
 }
 
+void RenderPass::LinkInput(const std::string& input, const std::string& provider)
+{
+	const auto findResult = _inputs.find(input);
+	if (findResult == _inputs.end())
+	{
+		throw SaffronException(
+			std::format("Trying to link input with name {}, but it did not exist. (Provider: {})", input, provider)
+		);
+	}
+
+	auto& inputResult = findResult->second;
+	inputResult.SetProvider(provider);
+}
+
 void RenderPass::RegisterInput(const std::string& name, std::shared_ptr<Framebuffer>& framebuffer)
 {
-	_inputs.emplace(name, Input{std::move(name), *this, framebuffer});
+	std::ostringstream oss;
+	oss << _name << '.' << name;
+	_inputs.emplace(oss.str(), Input{oss.str(), framebuffer});
 }
 
 void RenderPass::RegisterOutput(const std::string& name, const std::shared_ptr<Framebuffer>& framebuffer)
 {
-	_outputs.emplace(name, Output{std::move(name), *this, framebuffer});
+	std::ostringstream oss;
+	oss << _name << '.' << name;
+	_outputs.emplace(oss.str(), Output{oss.str(), framebuffer});
+}
+
+auto RenderPass::SceneCommon() -> Se::SceneCommon&
+{
+	return _sceneCommon;
+}
+
+auto RenderPass::SceneCommon() const -> const Se::SceneCommon&
+{
+	return const_cast<RenderPass&>(*this).SceneCommon();
 }
 }

@@ -152,6 +152,7 @@ project (module.Project)
 		"Source/**.hpp",
 		"Source/**.cpp",
 		"Assets/Shaders/**.hlsl",
+		"Assets/Shaders/**.hlsli",
     }
 
     vpaths {
@@ -187,6 +188,11 @@ project (module.Project)
     filter { "files:**_v.hlsl" }
         shadermodel "5.0"
         shadertype "Vertex"
+        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
+
+    filter { "files:**_i.hlsl" }
+        flags "ExcludeFromBuild"
+        shadermodel "5.0"
         shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
 
 group ""

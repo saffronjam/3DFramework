@@ -4,7 +4,8 @@
 
 namespace Se
 {
-class RendererApi
+struct PointLight
 {
+	Vector3 Position;
 };
 }

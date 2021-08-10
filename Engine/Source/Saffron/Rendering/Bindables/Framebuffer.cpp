@@ -128,33 +128,23 @@ void Framebuffer::Clear()
 	);
 }
 
-auto Framebuffer::TargetByIndex(uint index) const -> const Image&
+auto Framebuffer::ImageByIndex(uint index) const -> const Image&
+{
+	return *ImagePtrByIndex(index);
+}
+
+auto Framebuffer::ImagePtrByIndex(uint index) const -> const std::shared_ptr<Image>&
 {
 	Debug::Assert(index < _colorAttachments.size(), "Target index out of bounds");
-	return *_colorAttachments[index];
+	return _colorAttachments[index];
 }
 
-const Image& Framebuffer::FinalTarget() const
+auto Framebuffer::DepthImage() const -> const Image&
 {
-	return *FinalTargetPtr();
+	return *DepthImagePtr();
 }
 
-auto Framebuffer::FinalTargetPtr() const -> const std::shared_ptr<Image>&
-{
-	return _colorAttachments.front();
-}
-
-auto Framebuffer::DepthTarget() -> Image&
-{
-	return *DepthTargetPtr();
-}
-
-auto Framebuffer::DepthTarget() const -> const Image&
-{
-	return *DepthTargetPtr();
-}
-
-auto Framebuffer::DepthTargetPtr() const -> const std::shared_ptr<Image>&
+auto Framebuffer::DepthImagePtr() const -> const std::shared_ptr<Image>&
 {
 	Debug::Assert(_depthStencilAttachmentFormat != ImageFormat::None, "No depth attachment in framebuffer");
 	return _depthStencilAttachment;

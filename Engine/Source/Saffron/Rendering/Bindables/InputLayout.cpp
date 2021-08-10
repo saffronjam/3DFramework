@@ -2,11 +2,11 @@
 
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/Bindables/InputLayout.h"
-#include "Saffron/Rendering/Bindables/VertexShader.h"
+#include "Saffron/Rendering/Bindables/Shader.h"
 
 namespace Se
 {
-InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<VertexShader>& vertexShader) :
+InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader) :
 	_vertexLayout(vertexLayout)
 {
 	SetInitializer(
@@ -17,7 +17,7 @@ InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Vertex
 				[inst, vertexShader](const RendererPackage& package)
 				{
 					const auto& descs = inst->_vertexLayout.Descs();
-					auto& byteCode = vertexShader->ByteCode();
+					auto& byteCode = vertexShader->VsByteCode();
 
 					const auto hr = package.Device.CreateInputLayout(
 						descs.data(),
@@ -46,7 +46,7 @@ void InputLayout::Bind()
 
 auto InputLayout::Create(
 	VertexLayout vertexLayout,
-	const std::shared_ptr<VertexShader>& vertexShader
+	const std::shared_ptr<Shader>& vertexShader
 ) -> std::shared_ptr<InputLayout>
 {
 	return BindableStore::Add<InputLayout>(vertexLayout, vertexShader);

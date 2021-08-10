@@ -13,16 +13,20 @@ class Output;
 class Input
 {
 public:
-	Input(std::string name, RenderPass& source, std::shared_ptr<Framebuffer>& framebufferRef);
+	Input(std::string name, std::shared_ptr<Framebuffer>& framebufferRef);
 
 	void Connect(const Output& output);
 	void Connect(const std::shared_ptr<Framebuffer>& output);
 
 	auto Name() const -> const std::string&;
+	auto Provider() const -> const std::string&;
+
+	void SetProvider(const std::string& provider);
 
 private:
 	std::string _name;
-	RenderPass& _source;
+	std::string _provider;
+
 	std::shared_ptr<Framebuffer>& _framebufferRef;
 };
 }

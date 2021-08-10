@@ -5,7 +5,6 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
-#include "Saffron/Graphics/Mesh.h"
 #include "Saffron/Graphics/MeshStore.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
@@ -25,6 +24,10 @@ struct RendererPackage
 };
 
 using RenderFn = std::function<void(const RendererPackage& package)>;
+
+class Mesh;
+struct Mvp;
+class MvpCBuffer;
 
 class Renderer : public Singleton<Renderer>
 {
@@ -51,7 +54,6 @@ public:
 		Instance()._submitingContainer->.emplace_back(std::move(fn));
 	}
 #endif
-	static void SubmitMesh(const std::shared_ptr<Mesh>& mesh);
 
 	void Execute();
 
@@ -65,11 +67,6 @@ public:
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
 	static void SetRenderState(RenderState state);
-
-	static void BindTransform();
-	static void SetTransform(const Matrix& model);
-	static void SetTransform(const Matrix& view, const Matrix& projection);
-	static void SetTransform(const Mvp& mvp);
 
 	void CleanDebugInfo();
 
@@ -91,10 +88,9 @@ private:
 	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
 	ComPtr<ID3D11RasterizerState> _nativeRasterizerState;
 	ComPtr<ID3D11SamplerState> _nativeSamplerState;
-
+	D3D11_PRIMITIVE_TOPOLOGY _topology;
+	
 	std::shared_ptr<class BackBuffer> _backbuffer;
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
-	Mvp _mvp;
 
 	std::unique_ptr<BindableStore> _bindableStore;
 	std::unique_ptr<MeshStore> _meshStore;

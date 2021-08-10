@@ -36,12 +36,10 @@ public:
 	virtual void Resize(uint width, uint height);
 	void Clear();
 
-	auto TargetByIndex(uint index) const -> const Image&;
-	auto FinalTarget() const -> const Image&;
-	auto FinalTargetPtr() const -> const std::shared_ptr<Image>&;
-	auto DepthTarget() -> Image&;
-	auto DepthTarget() const -> const Image&;
-	auto DepthTargetPtr() const -> const std::shared_ptr<Image>&;
+	auto ImageByIndex(uint index) const -> const Image&;
+	auto ImagePtrByIndex(uint index) const -> const std::shared_ptr<Image>&;
+	auto DepthImage() const -> const Image&;
+	auto DepthImagePtr() const -> const std::shared_ptr<Image>&;
 
 	static auto Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>;
 

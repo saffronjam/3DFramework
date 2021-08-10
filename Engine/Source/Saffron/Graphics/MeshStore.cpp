@@ -180,16 +180,14 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 
 	storage.Add(meshVertices);
 
-	auto vs = VertexShader::Create("MeshShader_v");
-	auto ps = PixelShader::Create("MeshShader_p");
+	auto vs = Shader::Create("MeshShader");
 	auto vb = VertexBuffer::Create(storage);
 	auto ib = IndexBuffer::Create(reinterpret_cast<const uint*>(meshFaces.data()), meshFaces.size() * 3);
 	auto il = InputLayout::Create(layout, vs);
 
 	auto newMesh = std::shared_ptr<Mesh>(new Mesh());
 
-	newMesh->_vertexShader = std::move(vs);
-	newMesh->_pixelShader = std::move(ps);
+	newMesh->_shader = std::move(vs);
 	newMesh->_vertexBuffer = std::move(vb);
 	newMesh->_indexBuffer = std::move(ib);
 	newMesh->_inputLayout = std::move(il);

@@ -13,56 +13,16 @@ MvpCBuffer::MvpCBuffer() :
 }
 
 MvpCBuffer::MvpCBuffer(const Mvp& mvp) :
-	_mvp(mvp)
+	ConstantBuffer(mvp, 0)
+{
+}
+
+void MvpCBuffer::UploadData()
 {
 	// Since Hlsl in column major
-	Mvp transposed{_mvp.Model.Transpose(), _mvp.ViewProjection.Transpose(), _mvp.ModelViewProjection.Transpose()};
+	_data = {_data.Model.Transpose(), _data.ViewProjection.Transpose(), _data.ModelViewProjection.Transpose()};
 
-	D3D11_BUFFER_DESC bd;
-	bd.Usage = D3D11_USAGE_DYNAMIC;
-	bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	bd.MiscFlags = 0;
-	bd.ByteWidth = sizeof Mvp;
-	bd.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA sd = {};
-	sd.pSysMem = &transposed;
-
-	const auto hr = Renderer::Device().CreateBuffer(&bd, &sd, &_nativeBuffer);
-	ThrowIfBad(hr);
-}
-
-void MvpCBuffer::Bind()
-{
-	if (_dirty)
-	{
-		UploadTransform();
-	}
-
-	Renderer::Context().VSSetConstantBuffers(0, 1, _nativeBuffer.GetAddressOf());
-}
-
-void MvpCBuffer::UpdateTransform(const Mvp& mvp)
-{
-	_mvp = mvp;
-	_dirty = true;
-}
-
-void MvpCBuffer::UploadTransform()
-{
-	// Since Hlsl in column major
-	Mvp transposed{_mvp.Model.Transpose(), _mvp.ViewProjection.Transpose(), _mvp.ModelViewProjection.Transpose()};
-
-	D3D11_MAPPED_SUBRESOURCE mr = {};
-	const auto hr = Renderer::Context().Map(_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
-	ThrowIfBad(hr);
-
-	std::memcpy(mr.pData, &transposed, sizeof Mvp);
-
-	Renderer::Context().Unmap(_nativeBuffer.Get(), 0);
-
-	_dirty = false;
+	ConstantBuffer::UploadData();
 }
 
 auto MvpCBuffer::Create() -> std::shared_ptr<MvpCBuffer>

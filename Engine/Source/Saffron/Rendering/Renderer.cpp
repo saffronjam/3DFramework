@@ -5,6 +5,7 @@
 #include <d3dcompiler.h>
 
 #include "Saffron/Common/App.h"
+#include "Saffron/Graphics/Mesh.h"
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/ErrorHandling/HrException.h"
 #include "Saffron/Rendering/ErrorHandling/DxgiInfoException.h"
@@ -22,32 +23,11 @@ Renderer::Renderer(const Window& window) :
 	CreateSwapChain(window);
 
 	_backbuffer = BackBuffer::Create(window);
-	_mvpCBuffer = MvpCBuffer::Create();
 
 	if constexpr (ConfDebug)
 	{
 		_dxgiInfoQueue = std::make_unique<DxgiInfoManager>();
 	}
-}
-
-void Renderer::SubmitMesh(const std::shared_ptr<Mesh>& mesh)
-{
-	Renderer::Submit(
-		[mesh](const RendererPackage& package)
-		{
-			auto& inst = Instance();
-
-			auto& mvpCBuffer = Instance()._mvpCBuffer;
-			mvpCBuffer->Bind();
-			for (const auto& submesh : mesh->SubMeshes())
-			{
-				SetTransform(mesh->Transform() * submesh.Transform);
-				mvpCBuffer->UpdateTransform(inst._mvp);
-				mvpCBuffer->UploadTransform();
-				package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
-			};
-		}
-	);
 }
 
 void Renderer::Execute()
@@ -133,6 +113,7 @@ void Renderer::BeginFrame()
 			package.Context.OMSetDepthStencilState(inst._nativeDepthStencilState.Get(), 1);
 			package.Context.RSSetState(inst._nativeRasterizerState.Get());
 			package.Context.PSSetSamplers(0, 1, inst._nativeSamplerState.GetAddressOf());
+			package.Context.IASetPrimitiveTopology(inst._topology);
 		}
 	);
 }
@@ -188,32 +169,6 @@ void Renderer::SetRenderState(RenderState state)
 			}
 		}
 	);
-}
-
-void Renderer::BindTransform()
-{
-	Instance()._mvpCBuffer->Bind();
-}
-
-void Renderer::SetTransform(const Matrix& model)
-{
-	auto& inst = Instance();
-	inst._mvp.Model = model;
-	inst._mvp.ModelViewProjection = model * inst._mvp.ViewProjection;
-}
-
-void Renderer::SetTransform(const Matrix& view, const Matrix& projection)
-{
-	auto& inst = Instance();
-	inst._mvp.ViewProjection = view * projection;
-	inst._mvp.ModelViewProjection = inst._mvp.Model * view * projection;
-}
-
-void Renderer::SetTransform(const Mvp& mvp)
-{
-	auto& inst = Instance();
-	inst._mvp = mvp;
-	inst._mvpCBuffer->UpdateTransform(inst._mvp);
 }
 
 void Renderer::CleanDebugInfo()
@@ -355,6 +310,14 @@ void Renderer::CreateRenderState()
 
 	hr = _device->CreateSamplerState(&sd, &_nativeSamplerState);
 	ThrowIfBad(hr);
+
+
+	// Topology
+
+	if (_requestedState & RenderState::Topology_TriangleList)
+	{
+		_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	}
 }
 
 namespace Utils

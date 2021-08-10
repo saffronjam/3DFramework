@@ -1,21 +1,25 @@
-cbuffer MvpBuffer : register(b0) { matrix Model; matrix View; matrix Projection;}
+#include "Common_i.hlsl"
+
+struct VS_INPUT
+{
+	float3 Position : SV_POSITION;
+	float4 Color : COLOR0;
+};
 
 struct VS_OUTPUT
 {
 	float4 Position : SV_POSITION;
+	float4 Color : COLOR0;
 };
 
-static matrix Identity = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, 1}};
-
-VS_OUTPUT main(float3 pos : Position)
+VS_OUTPUT main(VS_INPUT input)
 {
 	VS_OUTPUT output;
 
-	float4 pos4 = float4(pos, 1.0);
-	pos4 = mul(pos4, Model);
-	pos4 = mul(pos4, View);
-	pos4 = mul(pos4, Projection);
+	float4 pos4 = float4(input.Position, 1.0);
+	pos4 = mul(pos4, Mvp);
 	output.Position = pos4;
+	output.Color = input.Color;
 
 	return output;
 }
