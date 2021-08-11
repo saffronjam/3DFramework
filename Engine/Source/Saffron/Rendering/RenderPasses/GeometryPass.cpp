@@ -21,7 +21,6 @@ void GeometryPass::Execute()
 	_target->Bind();
 	_target->Clear();
 
-
 	for (auto& mesh : SceneCommon().DrawCommands.at(RenderChannel_Geometry))
 	{
 		mesh->Bind();
@@ -36,7 +35,8 @@ void GeometryPass::Execute()
 				for (const auto& submesh : mesh->SubMeshes())
 				{
 					const auto model = submesh.Transform * mesh->Transform();
-					_mvpCBuffer->Update({model, viewProj, model * viewProj});
+
+					_mvpCBuffer->Update({model, model * common.CameraData.View, viewProj, model * viewProj});
 					_mvpCBuffer->UploadData();
 					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 				}

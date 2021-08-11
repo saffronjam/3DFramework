@@ -17,7 +17,7 @@ struct MeshVertex
 	{
 		return {
 			{"Position", ElementType::Float3}, {"Normal", ElementType::Float3}, {"Tangent", ElementType::Float3},
-			{"Binormal", ElementType::Float3}, {"TexCoord", ElementType::Float2},
+			{"Binormal", ElementType::Float3}, {"TexCoord", ElementType::Float2}
 		};
 	}
 };
@@ -51,7 +51,8 @@ public:
 	auto Transform() -> Matrix&;
 	auto Transform() const -> const Matrix&;
 
-	void SetShader(const std::shared_ptr<Shader>&);
+	// Until materials are implemented
+	void SetShader(const std::shared_ptr<Shader>& shader);
 	
 	static auto Create(const std::filesystem::path& path) -> std::shared_ptr<Mesh>;
 

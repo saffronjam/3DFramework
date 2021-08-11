@@ -8,7 +8,7 @@
 namespace Se
 {
 MvpCBuffer::MvpCBuffer() :
-	MvpCBuffer({Matrix::Identity, Matrix::Identity, Matrix::Identity})
+	MvpCBuffer({Matrix::Identity, Matrix::Identity, Matrix::Identity, Matrix::Identity})
 {
 }
 
@@ -20,7 +20,10 @@ MvpCBuffer::MvpCBuffer(const Mvp& mvp) :
 void MvpCBuffer::UploadData()
 {
 	// Since Hlsl in column major
-	_data = {_data.Model.Transpose(), _data.ViewProjection.Transpose(), _data.ModelViewProjection.Transpose()};
+	_data = {
+		_data.Model.Transpose(), _data.ModelView.Transpose(), _data.ViewProjection.Transpose(),
+		_data.ModelViewProjection.Transpose()
+	};
 
 	ConstantBuffer::UploadData();
 }

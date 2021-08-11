@@ -33,7 +33,7 @@ void EditorLayer::OnUpdate(TimeSpan ts)
 {
 	_camera.OnUpdate(ts);
 
-	_scene.OnUpdate();
+	_scene.OnUpdate(ts);
 	_scene.OnRender(_camera.Data());
 }
 

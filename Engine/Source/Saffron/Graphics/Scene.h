@@ -16,12 +16,17 @@ struct alignas(16) PointLightCBuffer
 	int nPointLights;
 };
 
+struct alignas(16) CommonCBuffer
+{
+	Vector3 CameraPosition;
+};
+
 class Scene
 {
 public:
 	Scene();
 
-	void OnUpdate();
+	void OnUpdate(TimeSpan ts);
 	void OnRender(const struct CameraData& cameraData);
 
 	auto Renderer() const -> const SceneRenderer&;
@@ -33,9 +38,12 @@ public:
 
 private:
 	SceneRenderer _sceneRenderer;
-	ConstantBuffer<PointLightCBuffer> _pointLightCBuffer;
+	std::shared_ptr<ConstantBuffer<PointLightCBuffer>> _pointLightCBuffer;
+	std::shared_ptr<ConstantBuffer<CommonCBuffer>> _commonCBuffer;
+	PointLight _pointLight;
 
 	std::shared_ptr<Mesh> _sampleMesh;
+	std::shared_ptr<Mesh> _sampleSphere;
 	
 };
 }

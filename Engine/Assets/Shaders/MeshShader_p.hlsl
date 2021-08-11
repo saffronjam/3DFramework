@@ -10,19 +10,37 @@ struct PS_INPUT
 	float2 TexCoord : TexCoord;
 	float3 Tangent : Tangent;
 	float3 Binormal : Binormal;
+	float3 WorldPosition : WorldPosition;
+	float3 ViewPos : ViewPos;
 
 	float3 LightPos[MAX_LIGHTS] : LightPos;
 };
 
 float4 main(PS_INPUT input) : SV_TARGET
 {
-	const float3 lightDir = input.LightPos[0] - input.Position;
-	const float diffuseStrength = max(dot(input.Normal, lightDir), 0.0f);
-	float3 diffuse = diffuseStrength * float3(1.0f, 0.4f, 0.4f);
+	const float3 normal = normalize(input.Normal);
+	const float3 lightColor = float3(1.0f, 0.0f, 0.0f);
+
+	// Ambient
+	const float3 ambientStength = 0.1f;
+	const float3 ambient = ambientStength * float3(1.0f, 1.0f, 1.0f);
 
 
-	const float4 objColor = ShaderTexture.Sample(SampleType, input.TexCoord);
-	const float4 finalColor = float4(diffuse, 0.0f) + objColor;
+	// Diffuse
+	const float3 lightDir = normalize(input.LightPos[0] - input.WorldPosition);
+	const float diffuseStrength = max(dot(normal, lightDir), 0.0f);
+	const float3 diffuse = diffuseStrength * lightColor;
+
+	// Specular
+	const float specularStrength = 0.5;
+	const float3 viewDir = normalize(input.ViewPos - input.WorldPosition);
+	const float3 reflectDir = reflect(-lightDir, normal);
+	const float specularIntensity = pow(max(dot(viewDir, reflectDir), 0.0f), 32);
+	const float3 specular = specularStrength * specularIntensity * lightColor;
+
 	
+	const float4 objColor = ShaderTexture.Sample(SampleType, input.TexCoord);
+	const float4 finalColor = float4(ambient + diffuse + specular, 1.0f);
+
 	return finalColor;
 }

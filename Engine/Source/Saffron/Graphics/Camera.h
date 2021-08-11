@@ -8,6 +8,7 @@ struct CameraData
 {
 	Matrix View;
 	Matrix Projection;
+	Vector3 Position;
 };
 
 class Camera

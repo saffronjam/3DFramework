@@ -39,21 +39,31 @@ void RenderGraph::SetViewportSize(uint width, uint height)
 
 void RenderGraph::RegisterInput(const std::string& name, std::shared_ptr<Framebuffer>& framebuffer)
 {
-	_globalInputs.emplace(name, Input{name, framebuffer});
+	std::ostringstream oss;
+	oss << "$." << name;
+	_globalInputs.emplace(oss.str(), Input{oss.str(), framebuffer});
 }
 
 void RenderGraph::RegisterOutput(const std::string& name, const std::shared_ptr<Framebuffer>& framebuffer)
 {
-	_globalOutputs.emplace(name, Output{name, framebuffer});
+	std::ostringstream oss;
+	oss << "$." << name;
+	_globalOutputs.emplace(oss.str(), Output{oss.str(), framebuffer});
 }
 
 void RenderGraph::LinkGlobalInput(const std::string& input, const std::string& provider)
 {
-	const auto findResult = _globalInputs.find(input);
+	const auto fullInputName = "$." + input;
+
+	const auto findResult = _globalInputs.find(fullInputName);
 	if (findResult == _globalInputs.end())
 	{
 		throw SaffronException(
-			std::format("Failed to link global input with name {}. It did not exist. (Supplier: {})", input, provider)
+			std::format(
+				"Failed to link global input with name {}. It did not exist. (Supplier: {})",
+				fullInputName,
+				provider
+			)
 		);
 	}
 

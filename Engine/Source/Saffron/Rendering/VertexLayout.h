@@ -11,6 +11,7 @@ enum class ElementType
 {
 	Float2,
 	Float3,
+	Float4,
 	Count
 };
 
@@ -38,6 +39,10 @@ public:
 		case ElementType::Float3:
 		{
 			return Executor<ElementType::Float3>::Exec(std::forward<Args>(args)...);
+		}
+		case ElementType::Float4:
+		{
+			return Executor<ElementType::Float4>::Exec(std::forward<Args>(args)...);
 		}
 		default:
 		{
@@ -71,6 +76,14 @@ struct InputLayoutElementMap<ElementType::Float3>
 	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32B32_FLOAT;
 	static constexpr size_t ByteSize = 12ull;
 	static constexpr const char* Code = "F3";
+};
+
+template <>
+struct InputLayoutElementMap<ElementType::Float4>
+{
+	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	static constexpr size_t ByteSize = 16ull;
+	static constexpr const char* Code = "F4";
 };
 
 template <>

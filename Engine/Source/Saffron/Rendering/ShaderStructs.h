@@ -4,7 +4,7 @@
 
 namespace Se
 {
-struct PointLight
+struct alignas(16) PointLight
 {
 	Vector3 Position;
 };

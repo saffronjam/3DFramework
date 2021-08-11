@@ -7,9 +7,10 @@
 
 namespace Se
 {
-struct Mvp
+struct alignas(16) Mvp
 {
 	Matrix Model;
+	Matrix ModelView;
 	Matrix ViewProjection;
 	Matrix ModelViewProjection;
 };

@@ -102,7 +102,7 @@ void EditorCamera::Reset()
 
 auto EditorCamera::Data() const -> CameraData
 {
-	return {View(), Projection()};
+	return {View(), Projection(), _position};
 }
 
 auto EditorCamera::View() const -> const Matrix&

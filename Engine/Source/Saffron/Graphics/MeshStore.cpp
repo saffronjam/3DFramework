@@ -129,7 +129,7 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 		{
 			for (int normalIndex = 0; normalIndex < subMesh.VertexCount; normalIndex++)
 			{
-				const auto& v = aiSubmesh->mVertices[normalIndex];
+				const auto& v = aiSubmesh->mNormals[normalIndex];
 
 				// We know that vertices has been added in previous loops
 				meshVertices[normalIndex].Normal = Vector3{v.x, v.y, v.z};

@@ -40,6 +40,11 @@ auto Mesh::Transform() const -> const Matrix&
 	return _transform;
 }
 
+void Mesh::SetShader(const std::shared_ptr<Shader>& shader)
+{
+	_shader = shader;
+}
+
 auto Mesh::Create(const std::filesystem::path& path) -> std::shared_ptr<Mesh>
 {
 	return MeshStore::Instance().Import(path);

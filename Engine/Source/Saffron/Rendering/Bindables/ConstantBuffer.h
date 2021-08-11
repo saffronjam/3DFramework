@@ -26,15 +26,14 @@ public:
 	void Bind() override;
 
 	void Update(const T& data);
+	virtual void UploadData();
+
 	void SetBindFlags(ConstantBufferBindFlags bindFlags);
 
 	auto Data() -> T&;
 	auto Data() const -> const T&;
 
 	static auto Create(const T& initialData, uint slot = 0) -> std::shared_ptr<ConstantBuffer>;
-
-protected:
-	virtual void UploadData();
 
 protected:
 	T _data;
@@ -163,6 +162,41 @@ void ConstantBuffer<T, Deferred>::Update(const T& data)
 }
 
 template <class T, bool Deferred>
+void ConstantBuffer<T, Deferred>::UploadData()
+{
+	if constexpr (Deferred)
+	{
+		const auto inst = ShareThisAs<ConstantBuffer<T, Deferred>>();
+		Renderer::Submit(
+			[inst](const RendererPackage& package)
+			{
+				D3D11_MAPPED_SUBRESOURCE mr = {};
+				const auto hr = package.Context.Map(inst->_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+				ThrowIfBad(hr);
+
+				std::memcpy(mr.pData, &inst->_data, sizeof T);
+
+				package.Context.Unmap(inst->_nativeBuffer.Get(), 0);
+
+				inst->_dirty = false;
+			}
+		);
+	}
+	else
+	{
+		D3D11_MAPPED_SUBRESOURCE mr = {};
+		const auto hr = Renderer::Context().Map(_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
+		ThrowIfBad(hr);
+
+		std::memcpy(mr.pData, &_data, sizeof T);
+
+		Renderer::Context().Unmap(_nativeBuffer.Get(), 0);
+
+		_dirty = false;
+	}
+}
+
+template <class T, bool Deferred>
 void ConstantBuffer<T, Deferred>::SetBindFlags(ConstantBufferBindFlags bindFlags)
 {
 	if constexpr (Deferred)
@@ -197,19 +231,5 @@ template <class T, bool Deferred>
 auto ConstantBuffer<T, Deferred>::Create(const T& initialData, uint slot) -> std::shared_ptr<ConstantBuffer>
 {
 	return BindableStore::Add<ConstantBuffer>(initialData, slot);
-}
-
-template <class T, bool Deferred>
-void ConstantBuffer<T, Deferred>::UploadData()
-{
-	D3D11_MAPPED_SUBRESOURCE mr = {};
-	const auto hr = Renderer::Context().Map(_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
-	ThrowIfBad(hr);
-
-	std::memcpy(mr.pData, &_data, sizeof T);
-
-	Renderer::Context().Unmap(_nativeBuffer.Get(), 0);
-
-	_dirty = false;
 }
 }
