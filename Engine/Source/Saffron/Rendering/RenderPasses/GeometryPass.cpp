@@ -21,6 +21,8 @@ void GeometryPass::Execute()
 	_target->Bind();
 	_target->Clear();
 
+	Renderer::SetViewportSize(_target->Width(), _target->Height());
+
 	for (auto& mesh : SceneCommon().DrawCommands.at(RenderChannel_Geometry))
 	{
 		mesh->Bind();

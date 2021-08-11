@@ -12,7 +12,7 @@ class Bindable : public virtual Managed<Bindable>
 public:
 	virtual ~Bindable() = default;
 
-	virtual void Bind() = 0;
+	virtual void Bind() const = 0;
 
 	void Initialize();
 

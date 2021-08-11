@@ -10,7 +10,7 @@ EditorLayer::EditorLayer() :
 void EditorLayer::OnAttach()
 {
 	const auto& window = App::Instance().Window();
-
+	_scene.SetViewportSize(window.Width(), window.Height());
 
 	_scene.ViewportResized += [this](const SizeEvent& event)
 	{
@@ -21,6 +21,14 @@ void EditorLayer::OnAttach()
 	_viewportPanel.Resized += [this](const SizeEvent& event)
 	{
 		_scene.SetViewportSize(event.Width, event.Height);
+		_camera.SetProjection(
+			Matrix::CreatePerspectiveFieldOfView(
+				Math::Pi / 4.0f,
+				static_cast<float>(event.Width) / static_cast<float>(event.Height),
+				0.1f,
+				100.0f
+			)
+		);
 		return false;
 	};
 }
@@ -51,6 +59,8 @@ void EditorLayer::OnUi()
 	//ImGui::Image(&_mesh->Textures()[0]->ShaderView(), {500, 500});
 
 	ImGui::End();
+
+	_scene.OnUi();
 
 
 	ImGui::ShowDemoWindow();

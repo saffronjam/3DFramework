@@ -2,6 +2,8 @@
 
 #include "Saffron/Rendering/SceneRenderer.h"
 
+#include <ranges>
+
 #include "Saffron/Graphics/Camera.h"
 #include "Saffron/Graphics/Mesh.h"
 #include "Saffron/Rendering/Bindables.h"
@@ -24,6 +26,11 @@ SceneRenderer::SceneRenderer(Scene& scene) :
 	_renderGraph.Setup(_sceneCommon);
 
 	SetViewportSize(100, 100);
+}
+
+void SceneRenderer::OnUi()
+{
+	_renderGraph.OnUi();
 }
 
 void SceneRenderer::Begin(const CameraData& cameraData)
@@ -64,13 +71,7 @@ void SceneRenderer::SubmitMesh(const std::shared_ptr<Mesh>& mesh, RenderChannels
 
 void SceneRenderer::SetViewportSize(uint width, uint height)
 {
-	Renderer::Submit(
-		[=](const RendererPackage& package)
-		{
-			D3D11_VIEWPORT viewport{0.0f, 0.0f, width, height, 0.0f, 1.0f};
-			package.Context.RSSetViewports(1, &viewport);
-		}
-	);
+	
 	_renderGraph.SetViewportSize(width, height);
 
 	Renderer::Submit(
@@ -89,5 +90,15 @@ auto SceneRenderer::FinalTarget() const -> const Framebuffer&
 auto SceneRenderer::FinalTargetPtr() const -> const std::shared_ptr<Framebuffer>&
 {
 	return _finalTarget;
+}
+
+auto SceneRenderer::SceneCommon() -> Se::SceneCommon&
+{
+	return _sceneCommon;
+}
+
+auto SceneRenderer::SceneCommon() const -> const Se::SceneCommon&
+{
+	return _sceneCommon;
 }
 }

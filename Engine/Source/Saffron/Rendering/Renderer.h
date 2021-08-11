@@ -23,6 +23,12 @@ struct RendererPackage
 	ID3D11DeviceContext& Context;
 };
 
+enum class RenderStrategy
+{
+	Immediate,
+	Deferred
+};
+
 using RenderFn = std::function<void(const RendererPackage& package)>;
 
 class Mesh;
@@ -46,12 +52,20 @@ public:
 #ifdef SE_DEBUG
 	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current())
 	{
-		Instance()._submitingContainer->emplace_back(Submition{fn, location});
+		if (auto& inst = Instance(); inst._strategy == RenderStrategy::Deferred)
+		[[likely]]
+		{
+			inst._submitingContainer->emplace_back(Submition{fn, location});
+		}
+		else
+		{
+			inst.ExecuteSubmition({fn, location});
+		}
 	}
 #else
 	static void Submit(RenderFn fn)
 	{
-		Instance()._submitingContainer->.emplace_back(std::move(fn));
+		Instance()._submitingContainer->.emplace_back(fn);
 	}
 #endif
 
@@ -67,8 +81,13 @@ public:
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
 	static void SetRenderState(RenderState state);
+	static void SetRenderStrategy(RenderStrategy strategy);
+	static void SetViewportSize(uint width, uint height);
 
 	void CleanDebugInfo();
+
+private:
+	void ExecuteSubmition(const Submition& submition);
 
 private:
 	void CreateDeviceAndContext();
@@ -82,6 +101,8 @@ private:
 	ComPtr<ID3D11DeviceContext> _context{};
 	ComPtr<IDXGIFactory2> _factory{};
 
+	RenderStrategy _strategy = RenderStrategy::Deferred;
+
 	// Render state
 	RenderState _submittedState;
 	RenderState _requestedState = RenderState::Default;
@@ -89,7 +110,7 @@ private:
 	ComPtr<ID3D11RasterizerState> _nativeRasterizerState;
 	ComPtr<ID3D11SamplerState> _nativeSamplerState;
 	D3D11_PRIMITIVE_TOPOLOGY _topology;
-	
+
 	std::shared_ptr<class BackBuffer> _backbuffer;
 
 	std::unique_ptr<BindableStore> _bindableStore;

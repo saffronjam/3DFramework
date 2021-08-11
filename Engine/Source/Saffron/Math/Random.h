@@ -2,14 +2,10 @@
 
 #include <random>
 
+#include "Saffron/Math/Math.h"
+
 namespace Se
 {
-template <typename T>
-using UniformRealDistribution = std::uniform_real_distribution<T>;
-template <typename T>
-using UniformIntDistribution = std::uniform_int_distribution<T>;
-
-
 class Random
 {
 public:
@@ -17,112 +13,75 @@ public:
 	using Engine = std::mt19937;
 
 public:
-	template <typename IntegralType>
-	static auto Integer(IntegralType lower = static_cast<IntegralType>(0),
-	                    IntegralType upper = static_cast<IntegralType>(100)) -> int
+	static auto Integer(int lower = 0, int upper = 100) -> int
 	{
-		static_assert(std::is_integral<IntegralType>::value, "IntegralType must be integral type");
 		static Device s_Device;
 		static Engine s_Engine(s_Device());
-		UniformIntDistribution<IntegralType> distribution(lower, upper);
+		const std::uniform_int_distribution distribution(lower, upper);
 		return distribution(s_Engine);
 	}
 
-	template <typename RealType = float>
-	static auto Real(RealType lower = static_cast<RealType>(0), RealType upper = static_cast<RealType>(1)) -> RealType
+	static auto Real(float lower = 0.0f, float upper = 1.0f) -> float
 	{
-		static_assert(std::is_floating_point<RealType>::value, "RealType must be floating point type");
 		static Device s_Device;
 		static Engine s_Engine(s_Device());
-		UniformRealDistribution<RealType> distribution(lower, upper);
+		const std::uniform_real_distribution distribution(lower, upper);
 		return distribution(s_Engine);
 	}
 
-	/*template <typename NumberType>
-	static auto Vec2(const sf::Vector2<NumberType>& low, const sf::Vector2<NumberType>& high) -> sf::Vector2<NumberType>
+	static auto Vec2(const Vector2& low, const Vector2& high) -> Vector2
 	{
-		return Vec2(low.x, low.y, high.x, high.y);
-	}*/
+		return {Real(low.x, high.x), Real(low.y, high.y)};
+	}
 
-	/*template <typename NumberType>
-	static auto Vec2(NumberType lowX, NumberType lowY, NumberType highX, NumberType highY) -> sf::Vector2<NumberType>
+	static auto Vec2(float lowX, float lowY, float highX, float highY) -> Vector2
 	{
-		static_assert(std::is_arithmetic<NumberType>::value, "NumberType must be arithmetic type");
-		if constexpr (std::is_integral<NumberType>::value)
-		{
-			float x = Integer<NumberType>(lowX, highX);
-			float y = Integer<NumberType>(lowY, highY);
-			return {x, y};
-		}
-		else
-		{
-			float x = Real<NumberType>(lowX, highX);
-			float y = Real<NumberType>(lowY, highY);
-			return {x, y};
-		}
-	}*/
+		return {Real(lowX, highX), Real(lowY, highY)};
+	}
 
-	/*template <typename NumberType>
-	static auto Vec3(const sf::Vector3<NumberType>& low, const sf::Vector3<NumberType>& high) -> sf::Vector3<NumberType>
+	static auto Vec3(const Vector3& low, const Vector3& high) -> Vector3
 	{
-		return Vec3(low.x, low.y, low.z, high.x, high.y, high.z);
-	}*/
+		return {Real(low.x, high.x), Real(low.y, high.y), Real(low.z, high.z)};
+	}
 
-	/*template <typename NumberType>
-	static auto Vec3(NumberType lowX, NumberType lowY, NumberType lowZ, NumberType highX, NumberType highY,
-	                 NumberType highZ) -> sf::Vector3<NumberType>
+	static auto Vec3(
+		float lowX = 0.0f,
+		float lowY = 0.0f,
+		float lowZ = 0.0f,
+		float highX = 1.0f,
+		float highY = 1.0f,
+		float highZ = 1.0f
+	) -> Vector3
 	{
-		static_assert(std::is_arithmetic<NumberType>::value, "NumberType must be arithmetic type");
-		if constexpr (std::is_integral<NumberType>::value)
-		{
-			float x = Integer<NumberType>(lowX, highX);
-			float y = Integer<NumberType>(lowY, highY);
-			float z = Integer<NumberType>(lowZ, highZ);
-			return {x, y, z};
-		}
-		else
-		{
-			float x = Real<NumberType>(lowX, highX);
-			float y = Real<NumberType>(lowY, highY);
-			float z = Real<NumberType>(lowZ, highZ);
-			return {x, y, z};
-		}
-	}*/
+		return {Real(lowX, highX), Real(lowY, highY), Real(lowZ, highZ)};
+	}
 
-	/*template<typename NumberType>
-	static auto Vec4(const sf::Vector4<NumberType>& low, const sf::Vector4<NumberType>& high) -> sf::Vector4<NumberType>
+	static auto Vec4(
+		const Vector4& low = {0.0f, 0.0f, 0.0f, 0.0f},
+		const Vector4& high = {1.0f, 1.0f, 1.0f, 1.0f}
+	) -> Vector4
 	{
-		return Vec4(low.x, low.y, low.z, low.w, high.x, high.y, high.z, high.w);
-	}*/
+		return {Real(low.x, high.x), Real(low.y, high.y), Real(low.z, high.z), Real(low.w, high.w)};
+	}
 
-	/*template<typename NumberType>
-	static auto Vec4(NumberType lowX, NumberType lowY, NumberType lowZ, NumberType lowW, NumberType highX,
-	                 NumberType highY, NumberType highZ, NumberType highW) -> sf::Vector4<NumberType>
+	static auto Vec4(
+		float lowX = 0.0f,
+		float lowY = 0.0f,
+		float lowZ = 0.0f,
+		float lowW = 0.0f,
+		float highX = 1.0f,
+		float highY = 1.0f,
+		float highZ = 1.0f,
+		float highW = 0.0f
+	) -> Vector4
 	{
-		static_assert(std::is_arithmetic<NumberType>::value, "NumberType must be arithmetic type");
-		if constexpr ( std::is_integral<NumberType>::value )
-		{
-			const auto x = static_cast<NumberType>(Integer<NumberType>(lowX, highX));
-			const auto y = static_cast<NumberType>(Integer<NumberType>(lowY, highY));
-			const auto z = static_cast<NumberType>(Integer<NumberType>(lowZ, highZ));
-			const auto w = static_cast<NumberType>(Integer<NumberType>(lowW, highW));
-			return { x, y, z, w };
-		}
-		else
-		{
-			const auto x = static_cast<NumberType>(Real<NumberType>(lowX, highX));
-			const auto y = static_cast<NumberType>(Real<NumberType>(lowY, highY));
-			const auto z = static_cast<NumberType>(Real<NumberType>(lowZ, highZ));
-			const auto w = static_cast<NumberType>(Real<NumberType>(lowW, highW));
-			return { x, y, z, w };
-		}
-	}*/
+		return {Real(lowX, highX), Real(lowY, highY), Real(lowZ, highZ), Real(lowW, highW)};
+	}
 
-	/*static auto Color(bool randomizeAlpha = false) -> sf::Color
+	static auto Color(bool randomizeAlpha = false) -> Color
 	{
-		const auto bVec = VecUtils::ConvertTo<sf::Vector4<uchar>>(Vec4(0, 0, 0, randomizeAlpha ? 0 : 255, 255, 255, 255, 255));
-		return sf::Color(bVec.x, bVec.y, bVec.z, bVec.w);
-	}*/
+		return Vec4(0, 0, 0, randomizeAlpha ? 0 : 255, 255, 255, 255, 255);
+	}
 };
 
 template <typename T>
@@ -137,10 +96,10 @@ public:
 
 	auto Generate() -> T
 	{
-		static Device s_RandomDevice;
-		static Engine s_Engine(s_RandomDevice());
+		static Device _randomDevice;
+		static Engine _engine(_randomDevice());
 
-		return _lower + static_cast<T>(GetUniformDistribution()(s_Engine)) * (_upper - _lower);
+		return _lower + static_cast<T>(UniformDistribution()(_engine)) * (_upper - _lower);
 	}
 
 	void SetLower(T lower) { _lower = lower; }
@@ -148,18 +107,17 @@ public:
 	void SetUpper(T upper) { _upper = upper; }
 
 private:
-	auto GetUniformDistribution() -> auto&
+	auto UniformDistribution() -> auto&
 	{
-		static_assert(std::is_arithmetic<T>::value);
-		if constexpr (std::is_integral<T>::value)
+		if constexpr (std::is_integral_v<T>)
 		{
-			static UniformIntDistribution<T> s_Distribution;
-			return s_Distribution;
+			static std::uniform_int_distribution _distribution;
+			return _distribution;
 		}
 		else
 		{
-			static UniformRealDistribution<T> s_Distribution;
-			return s_Distribution;
+			static std::uniform_real_distribution<T> _distribution;
+			return _distribution;
 		}
 	}
 

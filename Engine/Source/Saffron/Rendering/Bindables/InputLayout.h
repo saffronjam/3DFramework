@@ -15,7 +15,7 @@ class InputLayout : public Bindable
 public:
 	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader);
 
-	void Bind() override;
+	void Bind() const override;
 
 	static std::string Identifier(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader)
 	{

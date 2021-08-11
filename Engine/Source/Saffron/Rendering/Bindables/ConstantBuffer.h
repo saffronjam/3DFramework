@@ -23,7 +23,7 @@ class ConstantBuffer : public Bindable
 public:
 	explicit ConstantBuffer(const T& initialData, uint slot);
 
-	void Bind() override;
+	void Bind() const override;
 
 	void Update(const T& data);
 	virtual void UploadData();
@@ -97,17 +97,17 @@ ConstantBuffer<T, Deferred>::ConstantBuffer(const T& initialData, uint slot) :
 }
 
 template <class T, bool Deferred>
-void ConstantBuffer<T, Deferred>::Bind()
+void ConstantBuffer<T, Deferred>::Bind() const
 {
 	if constexpr (Deferred)
 	{
-		const auto inst = ShareThisAs<ConstantBuffer>();
+		const auto inst = ShareThisAs<const ConstantBuffer<T, Deferred>>();
 		Renderer::Submit(
 			[inst](const RendererPackage& package)
 			{
 				if (inst->_dirty)
 				{
-					inst->UploadData();
+					const_cast<ConstantBuffer<T, Deferred>&>(*inst).UploadData();
 				}
 
 				if (inst->_bindFlags & ConstantBufferBindFlags_VS)
@@ -125,7 +125,7 @@ void ConstantBuffer<T, Deferred>::Bind()
 	{
 		if (_dirty)
 		{
-			UploadData();
+			const_cast<ConstantBuffer<T, Deferred>&>(*this).UploadData();
 		}
 
 		auto& context = Renderer::Context();

@@ -31,13 +31,18 @@ class Framebuffer : public Bindable
 public:
 	explicit Framebuffer(const FramebufferSpec& spec);
 
-	void Bind() override;
+	void Bind() const override;
 
 	virtual void Resize(uint width, uint height);
 	void Clear();
 
+	auto Width() const -> uint;
+	auto Height() const -> uint;
+
+	auto ImageByIndex(uint index) -> Image&;
 	auto ImageByIndex(uint index) const -> const Image&;
 	auto ImagePtrByIndex(uint index) const -> const std::shared_ptr<Image>&;
+	auto DepthImage() -> Image&;
 	auto DepthImage() const -> const Image&;
 	auto DepthImagePtr() const -> const std::shared_ptr<Image>&;
 

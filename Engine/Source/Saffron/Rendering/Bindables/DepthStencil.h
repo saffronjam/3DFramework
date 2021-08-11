@@ -12,7 +12,7 @@ class DepthStencil : public Bindable
 public:
 	DepthStencil();
 
-	void Bind() override;
+	void Bind() const override;
 
 	void SetEnabled(bool enabled);
 
@@ -25,6 +25,6 @@ private:
 	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
 
 	D3D11_DEPTH_STENCIL_DESC _descriptor{};
-	bool _dirty = false;
+	mutable bool _dirty = false;
 };
 }

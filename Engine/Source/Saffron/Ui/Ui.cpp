@@ -9,6 +9,21 @@
 
 namespace Se
 {
+static auto shaderCallback = [](const ImDrawList* list, const ImDrawCmd* cmd)
+{
+	const auto& userShader = *static_cast<std::shared_ptr<const Shader>*>(cmd->UserCallbackData);
+
+	auto& ctx = ImGui_ImplDX11_GetBackendData()->pd3dDeviceContext;
+
+	auto* drawData = ImGui::GetMainViewport()->DrawData;
+	ImGui_ImplDX11_SetupRenderState(
+		nullptr,
+		ctx,
+		&const_cast<ID3D11VertexShader&>(userShader->NativeVsHandle()),
+		&const_cast<ID3D11PixelShader&>(userShader->NativePsHandle())
+	);
+};
+
 Ui::Ui() :
 	Singleton(this)
 {
@@ -63,7 +78,32 @@ void Ui::EndFrame()
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
 			Renderer::Instance().CleanDebugInfo();
+			Instance()._pendingShaders.clear();
 		}
 	);
+}
+
+void Ui::Image(const Texture& texture, const Vector2& size)
+{
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), {size.x, size.y});
+}
+
+void Ui::Image(const Texture& texture, const Shader& shader, const Vector2& size)
+{
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), {size.x, size.y});
+}
+
+void Ui::Image(const Se::Image& image, const Vector2& size)
+{
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), {size.x, size.y});
+}
+
+void Ui::Image(const Se::Image& image, const Shader& shader, const Vector2& size)
+{
+	const auto& inst = Instance()._pendingShaders.emplace_back(shader.ShareThisAs<const Shader>());
+
+	ImGui::GetWindowDrawList()->AddCallback(shaderCallback, const_cast<void*>(reinterpret_cast<const void*>(&inst)));
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), {size.x, size.y});
+	ImGui::GetWindowDrawList()->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
 }
 }

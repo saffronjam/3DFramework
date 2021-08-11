@@ -10,6 +10,8 @@ namespace Se
 class RenderGraph
 {
 public:
+	void OnUi();
+	
 	void Setup(SceneCommon& sceneCommon);
 	void Execute();
 

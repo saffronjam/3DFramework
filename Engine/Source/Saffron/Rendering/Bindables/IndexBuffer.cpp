@@ -41,9 +41,9 @@ IndexBuffer::IndexBuffer(const uint* data, uint count) :
 {
 }
 
-void IndexBuffer::Bind()
+void IndexBuffer::Bind() const
 {
-	const auto inst = ShareThisAs<IndexBuffer>();
+	const auto inst = ShareThisAs<const IndexBuffer>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{

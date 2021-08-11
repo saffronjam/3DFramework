@@ -37,59 +37,10 @@ void Renderer::Execute()
 		//Log::Info("Executing {} submitions", _submitions.Size());
 	}
 
-	auto package = RendererPackage{*_device.Get(), *_swapChain.Get(), *_context.Get()};
-
 	std::swap(_submitingContainer, _executingContainer);
 	for (auto& submition : *_executingContainer)
 	{
-		try
-		{
-			if constexpr (ConfDebug)
-			{
-				_dxgiInfoQueue->Begin();
-
-				try
-				{
-					submition.Fn(package);
-				}
-				catch (const SaffronException& e)
-				{
-					auto result = _dxgiInfoQueue->End();
-					if (result.size() > 0)
-					{
-						// Prioritize DxgiInfoException if it exists
-						throw DxgiInfoException(std::move(result), submition.Location);
-					}
-					throw;
-				}
-				auto result = _dxgiInfoQueue->End();
-				if (result.size() > 0)
-				{
-					throw DxgiInfoException(std::move(result), submition.Location);
-				}
-			}
-			else
-			{
-				submition.Fn(package);
-			}
-		}
-		catch (const HrException& e)
-		{
-			MessageBoxA(
-				static_cast<HWND>(App::Instance().Window().NativeHandle()),
-				e.What().c_str(),
-				e.Type(),
-				MB_OK | MB_ICONEXCLAMATION
-			);
-		} catch (const SaffronException& e)
-		{
-			MessageBoxA(
-				static_cast<HWND>(App::Instance().Window().NativeHandle()),
-				e.What().c_str(),
-				e.Type(),
-				MB_OK | MB_ICONEXCLAMATION
-			);
-		}
+		ExecuteSubmition(submition);
 	}
 	_executingContainer->clear();
 }
@@ -105,7 +56,7 @@ void Renderer::BeginFrame()
 	_backbuffer->Bind();
 	_backbuffer->Clear();
 
-	Renderer::Submit(
+	Submit(
 		[](const RendererPackage& package)
 		{
 			auto& inst = Instance();
@@ -120,7 +71,7 @@ void Renderer::BeginFrame()
 
 void Renderer::EndFrame()
 {
-	Renderer::Submit(
+	Submit(
 		[this](const RendererPackage& package)
 		{
 			package.SwapChain.Present(1, 0);
@@ -171,9 +122,79 @@ void Renderer::SetRenderState(RenderState state)
 	);
 }
 
+void Renderer::SetRenderStrategy(RenderStrategy strategy)
+{
+	Instance()._strategy = strategy;
+}
+
+void Renderer::SetViewportSize(uint width, uint height)
+{
+	Submit(
+		[=](const RendererPackage& package)
+		{
+			const D3D11_VIEWPORT viewport{0.0f, 0.0f, width, height, 0.0f, 1.0f};
+			package.Context.RSSetViewports(1, &viewport);
+		}
+	);
+}
+
 void Renderer::CleanDebugInfo()
 {
 	_dxgiInfoQueue->Begin();
+}
+
+void Renderer::ExecuteSubmition(const Submition& submition)
+{
+	const auto package = RendererPackage{*_device.Get(), *_swapChain.Get(), *_context.Get()};
+
+	try
+	{
+		if constexpr (ConfDebug)
+		{
+			_dxgiInfoQueue->Begin();
+
+			try
+			{
+				submition.Fn(package);
+			}
+			catch (const SaffronException& e)
+			{
+				auto result = _dxgiInfoQueue->End();
+				if (result.size() > 0)
+				{
+					// Prioritize DxgiInfoException if it exists
+					throw DxgiInfoException(std::move(result), submition.Location);
+				}
+				throw;
+			}
+			auto result = _dxgiInfoQueue->End();
+			if (result.size() > 0)
+			{
+				throw DxgiInfoException(std::move(result), submition.Location);
+			}
+		}
+		else
+		{
+			submition.Fn(package);
+		}
+	}
+	catch (const HrException& e)
+	{
+		MessageBoxA(
+			static_cast<HWND>(App::Instance().Window().NativeHandle()),
+			e.What().c_str(),
+			e.Type(),
+			MB_OK | MB_ICONEXCLAMATION
+		);
+	} catch (const SaffronException& e)
+	{
+		MessageBoxA(
+			static_cast<HWND>(App::Instance().Window().NativeHandle()),
+			e.What().c_str(),
+			e.Type(),
+			MB_OK | MB_ICONEXCLAMATION
+		);
+	}
 }
 
 void Renderer::CreateDeviceAndContext()

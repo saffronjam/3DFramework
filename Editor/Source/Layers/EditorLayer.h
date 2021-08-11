@@ -20,7 +20,7 @@ public:
 private:
 	EditorCamera _camera;
 	Scene _scene;
-		
+
 	// Ui
 	DockSpacePanel _dockSpacePanel;
 	ViewportPanel _viewportPanel;

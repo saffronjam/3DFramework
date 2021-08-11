@@ -28,6 +28,7 @@ public:
 
 	void OnUpdate(TimeSpan ts);
 	void OnRender(const struct CameraData& cameraData);
+	void OnUi();
 
 	auto Renderer() const -> const SceneRenderer&;
 	
@@ -42,8 +43,10 @@ private:
 	std::shared_ptr<ConstantBuffer<CommonCBuffer>> _commonCBuffer;
 	PointLight _pointLight;
 
-	std::shared_ptr<Mesh> _sampleMesh;
+	std::vector<std::shared_ptr<Mesh>> _sampleMeshes;
+	std::vector<Vector3> _sampleMeshesPosition;
 	std::shared_ptr<Mesh> _sampleSphere;
+	std::shared_ptr<Mesh> _samplePlane;
 	
 };
 }

@@ -14,7 +14,7 @@ public:
 	Texture(uint width, uint height, ImageFormat format, uint slot);
 	Texture(const std::filesystem::path& path, uint slot);
 
-	void Bind() override;
+	void Bind() const override;
 
 	auto Width() const -> uint;
 	auto Height() const -> uint;

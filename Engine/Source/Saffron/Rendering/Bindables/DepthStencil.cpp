@@ -49,15 +49,15 @@ DepthStencil::DepthStencil()
 	);
 }
 
-void DepthStencil::Bind()
+void DepthStencil::Bind() const
 {
-	const auto inst = ShareThisAs<DepthStencil>();
+	const auto inst = ShareThisAs<const DepthStencil>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
 			if (inst->_dirty)
 			{
-				inst->Recreate();
+				const_cast<DepthStencil&>(*inst).Recreate();
 				inst->_dirty = false;
 			}
 			package.Context.OMSetDepthStencilState(inst->_nativeDepthStencilState.Get(), 0);

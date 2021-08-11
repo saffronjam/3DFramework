@@ -61,9 +61,9 @@ Shader::Shader(std::filesystem::path path) :
 	);
 }
 
-void Shader::Bind()
+void Shader::Bind() const
 {
-	const auto inst = ShareThisAs<Shader>();
+	const auto inst = ShareThisAs<const Shader>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
@@ -85,6 +85,16 @@ auto Shader::VsByteCode() -> ID3DBlob&
 auto Shader::VsByteCode() const -> const ID3DBlob&
 {
 	return const_cast<Shader&>(*this).VsByteCode();
+}
+
+auto Shader::NativeVsHandle() const -> const ID3D11VertexShader&
+{
+	return *_nativeVertexShader.Get();
+}
+
+auto Shader::NativePsHandle() const -> const ID3D11PixelShader&
+{
+	return *_nativePixelShader.Get();
 }
 
 auto Shader::Identifer(std::filesystem::path path) -> std::string

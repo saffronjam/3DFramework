@@ -90,9 +90,9 @@ Texture::Texture(const std::filesystem::path& path, uint slot) :
 	);
 }
 
-void Texture::Bind()
+void Texture::Bind() const
 {
-	const auto inst = ShareThisAs<Texture>();
+	const auto inst = ShareThisAs<const Texture>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{

@@ -48,9 +48,9 @@ Framebuffer::Framebuffer(const FramebufferSpec& spec) :
 	);
 }
 
-void Framebuffer::Bind()
+void Framebuffer::Bind() const
 {
-	const auto inst = ShareThisAs<Framebuffer>();
+	const auto inst = ShareThisAs<const Framebuffer>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
@@ -128,6 +128,21 @@ void Framebuffer::Clear()
 	);
 }
 
+auto Framebuffer::Width() const -> uint
+{
+	return _width;
+}
+
+auto Framebuffer::Height() const -> uint
+{
+	return _height;
+}
+
+auto Framebuffer::ImageByIndex(uint index) -> Image&
+{
+	return *ImagePtrByIndex(index);
+}
+
 auto Framebuffer::ImageByIndex(uint index) const -> const Image&
 {
 	return *ImagePtrByIndex(index);
@@ -137,6 +152,11 @@ auto Framebuffer::ImagePtrByIndex(uint index) const -> const std::shared_ptr<Ima
 {
 	Debug::Assert(index < _colorAttachments.size(), "Target index out of bounds");
 	return _colorAttachments[index];
+}
+
+auto Framebuffer::DepthImage() -> Image&
+{
+	return *DepthImagePtr();
 }
 
 auto Framebuffer::DepthImage() const -> const Image&

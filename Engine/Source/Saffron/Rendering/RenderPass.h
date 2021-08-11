@@ -5,6 +5,7 @@
 #include "Saffron/Base.h"
 #include "Saffron/Rendering/Stream/Input.h"
 #include "Saffron/Rendering/Stream/Output.h"
+#include "Saffron/Ui/Ui.h"
 
 namespace Se
 {
@@ -15,6 +16,10 @@ class RenderPass
 public:
 	explicit RenderPass(std::string name, struct SceneCommon& sceneCommon);
 	virtual ~RenderPass() = default;
+
+	virtual void OnUi()
+	{
+	}
 
 	virtual void Execute() = 0;
 

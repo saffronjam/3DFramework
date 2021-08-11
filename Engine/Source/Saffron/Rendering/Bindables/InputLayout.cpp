@@ -33,9 +33,9 @@ InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader
 	);
 }
 
-void InputLayout::Bind()
+void InputLayout::Bind() const
 {
-	const auto inst = ShareThisAs<InputLayout>();
+	const auto inst = ShareThisAs<const InputLayout>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{

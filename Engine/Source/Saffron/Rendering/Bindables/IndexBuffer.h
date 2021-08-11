@@ -13,7 +13,7 @@ public:
 	explicit IndexBuffer(std::vector<uint> indices);
 	explicit IndexBuffer(const uint* data, uint count);
 
-	void Bind() override;
+	void Bind() const override;
 	
 
 	static auto Create(std::vector<uint> indices) -> std::shared_ptr<IndexBuffer>;

@@ -8,5 +8,4 @@
 #include "Saffron/Rendering/Bindables/Shader.h"
 #include "Saffron/Rendering/Bindables/Texture.h"
 #include "Saffron/Rendering/Bindables/VertexBuffer.h"
-#include "Saffron/Rendering/Bindables/Viewport.h"
 

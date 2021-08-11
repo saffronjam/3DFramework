@@ -58,7 +58,7 @@ void ViewportPanel::OnUi()
 	}
 	_viewportSize = viewportSize;
 
-	ImGui::Image(&toUse->ShaderView(), {_viewportSize.x, _viewportSize.y});
+	Ui::Image(*toUse, _viewportSize);
 
 	ImGui::End();
 	ImGui::PopStyleVar();

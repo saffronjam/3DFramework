@@ -13,10 +13,13 @@ class Shader : public Bindable
 public:
 	explicit Shader(std::filesystem::path path);
 
-	void Bind() override;
+	void Bind() const override;
 
 	auto VsByteCode() -> ID3DBlob&;
 	auto VsByteCode() const -> const ID3DBlob&;
+
+	auto NativeVsHandle() const -> const ID3D11VertexShader&;
+	auto NativePsHandle() const -> const ID3D11PixelShader&;
 
 	static auto Identifer(std::filesystem::path path) -> std::string;
 	static auto Create(std::filesystem::path path) -> std::shared_ptr<Shader>;

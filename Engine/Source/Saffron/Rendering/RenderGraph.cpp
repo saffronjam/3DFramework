@@ -3,13 +3,27 @@
 #include "Saffron/Rendering/RenderGraph.h"
 
 #include "Saffron/Rendering/RenderPasses/GeometryPass.h"
+#include "Saffron/Rendering/RenderPasses/ShadowMapPass.h"
 
 namespace Se
 {
+void RenderGraph::OnUi()
+{
+	for (auto& pass : _passes)
+	{
+		pass->OnUi();
+	}
+}
+
 void RenderGraph::Setup(SceneCommon& sceneCommon)
 {
 	{
 		auto pass = std::make_unique<GeometryPass>("geometry", sceneCommon);
+		AddPass(std::move(pass));
+	}
+
+	{
+		auto pass = std::make_unique<ShadowMapPass>("shadowMap", sceneCommon);
 		AddPass(std::move(pass));
 	}
 

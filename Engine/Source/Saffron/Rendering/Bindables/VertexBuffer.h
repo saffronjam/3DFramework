@@ -13,7 +13,7 @@ class VertexBuffer : public Bindable
 public:
 	explicit VertexBuffer(const VertexStorage& storage);
 
-	void Bind() override;
+	void Bind() const override;
 
 	auto VertexCount() const -> size_t;
 	

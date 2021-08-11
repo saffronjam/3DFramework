@@ -38,9 +38,9 @@ VertexBuffer::VertexBuffer(const VertexStorage& storage) :
 	);
 }
 
-void VertexBuffer::Bind()
+void VertexBuffer::Bind() const
 {
-	const auto inst = ShareThisAs<VertexBuffer>();
+	const auto inst = ShareThisAs<const VertexBuffer>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
