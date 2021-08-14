@@ -27,11 +27,10 @@ public:
 
 private:
 	std::weak_ptr<Image> _image;
-	std::shared_ptr<Image> _fallback;
 	std::string _title;
 
-	Vector2 _topLeft = {0.0f, 0.0f};
-	Vector2 _bottomRight = {0.0f, 0.0f};
-	Vector2 _viewportSize = {0.0f, 0.0f};
+	Vector2 _topLeft = { 5.0f, 5.0f};
+	Vector2 _bottomRight = {5.0f, 5.0f};
+	Vector2 _viewportSize = {5.0f, 5.0f};
 };
 }

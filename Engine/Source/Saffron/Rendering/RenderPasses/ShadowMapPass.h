@@ -11,15 +11,19 @@ class ShadowMapPass : public RenderPass
 public:
 	explicit ShadowMapPass(const std::string& name, struct SceneCommon& sceneCommon);
 
+	void OnSetupFinished() override;
 	void OnUi() override;
-	
+
 	void Execute() override;
 
 private:
 	std::shared_ptr<Framebuffer> _shadowMap;
 	std::shared_ptr<Shader> _shadowShader;
 	std::shared_ptr<Shader> _depthTextureShader;
+
 	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+
+	bool _orthographic = false;
 
 	static constexpr uint Width = 1024, Height = 1024;
 };

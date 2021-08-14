@@ -64,6 +64,7 @@ private:
 	std::shared_ptr<IndexBuffer> _indexBuffer;
 	std::shared_ptr<InputLayout> _inputLayout;
 	std::shared_ptr<Shader> _shader;
+	std::shared_ptr<Sampler> _sampler;
 
 	std::vector<SubMesh> _subMeshes;
 	std::vector<std::shared_ptr<Texture>> _textures;

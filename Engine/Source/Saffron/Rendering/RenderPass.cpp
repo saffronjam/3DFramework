@@ -55,6 +55,11 @@ auto RenderPass::Inputs() const -> const std::map<std::string, Input>&
 	return _inputs;
 }
 
+auto RenderPass::Outputs() -> std::map<std::string, Output>&
+{
+	return _outputs;
+}
+
 auto RenderPass::Outputs() const -> const std::map<std::string, Output>&
 {
 	return _outputs;
@@ -62,11 +67,21 @@ auto RenderPass::Outputs() const -> const std::map<std::string, Output>&
 
 void RenderPass::LinkInput(const std::string& input, const std::string& provider)
 {
-	const auto findResult = _inputs.find(input);
+	std::ostringstream oss;
+	oss << _name << '.' << input;
+	const auto fullInputName = oss.str();
+
+	const auto findResult = _inputs.find(fullInputName);
 	if (findResult == _inputs.end())
 	{
 		throw SaffronException(
-			std::format("Trying to link input with name {}, but it did not exist. (Provider: {})", input, provider)
+			std::format(
+				"Failed to link '{}' to '{}' because '{}' was not registered as an input to '{}'",
+				provider,
+				fullInputName,
+				input,
+				_name
+			)
 		);
 	}
 

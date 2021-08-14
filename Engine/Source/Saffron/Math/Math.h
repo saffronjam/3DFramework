@@ -14,7 +14,12 @@ using Matrix = DirectX::SimpleMath::Matrix;
 using Quaternion = DirectX::SimpleMath::Quaternion;
 
 using Color = DirectX::SimpleMath::Color;
-using Rect = DirectX::SimpleMath::Rectangle;
+
+struct Colors
+{
+	static const Color Black;
+	static const Color White;
+};
 
 class Math
 {

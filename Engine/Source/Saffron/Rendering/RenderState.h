@@ -64,13 +64,9 @@ struct RenderState
 		Rasterizer_Fill = BIT(13),
 		Rasterizer_Wireframe = BIT(14),
 
-		// Sampler
-		Sampler_Anisotropic = BIT(17),
-		Sampler_Bilinear = BIT(18),
-		Sampler_Point = BIT(19),
-
 		// Primitive topology
-		Topology_TriangleList = BIT(22)
+		Topology_TriangleList = BIT(17),
+		Topology_LineList = BIT(18)
 	};
 
 	static const RenderState Default;

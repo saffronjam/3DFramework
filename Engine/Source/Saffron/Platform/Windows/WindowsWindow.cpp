@@ -7,6 +7,8 @@
 
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Input/Keyboard.h"
+#include "Saffron/Graphics/Shapes/Rect.h"
+
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -201,16 +203,16 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 	{
 		const auto point = Utils::LParamToPointPosition(lParam);
 
-		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		const IntRect screenRect(0, 0, _spec.Width, _spec.Height);
 		if (screenRect.Contains(point))
 		{
 			if (!Mouse::IsCursorInWindow())
 			{
 				SetCapture(hWnd);
-				PushEvent({.Type=EventType::MouseEntered});
+				PushEvent({.Type = EventType::MouseEntered});
 			}
 			const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
-			PushEvent({.Type=EventType::MouseMoved, .MouseMove={x, y}});
+			PushEvent({.Type = EventType::MouseMoved, .MouseMove = {x, y}});
 		}
 		else
 		{
@@ -222,7 +224,7 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 			else
 			{
 				ReleaseCapture();
-				PushEvent({.Type=EventType::MouseLeft});
+				PushEvent({.Type = EventType::MouseLeft});
 			}
 		}
 		break;
@@ -254,7 +256,7 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		PushEvent({.Type = EventType::MouseButtonReleased, .MouseButton = {MouseButtonCode::Left, x, y}});
 
 		// Release mouse if outside of window
-		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		const IntRect screenRect(0, 0, _spec.Width, _spec.Height);
 		if (!screenRect.Contains(point))
 		{
 			ReleaseCapture();
@@ -271,7 +273,7 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		PushEvent({.Type = EventType::MouseButtonReleased, .MouseButton = {MouseButtonCode::Right, x, y}});
 
 		// Release mouse if outside of window
-		const Rect screenRect(0, 0, _spec.Width, _spec.Height);
+		const IntRect screenRect(0, 0, _spec.Width, _spec.Height);
 		if (!screenRect.Contains(point))
 		{
 			ReleaseCapture();
@@ -286,8 +288,8 @@ auto WindowsWindow::HandleWin32Message(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 		const int x = static_cast<int>(point.x), y = static_cast<int>(point.y);
 		PushEvent(
 			{
-				.Type=EventType::MouseWheelScrolled,
-				.MouseWheelScroll ={MouseWheelCode::VerticalWheel, static_cast<float>(delta), x, y}
+				.Type = EventType::MouseWheelScrolled,
+				.MouseWheelScroll = {MouseWheelCode::VerticalWheel, static_cast<float>(delta), x, y}
 			}
 		);
 		break;

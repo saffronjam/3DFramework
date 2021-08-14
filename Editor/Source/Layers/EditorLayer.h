@@ -18,7 +18,6 @@ public:
 	void OnUi() override;
 
 private:
-	EditorCamera _camera;
 	Scene _scene;
 
 	// Ui

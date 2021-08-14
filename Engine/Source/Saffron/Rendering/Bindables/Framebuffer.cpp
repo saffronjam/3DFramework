@@ -63,6 +63,19 @@ void Framebuffer::Bind() const
 	);
 }
 
+void Framebuffer::Unbind() const
+{
+	const auto inst = ShareThisAs<const Framebuffer>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			ID3D11RenderTargetView* nullRt = {nullptr};
+			ID3D11DepthStencilView* nullDs = nullptr;
+			package.Context.OMSetRenderTargets(1, &nullRt, nullDs);
+		}
+	);
+}
+
 void Framebuffer::Resize(uint width, uint height)
 {
 	const auto inst = ShareThisAs<Framebuffer>();

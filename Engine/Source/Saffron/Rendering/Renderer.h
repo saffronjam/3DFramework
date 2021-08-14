@@ -74,6 +74,10 @@ public:
 	void BeginFrame();
 	void EndFrame();
 
+	template <typename ... Args>
+	static void Log(const std::string& string, const Args& ... args);
+	static void Log(const std::string& string);
+
 	static auto Device() -> ID3D11Device&;
 	static auto Context() -> ID3D11DeviceContext&;
 	static auto SwapChain() -> IDXGISwapChain&;
@@ -93,7 +97,7 @@ private:
 	void CreateDeviceAndContext();
 	void CreateFactory();
 	void CreateSwapChain(const Window& window);
-	void CreateRenderState();
+	void CreateRenderState(uint state);
 
 private:
 	ComPtr<ID3D11Device> _device{};
@@ -104,8 +108,7 @@ private:
 	RenderStrategy _strategy = RenderStrategy::Deferred;
 
 	// Render state
-	RenderState _submittedState;
-	RenderState _requestedState = RenderState::Default;
+	RenderState _submittedState = 0;
 	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
 	ComPtr<ID3D11RasterizerState> _nativeRasterizerState;
 	ComPtr<ID3D11SamplerState> _nativeSamplerState;
@@ -127,9 +130,15 @@ private:
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 };
 
+template <typename ... Args>
+void Renderer::Log(const std::string& string, const Args&... args)
+{
+	Log(std::format(string, args...));
+}
+
 namespace Utils
 {
 D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state);
-D3D11_FILTER ToD3D11Filter(ulong state);
+D3D11_PRIMITIVE_TOPOLOGY ToD3D11PrimiteTopology(ulong state);
 }
 }

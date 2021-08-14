@@ -6,18 +6,18 @@
 
 namespace Se
 {
-InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader) :
+InputLayout::InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& shader) :
 	_vertexLayout(vertexLayout)
 {
 	SetInitializer(
-		[this, vertexShader]
+		[this, shader]
 		{
 			const auto inst = ShareThisAs<InputLayout>();
 			Renderer::Submit(
-				[inst, vertexShader](const RendererPackage& package)
+				[inst, shader](const RendererPackage& package)
 				{
 					const auto& descs = inst->_vertexLayout.Descs();
-					auto& byteCode = vertexShader->VsByteCode();
+					auto& byteCode = shader->VsByteCode();
 
 					const auto hr = package.Device.CreateInputLayout(
 						descs.data(),

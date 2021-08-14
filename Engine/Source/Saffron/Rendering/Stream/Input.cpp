@@ -7,7 +7,7 @@
 
 namespace Se
 {
-Input::Input(std::string name, std::shared_ptr<Framebuffer>& framebufferRef) :
+Input::Input(std::string name, std::shared_ptr<class Framebuffer>& framebufferRef) :
 	_name(std::move(name)),
 	_framebufferRef(framebufferRef)
 {
@@ -15,10 +15,10 @@ Input::Input(std::string name, std::shared_ptr<Framebuffer>& framebufferRef) :
 
 void Input::Connect(const Output& output)
 {
-	_framebufferRef = output.Target();
+	_framebufferRef = output.Framebuffer();
 }
 
-void Input::Connect(const std::shared_ptr<Framebuffer>& output)
+void Input::Connect(const std::shared_ptr<class Framebuffer>& output)
 {
 	_framebufferRef = output;
 }
@@ -36,5 +36,10 @@ auto Input::Provider() const -> const std::string&
 void Input::SetProvider(const std::string& provider)
 {
 	_provider = provider;
+}
+
+auto Input::Framebuffer() -> const std::shared_ptr<class Framebuffer>&
+{
+	return _framebufferRef;
 }
 }

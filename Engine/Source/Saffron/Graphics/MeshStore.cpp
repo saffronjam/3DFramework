@@ -142,7 +142,7 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 			for (int texCoordIndex = 0; texCoordIndex < subMesh.VertexCount; texCoordIndex++)
 			{
 				const auto& v = aiSubmesh->mTextureCoords[0][texCoordIndex];
-				
+
 				// We know that vertices has been added in previous loops
 				meshVertices[texCoordIndex].TexCoord = Vector2{v.x, 1.0f - v.y};
 			}
@@ -184,6 +184,7 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 	auto vb = VertexBuffer::Create(storage);
 	auto ib = IndexBuffer::Create(reinterpret_cast<const uint*>(meshFaces.data()), meshFaces.size() * 3);
 	auto il = InputLayout::Create(layout, vs);
+	auto sa = Sampler::Create({0, SamplerEdge::Wrap, SamplerFilter::Anisotropic});
 
 	auto newMesh = std::shared_ptr<Mesh>(new Mesh());
 
@@ -191,6 +192,8 @@ auto MeshStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mes
 	newMesh->_vertexBuffer = std::move(vb);
 	newMesh->_indexBuffer = std::move(ib);
 	newMesh->_inputLayout = std::move(il);
+	newMesh->_sampler = std::move(sa);
+
 	newMesh->_subMeshes = std::move(subMeshes);
 	newMesh->_textures = std::move(textures);
 

@@ -47,26 +47,9 @@ void Renderer::Execute()
 
 void Renderer::BeginFrame()
 {
-	if (_requestedState != _submittedState)
-	{
-		CreateRenderState();
-		_submittedState = _requestedState;
-	}
-
 	_backbuffer->Bind();
 	_backbuffer->Clear();
-
-	Submit(
-		[](const RendererPackage& package)
-		{
-			auto& inst = Instance();
-
-			package.Context.OMSetDepthStencilState(inst._nativeDepthStencilState.Get(), 1);
-			package.Context.RSSetState(inst._nativeRasterizerState.Get());
-			package.Context.PSSetSamplers(0, 1, inst._nativeSamplerState.GetAddressOf());
-			package.Context.IASetPrimitiveTopology(inst._topology);
-		}
-	);
+	SetRenderState(RenderState::Default);
 }
 
 void Renderer::EndFrame()
@@ -79,6 +62,18 @@ void Renderer::EndFrame()
 	);
 
 	Execute();
+}
+
+void Renderer::Log(const std::string& string)
+{
+	Submit(
+		[string](const RendererPackage& package)
+		{
+			{
+				std::cout << "[Renderer] " << string << '\n';
+			}
+		}
+	);
 }
 
 auto Renderer::Device() -> ID3D11Device&
@@ -108,15 +103,20 @@ auto Renderer::BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&
 
 void Renderer::SetRenderState(RenderState state)
 {
-	Instance()._requestedState = state;
-	Renderer::Submit(
-		[](const RendererPackage& package)
+	Submit(
+		[state](const RendererPackage& package)
 		{
 			auto& inst = Instance();
-			if (inst._requestedState != inst._submittedState)
+			if (state != inst._submittedState)
 			{
-				inst.CreateRenderState();
-				inst._submittedState = inst._requestedState;
+				inst.CreateRenderState(state);
+
+				package.Context.OMSetDepthStencilState(inst._nativeDepthStencilState.Get(), 1);
+				package.Context.RSSetState(inst._nativeRasterizerState.Get());
+				package.Context.PSSetSamplers(0, 1, inst._nativeSamplerState.GetAddressOf());
+				package.Context.IASetPrimitiveTopology(inst._topology);
+
+				inst._submittedState = state;
 			}
 		}
 	);
@@ -261,19 +261,19 @@ void Renderer::CreateSwapChain(const Window& window)
 	ThrowIfBad(hr);
 }
 
-void Renderer::CreateRenderState()
+void Renderer::CreateRenderState(uint state)
 {
 	// Depth stencil
 
 	D3D11_DEPTH_STENCIL_DESC dsd = {};
 
-	if (_requestedState & RenderState::DepthTest_Less || _requestedState & RenderState::DepthTest_LessEqual ||
-		_requestedState & RenderState::DepthTest_Equal || _requestedState & RenderState::DepthTest_GreterEqual ||
-		_requestedState & RenderState::DepthTest_Greter || _requestedState & RenderState::DepthTest_NotEqual ||
-		_requestedState & RenderState::DepthTest_Never || _requestedState & RenderState::DepthTest_Always)
+	if (state & RenderState::DepthTest_Less || state & RenderState::DepthTest_LessEqual || state &
+		RenderState::DepthTest_Equal || state & RenderState::DepthTest_GreterEqual || state &
+		RenderState::DepthTest_Greter || state & RenderState::DepthTest_NotEqual || state & RenderState::DepthTest_Never
+		|| state & RenderState::DepthTest_Always)
 	{
 		dsd.DepthEnable = true;
-		dsd.DepthFunc = Utils::ToD3D11CompFunc(_requestedState);
+		dsd.DepthFunc = Utils::ToD3D11CompFunc(state);
 		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	}
 	else
@@ -290,11 +290,11 @@ void Renderer::CreateRenderState()
 
 	D3D11_RASTERIZER_DESC rd = {};
 
-	if (_requestedState & RenderState::Rasterizer_CullBack)
+	if (state & RenderState::Rasterizer_CullBack)
 	{
 		rd.CullMode = D3D11_CULL_BACK;
 	}
-	else if (_requestedState & RenderState::Rasterizer_CullBack)
+	else if (state & RenderState::Rasterizer_CullFront)
 	{
 		rd.CullMode = D3D11_CULL_FRONT;
 	}
@@ -303,7 +303,7 @@ void Renderer::CreateRenderState()
 		rd.CullMode = D3D11_CULL_NONE;
 	}
 
-	if (_requestedState & RenderState::Rasterizer_Wireframe)
+	if (state & RenderState::Rasterizer_Wireframe)
 	{
 		rd.FillMode = D3D11_FILL_WIREFRAME;
 	}
@@ -311,34 +311,16 @@ void Renderer::CreateRenderState()
 	{
 		rd.FillMode = D3D11_FILL_SOLID;
 	}
+	rd.DepthBias = 50;
+	rd.SlopeScaledDepthBias = 2.0f;
+	rd.DepthBiasClamp = 1.0f;
+
 
 	hr = _device->CreateRasterizerState(&rd, &_nativeRasterizerState);
 	ThrowIfBad(hr);
 
-
-	// Sampler
-
-	D3D11_SAMPLER_DESC sd = {};
-
-	sd.Filter = Utils::ToD3D11Filter(_requestedState);
-	sd.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	if (_requestedState & RenderState::Sampler_Anisotropic)
-	{
-		sd.MaxAnisotropy = D3D11_REQ_MAXANISOTROPY;
-	}
-
-	hr = _device->CreateSamplerState(&sd, &_nativeSamplerState);
-	ThrowIfBad(hr);
-
-
 	// Topology
-
-	if (_requestedState & RenderState::Topology_TriangleList)
-	{
-		_topology = D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-	}
+	_topology = Utils::ToD3D11PrimiteTopology(state);
 }
 
 namespace Utils
@@ -357,13 +339,12 @@ D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state)
 	throw SaffronException("Invalid state. Could not convert to D3D11_COMPARISON_FUNC.");
 }
 
-D3D11_FILTER ToD3D11Filter(ulong state)
+D3D11_PRIMITIVE_TOPOLOGY ToD3D11PrimiteTopology(ulong state)
 {
-	if (state & RenderState::Sampler_Anisotropic) return D3D11_FILTER_ANISOTROPIC;
-	if (state & RenderState::Sampler_Bilinear) return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	if (state & RenderState::Sampler_Point) return D3D11_FILTER_MIN_MAG_MIP_POINT;
+	if (state & RenderState::Topology_TriangleList) return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+	if (state & RenderState::Topology_LineList) return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
 
-	throw SaffronException("Invalid filter. Could not convert to D3D11_FILTER.");
+	throw SaffronException("Invalid state. Could not convert to D3D11_PRIMITIVE_TOPOLOGY.");
 }
 }
 }

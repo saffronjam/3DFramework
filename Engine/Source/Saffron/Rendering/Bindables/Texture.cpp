@@ -9,6 +9,11 @@
 
 namespace Se
 {
+Texture::Texture(uint slot) :
+	_slot(slot)
+{
+}
+
 Texture::Texture(uint width, uint height, ImageFormat format, uint slot) :
 	_format(format),
 	_width(width),
@@ -90,13 +95,53 @@ Texture::Texture(const std::filesystem::path& path, uint slot) :
 	);
 }
 
+Texture::Texture(const std::shared_ptr<Image>& image, uint slot) :
+	_slot(slot)
+{
+	auto imageInst = image;
+	SetInitializer(
+		[this, imageInst]
+		{
+			const auto inst = ShareThisAs<Texture>();
+			Renderer::Submit(
+				[inst, imageInst](const RendererPackage& package)
+				{
+					const auto usage = imageInst->Usage();
+
+					if (usage & ImageUsage_ShaderResource)
+					{
+						inst->_nativeShaderResourceView = imageInst->_nativeShaderResourceView;
+					}
+					inst->_nativeTexture = imageInst->_nativeTexture;
+
+					inst->_width = imageInst->Width();
+					inst->_height = imageInst->Height();
+					inst->_format = imageInst->Format();
+				}
+			);
+		}
+	);
+}
+
 void Texture::Bind() const
 {
 	const auto inst = ShareThisAs<const Texture>();
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			package.Context.PSSetShaderResources(0, 1, inst->_nativeShaderResourceView.GetAddressOf());
+			package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+		}
+	);
+}
+
+void Texture::Unbind() const
+{
+	const auto inst = ShareThisAs<const Texture>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			ID3D11ShaderResourceView* srv = nullptr;
+			package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
 		}
 	);
 }
@@ -109,6 +154,28 @@ auto Texture::Width() const -> uint
 auto Texture::Height() const -> uint
 {
 	return _height;
+}
+
+void Texture::SetImage(const std::shared_ptr<Image>& image)
+{
+	const auto imageInst = image;
+	const auto inst = ShareThisAs<Texture>();
+	Renderer::Submit(
+		[inst, imageInst](const RendererPackage& package)
+		{
+			const auto usage = imageInst->Usage();
+
+			if (usage & ImageUsage_ShaderResource)
+			{
+				inst->_nativeShaderResourceView = imageInst->_nativeShaderResourceView;
+			}
+			inst->_nativeTexture = imageInst->_nativeTexture;
+
+			inst->_width = imageInst->Width();
+			inst->_height = imageInst->Height();
+			inst->_format = imageInst->Format();
+		}
+	);
 }
 
 auto Texture::NativeHandle() -> ID3D11Texture2D&
@@ -131,6 +198,11 @@ auto Texture::ShaderView() const -> const ID3D11ShaderResourceView&
 	return *_nativeShaderResourceView.Get();
 }
 
+auto Texture::Create(uint slot) -> std::shared_ptr<Texture>
+{
+	return BindableStore::Add<Texture>(slot);
+}
+
 auto Texture::Create(uint width, uint height, ImageFormat format, uint slot) -> std::shared_ptr<Texture>
 {
 	return BindableStore::Add<Texture>(width, height, format, slot);
@@ -139,5 +211,10 @@ auto Texture::Create(uint width, uint height, ImageFormat format, uint slot) -> 
 auto Texture::Create(const std::filesystem::path& path, uint slot) -> std::shared_ptr<Texture>
 {
 	return BindableStore::Add<Texture>(path, slot);
+}
+
+auto Texture::Create(const std::shared_ptr<Image>& image, uint slot) -> std::shared_ptr<Texture>
+{
+	return BindableStore::Add<Texture>(image, slot);
 }
 }

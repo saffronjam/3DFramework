@@ -13,7 +13,7 @@ class Shader;
 class InputLayout : public Bindable
 {
 public:
-	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader);
+	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& shader);
 
 	void Bind() const override;
 

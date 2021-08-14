@@ -85,25 +85,49 @@ void Ui::EndFrame()
 
 void Ui::Image(const Texture& texture, const Vector2& size)
 {
-	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), {size.x, size.y});
+	ImVec2 imSize{size.x, size.y};
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = {static_cast<float>(texture.Width()), static_cast<float>(texture.Height())};
+	}
+
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
 }
 
 void Ui::Image(const Texture& texture, const Shader& shader, const Vector2& size)
 {
-	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), {size.x, size.y});
+	ImVec2 imSize{size.x, size.y};
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = {static_cast<float>(texture.Width()), static_cast<float>(texture.Height())};
+	}
+
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
 }
 
 void Ui::Image(const Se::Image& image, const Vector2& size)
 {
-	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), {size.x, size.y});
+	ImVec2 imSize{size.x, size.y};
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = {static_cast<float>(image.Width()), static_cast<float>(image.Height())};
+	}
+
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), imSize);
 }
 
 void Ui::Image(const Se::Image& image, const Shader& shader, const Vector2& size)
 {
+	ImVec2 imSize{size.x, size.y};
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = {static_cast<float>(image.Width()), static_cast<float>(image.Height())};
+	}
+
 	const auto& inst = Instance()._pendingShaders.emplace_back(shader.ShareThisAs<const Shader>());
 
 	ImGui::GetWindowDrawList()->AddCallback(shaderCallback, const_cast<void*>(reinterpret_cast<const void*>(&inst)));
-	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), {size.x, size.y});
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), imSize);
 	ImGui::GetWindowDrawList()->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
 }
 }

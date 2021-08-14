@@ -19,8 +19,14 @@ auto Camera::Projection() const -> const Matrix&
 	return _projection;
 }
 
-void Camera::SetProjection(const Matrix& projection)
+void Camera::SetProjection(const struct ProjectionSpec& spec)
 {
-	_projection = projection;
+	_projectionSpec = spec;
+	_projection = Matrix::CreatePerspectiveFieldOfView(spec.Fov, spec.AspectRatio, spec.Near, spec.Far);
+}
+
+auto Camera::ProjectionSpec() const -> const struct ProjectionSpec&
+{
+	return _projectionSpec;
 }
 }

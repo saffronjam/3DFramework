@@ -145,7 +145,7 @@ void ConstantBuffer<T, Deferred>::Update(const T& data)
 {
 	if constexpr (Deferred)
 	{
-		const auto inst = ShareThisAs<ConstantBuffer>();
+		const auto inst = ShareThisAs<ConstantBuffer<T, Deferred>>();
 		Renderer::Submit(
 			[=](const RendererPackage& package)
 			{

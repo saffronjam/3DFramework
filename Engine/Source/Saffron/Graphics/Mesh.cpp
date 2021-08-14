@@ -14,10 +14,11 @@ void Mesh::Bind()
 	_indexBuffer->Bind();
 	_inputLayout->Bind();
 	_shader->Bind();
-	for (auto& texture : _textures)
+	for (const auto& texture : _textures)
 	{
 		texture->Bind();
 	}
+	_sampler->Bind();
 }
 
 auto Mesh::SubMeshes() const -> const std::vector<SubMesh>&

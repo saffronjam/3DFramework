@@ -1,16 +1,46 @@
 ﻿#include "SaffronPCH.h"
 
+
 #include "Saffron/Rendering/Bindables/VertexBuffer.h"
 
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
 #include "Saffron/Rendering/Renderer.h"
 
+#undef max
 namespace Se
 {
+VertexBuffer::VertexBuffer(const VertexLayout& layout, uint capacity) :
+	_size(0),
+	_capacity(capacity),
+	_stride(layout.ByteSize())
+{
+	SetInitializer(
+		[=]
+		{
+			const auto inst = ShareThisAs<VertexBuffer>();
+			Renderer::Submit(
+				[=](const RendererPackage& package)
+				{
+					D3D11_BUFFER_DESC bd = {};
+					bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+					bd.ByteWidth = inst->_stride * inst->_capacity;
+					bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+					bd.MiscFlags = 0;
+					bd.StructureByteStride = 0;
+					bd.Usage = D3D11_USAGE_DYNAMIC;
+
+					const auto hr = package.Device.CreateBuffer(&bd, nullptr, &inst->_nativeBuffer);
+					ThrowIfBad(hr);
+				}
+			);
+		}
+	);
+}
+
 VertexBuffer::VertexBuffer(const VertexStorage& storage) :
-	_vertexCount(storage.Count()),
-	_stride(storage.Stride()),
-	_offset(0)
+	_size(storage.Count()),
+	_capacity(storage.Count()),
+	_stride(storage.Stride())
 {
 	SetInitializer(
 		[this, storage]
@@ -57,7 +87,12 @@ void VertexBuffer::Bind() const
 
 auto VertexBuffer::VertexCount() const -> size_t
 {
-	return _vertexCount;
+	return _size;
+}
+
+auto VertexBuffer::Create(const VertexLayout& layout, uint reservedVertexCount) -> std::shared_ptr<VertexBuffer>
+{
+	return BindableStore::Add<VertexBuffer>(layout, reservedVertexCount);
 }
 
 auto VertexBuffer::Create(const VertexStorage& storage) -> std::shared_ptr<VertexBuffer>

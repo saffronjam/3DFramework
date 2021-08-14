@@ -5,15 +5,20 @@
 
 namespace Se
 {
-Output::Output(std::string name, std::shared_ptr<Framebuffer> framebuffer) :
+Output::Output(std::string name, std::shared_ptr<class Framebuffer> framebuffer) :
 	_name(std::move(name)),
 	_framebuffer(framebuffer)
 {
 }
 
-auto Output::Target() const -> const std::shared_ptr<Framebuffer>&
+auto Output::Framebuffer() const -> const std::shared_ptr<class Framebuffer>&
 {
 	return _framebuffer;
+}
+
+void Output::SetFramebuffer(const std::shared_ptr<class Framebuffer>& target)
+{
+	_framebuffer = target;
 }
 
 auto Output::Name() const -> const std::string&

@@ -14,6 +14,10 @@ public:
 
 	virtual void Bind() const = 0;
 
+	virtual void Unbind() const
+	{
+	}
+
 	void Initialize();
 
 protected:

@@ -127,6 +127,11 @@ auto Image::Format() const -> ImageFormat
 	return _spec.Format;
 }
 
+auto Image::Usage() const -> ImageUsage
+{
+	return _spec.Usage;
+}
+
 auto Image::Create(const ImageSpec& spec) -> std::shared_ptr<Image>
 {
 	return std::make_shared<Image>(spec);

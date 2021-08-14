@@ -11,9 +11,8 @@ namespace Se
 {
 Scene::Scene() :
 	_sceneRenderer(*this),
-	_pointLightCBuffer(ConstantBuffer<PointLightCBuffer>::Create({}, 2)),
 	_commonCBuffer(ConstantBuffer<CommonCBuffer>::Create({}, 1)),
-	_pointLight(Vector3{1.0f, 0.0f, 0.0f})
+	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}})
 {
 	for (int i = 0; i < 10; i++)
 	{
@@ -27,6 +26,10 @@ Scene::Scene() :
 	_samplePlane = Mesh::Create("Plane.fbx");
 	_samplePlane->Transform() = Matrix::CreateScale(10.0f) * Matrix::CreateTranslation(0.0f, -3.0f, 0.0f);
 
+	_cameraMesh = Mesh::Create("Sphere.fbx");
+
+	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
+
 	Renderer().ViewportResized += [this](const SizeEvent& event)
 	{
 		ViewportResized.Invoke(event);
@@ -36,12 +39,13 @@ Scene::Scene() :
 
 void Scene::OnUpdate(TimeSpan ts)
 {
+	_activeCamera->OnUpdate(ts);
 }
 
-void Scene::OnRender(const CameraData& cameraData)
+void Scene::OnRender()
 {
 	const auto& timer = App::Instance().Timer();
-	_pointLight.Position = Vector3{0.0f, std::sin(timer.SinceStart().Sec() * 16.0f) * 3.0f, 0.0f};
+	//_pointLight.Position = Vector3{0.0f, std::sin(timer.SinceStart().Sec() * 8.0f) * 3.0f, 0.0f};
 
 	float index = 0;
 	for (const auto& mesh : _sampleMeshes)
@@ -52,36 +56,70 @@ void Scene::OnRender(const CameraData& cameraData)
 			);
 		index++;
 	}
-
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
-
 	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
 
-	_pointLightCBuffer->Data().PointLights[0] = _pointLight;
-	_pointLightCBuffer->Data().nPointLights = 1;
-	_pointLightCBuffer->UploadData();
 
-	_commonCBuffer->Update({cameraData.Position});
-
-
-	_pointLightCBuffer->Bind();
+	_commonCBuffer->Update({_activeCamera->Data().Position});
 	_commonCBuffer->Bind();
 
-	_sceneRenderer.Begin(cameraData);
 
-	// Submit every mesh in the scene to respective channel
+	_sceneRenderer.Begin(_activeCamera->Data());
+
+	if (_drawCameraFrustums)
+	{
+		if (&_camera1 != _activeCamera)
+		{
+			_sceneRenderer.SubmitCameraFrustum(_camera1, _camera1.View());
+		}
+		if (&_camera2 != _activeCamera)
+		{
+			_sceneRenderer.SubmitCameraFrustum(_camera2, _camera2.View());
+		}
+	}
+
+	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry | RenderChannel_Shadow);
 	for (auto& mesh : _sampleMeshes)
 	{
-		_sceneRenderer.SubmitMesh(mesh, RenderChannel_Geometry | RenderChannel_Shadow);
+		_sceneRenderer.SubmitMesh(mesh);
 	}
-	_sceneRenderer.SubmitMesh(_sampleSphere, RenderChannel_Geometry);
-	_sceneRenderer.SubmitMesh(_samplePlane, RenderChannel_Geometry | RenderChannel_Shadow);
+	_sceneRenderer.SubmitMesh(_samplePlane);
+	_sceneRenderer.EndSubmtions();
+
+	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry);
+
+	_sceneRenderer.SubmitMesh(_sampleSphere);
+	_sceneRenderer.SubmitMesh(
+		_cameraMesh,
+		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera1.Data().Position)
+	);
+	_sceneRenderer.SubmitMesh(
+		_cameraMesh,
+		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera2.Data().Position)
+	);
+
+	_sceneRenderer.EndSubmtions();
 
 	_sceneRenderer.End();
 }
 
 void Scene::OnUi()
 {
+	ImGui::Begin("Scene");
+	ImGui::SliderFloat3("", reinterpret_cast<float*>(&_pointLight.Position), -2.0f, 15.0f);
+	if (ImGui::RadioButton("Camera1", &_activeRadioButton, 0))
+	{
+		_activeCamera = &_camera1;
+	}
+	if (ImGui::RadioButton("Camera2", &_activeRadioButton, 1))
+	{
+		_activeCamera = &_camera2;
+	}
+	ImGui::Checkbox("Frustums", &_drawCameraFrustums);
+
+	ImGui::End();
+
+	_activeCamera->OnUi();
 	_sceneRenderer.OnUi();
 }
 
@@ -90,8 +128,24 @@ auto Scene::Renderer() const -> const SceneRenderer&
 	return _sceneRenderer;
 }
 
+auto Scene::ViewportWidth() const -> uint
+{
+	return _viewportWidth;
+}
+
+auto Scene::ViewportHeight() const -> uint
+{
+	return _viewportHeight;
+}
+
 void Scene::SetViewportSize(uint width, uint height)
 {
 	_sceneRenderer.SetViewportSize(width, height);
+
+	_camera1.SetProjection({Math::Pi / 4.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f});
+	_camera2.SetProjection({Math::Pi / 4.0f, static_cast<float>(width) / static_cast<float>(height), 0.1f, 100.0f});
+
+	_viewportWidth = width;
+	_viewportHeight = height;
 }
 }

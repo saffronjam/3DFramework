@@ -52,6 +52,7 @@ public:
 	auto Width() const -> uint;
 	auto Height() const -> uint;
 	auto Format() const -> ImageFormat;
+	auto Usage() const->ImageUsage;
 
 	static auto Create(const ImageSpec& spec) -> std::shared_ptr<Image>;
 	static auto CreateFromBackBuffer() -> std::shared_ptr<Image>;
@@ -65,6 +66,8 @@ private:
 	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView;
 
 	ImageSpec _spec{};
+
+	friend class Texture;
 };
 
 template <typename T>

@@ -3,13 +3,14 @@
 #include "Saffron/Rendering/RenderGraph.h"
 
 #include "Saffron/Rendering/RenderPasses/GeometryPass.h"
+#include "Saffron/Rendering/RenderPasses/LinePass.h"
 #include "Saffron/Rendering/RenderPasses/ShadowMapPass.h"
 
 namespace Se
 {
 void RenderGraph::OnUi()
 {
-	for (auto& pass : _passes)
+	for (const auto& pass : _passes)
 	{
 		pass->OnUi();
 	}
@@ -18,26 +19,38 @@ void RenderGraph::OnUi()
 void RenderGraph::Setup(SceneCommon& sceneCommon)
 {
 	{
-		auto pass = std::make_unique<GeometryPass>("geometry", sceneCommon);
+		auto pass = std::make_unique<ShadowMapPass>("ShadowMap", sceneCommon);
 		AddPass(std::move(pass));
 	}
 
 	{
-		auto pass = std::make_unique<ShadowMapPass>("shadowMap", sceneCommon);
+		auto pass = std::make_unique<GeometryPass>("Geometry", sceneCommon);
+		pass->LinkInput("ShadowMap0", "ShadowMap.Target0");
+		AddPass(std::move(pass));
+	}
+
+	{
+		auto pass = std::make_unique<LinePass>("Lines", sceneCommon);
+		pass->LinkInput("Target", "Geometry.Target");
 		AddPass(std::move(pass));
 	}
 
 	// Final target
 	{
-		LinkGlobalInput("finalOutput", "geometry.target");
+		LinkGlobalInput("FinalOutput", "Lines.Target");
 	}
 
-	Connect();
+	ConnectAll();
+
+	for (const auto& pass : _passes)
+	{
+		pass->OnSetupFinished();
+	}
 }
 
 void RenderGraph::Execute()
 {
-	for (auto& pass : _passes)
+	for (const auto& pass : _passes)
 	{
 		pass->Execute();
 	}
@@ -45,7 +58,7 @@ void RenderGraph::Execute()
 
 void RenderGraph::SetViewportSize(uint width, uint height)
 {
-	for (auto& pass : _passes)
+	for (const auto& pass : _passes)
 	{
 		pass->SetViewportSize(width, height);
 	}
@@ -74,9 +87,10 @@ void RenderGraph::LinkGlobalInput(const std::string& input, const std::string& p
 	{
 		throw SaffronException(
 			std::format(
-				"Failed to link global input with name {}. It did not exist. (Supplier: {})",
+				"Failed to globally link '{}' to '{}' because '{}' was not registered as a global input",
+				provider,
 				fullInputName,
-				provider
+				input
 			)
 		);
 	}
@@ -90,16 +104,20 @@ void RenderGraph::AddPass(std::unique_ptr<RenderPass> pass)
 	_passes.emplace_back(std::move(pass));
 }
 
-void RenderGraph::Connect()
+void RenderGraph::ConnectAll()
 {
-	for (auto& pass : _passes)
+	for (const auto& pass : _passes)
 	{
-		ConnectInputs(pass->Inputs());
+		Connect(pass->Name(), pass->Inputs(), pass->Outputs());
 	}
-	ConnectInputs(_globalInputs);
+	Connect("$", _globalInputs, _globalOutputs);
 }
 
-void RenderGraph::ConnectInputs(std::map<std::string, Input>& inputs)
+void RenderGraph::Connect(
+	const std::string& passName,
+	std::map<std::string, Input>& inputs,
+	std::map<std::string, Output>& outputs
+)
 {
 	for (auto& input : inputs | std::views::values)
 	{
@@ -109,7 +127,8 @@ void RenderGraph::ConnectInputs(std::map<std::string, Input>& inputs)
 		{
 			throw SaffronException(
 				std::format(
-					"Failed to connect input {} with provider {}. Provider was not separated with '.'",
+					"Failed to connect '{}' to '{}' because '{}' was not separated with '.'",
+					input.Provider(),
 					input.Name(),
 					input.Provider()
 				)
@@ -123,7 +142,12 @@ void RenderGraph::ConnectInputs(std::map<std::string, Input>& inputs)
 			if (findResult == _globalOutputs.end())
 			{
 				throw SaffronException(
-					std::format("Failed to connect global input with name {}. It it did not exist.", split[1])
+					std::format(
+						"Failed to globally connect '{}' to '{}' because '{}' was not registered as a global input",
+						input.Provider(),
+						input.Name(),
+						split[1]
+					)
 				);
 			}
 
@@ -144,28 +168,44 @@ void RenderGraph::ConnectInputs(std::map<std::string, Input>& inputs)
 			if (renderPassFindResult == _passes.end())
 			{
 				throw SaffronException(
-					std::format("Failed to connect to render pass with name {}. It it did not exist.", split[1])
+					std::format(
+						"Failed to connect '{}' to '{}' because '{}' was not registered as a render pass.",
+						input.Provider(),
+						input.Name(),
+						split[0]
+					)
 				);
 			}
 
-			auto& renderPass = *renderPassFindResult;
+			const auto& renderPass = *renderPassFindResult;
 
 			const auto outputFindResult = renderPass->Outputs().find(input.Provider());
 			if (outputFindResult == renderPass->Outputs().end())
 			{
 				throw SaffronException(
 					std::format(
-						"Failed to connect {} --> {}. {} was not an input of {}.",
+						"Failed to connect '{}' to '{}' because '{}' was not registered as input to '{}'.",
 						input.Provider(),
 						input.Name(),
 						split[1],
-						input.Name()
+						split[0]
 					)
 				);
 			}
 
 			auto& output = outputFindResult->second;
 			input.Connect(output);
+		}
+
+		// Check if there is any streams connected within the pass
+		// Eg. input "Target" and output "Target" should be linked internally
+		for (auto& [name, input] : inputs)
+		{
+			const auto interalFindResult = outputs.find(name);
+			if (interalFindResult != outputs.end())
+			{
+				interalFindResult->second.SetFramebuffer(input.Framebuffer());
+			}
 		}
 	}
 }

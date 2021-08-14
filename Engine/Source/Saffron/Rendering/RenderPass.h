@@ -17,6 +17,10 @@ public:
 	explicit RenderPass(std::string name, struct SceneCommon& sceneCommon);
 	virtual ~RenderPass() = default;
 
+	virtual void OnSetupFinished()
+	{
+	}
+
 	virtual void OnUi()
 	{
 	}
@@ -29,6 +33,7 @@ public:
 	auto Name() const -> const std::string&;
 	auto Inputs() -> std::map<std::string, Input>&;
 	auto Inputs() const -> const std::map<std::string, Input>&;
+	auto Outputs() -> std::map<std::string, Output>&;
 	auto Outputs() const -> const std::map<std::string, Output>&;
 
 	void LinkInput(const std::string& input, const std::string& provider);

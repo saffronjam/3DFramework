@@ -14,6 +14,7 @@ public:
 	explicit Shader(std::filesystem::path path);
 
 	void Bind() const override;
+	void Unbind() const override;
 
 	auto VsByteCode() -> ID3DBlob&;
 	auto VsByteCode() const -> const ID3DBlob&;

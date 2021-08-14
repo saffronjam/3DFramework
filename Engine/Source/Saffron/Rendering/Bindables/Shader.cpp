@@ -73,6 +73,18 @@ void Shader::Bind() const
 	);
 }
 
+void Shader::Unbind() const
+{
+	const auto inst = ShareThisAs<const Shader>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			package.Context.VSSetShader(nullptr, nullptr, 0);
+			package.Context.PSSetShader(nullptr, nullptr, 0);
+		}
+	);
+}
+
 auto Shader::VsByteCode() -> ID3DBlob&
 {
 	if (_vsByteCode == nullptr)

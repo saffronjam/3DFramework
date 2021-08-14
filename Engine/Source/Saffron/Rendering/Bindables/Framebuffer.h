@@ -32,6 +32,7 @@ public:
 	explicit Framebuffer(const FramebufferSpec& spec);
 
 	void Bind() const override;
+	void Unbind() const override;
 
 	virtual void Resize(uint width, uint height);
 	void Clear();

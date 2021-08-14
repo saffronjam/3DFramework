@@ -11,7 +11,7 @@ class RenderGraph
 {
 public:
 	void OnUi();
-	
+
 	void Setup(SceneCommon& sceneCommon);
 	void Execute();
 
@@ -27,8 +27,12 @@ protected:
 	void AddPass(std::unique_ptr<RenderPass> pass);
 
 private:
-	void Connect();
-	void ConnectInputs(std::map<std::string, Input>& inputs);
+	void ConnectAll();
+	void Connect(
+		const std::string& passName,
+		std::map<std::string, Input>& inputs,
+		std::map<std::string, Output>& outputs
+	);
 
 private:
 	std::vector<std::unique_ptr<RenderPass>> _passes;

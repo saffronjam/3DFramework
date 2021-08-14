@@ -13,6 +13,7 @@ const Vector3 EditorCamera::_worldUp(0.0f, 1.0f, 0.0f);
 EditorCamera::EditorCamera() :
 	Camera(Matrix::CreatePerspectiveFieldOfView(Math::Pi / 4.0f, 16.0f / 9.0f, 0.1f, 100.0f))
 {
+	CreateView();
 }
 
 EditorCamera::EditorCamera(const Matrix& projection) :
@@ -23,29 +24,30 @@ EditorCamera::EditorCamera(const Matrix& projection) :
 
 void EditorCamera::OnUpdate(TimeSpan ts)
 {
+	const float speed = 100.0f;
 	if (Keyboard::IsKeyDown(KeyCode::W))
 	{
-		_position += _forward * ts.Sec() * 15.0f;
+		_position += _forward * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::S))
 	{
-		_position -= _forward * ts.Sec() * 15.0f;
+		_position -= _forward * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::D))
 	{
-		_position += _right * ts.Sec() * 15.0f;
+		_position += _right * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::A))
 	{
-		_position -= _right * ts.Sec() * 15.0f;
+		_position -= _right * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::Q))
 	{
-		_position -= _worldUp * ts.Sec() * 15.0f;
+		_position -= _worldUp * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::E))
 	{
-		_position += _worldUp * ts.Sec() * 15.0f;
+		_position += _worldUp * ts.Sec() * speed;
 	}
 
 	if (Mouse::IsButtonDown(MouseButtonCode::Right))

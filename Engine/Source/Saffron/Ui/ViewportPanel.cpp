@@ -10,13 +10,11 @@ static int counter = 0;
 
 ViewportPanel::ViewportPanel(const std::string& title, const std::weak_ptr<Image>& image) :
 	_image(image),
-	_fallback(Image::Create({100, 100, ImageUsage_ShaderResource, ImageFormat::RGBA})),
 	_title(title + "##" + std::to_string(counter++))
 {
 }
 
 ViewportPanel::ViewportPanel(const std::string& title) :
-	_fallback(Image::Create({100, 100, ImageUsage_ShaderResource, ImageFormat::RGBA})),
 	_title(title + "##" + std::to_string(counter++))
 {
 }
@@ -28,7 +26,7 @@ ViewportPanel::ViewportPanel() :
 
 void ViewportPanel::OnUi()
 {
-	auto toUse = _image.expired() ? _fallback : _image.lock();
+	auto toUse =  _image.lock();
 
 	if (toUse == nullptr)
 	{
