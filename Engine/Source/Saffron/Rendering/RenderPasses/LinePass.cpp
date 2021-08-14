@@ -14,6 +14,7 @@ LinePass::LinePass(const std::string& name, struct SceneCommon& sceneCommon) :
 	_mvpCBuffer(MvpCBuffer::Create())
 {
 	_vertexBuffer = VertexBuffer::Create(PosColVertex::Layout(), SceneCommon().MaxLines);
+	_indexBuffer = IndexBuffer::Create(SceneCommon().MaxLines);
 
 	RegisterInput("Target", _target);
 	RegisterOutput("Target", _target);
@@ -24,19 +25,20 @@ void LinePass::Execute()
 	const auto& common = SceneCommon();
 
 	// If no lines are submitted, skip pass
-	if (common.Lines.empty()) return;
+	if (common.LinesVertices.empty()) return;
 
 	// Setup renderer
 	Renderer::SetRenderState(_renderState);
 	Renderer::SetViewportSize(_target->Width(), _target->Height());
 
 	// Copy new vertices into vertex buffer
-	_vertexBuffer->SetVertices(common.Lines.data(), common.Lines.size() * 2);
-
+	_vertexBuffer->SetVertices(common.LinesVertices.data(), common.LinesVertices.size());
+	_indexBuffer->SetIndices(common.LineIndices.data(), common.LineIndices.size());
 
 	_target->Bind();
 	_shader->Bind();
 	_vertexBuffer->Bind();
+	_indexBuffer->Bind();
 	_inputLayout->Bind();
 
 	Renderer::Submit(
@@ -49,7 +51,7 @@ void LinePass::Execute()
 			_mvpCBuffer->Update({Matrix::Identity, view, view * proj, view * proj});
 			_mvpCBuffer->Bind();
 
-			package.Context.Draw(SceneCommon().Lines.size() * 2, 0);
+			package.Context.DrawIndexed(SceneCommon().LineIndices.size(), 0, 0);
 		}
 	);
 

@@ -46,7 +46,7 @@ void VertexBuffer::SetVertices(const VertexType* vertices, uint count, uint offs
 			const auto hr = package.Context.Map(inst->_nativeBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mr);
 			ThrowIfBad(hr);
 
-			std::memcpy(mr.pData, vertices, sizeof VertexType * count);
+			std::memcpy(static_cast<VertexType*>(mr.pData) + offset, vertices, sizeof VertexType * count);
 
 			package.Context.Unmap(inst->_nativeBuffer.Get(), 0);
 

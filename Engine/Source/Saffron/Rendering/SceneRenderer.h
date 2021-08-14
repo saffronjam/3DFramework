@@ -63,8 +63,9 @@ struct SceneCommon
 
 	// Lines
 	static constexpr uint MaxLines = 10000;
-	std::vector<std::pair<PosColVertex, PosColVertex>> Lines;
-};
+	std::vector<PosColVertex> LinesVertices;
+	std::vector<uint> LineIndices;
+ };
 
 class SceneRenderer
 {
@@ -82,6 +83,7 @@ public:
 	void SubmitMesh(const std::shared_ptr<Mesh>& mesh, const Matrix& transform = Matrix::Identity);
 	void SubmitLine(const Vector3& from, const Vector3& to, const Color& color);
 	void SubmitLines(const Vector3* positions, uint count, const Color& color);
+	void SubmitLines(const Vector3* positions, uint positionCount, const uint* indices, uint indexCount, const Color& color);
 	void SubmitRect(const FloatRect& rect, const Shader& shader);
 	void SubmitFullscreenRect(const Shader& shader);
 	void SubmitCameraFrustum(const Camera& camera, const Matrix& view);
