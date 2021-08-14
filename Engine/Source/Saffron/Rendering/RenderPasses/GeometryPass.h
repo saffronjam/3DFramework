@@ -28,7 +28,7 @@ private:
 	std::shared_ptr<Framebuffer> _target;
 	std::shared_ptr<Framebuffer> _shadowMap;
 	std::shared_ptr<ConstantBuffer<PointLightCBuffer>> _pointLightCBuffer;
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 
 	std::shared_ptr<Texture> _shadowMapTexture;
 	std::shared_ptr<Sampler> _shadowSampler;

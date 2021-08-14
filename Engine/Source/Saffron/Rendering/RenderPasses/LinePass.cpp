@@ -11,7 +11,7 @@ LinePass::LinePass(const std::string& name, struct SceneCommon& sceneCommon) :
 	RenderPass(name, sceneCommon),
 	_shader(Shader::Create("Line")),
 	_inputLayout(InputLayout::Create(PosColVertex::Layout(), _shader)),
-	_mvpCBuffer(MvpCBuffer::Create())
+	_mvpCBuffer(TransformCBuffer::Create())
 {
 	_vertexBuffer = VertexBuffer::Create(PosColVertex::Layout(), SceneCommon().MaxLines);
 	_indexBuffer = IndexBuffer::Create(SceneCommon().MaxLines);

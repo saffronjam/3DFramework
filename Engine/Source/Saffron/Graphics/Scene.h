@@ -39,7 +39,7 @@ private:
 	EditorCamera _camera2;
 	std::shared_ptr<Mesh> _cameraMesh;
 	EditorCamera* _activeCamera = &_camera1;
-	bool _drawCameraFrustums;
+	bool _drawCameraFrustums = false;
 
 
 	SceneRenderer _sceneRenderer;

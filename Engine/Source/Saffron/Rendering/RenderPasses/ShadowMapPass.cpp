@@ -13,7 +13,7 @@ ShadowMapPass::ShadowMapPass(const std::string& name, struct SceneCommon& sceneC
 	_shadowMap(Framebuffer::Create({Width, Height, {ImageFormat::RGBA, ImageFormat::Depth}})),
 	_shadowShader(Shader::Create("Shadow")),
 	_depthTextureShader(Shader::Create("DepthTexture")),
-	_mvpCBuffer(MvpCBuffer::Create())
+	_mvpCBuffer(TransformCBuffer::Create())
 {
 	RegisterOutput("Target0", _shadowMap);
 }

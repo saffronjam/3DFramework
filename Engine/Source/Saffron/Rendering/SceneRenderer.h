@@ -10,7 +10,7 @@
 namespace Se
 {
 struct Mvp;
-class MvpCBuffer;
+class TransformCBuffer;
 class Mesh;
 class Scene;
 struct CameraData;
@@ -82,7 +82,7 @@ public:
 private:
 	Scene& _scene;
 	struct SceneCommon _sceneCommon;
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 	std::vector<std::map<RenderChannels, std::vector<DrawCommand>>::iterator> _activeContainers;
 
 	RenderGraph _renderGraph;

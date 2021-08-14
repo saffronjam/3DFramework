@@ -52,7 +52,7 @@ struct RenderQueue
 
 class Mesh;
 struct Mvp;
-class MvpCBuffer;
+class TransformCBuffer;
 
 class VertexBuffer;
 class IndexBuffer;

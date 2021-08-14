@@ -14,7 +14,7 @@ namespace Se
 {
 SceneRenderer::SceneRenderer(Scene& scene) :
 	_scene(scene),
-	_mvpCBuffer(MvpCBuffer::Create())
+	_mvpCBuffer(TransformCBuffer::Create())
 {
 	// Construct empty containers for the duration of the object's lifetime
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Geometry, std::vector<DrawCommand>{});

@@ -20,7 +20,7 @@ private:
 	std::shared_ptr<InputLayout> _inputLayout;
 	std::shared_ptr<VertexBuffer> _vertexBuffer;
 	std::shared_ptr<IndexBuffer> _indexBuffer;
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 
 	const RenderState _renderState = RenderState::DepthTest_Less | RenderState::Rasterizer_CullFront |
 		RenderState::Rasterizer_Fill | RenderState::Topology_LineList;

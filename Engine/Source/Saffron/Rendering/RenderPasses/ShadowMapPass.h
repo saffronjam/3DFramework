@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Rendering/RenderPass.h"
-#include "Saffron/Rendering/Bindables/MvpCBuffer.h"
+#include "Saffron/Rendering/Bindables/TransformCBuffer.h"
 #include "Saffron/Rendering/Bindables/Shader.h"
 
 namespace Se
@@ -21,7 +21,7 @@ private:
 	std::shared_ptr<Shader> _shadowShader;
 	std::shared_ptr<Shader> _depthTextureShader;
 
-	std::shared_ptr<MvpCBuffer> _mvpCBuffer;
+	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 
 	bool _orthographic = false;
 

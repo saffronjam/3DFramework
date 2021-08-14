@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <d3d11_4.h>
-
 #include "Saffron/Base.h"
 #include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 
@@ -15,15 +13,15 @@ struct alignas(16) Mvp
 	Matrix ModelViewProjection;
 };
 
-class MvpCBuffer : public ConstantBuffer<Mvp, false>
+class TransformCBuffer : public ConstantBuffer<Mvp>
 {
 public:
-	MvpCBuffer();
-	explicit MvpCBuffer(const Mvp& mvp);
+	TransformCBuffer();
+	explicit TransformCBuffer(const Mvp& mvp);
 
 	void UploadData() override;
 
-	static auto Create() -> std::shared_ptr<MvpCBuffer>;
-	static auto Create(const Mvp& mvp) -> std::shared_ptr<MvpCBuffer>;
+	static auto Create() -> std::shared_ptr<TransformCBuffer>;
+	static auto Create(const Mvp& mvp) -> std::shared_ptr<TransformCBuffer>;
 };
 }

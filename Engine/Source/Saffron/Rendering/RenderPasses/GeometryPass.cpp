@@ -12,7 +12,7 @@ GeometryPass::GeometryPass(const std::string& name, struct SceneCommon& sceneCom
 	RenderPass(name, sceneCommon),
 	_target(Framebuffer::Create(FramebufferSpec{500, 500, {ImageFormat::RGBA, ImageFormat::Depth24Stencil8}})),
 	_pointLightCBuffer(ConstantBuffer<PointLightCBuffer>::Create({}, 2)),
-	_mvpCBuffer(MvpCBuffer::Create()),
+	_mvpCBuffer(TransformCBuffer::Create()),
 	_shadowMapTexture(Texture::Create(1)),
 	_shadowSampler(Sampler::Create({1, SamplerEdge::Border, SamplerFilter::Bilinear, Color{1.0f, 1.0f, 1.0f, 1.0f}})),
 	_testCube(TextureCube::Create(100, 100, ImageFormat::RGBA))
