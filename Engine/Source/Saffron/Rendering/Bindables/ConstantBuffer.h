@@ -102,14 +102,15 @@ void ConstantBuffer<T, Deferred>::Bind() const
 	if constexpr (Deferred)
 	{
 		const auto inst = ShareThisAs<const ConstantBuffer<T, Deferred>>();
+
+		if (inst->_dirty)
+		{
+			const_cast<ConstantBuffer<T, Deferred>&>(*inst).UploadData();
+		}
+
 		Renderer::Submit(
 			[inst](const RendererPackage& package)
 			{
-				if (inst->_dirty)
-				{
-					const_cast<ConstantBuffer<T, Deferred>&>(*inst).UploadData();
-				}
-
 				if (inst->_bindFlags & ConstantBufferBindFlags_VS)
 				{
 					package.Context.VSSetConstantBuffers(inst->_slot, 1, inst->_nativeBuffer.GetAddressOf());

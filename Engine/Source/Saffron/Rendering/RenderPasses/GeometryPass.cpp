@@ -26,9 +26,7 @@ void GeometryPass::OnSetupFinished()
 	Renderer::Submit(
 		[this](const RendererPackage&)
 		{
-			Renderer::SetRenderStrategy(RenderStrategy::Immediate);
 			_shadowMapTexture->SetImage(_shadowMap->DepthImagePtr());
-			Renderer::SetRenderStrategy(RenderStrategy::Deferred);
 		}
 	);
 }
@@ -36,7 +34,7 @@ void GeometryPass::OnSetupFinished()
 void GeometryPass::OnUi()
 {
 	ImGui::Begin("Shadow maps in Geometry");
-	// Needs own shader to render texture cube
+	 //Needs own shader to render texture cube
 	//ImGui::Image((void*)(&_testCube->ShaderView()), {100.0f, 100.0f});
 	ImGui::End();
 }

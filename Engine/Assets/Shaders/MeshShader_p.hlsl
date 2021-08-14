@@ -26,7 +26,7 @@ float CalculateShadow(float4 lightSpacePosition)
 	return currentDepth > closestDepth ? 1.0f : 0.0f;
 }
 
-struct PS_INPUT
+struct PsInput
 {
 	float4 Position : SV_POSITION;
 	float3 WorldPosition : WorldPosition;
@@ -41,7 +41,7 @@ struct PS_INPUT
 	float4 LightSpacePosition : LightSpacePosition;
 };
 
-float4 main(PS_INPUT input) : SV_TARGET
+float4 main(PsInput input) : SV_TARGET
 {
 	const float3 normal = normalize(input.Normal);
 	const float3 lightColor = float3(1.0f, 0.0f, 0.0f);

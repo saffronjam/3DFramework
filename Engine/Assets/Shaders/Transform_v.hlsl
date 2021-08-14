@@ -9,15 +9,15 @@ struct VsInput
 	float2 TexCoord : TexCoord;
 };
 
-struct VS_OUTPUT
+struct VsOutput
 {
 	float4 Position : SV_POSITION;
 	float4 Color : COLOR0;
 };
 
-VS_OUTPUT main(VsInput input)
+VsOutput main(VsInput input)
 {
-	VS_OUTPUT output;
+	VsOutput output;
 
 	float4 pos4 = float4(input.Position, 1.0);
 	pos4 = mul(pos4, Mvp);

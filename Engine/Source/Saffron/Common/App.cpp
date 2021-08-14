@@ -24,6 +24,9 @@ App::App(const AppSpec& spec) :
 void App::Run()
 {
 	OnCreate();
+
+	_renderer->Execute();
+
 	while (_running)
 	{
 		_keyboard->OnUpdate();
@@ -31,31 +34,55 @@ void App::Run()
 		_window->DispatchEvents();
 
 		_renderer->BeginFrame();
-		_ui->BeginFrame();
 
-		for (auto& layer : _layerStack)
+		// Logic
 		{
-			layer->OnUpdate(_timer.FrameTime());
+			for (const auto& layer : _layerStack)
+			{
+				layer->OnUpdate(_timer.FrameTime());
+			}
+
+			// Prepare Ui
+			{
+				_renderer->BeginQueue("Ui");
+
+				_ui->BeginFrame();
+
+				Renderer::Submit(
+					[this](const RendererPackage& package)
+					{
+						// Logic queue is started here to append every renderer call to after ui is done
+						_renderer->BeginQueue("Main");
+						OnUi();
+						for (const auto& layer : _layerStack)
+						{
+							layer->OnUi();
+						}
+						_renderer->EndQueue();
+					}
+				);
+
+				_ui->EndFrame();
+				_renderer->EndQueue();
+			}
+
+			_window->OnUpdate();
+			_renderer->Execute();
+
+			// Render Ui
+			{
+				_renderer->BeginQueue("Ui");
+				_renderer->Execute();
+				_renderer->EndQueue();
+			}
+			_timer.Restart();
 		}
 
-		Renderer::Submit(
-			[this](const RendererPackage& package)
-			{
-				OnUi();
-				for (auto& layer : _layerStack)
-				{
-					layer->OnUi();
-				}
-			}
-		);
-		
-		_timer.Restart();
-		_window->OnUpdate();
-		_ui->EndFrame();
 		_renderer->EndFrame();
+		_renderer->Execute();
 	}
 
-	for (auto& layer : _layerStack)
+	for (const auto& layer : _layerStack)
 	{
 		layer->OnDetach();
 	}

@@ -2,10 +2,14 @@
 
 #include <d3d11_4.h>
 #include <source_location>
+#include <vector>
+#include <unordered_map>
+#include <stack>
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
 #include "Saffron/Graphics/MeshStore.h"
+#include "Saffron/Graphics/Shapes/Rect.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/RenderState.h"
@@ -31,48 +35,58 @@ enum class RenderStrategy
 
 using RenderFn = std::function<void(const RendererPackage& package)>;
 
+
+struct Submition
+{
+	RenderFn Fn;
+	std::source_location Location;
+};
+
+struct RenderQueue
+{
+	std::string Name;
+	std::vector<Submition> Submitions;
+	bool Executing = false;
+};
+
+
 class Mesh;
 struct Mvp;
 class MvpCBuffer;
 
+class VertexBuffer;
+class IndexBuffer;
+class InputLayout;
+
 class Renderer : public Singleton<Renderer>
 {
-private:
-	struct Submition
-	{
-		RenderFn Fn;
-#ifdef SE_DEBUG
-		std::source_location Location;
-#endif
-	};
-
 public:
 	explicit Renderer(const Window& window);
+	~Renderer() override;
 
-#ifdef SE_DEBUG
 	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current())
 	{
-		if (auto& inst = Instance(); inst._strategy == RenderStrategy::Deferred)
+		if (auto& inst = Instance(); !inst._activeContainer->Executing && inst._strategy == RenderStrategy::Deferred)
 		[[likely]]
 		{
-			inst._submitingContainer->emplace_back(Submition{fn, location});
+			inst._activeContainer->Submitions.emplace_back(Submition{fn, location});
 		}
 		else
 		{
-			inst.ExecuteSubmition({fn, location});
+			inst.ExecuteSubmition(Submition{fn, location});
 		}
 	}
-#else
-	static void Submit(RenderFn fn)
-	{
-		Instance()._submitingContainer->.emplace_back(fn);
-	}
-#endif
 
 	void Execute();
 
 	void BeginFrame();
 	void EndFrame();
+
+	void BeginQueue(const std::string name);
+	void EndQueue();
+
+	static void SubmitIndexed();
+	static void SubmitFullscreenQuad();
 
 	template <typename ... Args>
 	static void Log(const std::string& string, const Args& ... args);
@@ -114,17 +128,21 @@ private:
 	ComPtr<ID3D11SamplerState> _nativeSamplerState;
 	D3D11_PRIMITIVE_TOPOLOGY _topology;
 
+	// Renderer data
 	std::shared_ptr<class BackBuffer> _backbuffer;
-
 	std::unique_ptr<BindableStore> _bindableStore;
 	std::unique_ptr<MeshStore> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
-	// Submitions	
-	std::vector<Submition> _submitionsPrimary;
-	std::vector<Submition> _submitionsSecondary;
-	std::vector<Submition>* _executingContainer = &_submitionsPrimary;
-	std::vector<Submition>* _submitingContainer = &_submitionsSecondary;
+	// Prepared submitions
+	std::shared_ptr<VertexBuffer> _quadVertexBuffer;
+	std::shared_ptr<IndexBuffer> _quadIndexBuffer;
+	std::shared_ptr<InputLayout> _quadInputLayout;
+
+	// Submitions
+	std::map<std::string, RenderQueue> _submitionContainers;
+	RenderQueue* _activeContainer = nullptr;
+	std::stack<std::string> _queues;
 
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};

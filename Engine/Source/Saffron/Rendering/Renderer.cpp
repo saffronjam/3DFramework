@@ -1,15 +1,17 @@
 ﻿#include "SaffronPCH.h"
 
-#include <Windows.h>
+#include "Saffron/Rendering/Renderer.h"
+
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <Windows.h>
 
 #include "Saffron/Common/App.h"
-#include "Saffron/Graphics/Mesh.h"
-#include "Saffron/Rendering/Renderer.h"
-#include "Saffron/Rendering/ErrorHandling/HrException.h"
-#include "Saffron/Rendering/ErrorHandling/DxgiInfoException.h"
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
+#include "Saffron/Rendering/Bindables.h"
+#include "Saffron/Rendering/ErrorHandling/DxgiInfoException.h"
+#include "Saffron/Rendering/ErrorHandling/HrException.h"
+#include "Saffron/Rendering/VertexTypes.h"
 
 namespace Se
 {
@@ -18,9 +20,15 @@ Renderer::Renderer(const Window& window) :
 	_bindableStore(std::make_unique<BindableStore>()),
 	_meshStore(std::make_unique<MeshStore>())
 {
+	BeginQueue("Main");
+
 	CreateDeviceAndContext();
 	CreateFactory();
 	CreateSwapChain(window);
+
+	_quadIndexBuffer = IndexBuffer::Create(4);
+	_quadVertexBuffer = VertexBuffer::Create(PosColTexVertex::Layout(), 4);
+	//_quadInputLayout = InputLayout::Create()
 
 	_backbuffer = BackBuffer::Create(window);
 
@@ -30,19 +38,27 @@ Renderer::Renderer(const Window& window) :
 	}
 }
 
+Renderer::~Renderer()
+{
+	EndQueue();
+}
+
 void Renderer::Execute()
 {
-	if constexpr (ConfDebug)
+	if (_activeContainer == nullptr)
 	{
-		//Log::Info("Executing {} submitions", _submitions.Size());
+		throw SaffronException("Call to Execute with out am active render queue");
 	}
 
-	std::swap(_submitingContainer, _executingContainer);
-	for (auto& submition : *_executingContainer)
+	auto* executingContainer = _activeContainer;
+
+	executingContainer->Executing = true;
+	for (auto& submition : executingContainer->Submitions)
 	{
 		ExecuteSubmition(submition);
 	}
-	_executingContainer->clear();
+	executingContainer->Executing = false;
+	executingContainer->Submitions.clear();
 }
 
 void Renderer::BeginFrame()
@@ -60,8 +76,51 @@ void Renderer::EndFrame()
 			package.SwapChain.Present(1, 0);
 		}
 	);
+}
 
-	Execute();
+void Renderer::BeginQueue(const std::string name)
+{
+	_queues.push(name);
+	const auto findResult = _submitionContainers.find(name);
+	if (findResult == _submitionContainers.end())
+	{
+		const auto result = _submitionContainers.emplace(name, RenderQueue{name});
+		_activeContainer = &result.first->second;
+	}
+	else
+	{
+		_activeContainer = &findResult->second;
+	}
+}
+
+void Renderer::EndQueue()
+{
+	Debug::Assert(!_activeContainer->Executing, "Can't end a render queue if the active queue is executing");
+
+	if (_queues.size() == 0)
+	{
+		throw SaffronException("No queue to end.");
+	}
+	_queues.pop();
+
+	if (_queues.size() == 0)
+	{
+		_activeContainer = nullptr;
+	}
+	else
+	{
+		const auto findResult = _submitionContainers.find(_queues.top());
+		Debug::Assert(findResult != _submitionContainers.end());
+		_activeContainer = &findResult->second;
+	}
+}
+
+void Renderer::SubmitIndexed()
+{
+}
+
+void Renderer::SubmitFullscreenQuad()
+{
 }
 
 void Renderer::Log(const std::string& string)

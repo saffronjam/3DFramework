@@ -17,6 +17,7 @@ using Color = DirectX::SimpleMath::Color;
 
 struct Colors
 {
+	static const Color Transparent;
 	static const Color Black;
 	static const Color White;
 };

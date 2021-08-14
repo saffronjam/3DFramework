@@ -5,7 +5,7 @@
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables.h"
-#include "Saffron/Graphics/Shapes.h"
+#include "Saffron/Rendering/VertexTypes.h"
 
 namespace Se
 {
@@ -22,29 +22,6 @@ enum RenderChannel_ : uint
 	RenderChannel_Geometry = BIT(0),
 	RenderChannel_Shadow = BIT(1),
 	RenderChannel_Outline = BIT(2),
-};
-
-struct PosColVertex
-{
-	Vector3 Position;
-	Color Color;
-
-	static auto Layout() -> VertexLayout
-	{
-		return {{"Position", ElementType::Float3}, {"Color", ElementType::Float4}};
-	}
-};
-
-struct PosTexColVertex
-{
-	Vector3 Position;
-	Vector2 TexCoords;
-	Color Color;
-
-	static auto Layout() -> VertexLayout
-	{
-		return {{"Position", ElementType::Float3}, {"TexCoord", ElementType::Float2}, {"Color", ElementType::Float4}};
-	}
 };
 
 struct DrawCommand
@@ -65,6 +42,11 @@ struct SceneCommon
 	static constexpr uint MaxLines = 10000;
 	std::vector<PosColVertex> LinesVertices;
 	std::vector<uint> LineIndices;
+
+	// Quads
+	static constexpr uint MaxQuads = 1000;
+	std::vector<PosColTexVertex> QuadVertices;
+	std::vector<uint> QuadIndices;
  };
 
 class SceneRenderer
@@ -84,8 +66,6 @@ public:
 	void SubmitLine(const Vector3& from, const Vector3& to, const Color& color);
 	void SubmitLines(const Vector3* positions, uint count, const Color& color);
 	void SubmitLines(const Vector3* positions, uint positionCount, const uint* indices, uint indexCount, const Color& color);
-	void SubmitRect(const FloatRect& rect, const Shader& shader);
-	void SubmitFullscreenRect(const Shader& shader);
 	void SubmitCameraFrustum(const Camera& camera, const Matrix& view);
 
 	void SetViewportSize(uint width, uint height);

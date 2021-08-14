@@ -171,15 +171,6 @@ void SceneRenderer::SubmitLines(
 	}
 }
 
-void SceneRenderer::SubmitRect(const FloatRect& rect, const Shader& shader)
-{
-}
-
-void SceneRenderer::SubmitFullscreenRect(const Shader& shader)
-{
-	SubmitRect({-1.0f, -1.0f, 2.0f, 2.0f}, shader);
-}
-
 void SceneRenderer::SubmitCameraFrustum(const Camera& camera, const Matrix& view)
 {
 	DirectX::BoundingFrustum frustum;

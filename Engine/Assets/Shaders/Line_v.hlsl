@@ -6,15 +6,15 @@ struct VsInput
 	float4 Color : Color;
 };
 
-struct VS_OUTPUT
+struct VsOutput
 {
 	float4 Position : SV_POSITION;
 	float4 Color : COLOR0;
 };
 
-VS_OUTPUT main(VsInput input)
+VsOutput main(VsInput input)
 {
-	VS_OUTPUT output;
+	VsOutput output;
 
 	output.Position = mul(float4(input.Position, 1.0), Mvp);
 	output.Color = input.Color;

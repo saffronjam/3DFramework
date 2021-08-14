@@ -7,16 +7,16 @@ struct VS_INPUT
 	float2 uv : TEXCOORD0;
 };
 
-struct PS_INPUT
+struct PsInput
 {
 	float4 pos : SV_POSITION;
 	float4 col : COLOR0;
 	float2 uv : TEXCOORD0;
 };
 
-PS_INPUT main(VS_INPUT input)
+PsInput main(VS_INPUT input)
 {
-	PS_INPUT output;
+	PsInput output;
 	output.pos = mul(ProjectionMatrix, float4(input.pos.xy, 0.0f, 1.0f));
 	output.col = input.col;
 	output.uv = input.uv;

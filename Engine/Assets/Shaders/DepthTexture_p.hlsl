@@ -1,4 +1,4 @@
-struct PS_INPUT
+struct PsInput
 {
 	float4 pos : SV_POSITION;
 	float4 col : COLOR0;
@@ -17,7 +17,7 @@ float LinearizeDepth(float depth)
 	return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));
 }
 
-float4 main(PS_INPUT input) : SV_Target
+float4 main(PsInput input) : SV_Target
 {
 	float4 out_col = input.col * texture0.Sample(sampler0, input.uv);
 
