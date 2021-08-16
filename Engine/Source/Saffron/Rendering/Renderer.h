@@ -8,8 +8,7 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
-#include "Saffron/Graphics/MeshStore.h"
-#include "Saffron/Graphics/Shapes/Rect.h"
+#include "Saffron/Graphics/ModelStore.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/RenderState.h"
@@ -50,7 +49,7 @@ struct RenderQueue
 };
 
 
-class Mesh;
+class Model;
 struct Mvp;
 class TransformCBuffer;
 
@@ -64,18 +63,7 @@ public:
 	explicit Renderer(const Window& window);
 	~Renderer() override;
 
-	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current())
-	{
-		if (auto& inst = Instance(); !inst._activeContainer->Executing && inst._strategy == RenderStrategy::Deferred)
-		[[likely]]
-		{
-			inst._activeContainer->Submitions.emplace_back(Submition{fn, location});
-		}
-		else
-		{
-			inst.ExecuteSubmition(Submition{fn, location});
-		}
-	}
+	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current());
 
 	void Execute();
 
@@ -85,7 +73,10 @@ public:
 	void BeginQueue(const std::string name);
 	void EndQueue();
 
-	static void SubmitIndexed();
+	static void BeginStrategy(RenderStrategy strategy);
+	static void EndStrategy();
+
+	static void SubmitIndexed(uint indexCount, uint baseIndex = 0, uint baseVertex = 0);
 	static void SubmitFullscreenQuad();
 
 	template <typename ... Args>
@@ -99,8 +90,9 @@ public:
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
 	static void SetRenderState(RenderState state);
-	static void SetRenderStrategy(RenderStrategy strategy);
 	static void SetViewportSize(uint width, uint height);
+
+	static auto WhiteTexture() -> const std::shared_ptr<Texture>&;
 
 	void CleanDebugInfo();
 
@@ -118,9 +110,7 @@ private:
 	ComPtr<IDXGISwapChain1> _swapChain{};
 	ComPtr<ID3D11DeviceContext> _context{};
 	ComPtr<IDXGIFactory2> _factory{};
-
-	RenderStrategy _strategy = RenderStrategy::Deferred;
-
+	
 	// Render state
 	RenderState _submittedState = 0;
 	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
@@ -131,18 +121,24 @@ private:
 	// Renderer data
 	std::shared_ptr<class BackBuffer> _backbuffer;
 	std::unique_ptr<BindableStore> _bindableStore;
-	std::unique_ptr<MeshStore> _meshStore;
+	std::unique_ptr<ModelStore> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
 	// Prepared submitions
 	std::shared_ptr<VertexBuffer> _quadVertexBuffer;
 	std::shared_ptr<IndexBuffer> _quadIndexBuffer;
-	std::shared_ptr<InputLayout> _quadInputLayout;
 
 	// Submitions
 	std::map<std::string, RenderQueue> _submitionContainers;
 	RenderQueue* _activeContainer = nullptr;
 	std::stack<std::string> _queues;
+
+	// Strategy
+	RenderStrategy _activeStrategy = RenderStrategy::Deferred;
+	std::stack<RenderStrategy> _strategies;
+
+	// Prepare textures
+	std::shared_ptr<Texture> _whiteTexture;
 
 	// Only initialized in debug
 	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};

@@ -14,6 +14,9 @@ enum class ImageFormat
 	RGBA32f,
 	RG16f,
 	RG32f,
+
+	SRGB,
+
 	Depth32f,
 	Depth24Stencil8,
 
@@ -147,6 +150,7 @@ inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
 	case DXGI_FORMAT_R16G16B16A16_FLOAT: return ImageFormat::RGBA16f;
 	case DXGI_FORMAT_R32G32B32A32_FLOAT: return ImageFormat::RGBA32f;
 	case DXGI_FORMAT_R16G16_FLOAT: return ImageFormat::RG16f;
+	case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: return ImageFormat::SRGB;
 	case DXGI_FORMAT_D24_UNORM_S8_UINT: return ImageFormat::Depth24Stencil8;
 	default: break;
 	}

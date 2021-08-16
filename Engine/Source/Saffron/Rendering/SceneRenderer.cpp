@@ -5,7 +5,7 @@
 #include <ranges>
 
 #include "Saffron/Graphics/Camera.h"
-#include "Saffron/Graphics/Mesh.h"
+#include "Saffron/Graphics/Model.h"
 #include "Saffron/Graphics/Scene.h"
 #include "Saffron/Rendering/Bindables.h"
 #include "Saffron/Rendering/Renderer.h"
@@ -14,12 +14,14 @@ namespace Se
 {
 SceneRenderer::SceneRenderer(Scene& scene) :
 	_scene(scene),
-	_mvpCBuffer(TransformCBuffer::Create())
+	_transformCBuffer(TransformCBuffer::Create())
 {
 	// Construct empty containers for the duration of the object's lifetime
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Geometry, std::vector<DrawCommand>{});
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Shadow, std::vector<DrawCommand>{});
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Outline, std::vector<DrawCommand>{});
+
+	_sceneCommon._sceneCommonCBuffer = ConstantBuffer<SceneCommonCBuffer>::Create(1);
 
 	_renderGraph.RegisterOutput("BackBuffer", Renderer::BackBufferPtr());
 	_renderGraph.RegisterInput("FinalOutput", _finalTarget);
@@ -93,7 +95,7 @@ void SceneRenderer::EndSubmtions()
 	_activeContainers.clear();
 }
 
-void SceneRenderer::SubmitMesh(const std::shared_ptr<Mesh>& mesh, const Matrix& transform)
+void SceneRenderer::SubmitModel(const std::shared_ptr<Model>& mesh, const Matrix& transform)
 {
 	for (const auto& activeContainer : _activeContainers)
 	{

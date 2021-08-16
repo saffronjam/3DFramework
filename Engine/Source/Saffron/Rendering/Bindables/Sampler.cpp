@@ -7,8 +7,9 @@
 
 namespace Se
 {
-Sampler::Sampler(const SamplerSpec& spec) :
-	_spec(spec)
+Sampler::Sampler(const SamplerSpec& spec, uint slot) :
+	_spec(spec),
+	_slot(slot)
 {
 	SetInitializer(
 		[this]
@@ -17,7 +18,7 @@ Sampler::Sampler(const SamplerSpec& spec) :
 			Renderer::Submit(
 				[inst](const RendererPackage& package)
 				{
-					const auto texAddressMode = Utils::ToD3D11TextureAddressMode(inst->_spec.Edge);
+					const auto texAddressMode = Utils::ToD3D11TextureAddressMode(inst->_spec.Wrap);
 					const auto filter = Utils::ToD3D11Filter(inst->_spec.Filter);
 
 					D3D11_SAMPLER_DESC sd = {};
@@ -41,23 +42,23 @@ void Sampler::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			package.Context.PSSetSamplers(inst->_spec.Slot, 1, inst->_nativeSamplerState.GetAddressOf());
+			package.Context.PSSetSamplers(inst->_slot, 1, inst->_nativeSamplerState.GetAddressOf());
 		}
 	);
 }
 
-auto Sampler::Create(const SamplerSpec& spec) -> std::shared_ptr<Sampler>
+auto Sampler::Create(const SamplerSpec& spec, uint slot) -> std::shared_ptr<Sampler>
 {
-	return BindableStore::Add<Sampler>(spec);
+	return BindableStore::Add<Sampler>(spec, slot);
 }
 
-auto Utils::ToD3D11TextureAddressMode(SamplerEdge edge) -> D3D11_TEXTURE_ADDRESS_MODE
+auto Utils::ToD3D11TextureAddressMode(SamplerWrap edge) -> D3D11_TEXTURE_ADDRESS_MODE
 {
 	switch (edge)
 	{
-	case SamplerEdge::Mirror: return D3D11_TEXTURE_ADDRESS_MIRROR;
-	case SamplerEdge::Wrap: return D3D11_TEXTURE_ADDRESS_WRAP;
-	case SamplerEdge::Border: return D3D11_TEXTURE_ADDRESS_BORDER;
+	case SamplerWrap::Mirror: return D3D11_TEXTURE_ADDRESS_MIRROR;
+	case SamplerWrap::Wrap: return D3D11_TEXTURE_ADDRESS_WRAP;
+	case SamplerWrap::Border: return D3D11_TEXTURE_ADDRESS_BORDER;
 	}
 	throw SaffronException("Invalid sampler edge. Could not convert to D3D11_TEXTURE_ADDRESS_MODE.");
 }

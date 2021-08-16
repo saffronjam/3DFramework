@@ -31,7 +31,6 @@ private:
 	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 
 	std::shared_ptr<Texture> _shadowMapTexture;
-	std::shared_ptr<Sampler> _shadowSampler;
 
 	std::shared_ptr<TextureCube> _testCube;
 

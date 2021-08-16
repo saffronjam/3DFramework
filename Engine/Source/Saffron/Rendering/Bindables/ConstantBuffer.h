@@ -50,7 +50,7 @@ private:
 
 template <class T>
 ConstantBuffer<T>::ConstantBuffer(uint slot) :
-	_slot(slot)
+	ConstantBuffer({}, slot)
 {
 }
 

@@ -22,6 +22,8 @@ struct VsOutput
 	float3 ViewPos : ViewPos;
 	float3 LightPos[MAX_LIGHTS] : LightPos;
 	float4 LightSpacePosition : LightSpacePosition;
+
+	float3x3 WorldNormals : WorldNormals;
 };
 
 VsOutput main(VsInput input)
@@ -38,6 +40,9 @@ VsOutput main(VsInput input)
 
 	output.ViewPos = CameraPosition;
 	output.LightSpacePosition = mul(float4(output.WorldPosition, 1.0f), PointLights[0].LightTransform);
+
+	output.WorldNormals = mul(float3x3(input.Tangent, input.Binormal, input.Normal), Model);
+
 
 	if (nPointLights >= 0)
 	{

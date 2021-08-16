@@ -4,29 +4,21 @@
 
 #include "Saffron/Common/App.h"
 #include "Saffron/Graphics/Camera.h"
-#include "Saffron/Graphics/Mesh.h"
+#include "Saffron/Graphics/Model.h"
 #include "Saffron/Math/Random.h"
 
 namespace Se
 {
 Scene::Scene() :
 	_sceneRenderer(*this),
-	_commonCBuffer(ConstantBuffer<CommonCBuffer>::Create({}, 1)),
 	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}})
 {
-	for (int i = 0; i < 10; i++)
-	{
-		auto mesh = Mesh::Create("Torus.fbx");
-		_sampleMeshes.emplace_back(mesh);
-		_sampleMeshesPosition.emplace_back(Random::Vec3({-1.0f, 0.0f, -1.0f}, {1.0f, 1.0f, 1.0f}) * 6.0f);
-	}
-
-	_sampleSphere = Mesh::Create("Sphere.fbx");
+	_sponzaScene = Model::Create("Sponza/Sponza.gltf");
+	_sampleSphere = Model::Create("Sphere.fbx");
+	_sponzaScene->Transform() *= Matrix::CreateScale(0.01f);
 	_sampleSphere->SetShader(Shader::Create("Transform"));
-	_samplePlane = Mesh::Create("Plane.fbx");
-	_samplePlane->Transform() = Matrix::CreateScale(10.0f) * Matrix::CreateTranslation(0.0f, -3.0f, 0.0f);
 
-	_cameraMesh = Mesh::Create("Sphere.fbx");
+	_cameraMesh = Model::Create("Sphere.fbx");
 
 	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
 
@@ -47,22 +39,8 @@ void Scene::OnRender()
 	const auto& timer = App::Instance().Timer();
 	//_pointLight.Position = Vector3{0.0f, std::sin(timer.SinceStart().Sec() * 8.0f) * 3.0f, 0.0f};
 
-	float index = 0;
-	for (const auto& mesh : _sampleMeshes)
-	{
-		mesh->Transform() = Matrix::CreateTranslation(_sampleMeshesPosition[static_cast<int>(index)]) *
-			Matrix::CreateTranslation(
-				{0.0f, std::sin(timer.SinceStart().Sec() * 8.0f * (1 + index / _sampleMeshes.size())) * 3.0f, 0.0f}
-			);
-		index++;
-	}
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
 	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
-
-
-	_commonCBuffer->Update({_activeCamera->Data().Position});
-	_commonCBuffer->Bind();
-
 
 	_sceneRenderer.Begin(_activeCamera->Data());
 
@@ -79,21 +57,17 @@ void Scene::OnRender()
 	}
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry | RenderChannel_Shadow);
-	for (auto& mesh : _sampleMeshes)
-	{
-		_sceneRenderer.SubmitMesh(mesh);
-	}
-	_sceneRenderer.SubmitMesh(_samplePlane);
+	_sceneRenderer.SubmitModel(_sponzaScene);
 	_sceneRenderer.EndSubmtions();
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry);
 
-	_sceneRenderer.SubmitMesh(_sampleSphere);
-	_sceneRenderer.SubmitMesh(
+	_sceneRenderer.SubmitModel(_sampleSphere);
+	_sceneRenderer.SubmitModel(
 		_cameraMesh,
 		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera1.Data().Position)
 	);
-	_sceneRenderer.SubmitMesh(
+	_sceneRenderer.SubmitModel(
 		_cameraMesh,
 		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera2.Data().Position)
 	);
@@ -121,6 +95,8 @@ void Scene::OnUi()
 
 	_activeCamera->OnUi();
 	_sceneRenderer.OnUi();
+
+	_sponzaScene->OnDebugUi();
 }
 
 auto Scene::Renderer() const -> const SceneRenderer&

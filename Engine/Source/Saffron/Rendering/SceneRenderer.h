@@ -11,7 +11,7 @@ namespace Se
 {
 struct Mvp;
 class TransformCBuffer;
-class Mesh;
+class Model;
 class Scene;
 struct CameraData;
 
@@ -26,13 +26,20 @@ enum RenderChannel_ : uint
 
 struct DrawCommand
 {
-	std::shared_ptr<Mesh> Mesh;
+	std::shared_ptr<Model> Model;
 	Matrix Transform;
+};
+
+struct alignas(16) SceneCommonCBuffer
+{
+	Vector3 CameraPosition;
 };
 
 struct SceneCommon
 {
 	CameraData CameraData;
+	std::shared_ptr<ConstantBuffer<SceneCommonCBuffer>> _sceneCommonCBuffer;
+
 	std::map<RenderChannels, std::vector<DrawCommand>> DrawCommands;
 
 	// Shadow and light
@@ -47,7 +54,7 @@ struct SceneCommon
 	static constexpr uint MaxQuads = 1000;
 	std::vector<PosColTexVertex> QuadVertices;
 	std::vector<uint> QuadIndices;
- };
+};
 
 class SceneRenderer
 {
@@ -62,10 +69,16 @@ public:
 	void BeginSubmtions(RenderChannels channels);
 	void EndSubmtions();
 
-	void SubmitMesh(const std::shared_ptr<Mesh>& mesh, const Matrix& transform = Matrix::Identity);
+	void SubmitModel(const std::shared_ptr<Model>& mesh, const Matrix& transform = Matrix::Identity);
 	void SubmitLine(const Vector3& from, const Vector3& to, const Color& color);
 	void SubmitLines(const Vector3* positions, uint count, const Color& color);
-	void SubmitLines(const Vector3* positions, uint positionCount, const uint* indices, uint indexCount, const Color& color);
+	void SubmitLines(
+		const Vector3* positions,
+		uint positionCount,
+		const uint* indices,
+		uint indexCount,
+		const Color& color
+	);
 	void SubmitCameraFrustum(const Camera& camera, const Matrix& view);
 
 	void SetViewportSize(uint width, uint height);
@@ -82,7 +95,7 @@ public:
 private:
 	Scene& _scene;
 	struct SceneCommon _sceneCommon;
-	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
+	std::shared_ptr<TransformCBuffer> _transformCBuffer;
 	std::vector<std::map<RenderChannels, std::vector<DrawCommand>>::iterator> _activeContainers;
 
 	RenderGraph _renderGraph;

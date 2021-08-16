@@ -17,8 +17,7 @@ namespace Se
 {
 Renderer::Renderer(const Window& window) :
 	Singleton(this),
-	_bindableStore(std::make_unique<BindableStore>()),
-	_meshStore(std::make_unique<MeshStore>())
+	_bindableStore(std::make_unique<BindableStore>())
 {
 	BeginQueue("Main");
 
@@ -26,9 +25,12 @@ Renderer::Renderer(const Window& window) :
 	CreateFactory();
 	CreateSwapChain(window);
 
+	_meshStore = std::make_unique<ModelStore>();
 	_quadIndexBuffer = IndexBuffer::Create(4);
 	_quadVertexBuffer = VertexBuffer::Create(PosColTexVertex::Layout(), 4);
-	//_quadInputLayout = InputLayout::Create()
+
+	constexpr uint data = 0xffffffff;
+	_whiteTexture = Texture::Create(1, 1, ImageFormat::RGBA, reinterpret_cast<const uchar*>(&data));
 
 	_backbuffer = BackBuffer::Create(window);
 
@@ -41,6 +43,19 @@ Renderer::Renderer(const Window& window) :
 Renderer::~Renderer()
 {
 	EndQueue();
+}
+
+void Renderer::Submit(const RenderFn& fn, std::source_location location)
+{
+	if (auto& inst = Instance(); !inst._activeContainer->Executing && inst._activeStrategy == RenderStrategy::Deferred)
+	[[likely]]
+	{
+		inst._activeContainer->Submitions.emplace_back(Submition{fn, location});
+	}
+	else
+	{
+		inst.ExecuteSubmition(Submition{fn, location});
+	}
 }
 
 void Renderer::Execute()
@@ -115,12 +130,53 @@ void Renderer::EndQueue()
 	}
 }
 
-void Renderer::SubmitIndexed()
+void Renderer::BeginStrategy(RenderStrategy strategy)
 {
+	auto& inst = Instance();
+	inst._strategies.push(strategy);
+	inst._activeStrategy = strategy;
+}
+
+void Renderer::EndStrategy()
+{
+	auto& inst = Instance();
+	if (inst._strategies.size() == 0)
+	{
+		throw SaffronException("No strategy to end.");
+	}
+	inst._strategies.pop();
+
+	if (inst._strategies.size() == 0)
+	{
+		inst._activeStrategy = RenderStrategy::Deferred;
+	}
+	else
+	{
+		inst._activeStrategy = inst._strategies.top();
+	}
+}
+
+void Renderer::SubmitIndexed(uint indexCount, uint baseIndex, uint baseVertex)
+{
+	Submit(
+		[=](const RendererPackage& package)
+		{
+			package.Context.DrawIndexed(indexCount, baseIndex, baseVertex);
+		}
+	);
 }
 
 void Renderer::SubmitFullscreenQuad()
 {
+	Submit(
+		[](const RendererPackage& package)
+		{
+			const auto& inst = Instance();
+			inst._quadIndexBuffer->Bind();
+			inst._quadVertexBuffer->Bind();
+			package.Context.DrawIndexed(4, 0, 0);
+		}
+	);
 }
 
 void Renderer::Log(const std::string& string)
@@ -181,11 +237,6 @@ void Renderer::SetRenderState(RenderState state)
 	);
 }
 
-void Renderer::SetRenderStrategy(RenderStrategy strategy)
-{
-	Instance()._strategy = strategy;
-}
-
 void Renderer::SetViewportSize(uint width, uint height)
 {
 	Submit(
@@ -195,6 +246,11 @@ void Renderer::SetViewportSize(uint width, uint height)
 			package.Context.RSSetViewports(1, &viewport);
 		}
 	);
+}
+
+auto Renderer::WhiteTexture() -> const std::shared_ptr<Texture>&
+{
+	return Instance()._whiteTexture;
 }
 
 void Renderer::CleanDebugInfo()

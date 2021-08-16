@@ -2,17 +2,13 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Graphics/EditorCamera.h"
-#include "Saffron/Graphics/Mesh.h"
+#include "Saffron/Graphics/Model.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 
 namespace Se
 {
-struct alignas(16) CommonCBuffer
-{
-	Vector3 CameraPosition;
-};
 
 class Scene
 {
@@ -37,20 +33,16 @@ private:
 	int _activeRadioButton = 0;
 	EditorCamera _camera1;
 	EditorCamera _camera2;
-	std::shared_ptr<Mesh> _cameraMesh;
+	std::shared_ptr<Model> _cameraMesh;
 	EditorCamera* _activeCamera = &_camera1;
 	bool _drawCameraFrustums = false;
-
-
+	
 	SceneRenderer _sceneRenderer;
-	std::shared_ptr<ConstantBuffer<CommonCBuffer>> _commonCBuffer;
 	PointLight _pointLight;
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
-
-	std::vector<std::shared_ptr<Mesh>> _sampleMeshes;
-	std::vector<Vector3> _sampleMeshesPosition;
-	std::shared_ptr<Mesh> _sampleSphere;
-	std::shared_ptr<Mesh> _samplePlane;
+	
+	std::shared_ptr<Model> _sampleSphere;
+	std::shared_ptr<Model> _sponzaScene;
 };
 }

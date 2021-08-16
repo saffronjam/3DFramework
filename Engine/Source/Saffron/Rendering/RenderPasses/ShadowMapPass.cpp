@@ -2,7 +2,7 @@
 
 #include "Saffron/Rendering/RenderPasses/ShadowMapPass.h"
 
-#include "Saffron/Graphics/Mesh.h"
+#include "Saffron/Graphics/Model.h"
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 
@@ -37,7 +37,7 @@ void ShadowMapPass::Execute()
 
 	for (auto& drawCommand : SceneCommon().DrawCommands.at(RenderChannel_Shadow))
 	{
-		drawCommand.Mesh->Bind();
+		drawCommand.Model->Bind();
 
 		// Light transform
 		auto& common = SceneCommon();
@@ -76,9 +76,9 @@ void ShadowMapPass::Execute()
 			{
 				_mvpCBuffer->Bind();
 
-				for (const auto& submesh : drawCommand.Mesh->SubMeshes())
+				for (const auto& submesh : drawCommand.Model->SubMeshes())
 				{
-					const auto model = submesh.Transform * drawCommand.Mesh->Transform() * drawCommand.Transform;
+					const auto model = submesh.Transform * drawCommand.Model->Transform() * drawCommand.Transform;
 
 					_mvpCBuffer->Update({model, model * view, viewProj, model * viewProj});
 					_mvpCBuffer->UploadData();

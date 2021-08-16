@@ -9,17 +9,33 @@
 
 namespace Se
 {
-Texture::Texture(uint slot) :
+Texture::Texture(const TextureSpec& spec, uint slot) :
+	_spec(spec),
 	_slot(slot)
 {
+	SetInitializer(
+		[this]
+		{
+			if (_spec.CreateSampler)
+			{
+				_sampler = Sampler::Create({_spec.SamplerWrap, _spec.SamplerFilter, {0.0f, 0.0f, 0.0f, 1.0f}}, _slot);
+			}
+		}
+	);
 }
 
-Texture::Texture(uint width, uint height, ImageFormat format, uint slot) :
+Texture::Texture(uint width, uint height, ImageFormat format, const uchar* data, const TextureSpec& spec, uint slot) :
+	_spec(spec),
 	_format(format),
 	_width(width),
 	_height(height),
 	_slot(slot)
 {
+	if (data != nullptr)
+	{
+		_dataBuffer = {data, data + width * height * Utils::ImageFormatToMemorySize(format)};
+	}
+
 	SetInitializer(
 		[this]
 		{
@@ -39,7 +55,15 @@ Texture::Texture(uint width, uint height, ImageFormat format, uint slot) :
 					td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 					td.CPUAccessFlags = 0;
 
-					auto hr = package.Device.CreateTexture2D(&td, nullptr, &inst->_nativeTexture);
+					D3D11_SUBRESOURCE_DATA sd = {};
+					const bool hasData = !inst->_dataBuffer.empty();
+					if (hasData)
+					{
+						sd.pSysMem = inst->_dataBuffer.data();
+						sd.SysMemPitch = inst->_width * Utils::ImageFormatToMemorySize(inst->_format);
+					}
+
+					auto hr = package.Device.CreateTexture2D(&td, hasData ? &sd : nullptr, &inst->_nativeTexture);
 					ThrowIfBad(hr);
 
 					D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
@@ -56,11 +80,17 @@ Texture::Texture(uint width, uint height, ImageFormat format, uint slot) :
 					ThrowIfBad(hr);
 				}
 			);
+
+			if (_spec.CreateSampler)
+			{
+				_sampler = Sampler::Create({_spec.SamplerWrap, _spec.SamplerFilter, {0.0f, 0.0f, 0.0f, 1.0f}}, _slot);
+			}
 		}
 	);
 }
 
-Texture::Texture(const std::filesystem::path& path, uint slot) :
+Texture::Texture(const std::filesystem::path& path, const TextureSpec& spec, uint slot) :
+	_spec(spec),
 	_slot(slot),
 	_path(std::make_optional(path))
 {
@@ -71,16 +101,29 @@ Texture::Texture(const std::filesystem::path& path, uint slot) :
 			Renderer::Submit(
 				[inst](const RendererPackage& package)
 				{
+					const auto loaderFlags = inst->_spec.SRGB
+						                         ? DirectX::WIC_LOADER_FORCE_RGBA32
+						                         : DirectX::WIC_LOADER_FORCE_SRGB;
+
 					// Load from disk
 					ComPtr<ID3D11Resource> texture;
-					const auto hr = DirectX::CreateWICTextureFromFile(
+					const auto hr = DirectX::CreateWICTextureFromFileEx(
 						&package.Device,
 						inst->_path->c_str(),
+						0,
+						D3D11_USAGE_DEFAULT,
+						D3D11_BIND_SHADER_RESOURCE,
+						0,
+						0,
+						loaderFlags,
 						&texture,
 						&inst->_nativeShaderResourceView
 					);
 					ThrowIfBad(hr);
 					texture->QueryInterface(__uuidof(ID3D11Texture2D), &inst->_nativeTexture);
+
+
+					inst->_loaded = true;
 
 					// Fetch texture info
 					D3D11_TEXTURE2D_DESC td;
@@ -91,11 +134,17 @@ Texture::Texture(const std::filesystem::path& path, uint slot) :
 					inst->_height = td.Height;
 				}
 			);
+
+			if (_spec.CreateSampler)
+			{
+				_sampler = Sampler::Create({_spec.SamplerWrap, _spec.SamplerFilter, {1.0f, 1.0f, 1.0f, 1.0f}}, _slot);
+			}
 		}
 	);
 }
 
-Texture::Texture(const std::shared_ptr<Image>& image, uint slot) :
+Texture::Texture(const std::shared_ptr<Image>& image, const TextureSpec& spec, uint slot) :
+	_spec(spec),
 	_slot(slot)
 {
 	auto imageInst = image;
@@ -119,6 +168,11 @@ Texture::Texture(const std::shared_ptr<Image>& image, uint slot) :
 					inst->_format = imageInst->Format();
 				}
 			);
+
+			if (_spec.CreateSampler)
+			{
+				_sampler = Sampler::Create({_spec.SamplerWrap, _spec.SamplerFilter, {1.0f, 1.0f, 1.0f, 1.0f}}, _slot);
+			}
 		}
 	);
 }
@@ -130,6 +184,10 @@ void Texture::Bind() const
 		[inst](const RendererPackage& package)
 		{
 			package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+			if (inst->_spec.CreateSampler)
+			{
+				inst->_sampler->Bind();
+			}
 		}
 	);
 }
@@ -142,6 +200,10 @@ void Texture::Unbind() const
 		{
 			ID3D11ShaderResourceView* srv = nullptr;
 			package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
+			if (inst->_spec.CreateSampler)
+			{
+				inst->_sampler->Unbind();
+			}
 		}
 	);
 }
@@ -154,6 +216,11 @@ auto Texture::Width() const -> uint
 auto Texture::Height() const -> uint
 {
 	return _height;
+}
+
+auto Texture::Loaded() const -> bool
+{
+	return _loaded;
 }
 
 void Texture::SetImage(const std::shared_ptr<Image>& image)
@@ -198,23 +265,46 @@ auto Texture::ShaderView() const -> const ID3D11ShaderResourceView&
 	return *_nativeShaderResourceView.Get();
 }
 
-auto Texture::Create(uint slot) -> std::shared_ptr<Texture>
+auto Texture::Create(const TextureSpec& spec, uint slot) -> std::shared_ptr<Texture>
 {
-	return BindableStore::Add<Texture>(slot);
+	return BindableStore::Add<Texture>(spec, slot);
 }
 
-auto Texture::Create(uint width, uint height, ImageFormat format, uint slot) -> std::shared_ptr<Texture>
+auto Texture::Create(
+	uint width,
+	uint height,
+	ImageFormat format,
+	const uchar* data,
+	const TextureSpec& spec,
+	uint slot
+) -> std::shared_ptr<Texture>
 {
-	return BindableStore::Add<Texture>(width, height, format, slot);
+	return BindableStore::Add<Texture>(width, height, format, data, spec, slot);
 }
 
-auto Texture::Create(const std::filesystem::path& path, uint slot) -> std::shared_ptr<Texture>
+auto Texture::Create(const std::filesystem::path& path, const TextureSpec& spec, uint slot) -> std::shared_ptr<Texture>
 {
-	return BindableStore::Add<Texture>(path, slot);
+	return BindableStore::Add<Texture>(path, spec, slot);
 }
 
-auto Texture::Create(const std::shared_ptr<Image>& image, uint slot) -> std::shared_ptr<Texture>
+auto Texture::Create(
+	const std::shared_ptr<Image>& image,
+	const TextureSpec& spec,
+	uint slot
+) -> std::shared_ptr<Texture>
 {
-	return BindableStore::Add<Texture>(image, slot);
+	return BindableStore::Add<Texture>(image, spec, slot);
+}
+
+size_t Utils::ImageFormatToMemorySize(ImageFormat format)
+{
+	switch (format)
+	{
+	case ImageFormat::RGBA: return 4;
+	case ImageFormat::RGBA32f: return 4 * sizeof(float);
+	default: break;
+	}
+
+	throw SaffronException("Invalid format. Could not convert to memory size.");
 }
 }

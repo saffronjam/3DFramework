@@ -1,3 +1,5 @@
+const float Pi = 3.141592;
+const float Epsilon = 0.00001;
 
 cbuffer MvpBuffer : register(b0)
 {
