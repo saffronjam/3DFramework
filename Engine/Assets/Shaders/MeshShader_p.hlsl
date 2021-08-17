@@ -98,10 +98,10 @@ float CalculateShadow(float4 lightSpacePosition)
 	// Perspective divide because LightSpacePosition is not passed through as "SV_POSITION"
 	float3 ndcPosition = (lightSpacePosition.xyz / lightSpacePosition.w);
 
-	if (ndcPosition.z > 1.0f || ndcPosition.z < 0.1f) return 1.0f;
+	if (ndcPosition.z > 1.0f) return 1.0f;
 
 	ndcPosition.x *= 0.5f;
-	ndcPosition.y *= 0.5f;
+	ndcPosition.y *= -0.5f;
 
 	ndcPosition.x += 0.5f;
 	ndcPosition.y += 0.5f;
@@ -163,7 +163,7 @@ float4 main(PsInput input) : SV_TARGET
 	const float lightDistance = length(input.LightPos[0] - input.WorldPosition);
 	const float attenuation = 1.0f / (lightDistance * lightDistance);
 	const float3 lightColor = float3(1.0f, 1.0f, 1.0f);
-	const float3 lightRadiance = lightColor;
+	const float3 lightRadiance = lightColor * attenuation;
 
 	const float NdotV = max(0.0f, dot(_pbrData.Normal, _pbrData.ViewDir));
 	const float NdotL = max(0.0f, dot(_pbrData.Normal, lightDir));

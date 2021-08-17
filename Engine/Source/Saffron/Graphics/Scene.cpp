@@ -39,6 +39,8 @@ void Scene::OnRender()
 	const auto& timer = App::Instance().Timer();
 	//_pointLight.Position = Vector3{0.0f, std::sin(timer.SinceStart().Sec() * 8.0f) * 3.0f, 0.0f};
 
+	//_pointLight.Position = _activeCamera->Data().Position;
+
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
 	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
 
