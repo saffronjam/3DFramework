@@ -13,7 +13,7 @@ struct alignas(16) MaterialDataCBuf
 	float Emission;
 	float EnvMapRotation;
 
-	bool UseNormalMap;
+	int UseNormalMap;
 };
 
 

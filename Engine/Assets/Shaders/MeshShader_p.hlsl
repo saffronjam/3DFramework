@@ -136,7 +136,7 @@ float4 main(PsInput input) : SV_TARGET
 	PBR_Data _pbrData;
 
 	// Calculate PBR inputs (one of each pair are 1.0f, hence why they can be multiplied)
-	_pbrData.Albedo = ModelTex[ModelTextureMapType_Albedo].Sample(ModelTexSam, input.TexCoord).xyz * AlbedoColor.xyz;
+	_pbrData.Albedo = ModelTex[ModelTextureMapType_Albedo].Sample(ModelTexSam, input.TexCoord).rgb * AlbedoColor.xyz;
 	_pbrData.Metalness = ModelTex[ModelTextureMapType_Metalness].Sample(ModelTexSam, input.TexCoord).r * Metalness;
 	_pbrData.Roughness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).r * Roughness;
 	_pbrData.Roughness = max(_pbrData.Roughness, 0.05f);

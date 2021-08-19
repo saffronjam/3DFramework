@@ -92,16 +92,13 @@ auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mo
 	}
 
 	const auto meshCount = scene->mNumMeshes;
-	const auto materialCount = scene->mNumMaterials;
 
 	std::vector<MeshVertex> meshVertices;
 	std::vector<MeshFace> meshFaces;
 	std::vector<SubMesh> subMeshes;
 	std::vector<std::map<ModelTextureMapType, std::shared_ptr<Texture>>> textures;
-	std::vector<std::shared_ptr<Material>> materials;
 
 	subMeshes.reserve(meshCount);
-	materials.reserve(materialCount);
 
 	uint vertexCount = 0;
 	uint indexCount = 0;
@@ -187,164 +184,14 @@ auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mo
 	}
 
 
+	std::vector<std::shared_ptr<Material>> materials;
+
 	if (scene->HasMaterials())
 	{
-		auto texBasePath = fullpath;
-		texBasePath.remove_filename();
-		for (int materialIndex = 0; materialIndex < materialCount; materialIndex++)
-		{
-			auto& texCont = textures.emplace_back();
-
-			auto* const aiMaterial = scene->mMaterials[materialIndex];
-			const auto aiMaterialName = std::string(aiMaterial->GetName().C_Str());
-
-			auto material = Material::Create(_meshShader, aiMaterialName);
-			material->CBuffer().SetBindFlags(ConstantBufferBindFlags_PS);
-			materials.emplace_back(material);
-
-
-			MaterialDataCBuf materialData;
-
-
-			const auto textureCount = aiMaterial->GetTextureCount(aiTextureType_DIFFUSE);
-
-			// Albedo color
-			aiColor3D aiAlbedoColor;
-			if (aiMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiAlbedoColor) == AI_SUCCESS)
-			{
-				materialData.AlbedoColor = Color{aiAlbedoColor.r, aiAlbedoColor.g, aiAlbedoColor.b, 1.0f};
-			}
-
-			// Emission
-			aiColor3D aiEmission;
-			if (aiMaterial->Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS)
-			{
-				materialData.Emission = aiEmission.r;
-			}
-
-			// Shininess (temporary for later calculation)
-			float shininess;
-			if (aiMaterial->Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
-			{
-				shininess = 80.0f;
-			}
-
-			// Reflectivity (temporary for later calculation)
-			float reflectivity;
-			if (aiMaterial->Get(AI_MATKEY_REFLECTIVITY, reflectivity) != AI_SUCCESS)
-			{
-				reflectivity = 80.0f;
-			}
-
-
-			//// Probe texture maps
-
-			aiString aiTexPath;
-
-			// Albedo map
-			const auto hasAlbedoMap = aiMaterial->GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
-			bool albedoMapFallback = !hasAlbedoMap;
-
-			if (hasAlbedoMap)
-			{
-				std::filesystem::path texPath = fullpath.parent_path();
-				texPath /= aiTexPath.C_Str();
-
-				TextureSpec spec;
-				spec.SRGB = true;
-				spec.CreateSampler = false;
-
-				// Force create texture since we need to know if fails or not
-				Renderer::BeginStrategy(RenderStrategy::Immediate);
-				auto texture = Texture::Create(texPath, spec);
-				Renderer::EndStrategy();
-
-				if (texture->Loaded())
-				{
-					texCont.emplace(ModelTextureMapType::Albedo, texture);
-					materialData.AlbedoColor = Colors::White;
-				}
-				else
-				{
-					albedoMapFallback = true;
-				}
-			}
-
-			if (albedoMapFallback)
-			{
-				texCont.emplace(ModelTextureMapType::Albedo, Renderer::WhiteTexture());
-			}
-
-			// Normal map
-			const auto hasNormalMap = aiMaterial->GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS;
-			bool normalMapFallback = !hasNormalMap;
-
-			if (hasNormalMap)
-			{
-				std::filesystem::path texPath = fullpath.parent_path();
-				texPath /= aiTexPath.C_Str();
-
-				// Force create texture since we need to know if fails or not
-				Renderer::BeginStrategy(RenderStrategy::Immediate);
-				auto texture = Texture::Create(texPath, {.CreateSampler = false});
-				Renderer::EndStrategy();
-
-				if (texture->Loaded())
-				{
-					texCont.emplace(ModelTextureMapType::Normal, texture);
-					materialData.UseNormalMap = true;
-				}
-				else
-				{
-					normalMapFallback = true;
-				}
-			}
-
-			if (normalMapFallback)
-			{
-				texCont.emplace(ModelTextureMapType::Normal, Renderer::WhiteTexture());
-				materialData.UseNormalMap = false;
-			}
-
-			const auto hasRoughtnessMap = aiMaterial->GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS;
-			bool roughnessMapFallback = !hasRoughtnessMap;
-
-			if (hasRoughtnessMap)
-			{
-				std::filesystem::path texPath = fullpath.parent_path();
-				texPath /= aiTexPath.C_Str();
-
-				// Force create texture since we need to know if fails or not
-				Renderer::BeginStrategy(RenderStrategy::Immediate);
-				auto texture = Texture::Create(texPath, {.CreateSampler = false});
-				Renderer::EndStrategy();
-
-				if (texture->Loaded())
-				{
-					texCont.emplace(ModelTextureMapType::Roughness, texture);
-					materialData.Roughness = 1.0f;
-				}
-				else
-				{
-					roughnessMapFallback = true;
-				}
-			}
-
-			if (roughnessMapFallback)
-			{
-				const float roughness = 1.0f - std::sqrt(shininess / 100.0f);
-
-				texCont.emplace(ModelTextureMapType::Roughness, Renderer::WhiteTexture());
-				materialData.Roughness = roughness;
-			}
-
-			// TODO: Metalness
-			materialData.Metalness = 1.0f;
-
-			material->SetMaterialData(materialData);
-		}
+		auto [importedMaterials, importedMaterialTextures] = ImportMaterials(*scene, fullpath);
+		materials = std::move(importedMaterials);
+		textures = std::move(importedMaterialTextures);
 	}
-
 
 	const auto layout = MeshVertex::VertexLayout();
 
@@ -379,5 +226,187 @@ auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mo
 	}
 
 	return newMesh;
+}
+
+auto ModelStore::ImportMaterials(
+	const aiScene& scene,
+	const std::filesystem::path& fullpath
+) const -> std::tuple<std::vector<std::shared_ptr<Material>>, std::vector<MatTexContainer>>
+{
+	const auto materialCount = scene.mNumMaterials;
+
+	Debug::Assert(materialCount > 0);
+
+	std::vector<std::shared_ptr<Material>> materials;
+	materials.reserve(materialCount);
+
+	std::vector<MatTexContainer> matTexContainer;
+
+	for (int materialIndex = 0; materialIndex < materialCount; materialIndex++)
+	{
+		auto* const aiMaterial = scene.mMaterials[materialIndex];
+		auto [material, materialTextures] = ImportMaterial(*aiMaterial, fullpath);
+
+		materials.emplace_back(material);
+		matTexContainer.emplace_back(std::move(materialTextures));
+	}
+
+	return std::make_tuple(materials, matTexContainer);
+}
+
+auto ModelStore::ImportMaterial(
+	aiMaterial& aiMaterial,
+	const std::filesystem::path& fullpath
+) const -> std::tuple<std::shared_ptr<Material>, MatTexContainer>
+{
+	MatTexContainer matTexContainer;
+	const auto materialName = std::string(aiMaterial.GetName().C_Str());
+
+	auto material = Material::Create(_meshShader, materialName);
+	material->CBuffer().SetBindFlags(ConstantBufferBindFlags_PS);
+
+	const auto parPath = fullpath.parent_path();
+
+	MaterialDataCBuf materialData;
+
+	// Albedo color
+	aiColor3D aiAlbedoColor;
+	if (aiMaterial.Get(AI_MATKEY_COLOR_DIFFUSE, aiAlbedoColor) == AI_SUCCESS)
+	{
+		materialData.AlbedoColor = Color{aiAlbedoColor.r, aiAlbedoColor.g, aiAlbedoColor.b, 1.0f};
+	}
+
+	// Emission
+	aiColor3D aiEmission;
+	if (aiMaterial.Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS)
+	{
+		materialData.Emission = aiEmission.r;
+	}
+
+	// Shininess (temporary for later calculation)
+	float shininess;
+	if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
+	{
+		shininess = 80.0f;
+	}
+
+
+	// Reflectivity (temporary for later calculation)
+	float metalness;
+	if (aiMaterial.Get(AI_MATKEY_REFLECTIVITY, metalness) != AI_SUCCESS)
+	{
+		metalness = 0.0f;
+	}
+
+
+	//// Probe texture maps
+
+	aiString aiTexPath;
+
+	// Albedo map
+	const auto hasAlbedoMap = aiMaterial.GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
+	bool albedoMapFallback = !hasAlbedoMap;
+
+	if (hasAlbedoMap)
+	{
+		std::filesystem::path texPath = parPath;
+		texPath /= aiTexPath.C_Str();
+
+		TextureSpec spec;
+		spec.SRGB = true;
+		spec.CreateSampler = false;
+
+		// Force create texture since we need to know if fails or not
+		Renderer::BeginStrategy(RenderStrategy::Immediate);
+		auto texture = Texture::Create(texPath, spec);
+		Renderer::EndStrategy();
+
+		if (texture->Loaded())
+		{
+			matTexContainer.emplace(ModelTextureMapType::Albedo, texture);
+			materialData.AlbedoColor = Colors::White;
+		}
+		else
+		{
+			albedoMapFallback = true;
+		}
+	}
+
+	if (albedoMapFallback)
+	{
+		matTexContainer.emplace(ModelTextureMapType::Albedo, Renderer::WhiteTexture());
+	}
+
+	// Normal map
+	const auto hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS;
+	bool normalMapFallback = !hasNormalMap;
+
+	if (hasNormalMap)
+	{
+		std::filesystem::path texPath = parPath;
+		texPath /= aiTexPath.C_Str();
+
+		// Force create texture since we need to know if fails or not
+		Renderer::BeginStrategy(RenderStrategy::Immediate);
+		auto texture = Texture::Create(texPath, {.CreateSampler = false});
+		Renderer::EndStrategy();
+
+		if (texture->Loaded())
+		{
+			matTexContainer.emplace(ModelTextureMapType::Normal, texture);
+			materialData.UseNormalMap = true;
+		}
+		else
+		{
+			normalMapFallback = true;
+		}
+	}
+
+	if (normalMapFallback)
+	{
+		matTexContainer.emplace(ModelTextureMapType::Normal, Renderer::WhiteTexture());
+		materialData.UseNormalMap = false;
+	}
+
+	const auto hasRoughtnessMap = aiMaterial.GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS;
+	bool roughnessMapFallback = !hasRoughtnessMap;
+
+	if (hasRoughtnessMap)
+	{
+		std::filesystem::path texPath = parPath;
+		texPath /= aiTexPath.C_Str();
+
+		// Force create texture since we need to know if fails or not
+		Renderer::BeginStrategy(RenderStrategy::Immediate);
+		auto texture = Texture::Create(texPath, {.CreateSampler = false});
+		Renderer::EndStrategy();
+
+		if (texture->Loaded())
+		{
+			matTexContainer.emplace(ModelTextureMapType::Roughness, texture);
+			materialData.Roughness = 1.0f;
+		}
+		else
+		{
+			roughnessMapFallback = true;
+		}
+	}
+
+	if (roughnessMapFallback)
+	{
+		const float roughness = 0.8f;
+		1.0f - std::sqrt(shininess / 100.0f);
+
+		matTexContainer.emplace(ModelTextureMapType::Roughness, Renderer::WhiteTexture());
+		materialData.Roughness = roughness;
+	}
+
+	// TODO: Metalness
+	materialData.Metalness = metalness;
+	matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
+
+	material->SetMaterialData(materialData);
+
+	return std::make_tuple(material, matTexContainer);
 }
 }

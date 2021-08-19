@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include "Saffron/Base.h"
+#include "Saffron/Common/Enums.h"
 #include "Saffron/Graphics/Material.h"
 #include "Saffron/Rendering/Bindables.h"
 
@@ -41,14 +42,6 @@ struct SubMesh
 	std::string NodeName, MeshName;
 };
 
-enum class ModelTextureMapType
-{
-	Albedo = 0,
-	Normal = 1,
-	Roughness = 2,
-	Metalness = 3,
-	Count
-};
 
 class Model : public Managed<Model>
 {
