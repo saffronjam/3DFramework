@@ -43,9 +43,17 @@ void EditorCamera::OnUpdate(TimeSpan ts)
 	}
 	if (Keyboard::IsKeyDown(KeyCode::Q))
 	{
-		_position -= _worldUp * ts.Sec() * speed;
+		_position -= _up * ts.Sec() * speed;
 	}
 	if (Keyboard::IsKeyDown(KeyCode::E))
+	{
+		_position += _up * ts.Sec() * speed;
+	}
+	if (Keyboard::IsKeyDown(KeyCode::LShift))
+	{
+		_position -= _worldUp * ts.Sec() * speed;
+	}
+	if (Keyboard::IsKeyDown(KeyCode::Space))
 	{
 		_position += _worldUp * ts.Sec() * speed;
 	}
