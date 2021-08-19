@@ -19,6 +19,7 @@ Scene::Scene() :
 	_sampleSphere->SetShader(Shader::Create("Transform"));
 
 	_cameraMesh = Model::Create("Sphere.fbx");
+	_sampleModel = Model::Create("Torus.fbx");
 
 	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
 
@@ -43,6 +44,10 @@ void Scene::OnRender()
 
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
 	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
+	_sampleModel->Transform() = Matrix::CreateFromYawPitchRoll(0.0f, Math::Pi / 3.0f, Math::Pi / 5.0f) *
+		Matrix::CreateTranslation(0.0f, 1.5f, 0.0f);
+
+
 
 	_sceneRenderer.Begin(_activeCamera->Data());
 
@@ -60,6 +65,7 @@ void Scene::OnRender()
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry | RenderChannel_Shadow);
 	_sceneRenderer.SubmitModel(_sponzaScene);
+	_sceneRenderer.SubmitModel(_sampleModel);
 	_sceneRenderer.EndSubmtions();
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry);

@@ -44,5 +44,6 @@ private:
 	
 	std::shared_ptr<Model> _sampleSphere;
 	std::shared_ptr<Model> _sponzaScene;
+	std::shared_ptr<Model> _sampleModel;
 };
 }
