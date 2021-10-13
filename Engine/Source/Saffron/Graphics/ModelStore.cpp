@@ -44,7 +44,7 @@ const uint ModelStore::DefaultImportFlags = aiProcess_CalcTangentSpace | // Crea
 
 ModelStore::ModelStore() :
 	Singleton(this),
-	_meshShader(Shader::Create("MeshShader"))
+	_modelShader(Shader::Create("MeshShader"))
 {
 	LogStream::Initialize();
 
@@ -262,7 +262,7 @@ auto ModelStore::ImportMaterial(
 	MatTexContainer matTexContainer;
 	const auto materialName = std::string(aiMaterial.GetName().C_Str());
 
-	auto material = Material::Create(_meshShader, materialName);
+	auto material = Material::Create(_modelShader, materialName);
 	material->CBuffer().SetBindFlags(ConstantBufferBindFlags_PS);
 
 	const auto parPath = fullpath.parent_path();
@@ -394,19 +394,55 @@ auto ModelStore::ImportMaterial(
 
 	if (roughnessMapFallback)
 	{
-		const float roughness = 0.8f;
-		1.0f - std::sqrt(shininess / 100.0f);
+		const float roughness = 1.0f - std::sqrt(shininess / 100.0f);
 
 		matTexContainer.emplace(ModelTextureMapType::Roughness, Renderer::WhiteTexture());
 		materialData.Roughness = roughness;
 	}
 
-	// TODO: Metalness
+
+	// Metalness texture is handled differently
+
+
 	materialData.Metalness = metalness;
-	matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
+
+	bool hasMetalnessMap = false;
+
+	for (int i = 0; i < aiMaterial.mNumProperties; i++)
+	{
+		const auto& prop = *aiMaterial.mProperties[i];
+
+		if (prop.mType == aiPTI_String)
+		{
+			
+		}
+	}
+
+	bool metalnessFallback = !hasMetalnessMap;
+
+	if(metalnessFallback)
+	{
+		matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
+			
+	}
+	
 
 	material->SetMaterialData(materialData);
 
 	return std::make_tuple(material, matTexContainer);
+}
+
+auto ModelStore::CreateDefaultMaterial() -> std::shared_ptr<Material>
+{
+	static constexpr const auto* MaterialName = "Saffron-Default";
+
+	const auto mat = Material::Create(Instance()._modelShader, MaterialName);
+	const MaterialDataCBuf matData{
+		.AlbedoColor = Color{0.8f, 0.8f, 0.8f}, .Metalness = 0.0f, .Roughness = 0.8f, .Emission = 0.0f,
+		.EnvMapRotation = 0.0f, .UseNormalMap = false
+	};
+	mat->SetMaterialData(matData);
+
+	return mat;
 }
 }

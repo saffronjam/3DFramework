@@ -37,10 +37,12 @@ private:
 		aiMaterial& aiMaterial,
 		const std::filesystem::path& fullpath
 	) const -> std::tuple<std::shared_ptr<Material>, MatTexContainer>;
+
+	static auto CreateDefaultMaterial() -> std::shared_ptr<Material>;
 private:
 	Assimp::Importer* _importer;
 	std::unordered_map<std::string, std::shared_ptr<Bindable>> _meshes;
-	std::shared_ptr<Shader> _meshShader;
+	std::shared_ptr<Shader> _modelShader;
 
 	static const uint DefaultImportFlags;
 	static const std::filesystem::path BasePath;
