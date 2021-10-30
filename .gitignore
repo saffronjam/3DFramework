@@ -52,6 +52,6 @@ Engine/bin/
 # Folders
 .vs/
 Bin/
+!ThirdParty/Premake/Bin/
 Bin-Int/
-!ThirdParty/Premake/Bin/premake5.exe
 Build/

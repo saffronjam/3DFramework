@@ -6,7 +6,7 @@ echo.
 pushd %~dp0\..\
 
 set "write=powershell write-host -background"
-set Script=ThirdParty\Premake\Bin\premake5.exe vs2019
+set Script=ThirdParty\Premake\Bin\premake5.exe vs2022
 
 call %Script%
 
