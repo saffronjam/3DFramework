@@ -10,6 +10,7 @@ struct alignas(16) PointLight
 {
 	Matrix LightTransform;
 	Vector3 Position;
-	float unused = 1.0f;
+	float Radius;
+	Color Color;
 };
 }

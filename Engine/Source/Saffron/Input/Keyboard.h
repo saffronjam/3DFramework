@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <array>
+
 #include "Saffron/Base.h"
 #include "Saffron/Event/Event.h"
 

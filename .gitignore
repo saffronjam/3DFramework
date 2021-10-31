@@ -45,6 +45,7 @@ RelWithDebInfo
 !ThirdParty/Premake/Bin/premake5.exe
 *.out
 *.app
+*.cso
 
 # Build directory
 Engine/bin/
@@ -53,5 +54,6 @@ Engine/bin/
 .vs/
 Bin/
 !ThirdParty/Premake/Bin/
+!Engine/ThirdParty/assimp/Bin/
 Bin-Int/
 Build/

@@ -18,6 +18,8 @@ GeometryPass::GeometryPass(const std::string& name, struct SceneCommon& sceneCom
 {
 	RegisterInput("ShadowMap0", _shadowMap);
 	RegisterOutput("Target", _target);
+
+	_pointLightCBuffer->SetBindFlags(ConstantBufferBindFlags_PS | ConstantBufferBindFlags_VS);
 }
 
 void GeometryPass::OnSetupFinished()
@@ -44,8 +46,8 @@ void GeometryPass::Execute()
 
 	// Update point light data
 	PointLightCBuffer data;
-	data.PointLights[0].LightTransform = common.PointLight.LightTransform.Transpose();
-	data.PointLights[0].Position = common.PointLight.Position;
+	data.PointLights[0] = common.PointLight;
+	data.PointLights[0].LightTransform = data.PointLights[0].LightTransform.Transpose();
 	data.nPointLights = 1;
 	_pointLightCBuffer->Update(data);
 

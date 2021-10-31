@@ -15,6 +15,7 @@
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Rendering/Bindables.h"
+#include "Saffron/Rendering/ShaderStore.h"
 #include "Saffron/Ui/Panels.h"
 #include "Saffron/Ui/Ui.h"
 

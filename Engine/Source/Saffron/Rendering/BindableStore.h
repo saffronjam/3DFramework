@@ -20,11 +20,20 @@ public:
 	template <typename T, typename ... Args>
 	static std::shared_ptr<T> Add(Args&& ... args)
 	{
+		std::shared_ptr<T> result;
+		Add(result, std::forward<Args>(args)...);
+		return result;
+	}
+
+	template <typename T, typename ... Args>
+	static bool Add(std::shared_ptr<T>& resource, Args&& ... args)
+	{
 		if constexpr (HasIdentifier<T, Args...>)
 		{
 			auto& inst = Instance();
+			
 
-			auto classCreateIdentifer = T::Identifier(std::forward<Args>(args)...);
+			auto classCreateIdentifer = T::Identifier(args...);
 			std::ostringstream oss;
 			oss << typeid(T).name() << '-' << classCreateIdentifer;
 
@@ -35,15 +44,18 @@ public:
 				auto newResource = std::make_shared<T>(std::forward<Args>(args)...);
 				newResource->Initialize();
 				inst._storage.emplace(fullIdentifier, newResource);
-				return newResource;
+				resource = newResource;
+				return true;
 			}
-			return std::static_pointer_cast<T>(tryFind->second);
+			resource = std::static_pointer_cast<T>(tryFind->second);
+			return false;
 		}
 		else
 		{
 			auto newResource = std::make_shared<T>(std::forward<Args>(args)...);
 			newResource->Initialize();
-			return newResource;
+			resource = newResource;
+			return true;
 		}
 	}
 

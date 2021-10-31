@@ -18,6 +18,8 @@ local function GetBasePath()
 	return debug.getinfo(1).source:match("@?(.*/)")
 end
 
+local EngineAstFol = GetBasePath() .. AstFol
+
 local function RequireAll()
     local result = {}
     result["DirectX"] = require("ThirdParty.DirectX.premake5")
@@ -92,15 +94,10 @@ end
 
 module.PostBuild = function (Project, Configuration, BinaryOutputDir, ProjectDir)
     local resFrom = GetBasePath() .. AstFol
-    local shrBinFrom = Utils.ProjectBin(module.Project) .. "Shaders/"
-
     local resBinTo = BinaryOutputDir .. AstFol
     local resPrjTo = ProjectDir .. AstFol
-    local shrBinTo = resBinTo .. "Shaders/"
-    local shrPrjTo = resPrjTo .. "Shaders/"
 
     Utils.CopyAssetsToOutput(Configuration, resFrom, resBinTo, resPrjTo);
-    Utils.CopyAssetsToOutput(Configuration, shrBinFrom, shrBinTo, shrPrjTo);
 
     PostBuildAll(Configuration, BinaryOutputDir, ProjectDir)
 end
@@ -118,7 +115,8 @@ group "Engine"
 module.AddDefines = function()
 	filter "configurations:Debug or Release or Dist"
         defines {
-            "SE_IMGUI_INI_PATH=\"Assets/imgui.ini\""
+            "SE_IMGUI_INI_PATH=\"Assets/imgui.ini\"",
+            "SE_ENGINE_ASSETS_PATH=\"" .. GetBasePath() .. "Assets/\""
         }
     filter "system:windows"
         defines {
@@ -183,17 +181,17 @@ project (module.Project)
     filter { "files:**_p.hlsl" }
         shadermodel "5.0"
         shadertype "Pixel"
-        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
+        shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
 
     filter { "files:**_v.hlsl" }
         shadermodel "5.0"
         shadertype "Vertex"
-        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
+        shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
 
     filter { "files:**_i.hlsl" }
         flags "ExcludeFromBuild"
         shadermodel "5.0"
-        shaderobjectfileoutput(OutBin .. "Shaders/%{file.basename}.cso")
+        shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
 
 group ""
 

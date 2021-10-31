@@ -10,6 +10,7 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
+#include "assimp/pbrmaterial.h"
 #include "Saffron/Graphics/Model.h"
 #include "Saffron/Graphics/Material.h"
 
@@ -368,7 +369,8 @@ auto ModelStore::ImportMaterial(
 		materialData.UseNormalMap = false;
 	}
 
-	const auto hasRoughtnessMap = aiMaterial.GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS;
+	const auto hasRoughtnessMap = aiMaterial.GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS ||
+		aiMaterial.GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &aiTexPath) == AI_SUCCESS;
 	bool roughnessMapFallback = !hasRoughtnessMap;
 
 	if (hasRoughtnessMap)

@@ -10,6 +10,7 @@
 #include "Saffron/Common/Window.h"
 #include "Saffron/Graphics/ModelStore.h"
 #include "Saffron/Rendering/BindableStore.h"
+#include "Saffron/Rendering/ShaderStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/RenderState.h"
 #include "Saffron/Rendering/Bindables/BackBuffer.h"
@@ -121,6 +122,7 @@ private:
 	// Renderer data
 	std::shared_ptr<class BackBuffer> _backbuffer;
 	std::unique_ptr<BindableStore> _bindableStore;
+	std::unique_ptr<ShaderStore> _shaderStore;
 	std::unique_ptr<ModelStore> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 

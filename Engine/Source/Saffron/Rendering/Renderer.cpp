@@ -17,7 +17,8 @@ namespace Se
 {
 Renderer::Renderer(const Window& window) :
 	Singleton(this),
-	_bindableStore(std::make_unique<BindableStore>())
+	_bindableStore(std::make_unique<BindableStore>()),
+	_shaderStore(std::make_unique<ShaderStore>())
 {
 	BeginQueue("Main");
 

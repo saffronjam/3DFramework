@@ -8,7 +8,7 @@ namespace Se
 {
 std::unique_ptr<App> CreateApp()
 {
-	return std::make_unique<EditorApp>(AppSpec{WindowSpec{.Title="Hello, world"}});
+	return std::make_unique<EditorApp>(AppSpec{WindowSpec{.Width = 1500, .Height = 900, .Title = "Saffron Engine"}});
 }
 
 EditorApp::EditorApp(const AppSpec& spec) :

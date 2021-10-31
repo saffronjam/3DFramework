@@ -17,7 +17,7 @@ if %errorlevel% gtr 0 (
 pause
 ) else (
 %write% green Success
-timeout /t 2
+timeout /t 1
 )
 
 echo.

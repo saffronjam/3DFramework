@@ -18,7 +18,7 @@ module.Link = function ()
 			GetBasePath() .. "Lib/Debug"
 		}
 		links {
-			"assimp-vc142-mtd.lib"
+			"assimp-vc143-mtd.lib"
 		}
 
 	filter "configurations:Release or Dist"
@@ -26,7 +26,7 @@ module.Link = function ()
 			GetBasePath() .. "Lib/Release"
 		}
 		links {
-			"assimp-vc142-mt.lib"
+			"assimp-vc143-mt.lib"
 		}
 end
 
@@ -38,6 +38,8 @@ module.PostBuild = function(Configuration, BinaryOutputDir, ProjectDir)
 		elseif Configuration == "Release" or Configuration == "Dist" then
 			from = GetBasePath() .. "Bin/Release/"
 		end
+
+		print(GetBasePath())
 	
 		if from ~= "" then
 			buildcommands {

@@ -11,17 +11,19 @@ namespace Se
 {
 Scene::Scene() :
 	_sceneRenderer(*this),
-	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}})
+	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}, 5.0f})
 {
+	_sampleModel = Model::Create("AntCamera/scene.gltf");
 	_sponzaScene = Model::Create("Sponza/Sponza.gltf");
 	_sampleSphere = Model::Create("Sphere.fbx");
 	_sponzaScene->Transform() *= Matrix::CreateScale(0.01f);
 	_sampleSphere->SetShader(Shader::Create("Transform"));
 
 	_cameraMesh = Model::Create("Sphere.fbx");
-	_sampleModel = Model::Create("Torus.fbx");
 
-	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
+	_pointLight.Position = Vector3{ 0.0f, 5.0f, 0.0f };
+	_pointLight.Radius = 4.0f;
+	_pointLight.Color = Colors::White;
 
 	Renderer().ViewportResized += [this](const SizeEvent& event)
 	{
@@ -88,7 +90,9 @@ void Scene::OnRender()
 void Scene::OnUi()
 {
 	ImGui::Begin("Scene");
-	ImGui::SliderFloat3("", reinterpret_cast<float*>(&_pointLight.Position), -2.0f, 15.0f);
+	ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&_pointLight.Position), -2.0f, 15.0f);
+	ImGui::SliderFloat3("Color", reinterpret_cast<float*>(&_pointLight.Color), 0.0f, 1.0f);
+	ImGui::SliderFloat("Radius", &_pointLight.Radius, 0.1f, 10.0f);
 	if (ImGui::RadioButton("Camera1", &_activeRadioButton, 0))
 	{
 		_activeCamera = &_camera1;

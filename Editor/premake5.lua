@@ -48,9 +48,9 @@ project (ProjectName)
     Engine.AddDefines()
 
     local from = GetBasePath() .. AstFol
-    Utils.CopyAssetsToOutput("Debug", from, OutBin .. AstFol, PrjLoc .. AstFol)
-    Utils.CopyAssetsToOutput("Release", from, OutBin  .. AstFol, PrjLoc .. AstFol)
-    Utils.CopyAssetsToOutput("Dist", from, OutBinDist  .. AstFol, PrjLoc .. AstFol)
+    -- Utils.CopyAssetsToOutput("Debug", from, OutBin .. AstFol, PrjLoc .. AstFol)
+    -- Utils.CopyAssetsToOutput("Release", from, OutBin  .. AstFol, PrjLoc .. AstFol)
+    -- Utils.CopyAssetsToOutput("Dist", from, OutBinDist  .. AstFol, PrjLoc .. AstFol)
 
     filter "configurations:Debug"
         symbols "On"

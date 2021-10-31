@@ -23,6 +23,16 @@ void EditorLayer::OnAttach()
 		_scene.SetViewportSize(event.Width, event.Height);
 		return false;
 	};
+
+
+	App::Instance().Window().GainedFocus += []
+	{
+		for (auto& shader : ShaderStore::GetAll())
+		{
+			shader->Reload();
+		}
+		return false;
+	};
 }
 
 void EditorLayer::OnDetach()
@@ -31,7 +41,6 @@ void EditorLayer::OnDetach()
 
 void EditorLayer::OnUpdate(TimeSpan ts)
 {
-
 	_scene.OnUpdate(ts);
 	_scene.OnRender();
 }
@@ -43,7 +52,22 @@ void EditorLayer::OnUi()
 	_viewportPanel.OnUi();
 	_depthViewportPanel.OnUi();
 	_scene.OnUi();
-	
+
+	auto shaders = ShaderStore::GetAll();
+
+	ImGui::Begin("Shaders");
+	for (auto& shader : shaders)
+	{
+		ImGui::Text(shader->Name().c_str());
+		ImGui::SameLine();
+		if (ImGui::Button("Reload"))
+		{
+			shader->Reload();
+		}
+	}
+	ImGui::End();
+
+
 	ImGui::ShowDemoWindow();
 
 	_dockSpacePanel.End();

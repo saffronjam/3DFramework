@@ -20,6 +20,7 @@ struct Colors
 	static const Color Transparent;
 	static const Color Black;
 	static const Color White;
+	static const Color Red;
 };
 
 class Math

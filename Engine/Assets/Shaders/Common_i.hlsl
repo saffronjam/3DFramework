@@ -1,5 +1,5 @@
 const float Pi = 3.141592;
-const float Epsilon = 0.00001;
+const float Epsilon = 0.000001;
 
 cbuffer MvpBuffer : register(b0)
 {
@@ -15,6 +15,8 @@ struct PointLight
 {
     matrix LightTransform;
 	float3 Position;
+    float Radius;
+    float3 Color;
 };
 
 cbuffer CommonCBuffer : register(b1)
