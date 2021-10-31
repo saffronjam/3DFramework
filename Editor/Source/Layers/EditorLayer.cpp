@@ -91,11 +91,20 @@ void EditorLayer::OnUi()
 	ImGui::End();
 
 	ImGui::Begin("Editor");
-	ImGui::RadioButton("Translate", _gizmoControl == GizmoControl::Translate);
+	if (ImGui::RadioButton("Translate", _gizmoControl == GizmoControl::Translate))
+	{
+		_gizmoControl = GizmoControl::Translate;
+	}
 	ImGui::SameLine();
-	ImGui::RadioButton("Rotate", _gizmoControl == GizmoControl::Rotate);
+	if (ImGui::RadioButton("Rotate", _gizmoControl == GizmoControl::Rotate))
+	{
+		_gizmoControl = GizmoControl::Rotate;
+	}
 	ImGui::SameLine();
-	ImGui::RadioButton("Scale", _gizmoControl == GizmoControl::Scale);
+		if (ImGui::RadioButton("Scale", _gizmoControl == GizmoControl::Scale))
+	{
+		_gizmoControl = GizmoControl::Scale;
+	}
 	ImGui::End();
 
 	ImGui::ShowDemoWindow();

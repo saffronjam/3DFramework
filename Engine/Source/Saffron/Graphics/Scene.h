@@ -48,8 +48,6 @@ private:
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
 
-	std::shared_ptr<Model> _sampleSphere;
-	std::shared_ptr<Model> _sponzaScene;
-	std::shared_ptr<Model> _sampleModel;
+	std::vector<std::shared_ptr<Model>> _models;
 };
 }

@@ -13,20 +13,23 @@ Scene::Scene() :
 	_sceneRenderer(*this),
 	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}, 5.0f})
 {
-	_sampleModel = Model::Create("AntCamera/scene.gltf");
-	_sponzaScene = Model::Create("Sponza/Sponza.gltf");
-	_sampleSphere = Model::Create("Sphere.fbx");
-	_sponzaScene->Transform() *= Matrix::CreateScale(0.01f);
-	_sampleSphere->SetShader(Shader::Create("Transform"));
+	_models.push_back(Model::Create("Cube.fbx"));
+	_models.back()->Transform() = Matrix::CreateScale(25.0f, 0.5f, 12.0f) * Matrix::CreateTranslation(
+		0.0f,
+		-3.0f,
+		0.0f
+	);
+	for (int i = 0; i < 5; i++)
+	{
+		_models.push_back(Model::Create("Sphere.fbx"));
+		_models.back()->Transform() = Matrix::CreateTranslation(-20.0f + static_cast<float>(i) * 10.0f, 4, 0.0f);
+	}
 
 	_cameraMesh = Model::Create("Sphere.fbx");
 
 	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
 	_pointLight.Radius = 4.0f;
 	_pointLight.Color = Colors::White;
-
-	_sampleModel->Transform() = Matrix::CreateFromYawPitchRoll(0.0f, Math::Pi / 3.0f, Math::Pi / 5.0f) *
-		Matrix::CreateTranslation(0.0f, 1.5f, 0.0f);
 
 	Renderer().ViewportResized += [this](const SizeEvent& event)
 	{
@@ -42,14 +45,7 @@ void Scene::OnUpdate(TimeSpan ts)
 
 void Scene::OnRender()
 {
-	const auto& timer = App::Instance().Timer();
-	//_pointLight.Position = Vector3{0.0f, std::sin(timer.SinceStart().Sec() * 8.0f) * 3.0f, 0.0f};
-
-	//_pointLight.Position = _activeCamera->Data().Position;
-
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
-	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
-
 
 
 	_sceneRenderer.Begin(_activeCamera->Data());
@@ -67,13 +63,20 @@ void Scene::OnRender()
 	}
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry | RenderChannel_Shadow);
-	_sceneRenderer.SubmitModel(_sponzaScene);
-	_sceneRenderer.SubmitModel(_sampleModel);
+
+	for (const auto& model : _models)
+	{
+		_sceneRenderer.SubmitModel(model);
+	}
+
 	_sceneRenderer.EndSubmtions();
 
 	_sceneRenderer.BeginSubmtions(RenderChannel_Geometry);
 
-	_sceneRenderer.SubmitModel(_sampleSphere);
+	for (const auto& model : _models)
+	{
+		_sceneRenderer.SubmitModel(model);
+	}
 	_sceneRenderer.SubmitModel(
 		_cameraMesh,
 		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera1.Data().Position)
@@ -108,8 +111,6 @@ void Scene::OnUi()
 
 	_activeCamera->OnUi();
 	_sceneRenderer.OnUi();
-
-	_sponzaScene->OnDebugUi();
 }
 
 auto Scene::Renderer() const -> const SceneRenderer&
@@ -119,12 +120,12 @@ auto Scene::Renderer() const -> const SceneRenderer&
 
 auto Scene::SelectedModel() -> std::shared_ptr<Model>&
 {
-	return _sampleModel;
+	return _models.front();
 }
 
 auto Scene::SelectedModel() const -> const std::shared_ptr<Model>&
 {
-	return _sampleModel;
+	return _models.front();
 }
 
 auto Scene::Camera() -> EditorCamera&
