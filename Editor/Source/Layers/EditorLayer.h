@@ -24,5 +24,7 @@ private:
 	DockSpacePanel _dockSpacePanel;
 	ViewportPanel _viewportPanel;
 	ViewportPanel _depthViewportPanel;
+
+	GizmoControl _gizmoControl = GizmoControl::Translate;
 };
 }

@@ -21,9 +21,12 @@ Scene::Scene() :
 
 	_cameraMesh = Model::Create("Sphere.fbx");
 
-	_pointLight.Position = Vector3{ 0.0f, 5.0f, 0.0f };
+	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
 	_pointLight.Radius = 4.0f;
 	_pointLight.Color = Colors::White;
+
+	_sampleModel->Transform() = Matrix::CreateFromYawPitchRoll(0.0f, Math::Pi / 3.0f, Math::Pi / 5.0f) *
+		Matrix::CreateTranslation(0.0f, 1.5f, 0.0f);
 
 	Renderer().ViewportResized += [this](const SizeEvent& event)
 	{
@@ -46,8 +49,6 @@ void Scene::OnRender()
 
 	_sceneRenderer.SceneCommon().PointLight = _pointLight;
 	_sampleSphere->Transform() = Matrix::CreateScale(0.02f) * Matrix::CreateTranslation(_pointLight.Position);
-	_sampleModel->Transform() = Matrix::CreateFromYawPitchRoll(0.0f, Math::Pi / 3.0f, Math::Pi / 5.0f) *
-		Matrix::CreateTranslation(0.0f, 1.5f, 0.0f);
 
 
 
@@ -114,6 +115,26 @@ void Scene::OnUi()
 auto Scene::Renderer() const -> const SceneRenderer&
 {
 	return _sceneRenderer;
+}
+
+auto Scene::SelectedModel() -> std::shared_ptr<Model>&
+{
+	return _sampleModel;
+}
+
+auto Scene::SelectedModel() const -> const std::shared_ptr<Model>&
+{
+	return _sampleModel;
+}
+
+auto Scene::Camera() -> EditorCamera&
+{
+	return *_activeCamera;
+}
+
+auto Scene::Camera() const -> const EditorCamera&
+{
+	return *_activeCamera;
 }
 
 auto Scene::ViewportWidth() const -> uint

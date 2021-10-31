@@ -56,6 +56,7 @@ void Ui::BeginFrame()
 			ImGui_ImplDX11_NewFrame();
 			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
+			ImGuizmo::BeginFrame();
 		}
 	);
 }
@@ -81,6 +82,12 @@ void Ui::EndFrame()
 			Instance()._pendingShaders.clear();
 		}
 	);
+}
+
+void Ui::BeginGizmo(uint viewportWidth, uint viewportHeight)
+{
+	ImGuizmo::SetDrawlist();
+	ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, viewportWidth, viewportHeight);
 }
 
 void Ui::Image(const Texture& texture, const Vector2& size)
@@ -129,5 +136,25 @@ void Ui::Image(const Se::Image& image, const Shader& shader, const Vector2& size
 	ImGui::GetWindowDrawList()->AddCallback(shaderCallback, const_cast<void*>(reinterpret_cast<const void*>(&inst)));
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), imSize);
 	ImGui::GetWindowDrawList()->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
+}
+
+void Ui::Gizmo(Matrix& result, const Matrix& view, const Matrix proj, GizmoControl control)
+{
+	auto* model = reinterpret_cast<float*>(&result);
+	const auto* viewPtr = reinterpret_cast<const float*>(&view);
+	const auto* projPtr = reinterpret_cast<const float*>(&proj);
+
+	ImGuizmo::Manipulate(viewPtr, projPtr, ToImGuizmoOperation(control), ImGuizmo::LOCAL, model);
+}
+
+ImGuizmo::OPERATION Ui::ToImGuizmoOperation(GizmoControl gizmoControl)
+{
+	switch (gizmoControl)
+	{
+	case GizmoControl::Translate: return ImGuizmo::TRANSLATE;
+	case GizmoControl::Rotate: return ImGuizmo::ROTATE;
+	case GizmoControl::Scale: return ImGuizmo::SCALE;
+	default: ;
+	}
 }
 }

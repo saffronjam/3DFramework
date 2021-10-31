@@ -58,6 +58,8 @@ void ViewportPanel::OnUi()
 
 	Ui::Image(*toUse, _viewportSize);
 
+	Renderered.Invoke(SizeEvent(viewportSize.x, viewportSize.y));
+
 	ImGui::End();
 	ImGui::PopStyleVar();
 }

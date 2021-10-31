@@ -9,7 +9,6 @@
 
 namespace Se
 {
-
 class Scene
 {
 public:
@@ -20,6 +19,13 @@ public:
 	void OnUi();
 
 	auto Renderer() const -> const SceneRenderer&;
+
+	// Will use entities later
+	auto SelectedModel() -> std::shared_ptr<Model>&;
+	auto SelectedModel() const -> const std::shared_ptr<Model>&;
+
+	auto Camera() -> EditorCamera&;
+	auto Camera() const -> const EditorCamera&;
 
 	auto ViewportWidth() const -> uint;
 	auto ViewportHeight() const -> uint;
@@ -36,12 +42,12 @@ private:
 	std::shared_ptr<Model> _cameraMesh;
 	EditorCamera* _activeCamera = &_camera1;
 	bool _drawCameraFrustums = false;
-	
+
 	SceneRenderer _sceneRenderer;
 	PointLight _pointLight;
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
-	
+
 	std::shared_ptr<Model> _sampleSphere;
 	std::shared_ptr<Model> _sponzaScene;
 	std::shared_ptr<Model> _sampleModel;

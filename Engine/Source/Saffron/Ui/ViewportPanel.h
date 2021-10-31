@@ -24,6 +24,7 @@ public:
 
 public:
 	SubscriberList<const SizeEvent&> Resized;
+	SubscriberList<const SizeEvent&> Renderered;
 
 private:
 	std::weak_ptr<Image> _image;

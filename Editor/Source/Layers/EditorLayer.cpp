@@ -24,6 +24,16 @@ void EditorLayer::OnAttach()
 		return false;
 	};
 
+	_viewportPanel.Renderered += [this](const SizeEvent& event)
+	{
+		auto& selected = _scene.SelectedModel();
+		auto& camera = _scene.Camera();
+
+		Ui::BeginGizmo(event.Width, event.Height);
+		Ui::Gizmo(selected->Transform(), camera.View(), camera.Projection(), _gizmoControl);
+		return false;
+	};
+
 
 	App::Instance().Window().GainedFocus += []
 	{
@@ -43,6 +53,19 @@ void EditorLayer::OnUpdate(TimeSpan ts)
 {
 	_scene.OnUpdate(ts);
 	_scene.OnRender();
+
+	if (Keyboard::IsKeyPressed(KeyCode::Num1))
+	{
+		_gizmoControl = GizmoControl::Translate;
+	}
+	if (Keyboard::IsKeyPressed(KeyCode::Num2))
+	{
+		_gizmoControl = GizmoControl::Rotate;
+	}
+	if (Keyboard::IsKeyPressed(KeyCode::Num3))
+	{
+		_gizmoControl = GizmoControl::Scale;
+	}
 }
 
 void EditorLayer::OnUi()
@@ -67,6 +90,13 @@ void EditorLayer::OnUi()
 	}
 	ImGui::End();
 
+	ImGui::Begin("Editor");
+	ImGui::RadioButton("Translate", _gizmoControl == GizmoControl::Translate);
+	ImGui::SameLine();
+	ImGui::RadioButton("Rotate", _gizmoControl == GizmoControl::Rotate);
+	ImGui::SameLine();
+	ImGui::RadioButton("Scale", _gizmoControl == GizmoControl::Scale);
+	ImGui::End();
 
 	ImGui::ShowDemoWindow();
 
