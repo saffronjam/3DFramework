@@ -7,6 +7,8 @@
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
 #include "Saffron/Rendering/Renderer.h"
 
+#include "DirectXTex/DirectXTex.h"
+
 namespace Se
 {
 Texture::Texture(const TextureSpec& spec, uint slot) :
@@ -105,23 +107,79 @@ Texture::Texture(const std::filesystem::path& path, const TextureSpec& spec, uin
 						                         ? DirectX::WIC_LOADER_FORCE_RGBA32
 						                         : DirectX::WIC_LOADER_FORCE_SRGB;
 
-					// Load from disk
-					ComPtr<ID3D11Resource> texture;
-					const auto hr = DirectX::CreateWICTextureFromFileEx(
-						&package.Device,
-						inst->_path->c_str(),
-						0,
-						D3D11_USAGE_DEFAULT,
-						D3D11_BIND_SHADER_RESOURCE,
-						0,
-						0,
-						loaderFlags,
-						&texture,
-						&inst->_nativeShaderResourceView
-					);
-					ThrowIfBad(hr);
-					texture->QueryInterface(__uuidof(ID3D11Texture2D), &inst->_nativeTexture);
+					const auto* path = inst->_path->c_str();
 
+
+					bool isHdr = inst->_path->extension() == ".hdr";
+
+					if (isHdr)
+					{
+						// Load from disk
+						DirectX::TexMetadata metaData;
+						DirectX::GetMetadataFromHDRFile(path, metaData);
+
+						DirectX::ScratchImage scratchImage;
+						DirectX::LoadFromHDRFile(path, &metaData, scratchImage);
+
+						inst->_width = metaData.width;
+						inst->_height = metaData.height;
+						inst->_format = Utils::ToSaffronFormat(metaData.format);
+
+						// Convert to texture
+						D3D11_TEXTURE2D_DESC td = {};
+						td.Width = inst->_width;
+						td.Height = inst->_height;
+						td.Format = metaData.format;
+						td.ArraySize = 1;
+						td.MipLevels = 1;
+						td.MiscFlags = 0;
+						td.SampleDesc.Count = 1;
+						td.Usage = D3D11_USAGE_DEFAULT;
+						td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+						td.CPUAccessFlags = 0;
+
+						D3D11_SUBRESOURCE_DATA sd = {};
+						sd.pSysMem = scratchImage.GetPixels();
+						sd.SysMemPitch = inst->_width * Utils::ImageFormatToMemorySize(inst->_format);
+
+						auto hr = package.Device.CreateTexture2D(&td, &sd, &inst->_nativeTexture);
+						ThrowIfBad(hr);
+
+						D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
+						srvd.Format = td.Format;
+						srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+						srvd.Texture2D.MipLevels = td.MipLevels;
+						srvd.Texture2D.MostDetailedMip = 0;
+
+						hr = package.Device.CreateShaderResourceView(
+							inst->_nativeTexture.Get(),
+							&srvd,
+							&inst->_nativeShaderResourceView
+						);
+						ThrowIfBad(hr);
+
+						// TODO: Store this for some time in case it is loaded from disk again
+						scratchImage.Release();
+					}
+					else
+					{
+						// Load from disk
+						ComPtr<ID3D11Resource> texture;
+						const auto hr = DirectX::CreateWICTextureFromFileEx(
+							&package.Device,
+							path,
+							0,
+							D3D11_USAGE_DEFAULT,
+							D3D11_BIND_SHADER_RESOURCE,
+							0,
+							0,
+							loaderFlags,
+							&texture,
+							&inst->_nativeShaderResourceView
+						);
+						ThrowIfBad(hr);
+						texture->QueryInterface(__uuidof(ID3D11Texture2D), &inst->_nativeTexture);
+					}
 
 					inst->_loaded = true;
 

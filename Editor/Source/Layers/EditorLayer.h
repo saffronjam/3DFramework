@@ -26,5 +26,7 @@ private:
 	ViewportPanel _depthViewportPanel;
 
 	GizmoControl _gizmoControl = GizmoControl::Translate;
+
+	std::shared_ptr<Texture> _texture;
 };
 }

@@ -34,6 +34,8 @@ void EditorLayer::OnAttach()
 		return false;
 	};
 
+	_texture = Texture::Create("Assets/Textures/Milkyway/Milkyway_small.hdr");
+
 
 	App::Instance().Window().GainedFocus += []
 	{
@@ -77,7 +79,7 @@ void EditorLayer::OnUi()
 	_scene.OnUi();
 
 	auto shaders = ShaderStore::GetAll();
-
+	
 	ImGui::Begin("Shaders");
 	for (auto& shader : shaders)
 	{
@@ -91,6 +93,7 @@ void EditorLayer::OnUi()
 	ImGui::End();
 
 	ImGui::Begin("Editor");
+	Ui::Image(*_texture);
 	if (ImGui::RadioButton("Translate", _gizmoControl == GizmoControl::Translate))
 	{
 		_gizmoControl = GizmoControl::Translate;

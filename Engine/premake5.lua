@@ -21,12 +21,13 @@ end
 local EngineAstFol = GetBasePath() .. AstFol
 
 local function RequireAll()
-    local result = {}
-    result["DirectX"] = require("ThirdParty.DirectX.premake5")
-    result["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
-    result["ImGui"] = require("ThirdParty.imgui.premake5")
-    result["Assimp"] = require("ThirdParty.assimp.premake5")
-    return result
+    local deps = {}
+    deps["DirectX"] = require("ThirdParty.DirectX.premake5")
+    deps["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
+    deps["DirectXTex"] = require("ThirdParty.DirectXTex.premake5")
+    deps["ImGui"] = require("ThirdParty.imgui.premake5")
+    deps["Assimp"] = require("ThirdParty.assimp.premake5")
+    return deps
 end
 
 local ThirdParties
