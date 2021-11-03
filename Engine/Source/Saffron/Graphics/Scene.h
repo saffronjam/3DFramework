@@ -49,5 +49,8 @@ private:
 	uint _viewportWidth = 0, _viewportHeight = 0;
 
 	std::vector<std::shared_ptr<Model>> _models;
+	float metalness = 0.0f;
+	float roughness = 0.2f;
+	Vector3 albedo = {1.0f, 0.0f, 0.0f};
 };
 }

@@ -1,5 +1,5 @@
-const float Pi = 3.141592;
-const float Epsilon = 0.000001;
+static const float Pi = 3.141592f;
+static const float Epsilon = 0.000001;
 
 cbuffer MvpBuffer : register(b0)
 {

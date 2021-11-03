@@ -1,5 +1,7 @@
 #include "Common_i.hlsl"
 
+
+const float PiLocal = 3.141592f;
 #define ModelTextureMapType_Albedo 0
 #define ModelTextureMapType_Normal 1
 #define ModelTextureMapType_Roughness 2
@@ -28,7 +30,6 @@ struct PBR_Data
 
 	float3 Normal;
 	float3 ViewDir;
-	float NdotV;
 };
 
 static const float3 FrenselDielectric = 0.04f;
@@ -117,6 +118,41 @@ struct PsInput
 	float3x3 WorldNormals : WorldNormals;
 };
 
+float3 CalculatePointLights(float3 F0, in PBR_Data pbrData, float3 pixelWorldPosition)
+{
+    float3 sum = float3(0.0, 0.0, 0.0);
+    for (int i = 0; i < 1; i++)
+    {
+        PointLight light = PointLights[i];
+        
+        float3 Li = normalize(light.Position - pixelWorldPosition);
+        float3 Lh = normalize(Li + pbrData.ViewDir);
+        
+        const float Ldistance = length(light.Position - pixelWorldPosition);
+        float Lattenuation = clamp(1.0 - (Ldistance * Ldistance) / (light.Radius * light.Radius), 0.0, 1.0);
+        Lattenuation *= lerp(Lattenuation, 1.0, 0.0f /*Falloff*/);
+        const float3 Lradiance = light.Color * Lattenuation;
+
+        const float cosLi = max(0.0, dot(pbrData.Normal, Li));
+        const float cosLh = max(0.0, dot(pbrData.Normal, Lh));
+        const float cosLo = max(dot(pbrData.Normal, pbrData.ViewDir), 0.0);
+
+        const float3 F = fresnelSchlickRoughness(F0, max(dot(Lh, pbrData.ViewDir), 0.0), pbrData.Roughness);
+        const float D = ndfGGX(cosLh, pbrData.Roughness);
+        const float G = gaSchlickGGX(cosLi, cosLo, pbrData.Roughness);
+
+        const float3 kD = (1 - F) * (1.0 - pbrData.Metalness);
+        const float3 specular = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+
+        sum += (kD * pbrData.Albedo + specular) * Lradiance * cosLi;
+    }
+
+    float3 gammaCorr = pow(sum / (sum + float3(1.0, 1.0, 1.0)), float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
+
+    return gammaCorr;
+}
+
+
 float4 main(PsInput input) : SV_TARGET
 {
 	//// PBR
@@ -124,7 +160,7 @@ float4 main(PsInput input) : SV_TARGET
 
 	// Calculate PBR inputs (one of each pair are 1.0f, hence why they can be multiplied)
 	_pbrData.Albedo = ModelTex[ModelTextureMapType_Albedo].Sample(ModelTexSam, input.TexCoord).rgb * AlbedoColor.xyz;
-    _pbrData.Metalness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).b * 1;
+    _pbrData.Metalness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).b * Metalness;
 	_pbrData.Roughness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).g * Roughness;
 	_pbrData.Roughness = max(_pbrData.Roughness, 0.05f);
 
@@ -141,68 +177,13 @@ float4 main(PsInput input) : SV_TARGET
 	else
 	{
 		_pbrData.Normal = normalize(input.Normal);
-	}
+    }
 	_pbrData.ViewDir = normalize(input.ViewPos - input.WorldPosition);				// Lo
 
-	
-    float3 Lo = _pbrData.ViewDir;
-    float3 N = _pbrData.Normal;
-    float roughness = _pbrData.Roughness;
-    float metalness = _pbrData.Metalness;
-    float3 albedo = _pbrData.Albedo;
+	// Frensel reflectance
+    float3 F0 = lerp(float3(0.04, 0.04, 0.04), pow(_pbrData.Albedo, float3(2.2, 2.2, 2.2)), _pbrData.Metalness);
 
+    float3 pointLightsContribution = CalculatePointLights(F0, _pbrData, input.WorldPosition);
 
-	//// Frensel reflectance
-    const float3 F0 = lerp(FrenselDielectric, albedo, metalness);
-    float cosLo = max(0.0, dot(N, Lo));
-    float3 Lr = 2.0 * cosLo * N - Lo;
-
-
-    float3 directLighting = 0.0;
-    for (int i = 0; i < 1; i++)
-    {
-        PointLight light = PointLights[i];
-
-    	//// Light radiance
-        const float Ldistance = length(light.Position - input.WorldPosition);
-        const float Lattenuation = clamp(1.0 - (Ldistance * Ldistance) / (light.Radius * light.Radius), 0.0, 1.0);
-        const float3 Lcolor = light.Color;
-        const float3 Lradiance = Lcolor * Lattenuation; // Lradiance
-		///////////////////
-
-        const float3 Li = normalize(input.LightPos[i] - input.WorldPosition);
-        float3 Lh = normalize(Li + Lo);
-		
-        float cosLi = max(0.0, dot(N, Li));
-        float cosLh = max(0.0, dot(N, Lh));
-
-		// Calculate Fresnel term for direct lighting. 
-        float3 F = fresnelSchlickRoughness(F0, max(0.0, dot(Lh, Lo)), roughness);
-		// Calculate normal distribution for specular BRDF.
-        float D = ndfGGX(cosLh, roughness);
-		// Calculate geometric attenuation for specular BRDF.
-        float G = gaSchlickGGX(cosLi, cosLo, roughness);
-
-		// Diffuse scattering happens due to light being refracted multiple times by a dielectric medium.
-		// Metals on the other hand either reflect or absorb energy, so diffuse contribution is always zero.
-		// To be energy conserving we must scale diffuse BRDF contribution based on Fresnel factor & metalness.
-        float3 kd = (1.0 - F) * (1.0 - metalness);
-
-		// Lambert diffuse BRDF.
-		// We don't scale by 1/PI for lighting & material units to be more convenient.
-		// See: https://seblagarde.wordpress.com/2012/01/08/pi-or-not-to-pi-in-game-lighting-equation/
-        float3 diffuseBRDF = kd * albedo;
-
-		// Cook-Torrance specular microfacet BRDF.
-        float3 specularBRDF = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
-        specularBRDF = clamp(specularBRDF, float3(0.0f, 0.0f, 0.0f), float3(5.0f, 5.0f, 5.0f));
-
-		// Total contribution for this light.
-        directLighting += (diffuseBRDF + specularBRDF) * Lradiance * cosLi;
-    }
-
-    float3 final = directLighting * (1 - CalculateShadow(input.LightSpacePosition)) + 0.3 * albedo;
-
-    return float4(final, 1.0f);
-
+    return float4(pointLightsContribution, 1.0f);
 }

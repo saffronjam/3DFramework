@@ -33,7 +33,7 @@ VsOutput main(VsInput input)
 	output.Position = mul(float4(input.Position, 1.0f), Mvp);
 	output.WorldPosition = (float3)mul(float4(input.Position, 1.0f), Model);
 
-    output.Normal = mul(Model, input.Normal);
+    output.Normal = mul((float3x3)Model, input.Normal);
 	output.TexCoord = input.TexCoord;
 	output.Tangent = input.Tangent;
 	output.Binormal = input.Binormal;

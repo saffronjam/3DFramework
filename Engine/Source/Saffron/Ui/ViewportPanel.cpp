@@ -71,7 +71,11 @@ void ViewportPanel::SetImage(const std::shared_ptr<Image>& image)
 
 auto ViewportPanel::MousePosition(bool normalized) const -> Vector2
 {
-	auto position = Mouse::CursorPosition(true);
+	auto imPosition = ImGui::GetMousePos();
+
+	Vector2 position(imPosition.x, imPosition.y);
+	
+
 	position.x -= _topLeft.x;
 	position.y -= _topLeft.y;
 

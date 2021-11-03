@@ -36,7 +36,7 @@ public:
 	static void Image(const class Image& image, const Shader& shader, const Vector2& size = {0.0f, 0.0f});
 
 	static void Gizmo(Matrix& result, const Matrix& view, const Matrix proj, GizmoControl control);
-
+	
 private:
 	static ImGuizmo::OPERATION ToImGuizmoOperation(GizmoControl gizmoControl);
 

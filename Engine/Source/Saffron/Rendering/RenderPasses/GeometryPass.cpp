@@ -61,7 +61,7 @@ void GeometryPass::Execute()
 		_pointLightCBuffer->Bind();
 		common._sceneCommonCBuffer->Update({ common.CameraData.Position });
 		common._sceneCommonCBuffer->Bind();
-
+		
 		Renderer::Submit(
 			[this, drawCommand, common](const RendererPackage& package)
 			{

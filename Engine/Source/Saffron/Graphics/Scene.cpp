@@ -19,10 +19,16 @@ Scene::Scene() :
 		-3.0f,
 		0.0f
 	);
-	for (int i = 0; i < 5; i++)
+	constexpr int nBalls = 5;
+	for (int i = 0; i < nBalls; i++)
 	{
+		const float progress = static_cast<float>(i) / static_cast<float>(nBalls - 1);
+
 		_models.push_back(Model::Create("Sphere.fbx"));
-		_models.back()->Transform() = Matrix::CreateTranslation(-20.0f + static_cast<float>(i) * 10.0f, 4, 0.0f);
+		_models.back()->Transform() = Matrix::CreateTranslation(-5.0f + static_cast<float>(i) * 2.5f, 4, 0.0f);
+		_models.back()->Materials().front()->SetMaterialData(
+			MaterialDataCBuf{Colors::Red, 0.0f, 0.00f, 1.0f, 0.0f, false}
+		);
 	}
 
 	_cameraMesh = Model::Create("Sphere.fbx");
@@ -94,7 +100,41 @@ void Scene::OnRender()
 void Scene::OnUi()
 {
 	ImGui::Begin("Scene");
-	ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&_pointLight.Position), -2.0f, 15.0f);
+	if (ImGui::SliderFloat("Metalness", &metalness, 0.0f, 1.0f))
+	{
+		for (auto& model : _models)
+		{
+			auto& cb = model->Materials().front()->CBuffer();
+			auto& data = cb.Data();
+			data.Metalness = metalness;
+			cb.UploadData();
+		}
+	}
+	if (ImGui::SliderFloat("Roughness", &roughness, 0.0f, 1.0f))
+	{
+		for (auto& model : _models)
+		{
+			auto& cb = model->Materials().front()->CBuffer();
+			auto& data = cb.Data();
+			data.Roughness = roughness;
+			cb.UploadData();
+		}
+	}
+	if (ImGui::SliderFloat3("Albedo", reinterpret_cast<float*>(&albedo), 0.0f, 1.0f))
+	{
+		for (auto& model : _models)
+		{
+			auto& cb = model->Materials().front()->CBuffer();
+			auto& data = cb.Data();
+			data.AlbedoColor = Color(albedo.x, albedo.y, albedo.z);
+			cb.UploadData();
+		}
+	}
+
+	_models[1]->OnDebugUi();
+
+	ImGui::Separator();
+	ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&_pointLight.Position), -12.0f, 12.0f);
 	ImGui::SliderFloat3("Color", reinterpret_cast<float*>(&_pointLight.Color), 0.0f, 1.0f);
 	ImGui::SliderFloat("Radius", &_pointLight.Radius, 0.1f, 10.0f);
 	if (ImGui::RadioButton("Camera1", &_activeRadioButton, 0))
