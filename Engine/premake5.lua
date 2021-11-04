@@ -189,6 +189,11 @@ project (module.Project)
         shadertype "Vertex"
         shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
 
+    filter { "files:**_c.hlsl" }
+        shadermodel "5.0"
+        shadertype "Compute"
+        shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
+
     filter { "files:**_i.hlsl" }
         flags "ExcludeFromBuild"
         shadermodel "5.0"

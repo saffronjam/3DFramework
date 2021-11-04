@@ -32,7 +32,7 @@ void Model::OnDebugUi()
 	ImGui::Begin("Model");
 	for (auto& cont : _textures)
 	{
-		auto type = ModelTextureMapType::Roughness;
+		auto type = ModelTextureMapType::Albedo;
 		if (cont[type] != nullptr)
 		{
 			Ui::Image(*cont[type]);

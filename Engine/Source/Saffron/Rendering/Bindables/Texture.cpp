@@ -103,11 +103,24 @@ Texture::Texture(const std::filesystem::path& path, const TextureSpec& spec, uin
 			Renderer::Submit(
 				[inst](const RendererPackage& package)
 				{
+					if (!std::filesystem::is_regular_file(inst->_path.value()))
+					{
+						throw SaffronException(
+							std::format("Failed to create texture. Path was not a file: {}", inst->_path->string())
+						);
+					}
+
+					if (!std::filesystem::exists(inst->_path.value()))
+					{
+						throw SaffronException(
+							std::format("Failed to create texture. File does not exist: {}", inst->_path->string())
+						);
+					}
+
+					const auto* path = inst->_path->c_str();
 					const auto loaderFlags = inst->_spec.SRGB
 						                         ? DirectX::WIC_LOADER_FORCE_RGBA32
 						                         : DirectX::WIC_LOADER_FORCE_SRGB;
-
-					const auto* path = inst->_path->c_str();
 
 
 					bool isHdr = inst->_path->extension() == ".hdr";
@@ -274,6 +287,11 @@ auto Texture::Width() const -> uint
 auto Texture::Height() const -> uint
 {
 	return _height;
+}
+
+auto Texture::Format() const -> ImageFormat
+{
+	return _format;
 }
 
 auto Texture::Loaded() const -> bool

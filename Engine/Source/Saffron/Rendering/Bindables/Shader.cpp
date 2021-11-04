@@ -11,8 +11,9 @@
 
 namespace Se
 {
-Shader::Shader(std::filesystem::path path) :
-	_path(std::move(path))
+Shader::Shader(const std::filesystem::path& path, bool isCompute) :
+	_path(path),
+	_isCompute(isCompute)
 {
 	SetInitializer(
 		[this]
@@ -23,36 +24,26 @@ Shader::Shader(std::filesystem::path path) :
 				{
 					inst->_name = inst->_path.stem().string();
 
-					constexpr auto* engineBasePath = SE_ENGINE_ASSETS_PATH;
+					if (inst->_isCompute)
+					{
+						// Compute shader
+						const std::filesystem::path csFullpath = BinaryPath(inst->_path, CsSuffix);
+						auto blob = LoadByteCode(csFullpath);
+						inst->_nativeComputeShader = CreateComputeShader(package, *blob.Get());
+					}
+					else
+					{
+						// Vertex shader
+						const std::filesystem::path vsFullpath = BinaryPath(inst->_path, VsSuffix);
+						auto blob = LoadByteCode(vsFullpath);
+						inst->_vsByteCode = blob;
+						inst->_nativeVertexShader = CreateVertexShader(package, *blob.Get());
 
-					// Paths
-					const std::filesystem::path vsFullpath = BinaryPath(inst->_path, VsSuffix);
-					const std::filesystem::path psFullpath = BinaryPath(inst->_path, PsSuffix);
-
-					// Vertex shader
-					auto hr = D3DReadFileToBlob(vsFullpath.c_str(), &inst->_vsByteCode);
-					ThrowIfBad(hr);
-
-					hr = package.Device.CreateVertexShader(
-						inst->_vsByteCode->GetBufferPointer(),
-						inst->_vsByteCode->GetBufferSize(),
-						nullptr,
-						&inst->_nativeVertexShader
-					);
-					ThrowIfBad(hr);
-
-					// Pixel shader
-					ComPtr<ID3DBlob> blob;
-					hr = D3DReadFileToBlob(psFullpath.c_str(), &blob);
-					ThrowIfBad(hr);
-
-					hr = package.Device.CreatePixelShader(
-						blob->GetBufferPointer(),
-						blob->GetBufferSize(),
-						nullptr,
-						&inst->_nativePixelShader
-					);
-					ThrowIfBad(hr);
+						// Pixel shader
+						const std::filesystem::path psFullpath = BinaryPath(inst->_path, PsSuffix);
+						blob = LoadByteCode(psFullpath);
+						inst->_nativePixelShader = CreatePixelShader(package, *blob.Get());
+					}
 				}
 			);
 		}
@@ -89,75 +80,26 @@ void Shader::Reload()
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			//// Setup
-
-			// Paths
-			const std::filesystem::path vsFullpath = TextualPath(inst->_path, VsSuffix);
-			const std::filesystem::path psFullpath = TextualPath(inst->_path, PsSuffix);
-
-			///// Compile
-			ComPtr<ID3DBlob> errorBlob;
-
-			constexpr auto* vsProfile = "vs_5_0";
-			constexpr uint flags = D3DCOMPILE_ENABLE_STRICTNESS | (ConfDebug ? D3DCOMPILE_DEBUG : 0);
-
-			constexpr auto* psProfile = "ps_5_0";
-			ComPtr<ID3DBlob> psBlob;
-
-			// Vertex shader
-			auto hr = D3DCompileFromFile(
-				vsFullpath.c_str(),
-				nullptr,
-				D3D_COMPILE_STANDARD_FILE_INCLUDE,
-				"main",
-				vsProfile,
-				flags,
-				0,
-				&inst->_vsByteCode,
-				&errorBlob
-			);
-
-			if (BadHResult(hr))
+			if (inst->_isCompute)
 			{
-				const auto* errorMsg = static_cast<const char*>(errorBlob->GetBufferPointer());
-				throw SaffronException(std::format("Failed to reload shader. Could not compile: {}", errorMsg));
+				// Compute shader
+				const std::filesystem::path csFullpath = TextualPath(inst->_path, CsSuffix);
+				auto blob = CompileShader(csFullpath, CsProfile);
+				inst->_nativeComputeShader = CreateComputeShader(package, *blob.Get());
 			}
-
-			hr = package.Device.CreateVertexShader(
-				inst->_vsByteCode->GetBufferPointer(),
-				inst->_vsByteCode->GetBufferSize(),
-				nullptr,
-				&inst->_nativeVertexShader
-			);
-			ThrowIfBad(hr);
-
-			// Pixel shader
-
-			hr = D3DCompileFromFile(
-				psFullpath.c_str(),
-				nullptr,
-				D3D_COMPILE_STANDARD_FILE_INCLUDE,
-				"main",
-				psProfile,
-				flags,
-				0,
-				&psBlob,
-				&errorBlob
-			);
-
-			if (BadHResult(hr))
+			else
 			{
-				const auto* errorMsg = static_cast<const char*>(errorBlob->GetBufferPointer());
-				throw SaffronException(std::format("Failed to reload shader. Could not compile: {}", errorMsg));
-			}
+				// Vertex shader
+				const std::filesystem::path vsFullpath = TextualPath(inst->_path, VsSuffix);
+				auto blob = CompileShader(vsFullpath, VsProfile);
+				inst->_vsByteCode = blob;
+				inst->_nativeVertexShader = CreateVertexShader(package, *blob.Get());
 
-			hr = package.Device.CreatePixelShader(
-				psBlob->GetBufferPointer(),
-				psBlob->GetBufferSize(),
-				nullptr,
-				&inst->_nativePixelShader
-			);
-			ThrowIfBad(hr);
+				// Pixel shader
+				const std::filesystem::path psFullpath = TextualPath(inst->_path, PsSuffix);
+				blob = CompileShader(psFullpath, PsProfile);
+				inst->_nativePixelShader = CreatePixelShader(package, *blob.Get());
+			}
 		}
 	);
 }
@@ -178,12 +120,20 @@ auto Shader::VsByteCode() const -> const ID3DBlob&
 
 auto Shader::NativeVsHandle() const -> const ID3D11VertexShader&
 {
+	Debug::Assert(!_isCompute, "Shader was a compute shader");
 	return *_nativeVertexShader.Get();
 }
 
 auto Shader::NativePsHandle() const -> const ID3D11PixelShader&
 {
+	Debug::Assert(!_isCompute, "Shader was a compute shader");
 	return *_nativePixelShader.Get();
+}
+
+auto Shader::NativeCsHandle() const -> const ID3D11ComputeShader&
+{
+	Debug::Assert(_isCompute, "Shader was not a compute shader");
+	return *_nativeComputeShader.Get();
 }
 
 auto Shader::Name() const -> const std::string&
@@ -191,15 +141,17 @@ auto Shader::Name() const -> const std::string&
 	return _name;
 }
 
-auto Shader::Identifier(std::filesystem::path path) -> std::string
+auto Shader::Identifier(const std::filesystem::path& path, bool isCompute) -> std::string
 {
-	return path.string();
+	std::ostringstream oss;
+	oss << path.string() << (isCompute ? "::Compute" : "::VertexPixel");
+	return oss.str();
 }
 
-auto Shader::Create(std::filesystem::path path) -> std::shared_ptr<Shader>
+auto Shader::Create(const std::filesystem::path& path, bool isCompute) -> std::shared_ptr<Shader>
 {
 	std::shared_ptr<Shader> shader;
-	const auto added = BindableStore::Add<Shader>(shader, std::move(path));
+	const auto added = BindableStore::Add<Shader>(shader, path, isCompute);
 	if (added)
 	{
 		ShaderStore::Add(shader);
@@ -219,5 +171,65 @@ auto Shader::TextualPath(const std::filesystem::path& relative, const char* suff
 	std::ostringstream oss;
 	oss << RootPath << BasePath << relative.string() << suffix << TextExtension;
 	return oss.str();
+}
+
+auto Shader::LoadByteCode(const std::filesystem::path& fullpath) -> ComPtr<ID3DBlob>
+{
+	ComPtr<ID3DBlob> blob;
+	auto hr = D3DReadFileToBlob(fullpath.c_str(), &blob);
+	ThrowIfBad(hr);
+	return blob;
+}
+
+auto Shader::CompileShader(const std::filesystem::path& fullpath, const char* profile) -> ComPtr<ID3DBlob>
+{
+	constexpr uint flags = D3DCOMPILE_ENABLE_STRICTNESS | (ConfDebug ? D3DCOMPILE_DEBUG : 0);
+
+	ComPtr<ID3DBlob> errorBlob;
+	ComPtr<ID3DBlob> shaderBlob;
+
+	auto hr = D3DCompileFromFile(
+		fullpath.c_str(),
+		nullptr,
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		ShaderEntryPoint,
+		profile,
+		flags,
+		0,
+		&shaderBlob,
+		&errorBlob
+	);
+
+	if (BadHResult(hr))
+	{
+		const auto* errorMsg = static_cast<const char*>(errorBlob->GetBufferPointer());
+		throw SaffronException(std::format("Failed to compile shader: {}", errorMsg));
+	}
+
+	return shaderBlob;
+}
+
+auto Shader::CreateVertexShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11VertexShader>
+{
+	ComPtr<ID3D11VertexShader> result;
+	const auto hr = package.Device.CreateVertexShader(blob.GetBufferPointer(), blob.GetBufferSize(), nullptr, &result);
+	ThrowIfBad(hr);
+	return result;
+}
+
+auto Shader::CreatePixelShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11PixelShader>
+{
+	ComPtr<ID3D11PixelShader> result;
+	auto hr = package.Device.CreatePixelShader(blob.GetBufferPointer(), blob.GetBufferSize(), nullptr, &result);
+	ThrowIfBad(hr);
+	return result;
+}
+
+auto Shader::CreateComputeShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11ComputeShader>
+{
+	ComPtr<ID3D11ComputeShader> result;
+	const auto hr = package.Device.CreateComputeShader(blob.GetBufferPointer(), blob.GetBufferSize(), nullptr, &result);
+	ThrowIfBad(hr);
+	return result;
 }
 }

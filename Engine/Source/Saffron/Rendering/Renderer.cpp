@@ -46,6 +46,11 @@ Renderer::~Renderer()
 	EndQueue();
 }
 
+auto Renderer::Config() -> RendererConfig&
+{
+	return Instance()._config;
+}
+
 void Renderer::Submit(const RenderFn& fn, std::source_location location)
 {
 	if (auto& inst = Instance(); !inst._activeContainer->Executing && inst._activeStrategy == RenderStrategy::Deferred)

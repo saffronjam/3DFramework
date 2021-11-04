@@ -55,8 +55,8 @@ TextureCube::TextureCube(uint width, uint height, ImageFormat format, uint slot)
 					D3D11_SHADER_RESOURCE_VIEW_DESC sd = {};
 					sd.Format = td.Format;
 					sd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-					sd.Texture2D.MostDetailedMip = 0;
-					sd.Texture2D.MipLevels = 1;
+					sd.TextureCube.MostDetailedMip = 0;
+					sd.TextureCube.MipLevels = 1;
 
 					hr = package.Device.CreateShaderResourceView(
 						inst->_nativeTexture2d.Get(),
@@ -79,6 +79,16 @@ void TextureCube::Bind() const
 			package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
 		}
 	);
+}
+
+auto TextureCube::NativeHandle() -> ID3D11Texture2D&
+{
+	return *_nativeTexture2d.Get();
+}
+
+auto TextureCube::NativeHandle() const -> const ID3D11Texture2D&
+{
+	return *_nativeTexture2d.Get();
 }
 
 auto TextureCube::ShaderView() const -> const ID3D11ShaderResourceView&

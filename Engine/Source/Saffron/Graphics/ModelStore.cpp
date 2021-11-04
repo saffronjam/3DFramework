@@ -338,6 +338,7 @@ auto ModelStore::ImportMaterial(
 		matTexContainer.emplace(ModelTextureMapType::Albedo, Renderer::WhiteTexture());
 	}
 
+
 	// Normal map
 	const auto hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS;
 	bool normalMapFallback = !hasNormalMap;

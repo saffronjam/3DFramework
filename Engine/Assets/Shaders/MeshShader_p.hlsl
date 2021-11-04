@@ -152,6 +152,14 @@ float3 CalculatePointLights(float3 F0, in PBR_Data pbrData, float3 pixelWorldPos
     return gammaCorr;
 }
 
+const float2 invAtan = float2(0.1591, 0.3183);
+float2 SampleSphericalMap(float3 v)
+{
+    float2 uv = float2(atan2(v.z, v.x), asin(v.y));
+    uv *= invAtan;
+    uv += 0.5;
+    return uv;
+}
 
 float4 main(PsInput input) : SV_TARGET
 {

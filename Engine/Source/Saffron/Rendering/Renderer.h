@@ -49,6 +49,12 @@ struct RenderQueue
 	bool Executing = false;
 };
 
+struct RendererConfig
+{
+	uint EnvironmentMapResolution = 1024;
+	uint IrradianceMapComputeSamples = 512;
+};
+
 
 class Model;
 struct Mvp;
@@ -63,6 +69,8 @@ class Renderer : public Singleton<Renderer>
 public:
 	explicit Renderer(const Window& window);
 	~Renderer() override;
+
+	static auto Config() -> RendererConfig&;
 
 	static void Submit(const RenderFn& fn, std::source_location location = std::source_location::current());
 
@@ -107,6 +115,8 @@ private:
 	void CreateRenderState(uint state);
 
 private:
+	RendererConfig _config;
+
 	ComPtr<ID3D11Device> _device{};
 	ComPtr<IDXGISwapChain1> _swapChain{};
 	ComPtr<ID3D11DeviceContext> _context{};

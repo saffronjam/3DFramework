@@ -31,6 +31,7 @@ public:
 
 	auto Width() const -> uint;
 	auto Height() const -> uint;
+	auto Format() const -> ImageFormat;
 	auto Loaded() const -> bool;
 
 	void SetImage(const std::shared_ptr<Image>& image);
@@ -59,7 +60,7 @@ public:
 		const TextureSpec& spec = TextureSpec(),
 		uint slot = 0
 	) -> std::shared_ptr<Texture>;
-
+	
 private:
 	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView;
 	ComPtr<ID3D11Texture2D> _nativeTexture;

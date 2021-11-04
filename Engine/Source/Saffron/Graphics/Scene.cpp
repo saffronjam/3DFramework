@@ -19,6 +19,7 @@ Scene::Scene() :
 		-3.0f,
 		0.0f
 	);
+
 	constexpr int nBalls = 5;
 	for (int i = 0; i < nBalls; i++)
 	{
@@ -30,7 +31,7 @@ Scene::Scene() :
 			MaterialDataCBuf{Colors::Red, 0.0f, 0.00f, 1.0f, 0.0f, false}
 		);
 	}
-
+	
 	_cameraMesh = Model::Create("Sphere.fbx");
 
 	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
@@ -42,6 +43,9 @@ Scene::Scene() :
 		ViewportResized.Invoke(event);
 		return false;
 	};
+	
+	
+
 }
 
 void Scene::OnUpdate(TimeSpan ts)

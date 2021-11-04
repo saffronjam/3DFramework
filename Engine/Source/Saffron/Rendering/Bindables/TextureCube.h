@@ -15,6 +15,9 @@ public:
 
 	void Bind() const override;
 
+	auto NativeHandle()->ID3D11Texture2D&;
+	auto NativeHandle() const -> const ID3D11Texture2D&;
+
 	auto ShaderView() const -> const ID3D11ShaderResourceView&;
 
 	auto Width() const -> uint;

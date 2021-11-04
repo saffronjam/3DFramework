@@ -163,6 +163,23 @@ inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
 	throw SaffronException("Dxgi format not supported");
 }
 
+inline auto ToD3D11Format(ImageFormat format) -> DXGI_FORMAT
+{
+	switch (format)
+	{
+	case ImageFormat::R: return DXGI_FORMAT_R8_UNORM;
+	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
+	case ImageFormat::RGBA16: return DXGI_FORMAT_R16G16B16A16_UNORM;
+	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
+	case ImageFormat::RG16f: return DXGI_FORMAT_R16G16_FLOAT;
+	case ImageFormat::SRGB: return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+	case ImageFormat::Depth24Stencil8: return DXGI_FORMAT_D24_UNORM_S8_UINT;
+	default: break;
+	}
+	throw SaffronException("Saffron format not supported");
+}
+
 inline auto ToD3D11BindFlag(ImageUsage usage) -> uint
 {
 	switch (usage)

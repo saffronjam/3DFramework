@@ -18,7 +18,6 @@ pause
 ) else (
 %write% green Success
 timeout /t 1
-pause
 )
 
 echo.
