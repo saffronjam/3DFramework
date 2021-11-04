@@ -7,8 +7,22 @@
 #include "Saffron/Rendering/Image.h"
 #include "Saffron/Rendering/Bindables/Sampler.h"
 
+namespace DirectX
+{
+struct TexMetadata;
+class ScratchImage;
+}
+
 namespace Se
 {
+using TextureUsage = uint;
+
+enum TextureUsageFlags : uint
+{
+	TextureUsage_UnorderedAccess = 1 << 0,
+	TextureUsage_ShaderResource = 1 << 1
+};
+
 struct TextureSpec
 {
 	SamplerWrap SamplerWrap = SamplerWrap::Mirror;
@@ -16,7 +30,11 @@ struct TextureSpec
 	bool GenerateMips = true;
 	bool SRGB = false;
 	bool CreateSampler = true;
+	TextureUsage Usage = TextureUsage_ShaderResource;
 };
+
+struct RendererPackage;
+
 
 class Texture : public Bindable
 {
@@ -40,6 +58,8 @@ public:
 	auto NativeHandle() const -> const ID3D11Texture2D&;
 	auto ShaderView() -> ID3D11ShaderResourceView&;
 	auto ShaderView() const -> const ID3D11ShaderResourceView&;
+	auto UnorderedView() -> ID3D11UnorderedAccessView&;
+	auto UnorderedView() const -> const ID3D11UnorderedAccessView&;
 
 	static auto Create(const TextureSpec& spec = TextureSpec(), uint slot = 0) -> std::shared_ptr<Texture>;;
 	static auto Create(
@@ -60,9 +80,42 @@ public:
 		const TextureSpec& spec = TextureSpec(),
 		uint slot = 0
 	) -> std::shared_ptr<Texture>;
-	
+
+private:
+	static auto CreateSrv(
+		const RendererPackage& package,
+		ID3D11Texture2D& tex,
+		const DirectX::TexMetadata& meta
+	) -> ComPtr<ID3D11ShaderResourceView>;
+
+	static auto CreateUav(
+		const RendererPackage& package,
+		ID3D11Texture2D& tex,
+		const DirectX::TexMetadata& meta
+	) -> ComPtr<ID3D11UnorderedAccessView>;
+
+	static auto LoadWicFromFile(
+		const RendererPackage& package,
+		const std::filesystem::path& path,
+		const TextureSpec& spec
+	) -> std::tuple<ComPtr<ID3D11Texture2D>, DirectX::TexMetadata>;
+
+	static auto LoadHdrFromFile(
+		const RendererPackage& package,
+		const std::filesystem::path& path,
+		const TextureSpec& spec
+	) -> std::tuple<ComPtr<ID3D11Texture2D>, DirectX::TexMetadata>;
+
+	static auto CreateFromScratchAndMeta(
+		const RendererPackage& package,
+		const DirectX::ScratchImage& scratch,
+		const DirectX::TexMetadata& meta,
+		const TextureSpec& spec
+	) -> ComPtr<ID3D11Texture2D>;
+
 private:
 	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView;
+	ComPtr<ID3D11UnorderedAccessView> _nativeUnorderedAccessView;
 	ComPtr<ID3D11Texture2D> _nativeTexture;
 	std::shared_ptr<Sampler> _sampler;
 
@@ -78,6 +131,34 @@ private:
 
 namespace Utils
 {
-static size_t ImageFormatToMemorySize(ImageFormat format);
+static auto ImageFormatToMemorySize(ImageFormat format) -> size_t;
+
+inline auto ToD3D11TextureBindFlag(TextureUsage usage) -> uint
+{
+	switch (usage)
+	{
+	case TextureUsage_UnorderedAccess: return D3D11_BIND_UNORDERED_ACCESS;
+	case TextureUsage_ShaderResource: return D3D11_BIND_SHADER_RESOURCE;
+	default: break;
+	}
+	throw SaffronException("Image usage not supported");
+}
+
+inline auto ToD3D11TextureBindFlags(TextureUsage usages) -> uint
+{
+	uint result = 0;
+
+	if (usages & TextureUsage_UnorderedAccess)
+	{
+		result |= ToD3D11TextureBindFlag(TextureUsage_UnorderedAccess);
+	}
+
+	if (usages & TextureUsage_ShaderResource)
+	{
+		result |= ToD3D11TextureBindFlag(TextureUsage_ShaderResource);
+	}
+
+	return result;
+}
 }
 }

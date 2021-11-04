@@ -6,6 +6,7 @@
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables/ConstantBuffer.h"
+#include "Saffron/Rendering/SceneEnvironment.h"
 
 namespace Se
 {
@@ -42,6 +43,7 @@ private:
 	std::shared_ptr<Model> _cameraMesh;
 	EditorCamera* _activeCamera = &_camera1;
 	bool _drawCameraFrustums = false;
+	std::shared_ptr<SceneEnvironment> _environment;
 
 	SceneRenderer _sceneRenderer;
 	PointLight _pointLight;
@@ -52,5 +54,9 @@ private:
 	float metalness = 0.0f;
 	float roughness = 0.2f;
 	Vector3 albedo = {1.0f, 0.0f, 0.0f};
+
+
+	std::shared_ptr<Texture> _testWicTex;
+
 };
 }

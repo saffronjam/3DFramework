@@ -39,17 +39,8 @@ TextureCube::TextureCube(uint width, uint height, ImageFormat format, uint slot)
 					{
 						color = Color{ 1.0f, 1.0f, 1.0f, 1.0f };
 					}
-
-
-					std::array<D3D11_SUBRESOURCE_DATA, 6> subResData;
-					for (int i = 0; i < 6; i++)
-					{
-						subResData[i].pSysMem = colors;
-						subResData[i].SysMemPitch = 100 * 4;
-						subResData[i].SysMemSlicePitch = 0;
-					}
-
-					auto hr = package.Device.CreateTexture2D(&td, subResData.data(), &inst->_nativeTexture2d);
+					
+					auto hr = package.Device.CreateTexture2D(&td, nullptr, &inst->_nativeTexture2d);
 					ThrowIfBad(hr);
 
 					D3D11_SHADER_RESOURCE_VIEW_DESC sd = {};

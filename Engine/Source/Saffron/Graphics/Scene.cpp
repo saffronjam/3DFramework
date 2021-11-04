@@ -31,7 +31,7 @@ Scene::Scene() :
 			MaterialDataCBuf{Colors::Red, 0.0f, 0.00f, 1.0f, 0.0f, false}
 		);
 	}
-	
+
 	_cameraMesh = Model::Create("Sphere.fbx");
 
 	_pointLight.Position = Vector3{0.0f, 5.0f, 0.0f};
@@ -43,9 +43,11 @@ Scene::Scene() :
 		ViewportResized.Invoke(event);
 		return false;
 	};
-	
-	
 
+	_environment = SceneEnvironment::Create("Assets/Textures/GrandCanyon_C_YumaPoint/GCanyon_C_YumaPoint_3k.hdr");
+
+
+	_testWicTex = Texture::Create("Assets/Textures/skybox/back.jpg");
 }
 
 void Scene::OnUpdate(TimeSpan ts)

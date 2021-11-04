@@ -54,7 +54,7 @@ Texture::Texture(uint width, uint height, ImageFormat format, const uchar* data,
 					td.MiscFlags = 0;
 					td.SampleDesc.Count = 1;
 					td.Usage = D3D11_USAGE_DEFAULT;
-					td.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+					td.BindFlags = Utils::ToD3D11TextureBindFlags(inst->_spec.Usage);
 					td.CPUAccessFlags = 0;
 
 					D3D11_SUBRESOURCE_DATA sd = {};
@@ -68,18 +68,18 @@ Texture::Texture(uint width, uint height, ImageFormat format, const uchar* data,
 					auto hr = package.Device.CreateTexture2D(&td, hasData ? &sd : nullptr, &inst->_nativeTexture);
 					ThrowIfBad(hr);
 
-					D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
-					srvd.Format = td.Format;
-					srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-					srvd.Texture2D.MipLevels = td.MipLevels;
-					srvd.Texture2D.MostDetailedMip = 0;
-
-					hr = package.Device.CreateShaderResourceView(
-						inst->_nativeTexture.Get(),
-						&srvd,
-						&inst->_nativeShaderResourceView
-					);
-					ThrowIfBad(hr);
+					auto& texRef = *inst->_nativeTexture.Get();
+					auto meta = DirectX::TexMetadata{
+						.width = td.Width, .height = td.Height, .mipLevels = td.MipLevels, .format = td.Format
+					};
+					if (inst->_spec.Usage & TextureUsage_ShaderResource)
+					{
+						inst->_nativeShaderResourceView = CreateSrv(package, texRef, meta);
+					}
+					if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
+					{
+						inst->_nativeUnorderedAccessView = CreateUav(package, texRef, meta);
+					}
 				}
 			);
 
@@ -117,92 +117,31 @@ Texture::Texture(const std::filesystem::path& path, const TextureSpec& spec, uin
 						);
 					}
 
-					const auto* path = inst->_path->c_str();
-					const auto loaderFlags = inst->_spec.SRGB
-						                         ? DirectX::WIC_LOADER_FORCE_RGBA32
-						                         : DirectX::WIC_LOADER_FORCE_SRGB;
-
-
+					//// Create texture
+					// TODO: Support DDS, TGA...
 					bool isHdr = inst->_path->extension() == ".hdr";
 
-					if (isHdr)
+					auto [tex, meta] = isHdr
+						                   ? LoadHdrFromFile(package, inst->_path.value(), inst->_spec)
+						                   : LoadWicFromFile(package, inst->_path.value(), inst->_spec);
+					inst->_nativeTexture = tex;
+
+					//// Create views
+					auto& texRef = *inst->_nativeTexture.Get();
+					if (inst->_spec.Usage & TextureUsage_ShaderResource)
 					{
-						// Load from disk
-						DirectX::TexMetadata metaData;
-						DirectX::GetMetadataFromHDRFile(path, metaData);
-
-						DirectX::ScratchImage scratchImage;
-						DirectX::LoadFromHDRFile(path, &metaData, scratchImage);
-
-						inst->_width = metaData.width;
-						inst->_height = metaData.height;
-						inst->_format = Utils::ToSaffronFormat(metaData.format);
-
-						// Convert to texture
-						D3D11_TEXTURE2D_DESC td = {};
-						td.Width = inst->_width;
-						td.Height = inst->_height;
-						td.Format = metaData.format;
-						td.ArraySize = 1;
-						td.MipLevels = 1;
-						td.MiscFlags = 0;
-						td.SampleDesc.Count = 1;
-						td.Usage = D3D11_USAGE_DEFAULT;
-						td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-						td.CPUAccessFlags = 0;
-
-						D3D11_SUBRESOURCE_DATA sd = {};
-						sd.pSysMem = scratchImage.GetPixels();
-						sd.SysMemPitch = inst->_width * Utils::ImageFormatToMemorySize(inst->_format);
-
-						auto hr = package.Device.CreateTexture2D(&td, &sd, &inst->_nativeTexture);
-						ThrowIfBad(hr);
-
-						D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
-						srvd.Format = td.Format;
-						srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-						srvd.Texture2D.MipLevels = td.MipLevels;
-						srvd.Texture2D.MostDetailedMip = 0;
-
-						hr = package.Device.CreateShaderResourceView(
-							inst->_nativeTexture.Get(),
-							&srvd,
-							&inst->_nativeShaderResourceView
-						);
-						ThrowIfBad(hr);
-
-						// TODO: Store this for some time in case it is loaded from disk again
-						scratchImage.Release();
+						inst->_nativeShaderResourceView = CreateSrv(package, texRef, meta);
 					}
-					else
+					if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
 					{
-						// Load from disk
-						ComPtr<ID3D11Resource> texture;
-						const auto hr = DirectX::CreateWICTextureFromFileEx(
-							&package.Device,
-							path,
-							0,
-							D3D11_USAGE_DEFAULT,
-							D3D11_BIND_SHADER_RESOURCE,
-							0,
-							0,
-							loaderFlags,
-							&texture,
-							&inst->_nativeShaderResourceView
-						);
-						ThrowIfBad(hr);
-						texture->QueryInterface(__uuidof(ID3D11Texture2D), &inst->_nativeTexture);
+						inst->_nativeUnorderedAccessView = CreateUav(package, texRef, meta);
 					}
 
+					//// Convert metadata
+					inst->_width = meta.width;
+					inst->_height = meta.height;
+					inst->_format = Utils::ToSaffronFormat(meta.format);
 					inst->_loaded = true;
-
-					// Fetch texture info
-					D3D11_TEXTURE2D_DESC td;
-					inst->_nativeTexture->GetDesc(&td);
-
-					inst->_format = Utils::ToSaffronFormat(td.Format);
-					inst->_width = td.Width;
-					inst->_height = td.Height;
 				}
 			);
 
@@ -228,7 +167,7 @@ Texture::Texture(const std::shared_ptr<Image>& image, const TextureSpec& spec, u
 				{
 					const auto usage = imageInst->Usage();
 
-					if (usage & ImageUsage_ShaderResource)
+					if (usage & ImageUsage_ShaderResource && inst->_spec.Usage & TextureUsage_ShaderResource)
 					{
 						inst->_nativeShaderResourceView = imageInst->_nativeShaderResourceView;
 					}
@@ -254,7 +193,10 @@ void Texture::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+			if (inst->_spec.Usage & TextureUsage_ShaderResource)
+			{
+				package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+			}
 			if (inst->_spec.CreateSampler)
 			{
 				inst->_sampler->Bind();
@@ -269,8 +211,18 @@ void Texture::Unbind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			ID3D11ShaderResourceView* srv = nullptr;
-			package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
+			if (inst->_spec.Usage & TextureUsage_ShaderResource)
+			{
+				ID3D11ShaderResourceView* srv = nullptr;
+				package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
+			}
+
+			if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
+			{
+				ID3D11UnorderedAccessView* srv = nullptr;
+				package.Context.CSSetUnorderedAccessViews(inst->_slot, 1, &srv, nullptr);
+			}
+
 			if (inst->_spec.CreateSampler)
 			{
 				inst->_sampler->Unbind();
@@ -308,7 +260,7 @@ void Texture::SetImage(const std::shared_ptr<Image>& image)
 		{
 			const auto usage = imageInst->Usage();
 
-			if (usage & ImageUsage_ShaderResource)
+			if (usage & ImageUsage_ShaderResource && inst->_spec.Usage & TextureUsage_ShaderResource)
 			{
 				inst->_nativeShaderResourceView = imageInst->_nativeShaderResourceView;
 			}
@@ -341,6 +293,16 @@ auto Texture::ShaderView() const -> const ID3D11ShaderResourceView&
 	return *_nativeShaderResourceView.Get();
 }
 
+auto Texture::UnorderedView() -> ID3D11UnorderedAccessView&
+{
+	return *_nativeUnorderedAccessView.Get();
+}
+
+auto Texture::UnorderedView() const -> const ID3D11UnorderedAccessView&
+{
+	return *_nativeUnorderedAccessView.Get();
+}
+
 auto Texture::Create(const TextureSpec& spec, uint slot) -> std::shared_ptr<Texture>
 {
 	return BindableStore::Add<Texture>(spec, slot);
@@ -370,6 +332,117 @@ auto Texture::Create(
 ) -> std::shared_ptr<Texture>
 {
 	return BindableStore::Add<Texture>(image, spec, slot);
+}
+
+auto Texture::CreateSrv(
+	const RendererPackage& package,
+	ID3D11Texture2D& tex,
+	const DirectX::TexMetadata& meta
+) -> ComPtr<ID3D11ShaderResourceView>
+{
+	D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
+	srvd.Format = meta.format;
+	srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	srvd.Texture2D.MipLevels = meta.mipLevels;
+	srvd.Texture2D.MostDetailedMip = 0;
+
+	ComPtr<ID3D11ShaderResourceView> result;
+	const auto hr = package.Device.CreateShaderResourceView(&tex, &srvd, &result);
+	ThrowIfBad(hr);
+	return result;
+}
+
+auto Texture::CreateUav(
+	const RendererPackage& package,
+	ID3D11Texture2D& tex,
+	const DirectX::TexMetadata& meta
+) -> ComPtr<ID3D11UnorderedAccessView>
+{
+	D3D11_UNORDERED_ACCESS_VIEW_DESC uavd = {};
+	uavd.Format = meta.format;
+	uavd.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+	uavd.Texture2D.MipSlice = meta.mipLevels; // Unsure...
+
+	ComPtr<ID3D11UnorderedAccessView> result;
+	const auto hr = package.Device.CreateUnorderedAccessView(&tex, &uavd, &result);
+	ThrowIfBad(hr);
+	return result;
+}
+
+auto Texture::LoadWicFromFile(
+	const RendererPackage& package,
+	const std::filesystem::path& path,
+	const TextureSpec& spec
+) -> std::tuple<ComPtr<ID3D11Texture2D>, DirectX::TexMetadata>
+{
+	const auto wicFlags = spec.SRGB ? DirectX::WIC_FLAGS_FORCE_SRGB : DirectX::WIC_FLAGS_FORCE_RGB;
+
+	// Load from disk
+	DirectX::TexMetadata metaData;
+	DirectX::GetMetadataFromWICFile(path.c_str(), wicFlags, metaData);
+
+	DirectX::ScratchImage scratchImage;
+	DirectX::LoadFromWICFile(path.c_str(), wicFlags, &metaData, scratchImage);
+
+	auto res = CreateFromScratchAndMeta(package, scratchImage, metaData, spec);
+
+	// TODO: Store this for some time in case it is loaded from disk again
+	scratchImage.Release();
+
+	return std::make_tuple(res, metaData);
+}
+
+auto Texture::LoadHdrFromFile(
+	const RendererPackage& package,
+	const std::filesystem::path& path,
+	const TextureSpec& spec
+) -> std::tuple<ComPtr<ID3D11Texture2D>, DirectX::TexMetadata>
+{
+	// Load from disk
+	DirectX::TexMetadata metaData = {};
+	DirectX::GetMetadataFromHDRFile(path.c_str(), metaData);
+
+	DirectX::ScratchImage scratchImage;
+	DirectX::LoadFromHDRFile(path.c_str(), &metaData, scratchImage);
+
+	auto res = CreateFromScratchAndMeta(package, scratchImage, metaData, spec);
+
+	// TODO: Store this for some time in case it is loaded from disk again
+	scratchImage.Release();
+
+	return std::make_tuple(res, metaData);
+}
+
+auto Texture::CreateFromScratchAndMeta(
+	const RendererPackage& package,
+	const DirectX::ScratchImage& scratch,
+	const DirectX::TexMetadata& meta,
+	const TextureSpec& spec
+) -> ComPtr<ID3D11Texture2D>
+{
+	// Convert to texture
+	D3D11_TEXTURE2D_DESC td = {};
+	td.Width = meta.width;
+	td.Height = meta.height;
+	td.Format = meta.format;
+	td.ArraySize = 1;
+	td.MipLevels = 1;
+	td.MiscFlags = 0;
+	td.SampleDesc.Count = 1;
+	td.Usage = D3D11_USAGE_DEFAULT;
+	td.BindFlags = Utils::ToD3D11TextureBindFlags(spec.Usage);
+	td.CPUAccessFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA sd = {};
+	sd.pSysMem = scratch.GetPixels();
+	// Works as long as we expect exactly one image in each file
+	sd.SysMemPitch = scratch.GetImages()->rowPitch;
+
+	ComPtr<ID3D11Texture2D> texResult;
+	auto hr = package.Device.CreateTexture2D(&td, &sd, &texResult);
+	ThrowIfBad(hr);
+
+	return texResult;
 }
 
 size_t Utils::ImageFormatToMemorySize(ImageFormat format)
