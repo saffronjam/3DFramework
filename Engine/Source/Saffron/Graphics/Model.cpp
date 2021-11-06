@@ -27,6 +27,27 @@ void Model::Bind()
 	_sampler->Bind();
 }
 
+void Model::Unbind()
+{
+	_vertexBuffer->Unbind();
+	_indexBuffer->Unbind();
+	_inputLayout->Unbind();
+
+	const auto inst = ShareThisAs<Model>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			constexpr ID3D11ShaderResourceView* srv = nullptr;
+			package.Context.PSSetShaderResources(
+				0,
+				1,
+				&srv
+			);
+		}
+	);
+	_sampler->Unbind();
+}
+
 void Model::OnDebugUi()
 {
 	ImGui::Begin("Model");

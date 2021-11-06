@@ -25,7 +25,7 @@ enum TextureUsageFlags : uint
 
 struct TextureSpec
 {
-	SamplerWrap SamplerWrap = SamplerWrap::Mirror;
+	SamplerWrap SamplerWrap = SamplerWrap::Wrap;
 	SamplerFilter SamplerFilter = SamplerFilter::Bilinear;
 	bool GenerateMips = true;
 	bool SRGB = false;
@@ -114,9 +114,9 @@ private:
 	) -> ComPtr<ID3D11Texture2D>;
 
 private:
-	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView;
-	ComPtr<ID3D11UnorderedAccessView> _nativeUnorderedAccessView;
-	ComPtr<ID3D11Texture2D> _nativeTexture;
+	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView{};
+	ComPtr<ID3D11UnorderedAccessView> _nativeUnorderedAccessView{};
+	ComPtr<ID3D11Texture2D> _nativeTexture{};
 	std::shared_ptr<Sampler> _sampler;
 
 	TextureSpec _spec;
@@ -127,6 +127,63 @@ private:
 	std::optional<std::filesystem::path> _path;
 
 	std::vector<uchar> _dataBuffer;
+};
+
+
+class TextureCube : public Bindable
+{
+public:
+	TextureCube(uint width, uint height, ImageFormat format, const TextureSpec& spec, uint slot);
+
+	void Bind() const override;
+	void Unbind() const override;
+
+	auto NativeHandle() -> ID3D11Texture2D&;
+	auto NativeHandle() const -> const ID3D11Texture2D&;
+	auto ShaderView() -> ID3D11ShaderResourceView&;
+	auto ShaderView() const -> const ID3D11ShaderResourceView&;
+	auto UnorderedView()->ID3D11UnorderedAccessView&;
+	auto UnorderedView() const -> const ID3D11UnorderedAccessView&;
+
+	auto Width() const -> uint;
+	auto Height() const -> uint;
+	auto Format() const->ImageFormat;
+
+	void SetUsage(TextureUsage usage);
+
+	static auto Create(
+		uint width,
+		uint height,
+		ImageFormat format,
+		const TextureSpec& spec = TextureSpec(),
+		uint slot = 0
+	) -> std::shared_ptr<TextureCube>;
+
+private:
+	static auto CreateSrv(
+		const RendererPackage& package,
+		ID3D11Texture2D& tex,
+		const DirectX::TexMetadata& meta
+	) -> ComPtr<ID3D11ShaderResourceView>;
+
+	static auto CreateUav(
+		const RendererPackage& package,
+		ID3D11Texture2D& tex,
+		const DirectX::TexMetadata& meta
+	) -> ComPtr<ID3D11UnorderedAccessView>;
+
+private:
+	ComPtr<ID3D11ShaderResourceView> _nativeShaderResourceView{};
+	ComPtr<ID3D11UnorderedAccessView> _nativeUnorderedAccessView{};
+	ComPtr<ID3D11Texture2D> _nativeTexture{};
+	std::shared_ptr<Sampler> _sampler;
+
+	uint _width = 0;
+	uint _height = 0;
+	ImageFormat _format = ImageFormat::None;
+	TextureSpec _spec;
+
+	uint _slot = 0;
 };
 
 namespace Utils

@@ -57,16 +57,19 @@ struct RenderState
 		DepthTest_Never = BIT(7),
 		DepthTest_Always = BIT(8),
 
+		DepthWriteMask_All = BIT(9),
+		DepthWriteMask_Zero = BIT(10),
+
 		// Rasterizer
-		Rasterizer_CullFront = BIT(10),
-		Rasterizer_CullBack = BIT(11),
-		Rasterizer_CullNever = BIT(12),
-		Rasterizer_Fill = BIT(13),
-		Rasterizer_Wireframe = BIT(14),
+		Rasterizer_CullFront = BIT(14),
+		Rasterizer_CullBack = BIT(15),
+		Rasterizer_CullNever = BIT(16),
+		Rasterizer_Fill = BIT(17),
+		Rasterizer_Wireframe = BIT(18),
 
 		// Primitive topology
-		Topology_TriangleList = BIT(17),
-		Topology_LineList = BIT(18)
+		Topology_TriangleList = BIT(22),
+		Topology_LineList = BIT(23)
 	};
 
 	static const RenderState Default;

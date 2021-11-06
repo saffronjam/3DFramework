@@ -23,10 +23,10 @@ public:
 	static auto Create(const uint* data, uint count) -> std::shared_ptr<IndexBuffer>;
 
 private:
-	ComPtr<ID3D11Buffer> _nativeBuffer;
+	ComPtr<ID3D11Buffer> _nativeBuffer{};
 	
-	uint _capacity;
-	uint _size;
+	uint _capacity{};
+	uint _size{};
 	uint _offset = 0;
 };
 }

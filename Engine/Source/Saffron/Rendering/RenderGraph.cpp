@@ -5,6 +5,8 @@
 #include "Saffron/Rendering/RenderPasses/GeometryPass.h"
 #include "Saffron/Rendering/RenderPasses/LinePass.h"
 #include "Saffron/Rendering/RenderPasses/ShadowMapPass.h"
+#include "Saffron/Rendering/RenderPasses/SkyboxPass.h"
+#include "Saffron/Rendering/RenderPasses/TargetHostPass.h"
 
 namespace Se
 {
@@ -24,7 +26,19 @@ void RenderGraph::Setup(SceneCommon& sceneCommon)
 	}
 
 	{
+		auto pass = std::make_unique<TargetHostPass>("TargetHost", sceneCommon);
+		AddPass(std::move(pass));
+	}
+
+	{
+		auto pass = std::make_unique<SkyboxPass>("Skybox", sceneCommon);
+		pass->LinkInput("Target", "TargetHost.Target");
+		AddPass(std::move(pass));
+	}
+
+	{
 		auto pass = std::make_unique<GeometryPass>("Geometry", sceneCommon);
+		pass->LinkInput("Target", "Skybox.Target");
 		pass->LinkInput("ShadowMap0", "ShadowMap.Target0");
 		AddPass(std::move(pass));
 	}

@@ -234,13 +234,17 @@ void Renderer::SetRenderState(RenderState state)
 
 				package.Context.OMSetDepthStencilState(inst._nativeDepthStencilState.Get(), 1);
 				package.Context.RSSetState(inst._nativeRasterizerState.Get());
-				package.Context.PSSetSamplers(0, 1, inst._nativeSamplerState.GetAddressOf());
 				package.Context.IASetPrimitiveTopology(inst._topology);
 
 				inst._submittedState = state;
 			}
 		}
 	);
+}
+
+void Renderer::ResetRenderState()
+{
+	SetRenderState(RenderState::Default);
 }
 
 void Renderer::SetViewportSize(uint width, uint height)
@@ -395,14 +399,13 @@ void Renderer::CreateRenderState(uint state)
 	{
 		dsd.DepthEnable = true;
 		dsd.DepthFunc = Utils::ToD3D11CompFunc(state);
-		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	}
 	else
 	{
 		dsd.DepthEnable = false;
-		dsd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
 	}
 
+	dsd.DepthWriteMask = Utils::ToD3D11WriteMask(state);
 	auto hr = _device->CreateDepthStencilState(&dsd, &_nativeDepthStencilState);
 	ThrowIfBad(hr);
 
@@ -458,6 +461,14 @@ D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state)
 	if (state & RenderState::DepthTest_Always) return D3D11_COMPARISON_ALWAYS;
 
 	throw SaffronException("Invalid state. Could not convert to D3D11_COMPARISON_FUNC.");
+}
+
+D3D11_DEPTH_WRITE_MASK ToD3D11WriteMask(ulong state)
+{
+	if (state & RenderState::DepthWriteMask_All) return D3D11_DEPTH_WRITE_MASK_ALL;
+	if (state & RenderState::DepthWriteMask_Zero) return D3D11_DEPTH_WRITE_MASK_ZERO;
+
+	throw SaffronException("Invalid state. Could not convert to D3D11_DEPTH_WRITE_MASK.");
 }
 
 D3D11_PRIMITIVE_TOPOLOGY ToD3D11PrimiteTopology(ulong state)

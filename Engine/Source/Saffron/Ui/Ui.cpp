@@ -112,6 +112,28 @@ void Ui::Image(const Texture& texture, const Shader& shader, const Vector2& size
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
 }
 
+void Ui::Image(const TextureCube& texture, const Vector2& size)
+{
+	ImVec2 imSize{ size.x, size.y };
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = { static_cast<float>(texture.Width()), static_cast<float>(texture.Height()) };
+	}
+
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
+}
+
+void Ui::Image(const TextureCube& texture, const Shader& shader, const Vector2& size)
+{
+	ImVec2 imSize{ size.x, size.y };
+	if (size.x == 0.0f || size.y == 0.0f)
+	{
+		imSize = { static_cast<float>(texture.Width()), static_cast<float>(texture.Height()) };
+	}
+
+	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
+}
+
 void Ui::Image(const Se::Image& image, const Vector2& size)
 {
 	ImVec2 imSize{size.x, size.y};

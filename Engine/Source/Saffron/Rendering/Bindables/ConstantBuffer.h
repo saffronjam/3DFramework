@@ -25,6 +25,7 @@ public:
 	explicit ConstantBuffer(const T& initialData, uint slot);
 
 	void Bind() const override;
+	void Unbind() const override;
 
 	void Update(const T& data);
 	virtual void UploadData();
@@ -105,6 +106,28 @@ void ConstantBuffer<T>::Bind() const
 			if (inst->_bindFlags & ConstantBufferBindFlags_PS)
 			{
 				package.Context.PSSetConstantBuffers(inst->_slot, 1, inst->_nativeBuffer.GetAddressOf());
+			}
+		}
+	);
+}
+
+template <class T>
+void ConstantBuffer<T>::Unbind() const
+{
+	const auto inst = ShareThisAs<const ConstantBuffer<T>>();
+
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			if (inst->_bindFlags & ConstantBufferBindFlags_VS)
+			{
+				constexpr ID3D11Buffer* buffer = nullptr;
+				package.Context.VSSetConstantBuffers(inst->_slot, 1, &buffer);
+			}
+			if (inst->_bindFlags & ConstantBufferBindFlags_PS)
+			{
+				constexpr ID3D11Buffer* buffer = nullptr;
+				package.Context.PSSetConstantBuffers(inst->_slot, 1, &buffer);
 			}
 		}
 	);

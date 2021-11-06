@@ -48,6 +48,8 @@ class Model : public Managed<Model>
 	friend class ModelStore;
 public:
 	void Bind();
+	void Unbind();
+
 	void OnDebugUi();
 
 	auto SubMeshes() const -> const std::vector<SubMesh>&;

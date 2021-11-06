@@ -99,6 +99,7 @@ public:
 	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
 
 	static void SetRenderState(RenderState state);
+	static void ResetRenderState();
 	static void SetViewportSize(uint width, uint height);
 
 	static auto WhiteTexture() -> const std::shared_ptr<Texture>&;
@@ -121,7 +122,7 @@ private:
 	ComPtr<IDXGISwapChain1> _swapChain{};
 	ComPtr<ID3D11DeviceContext> _context{};
 	ComPtr<IDXGIFactory2> _factory{};
-	
+
 	// Render state
 	RenderState _submittedState = 0;
 	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
@@ -165,6 +166,7 @@ void Renderer::Log(const std::string& string, const Args&... args)
 namespace Utils
 {
 D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state);
+D3D11_DEPTH_WRITE_MASK ToD3D11WriteMask(ulong state);
 D3D11_PRIMITIVE_TOPOLOGY ToD3D11PrimiteTopology(ulong state);
 }
 }

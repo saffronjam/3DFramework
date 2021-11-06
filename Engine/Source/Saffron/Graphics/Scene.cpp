@@ -44,10 +44,12 @@ Scene::Scene() :
 		return false;
 	};
 
-	_environment = SceneEnvironment::Create("Assets/Textures/GrandCanyon_C_YumaPoint/GCanyon_C_YumaPoint_3k.hdr");
-
-
-	_testWicTex = Texture::Create("Assets/Textures/skybox/back.jpg");
+	cube = TextureCube::Create(
+		1024,
+		1024,
+		ImageFormat::RGBA32f,
+		{.CreateSampler = false,  .Usage = TextureUsage_ShaderResource | TextureUsage_UnorderedAccess }
+	);
 }
 
 void Scene::OnUpdate(TimeSpan ts)

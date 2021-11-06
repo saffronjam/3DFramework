@@ -56,8 +56,15 @@ void Shader::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			package.Context.VSSetShader(inst->_nativeVertexShader.Get(), nullptr, 0);
-			package.Context.PSSetShader(inst->_nativePixelShader.Get(), nullptr, 0);
+			if (inst->_isCompute)
+			{
+				package.Context.CSSetShader(inst->_nativeComputeShader.Get(), nullptr, 0);
+			}
+			else
+			{
+				package.Context.VSSetShader(inst->_nativeVertexShader.Get(), nullptr, 0);
+				package.Context.PSSetShader(inst->_nativePixelShader.Get(), nullptr, 0);
+			}
 		}
 	);
 }
@@ -68,8 +75,15 @@ void Shader::Unbind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			package.Context.VSSetShader(nullptr, nullptr, 0);
-			package.Context.PSSetShader(nullptr, nullptr, 0);
+			if (inst->_isCompute)
+			{
+				package.Context.CSSetShader(nullptr, nullptr, 0);
+			}
+			else
+			{
+				package.Context.VSSetShader(nullptr, nullptr, 0);
+				package.Context.PSSetShader(nullptr, nullptr, 0);
+			}
 		}
 	);
 }

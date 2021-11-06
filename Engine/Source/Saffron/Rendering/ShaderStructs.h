@@ -6,6 +6,8 @@ namespace Se
 {
 static constexpr uint MaxLights = 4;
 
+namespace ShaderStructs
+{
 struct alignas(16) PointLight
 {
 	Matrix LightTransform;
@@ -13,4 +15,5 @@ struct alignas(16) PointLight
 	float Radius;
 	Color Color;
 };
+}
 }

@@ -5,6 +5,7 @@
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables.h"
+#include "Saffron/Rendering/SceneEnvironment.h"
 #include "Saffron/Rendering/VertexTypes.h"
 
 namespace Se
@@ -30,30 +31,36 @@ struct DrawCommand
 	Matrix Transform;
 };
 
+namespace ShaderStructs
+{
 struct alignas(16) SceneCommonCBuffer
 {
 	Vector3 CameraPosition;
 };
+}
 
 struct SceneCommon
 {
 	CameraData CameraData;
-	std::shared_ptr<ConstantBuffer<SceneCommonCBuffer>> _sceneCommonCBuffer;
+	std::shared_ptr<ConstantBuffer<ShaderStructs::SceneCommonCBuffer>> _sceneCommonCBuffer;
 
-	std::map<RenderChannels, std::vector<DrawCommand>> DrawCommands;
+	std::map<RenderChannels, std::vector<DrawCommand>> DrawCommands{};
 
 	// Shadow and light
-	PointLight PointLight;
+	ShaderStructs::PointLight PointLight;
 
 	// Lines
 	static constexpr uint MaxLines = 10000;
-	std::vector<PosColVertex> LinesVertices;
-	std::vector<uint> LineIndices;
+	std::vector<PosColVertex> LinesVertices{};
+	std::vector<uint> LineIndices{};
 
 	// Quads
 	static constexpr uint MaxQuads = 1000;
-	std::vector<PosColTexVertex> QuadVertices;
-	std::vector<uint> QuadIndices;
+	std::vector<PosColTexVertex> QuadVertices{};
+	std::vector<uint> QuadIndices{};
+
+	// Environment and skybox
+	std::shared_ptr<SceneEnvironment> Environment;
 };
 
 class SceneRenderer

@@ -84,8 +84,12 @@ void ShadowMapPass::Execute()
 					_mvpCBuffer->UploadData();
 					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 				}
+
+				_mvpCBuffer->Unbind();
 			}
 		);
+
+		_shadowShader->Unbind();
 	}
 
 	_shadowMap->Unbind();

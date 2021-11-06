@@ -4,10 +4,10 @@
 
 namespace Se
 {
-VertexStorage::VertexStorage(VertexLayout layout) :
-	_layout(std::move(layout)),
-	_data()
+VertexStorage::VertexStorage(const VertexLayout &layout, size_t reserved) :
+	_layout(layout)
 {
+	_data.reserve(reserved * layout.ByteSize());
 }
 
 auto VertexStorage::Data() -> uchar*

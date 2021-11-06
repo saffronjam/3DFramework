@@ -2,7 +2,7 @@
 
 
 Texture2D equirectangularTex : register(t0);
-RWTexture2DArray<float> cubemap : register(u0);
+RWTexture2DArray<float4> cubemap : register(u0);
 
 SamplerState equirectSampler : register(s0);
 
@@ -37,6 +37,6 @@ void main( uint3 DTid : SV_DispatchThreadID )
     float theta = acos(cubeTC.y);
     float2 uv = float2(phi / (2.0 * Pi) + 0.5, theta / Pi);
 
-    float4 color = { 0.0, 0.0, 0.0, 0.0 };
-    cubemap[DTid] = color;
+    float4 color = equirectangularTex.SampleLevel(equirectSampler, uv, 1);
+    cubemap[uint3(DTid.xyz)] = color;
 }

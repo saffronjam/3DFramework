@@ -52,9 +52,15 @@ void LinePass::Execute()
 			_mvpCBuffer->Bind();
 
 			package.Context.DrawIndexed(SceneCommon().LineIndices.size(), 0, 0);
+
+			_mvpCBuffer->Unbind();
 		}
 	);
 
+	_shader->Unbind();
+	_vertexBuffer->Unbind();
+	_indexBuffer->Unbind();
+	_inputLayout->Unbind();
 	_target->Unbind();
 }
 }

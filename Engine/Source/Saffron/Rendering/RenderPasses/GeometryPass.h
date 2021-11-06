@@ -8,7 +8,7 @@ namespace Se
 {
 struct alignas(16) PointLightCBuffer
 {
-	PointLight PointLights[MaxLights];
+	ShaderStructs::PointLight PointLights[MaxLights];
 	int nPointLights;
 };
 
@@ -31,8 +31,6 @@ private:
 	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
 
 	std::shared_ptr<Texture> _shadowMapTexture;
-
-	std::shared_ptr<TextureCube> _testCube;
 
 };
 }

@@ -21,7 +21,7 @@ SceneRenderer::SceneRenderer(Scene& scene) :
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Shadow, std::vector<DrawCommand>{});
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Outline, std::vector<DrawCommand>{});
 
-	_sceneCommon._sceneCommonCBuffer = ConstantBuffer<SceneCommonCBuffer>::Create(1);
+	_sceneCommon._sceneCommonCBuffer = ConstantBuffer<ShaderStructs::SceneCommonCBuffer>::Create(1);
 
 	_renderGraph.RegisterOutput("BackBuffer", Renderer::BackBufferPtr());
 	_renderGraph.RegisterInput("FinalOutput", _finalTarget);
@@ -31,12 +31,17 @@ SceneRenderer::SceneRenderer(Scene& scene) :
 	_sceneCommon.LinesVertices.reserve(_sceneCommon.MaxLines);
 	_sceneCommon.LineIndices.reserve(_sceneCommon.MaxLines);
 
+	_sceneCommon.Environment = SceneEnvironment::Create(
+		"Assets/Textures/GrandCanyon_C_YumaPoint/GCanyon_C_YumaPoint_3k.hdr"
+	);
+
 	SetViewportSize(100, 100);
 }
 
 void SceneRenderer::OnUi()
 {
 	_renderGraph.OnUi();
+	_sceneCommon.Environment->OnUi();
 }
 
 void SceneRenderer::Begin(const CameraData& cameraData)

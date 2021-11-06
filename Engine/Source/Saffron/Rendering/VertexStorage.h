@@ -8,7 +8,7 @@ namespace Se
 class VertexStorage
 {
 public:
-	explicit VertexStorage(VertexLayout layout);
+	explicit VertexStorage(const VertexLayout& layout, size_t reserved = 0);
 
 	template <typename VertexType>
 	void Add(VertexType type);
@@ -24,7 +24,7 @@ public:
 
 private:
 	VertexLayout _layout;
-	std::vector<uchar> _data;
+	std::vector<uchar> _data{};
 };
 
 template <typename VertexType>

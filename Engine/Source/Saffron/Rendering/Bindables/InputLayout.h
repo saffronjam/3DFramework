@@ -16,6 +16,7 @@ public:
 	InputLayout(VertexLayout vertexLayout, const std::shared_ptr<Shader>& shader);
 
 	void Bind() const override;
+	void Unbind() const override;
 
 	static std::string Identifier(VertexLayout vertexLayout, const std::shared_ptr<Shader>& vertexShader)
 	{

@@ -43,10 +43,9 @@ private:
 	std::shared_ptr<Model> _cameraMesh;
 	EditorCamera* _activeCamera = &_camera1;
 	bool _drawCameraFrustums = false;
-	std::shared_ptr<SceneEnvironment> _environment;
 
 	SceneRenderer _sceneRenderer;
-	PointLight _pointLight;
+	ShaderStructs::PointLight _pointLight;
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
 
@@ -55,8 +54,6 @@ private:
 	float roughness = 0.2f;
 	Vector3 albedo = {1.0f, 0.0f, 0.0f};
 
-
-	std::shared_ptr<Texture> _testWicTex;
-
+	std::shared_ptr<TextureCube> cube;
 };
 }

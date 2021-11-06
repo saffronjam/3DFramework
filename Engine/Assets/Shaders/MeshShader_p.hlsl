@@ -15,9 +15,9 @@ Texture2D ShadowMapTexture : register(t4);
 SamplerState ShadowMapSampleType : register(s4);
 
 
-/////////
-// PBR //
-/////////
+///////////////
+///// PBR /////
+///////////////
 
 cbuffer PBR_Material : register(b3){ float4 AlbedoColor; float Metalness; float Roughness; float Emission; float
 EnvMapRotation; bool UseNormalMap;};
@@ -34,10 +34,6 @@ struct PBR_Data
 
 static const float3 FrenselDielectric = 0.04f;
 
-
-///////////////
-///// PBR /////
-///////////////
 
 // GGX/Towbridge-Reitz normal distribution function.
 // Uses Disney's reparametrization of alpha = roughness^2.

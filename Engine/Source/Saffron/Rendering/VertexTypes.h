@@ -4,6 +4,17 @@
 
 namespace Se
 {
+struct PosTexVertex
+{
+	Vector3 Position;
+	Vector2 TexCoord;
+
+	static auto Layout() -> VertexLayout
+	{
+		return {{"Position", ElementType::Float3}, {"TexCoord", ElementType::Float2}};
+	}
+};
+
 struct PosColVertex
 {
 	Vector3 Position;

@@ -44,6 +44,17 @@ void InputLayout::Bind() const
 	);
 }
 
+void InputLayout::Unbind() const
+{
+	Renderer::Submit(
+		[](const RendererPackage& package)
+		{
+			constexpr ID3D11InputLayout* layout = nullptr;
+			package.Context.IASetInputLayout(layout);
+		}
+	);
+}
+
 auto InputLayout::Create(
 	VertexLayout vertexLayout,
 	const std::shared_ptr<Shader>& vertexShader

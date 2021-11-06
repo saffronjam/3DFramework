@@ -32,6 +32,8 @@ public:
 	
 	static void Image(const Texture& texture, const Vector2& size = {0.0f, 0.0f});
 	static void Image(const Texture& texture, const Shader& shader, const Vector2& size = {0.0f, 0.0f});
+	static void Image(const TextureCube& texture, const Vector2& size = { 0.0f, 0.0f });
+	static void Image(const TextureCube& texture, const Shader& shader, const Vector2& size = { 0.0f, 0.0f });
 	static void Image(const class Image& image, const Vector2& size = { 0.0f, 0.0f });
 	static void Image(const class Image& image, const Shader& shader, const Vector2& size = {0.0f, 0.0f});
 

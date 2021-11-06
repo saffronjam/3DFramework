@@ -34,6 +34,7 @@ public:
 	explicit Sampler(const SamplerSpec& spec, uint slot);
 
 	void Bind() const override;
+	void Unbind() const override;
 
 	static auto Create(const SamplerSpec& spec = SamplerSpec{}, uint slot = 0) -> std::shared_ptr<Sampler>;
 

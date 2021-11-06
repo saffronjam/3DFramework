@@ -26,6 +26,7 @@ Sampler::Sampler(const SamplerSpec& spec, uint slot) :
 					sd.AddressU = texAddressMode;
 					sd.AddressV = texAddressMode;
 					sd.AddressW = texAddressMode;
+
 					std::memcpy(sd.BorderColor, inst->_spec.BorderColor, sizeof(Color));
 
 					const auto hr = package.Device.CreateSamplerState(&sd, &inst->_nativeSamplerState);
@@ -42,7 +43,20 @@ void Sampler::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
+			package.Context.CSSetSamplers(inst->_slot, 1, inst->_nativeSamplerState.GetAddressOf());
 			package.Context.PSSetSamplers(inst->_slot, 1, inst->_nativeSamplerState.GetAddressOf());
+		}
+	);
+}
+
+void Sampler::Unbind() const
+{
+	const auto inst = ShareThisAs<const Sampler>();
+	Renderer::Submit(
+		[inst](const RendererPackage& package)
+		{
+			constexpr ID3D11SamplerState* sampler = nullptr;
+			package.Context.PSSetSamplers(inst->_slot, 1, &sampler);
 		}
 	);
 }

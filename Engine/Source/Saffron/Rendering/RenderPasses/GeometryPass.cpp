@@ -10,13 +10,12 @@ namespace Se
 {
 GeometryPass::GeometryPass(const std::string& name, struct SceneCommon& sceneCommon) :
 	RenderPass(name, sceneCommon),
-	_target(Framebuffer::Create(FramebufferSpec{500, 500, {ImageFormat::RGBA, ImageFormat::Depth24Stencil8}})),
 	_pointLightCBuffer(ConstantBuffer<PointLightCBuffer>::Create({}, 2)),
 	_mvpCBuffer(TransformCBuffer::Create()),
-	_shadowMapTexture(Texture::Create(TextureSpec{SamplerWrap::Border, SamplerFilter::Bilinear}, 4)),
-	_testCube(TextureCube::Create(100, 100, ImageFormat::RGBA))
+	_shadowMapTexture(Texture::Create(TextureSpec{SamplerWrap::Border, SamplerFilter::Bilinear}, 4))
 {
 	RegisterInput("ShadowMap0", _shadowMap);
+	RegisterInput("Target", _target);
 	RegisterOutput("Target", _target);
 
 	_pointLightCBuffer->SetBindFlags(ConstantBufferBindFlags_PS | ConstantBufferBindFlags_VS);
@@ -41,7 +40,7 @@ void GeometryPass::Execute()
 	auto& common = SceneCommon();
 
 	// Setup renderer
-	Renderer::SetRenderState(RenderState::Default);
+	Renderer::ResetRenderState();
 	Renderer::SetViewportSize(_target->Width(), _target->Height());
 
 	// Update point light data
@@ -53,7 +52,6 @@ void GeometryPass::Execute()
 
 	// Render to texture
 	_target->Bind();
-	_target->Clear();
 
 	for (auto& drawCommand : common.DrawCommands.at(RenderChannel_Geometry))
 	{
@@ -67,7 +65,7 @@ void GeometryPass::Execute()
 			{
 				_mvpCBuffer->Bind();
 
-				const auto& materials = drawCommand.Model->Materials();				
+				const auto& materials = drawCommand.Model->Materials();
 				const auto viewProj = common.CameraData.View * common.CameraData.Projection;
 
 				for (const auto& submesh : drawCommand.Model->SubMeshes())
@@ -88,8 +86,13 @@ void GeometryPass::Execute()
 					_mvpCBuffer->UploadData();
 					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 				}
+
+				_mvpCBuffer->Unbind();
 			}
 		);
+
+		common._sceneCommonCBuffer->Unbind();
+		drawCommand.Model->Unbind();
 	}
 
 	_shadowMapTexture->Unbind();
