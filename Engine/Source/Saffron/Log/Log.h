@@ -14,6 +14,10 @@ public:
 	static void Info(const std::string& string);
 
 	template <typename ... Args>
+	static void Warn(const std::string& string, const Args& ... args);
+	static void Warn(const std::string& string);
+
+	template <typename ... Args>
 	static void Debug(const std::string& string, const Args& ... args);
 	static void Debug(const std::string& string);
 
@@ -25,6 +29,12 @@ template <typename ... Args>
 void Log::Info(const std::string& string, const Args&... args)
 {
 	Info(std::format(string, args...));
+}
+
+template <typename ... Args>
+void Log::Warn(const std::string& string, const Args&... args)
+{
+	Warn(std::format(string, args...));
 }
 
 template <typename ... Args>

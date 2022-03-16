@@ -193,6 +193,11 @@ project (module.Project)
         shadermodel "5.0"
         shadertype "Compute"
         shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
+        
+    filter { "files:**_g.hlsl" }
+        shadermodel "5.0"
+        shadertype "Geometry"
+        shaderobjectfileoutput(EngineAstFol .. "Shaders/Bin/%{file.basename}.cso")
 
     filter { "files:**_i.hlsl" }
         flags "ExcludeFromBuild"

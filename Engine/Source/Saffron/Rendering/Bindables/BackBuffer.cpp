@@ -24,7 +24,7 @@ BackBuffer::BackBuffer(const Window& window)
 
 					auto mainImage = Image::CreateFromBackBuffer();
 
-					inst->_colorAttachmentFormats.push_back(mainImage->Format());
+					inst->_colorAttachmentFormats.emplace_back(mainImage->Format(), 1);
 					inst->_colorAttachments.push_back(std::move(mainImage));
 				}
 			);

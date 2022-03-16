@@ -10,7 +10,7 @@ namespace ShaderStructs
 {
 struct alignas(16) PointLight
 {
-	Matrix LightTransform;
+	std::array<Matrix, 6> LookAt;
 	Vector3 Position;
 	float Radius;
 	Color Color;

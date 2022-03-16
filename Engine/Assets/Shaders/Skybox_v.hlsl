@@ -1,13 +1,11 @@
 cbuffer Camera : register(b0)
 {
     matrix ViewProj;
-    matrix ViewProjInv;
 }
 
 struct VsInput
 {
 	float3 Position : Position;
-	float2 TexCoord : TexCoord;
 };
 
 struct VsOutput
@@ -23,7 +21,6 @@ VsOutput main(VsInput input)
     output.WorldPos = input.Position;
 
     output.Position = mul(float4(input.Position, 0.0f), ViewProj);
-
     output.Position.z = output.Position.w;
 
 	return output;

@@ -21,6 +21,8 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 
 	Debug::Assert(!(depthStencil && renderTarget), "Image can't be both depth stencil and render target");
 
+	const bool isArray = spec.ArraySize > 1;
+
 	if (depthStencil)
 	{
 		bindFlags |= Utils::ToD3D11BindFlag(ImageUsage_DepthStencil);
@@ -43,9 +45,9 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 	td.Format = Utils::ToDxgiTextureFormat(_spec.Format);
 	td.Width = _spec.Width;
 	td.Height = _spec.Height;
-	td.ArraySize = 1;
+	td.ArraySize = spec.ArraySize;
 	td.MipLevels = 1;
-	td.MiscFlags = 0;
+	td.MiscFlags = isArray ? D3D11_RESOURCE_MISC_TEXTURECUBE : 0;
 	td.SampleDesc.Count = 1;
 	td.Usage = D3D11_USAGE_DEFAULT;
 	td.BindFlags = bindFlags;
@@ -64,8 +66,18 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 	{
 		D3D11_DEPTH_STENCIL_VIEW_DESC dsd = {};
 		dsd.Format = Utils::ToDxgiDepthStencilFormat(_spec.Format);
-		dsd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		dsd.Texture2D.MipSlice = 0;
+		if (isArray)
+		{
+			dsd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+			dsd.Texture2DArray.ArraySize = spec.ArraySize;
+			dsd.Texture2DArray.FirstArraySlice = 0;
+			dsd.Texture2DArray.MipSlice = 0;
+		}
+		else
+		{
+			dsd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			dsd.Texture2D.MipSlice = 0;
+		}
 
 		ComPtr<ID3D11DepthStencilView> depthStencilView;
 		hr = device.CreateDepthStencilView(_nativeTexture.Get(), &dsd, &depthStencilView);
@@ -78,8 +90,18 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 	{
 		D3D11_RENDER_TARGET_VIEW_DESC rd = {};
 		rd.Format = Utils::ToDxgiRenderTargetFormat(_spec.Format);
-		rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-		rd.Texture2D.MipSlice = 0;
+		if (isArray)
+		{
+			rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			rd.Texture2DArray.ArraySize = spec.ArraySize;
+			rd.Texture2DArray.FirstArraySlice = 0;
+			rd.Texture2DArray.MipSlice = 0;
+		}
+		else
+		{
+			rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			rd.Texture2D.MipSlice = 0;
+		}
 
 		ComPtr<ID3D11RenderTargetView> renderTargetView;
 		hr = device.CreateRenderTargetView(_nativeTexture.Get(), &rd, &renderTargetView);
@@ -88,13 +110,23 @@ Image::Image(const ImageSpec& spec, const uint* initialData) :
 		_nativeRenderView = renderTargetView;
 	}
 
+	// Temp: Always bind shader resource
 	if (shaderResource || true)
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvd = {};
 		srvd.Format = Utils::ToDxgiShaderResourceFormat(_spec.Format);
-		srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-		srvd.Texture2D.MipLevels = td.MipLevels;
-		srvd.Texture2D.MostDetailedMip = 0;
+		if (isArray)
+		{
+			srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+			srvd.TextureCube.MipLevels = td.MipLevels;
+			srvd.TextureCube.MostDetailedMip = 0;
+		}
+		else
+		{
+			srvd.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			srvd.Texture2D.MostDetailedMip = 0;
+			srvd.Texture2D.MipLevels = td.MipLevels;
+		}
 
 		hr = device.CreateShaderResourceView(_nativeTexture.Get(), &srvd, &_nativeShaderResourceView);
 		ThrowIfBad(hr);

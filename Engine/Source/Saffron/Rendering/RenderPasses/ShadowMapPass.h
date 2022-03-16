@@ -1,11 +1,19 @@
 ﻿#pragma once
 
 #include "Saffron/Rendering/RenderPass.h"
+#include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables/TransformCBuffer.h"
 #include "Saffron/Rendering/Bindables/Shader.h"
 
 namespace Se
 {
+struct alignas(16) ShadowMapPassCBuffer
+{
+	Color Values;
+	Matrix Model;
+	ShaderStructs::PointLight PointLight;
+};
+
 class ShadowMapPass : public RenderPass
 {
 public:
@@ -21,7 +29,7 @@ private:
 	std::shared_ptr<Shader> _shadowShader;
 	std::shared_ptr<Shader> _depthTextureShader;
 
-	std::shared_ptr<TransformCBuffer> _mvpCBuffer;
+	std::shared_ptr<ConstantBuffer<ShadowMapPassCBuffer>> _shadowMapCBuffer;
 
 	bool _orthographic = false;
 

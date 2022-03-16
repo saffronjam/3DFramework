@@ -1,6 +1,10 @@
 ﻿#include "SaffronPCH.h"
 
 #include "Saffron/Rendering/RenderPasses/SkyboxPass.h"
+
+#include "Saffron/Rendering/Binders/Binder.h"
+#include "Saffron/Rendering/Binders/ShaderBindFlagsBinder.h"
+#include "Saffron/Rendering/Binders/TextureUsageBinder.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Rendering/VertexTypes.h"
 
@@ -16,34 +20,34 @@ SkyboxPass::SkyboxPass(const std::string& name, struct SceneCommon& sceneCommon)
 	_skyboxCBuffer = ConstantBuffer<ShaderStructs::SkyboxCameraCBuffer>::Create();
 
 	//// Setup unit cube
-	VertexLayout layout = PosTexVertex::Layout();
+	VertexLayout layout = PosVertex::Layout();
 	VertexStorage storage(layout);
 	constexpr int side = 1.0f;
 	// Maaaaybe should be inside a generator class
-	storage.Add<PosTexVertex>({Vector3{-side, -side, -side}, Vector2{0.0f, 0.0f}}); // 0 near side
-	storage.Add<PosTexVertex>({Vector3{side, -side, -side}, Vector2{1.0f, 0.0f}}); // 1
-	storage.Add<PosTexVertex>({Vector3{-side, side, -side}, Vector2{0.0f, 1.0f}}); // 2
-	storage.Add<PosTexVertex>({Vector3{side, side, -side}, Vector2{1.0f, 1.0f}}); // 3
-	storage.Add<PosTexVertex>({Vector3{-side, -side, side}, Vector2{0.0f, 0.0f}}); // 4 far side
-	storage.Add<PosTexVertex>({Vector3{side, -side, side}, Vector2{1.0f, 0.0f}}); // 5
-	storage.Add<PosTexVertex>({Vector3{-side, side, side}, Vector2{0.0f, 1.0f}}); // 6
-	storage.Add<PosTexVertex>({Vector3{side, side, side}, Vector2{1.0f, 1.0f}}); // 7
-	storage.Add<PosTexVertex>({Vector3{-side, -side, -side}, Vector2{0.0f, 0.0f}}); // 8 left side
-	storage.Add<PosTexVertex>({Vector3{-side, side, -side}, Vector2{1.0f, 0.0f}}); // 9
-	storage.Add<PosTexVertex>({Vector3{-side, -side, side}, Vector2{0.0f, 1.0f}}); // 10
-	storage.Add<PosTexVertex>({Vector3{-side, side, side}, Vector2{1.0f, 1.0f}}); // 11
-	storage.Add<PosTexVertex>({Vector3{side, -side, -side}, Vector2{0.0f, 0.0f}}); // 12 right side
-	storage.Add<PosTexVertex>({Vector3{side, side, -side}, Vector2{1.0f, 0.0f}}); // 13
-	storage.Add<PosTexVertex>({Vector3{side, -side, side}, Vector2{0.0f, 1.0f}}); // 14
-	storage.Add<PosTexVertex>({Vector3{side, side, side}, Vector2{1.0f, 1.0f}}); // 15
-	storage.Add<PosTexVertex>({Vector3{-side, -side, -side}, Vector2{0.0f, 0.0f}}); // 16 bottom side
-	storage.Add<PosTexVertex>({Vector3{side, -side, -side}, Vector2{1.0f, 0.0f}}); // 17
-	storage.Add<PosTexVertex>({Vector3{-side, -side, side}, Vector2{0.0f, 1.0f}}); // 18
-	storage.Add<PosTexVertex>({Vector3{side, -side, side}, Vector2{1.0f, 1.0f}}); // 19
-	storage.Add<PosTexVertex>({Vector3{-side, side, -side}, Vector2{0.0f, 0.0f}}); // 20 top side
-	storage.Add<PosTexVertex>({Vector3{side, side, -side}, Vector2{1.0f, 0.0f}}); // 21
-	storage.Add<PosTexVertex>({Vector3{-side, side, side}, Vector2{0.0f, 1.0f}}); // 22
-	storage.Add<PosTexVertex>({Vector3{side, side, side}, Vector2{1.0f, 1.0f}}); // 23
+	storage.Add<PosVertex>({Vector3{-side, -side, -side}}); // 0 near side
+	storage.Add<PosVertex>({Vector3{side, -side, -side}}); // 1
+	storage.Add<PosVertex>({Vector3{-side, side, -side}}); // 2
+	storage.Add<PosVertex>({Vector3{side, side, -side} }); // 3
+	storage.Add<PosVertex>({Vector3{-side, -side, side}}); // 4 far side
+	storage.Add<PosVertex>({Vector3{side, -side, side} }); // 5
+	storage.Add<PosVertex>({Vector3{-side, side, side} }); // 6
+	storage.Add<PosVertex>({Vector3{side, side, side} }); // 7
+	storage.Add<PosVertex>({Vector3{-side, -side, -side}}); // 8 left side
+	storage.Add<PosVertex>({Vector3{-side, side, -side}}); // 9
+	storage.Add<PosVertex>({Vector3{-side, -side, side}}); // 10
+	storage.Add<PosVertex>({Vector3{-side, side, side} }); // 11
+	storage.Add<PosVertex>({Vector3{side, -side, -side}}); // 12 right side
+	storage.Add<PosVertex>({Vector3{side, side, -side} }); // 13
+	storage.Add<PosVertex>({Vector3{side, -side, side} }); // 14
+	storage.Add<PosVertex>({Vector3{side, side, side} }); // 15
+	storage.Add<PosVertex>({Vector3{-side, -side, -side}}); // 16 bottom side
+	storage.Add<PosVertex>({Vector3{side, -side, -side}}); // 17
+	storage.Add<PosVertex>({Vector3{-side, -side, side}}); // 18
+	storage.Add<PosVertex>({Vector3{side, -side, side} }); // 19
+	storage.Add<PosVertex>({Vector3{-side, side, -side}}); // 20 top side
+	storage.Add<PosVertex>({Vector3{side, side, -side} }); // 21
+	storage.Add<PosVertex>({Vector3{-side, side, side} }); // 22
+	storage.Add<PosVertex>({Vector3{side, side, side}}); // 23
 	_cubePrimitive.Vb = VertexBuffer::Create(storage);
 	_cubePrimitive.Ib = IndexBuffer::Create(
 		{
@@ -63,18 +67,22 @@ void SkyboxPass::Execute()
 		RenderState::Rasterizer_Fill | RenderState::Topology_TriangleList
 	);
 
-	_target->Bind();
+	const auto& com = SceneCommon();
 
-	const auto viewProj = SceneCommon().CameraData.View * SceneCommon().CameraData.Projection;
-	_skyboxCBuffer->Update({viewProj.Transpose(), viewProj.Invert().Transpose()});
+	ScopedBinder(_target);
 
-	SceneCommon().Environment->Bind();
+	const auto viewProj = com.CameraData.View * com.CameraData.Projection;
+	_skyboxCBuffer->Update({viewProj.Transpose(), viewProj.Transpose().Invert()});
 
-	_shader->Bind();
-	_skyboxCBuffer->Bind();
-	_cubePrimitive.Ib->Bind();
-	_cubePrimitive.Vb->Bind();
-	_cubePrimitive.Il->Bind();
+	ScopedBindFlagsBinder(com.Environment->Texture(), BindFlag_PS);
+	ScopedTexUsageBinder(com.Environment->Texture(), TextureUsage_ShaderResource);
+
+	ScopedBinder(com.Environment->Texture());
+	ScopedBinder(_shader);
+	ScopedBinder(_skyboxCBuffer);
+	ScopedBinder(_cubePrimitive.Ib);
+	ScopedBinder(_cubePrimitive.Vb);
+	ScopedBinder(_cubePrimitive.Il);
 
 	Renderer::Submit(
 		[this](const RendererPackage& package)
@@ -83,8 +91,5 @@ void SkyboxPass::Execute()
 			package.Context.DrawIndexed(nCubeIndices, 0, 0);
 		}
 	);
-
-
-	_target->Unbind();
 }
 }

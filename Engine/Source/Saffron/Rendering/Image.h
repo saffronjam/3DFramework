@@ -10,6 +10,7 @@ enum class ImageFormat
 {
 	None = 0,
 	R,
+	R32f,
 	RGBA,
 	RGBA16,
 	RGBA16f,
@@ -40,6 +41,7 @@ struct ImageSpec
 	uint Width, Height;
 	ImageUsage Usage;
 	ImageFormat Format;
+	int ArraySize = 1;
 };
 
 class Image
@@ -93,6 +95,7 @@ inline auto ToDxgiTextureFormat(ImageFormat format) -> DXGI_FORMAT
 {
 	switch (format)
 	{
+	case ImageFormat::R32f: return DXGI_FORMAT_R32_FLOAT;
 	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
 	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -119,6 +122,7 @@ inline auto ToDxgiRenderTargetFormat(ImageFormat format) -> DXGI_FORMAT
 {
 	switch (format)
 	{
+	case ImageFormat::R32f: return DXGI_FORMAT_R32_FLOAT;
 	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
 	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
 	case ImageFormat::RGBA32f: return DXGI_FORMAT_R32G32B32A32_FLOAT;
@@ -133,6 +137,7 @@ inline auto ToDxgiShaderResourceFormat(ImageFormat format) -> DXGI_FORMAT
 	switch (format)
 	{
 	case ImageFormat::R: return DXGI_FORMAT_R8_UNORM;
+	case ImageFormat::R32f: return DXGI_FORMAT_R32_FLOAT;
 	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
 	case ImageFormat::RGBA16: return DXGI_FORMAT_R16G16B16A16_UNORM;
 	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;
@@ -151,6 +156,7 @@ inline auto ToSaffronFormat(DXGI_FORMAT format) -> ImageFormat
 	switch (format)
 	{
 	case DXGI_FORMAT_R8_UNORM: return ImageFormat::R;
+	case DXGI_FORMAT_R32_FLOAT: return ImageFormat::R32f;
 	case DXGI_FORMAT_R8G8B8A8_UNORM: return ImageFormat::RGBA;
 	case DXGI_FORMAT_R16G16B16A16_UNORM: return ImageFormat::RGBA16;
 	case DXGI_FORMAT_R16G16B16A16_FLOAT: return ImageFormat::RGBA16f;
@@ -168,6 +174,7 @@ inline auto ToD3D11Format(ImageFormat format) -> DXGI_FORMAT
 	switch (format)
 	{
 	case ImageFormat::R: return DXGI_FORMAT_R8_UNORM;
+	case ImageFormat::R32f: return DXGI_FORMAT_R32_FLOAT;
 	case ImageFormat::RGBA: return DXGI_FORMAT_R8G8B8A8_UNORM;
 	case ImageFormat::RGBA16: return DXGI_FORMAT_R16G16B16A16_UNORM;
 	case ImageFormat::RGBA16f: return DXGI_FORMAT_R16G16B16A16_FLOAT;

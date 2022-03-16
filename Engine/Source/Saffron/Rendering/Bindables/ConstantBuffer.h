@@ -9,14 +9,6 @@
 
 namespace Se
 {
-using ConstantBufferBindFlags = uint;
-
-enum ConstantBufferBindFlags_
-{
-	ConstantBufferBindFlags_VS = 1 << 0,
-	ConstantBufferBindFlags_PS = 1 << 1
-};
-
 template <class T>
 class ConstantBuffer : public Bindable
 {
@@ -30,7 +22,7 @@ public:
 	void Update(const T& data);
 	virtual void UploadData();
 
-	void SetBindFlags(ConstantBufferBindFlags bindFlags);
+	void SetBindFlags(ShaderBindFlags bindFlags);
 
 	auto Data() -> T&;
 	auto Data() const -> const T&;
@@ -46,7 +38,7 @@ private:
 
 	uint _slot;
 	bool _dirty = false;
-	ConstantBufferBindFlags _bindFlags = ConstantBufferBindFlags_VS;
+	ShaderBindFlags _bindFlags = BindFlag_VS;
 };
 
 template <class T>
@@ -99,13 +91,17 @@ void ConstantBuffer<T>::Bind() const
 				const_cast<ConstantBuffer<T>&>(*inst).UploadData();
 			}
 
-			if (inst->_bindFlags & ConstantBufferBindFlags_VS)
+			if (inst->_bindFlags & BindFlag_VS)
 			{
 				package.Context.VSSetConstantBuffers(inst->_slot, 1, inst->_nativeBuffer.GetAddressOf());
 			}
-			if (inst->_bindFlags & ConstantBufferBindFlags_PS)
+			if (inst->_bindFlags & BindFlag_PS)
 			{
 				package.Context.PSSetConstantBuffers(inst->_slot, 1, inst->_nativeBuffer.GetAddressOf());
+			}
+			if (inst->_bindFlags & BindFlag_GS)
+			{
+				package.Context.GSSetConstantBuffers(inst->_slot, 1, inst->_nativeBuffer.GetAddressOf());
 			}
 		}
 	);
@@ -119,15 +115,20 @@ void ConstantBuffer<T>::Unbind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			if (inst->_bindFlags & ConstantBufferBindFlags_VS)
+			if (inst->_bindFlags & BindFlag_VS)
 			{
 				constexpr ID3D11Buffer* buffer = nullptr;
 				package.Context.VSSetConstantBuffers(inst->_slot, 1, &buffer);
 			}
-			if (inst->_bindFlags & ConstantBufferBindFlags_PS)
+			if (inst->_bindFlags & BindFlag_PS)
 			{
 				constexpr ID3D11Buffer* buffer = nullptr;
 				package.Context.PSSetConstantBuffers(inst->_slot, 1, &buffer);
+			}
+			if (inst->_bindFlags & BindFlag_GS)
+			{
+				constexpr ID3D11Buffer* buffer = nullptr;
+				package.Context.GSSetConstantBuffers(inst->_slot, 1, &buffer);
 			}
 		}
 	);
@@ -167,7 +168,7 @@ void ConstantBuffer<T>::UploadData()
 }
 
 template <class T>
-void ConstantBuffer<T>::SetBindFlags(ConstantBufferBindFlags bindFlags)
+void ConstantBuffer<T>::SetBindFlags(ShaderBindFlags bindFlags)
 {
 	const auto inst = ShareThisAs<ConstantBuffer>();
 	Renderer::Submit(

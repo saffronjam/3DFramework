@@ -100,7 +100,7 @@ public:
 
 	static void SetRenderState(RenderState state);
 	static void ResetRenderState();
-	static void SetViewportSize(uint width, uint height);
+	static void SetViewportSize(uint width, uint height, float depth = 1.0f);
 
 	static auto WhiteTexture() -> const std::shared_ptr<Texture>&;
 

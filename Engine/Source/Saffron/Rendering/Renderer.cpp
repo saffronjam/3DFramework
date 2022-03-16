@@ -247,12 +247,14 @@ void Renderer::ResetRenderState()
 	SetRenderState(RenderState::Default);
 }
 
-void Renderer::SetViewportSize(uint width, uint height)
+void Renderer::SetViewportSize(uint width, uint height, float depth)
 {
 	Submit(
 		[=](const RendererPackage& package)
 		{
-			const D3D11_VIEWPORT viewport{0.0f, 0.0f, width, height, 0.0f, 1.0f};
+			const D3D11_VIEWPORT viewport{
+				0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, depth
+			};
 			package.Context.RSSetViewports(1, &viewport);
 		}
 	);
@@ -435,10 +437,9 @@ void Renderer::CreateRenderState(uint state)
 	{
 		rd.FillMode = D3D11_FILL_SOLID;
 	}
-	rd.DepthBias = 50;
+	rd.DepthBias = 0;
 	rd.SlopeScaledDepthBias = 2.0f;
 	rd.DepthBiasClamp = 1.0f;
-
 
 	hr = _device->CreateRasterizerState(&rd, &_nativeRasterizerState);
 	ThrowIfBad(hr);

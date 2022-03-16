@@ -3,6 +3,7 @@
 #include <optional>
 #include <functional>
 
+#include "Saffron/Common/Enums.h"
 #include "Saffron/Common/Managed.h"
 
 namespace Se

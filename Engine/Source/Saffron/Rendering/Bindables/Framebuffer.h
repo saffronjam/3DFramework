@@ -7,16 +7,29 @@
 #include "Saffron/Rendering/Bindable.h"
 #include "Saffron/Rendering/Image.h"
 
+
 namespace Se
 {
-struct FramebufferAttachmentSpec
+struct FrameBufferAttachmentElement
 {
-	FramebufferAttachmentSpec(std::initializer_list<ImageFormat> formats) :
-		Formats(formats)
+	FrameBufferAttachmentElement(ImageFormat format, int arraySize = 1) :
+		Format(format),
+		ArraySize(arraySize)
 	{
 	}
 
-	std::vector<ImageFormat> Formats;
+	ImageFormat Format;
+	int ArraySize;
+};
+
+struct FramebufferAttachmentSpec
+{
+	FramebufferAttachmentSpec(std::initializer_list<FrameBufferAttachmentElement> formats)
+		: Formats(formats)
+	{
+	}
+
+	std::vector<FrameBufferAttachmentElement> Formats{};
 };
 
 struct FramebufferSpec
@@ -47,6 +60,8 @@ public:
 	auto DepthImage() const -> const Image&;
 	auto DepthImagePtr() const -> const std::shared_ptr<Image>&;
 
+	void SetDepthClearValue(float value);
+
 	static auto Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>;
 
 protected:
@@ -59,13 +74,16 @@ protected:
 	uint _width = 0, _height = 0;
 	Color _clearColor;
 
-	std::vector<ImageFormat> _colorAttachmentFormats;
-	ImageFormat _depthStencilAttachmentFormat = ImageFormat::None;
+	std::vector<FrameBufferAttachmentElement> _colorAttachmentFormats;
+	FrameBufferAttachmentElement _depthStencilAttachmentFormat = {ImageFormat::None, 1};
 
 	std::vector<std::shared_ptr<Image>> _colorAttachments;
 	std::shared_ptr<Image> _depthStencilAttachment;
 
 	std::vector<ID3D11RenderTargetView*> _nativeRenderTargetViews;
+
+	float _depthClearValue = 1.0f;
+	uchar _stencilClearValue = 0;
 };
 
 namespace Utils

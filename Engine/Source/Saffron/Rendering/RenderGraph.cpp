@@ -45,7 +45,7 @@ void RenderGraph::Setup(SceneCommon& sceneCommon)
 
 	{
 		auto pass = std::make_unique<LinePass>("Lines", sceneCommon);
-		pass->LinkInput("Target", "Geometry.Target");
+		pass->LinkInput("Target", "Skybox.Target");
 		AddPass(std::move(pass));
 	}
 

@@ -4,6 +4,16 @@
 
 namespace Se
 {
+struct PosVertex
+{
+	Vector3 Position;
+
+	static auto Layout() -> VertexLayout
+	{
+		return {{"Position", ElementType::Float3}};
+	}
+};
+
 struct PosTexVertex
 {
 	Vector3 Position;

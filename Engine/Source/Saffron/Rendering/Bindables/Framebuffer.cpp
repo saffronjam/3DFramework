@@ -23,9 +23,9 @@ Framebuffer::Framebuffer(const FramebufferSpec& spec) :
 				{
 					const auto iter = std::ranges::find_if(
 						inst->_colorAttachmentFormats,
-						[&inst](ImageFormat format)
+						[&inst](const FrameBufferAttachmentElement& el)
 						{
-							return Utils::IsDepthFormat(format);
+							return Utils::IsDepthFormat(el.Format);
 						}
 					);
 
@@ -36,9 +36,9 @@ Framebuffer::Framebuffer(const FramebufferSpec& spec) :
 
 					std::erase_if(
 						inst->_colorAttachmentFormats,
-						[](ImageFormat format)
+						[](const FrameBufferAttachmentElement& el)
 						{
-							return Utils::IsDepthFormat(format);
+							return Utils::IsDepthFormat(el.Format);
 						}
 					);
 				}
@@ -54,7 +54,7 @@ void Framebuffer::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			auto* ds = inst->_depthStencilAttachmentFormat == ImageFormat::None
+			auto* ds = inst->_depthStencilAttachmentFormat.Format == ImageFormat::None
 				           ? nullptr
 				           : &inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>();
 			auto* const* rs = inst->_colorAttachments.empty() ? nullptr : inst->_nativeRenderTargetViews.data();
@@ -89,10 +89,10 @@ void Framebuffer::Resize(uint width, uint height)
 			{
 				_colorAttachments.resize(_colorAttachmentFormats.size());
 				int index = 0;
-				const auto usage = ImageUsage_RenderTarget | ImageUsage_ShaderResource;
-				for (const auto format : _colorAttachmentFormats)
+				constexpr auto usage = ImageUsage_RenderTarget | ImageUsage_ShaderResource;
+				for (const auto& [format, size] : _colorAttachmentFormats)
 				{
-					_colorAttachments[index++] = Image::Create({width, height, usage, format});
+					_colorAttachments[index++] = Image::Create({width, height, usage, format, size});
 				}
 
 				_nativeRenderTargetViews.resize(inst->_colorAttachments.size());
@@ -103,10 +103,11 @@ void Framebuffer::Resize(uint width, uint height)
 				}
 			}
 
-			if (_depthStencilAttachmentFormat != ImageFormat::None)
+			if (_depthStencilAttachmentFormat.Format != ImageFormat::None)
 			{
+				const auto& el = _depthStencilAttachmentFormat;
 				_depthStencilAttachment = Image::Create(
-					{width, height, ImageUsage_DepthStencil | ImageUsage_ShaderResource, _depthStencilAttachmentFormat}
+					{width, height, ImageUsage_DepthStencil | ImageUsage_ShaderResource, el.Format, el.ArraySize}
 				);
 			}
 
@@ -128,13 +129,13 @@ void Framebuffer::Clear()
 				package.Context.ClearRenderTargetView(view, reinterpret_cast<const float*>(&inst->_clearColor));
 			}
 
-			if (inst->_depthStencilAttachmentFormat != ImageFormat::None)
+			if (inst->_depthStencilAttachmentFormat.Format != ImageFormat::None)
 			{
 				package.Context.ClearDepthStencilView(
 					&inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>(),
 					D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-					1.0f,
-					0
+					inst->_depthClearValue,
+					inst->_stencilClearValue
 				);
 			}
 		}
@@ -179,8 +180,13 @@ auto Framebuffer::DepthImage() const -> const Image&
 
 auto Framebuffer::DepthImagePtr() const -> const std::shared_ptr<Image>&
 {
-	Debug::Assert(_depthStencilAttachmentFormat != ImageFormat::None, "No depth attachment in framebuffer");
+	Debug::Assert(_depthStencilAttachmentFormat.Format != ImageFormat::None, "No depth attachment in framebuffer");
 	return _depthStencilAttachment;
+}
+
+void Framebuffer::SetDepthClearValue(float value)
+{
+	_depthClearValue = value;
 }
 
 auto Framebuffer::Create(const FramebufferSpec& spec) -> std::shared_ptr<Framebuffer>

@@ -1,16 +1,6 @@
 static const float Pi = 3.141592f;
 static const float Epsilon = 0.000001;
 
-cbuffer MvpBuffer : register(b0)
-{
-	matrix Model;
-	matrix Mv;
-	matrix Vp;
-	matrix Mvp;
-}
-
-#define MAX_LIGHTS 4
-
 struct PointLight
 {
     matrix LookAt[6];
@@ -18,17 +8,6 @@ struct PointLight
     float Radius;
     float3 Color;
 };
-
-cbuffer CommonCBuffer : register(b1)
-{
-	float3 CameraPosition;
-}
-
-cbuffer PointLights : register(b2)
-{
-	PointLight PointLights[MAX_LIGHTS];
-	int nPointLights;
-}
 
 float4x4 inverse(float4x4 m) {
     float n11 = m[0][0], n12 = m[1][0], n13 = m[2][0], n14 = m[3][0];

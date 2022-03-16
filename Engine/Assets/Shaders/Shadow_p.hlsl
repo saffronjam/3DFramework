@@ -1,4 +1,26 @@
-float4 main() : SV_TARGET
+#include "Shadow_i.hlsl"
+
+struct PsInput
 {
-	return float4(0.0f, 0.0f, 0.0f, 1.0f);
+	float4 Position : SV_Position;
+	float4 PixPos : PixPos;
+};
+
+struct PsOutput
+{
+	float4 Value : SV_Target;
+	float Depth : SV_Depth;
+};
+
+PsOutput main(PsInput input)
+{
+	float lightDistance = length(input.PixPos.xyz - Light.Position);
+	lightDistance = lightDistance / Light.Radius;
+
+	PsOutput output;
+
+	output.Value = float4(1, 0, 1, 1);
+	output.Depth = lightDistance;
+
+	return output;
 }

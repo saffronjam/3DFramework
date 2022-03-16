@@ -43,6 +43,14 @@ Shader::Shader(const std::filesystem::path& path, bool isCompute) :
 						const std::filesystem::path psFullpath = BinaryPath(inst->_path, PsSuffix);
 						blob = LoadByteCode(psFullpath);
 						inst->_nativePixelShader = CreatePixelShader(package, *blob.Get());
+
+						// Geometry shader
+						const std::filesystem::path gsFullpath = BinaryPath(inst->_path, GsSuffix);
+						if(exists(gsFullpath))
+						{
+							blob = LoadByteCode(gsFullpath);
+							inst->_nativeGeometryShader = CreateGeometryShader(package, *blob.Get());
+						}
 					}
 				}
 			);
@@ -64,6 +72,10 @@ void Shader::Bind() const
 			{
 				package.Context.VSSetShader(inst->_nativeVertexShader.Get(), nullptr, 0);
 				package.Context.PSSetShader(inst->_nativePixelShader.Get(), nullptr, 0);
+				if(inst->_nativeGeometryShader)
+				{
+					package.Context.GSSetShader(inst->_nativeGeometryShader.Get(), nullptr, 0);
+				}
 			}
 		}
 	);
@@ -83,6 +95,7 @@ void Shader::Unbind() const
 			{
 				package.Context.VSSetShader(nullptr, nullptr, 0);
 				package.Context.PSSetShader(nullptr, nullptr, 0);
+				package.Context.GSSetShader(nullptr, nullptr, 0);
 			}
 		}
 	);
@@ -113,6 +126,14 @@ void Shader::Reload()
 				const std::filesystem::path psFullpath = TextualPath(inst->_path, PsSuffix);
 				blob = CompileShader(psFullpath, PsProfile);
 				inst->_nativePixelShader = CreatePixelShader(package, *blob.Get());
+
+				// Geometry shader
+				const std::filesystem::path gsFullpath = TextualPath(inst->_path, GsSuffix);
+				if(exists(gsFullpath))
+				{
+					blob = CompileShader(gsFullpath, GsProfile);
+					inst->_nativeGeometryShader = CreateGeometryShader(package, *blob.Get());
+				}
 			}
 		}
 	);
@@ -243,6 +264,14 @@ auto Shader::CreateComputeShader(const RendererPackage& package, ID3DBlob& blob)
 {
 	ComPtr<ID3D11ComputeShader> result;
 	const auto hr = package.Device.CreateComputeShader(blob.GetBufferPointer(), blob.GetBufferSize(), nullptr, &result);
+	ThrowIfBad(hr);
+	return result;
+}
+
+auto Shader::CreateGeometryShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11GeometryShader>
+{
+	ComPtr<ID3D11GeometryShader> result;
+	const auto hr = package.Device.CreateGeometryShader(blob.GetBufferPointer(), blob.GetBufferSize(), nullptr, &result);
 	ThrowIfBad(hr);
 	return result;
 }

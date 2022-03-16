@@ -6,15 +6,22 @@
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 
+#undef min
+#undef max
+
 namespace Se
 {
 ShadowMapPass::ShadowMapPass(const std::string& name, struct SceneCommon& sceneCommon) :
 	RenderPass(name, sceneCommon),
-	_shadowMap(Framebuffer::Create({Width, Height, {ImageFormat::RGBA, ImageFormat::Depth}})),
+	_shadowMap(Framebuffer::Create({Width, Height, {{ImageFormat::RGBA, 6}, {ImageFormat::Depth, 6}}})),
 	_shadowShader(Shader::Create("Shadow")),
 	_depthTextureShader(Shader::Create("DepthTexture")),
-	_mvpCBuffer(TransformCBuffer::Create())
+	_shadowMapCBuffer(ConstantBuffer<ShadowMapPassCBuffer>::Create())
 {
+	_shadowMapCBuffer->SetBindFlags(BindFlag_GS | BindFlag_VS | BindFlag_PS);
+
+	//_shadowMap->SetDepthClearValue(0.0f);
+
 	RegisterOutput("Target0", _shadowMap);
 }
 
@@ -26,7 +33,7 @@ void ShadowMapPass::OnUi()
 {
 	ImGui::Begin("Shadow map");
 	ImGui::Checkbox("Orthographic", &_orthographic);
-	Ui::Image(_shadowMap->DepthImage(), *_depthTextureShader, {500.0f, 500.0f});
+	Ui::Image(_shadowMap->ImageByIndex(0), *_depthTextureShader, {500.0f, 500.0f});
 	ImGui::End();
 }
 
@@ -35,36 +42,14 @@ void ShadowMapPass::Execute()
 	_shadowMap->Bind();
 	_shadowMap->Clear();
 
+	/*Renderer::SetRenderState(
+		RenderState::DepthTest_Greter | RenderState::DepthWriteMask_All | RenderState::Rasterizer_CullFront |
+		RenderState::Rasterizer_Fill | RenderState::Topology_TriangleList
+	);*/
+
 	for (auto& drawCommand : SceneCommon().DrawCommands.at(RenderChannel_Shadow))
 	{
 		drawCommand.Model->Bind();
-
-		// Light transform
-		auto& common = SceneCommon();
-
-		Matrix view, proj;
-
-		if (_orthographic)
-		{
-			view = Matrix::CreateLookAt(
-				Vector3(0.0f, 4.0f, 0.0f),
-				Vector3(0.0f, 0.0f, 0.0f),
-				Vector3(1.0f, 0.0f, 0.0f)
-			);
-			proj = Matrix::CreateOrthographicOffCenter(-10.0f, 10.0f, -10.0f, 10.0f, -10.0, 30.0f);
-		}
-		else
-		{
-			view = Matrix::CreateLookAt(
-				common.PointLight.Position,
-				common.PointLight.Position + Vector3{0.0f, -1.0f, 0.0f},
-				Vector3{1.0f, 0.0f, 0.0f}
-			);
-			proj = Matrix::CreatePerspectiveFieldOfView(Math::Pi / 2.0f, 1.0f, 0.1f, 30.0f);
-		}
-
-		Matrix viewProj = view * proj;
-		common.PointLight.LightTransform = viewProj;
 
 		// Overwrite shader
 		_shadowShader->Bind();
@@ -72,25 +57,55 @@ void ShadowMapPass::Execute()
 		Renderer::SetViewportSize(Width, Height);
 
 		Renderer::Submit(
-			[this, drawCommand, view, viewProj](const RendererPackage& package) mutable
+			[this, drawCommand](const RendererPackage& package) mutable
 			{
-				_mvpCBuffer->Bind();
+				auto& common = SceneCommon();
+
+				const auto& pos = common.PointLight.Position;
+				const auto proj = Matrix::CreatePerspectiveFieldOfView(
+					Math::Pi / 2.0f,
+					1.0f,
+					0.5f,
+					common.PointLight.Radius
+				);
+
+				std::array<Matrix, 6> lookAts;
+				lookAts[0] = Matrix::CreateLookAt(pos, pos + Vector3{1.0, 0.0, 0.0}, Vector3{0.0, 1.0, 0.0}) * proj;
+				lookAts[1] = Matrix::CreateLookAt(pos, pos + Vector3{-1.0, 0.0, 0.0}, Vector3{0.0, 1.0, 0.0}) * proj;
+				lookAts[2] = Matrix::CreateLookAt(pos, pos + Vector3{0.0, 1.0, 0.0}, Vector3{0.0, 0.0, 1.0}) * proj;
+				lookAts[3] = Matrix::CreateLookAt(pos, pos + Vector3{0.0, -1.0, 0.0}, Vector3{0.0, 0.0, -1.0}) * proj;
+				lookAts[5] = Matrix::CreateLookAt(pos, pos + Vector3{0.0, 0.0, 1.0}, Vector3{0.0, 1.0, 0.0}) * proj;
+				lookAts[4] = Matrix::CreateLookAt(pos, pos + Vector3{0.0, 0.0, -1.0}, Vector3{0.0, 1.0, 0.0}) * proj;
+
+				for (int i = 0; i < 6; i++)
+				{
+					lookAts[i] = lookAts[i].Transpose();
+				}
+
+				common.PointLight.LookAt = lookAts;
+
+				_shadowMapCBuffer->Bind();
 
 				for (const auto& submesh : drawCommand.Model->SubMeshes())
 				{
-					const auto model = submesh.Transform * drawCommand.Model->Transform() * drawCommand.Transform;
+					const auto modelTransform = submesh.Transform * drawCommand.Model->Transform() * drawCommand.
+						Transform;
 
-					_mvpCBuffer->Update({model, model * view, viewProj, model * viewProj});
-					_mvpCBuffer->UploadData();
+					_shadowMapCBuffer->Update(
+						{Color{1.0f, 0.0f, 0.0f, 1.0f}, modelTransform.Transpose(), common.PointLight}
+					);
+					_shadowMapCBuffer->UploadData();
 					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 				}
 
-				_mvpCBuffer->Unbind();
+				_shadowMapCBuffer->Unbind();
 			}
 		);
 
 		_shadowShader->Unbind();
 	}
+
+	Renderer::ResetRenderState();
 
 	_shadowMap->Unbind();
 }

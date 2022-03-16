@@ -264,7 +264,7 @@ auto ModelStore::ImportMaterial(
 	const auto materialName = std::string(aiMaterial.GetName().C_Str());
 
 	auto material = Material::Create(_modelShader, materialName);
-	material->CBuffer().SetBindFlags(ConstantBufferBindFlags_PS);
+	material->CBuffer().SetBindFlags(BindFlag_PS);
 
 	const auto parPath = fullpath.parent_path();
 

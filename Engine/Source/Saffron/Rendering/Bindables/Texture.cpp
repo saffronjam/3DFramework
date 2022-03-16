@@ -195,17 +195,36 @@ void Texture::Bind() const
 		{
 			if (inst->_spec.Usage & TextureUsage_ShaderResource)
 			{
-				package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
-				package.Context.CSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+				const auto srv = inst->_nativeShaderResourceView.GetAddressOf();
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_PS)
+				{
+					package.Context.PSSetShaderResources(slot, 1, srv);
+				}
+				if (inst->_bindFlags & BindFlag_VS)
+				{
+					package.Context.VSSetShaderResources(slot, 1, srv);
+				}
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetShaderResources(slot, 1, srv);
+				}
 			}
 			if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
 			{
-				package.Context.CSSetUnorderedAccessViews(
-					inst->_slot,
-					1,
-					inst->_nativeUnorderedAccessView.GetAddressOf(),
-					nullptr
-				);
+				const auto srv = inst->_nativeUnorderedAccessView.GetAddressOf();
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetUnorderedAccessViews(slot, 1, srv, nullptr);
+				}
+				if constexpr (ConfDebug)
+				{
+					if (inst->_bindFlags & BindFlag_VS || inst->_bindFlags & BindFlag_PS)
+					{
+						Log::Warn("Trying to bind uav to non-compute shader");
+					}
+				}
 			}
 
 			if (inst->_spec.CreateSampler)
@@ -226,20 +245,45 @@ void Texture::Unbind() const
 		{
 			if (inst->_spec.Usage & TextureUsage_ShaderResource)
 			{
+				const auto slot = inst->_slot;
 				ID3D11ShaderResourceView* srv = nullptr;
-				package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
-				package.Context.CSSetShaderResources(inst->_slot, 1, &srv);
+				if (inst->_bindFlags & BindFlag_PS)
+				{
+					package.Context.PSSetShaderResources(slot, 1, &srv);
+				}
+				if (inst->_bindFlags & BindFlag_VS)
+				{
+					package.Context.VSSetShaderResources(slot, 1, &srv);
+				}
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetShaderResources(slot, 1, &srv);
+				}
 			}
 
 			if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
 			{
-				ID3D11UnorderedAccessView* srv = nullptr;
-				package.Context.CSSetUnorderedAccessViews(inst->_slot, 1, &srv, nullptr);
+				ID3D11UnorderedAccessView* uav = nullptr;
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetUnorderedAccessViews(slot, 1, &uav, nullptr);
+				}
+				if constexpr (ConfDebug)
+				{
+					if (inst->_bindFlags & BindFlag_VS || inst->_bindFlags & BindFlag_PS)
+					{
+						Log::Warn("Trying to unbind uav from non-compute shader");
+					}
+				}
 			}
+
 
 			if (inst->_spec.CreateSampler)
 			{
+				Renderer::BeginStrategy(RenderStrategy::Immediate);
 				inst->_sampler->Unbind();
+				Renderer::EndStrategy();
 			}
 		}
 	);
@@ -265,6 +309,11 @@ auto Texture::Loaded() const -> bool
 	return _loaded;
 }
 
+auto Texture::BindFlags() const -> ShaderBindFlags
+{
+	return _bindFlags;
+}
+
 void Texture::SetImage(const std::shared_ptr<Image>& image)
 {
 	const auto imageInst = image;
@@ -283,6 +332,17 @@ void Texture::SetImage(const std::shared_ptr<Image>& image)
 			inst->_width = imageInst->Width();
 			inst->_height = imageInst->Height();
 			inst->_format = imageInst->Format();
+		}
+	);
+}
+
+void Texture::SetBindFlags(ShaderBindFlags flags)
+{
+	const auto inst = ShareThisAs<Texture>();
+	Renderer::Submit(
+		[inst, flags](const RendererPackage& package)
+		{
+			inst->_bindFlags = flags;
 		}
 	);
 }
@@ -536,16 +596,36 @@ void TextureCube::Bind() const
 		{
 			if (inst->_spec.Usage & TextureUsage_ShaderResource)
 			{
-				package.Context.PSSetShaderResources(inst->_slot, 1, inst->_nativeShaderResourceView.GetAddressOf());
+				const auto srv = inst->_nativeShaderResourceView.GetAddressOf();
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_PS)
+				{
+					package.Context.PSSetShaderResources(slot, 1, srv);
+				}
+				if (inst->_bindFlags & BindFlag_VS)
+				{
+					package.Context.VSSetShaderResources(slot, 1, srv);
+				}
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetShaderResources(slot, 1, srv);
+				}
 			}
 			if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
 			{
-				package.Context.CSSetUnorderedAccessViews(
-					inst->_slot,
-					1,
-					inst->_nativeUnorderedAccessView.GetAddressOf(),
-					nullptr
-				);
+				const auto srv = inst->_nativeUnorderedAccessView.GetAddressOf();
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetUnorderedAccessViews(slot, 1, srv, nullptr);
+				}
+				if constexpr (ConfDebug)
+				{
+					if (inst->_bindFlags & BindFlag_VS || inst->_bindFlags & BindFlag_PS)
+					{
+						Log::Warn("Trying to bind uav to non-compute shader");
+					}
+				}
 			}
 
 			if (inst->_spec.CreateSampler)
@@ -566,19 +646,44 @@ void TextureCube::Unbind() const
 		{
 			if (inst->_spec.Usage & TextureUsage_ShaderResource)
 			{
+				const auto slot = inst->_slot;
 				ID3D11ShaderResourceView* srv = nullptr;
-				package.Context.PSSetShaderResources(inst->_slot, 1, &srv);
+				if (inst->_bindFlags & BindFlag_PS)
+				{
+					package.Context.PSSetShaderResources(slot, 1, &srv);
+				}
+				if (inst->_bindFlags & BindFlag_VS)
+				{
+					package.Context.VSSetShaderResources(slot, 1, &srv);
+				}
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetShaderResources(slot, 1, &srv);
+				}
 			}
 
 			if (inst->_spec.Usage & TextureUsage_UnorderedAccess)
 			{
-				ID3D11UnorderedAccessView* srv = nullptr;
-				package.Context.CSSetUnorderedAccessViews(inst->_slot, 1, &srv, nullptr);
+				ID3D11UnorderedAccessView* uav = nullptr;
+				const auto slot = inst->_slot;
+				if (inst->_bindFlags & BindFlag_CS)
+				{
+					package.Context.CSSetUnorderedAccessViews(slot, 1, &uav, nullptr);
+				}
+				if constexpr (ConfDebug)
+				{
+					if (inst->_bindFlags & BindFlag_VS || inst->_bindFlags & BindFlag_PS)
+					{
+						Log::Warn("Trying to unbind uav from non-compute shader");
+					}
+				}
 			}
 
 			if (inst->_spec.CreateSampler)
 			{
+				Renderer::BeginStrategy(RenderStrategy::Immediate);
 				inst->_sampler->Unbind();
+				Renderer::EndStrategy();
 			}
 		}
 	);
@@ -629,6 +734,27 @@ auto TextureCube::Format() const -> ImageFormat
 	return _format;
 }
 
+auto TextureCube::BindFlags() const -> ShaderBindFlags
+{
+	return _bindFlags;
+}
+
+auto TextureCube::Usage() const -> TextureUsage
+{
+	return _spec.Usage;
+}
+
+void TextureCube::SetBindFlags(ShaderBindFlags flags)
+{
+	const auto inst = ShareThisAs<TextureCube>();
+	Renderer::Submit(
+		[inst, flags](const RendererPackage& package)
+		{
+			inst->_bindFlags = flags;
+		}
+	);
+}
+
 void TextureCube::SetUsage(TextureUsage usage)
 {
 	const auto inst = ShareThisAs<TextureCube>();
@@ -642,11 +768,11 @@ void TextureCube::SetUsage(TextureUsage usage)
 			D3D11_TEXTURE2D_DESC td;
 			inst->_nativeTexture->GetDesc(&td);
 			auto meta = DirectX::TexMetadata{
-						.width = td.Width, .height = td.Height, .mipLevels = td.MipLevels, .format = td.Format
+				.width = td.Width, .height = td.Height, .mipLevels = td.MipLevels, .format = td.Format
 			};
 			auto& texRef = *inst->_nativeTexture.Get();
 			auto& oldUsage = inst->_spec.Usage;
-			
+
 			const auto srvDiff = (oldUsage & TextureUsage_ShaderResource) != (usage & TextureUsage_ShaderResource);
 			if (srvDiff)
 			{

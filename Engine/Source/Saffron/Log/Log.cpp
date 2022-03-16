@@ -18,6 +18,11 @@ void Log::Info(const std::string& string)
 	std::cout << "[Info] " << string << '\n';
 }
 
+void Log::Warn(const std::string& string)
+{
+	std::cout << "[Warn] " << string << '\n';
+}
+
 void Log::Debug(const std::string& string)
 {
 	std::cerr << "[Debug] " << string << '\n';

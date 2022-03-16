@@ -10,9 +10,11 @@
 namespace Se
 {
 Scene::Scene() :
-	_sceneRenderer(*this),
-	_pointLight({Matrix::Identity, Vector3{1.0f, 0.0f, 0.0f}, 5.0f})
+	_sceneRenderer(*this)
 {
+	_pointLight.Position = Vector3{ 1.0f, 0.0f, 0.0f };
+	_pointLight.Radius = 5.0f;
+
 	_models.push_back(Model::Create("Cube.fbx"));
 	_models.back()->Transform() = Matrix::CreateScale(25.0f, 0.5f, 12.0f) * Matrix::CreateTranslation(
 		0.0f,
@@ -20,13 +22,19 @@ Scene::Scene() :
 		0.0f
 	);
 
-	constexpr int nBalls = 5;
+	_lightModel = Model::Create("Sphere.fbx");
+
+	constexpr int nBalls = 3;
 	for (int i = 0; i < nBalls; i++)
 	{
 		const float progress = static_cast<float>(i) / static_cast<float>(nBalls - 1);
 
+		const auto pos = Random::Vec3(-1, -1, -1, 1, 1, 1) * 20.0f;
+
 		_models.push_back(Model::Create("Sphere.fbx"));
-		_models.back()->Transform() = Matrix::CreateTranslation(-5.0f + static_cast<float>(i) * 2.5f, 4, 0.0f);
+		//_models.back()->Transform() = Matrix::CreateTranslation(-5.0f + static_cast<float>(i) * 2.5f, 4, 0.0f);
+		//_models.back()->Transform() = Matrix::CreateTranslation(pos);
+		_models.back()->Transform() = Matrix::CreateTranslation(0.0f, static_cast<float>(-nBalls) / 2 + i, 0.0f);
 		_models.back()->Materials().front()->SetMaterialData(
 			MaterialDataCBuf{Colors::Red, 0.0f, 0.00f, 1.0f, 0.0f, false}
 		);
@@ -48,7 +56,7 @@ Scene::Scene() :
 		1024,
 		1024,
 		ImageFormat::RGBA32f,
-		{.CreateSampler = false,  .Usage = TextureUsage_ShaderResource | TextureUsage_UnorderedAccess }
+		{.CreateSampler = false, .Usage = TextureUsage_ShaderResource | TextureUsage_UnorderedAccess}
 	);
 }
 
@@ -99,6 +107,7 @@ void Scene::OnRender()
 		_cameraMesh,
 		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera2.Data().Position)
 	);
+	_sceneRenderer.SubmitModel(_lightModel, Matrix::CreateScale(1.5) * Matrix::CreateTranslation(_sceneRenderer.SceneCommon().PointLight.Position));
 
 	_sceneRenderer.EndSubmtions();
 
@@ -108,6 +117,20 @@ void Scene::OnRender()
 void Scene::OnUi()
 {
 	ImGui::Begin("Scene");
+	if (ImGui::Button("Milky way"))
+	{
+		_sceneRenderer.SceneCommon().Environment = SceneEnvironment::Create(
+			"Assets/Textures/Milkyway/Milkyway_BG.jpg"
+		);
+	}
+	if (ImGui::Button("Grand canyon"))
+	{
+		_sceneRenderer.SceneCommon().Environment = SceneEnvironment::Create(
+			"Assets/Textures/GrandCanyon_C_YumaPoint/GCanyon_C_YumaPoint_3k.hdr"
+		);
+	}
+
+
 	if (ImGui::SliderFloat("Metalness", &metalness, 0.0f, 1.0f))
 	{
 		for (auto& model : _models)
@@ -142,9 +165,9 @@ void Scene::OnUi()
 	_models[1]->OnDebugUi();
 
 	ImGui::Separator();
-	ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&_pointLight.Position), -12.0f, 12.0f);
+	ImGui::SliderFloat3("Position", reinterpret_cast<float*>(&_pointLight.Position), -25.0f, 25.0f);
 	ImGui::SliderFloat3("Color", reinterpret_cast<float*>(&_pointLight.Color), 0.0f, 1.0f);
-	ImGui::SliderFloat("Radius", &_pointLight.Radius, 0.1f, 10.0f);
+	ImGui::SliderFloat("Radius", &_pointLight.Radius, 0.1f, 50.0f);
 	if (ImGui::RadioButton("Camera1", &_activeRadioButton, 0))
 	{
 		_activeCamera = &_camera1;

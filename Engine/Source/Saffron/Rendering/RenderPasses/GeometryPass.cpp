@@ -5,6 +5,7 @@
 #include "Saffron/Graphics/Model.h"
 #include "Saffron/Rendering/Renderer.h"
 #include "Saffron/Rendering/SceneRenderer.h"
+#include "Saffron/Rendering/Binders/Binder.h"
 
 namespace Se
 {
@@ -18,7 +19,7 @@ GeometryPass::GeometryPass(const std::string& name, struct SceneCommon& sceneCom
 	RegisterInput("Target", _target);
 	RegisterOutput("Target", _target);
 
-	_pointLightCBuffer->SetBindFlags(ConstantBufferBindFlags_PS | ConstantBufferBindFlags_VS);
+	_pointLightCBuffer->SetBindFlags(BindFlag_PS | BindFlag_VS);
 }
 
 void GeometryPass::OnSetupFinished()
@@ -46,24 +47,26 @@ void GeometryPass::Execute()
 	// Update point light data
 	PointLightCBuffer data;
 	data.PointLights[0] = common.PointLight;
-	data.PointLights[0].LightTransform = data.PointLights[0].LightTransform.Transpose();
 	data.nPointLights = 1;
 	_pointLightCBuffer->Update(data);
 
 	// Render to texture
-	_target->Bind();
+	ScopedBinder(_target);
 
 	for (auto& drawCommand : common.DrawCommands.at(RenderChannel_Geometry))
 	{
-		drawCommand.Model->Bind();
-		_pointLightCBuffer->Bind();
-		common._sceneCommonCBuffer->Update({ common.CameraData.Position });
-		common._sceneCommonCBuffer->Bind();
-		
+		common._sceneCommonCBuffer->Update({common.CameraData.Position});
+
+		ScopedBinder(drawCommand.Model);
+		ScopedBinder(_pointLightCBuffer);
+		ScopedBinder(common._sceneCommonCBuffer);
+
 		Renderer::Submit(
 			[this, drawCommand, common](const RendererPackage& package)
 			{
-				_mvpCBuffer->Bind();
+				Renderer::BeginStrategy(RenderStrategy::Immediate);
+
+				ScopedBinder(_mvpCBuffer);
 
 				const auto& materials = drawCommand.Model->Materials();
 				const auto viewProj = common.CameraData.View * common.CameraData.Projection;
@@ -76,7 +79,7 @@ void GeometryPass::Execute()
 					materials[submesh.MaterialIndex]->CBuffer().Bind();
 					materials[submesh.MaterialIndex]->Shader().Bind();
 					_shadowMapTexture->Bind();
-					
+
 					const auto modelTransform = submesh.Transform * drawCommand.Model->Transform() * drawCommand.
 						Transform;
 
@@ -87,16 +90,12 @@ void GeometryPass::Execute()
 					package.Context.DrawIndexed(submesh.IndexCount, submesh.BaseIndex, submesh.BaseVertex);
 				}
 
-				_mvpCBuffer->Unbind();
+				Renderer::EndStrategy();
 			}
 		);
-
-		common._sceneCommonCBuffer->Unbind();
-		drawCommand.Model->Unbind();
 	}
 
 	_shadowMapTexture->Unbind();
-	_target->Unbind();
 }
 
 

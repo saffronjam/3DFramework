@@ -11,9 +11,24 @@ const float PiLocal = 3.141592f;
 Texture2D ModelTex[ModelTextureMapType_Count] : register(t0);
 SamplerState ModelTexSam : register(s0);
 
-Texture2D ShadowMapTexture : register(t4);
+TextureCube ShadowMapTexture : register(t4);
 SamplerState ShadowMapSampleType : register(s4);
 
+struct PsInput
+{
+    float4 Position : SV_POSITION;
+    float3 WorldPosition : WorldPosition;
+
+    float3 Normal : Normal;
+    float2 TexCoord : TexCoord;
+    float3 Tangent : Tangent;
+    float3 Binormal : Binormal;
+
+    float3 ViewPos : ViewPos;
+    float3 LightPos[MAX_LIGHTS] : LightPos;
+
+    float3x3 WorldNormals : WorldNormals;
+};
 
 ///////////////
 ///// PBR /////
@@ -76,43 +91,26 @@ float3 fresnelSchlickRoughness(float3 F0, float cosTheta, float roughness)
 /// Shadows ///
 ///////////////
 
-float CalculateShadow(float4 lightSpacePosition)
+float CalculateShadow(float3 pixPos)
 {
-	// Perspective divide because LightSpacePosition is not passed through as "SV_POSITION"
-	float3 ndcPosition = (lightSpacePosition.xyz / lightSpacePosition.w);
+    // Get vector between fragment position and light position
+    float3 pixelToLight = pixPos - PointLights[0].Position;
+    pixelToLight.z *= -1;
+    // Use the light to fragment vector to sample from the depth map    
+    float closestDepth = ShadowMapTexture.Sample(ShadowMapSampleType, pixelToLight).r;
 
-	if (ndcPosition.z >= 1.0f || ndcPosition.z < 0.0f)
+	float currentDepth = length(pixelToLight) / PointLights[0].Radius;
+
+    if(currentDepth > 1)
+    {
         return 1.0f;
+    }
 
-	ndcPosition.x *= 0.5f;
-	ndcPosition.y *= -0.5f;
+    float bias = 0.1;
+    float shadow = currentDepth - bias < closestDepth ? 1.0 : 0.0;
 
-	ndcPosition.x += 0.5f;
-	ndcPosition.y += 0.5f;
-
-	const float closestDepth = ShadowMapTexture.Sample(ShadowMapSampleType, ndcPosition.xy).r;
-	const float currentDepth = ndcPosition.z;
-
-	// 1 -> full shadow. 0 -> no shadow
-	return currentDepth > closestDepth ? 1.0f : 0.0f;
+    return shadow;
 }
-
-struct PsInput
-{
-	float4 Position : SV_POSITION;
-	float3 WorldPosition : WorldPosition;
-
-	float3 Normal : Normal;
-	float2 TexCoord : TexCoord;
-	float3 Tangent : Tangent;
-	float3 Binormal : Binormal;
-
-	float3 ViewPos : ViewPos;
-	float3 LightPos[MAX_LIGHTS] : LightPos;
-	float4 LightSpacePosition : LightSpacePosition;
-
-	float3x3 WorldNormals : WorldNormals;
-};
 
 float3 CalculatePointLights(float3 F0, in PBR_Data pbrData, float3 pixelWorldPosition)
 {
@@ -189,5 +187,8 @@ float4 main(PsInput input) : SV_TARGET
 
     float3 pointLightsContribution = CalculatePointLights(F0, _pbrData, input.WorldPosition);
 
-    return float4(pointLightsContribution, 1.0f);
+    //return float4(pointLightsContribution, 1.0f) * (1.0 - CalculateShadow(input.Position));
+    float shadow = CalculateShadow(input.WorldPosition);
+    return float4(pointLightsContribution, 1.0) * shadow;
+    //return shadow;
 }

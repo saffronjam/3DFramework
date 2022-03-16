@@ -26,6 +26,7 @@ public:
 	auto NativeVsHandle() const -> const ID3D11VertexShader&;
 	auto NativePsHandle() const -> const ID3D11PixelShader&;
 	auto NativeCsHandle() const -> const ID3D11ComputeShader&;
+	auto NativeGsHandle() const -> const ID3D11GeometryShader&;
 
 	auto Name() const -> const std::string&;
 
@@ -44,12 +45,14 @@ private:
 
 	static auto CreateVertexShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11VertexShader>;
 	static auto CreatePixelShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11PixelShader>;
-	static auto CreateComputeShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11ComputeShader>;
+	static auto CreateComputeShader(const RendererPackage& package, ID3DBlob& blob)->ComPtr<ID3D11ComputeShader>;
+	static auto CreateGeometryShader(const RendererPackage& package, ID3DBlob& blob) -> ComPtr<ID3D11GeometryShader>;
 
 private:
 	ComPtr<ID3D11VertexShader> _nativeVertexShader{};
 	ComPtr<ID3D11PixelShader> _nativePixelShader{};
 	ComPtr<ID3D11ComputeShader> _nativeComputeShader{};
+	ComPtr<ID3D11GeometryShader> _nativeGeometryShader{};
 	ComPtr<ID3DBlob> _vsByteCode{};
 
 	std::filesystem::path _path;
@@ -64,9 +67,11 @@ private:
 	static constexpr const char* VsSuffix = "_v";
 	static constexpr const char* PsSuffix = "_p";
 	static constexpr const char* CsSuffix = "_c";
+	static constexpr const char* GsSuffix = "_g";
 	static constexpr const char* VsProfile = "vs_5_0";
 	static constexpr const char* PsProfile = "ps_5_0";
 	static constexpr const char* CsProfile = "cs_5_0";
+	static constexpr const char* GsProfile = "gs_5_0";
 	static constexpr const char* ShaderEntryPoint = "main";
 };
 }

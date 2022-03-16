@@ -11,6 +11,7 @@
 #include "Saffron/Common/Singleton.h"
 #include "Saffron/Common/SubscriberList.h"
 #include "Saffron/Common/TimeSpan.h"
+#include "Saffron/Common/Enums.h"
 #include "Saffron/Core/Config.h"
 #include "Saffron/Core/Macros.h"
 #include "Saffron/Core/TypeDefs.h"

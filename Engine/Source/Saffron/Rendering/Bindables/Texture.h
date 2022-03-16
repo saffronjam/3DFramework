@@ -15,14 +15,6 @@ class ScratchImage;
 
 namespace Se
 {
-using TextureUsage = uint;
-
-enum TextureUsageFlags : uint
-{
-	TextureUsage_UnorderedAccess = 1 << 0,
-	TextureUsage_ShaderResource = 1 << 1
-};
-
 struct TextureSpec
 {
 	SamplerWrap SamplerWrap = SamplerWrap::Wrap;
@@ -51,8 +43,10 @@ public:
 	auto Height() const -> uint;
 	auto Format() const -> ImageFormat;
 	auto Loaded() const -> bool;
+	auto BindFlags() const -> ShaderBindFlags;
 
 	void SetImage(const std::shared_ptr<Image>& image);
+	void SetBindFlags(ShaderBindFlags flags);
 
 	auto NativeHandle() -> ID3D11Texture2D&;
 	auto NativeHandle() const -> const ID3D11Texture2D&;
@@ -121,6 +115,7 @@ private:
 
 	TextureSpec _spec;
 	ImageFormat _format = ImageFormat::None;
+	ShaderBindFlags _bindFlags = BindFlag_PS;
 	uint _width = 0, _height = 0;
 	uint _slot = 0;
 	bool _loaded = false;
@@ -142,13 +137,16 @@ public:
 	auto NativeHandle() const -> const ID3D11Texture2D&;
 	auto ShaderView() -> ID3D11ShaderResourceView&;
 	auto ShaderView() const -> const ID3D11ShaderResourceView&;
-	auto UnorderedView()->ID3D11UnorderedAccessView&;
+	auto UnorderedView() -> ID3D11UnorderedAccessView&;
 	auto UnorderedView() const -> const ID3D11UnorderedAccessView&;
 
 	auto Width() const -> uint;
 	auto Height() const -> uint;
-	auto Format() const->ImageFormat;
+	auto Format() const -> ImageFormat;
+	auto BindFlags() const -> ShaderBindFlags;
+	auto Usage() const -> TextureUsage;
 
+	void SetBindFlags(ShaderBindFlags flags);
 	void SetUsage(TextureUsage usage);
 
 	static auto Create(
@@ -181,6 +179,7 @@ private:
 	uint _width = 0;
 	uint _height = 0;
 	ImageFormat _format = ImageFormat::None;
+	ShaderBindFlags _bindFlags = BindFlag_PS;
 	TextureSpec _spec;
 
 	uint _slot = 0;
