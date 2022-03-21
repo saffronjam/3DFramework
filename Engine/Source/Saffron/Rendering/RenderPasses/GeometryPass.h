@@ -8,8 +8,9 @@ namespace Se
 {
 struct alignas(16) PointLightCBuffer
 {
-	ShaderStructs::PointLight PointLights[MaxLights];
+	std::array<ShaderStructs::PointLight, MaxLights> PointLights;
 	int nPointLights;
+	Color Ambient;
 };
 
 class GeometryPass : public RenderPass

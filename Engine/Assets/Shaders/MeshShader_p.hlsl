@@ -16,18 +16,18 @@ SamplerState ShadowMapSampleType : register(s4);
 
 struct PsInput
 {
-    float4 Position : SV_POSITION;
-    float3 WorldPosition : WorldPosition;
+	float4 Position : SV_POSITION;
+	float3 WorldPosition : WorldPosition;
 
-    float3 Normal : Normal;
-    float2 TexCoord : TexCoord;
-    float3 Tangent : Tangent;
-    float3 Binormal : Binormal;
+	float3 Normal : Normal;
+	float2 TexCoord : TexCoord;
+	float3 Tangent : Tangent;
+	float3 Binormal : Binormal;
 
-    float3 ViewPos : ViewPos;
-    float3 LightPos[MAX_LIGHTS] : LightPos;
+	float3 ViewPos : ViewPos;
+	float3 LightPos[MAX_LIGHTS] : LightPos;
 
-    float3x3 WorldNormals : WorldNormals;
+	float3x3 WorldNormals : WorldNormals;
 };
 
 ///////////////
@@ -54,36 +54,36 @@ static const float3 FrenselDielectric = 0.04f;
 // Uses Disney's reparametrization of alpha = roughness^2.
 float ndfGGX(float cosLh, float roughness)
 {
-    float alpha = roughness * roughness;
-    float alphaSq = alpha * alpha;
+	float alpha = roughness * roughness;
+	float alphaSq = alpha * alpha;
 
-    float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
-    return alphaSq / (Pi * denom * denom);
+	float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+	return alphaSq / (Pi * denom * denom);
 }
 
 // Single term for separable Schlick-GGX below.
 float gaSchlickG1(float cosTheta, float k)
 {
-    return cosTheta / (cosTheta * (1.0 - k) + k);
+	return cosTheta / (cosTheta * (1.0 - k) + k);
 }
 
 // Schlick-GGX approximation of geometric attenuation function using Smith's method.
 float gaSchlickGGX(float cosLi, float cosLo, float roughness)
 {
-    float r = roughness + 1.0;
-    float k = (r * r) / 8.0; // Epic suggests using this roughness remapping for analytic lights.
-    return gaSchlickG1(cosLi, k) * gaSchlickG1(cosLo, k);
+	float r = roughness + 1.0;
+	float k = (r * r) / 8.0; // Epic suggests using this roughness remapping for analytic lights.
+	return gaSchlickG1(cosLi, k) * gaSchlickG1(cosLo, k);
 }
 
 // Shlick's approximation of the Fresnel factor.
 float3 fresnelSchlick(float3 F0, float cosTheta)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+	return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 float3 fresnelSchlickRoughness(float3 F0, float cosTheta, float roughness)
 {
-    return F0 + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
+	return F0 + (max(float3(1.0 - roughness, 1.0 - roughness, 1.0 - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
 
@@ -91,68 +91,78 @@ float3 fresnelSchlickRoughness(float3 F0, float cosTheta, float roughness)
 /// Shadows ///
 ///////////////
 
-float CalculateShadow(float3 pixPos)
+static float3 sampleOffsetDirections[20] = {
+	float3(1, 1, 1), float3(1, -1, 1), float3(-1, -1, 1), float3(-1, 1, 1), float3(1, 1, -1), float3(1, -1, -1),
+	float3(-1, -1, -1), float3(-1, 1, -1), float3(1, 1, 0), float3(1, -1, 0), float3(-1, -1, 0), float3(-1, 1, 0),
+	float3(1, 0, 1), float3(-1, 0, 1), float3(1, 0, -1), float3(-1, 0, -1), float3(0, 1, 1), float3(0, -1, 1),
+	float3(0, -1, -1), float3(0, 1, -1)
+};
+
+float CalculateShadow(float3 pixPos, float3 viewPos)
 {
-    // Get vector between fragment position and light position
-    float3 pixelToLight = pixPos - PointLights[0].Position;
-    pixelToLight.z *= -1;
-    // Use the light to fragment vector to sample from the depth map    
-    float closestDepth = ShadowMapTexture.Sample(ShadowMapSampleType, pixelToLight).r;
+	float shadow = 0.0;
+	float bias = 0.15;
+	int samples = 1;
+	float3 pixelToLight = pixPos - PointLights[0].Position;
+	float currentDepth = length(pixelToLight);
+	float viewDistance = length(pixPos - viewPos);
+	float diskRadius = 0.15;
+	for (int i = 0; i < samples; ++i)
+	{
+		float closestDepth = ShadowMapTexture.Sample(
+			ShadowMapSampleType,
+			pixelToLight + sampleOffsetDirections[i] * diskRadius
+		).r;
+		closestDepth *= PointLights[0].Radius;
+		if (currentDepth - bias > closestDepth) shadow += 1.0;
+	}
+	shadow /= float(samples);
 
-	float currentDepth = length(pixelToLight) / PointLights[0].Radius;
-
-    if(currentDepth > 1)
-    {
-        return 1.0f;
-    }
-
-    float bias = 0.1;
-    float shadow = currentDepth - bias < closestDepth ? 1.0 : 0.0;
-
-    return shadow;
+	return 1.0 - shadow;
 }
 
 float3 CalculatePointLights(float3 F0, in PBR_Data pbrData, float3 pixelWorldPosition)
 {
-    float3 sum = float3(0.0, 0.0, 0.0);
-    for (int i = 0; i < 1; i++)
-    {
-        PointLight light = PointLights[i];
-        
-        float3 Li = normalize(light.Position - pixelWorldPosition);
-        float3 Lh = normalize(Li + pbrData.ViewDir);
-        
-        const float Ldistance = length(light.Position - pixelWorldPosition);
-        float Lattenuation = clamp(1.0 - (Ldistance * Ldistance) / (light.Radius * light.Radius), 0.0, 1.0);
-        Lattenuation *= lerp(Lattenuation, 1.0, 0.0f /*Falloff*/);
-        const float3 Lradiance = light.Color * Lattenuation;
+	float3 sum = float3(0.0, 0.0, 0.0);
+	for (int i = 0; i < 1; i++)
+	{
+		PointLight light = PointLights[i];
 
-        const float cosLi = max(0.0, dot(pbrData.Normal, Li));
-        const float cosLh = max(0.0, dot(pbrData.Normal, Lh));
-        const float cosLo = max(dot(pbrData.Normal, pbrData.ViewDir), 0.0);
+		float3 Li = normalize(light.Position - pixelWorldPosition);
+		float3 Lh = normalize(Li + pbrData.ViewDir);
 
-        const float3 F = fresnelSchlickRoughness(F0, max(dot(Lh, pbrData.ViewDir), 0.0), pbrData.Roughness);
-        const float D = ndfGGX(cosLh, pbrData.Roughness);
-        const float G = gaSchlickGGX(cosLi, cosLo, pbrData.Roughness);
+		const float Ldistance = length(light.Position - pixelWorldPosition);
+		float Lattenuation = clamp(1.0 - (Ldistance * Ldistance) / (light.Radius * light.Radius), 0.0, 1.0);
+		Lattenuation *= lerp(Lattenuation, 1.0, 0.0f /*Falloff*/);
+		const float3 Lradiance = light.Color * Lattenuation;
 
-        const float3 kD = (1 - F) * (1.0 - pbrData.Metalness);
-        const float3 specular = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+		const float cosLi = max(0.0, dot(pbrData.Normal, Li));
+		const float cosLh = max(0.0, dot(pbrData.Normal, Lh));
+		const float cosLo = max(dot(pbrData.Normal, pbrData.ViewDir), 0.0);
 
-        sum += (kD * pbrData.Albedo + specular) * Lradiance * cosLi;
-    }
+		const float3 F = fresnelSchlickRoughness(F0, max(dot(Lh, pbrData.ViewDir), 0.0), pbrData.Roughness);
+		const float D = ndfGGX(cosLh, pbrData.Roughness);
+		const float G = gaSchlickGGX(cosLi, cosLo, pbrData.Roughness);
+
+		const float3 kD = (1 - F) * (1.0 - pbrData.Metalness);
+		const float3 specular = (F * D * G) / max(Epsilon, 4.0 * cosLi * cosLo);
+
+		sum += (kD * pbrData.Albedo + specular) * Lradiance * cosLi;
+	}
 
     float3 gammaCorr = pow(sum / (sum + float3(1.0, 1.0, 1.0)), float3(1.0 / 2.2, 1.0 / 2.2, 1.0 / 2.2));
 
-    return gammaCorr;
+	return gammaCorr;
 }
 
 const float2 invAtan = float2(0.1591, 0.3183);
+
 float2 SampleSphericalMap(float3 v)
 {
-    float2 uv = float2(atan2(v.z, v.x), asin(v.y));
-    uv *= invAtan;
-    uv += 0.5;
-    return uv;
+	float2 uv = float2(atan2(v.z, v.x), asin(v.y));
+	uv *= invAtan;
+	uv += 0.5;
+	return uv;
 }
 
 float4 main(PsInput input) : SV_TARGET
@@ -162,33 +172,34 @@ float4 main(PsInput input) : SV_TARGET
 
 	// Calculate PBR inputs (one of each pair are 1.0f, hence why they can be multiplied)
 	_pbrData.Albedo = ModelTex[ModelTextureMapType_Albedo].Sample(ModelTexSam, input.TexCoord).rgb * AlbedoColor.xyz;
-    _pbrData.Metalness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).b * Metalness;
+	_pbrData.Metalness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).b * Metalness;
 	_pbrData.Roughness = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).g * Roughness;
 	_pbrData.Roughness = max(_pbrData.Roughness, 0.05f);
 
-    float ao = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).r;
+	float ao = ModelTex[ModelTextureMapType_Roughness].Sample(ModelTexSam, input.TexCoord).r;
 
 	// Normals can't be multiplied, either value or map
 	if (UseNormalMap)
-    {
+	{
 		_pbrData.Normal = normalize(
 			ModelTex[ModelTextureMapType_Normal].Sample(ModelTexSam, input.TexCoord).rgb * 2.0f - 1.0f
 		);
-        _pbrData.Normal = normalize(mul(input.WorldNormals, _pbrData.Normal));
-    }
+		_pbrData.Normal = normalize(mul(input.WorldNormals, _pbrData.Normal));
+	}
 	else
 	{
 		_pbrData.Normal = normalize(input.Normal);
-    }
-	_pbrData.ViewDir = normalize(input.ViewPos - input.WorldPosition);				// Lo
+	}
+	_pbrData.ViewDir = normalize(input.ViewPos - input.WorldPosition); // Lo
 
 	// Frensel reflectance
-    float3 F0 = lerp(float3(0.04, 0.04, 0.04), pow(_pbrData.Albedo, float3(2.2, 2.2, 2.2)), _pbrData.Metalness);
+	float3 F0 = lerp(float3(0.04, 0.04, 0.04), pow(_pbrData.Albedo, float3(2.2, 2.2, 2.2)), _pbrData.Metalness);
 
-    float3 pointLightsContribution = CalculatePointLights(F0, _pbrData, input.WorldPosition);
+	float3 pointLightsContribution = CalculatePointLights(F0, _pbrData, input.WorldPosition);
 
-    //return float4(pointLightsContribution, 1.0f) * (1.0 - CalculateShadow(input.Position));
-    float shadow = CalculateShadow(input.WorldPosition);
-    return float4(pointLightsContribution, 1.0) * shadow;
-    //return shadow;
+	//return float4(pointLightsContribution, 1.0f) * (1.0 - CalculateShadow(input.Position));
+	float shadow = CalculateShadow(input.WorldPosition, input.ViewPos);
+	float3 color = pointLightsContribution * shadow + float3(0.1, 0.1, 0.1) * _pbrData.Albedo;
+	return float4(color, 1.0);
+	//return shadow;
 }

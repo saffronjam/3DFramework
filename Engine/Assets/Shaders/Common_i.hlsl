@@ -24,10 +24,11 @@ cbuffer CommonCBuffer : register(b1)
 	float3 CameraPosition;
 }
 
-cbuffer PointLights : register(b2)
+cbuffer LightData : register(b2)
 {
 	PointLight PointLights[MAX_LIGHTS];
 	int nPointLights;
+    float4 Ambient;
 }
 
 float4x4 inverse(float4x4 m) {

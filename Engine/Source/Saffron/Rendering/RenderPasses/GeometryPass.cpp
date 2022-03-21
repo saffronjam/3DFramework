@@ -47,7 +47,9 @@ void GeometryPass::Execute()
 	// Update point light data
 	PointLightCBuffer data;
 	data.PointLights[0] = common.PointLight;
+	data.PointLights[1] = ShaderStructs::PointLight{common.CameraData.Position, 20.0f};
 	data.nPointLights = 1;
+	data.Ambient = Color{0.1f, 0.1f, 0.1f};
 	_pointLightCBuffer->Update(data);
 
 	// Render to texture
