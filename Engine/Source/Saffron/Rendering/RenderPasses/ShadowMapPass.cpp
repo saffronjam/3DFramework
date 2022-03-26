@@ -33,7 +33,7 @@ void ShadowMapPass::OnUi()
 {
 	ImGui::Begin("Shadow map");
 	ImGui::Checkbox("Orthographic", &_orthographic);
-	Ui::Image(_shadowMap->ImageByIndex(0), *_depthTextureShader, {500.0f, 500.0f});
+	Ui::Image(_shadowMap->ImageByIndex(0), _depthTextureShader, {500.0f, 500.0f});
 	ImGui::End();
 }
 

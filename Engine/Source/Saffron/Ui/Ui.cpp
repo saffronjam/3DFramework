@@ -1,87 +1,406 @@
 ﻿#include "SaffronPCH.h"
 
-#include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
-
-#include "Saffron/Common/App.h"
+#include "Saffron/Common/Utils.h"
 #include "Saffron/Ui/Ui.h"
-
+#include "Saffron/Ui/Colors.h"
 
 namespace Se
 {
-static auto shaderCallback = [](const ImDrawList* list, const ImDrawCmd* cmd)
+using namespace Ui;
+using namespace Ui::Utils;
+using namespace ImGuiUtils;
+using namespace Draw;
+
+std::atomic<int> IdBinder::counter = 0;
+
+ImU32 Ui::Utils::ColourWithValue(const ImColor& color, float value)
 {
-	const auto& userShader = *static_cast<std::shared_ptr<const Shader>*>(cmd->UserCallbackData);
+	const ImVec4& colRow = color.Value;
+	float hue, sat, val;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, hue, sat, val);
+	return ImColor::HSV(hue, sat, std::min(value, 1.0f));
+}
 
-	auto& ctx = ImGui_ImplDX11_GetBackendData()->pd3dDeviceContext;
+ImU32 Ui::Utils::ColourWithSaturation(const ImColor& color, float saturation)
+{
+	const ImVec4& colRow = color.Value;
+	float hue, sat, val;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, hue, sat, val);
+	return ImColor::HSV(hue, std::min(saturation, 1.0f), val);
+}
 
-	auto* drawData = ImGui::GetMainViewport()->DrawData;
-	ImGui_ImplDX11_SetupRenderState(
-		nullptr,
-		ctx,
-		&const_cast<ID3D11VertexShader&>(userShader->NativeVsHandle()),
-		&const_cast<ID3D11PixelShader&>(userShader->NativePsHandle())
+ImU32 Ui::Utils::ColourWithHue(const ImColor& color, float hue)
+{
+	const ImVec4& colRow = color.Value;
+	float h, s, v;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, h, s, v);
+	return ImColor::HSV(std::min(hue, 1.0f), s, v);
+}
+
+ImU32 Ui::Utils::ColourWithMultipliedValue(const ImColor& color, float multiplier)
+{
+	const ImVec4& colRow = color.Value;
+	float hue, sat, val;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, hue, sat, val);
+	return ImColor::HSV(hue, sat, std::min(val * multiplier, 1.0f));
+}
+
+ImU32 Ui::Utils::ColourWithMultipliedSaturation(const ImColor& color, float multiplier)
+{
+	const ImVec4& colRow = color.Value;
+	float hue, sat, val;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, hue, sat, val);
+	return ImColor::HSV(hue, std::min(sat * multiplier, 1.0f), val);
+}
+
+ImU32 Ui::Utils::ColourWithMultipliedHue(const ImColor& color, float multiplier)
+{
+	const ImVec4& colRow = color.Value;
+	float hue, sat, val;
+	ImGui::ColorConvertRGBtoHSV(colRow.x, colRow.y, colRow.z, hue, sat, val);
+	return ImColor::HSV(std::min(hue * multiplier, 1.0f), sat, val);
+}
+
+auto Ui::Utils::ToSaffronRect(const ImRect& rect) -> FloatRect
+{
+	return {rect.Min.x, rect.Min.y, rect.Max.x - rect.Min.x, rect.Max.y - rect.Min.y};
+}
+
+void Draw::Underline(bool fullWidth, float offsetX, float offsetY)
+{
+	if (fullWidth)
+	{
+		if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr) ImGui::PushColumnsBackground();
+		else if (ImGui::GetCurrentTable() != nullptr) ImGui::TablePushBackgroundChannel();
+	}
+
+	const float width = fullWidth ? ImGui::GetWindowWidth() : ImGui::GetContentRegionAvail().x;
+	const ImVec2 cursor = ImGui::GetCursorScreenPos();
+	ImGui::GetWindowDrawList()->AddLine(
+		ImVec2(cursor.x + offsetX, cursor.y + offsetY),
+		ImVec2(cursor.x + width, cursor.y + offsetY),
+		Theme::backgroundDark,
+		1.0f
 	);
-};
 
-Ui::Ui() :
-	Singleton(this)
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	(void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable; // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
-
-	const auto& app = App::Instance();
-	const auto hwnd = static_cast<HWND>(app.Window().NativeHandle());
-	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplDX11_Init(&Renderer::Device(), &Renderer::Context());
+	if (fullWidth)
+	{
+		if (ImGui::GetCurrentWindow()->DC.CurrentColumns != nullptr) ImGui::PopColumnsBackground();
+		else if (ImGui::GetCurrentTable() != nullptr) ImGui::TablePopBackgroundChannel();
+	}
 }
 
-Ui::~Ui()
+bool Draw::Vec3Control(const std::string& label, Vector3& values, float resetValue, float columnWidth)
 {
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
-}
+	bool modified = false;
 
-void Ui::BeginFrame()
-{
-	Renderer::Submit(
-		[this](const RendererPackage& package)
+
+	IdBinder idBinder;
+
+	ImGui::TableSetColumnIndex(0);
+	ShiftCursor(17.0f, 7.0f);
+
+	ImGui::Text(label.c_str());
+	Underline(false, 0.0f, 2.0f);
+
+	ImGui::TableSetColumnIndex(1);
+	ShiftCursor(7.0f, 0.0f);
+
+	{
+		constexpr float spacingX = 8.0f;
+		StyleBinder itemSpacing(ImGuiStyleVar_ItemSpacing, ImVec2{spacingX, 0.0f});
+		StyleBinder padding(ImGuiStyleVar_WindowPadding, ImVec2{0.0f, 2.0f});
+
 		{
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
-			ImGuizmo::BeginFrame();
-		}
-	);
-}
+			// Begin XYZ area
+			ColorBinder padding(ImGuiCol_Border, IM_COL32(0, 0, 0, 0));
+			StyleBinder frame(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
 
-void Ui::EndFrame()
-{
-	Renderer::BackBuffer().Bind();
-	Renderer::Submit(
-		[this](const RendererPackage& package)
-		{
-			auto& app = App::Instance();
-			auto& io = ImGui::GetIO();
-			io.DisplaySize = ImVec2(
-				static_cast<float>(app.Window().Width()),
-				static_cast<float>(app.Window().Height())
+			ImGui::BeginChild(
+				ImGui::GetID((label + "fr").c_str()),
+				ImVec2(ImGui::GetContentRegionAvail().x - spacingX, ImGui::GetFrameHeightWithSpacing() + 8.0f),
+				false,
+				ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse
 			);
-
-			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-			ImGui::UpdatePlatformWindows();
-			ImGui::RenderPlatformWindowsDefault();
-			Renderer::Instance().CleanDebugInfo();
-			Instance()._pendingShaders.clear();
 		}
+		constexpr float framePadding = 2.0f;
+		constexpr float outlineSpacing = 1.0f;
+		const float lineHeight = GImGui->Font->FontSize + framePadding * 2.0f;
+		const ImVec2 buttonSize = {lineHeight + 2.0f, lineHeight};
+		const float inputItemWidth = (ImGui::GetContentRegionAvail().x - spacingX) / 3.0f - buttonSize.x;
+
+		const ImGuiIO& io = ImGui::GetIO();
+		auto boldFont = io.Fonts->Fonts[0];
+
+		auto drawControl = [&](
+			const std::string& label,
+			float& value,
+			const ImVec4& colourN,
+			const ImVec4& colourH,
+			const ImVec4& colourP
+		)
+		{
+			{
+				StyleBinder buttonFrame(ImGuiStyleVar_FramePadding, ImVec2(framePadding, 0.0f));
+				StyleBinder buttonRounding(ImGuiStyleVar_FrameRounding, 1.0f);
+				ColorStackBinder buttonColours(
+					ImGuiCol_Button,
+					colourN,
+					ImGuiCol_ButtonHovered,
+					colourH,
+					ImGuiCol_ButtonActive,
+					colourP
+				);
+
+				//Ui::ScopedFont buttonFont(boldFont);
+
+				ShiftCursorY(2.0f);
+				if (ImGui::Button(label.c_str(), buttonSize))
+				{
+					value = resetValue;
+					modified = true;
+				}
+			}
+
+			ImGui::SameLine(0.0f, outlineSpacing);
+			ImGui::SetNextItemWidth(inputItemWidth);
+			ShiftCursorY(-2.0f);
+			modified |= ImGui::DragFloat(("##" + label).c_str(), &value, 0.1f, 0.0f, 0.0f, "%.2f");
+
+			//if (!Ui::IsItemDisabled()) Ui::DrawItemActivityOutline(2.0f, true, Colours::Theme::accent);
+		};
+
+
+		drawControl(
+			"X",
+			values.x,
+			ImVec4{0.8f, 0.1f, 0.15f, 1.0f},
+			ImVec4{0.9f, 0.2f, 0.2f, 1.0f},
+			ImVec4{0.8f, 0.1f, 0.15f, 1.0f}
+		);
+
+		ImGui::SameLine(0.0f, outlineSpacing);
+		drawControl(
+			"Y",
+			values.y,
+			ImVec4{0.2f, 0.7f, 0.2f, 1.0f},
+			ImVec4{0.3f, 0.8f, 0.3f, 1.0f},
+			ImVec4{0.2f, 0.7f, 0.2f, 1.0f}
+		);
+
+		ImGui::SameLine(0.0f, outlineSpacing);
+		drawControl(
+			"Z",
+			values.z,
+			ImVec4{0.1f, 0.25f, 0.8f, 1.0f},
+			ImVec4{0.2f, 0.35f, 0.9f, 1.0f},
+			ImVec4{0.1f, 0.25f, 0.8f, 1.0f}
+		);
+
+		ImGui::EndChild();
+	}
+
+	return modified;
+}
+
+void Draw::ButtonImage(
+	const Texture& imageNormal,
+	const Texture& imageHovered,
+	const Texture& imagePressed,
+	uint tintNormal,
+	uint tintHovered,
+	uint tintPressed,
+	const Vector2& rectMin,
+	const Vector2& rectMax
+)
+{
+	auto* drawList = ImGui::GetWindowDrawList();
+	if (ImGui::IsItemActive())
+	{
+		drawList->AddImage(
+			&const_cast<ID3D11ShaderResourceView&>(imagePressed.ShaderView()),
+			reinterpret_cast<const ImVec2&>(rectMin),
+			reinterpret_cast<const ImVec2&>(rectMax),
+			ImVec2(0, 0),
+			ImVec2(1, 1),
+			tintPressed
+		);
+	}
+	else if (ImGui::IsItemHovered())
+	{
+		drawList->AddImage(
+			&const_cast<ID3D11ShaderResourceView&>(imageHovered.ShaderView()),
+			reinterpret_cast<const ImVec2&>(rectMin),
+			reinterpret_cast<const ImVec2&>(rectMax),
+			ImVec2(0, 0),
+			ImVec2(1, 1),
+			tintHovered
+		);
+	}
+	else
+	{
+		drawList->AddImage(
+			&const_cast<ID3D11ShaderResourceView&>(imageNormal.ShaderView()),
+			reinterpret_cast<const ImVec2&>(rectMin),
+			reinterpret_cast<const ImVec2&>(rectMax),
+			ImVec2(0, 0),
+			ImVec2(1, 1),
+			tintNormal
+		);
+	}
+}
+
+void Draw::ButtonImage(
+	const Texture& image,
+	uint tintNormal,
+	uint tintHovered,
+	uint tintPressed,
+	const Vector2& rectMin,
+	const Vector2& rectMax
+)
+{
+	ButtonImage(image, image, image, tintNormal, tintHovered, tintPressed, rectMin, rectMax);
+}
+
+void Draw::ButtonImage(const Texture& image, uint tintNormal, uint tintHovered, uint tintPressed, FloatRect rect)
+{
+	const Vector2 topLeft{rect.x, rect.y};
+	ButtonImage(
+		image,
+		image,
+		image,
+		tintNormal,
+		tintHovered,
+		tintPressed,
+		topLeft,
+		topLeft + Vector2{rect.Width, rect.Height}
 	);
+}
+
+void Draw::ButtonImage(
+	const Texture& imageNormal,
+	const Texture& imageHovered,
+	const Texture& imagePressed,
+	uint tintNormal,
+	uint tintHovered,
+	uint tintPressed
+)
+{
+	const auto imTopLeft = ImGui::GetItemRectMin();
+	const auto imBottomRight = ImGui::GetItemRectMin();
+	const auto topLeft{reinterpret_cast<const Vector2&>(imTopLeft)};
+	const auto bottomRight{reinterpret_cast<const Vector2&>(imBottomRight)};
+	ButtonImage(imageNormal, imageHovered, imagePressed, tintNormal, tintHovered, tintPressed, topLeft, bottomRight);
+}
+
+void Draw::ButtonImage(const Texture& image, uint tintNormal, uint tintHovered, uint tintPressed)
+{
+	const auto imTopLeft = ImGui::GetItemRectMin();
+	const auto imBottomRight = ImGui::GetItemRectMin();
+	const auto topLeft{reinterpret_cast<const Vector2&>(imTopLeft)};
+	const auto bottomRight{reinterpret_cast<const Vector2&>(imBottomRight)};
+	ButtonImage(image, image, image, tintNormal, tintHovered, tintPressed, topLeft, bottomRight);
+}
+
+auto Draw::PropertyGridHeader(const std::string& name, bool openByDefault) -> bool
+{
+	ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_SpanAvailWidth |
+		ImGuiTreeNodeFlags_AllowItemOverlap | ImGuiTreeNodeFlags_FramePadding;
+
+	if (openByDefault) treeNodeFlags |= ImGuiTreeNodeFlags_DefaultOpen;
+
+	bool open = false;
+	constexpr float framePaddingX = 6.0f;
+	constexpr float framePaddingY = 6.0f; // affects height of the header
+
+	StyleBinder headerRounding(ImGuiStyleVar_FrameRounding, 0.0f);
+	StyleBinder headerPaddingAndHeight(ImGuiStyleVar_FramePadding, ImVec2{framePaddingX, framePaddingY});
+
+	//Ui::PushID();
+	ImGui::PushID(name.c_str());
+	open = ImGui::TreeNodeEx("##dummy_id", treeNodeFlags, Se::Utils::ToUpper(name).c_str());
+	//Ui::PopID();
+	ImGui::PopID();
+
+	return open;
+}
+
+
+void Ui::ShiftCursorX(float distance)
+{
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + distance);
+}
+
+void Ui::ShiftCursorY(float distance)
+{
+	ImGui::SetCursorPosY(ImGui::GetCursorPosY() + distance);
+}
+
+void Ui::ShiftCursor(float x, float y)
+{
+	const ImVec2 cursor = ImGui::GetCursorPos();
+	ImGui::SetCursorPos(ImVec2(cursor.x + x, cursor.y + y));
+}
+
+bool Ui::BeginPopup(const char* str_id, ImGuiWindowFlags flags)
+{
+	bool opened = false;
+	if (ImGui::BeginPopup(str_id, flags))
+	{
+		opened = true;
+		// Fill background wiht nice gradient
+		const float padding = ImGui::GetStyle().WindowBorderSize;
+		const auto windowRect = RectExpanded(ImGui::GetCurrentWindow()->Rect(), -padding, -padding);
+		ImGui::PushClipRect(windowRect.Min, windowRect.Max, false);
+		const ImColor col1 = ImGui::GetStyleColorVec4(ImGuiCol_PopupBg); // Colours::Theme::backgroundPopup;
+		const ImColor col2 = ColourWithMultipliedValue(col1, 0.8f);
+		ImGui::GetWindowDrawList()->AddRectFilledMultiColor(windowRect.Min, windowRect.Max, col1, col1, col2, col2);
+		ImGui::GetWindowDrawList()->AddRect(windowRect.Min, windowRect.Max, ColourWithMultipliedValue(col1, 1.1f));
+		ImGui::PopClipRect();
+
+		// Popped in EndPopup()
+		ImGui::PushStyleColor(ImGuiCol_HeaderHovered, IM_COL32(0, 0, 0, 80));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(1.0f, 1.0f));
+	}
+
+	return opened;
+}
+
+void Ui::EndPopup()
+{
+	ImGui::PopStyleVar(); // WindowPadding;
+	ImGui::PopStyleColor(); // HeaderHovered;
+	ImGui::EndPopup();
+}
+
+auto ImGuiUtils::GetItemRect() -> ImRect
+{
+	return ImRect(ImGui::GetItemRectMin(), ImGui::GetItemRectMax());
+}
+
+auto ImGuiUtils::RectExpanded(const ImRect& rect, float x, float y) -> ImRect
+{
+	ImRect result = rect;
+	result.Min.x -= x;
+	result.Min.y -= y;
+	result.Max.x += x;
+	result.Max.y += y;
+	return result;
+}
+
+auto ImGuiUtils::RectOffset(const ImRect& rect, float x, float y) -> ImRect
+{
+	ImRect result = rect;
+	result.Min.x += x;
+	result.Min.y += y;
+	result.Max.x += x;
+	result.Max.y += y;
+	return result;
+}
+
+auto ImGuiUtils::RectOffset(const ImRect& rect, ImVec2 xy) -> ImRect
+{
+	return RectOffset(rect, xy.x, xy.y);
 }
 
 void Ui::BeginGizmo(uint viewportWidth, uint viewportHeight)
@@ -114,10 +433,10 @@ void Ui::Image(const Texture& texture, const Shader& shader, const Vector2& size
 
 void Ui::Image(const TextureCube& texture, const Vector2& size)
 {
-	ImVec2 imSize{ size.x, size.y };
+	ImVec2 imSize{size.x, size.y};
 	if (size.x == 0.0f || size.y == 0.0f)
 	{
-		imSize = { static_cast<float>(texture.Width()), static_cast<float>(texture.Height()) };
+		imSize = {static_cast<float>(texture.Width()), static_cast<float>(texture.Height())};
 	}
 
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
@@ -125,10 +444,10 @@ void Ui::Image(const TextureCube& texture, const Vector2& size)
 
 void Ui::Image(const TextureCube& texture, const Shader& shader, const Vector2& size)
 {
-	ImVec2 imSize{ size.x, size.y };
+	ImVec2 imSize{size.x, size.y};
 	if (size.x == 0.0f || size.y == 0.0f)
 	{
-		imSize = { static_cast<float>(texture.Width()), static_cast<float>(texture.Height()) };
+		imSize = {static_cast<float>(texture.Width()), static_cast<float>(texture.Height())};
 	}
 
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(texture.ShaderView()), imSize);
@@ -145,7 +464,7 @@ void Ui::Image(const Se::Image& image, const Vector2& size)
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), imSize);
 }
 
-void Ui::Image(const Se::Image& image, const Shader& shader, const Vector2& size)
+void Ui::Image(const Se::Image& image, const std::shared_ptr<Shader>& shader, const Vector2& size)
 {
 	ImVec2 imSize{size.x, size.y};
 	if (size.x == 0.0f || size.y == 0.0f)
@@ -153,11 +472,7 @@ void Ui::Image(const Se::Image& image, const Shader& shader, const Vector2& size
 		imSize = {static_cast<float>(image.Width()), static_cast<float>(image.Height())};
 	}
 
-	const auto& inst = Instance()._pendingShaders.emplace_back(shader.ShareThisAs<const Shader>());
-
-	ImGui::GetWindowDrawList()->AddCallback(shaderCallback, const_cast<void*>(reinterpret_cast<const void*>(&inst)));
 	ImGui::Image(&const_cast<ID3D11ShaderResourceView&>(image.ShaderView()), imSize);
-	ImGui::GetWindowDrawList()->AddCallback(ImDrawCallback_ResetRenderState, nullptr);
 }
 
 void Ui::Gizmo(Matrix& result, const Matrix& view, const Matrix proj, GizmoControl control)
@@ -166,17 +481,20 @@ void Ui::Gizmo(Matrix& result, const Matrix& view, const Matrix proj, GizmoContr
 	const auto* viewPtr = reinterpret_cast<const float*>(&view);
 	const auto* projPtr = reinterpret_cast<const float*>(&proj);
 
-	ImGuizmo::Manipulate(viewPtr, projPtr, ToImGuizmoOperation(control), ImGuizmo::LOCAL, model);
+	Manipulate(viewPtr, projPtr, ToImGuizmoOperation(control), ImGuizmo::LOCAL, model);
 }
 
-ImGuizmo::OPERATION Ui::ToImGuizmoOperation(GizmoControl gizmoControl)
+ImGuizmo::OPERATION Ui::Utils::ToImGuizmoOperation(GizmoControl gizmoControl)
 {
 	switch (gizmoControl)
 	{
 	case GizmoControl::Translate: return ImGuizmo::TRANSLATE;
 	case GizmoControl::Rotate: return ImGuizmo::ROTATE;
 	case GizmoControl::Scale: return ImGuizmo::SCALE;
-	default: ;
+	default:
+	{
+		throw SaffronException("Invalid Gizmo Control");
+	}
 	}
 }
 }

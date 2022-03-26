@@ -2,7 +2,7 @@
 
 #define NOMINMAX
 
-#include "Saffron/Graphics/ModelStore.h"
+#include "Saffron/Graphics/ModelRegistry.h"
 
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/Importer.hpp>
@@ -33,9 +33,9 @@ struct LogStream : Assimp::LogStream
 
 namespace Se
 {
-const std::filesystem::path ModelStore::BasePath("Assets/Meshes/");
+const std::filesystem::path ModelRegistry::BasePath("Assets/Models/");
 
-const uint ModelStore::DefaultImportFlags = aiProcess_CalcTangentSpace | // Create binormals/tangents just in case
+const uint ModelRegistry::DefaultImportFlags = aiProcess_CalcTangentSpace | // Create binormals/tangents just in case
 	aiProcess_Triangulate | // Make sure we're triangles
 	aiProcess_SortByPType | // Split meshes by primitive type
 	aiProcess_GenNormals | // Make sure we have legit normals
@@ -43,7 +43,7 @@ const uint ModelStore::DefaultImportFlags = aiProcess_CalcTangentSpace | // Crea
 	aiProcess_OptimizeMeshes | // Batch draws where possible
 	aiProcess_JoinIdenticalVertices | aiProcess_ValidateDataStructure; // Validation
 
-ModelStore::ModelStore() :
+ModelRegistry::ModelRegistry() :
 	Singleton(this),
 	_modelShader(Shader::Create("MeshShader"))
 {
@@ -52,7 +52,7 @@ ModelStore::ModelStore() :
 	_importer = new Assimp::Importer();
 }
 
-ModelStore::~ModelStore()
+ModelRegistry::~ModelRegistry()
 {
 	delete _importer;
 }
@@ -65,7 +65,7 @@ auto stripFirstDir(const std::filesystem::path path) -> std::filesystem::path
 }
 
 
-auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Model>
+auto ModelRegistry::Import(const std::filesystem::path& path) -> std::shared_ptr<Model>
 {
 	auto fullpath = BasePath;
 	fullpath += path;
@@ -217,6 +217,9 @@ auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mo
 	newMesh->_subMeshes = std::move(subMeshes);
 	newMesh->_textures = std::move(textures);
 
+	newMesh->_name = path.stem().string();
+	newMesh->_path = path;
+
 	for (const auto& texCont : newMesh->_textures)
 	{
 		auto& nativeSrvCont = newMesh->_nativeTextureSrvs.emplace_back();
@@ -229,7 +232,7 @@ auto ModelStore::Import(const std::filesystem::path& path) -> std::shared_ptr<Mo
 	return newMesh;
 }
 
-auto ModelStore::ImportMaterials(
+auto ModelRegistry::ImportMaterials(
 	const aiScene& scene,
 	const std::filesystem::path& fullpath
 ) const -> std::tuple<std::vector<std::shared_ptr<Material>>, std::vector<MatTexContainer>>
@@ -255,7 +258,7 @@ auto ModelStore::ImportMaterials(
 	return std::make_tuple(materials, matTexContainer);
 }
 
-auto ModelStore::ImportMaterial(
+auto ModelRegistry::ImportMaterial(
 	aiMaterial& aiMaterial,
 	const std::filesystem::path& fullpath
 ) const -> std::tuple<std::shared_ptr<Material>, MatTexContainer>
@@ -417,25 +420,23 @@ auto ModelStore::ImportMaterial(
 
 		if (prop.mType == aiPTI_String)
 		{
-			
 		}
 	}
 
 	bool metalnessFallback = !hasMetalnessMap;
 
-	if(metalnessFallback)
+	if (metalnessFallback)
 	{
 		matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
-			
 	}
-	
+
 
 	material->SetMaterialData(materialData);
 
 	return std::make_tuple(material, matTexContainer);
 }
 
-auto ModelStore::CreateDefaultMaterial() -> std::shared_ptr<Material>
+auto ModelRegistry::CreateDefaultMaterial() -> std::shared_ptr<Material>
 {
 	static constexpr const auto* MaterialName = "Saffron-Default";
 

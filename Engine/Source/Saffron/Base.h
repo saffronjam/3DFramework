@@ -41,3 +41,6 @@ auto PtrAs(const std::shared_ptr<U>& smartPointer)
 #ifndef SE_FUNCTION
 #define SE_FUNCTION()
 #endif
+
+#undef min
+#undef max

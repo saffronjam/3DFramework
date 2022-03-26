@@ -26,7 +26,7 @@ Renderer::Renderer(const Window& window) :
 	CreateFactory();
 	CreateSwapChain(window);
 
-	_meshStore = std::make_unique<ModelStore>();
+	_meshStore = std::make_unique<ModelRegistry>();
 	_quadIndexBuffer = IndexBuffer::Create(4);
 	_quadVertexBuffer = VertexBuffer::Create(PosColTexVertex::Layout(), 4);
 

@@ -2,7 +2,7 @@
 
 #include "Saffron/Graphics/Model.h"
 
-#include "Saffron/Graphics/ModelStore.h"
+#include "Saffron/Graphics/ModelRegistry.h"
 #include "Saffron/Rendering/Renderer.h"
 
 namespace Se
@@ -94,6 +94,16 @@ auto Model::Transform() const -> const Matrix&
 	return _transform;
 }
 
+auto Model::Name() const -> const std::string&
+{
+	return _name;
+}
+
+auto Model::Path() const -> const std::filesystem::path&
+{
+	return _path;
+}
+
 void Model::SetShader(const std::shared_ptr<Shader>& shader)
 {
 	_shader = shader;
@@ -101,7 +111,7 @@ void Model::SetShader(const std::shared_ptr<Shader>& shader)
 
 auto Model::Create(const std::filesystem::path& path) -> std::shared_ptr<Model>
 {
-	return ModelStore::Instance().Import(path);
+	return ModelRegistry::Instance().Import(path);
 }
 
 Model::Model()

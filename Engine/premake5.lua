@@ -27,6 +27,15 @@ local function RequireAll()
     deps["DirectXTex"] = require("ThirdParty.DirectXTex.premake5")
     deps["ImGui"] = require("ThirdParty.imgui.premake5")
     deps["Assimp"] = require("ThirdParty.assimp.premake5")
+    deps["Entt"] = require("ThirdParty.entt.premake5")
+    deps["Json"] = require("ThirdParty.json.premake5")
+
+    for k, v in pairs(deps) do
+        print("Installed: " .. k)
+    end
+
+    print()
+
     return deps
 end
 

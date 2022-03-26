@@ -1,39 +1,65 @@
 ﻿#include "Layers/EditorLayer.h"
 
+#include "Saffron/Scene/Entity.h"
+
 namespace Se
 {
 EditorLayer::EditorLayer() :
-	_viewportPanel("Output")
+	_scene(SceneSerializer::ReadFromFile("development.json")),
+	_viewportPanel("Output"),
+	_entityRegistryPanel(_scene.get())
 {
 }
 
 void EditorLayer::OnAttach()
 {
 	const auto& window = App::Instance().Window();
-	_scene.SetViewportSize(window.Width(), window.Height());
+	_scene->SetViewportSize(window.Width(), window.Height());
 
-	_scene.ViewportResized += [this](const SizeEvent& event)
+	_scene->ViewportResized += [this](const SizeEvent& event)
 	{
-		_viewportPanel.SetImage(_scene.Renderer().FinalTargetPtr()->ImagePtrByIndex(0));
-		_depthViewportPanel.SetImage(_scene.Renderer().FinalTargetPtr()->DepthImagePtr());
+		_viewportPanel.SetImage(_scene->Renderer().FinalTargetPtr()->ImagePtrByIndex(0));
+		_depthViewportPanel.SetImage(_scene->Renderer().FinalTargetPtr()->DepthImagePtr());
 		return false;
 	};
 	_viewportPanel.Resized += [this](const SizeEvent& event)
 	{
-		_scene.SetViewportSize(event.Width, event.Height);
+		_scene->SetViewportSize(event.Width, event.Height);
 		return false;
 	};
 
 	_viewportPanel.Renderered += [this](const SizeEvent& event)
 	{
-		auto& selected = _scene.SelectedModel();
-		auto& camera = _scene.Camera();
+		if (!_scene->HasSelectedEntity())
+		{
+			return false;
+		}
+
+		auto selected = _scene->SelectedEntity();
+		auto& transformComponent = selected.Get<TransformComponent>();
+		auto transform = transformComponent.Transform();
+		auto& camera = _scene->Camera();
 
 		Ui::BeginGizmo(event.Width, event.Height);
-		Ui::Gizmo(selected->Transform(), camera.View(), camera.Projection(), _gizmoControl);
+		Ui::Gizmo(transform, camera.View(), camera.Projection(), _gizmoControl);
+
+		Vector3 translation, scale;
+		Quaternion rotation;
+		if (transform.Decompose(scale, rotation, translation))
+		{
+			transformComponent.Scale = scale;
+			transformComponent.Translation = translation;
+			transformComponent.Rotation = Math::ToEulerAngles(rotation);
+		}
 		return false;
 	};
-	
+
+	_scene->OnSelcetedEntity += [this](const Entity& entity)
+	{
+		_entityPanel.SetEntity(entity);
+		return false;
+	};
+
 	App::Instance().Window().GainedFocus += []
 	{
 		for (auto& shader : ShaderStore::GetAll())
@@ -46,12 +72,13 @@ void EditorLayer::OnAttach()
 
 void EditorLayer::OnDetach()
 {
+	SceneSerializer::WriteToFile(*_scene, "development.json");
 }
 
 void EditorLayer::OnUpdate(TimeSpan ts)
 {
-	_scene.OnUpdate(ts);
-	_scene.OnRender();
+	_scene->OnUpdate(ts);
+	_scene->OnRender();
 
 	if (Keyboard::IsKeyPressed(KeyCode::Num1))
 	{
@@ -73,10 +100,12 @@ void EditorLayer::OnUi()
 
 	_viewportPanel.OnUi();
 	_depthViewportPanel.OnUi();
-	_scene.OnUi();
+	_entityPanel.OnUi();
+	_entityRegistryPanel.OnUi();
+	_scene->OnUi();
 
 	auto shaders = ShaderStore::GetAll();
-	
+
 	ImGui::Begin("Shaders");
 	for (auto& shader : shaders)
 	{
@@ -100,7 +129,7 @@ void EditorLayer::OnUi()
 		_gizmoControl = GizmoControl::Rotate;
 	}
 	ImGui::SameLine();
-		if (ImGui::RadioButton("Scale", _gizmoControl == GizmoControl::Scale))
+	if (ImGui::RadioButton("Scale", _gizmoControl == GizmoControl::Scale))
 	{
 		_gizmoControl = GizmoControl::Scale;
 	}

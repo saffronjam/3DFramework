@@ -8,7 +8,7 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Common/Window.h"
-#include "Saffron/Graphics/ModelStore.h"
+#include "Saffron/Graphics/ModelRegistry.h"
 #include "Saffron/Rendering/BindableStore.h"
 #include "Saffron/Rendering/ShaderStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
@@ -134,7 +134,7 @@ private:
 	std::shared_ptr<class BackBuffer> _backbuffer;
 	std::unique_ptr<BindableStore> _bindableStore;
 	std::unique_ptr<ShaderStore> _shaderStore;
-	std::unique_ptr<ModelStore> _meshStore;
+	std::unique_ptr<ModelRegistry> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
 	// Prepared submitions

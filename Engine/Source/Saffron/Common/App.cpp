@@ -9,7 +9,8 @@ App::App(const AppSpec& spec) :
 	Singleton(this),
 	_window(Window::Create(spec.WindowSpec)),
 	_renderer(std::make_unique<Renderer>(*_window)),
-	_ui(std::make_unique<Ui>()),
+	_uiManager(std::make_unique<UiManager>()),
+	_sceneRegistry(std::make_unique<SceneRegistry>()),
 	_keyboard(std::make_unique<Keyboard>()),
 	_mouse(std::make_unique<Mouse>())
 {
@@ -46,7 +47,7 @@ void App::Run()
 			{
 				_renderer->BeginQueue("Ui");
 
-				_ui->BeginFrame();
+				_uiManager->BeginFrame();
 
 				Renderer::Submit(
 					[this](const RendererPackage& package)
@@ -62,7 +63,7 @@ void App::Run()
 					}
 				);
 
-				_ui->EndFrame();
+				_uiManager->EndFrame();
 				_renderer->EndQueue();
 			}
 

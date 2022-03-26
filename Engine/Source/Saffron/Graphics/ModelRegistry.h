@@ -19,12 +19,12 @@ class Model;
 class Material;
 class Texture;
 
-class ModelStore : public Singleton<ModelStore>
+class ModelRegistry : public Singleton<ModelRegistry>
 {
 	using MatTexContainer = std::map<ModelTextureMapType, std::shared_ptr<Texture>>;
 public:
-	ModelStore();
-	~ModelStore() override;
+	ModelRegistry();
+	~ModelRegistry() override;
 
 	auto Import(const std::filesystem::path& path) -> std::shared_ptr<Model>;
 

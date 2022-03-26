@@ -104,6 +104,7 @@ float CalculateShadow(float3 pixPos, float3 viewPos)
 	float bias = 0.15;
 	int samples = 1;
 	float3 pixelToLight = pixPos - PointLights[0].Position;
+	pixelToLight.z *= -1;
 	float currentDepth = length(pixelToLight);
 	float viewDistance = length(pixPos - viewPos);
 	float diskRadius = 0.15;

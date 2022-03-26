@@ -6,7 +6,7 @@
 
 #include "Saffron/Graphics/Camera.h"
 #include "Saffron/Graphics/Model.h"
-#include "Saffron/Graphics/Scene.h"
+#include "Saffron/Scene/Scene.h"
 #include "Saffron/Rendering/Bindables.h"
 #include "Saffron/Rendering/Renderer.h"
 

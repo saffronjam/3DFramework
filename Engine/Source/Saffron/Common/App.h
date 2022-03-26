@@ -9,7 +9,8 @@
 #include "Saffron/Input/Keyboard.h"
 #include "Saffron/Input/Mouse.h"
 #include "Saffron/Rendering/Renderer.h"
-#include "Saffron/Ui/Ui.h"
+#include "Saffron/Scene/SceneRegistry.h"
+#include "Saffron/Ui/UiManager.h"
 
 namespace Se
 {
@@ -42,7 +43,8 @@ private:
 
 	std::unique_ptr<class Window> _window;
 	std::unique_ptr<Renderer> _renderer;
-	std::unique_ptr<Ui> _ui;
+	std::unique_ptr<UiManager> _uiManager;
+	std::unique_ptr<SceneRegistry> _sceneRegistry;
 
 	std::unique_ptr<Keyboard> _keyboard;
 	std::unique_ptr<Mouse> _mouse;

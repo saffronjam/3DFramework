@@ -7,23 +7,25 @@
 #include "Saffron/Rendering/ShaderStructs.h"
 #include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 #include "Saffron/Rendering/SceneEnvironment.h"
+#include "Saffron/Scene/EntityRegistry.h"
+#include "Saffron/Scene/EntityComponents.h"
 
 namespace Se
 {
-class Scene
+class Entity;
+
+class Scene : public Managed<Scene>
 {
 public:
-	Scene();
-
 	void OnUpdate(TimeSpan ts);
 	void OnRender();
 	void OnUi();
 
 	auto Renderer() const -> const SceneRenderer&;
 
-	// Will use entities later
-	auto SelectedModel() -> std::shared_ptr<Model>&;
-	auto SelectedModel() const -> const std::shared_ptr<Model>&;
+	auto HasSelectedEntity() const -> bool;
+	auto SelectedEntity() const -> Entity;
+	void SetSelectedEntity(const Entity& entity);
 
 	auto Camera() -> EditorCamera&;
 	auto Camera() const -> const EditorCamera&;
@@ -31,12 +33,33 @@ public:
 	auto ViewportWidth() const -> uint;
 	auto ViewportHeight() const -> uint;
 
+	auto Id() const -> Uuid;
+
 	void SetViewportSize(uint width, uint height);
+
+	auto CreateEntity(Uuid id) -> Entity;
+	auto CreateEntity(const std::string& name) -> Entity;
+	auto CreateEntity(Uuid id, const std::string& name) -> Entity;
+	auto Registry() const -> const EntityRegistry&;
+	auto Registry() -> EntityRegistry&;
+
+	static auto Create() -> const std::shared_ptr<Scene>&;
+
+public:
+	SubscriberList<const Entity&> OnSelcetedEntity;
+
+private:
+	Scene();
+	auto RegisterEntity(Uuid id) -> Entity;
 
 public:
 	mutable SubscriberList<const SizeEvent&> ViewportResized;
 
 private:
+	Uuid _id{};
+
+	Uuid _selectedEntityId = Uuid::Null();
+
 	int _activeRadioButton = 0;
 	EditorCamera _camera1;
 	EditorCamera _camera2;
@@ -49,12 +72,14 @@ private:
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
 
-	std::vector<std::shared_ptr<Model>> _models{};
 	std::shared_ptr<Model> _lightModel;
 	float metalness = 0.0f;
 	float roughness = 0.2f;
 	Vector3 albedo = {1.0f, 0.0f, 0.0f};
 
-	std::shared_ptr<TextureCube> cube;
+	// Entities
+	EntityRegistry _registry;
+
+	friend class SceneRegistry;
 };
 }

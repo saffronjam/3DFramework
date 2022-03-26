@@ -19,12 +19,13 @@ public:
 
 	operator const ulong() const { return _uuid; }
 
-	auto operator==(const Uuid& other) const -> bool
+	template<typename Comparable>
+	auto operator==(const Comparable& other) const -> bool
 	{
-		return _uuid == other._uuid;
+		return _uuid == static_cast<const ulong&>(other);
 	}
 
-	static auto Null() -> Uuid { return Uuid(0ull); }
+	static auto Null() -> Uuid { return {0ull}; }
 
 private:
 	ulong _uuid;

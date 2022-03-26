@@ -45,7 +45,7 @@ struct SubMesh
 
 class Model : public Managed<Model>
 {
-	friend class ModelStore;
+	friend class ModelRegistry;
 public:
 	void Bind();
 	void Unbind();
@@ -58,6 +58,9 @@ public:
 	auto MaterialTextureShaderViews(int materialIndex) const -> const std::array<ID3D11ShaderResourceView*, static_cast<int>(ModelTextureMapType::Count)>&;
 	auto Transform() -> Matrix&;
 	auto Transform() const -> const Matrix&;
+
+	auto Name() const -> const std::string&;
+	auto Path() const -> const std::filesystem::path&;
 
 	// Until materials are implemented
 	void SetShader(const std::shared_ptr<Shader>& shader);
@@ -74,6 +77,9 @@ private:
 	std::shared_ptr<Shader> _shader;
 	std::shared_ptr<Sampler> _sampler;
 	std::vector<std::shared_ptr<Material>> _materials;
+
+	std::string _name;
+	std::filesystem::path _path;
 
 	std::vector<SubMesh> _subMeshes;
 
