@@ -12,6 +12,7 @@ struct VsInput
 struct VsOutput
 {
 	float4 Position : SV_POSITION;
+	float4 PixPos : PixPos;
 };
 
 VsOutput main(VsInput input)
@@ -19,8 +20,8 @@ VsOutput main(VsInput input)
 	VsOutput output;
 
 	float4 pos4 = float4(input.Position, 1.0);
-	pos4 = mul(pos4, Model);
-	output.Position = pos4;
+	output.Position = mul(pos4, Mvp);
+	output.PixPos = mul(pos4, Model);
 
 	return output;
 }

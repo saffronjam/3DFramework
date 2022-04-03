@@ -47,6 +47,9 @@ void SceneRenderer::OnUi()
 void SceneRenderer::Begin(const CameraData& cameraData)
 {
 	_sceneCommon.CameraData = cameraData;
+
+	// TMP
+	_sceneCommon.PointLightShaderStruct = _sceneCommon.PointLight.CreateShaderStruct();
 }
 
 void SceneRenderer::End()

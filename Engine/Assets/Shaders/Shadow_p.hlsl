@@ -14,8 +14,8 @@ struct PsOutput
 
 PsOutput main(PsInput input)
 {
-	float lightDistance = length(input.PixPos.xyz - Light.Position);
-	lightDistance = lightDistance / Light.Radius;
+	float lightDistance = length(input.PixPos.xyz - Position);
+	lightDistance = lightDistance / Radius;
 
 	PsOutput output;
 

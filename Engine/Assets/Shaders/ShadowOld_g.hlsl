@@ -23,7 +23,8 @@ void main(triangle GsInput input[3], inout TriangleStream<GsOutput> cubeMapStrea
 		for (int vertex = 0; vertex < 3; vertex++)
 		{
 			output.PixPos = input[vertex].Position;
-			output.Position = mul(input[vertex].Position, Light.LookAt[face]);
+			//output.Position = mul(input[vertex].Position, Light.LookAt[face]);
+			output.Position = float4(0, 0, 0, 0);
 			cubeMapStream.Append(output);
 		}
 		cubeMapStream.RestartStrip();

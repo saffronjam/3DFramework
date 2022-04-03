@@ -199,8 +199,10 @@ float4 main(PsInput input) : SV_TARGET
 	float3 pointLightsContribution = CalculatePointLights(F0, _pbrData, input.WorldPosition);
 
 	//return float4(pointLightsContribution, 1.0f) * (1.0 - CalculateShadow(input.Position));
-	float shadow = CalculateShadow(input.WorldPosition, input.ViewPos);
-	float3 color = pointLightsContribution * shadow + float3(0.1, 0.1, 0.1) * _pbrData.Albedo;
-	return float4(color, 1.0);
+	//float shadow = CalculateShadow(input.WorldPosition, input.ViewPos);
+	//float3 color = pointLightsContribution * shadow + float3(0.1, 0.1, 0.1) * _pbrData.Albedo;
 	//return shadow;
+	
+	float3 color = pointLightsContribution + float3(0.1, 0.1, 0.1) * _pbrData.Albedo;
+	return float4(color, 1.0);
 }

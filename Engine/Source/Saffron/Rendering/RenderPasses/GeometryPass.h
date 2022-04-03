@@ -2,7 +2,7 @@
 
 #include "Saffron/Rendering/RenderPass.h"
 #include "Saffron/Rendering/Bindables.h"
-#include "Saffron/Rendering/ShaderStructs.h"
+#include "Saffron/Rendering/PointLight.h"
 
 namespace Se
 {

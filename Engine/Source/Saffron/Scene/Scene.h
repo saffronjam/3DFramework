@@ -4,7 +4,7 @@
 #include "Saffron/Graphics/EditorCamera.h"
 #include "Saffron/Graphics/Model.h"
 #include "Saffron/Rendering/SceneRenderer.h"
-#include "Saffron/Rendering/ShaderStructs.h"
+#include "Saffron/Rendering/PointLight.h"
 #include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 #include "Saffron/Rendering/SceneEnvironment.h"
 #include "Saffron/Scene/EntityRegistry.h"
@@ -68,7 +68,7 @@ private:
 	bool _drawCameraFrustums = false;
 
 	SceneRenderer _sceneRenderer;
-	ShaderStructs::PointLight _pointLight;
+	PointLight _pointLight;
 
 	uint _viewportWidth = 0, _viewportHeight = 0;
 

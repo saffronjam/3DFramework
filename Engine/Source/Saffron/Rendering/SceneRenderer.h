@@ -3,8 +3,9 @@
 #include "Saffron/Base.h"
 #include "Saffron/Graphics/Camera.h"
 #include "Saffron/Rendering/RenderGraph.h"
-#include "Saffron/Rendering/ShaderStructs.h"
+#include "Saffron/Rendering/PointLight.h"
 #include "Saffron/Rendering/Bindables.h"
+#include "Saffron/Rendering/LightRegister.h"
 #include "Saffron/Rendering/SceneEnvironment.h"
 #include "Saffron/Rendering/VertexTypes.h"
 
@@ -47,7 +48,10 @@ struct SceneCommon
 	std::map<RenderChannels, std::vector<DrawCommand>> DrawCommands{};
 
 	// Shadow and light
-	ShaderStructs::PointLight PointLight;
+	LightRegister LightRegister;
+	PointLight PointLight;
+	// TMP
+	ShaderStructs::PointLight PointLightShaderStruct;
 
 	// Lines
 	static constexpr uint MaxLines = 10000;

@@ -249,11 +249,17 @@ void Renderer::ResetRenderState()
 
 void Renderer::SetViewportSize(uint width, uint height, float depth)
 {
+	SetViewportSize(0, 0, width, height, depth);
+}
+
+void Renderer::SetViewportSize(uint x, uint y, uint width, uint height, float depth)
+{
 	Submit(
 		[=](const RendererPackage& package)
 		{
 			const D3D11_VIEWPORT viewport{
-				0.0f, 0.0f, static_cast<float>(width), static_cast<float>(height), 0.0f, depth
+				static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height),
+				0.0f, depth
 			};
 			package.Context.RSSetViewports(1, &viewport);
 		}
