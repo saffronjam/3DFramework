@@ -4,13 +4,13 @@
 
 namespace Se
 {
-void LayerStack::Attach(std::shared_ptr<Layer> layer)
+void LayerStack::Attach(const std::shared_ptr<Layer>& layer)
 {
-	auto ref = _layers.emplace_back(std::move(layer));
+	const auto ref = _layers.emplace_back(layer);
 	ref->OnAttach();
 }
 
-void LayerStack::Detach(std::shared_ptr<Layer> layer)
+void LayerStack::Detach(const std::shared_ptr<Layer>& layer)
 {
 	layer->OnDetach();
 	std::erase(_layers, layer);

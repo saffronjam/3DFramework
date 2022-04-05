@@ -23,9 +23,8 @@ public:
 
 	static auto CursorPosition(bool normalized = false) -> const Vector2&;
 	static auto Swipe() -> const Vector2&;
-
-	static auto VerticalScroll() -> float;
-	static auto HorizontalScroll() -> float;
+	
+	static auto Scroll() -> float;
 
 private:
 	static void OnButtonPress(const MouseButtonEvent& event);
@@ -36,8 +35,8 @@ private:
 	static void OnScroll(const MouseWheelScrollEvent& event);
 	
 private:
-	std::array<bool, static_cast<int>(MouseButtonCode::Count)> _buttonStates;
-	std::array<bool, static_cast<int>(MouseButtonCode::Count)> _prevButtonStates;
+	std::unordered_map<MouseButtonCode, bool> _buttonStates{};
+	std::unordered_map<MouseButtonCode, bool> _prevButtonStates{};
 
 	Vector2 _mousePosition = Vector2(0.0f, 0.0f);
 	Vector2 _mousePositionNDC = Vector2(0.0f, 0.0f);
@@ -45,8 +44,7 @@ private:
 
 	Vector2 _mouseSwipe = Vector2(0.0f, 0.0f);
 
-	float _verticalScrollBuffer = 0.0f;
-	float _horizontalScrollBuffer = 0.0f;
+	float _scrollBuffer = 0.0f;
 
 	bool _cursorEnabled = true;
 	bool _cursorInWindow = true;

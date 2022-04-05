@@ -11,13 +11,6 @@ namespace Se
 Mouse::Mouse() :
 	Singleton(this)
 {
-	for (int i = 0; i < static_cast<int>(MouseButtonCode::Count); i++)
-	{
-		_buttonStates[i] = false;
-		_prevButtonStates[i] = false;
-	}
-
-
 	auto& win = App::Instance().Window();
 	win.MouseWheelScrolled += SE_EV_ACTION(Mouse::OnScroll);
 	win.MouseButtonPressed += SE_EV_ACTION(Mouse::OnButtonPress);
@@ -33,8 +26,7 @@ void Mouse::OnUpdate()
 
 	inst._prevButtonStates = inst._buttonStates;
 
-	inst._horizontalScrollBuffer = 0.0f;
-	inst._verticalScrollBuffer = 0.0f;
+	inst._scrollBuffer = 0.0f;
 	inst._mouseSwipe = Vector2{0.0f, 0.0f};
 }
 
@@ -43,27 +35,34 @@ auto Mouse::IsButtonDown(const MouseButtonCode& button) -> bool
 {
 	auto& inst = Instance();
 
-	return inst._buttonStates[static_cast<int>(button)];
+	return inst._buttonStates[button];
 }
 
 auto Mouse::IsButtonPressed(const MouseButtonCode& button) -> bool
 {
 	auto& inst = Instance();
 
-	return inst._buttonStates[static_cast<int>(button)] && !inst._prevButtonStates[static_cast<int>(button)];
+	return inst._buttonStates[button] && !inst._prevButtonStates[button];
 }
 
 auto Mouse::IsButtonReleased(const MouseButtonCode& button) -> bool
 {
 	auto& inst = Instance();
 
-	return !inst._buttonStates[static_cast<int>(button)] && inst._prevButtonStates[static_cast<int>(button)];
+	return !inst._buttonStates[button] && inst._prevButtonStates[button];
 }
 
 auto Mouse::IsAnyButtonDown() -> bool
 {
-	auto& inst = Instance();
-	return std::ranges::any_of(inst._buttonStates, [](bool element) { return element; });
+	const auto& inst = Instance();
+	for (const auto state : inst._buttonStates | std::views::values)
+	{
+		if (state)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 auto Mouse::IsCursorEnabled() -> bool
@@ -94,32 +93,25 @@ auto Mouse::Swipe() -> const Vector2&
 	return inst._mouseSwipe;
 }
 
-auto Mouse::VerticalScroll() -> float
+auto Mouse::Scroll() -> float
 {
 	auto& inst = Instance();
 
-	return inst._verticalScrollBuffer;
-}
-
-auto Mouse::HorizontalScroll() -> float
-{
-	auto& inst = Instance();
-
-	return inst._horizontalScrollBuffer;
+	return inst._scrollBuffer;
 }
 
 void Mouse::OnButtonPress(const MouseButtonEvent& event)
 {
 	auto& inst = Instance();
 
-	inst._buttonStates[static_cast<int>(event.Button)] = true;
+	inst._buttonStates[event.Button] = true;
 }
 
 void Mouse::OnButtonRelease(const MouseButtonEvent& event)
 {
 	auto& inst = Instance();
 
-	inst._buttonStates[static_cast<int>(event.Button)] = false;
+	inst._buttonStates[event.Button] = false;
 }
 
 void Mouse::OnMove(const MouseMoveEvent& event)
@@ -154,13 +146,6 @@ void Mouse::OnScroll(const MouseWheelScrollEvent& event)
 {
 	auto& inst = Instance();
 
-	if (event.Wheel == MouseWheelCode::HorizontalWheel)
-	{
-		inst._horizontalScrollBuffer += event.Delta;
-	}
-	else if (event.Wheel == MouseWheelCode::VerticalWheel)
-	{
-		inst._verticalScrollBuffer += event.Delta;
-	}
+	inst._scrollBuffer += event.Delta;
 }
 }

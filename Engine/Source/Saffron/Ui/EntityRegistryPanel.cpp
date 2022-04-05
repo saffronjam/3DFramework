@@ -38,7 +38,7 @@ void EntityRegistryPanel::OnUi()
 
 		const auto id = reinterpret_cast<void*>(static_cast<std::intptr_t>(enttHandle));
 		constexpr auto flags = ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
-		bool treeViewOpened = ImGui::TreeNodeEx(id, flags, "%s", name.Name.c_str());
+		const bool treeViewOpened = ImGui::TreeNodeEx(id, flags, "%s", name.Name.c_str());
 		if (ImGui::IsItemClicked())
 		{
 			_scene->SetSelectedEntity(entity);

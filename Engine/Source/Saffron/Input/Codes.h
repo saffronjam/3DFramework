@@ -4,357 +4,164 @@ namespace Se
 {
 enum class KeyCode
 {
-	/// <summary>Unhandled key</summary>
-	Unknown = -1,
-
-	/// <summary>The A key</summary>
-	A = 0,
-
-	/// <summary>The B key</summary>
-	B,
-
-	/// <summary>The C key</summary>
-	C,
-
-	/// <summary>The D key</summary>
-	D,
-
-	/// <summary>The E key</summary>
-	E,
-
-	/// <summary>The F key</summary>
-	F,
-
-	/// <summary>The G key</summary>
-	G,
-
-	/// <summary>The H key</summary>
-	H,
-
-	/// <summary>The I key</summary>
-	I,
-
-	/// <summary>The J key</summary>
-	J,
-
-	/// <summary>The K key</summary>
-	K,
-
-	/// <summary>The L key</summary>
-	L,
-
-	/// <summary>The M key</summary>
-	M,
-
-	/// <summary>The N key</summary>
-	N,
-
-	/// <summary>The O key</summary>
-	O,
-
-	/// <summary>The P key</summary>
-	P,
-
-	/// <summary>The Q key</summary>
-	Q,
-
-	/// <summary>The R key</summary>
-	R,
-
-	/// <summary>The S key</summary>
-	S,
-
-	/// <summary>The T key</summary>
-	T,
-
-	/// <summary>The U key</summary>
-	U,
-
-	/// <summary>The V key</summary>
-	V,
-
-	/// <summary>The W key</summary>
-	W,
-
-	/// <summary>The X key</summary>
-	X,
-
-	/// <summary>The Y key</summary>
-	Y,
-
-	/// <summary>The Z key</summary>
-	Z,
-
-	/// <summary>The 0 key</summary>
-	Num0,
-
-	/// <summary>The 1 key</summary>
-	Num1,
-
-	/// <summary>The 2 key</summary>
-	Num2,
-
-	/// <summary>The 3 key</summary>
-	Num3,
-
-	/// <summary>The 4 key</summary>
-	Num4,
-
-	/// <summary>The 5 key</summary>
-	Num5,
-
-	/// <summary>The 6 key</summary>
-	Num6,
-
-	/// <summary>The 7 key</summary>
-	Num7,
-
-	/// <summary>The 8 key</summary>
-	Num8,
-
-	/// <summary>The 9 key</summary>
-	Num9,
-
-	/// <summary>The Escape key</summary>
-	Escape,
-
-	/// <summary>The left Control key</summary>
-	LControl,
-
-	/// <summary>The left Shift key</summary>
-	LShift,
-
-	/// <summary>The left Alt key</summary>
-	LAlt,
-
-	/// <summary>The left OS specific key: window (Windows and Linux), apple (MacOS X), ...</summary>
-	LSystem,
-
-	/// <summary>The right Control key</summary>
-	RControl,
-
-	/// <summary>The right Shift key</summary>
-	RShift,
-
-	/// <summary>The right Alt key</summary>
-	RAlt,
-
-	/// <summary>The right OS specific key: window (Windows and Linux), apple (MacOS X), ...</summary>
-	RSystem,
-
-	/// <summary>The Menu key</summary>
-	Menu,
-
-	/// <summary>The [ key</summary>
-	LBracket,
-
-	/// <summary>The ] key</summary>
-	RBracket,
-
-	/// <summary>The ; key</summary>
-	Semicolon,
-
-	/// <summary>The , key</summary>
-	Comma,
-
-	/// <summary>The . key</summary>
-	Period,
-
-	/// <summary>The ' key</summary>
-	Quote,
-
-	/// <summary>The / key</summary>
-	Slash,
-
-	/// <summary>The \ key</summary>
-	Backslash,
-
-	/// <summary>The ~ key</summary>
-	Tilde,
-
-	/// <summary>The = key</summary>
-	Equal,
-
-	/// <summary>The - key</summary>
-	Hyphen,
-
-	/// <summary>The Space key</summary>
-	Space,
-
-	/// <summary>The Return key</summary>
-	Enter,
-
-	/// <summary>The Backspace key</summary>
-	Backspace,
-
-	/// <summary>The Tabulation key</summary>
-	Tab,
-
-	/// <summary>The Page up key</summary>
-	PageUp,
-
-	/// <summary>The Page down key</summary>
-	PageDown,
-
-	/// <summary>The End key</summary>
-	End,
-
-	/// <summary>The Home key</summary>
-	Home,
-
-	/// <summary>The Insert key</summary>
-	Insert,
-
-	/// <summary>The Delete key</summary>
-	Delete,
-
-	/// <summary>The + key</summary>
-	Add,
-
-	/// <summary>The - key</summary>
-	Subtract,
-
-	/// <summary>The * key</summary>
-	Multiply,
-
-	/// <summary>The / key</summary>
-	Divide,
-
-	/// <summary>Left arrow</summary>
-	Left,
-
-	/// <summary>Right arrow</summary>
-	Right,
-
-	/// <summary>Up arrow</summary>
-	Up,
-
-	/// <summary>Down arrow</summary>
-	Down,
-
-	/// <summary>The numpad 0 key</summary>
-	Numpad0,
-
-	/// <summary>The numpad 1 key</summary>
-	Numpad1,
-
-	/// <summary>The numpad 2 key</summary>
-	Numpad2,
-
-	/// <summary>The numpad 3 key</summary>
-	Numpad3,
-
-	/// <summary>The numpad 4 key</summary>
-	Numpad4,
-
-	/// <summary>The numpad 5 key</summary>
-	Numpad5,
-
-	/// <summary>The numpad 6 key</summary>
-	Numpad6,
-
-	/// <summary>The numpad 7 key</summary>
-	Numpad7,
-
-	/// <summary>The numpad 8 key</summary>
-	Numpad8,
-
-	/// <summary>The numpad 9 key</summary>
-	Numpad9,
-
-	/// <summary>The F1 key</summary>
-	F1,
-
-	/// <summary>The F2 key</summary>
-	F2,
-
-	/// <summary>The F3 key</summary>
-	F3,
-
-	/// <summary>The F4 key</summary>
-	F4,
-
-	/// <summary>The F5 key</summary>
-	F5,
-
-	/// <summary>The F6 key</summary>
-	F6,
-
-	/// <summary>The F7 key</summary>
-	F7,
-
-	/// <summary>The F8 key</summary>
-	F8,
-
-	/// <summary>The F9 key</summary>
-	F9,
-
-	/// <summary>The F10 key</summary>
-	F10,
-
-	/// <summary>The F11 key</summary>
-	F11,
-
-	/// <summary>The F12 key</summary>
-	F12,
-
-	/// <summary>The F13 key</summary>
-	F13,
-
-	/// <summary>The F14 key</summary>
-	F14,
-
-	/// <summary>The F15 key</summary>
-	F15,
-
-	/// <summary>The Pause key</summary>
-	Pause,
-
-	/// <summary>The total number of keyboard keys</summary>
-	Count,
-	// Keep last
+	Space = 32,
+	Apostrophe = 39,
+	Comma = 44,
+	Minus = 45,
+	Period = 46,
+	Slash = 47,
+	D0 = 48,
+	D1 = 49,
+	D2 = 50,
+	D3 = 51,
+	D4 = 52,
+	D5 = 53,
+	D6 = 54,
+	D7 = 55,
+	D8 = 56,
+	D9 = 57,
+	Semicolon = 59,
+	/* , */
+	Equal = 61,
+	/* = */
+	A = 65,
+	B = 66,
+	C = 67,
+	D = 68,
+	E = 69,
+	F = 70,
+	G = 71,
+	H = 72,
+	I = 73,
+	J = 74,
+	K = 75,
+	L = 76,
+	M = 77,
+	N = 78,
+	O = 79,
+	P = 80,
+	Q = 81,
+	R = 82,
+	S = 83,
+	T = 84,
+	U = 85,
+	V = 86,
+	W = 87,
+	X = 88,
+	Y = 89,
+	Z = 90,
+	LeftBracket = 91,
+	/* [ */
+	Backslash = 92,
+	/* \ */
+	RightBracket = 93,
+	/* ] */
+	GraveAccent = 96,
+	/* ` */
+	World1 = 161,
+	/* non-US #1 */
+	World2 = 162,
+	/* non-US #2 */
+	Escape = 256,
+	Enter = 257,
+	Tab = 258,
+	Backspace = 259,
+	Insert = 260,
+	Delete = 261,
+	Right = 262,
+	Left = 263,
+	Down = 264,
+	Up = 265,
+	PageUp = 266,
+	PageDown = 267,
+	Home = 268,
+	End = 269,
+	CapsLock = 280,
+	ScrollLock = 281,
+	NumLock = 282,
+	PrintScreen = 283,
+	Pause = 284,
+	F1 = 290,
+	F2 = 291,
+	F3 = 292,
+	F4 = 293,
+	F5 = 294,
+	F6 = 295,
+	F7 = 296,
+	F8 = 297,
+	F9 = 298,
+	F10 = 299,
+	F11 = 300,
+	F12 = 301,
+	F13 = 302,
+	F14 = 303,
+	F15 = 304,
+	F16 = 305,
+	F17 = 306,
+	F18 = 307,
+	F19 = 308,
+	F20 = 309,
+	F21 = 310,
+	F22 = 311,
+	F23 = 312,
+	F24 = 313,
+	F25 = 314,
+	KP0 = 320,
+	KP1 = 321,
+	KP2 = 322,
+	KP3 = 323,
+	KP4 = 324,
+	KP5 = 325,
+	KP6 = 326,
+	KP7 = 327,
+	KP8 = 328,
+	KP9 = 329,
+	KPDecimal = 330,
+	KPDivide = 331,
+	KPMultiply = 332,
+	KPSubtract = 333,
+	KPAdd = 334,
+	KPEnter = 335,
+	KPEqual = 336,
+	LShift = 340,
+	LControl = 341,
+	LAlt = 342,
+	LSuper = 343,
+	RShift = 344,
+	RControl = 345,
+	RAlt = 346,
+	RSuper = 347,
+	Menu = 348,
+	Undefined = 1000
 };
 
-////////////////////////////////////////////////////////////
-/// <summary>
-/// Mouse buttons
-/// </summary>
-////////////////////////////////////////////////////////////
 enum class MouseButtonCode
 {
-	/// <summary>The left mouse Button</summary>
-	Left,
-
-	/// <summary>The right mouse Button</summary>
-	Right,
-
-	/// <summary>The middle (Wheel) mouse Button</summary>
-	Middle,
-
-	/// <summary>The first extra mouse Button</summary>
-	XButton1,
-
-	/// <summary>The second extra mouse Button</summary>
-	XButton2,
-
-	/// <summary>Keep last -- the total number of mouse buttons</summary>
-	Count
+	Num1 = 0,
+	Num2 = 1,
+	Num3 = 2,
+	Num4 = 3,
+	Num5 = 4,
+	Num6 = 5,
+	Num7 = 6,
+	Num8 = 7,
+	Last = Num8,
+	Left = Num1,
+	Right = Num2,
+	Middle = Num3,
+	Undefined = 100
 };
 
-////////////////////////////////////////////////////////////
-/// <summary>
-/// Mouse wheels
-/// </summary>
-////////////////////////////////////////////////////////////
-enum class MouseWheelCode
+inline std::ostream& operator<<(std::ostream& os, KeyCode keyCode)
 {
-	/// <summary>The vertical mouse Wheel</summary>
-	VerticalWheel,
+	os << static_cast<int>(keyCode);
+	return os;
+}
 
-	/// <summary>The horizontal mouse Wheel</summary>
-	HorizontalWheel,
 
-	/// <summary>Keep last -- the total number of mouse wheels</summary>
-	Count
-};
+inline std::ostream& operator<<(std::ostream& os, MouseButtonCode buttonCode)
+{
+	os << static_cast<int>(buttonCode);
+	return os;
+}
 }

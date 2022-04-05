@@ -13,6 +13,7 @@
 #include "assimp/pbrmaterial.h"
 #include "Saffron/Graphics/Model.h"
 #include "Saffron/Graphics/Material.h"
+#include "Saffron/Rendering/VertexStorage.h"
 
 struct LogStream : Assimp::LogStream
 {
@@ -44,8 +45,7 @@ const uint ModelRegistry::DefaultImportFlags = aiProcess_CalcTangentSpace | // C
 	aiProcess_JoinIdenticalVertices | aiProcess_ValidateDataStructure; // Validation
 
 ModelRegistry::ModelRegistry() :
-	Singleton(this),
-	_modelShader(Shader::Create("MeshShader"))
+	Singleton(this)
 {
 	LogStream::Initialize();
 
@@ -76,8 +76,8 @@ auto ModelRegistry::Import(const std::filesystem::path& path) -> std::shared_ptr
 	if (result != _meshes.end())
 	{
 		const auto existingMesh = std::dynamic_pointer_cast<Model>(result->second);
-		const auto vb = existingMesh->_vertexBuffer;
-		const auto ib = existingMesh->_indexBuffer;
+		//const auto vb = existingMesh->_vertexBuffer;
+		//const auto ib = existingMesh->_indexBuffer;
 
 		auto newMesh = std::shared_ptr<Model>(new Model());
 		return newMesh;
@@ -200,42 +200,41 @@ auto ModelRegistry::Import(const std::filesystem::path& path) -> std::shared_ptr
 
 	storage.Add(meshVertices);
 
-	auto vs = Shader::Create("MeshShader");
-	auto vb = VertexBuffer::Create(storage);
-	auto ib = IndexBuffer::Create(reinterpret_cast<const uint*>(meshFaces.data()), meshFaces.size() * 3);
-	auto il = InputLayout::Create(layout, vs);
-	auto sa = Sampler::Create();
+	//auto vs = Shader::Create("MeshShader");
+	//auto vb = VertexBuffer::Create(storage);
+	//auto ib = IndexBuffer::Create(reinterpret_cast<const uint*>(meshFaces.data()), meshFaces.size() * 3);
+	//auto il = InputLayout::Create(layout, vs);
+	//auto sa = Sampler::Create();
 	auto newMesh = std::shared_ptr<Model>(new Model());
 
-	newMesh->_shader = std::move(vs);
-	newMesh->_vertexBuffer = std::move(vb);
-	newMesh->_indexBuffer = std::move(ib);
-	newMesh->_inputLayout = std::move(il);
-	newMesh->_sampler = std::move(sa);
-	newMesh->_materials = std::move(materials);
+	//newMesh->_shader = std::move(vs);
+	//newMesh->_vertexBuffer = std::move(vb);
+	//newMesh->_indexBuffer = std::move(ib);
+	//newMesh->_inputLayout = std::move(il);
+	//newMesh->_sampler = std::move(sa);
+	//newMesh->_materials = std::move(materials);
 
-	newMesh->_subMeshes = std::move(subMeshes);
-	newMesh->_textures = std::move(textures);
+	//newMesh->_subMeshes = std::move(subMeshes);
+	//newMesh->_textures = std::move(textures);
 
-	newMesh->_name = path.stem().string();
-	newMesh->_path = path;
+	//newMesh->_name = path.stem().string();
+	//newMesh->_path = path;
 
-	for (const auto& texCont : newMesh->_textures)
-	{
-		auto& nativeSrvCont = newMesh->_nativeTextureSrvs.emplace_back();
-		for (const auto& [type, tex] : texCont)
-		{
-			nativeSrvCont[static_cast<int>(type)] = &tex->ShaderView();
-		}
-	}
+	//for (const auto& texCont : newMesh->_textures)
+	//{
+	//	auto& nativeSrvCont = newMesh->_nativeTextureSrvs.emplace_back();
+	//	for (const auto& [type, tex] : texCont)
+	//	{
+	//		nativeSrvCont[static_cast<int>(type)] = &tex->ShaderView();
+	//	}
+	//}
 
 	return newMesh;
 }
 
-auto ModelRegistry::ImportMaterials(
-	const aiScene& scene,
-	const std::filesystem::path& fullpath
-) const -> std::tuple<std::vector<std::shared_ptr<Material>>, std::vector<MatTexContainer>>
+auto ModelRegistry::ImportMaterials(const aiScene& scene,
+                                    const std::filesystem::path& fullpath) const -> std::tuple<
+	std::vector<std::shared_ptr<Material>>, std::vector<MatTexContainer>>
 {
 	const auto materialCount = scene.mNumMaterials;
 
@@ -258,194 +257,193 @@ auto ModelRegistry::ImportMaterials(
 	return std::make_tuple(materials, matTexContainer);
 }
 
-auto ModelRegistry::ImportMaterial(
-	aiMaterial& aiMaterial,
-	const std::filesystem::path& fullpath
-) const -> std::tuple<std::shared_ptr<Material>, MatTexContainer>
+auto ModelRegistry::ImportMaterial(aiMaterial& aiMaterial,
+                                   const std::filesystem::path& fullpath) const -> std::tuple<
+	std::shared_ptr<Material>, MatTexContainer>
 {
 	MatTexContainer matTexContainer;
 	const auto materialName = std::string(aiMaterial.GetName().C_Str());
 
-	auto material = Material::Create(_modelShader, materialName);
-	material->CBuffer().SetBindFlags(BindFlag_PS);
+	//auto material = Material::Create(_modelShader, materialName);
+	//material->CBuffer().SetBindFlags(BindFlag_PS);
 
-	const auto parPath = fullpath.parent_path();
+	//const auto parPath = fullpath.parent_path();
 
-	MaterialDataCBuf materialData;
+	//MaterialDataCBuf materialData;
 
-	// Albedo color
-	aiColor3D aiAlbedoColor;
-	if (aiMaterial.Get(AI_MATKEY_COLOR_DIFFUSE, aiAlbedoColor) == AI_SUCCESS)
-	{
-		materialData.AlbedoColor = Color{aiAlbedoColor.r, aiAlbedoColor.g, aiAlbedoColor.b, 1.0f};
-	}
+	//// Albedo color
+	//aiColor3D aiAlbedoColor;
+	//if (aiMaterial.Get(AI_MATKEY_COLOR_DIFFUSE, aiAlbedoColor) == AI_SUCCESS)
+	//{
+	//	materialData.AlbedoColor = Color{aiAlbedoColor.r, aiAlbedoColor.g, aiAlbedoColor.b, 1.0f};
+	//}
 
-	// Emission
-	aiColor3D aiEmission;
-	if (aiMaterial.Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS)
-	{
-		materialData.Emission = aiEmission.r;
-	}
+	//// Emission
+	//aiColor3D aiEmission;
+	//if (aiMaterial.Get(AI_MATKEY_COLOR_EMISSIVE, aiEmission) == AI_SUCCESS)
+	//{
+	//	materialData.Emission = aiEmission.r;
+	//}
 
-	// Shininess (temporary for later calculation)
-	float shininess;
-	if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
-	{
-		shininess = 80.0f;
-	}
-
-
-	// Reflectivity (temporary for later calculation)
-	float metalness;
-	if (aiMaterial.Get(AI_MATKEY_REFLECTIVITY, metalness) != AI_SUCCESS)
-	{
-		metalness = 0.0f;
-	}
+	//// Shininess (temporary for later calculation)
+	//float shininess;
+	//if (aiMaterial.Get(AI_MATKEY_SHININESS, shininess) != AI_SUCCESS)
+	//{
+	//	shininess = 80.0f;
+	//}
 
 
-	//// Probe texture maps
-
-	aiString aiTexPath;
-
-	// Albedo map
-	const auto hasAlbedoMap = aiMaterial.GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
-	bool albedoMapFallback = !hasAlbedoMap;
-
-	if (hasAlbedoMap)
-	{
-		std::filesystem::path texPath = parPath;
-		texPath /= aiTexPath.C_Str();
-
-		TextureSpec spec;
-		spec.SRGB = true;
-		spec.CreateSampler = false;
-
-		// Force create texture since we need to know if fails or not
-		Renderer::BeginStrategy(RenderStrategy::Immediate);
-		auto texture = Texture::Create(texPath, spec);
-		Renderer::EndStrategy();
-
-		if (texture->Loaded())
-		{
-			matTexContainer.emplace(ModelTextureMapType::Albedo, texture);
-			materialData.AlbedoColor = Colors::White;
-		}
-		else
-		{
-			albedoMapFallback = true;
-		}
-	}
-
-	if (albedoMapFallback)
-	{
-		matTexContainer.emplace(ModelTextureMapType::Albedo, Renderer::WhiteTexture());
-	}
+	//// Reflectivity (temporary for later calculation)
+	//float metalness;
+	//if (aiMaterial.Get(AI_MATKEY_REFLECTIVITY, metalness) != AI_SUCCESS)
+	//{
+	//	metalness = 0.0f;
+	//}
 
 
-	// Normal map
-	const auto hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS;
-	bool normalMapFallback = !hasNormalMap;
+	////// Probe texture maps
 
-	if (hasNormalMap)
-	{
-		std::filesystem::path texPath = parPath;
-		texPath /= aiTexPath.C_Str();
+	//aiString aiTexPath;
 
-		// Force create texture since we need to know if fails or not
-		Renderer::BeginStrategy(RenderStrategy::Immediate);
-		auto texture = Texture::Create(texPath, {.CreateSampler = false});
-		Renderer::EndStrategy();
+	//// Albedo map
+	//const auto hasAlbedoMap = aiMaterial.GetTexture(aiTextureType_DIFFUSE, 0, &aiTexPath) == AI_SUCCESS;
+	//bool albedoMapFallback = !hasAlbedoMap;
 
-		if (texture->Loaded())
-		{
-			matTexContainer.emplace(ModelTextureMapType::Normal, texture);
-			materialData.UseNormalMap = true;
-		}
-		else
-		{
-			normalMapFallback = true;
-		}
-	}
+	//if (hasAlbedoMap)
+	//{
+	//	std::filesystem::path texPath = parPath;
+	//	texPath /= aiTexPath.C_Str();
 
-	if (normalMapFallback)
-	{
-		matTexContainer.emplace(ModelTextureMapType::Normal, Renderer::WhiteTexture());
-		materialData.UseNormalMap = false;
-	}
+	//	TextureSpec spec;
+	//	spec.SRGB = true;
+	//	spec.CreateSampler = false;
 
-	const auto hasRoughtnessMap = aiMaterial.GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS ||
-		aiMaterial.GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &aiTexPath) == AI_SUCCESS;
-	bool roughnessMapFallback = !hasRoughtnessMap;
+	//	// Force create texture since we need to know if fails or not
+	//	Renderer::BeginStrategy(RenderStrategy::Immediate);
+	//	auto texture = Texture::Create(texPath, spec);
+	//	Renderer::EndStrategy();
 
-	if (hasRoughtnessMap)
-	{
-		std::filesystem::path texPath = parPath;
-		texPath /= aiTexPath.C_Str();
+	//	if (texture->Loaded())
+	//	{
+	//		matTexContainer.emplace(ModelTextureMapType::Albedo, texture);
+	//		materialData.AlbedoColor = Colors::White;
+	//	}
+	//	else
+	//	{
+	//		albedoMapFallback = true;
+	//	}
+	//}
 
-		// Force create texture since we need to know if fails or not
-		Renderer::BeginStrategy(RenderStrategy::Immediate);
-		auto texture = Texture::Create(texPath, {.CreateSampler = false});
-		Renderer::EndStrategy();
-
-		if (texture->Loaded())
-		{
-			matTexContainer.emplace(ModelTextureMapType::Roughness, texture);
-			materialData.Roughness = 1.0f;
-		}
-		else
-		{
-			roughnessMapFallback = true;
-		}
-	}
-
-	if (roughnessMapFallback)
-	{
-		const float roughness = 1.0f - std::sqrt(shininess / 100.0f);
-
-		matTexContainer.emplace(ModelTextureMapType::Roughness, Renderer::WhiteTexture());
-		materialData.Roughness = roughness;
-	}
+	//if (albedoMapFallback)
+	//{
+	//	matTexContainer.emplace(ModelTextureMapType::Albedo, Renderer::WhiteTexture());
+	//}
 
 
-	// Metalness texture is handled differently
+	//// Normal map
+	//const auto hasNormalMap = aiMaterial.GetTexture(aiTextureType_NORMALS, 0, &aiTexPath) == AI_SUCCESS;
+	//bool normalMapFallback = !hasNormalMap;
+
+	//if (hasNormalMap)
+	//{
+	//	std::filesystem::path texPath = parPath;
+	//	texPath /= aiTexPath.C_Str();
+
+	//	// Force create texture since we need to know if fails or not
+	//	Renderer::BeginStrategy(RenderStrategy::Immediate);
+	//	auto texture = Texture::Create(texPath, {.CreateSampler = false});
+	//	Renderer::EndStrategy();
+
+	//	if (texture->Loaded())
+	//	{
+	//		matTexContainer.emplace(ModelTextureMapType::Normal, texture);
+	//		materialData.UseNormalMap = true;
+	//	}
+	//	else
+	//	{
+	//		normalMapFallback = true;
+	//	}
+	//}
+
+	//if (normalMapFallback)
+	//{
+	//	matTexContainer.emplace(ModelTextureMapType::Normal, Renderer::WhiteTexture());
+	//	materialData.UseNormalMap = false;
+	//}
+
+	//const auto hasRoughtnessMap = aiMaterial.GetTexture(aiTextureType_SHININESS, 0, &aiTexPath) == AI_SUCCESS ||
+	//	aiMaterial.GetTexture(AI_MATKEY_GLTF_PBRMETALLICROUGHNESS_METALLICROUGHNESS_TEXTURE, &aiTexPath) == AI_SUCCESS;
+	//bool roughnessMapFallback = !hasRoughtnessMap;
+
+	//if (hasRoughtnessMap)
+	//{
+	//	std::filesystem::path texPath = parPath;
+	//	texPath /= aiTexPath.C_Str();
+
+	//	// Force create texture since we need to know if fails or not
+	//	Renderer::BeginStrategy(RenderStrategy::Immediate);
+	//	auto texture = Texture::Create(texPath, {.CreateSampler = false});
+	//	Renderer::EndStrategy();
+
+	//	if (texture->Loaded())
+	//	{
+	//		matTexContainer.emplace(ModelTextureMapType::Roughness, texture);
+	//		materialData.Roughness = 1.0f;
+	//	}
+	//	else
+	//	{
+	//		roughnessMapFallback = true;
+	//	}
+	//}
+
+	//if (roughnessMapFallback)
+	//{
+	//	const float roughness = 1.0f - std::sqrt(shininess / 100.0f);
+
+	//	matTexContainer.emplace(ModelTextureMapType::Roughness, Renderer::WhiteTexture());
+	//	materialData.Roughness = roughness;
+	//}
 
 
-	materialData.Metalness = metalness;
-
-	bool hasMetalnessMap = false;
-
-	for (int i = 0; i < aiMaterial.mNumProperties; i++)
-	{
-		const auto& prop = *aiMaterial.mProperties[i];
-
-		if (prop.mType == aiPTI_String)
-		{
-		}
-	}
-
-	bool metalnessFallback = !hasMetalnessMap;
-
-	if (metalnessFallback)
-	{
-		matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
-	}
+	//// Metalness texture is handled differently
 
 
-	material->SetMaterialData(materialData);
+	//materialData.Metalness = metalness;
 
-	return std::make_tuple(material, matTexContainer);
+	//bool hasMetalnessMap = false;
+
+	//for (int i = 0; i < aiMaterial.mNumProperties; i++)
+	//{
+	//	const auto& prop = *aiMaterial.mProperties[i];
+
+	//	if (prop.mType == aiPTI_String)
+	//	{
+	//	}
+	//}
+
+	//bool metalnessFallback = !hasMetalnessMap;
+
+	//if (metalnessFallback)
+	//{
+	//	matTexContainer.emplace(ModelTextureMapType::Metalness, Renderer::WhiteTexture());
+	//}
+
+
+	//material->SetMaterialData(materialData);
+
+	return std::make_tuple(Material::Create("NOT IMPLEMENTED"), matTexContainer);
 }
 
 auto ModelRegistry::CreateDefaultMaterial() -> std::shared_ptr<Material>
 {
 	static constexpr const auto* MaterialName = "Saffron-Default";
 
-	const auto mat = Material::Create(Instance()._modelShader, MaterialName);
+	const auto mat = Material::Create(MaterialName);
 	const MaterialDataCBuf matData{
 		.AlbedoColor = Color{0.8f, 0.8f, 0.8f}, .Metalness = 0.0f, .Roughness = 0.8f, .Emission = 0.0f,
 		.EnvMapRotation = 0.0f, .UseNormalMap = false
 	};
-	mat->SetMaterialData(matData);
+	//mat->SetMaterialData(matData);
 
 	return mat;
 }

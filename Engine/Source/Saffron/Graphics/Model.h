@@ -4,6 +4,7 @@
 #include "Saffron/Common/Enums.h"
 #include "Saffron/Graphics/Material.h"
 #include "Saffron/Rendering/Bindables.h"
+#include "Saffron/Rendering/VertexLayout.h"
 
 namespace Se
 {
@@ -54,16 +55,11 @@ public:
 
 	auto SubMeshes() const -> const std::vector<SubMesh>&;
 	auto Materials() const -> const std::vector<std::shared_ptr<Material>>&;
-	auto MaterialTextures() const -> const std::vector<std::map<ModelTextureMapType, std::shared_ptr<Texture>>>&;
-	auto MaterialTextureShaderViews(int materialIndex) const -> const std::array<ID3D11ShaderResourceView*, static_cast<int>(ModelTextureMapType::Count)>&;
 	auto Transform() -> Matrix&;
 	auto Transform() const -> const Matrix&;
 
 	auto Name() const -> const std::string&;
 	auto Path() const -> const std::filesystem::path&;
-
-	// Until materials are implemented
-	void SetShader(const std::shared_ptr<Shader>& shader);
 
 	static auto Create(const std::filesystem::path& path) -> std::shared_ptr<Model>;
 
@@ -71,22 +67,13 @@ private:
 	Model();
 
 private:
-	std::shared_ptr<VertexBuffer> _vertexBuffer;
-	std::shared_ptr<IndexBuffer> _indexBuffer;
-	std::shared_ptr<InputLayout> _inputLayout;
-	std::shared_ptr<Shader> _shader;
-	std::shared_ptr<Sampler> _sampler;
 	std::vector<std::shared_ptr<Material>> _materials;
 
 	std::string _name;
 	std::filesystem::path _path;
 
 	std::vector<SubMesh> _subMeshes;
-
-	// Materials
-	std::vector<std::map<ModelTextureMapType, std::shared_ptr<Texture>>> _textures;
-	std::vector<std::array<ID3D11ShaderResourceView*, static_cast<int>(ModelTextureMapType::Count)>> _nativeTextureSrvs = {};
-
+	
 	Matrix _transform;
 };
 }

@@ -54,11 +54,7 @@ void Framebuffer::Bind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			auto* ds = inst->_depthStencilAttachmentFormat.Format == ImageFormat::None
-				           ? nullptr
-				           : &inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>();
-			auto* const* rs = inst->_colorAttachments.empty() ? nullptr : inst->_nativeRenderTargetViews.data();
-			package.Context.OMSetRenderTargets(inst->_nativeRenderTargetViews.size(), rs, ds);
+			
 		}
 	);
 }
@@ -69,9 +65,7 @@ void Framebuffer::Unbind() const
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			ID3D11RenderTargetView* nullRt = {nullptr};
-			ID3D11DepthStencilView* nullDs = nullptr;
-			package.Context.OMSetRenderTargets(1, &nullRt, nullDs);
+			
 		}
 	);
 }
@@ -83,7 +77,6 @@ void Framebuffer::Resize(uint width, uint height)
 		[=](const RendererPackage& package)
 		{
 			_colorAttachments.clear();
-			_nativeRenderTargetViews.clear();
 
 			if (!_colorAttachmentFormats.empty())
 			{
@@ -95,11 +88,8 @@ void Framebuffer::Resize(uint width, uint height)
 					_colorAttachments[index++] = Image::Create({width, height, usage, format, size});
 				}
 
-				_nativeRenderTargetViews.resize(inst->_colorAttachments.size());
 				for (int i = 0; i < _colorAttachments.size(); i++)
 				{
-					auto* rtv = &_colorAttachments[i]->RenderViewAs<ID3D11RenderTargetView>();
-					_nativeRenderTargetViews[i] = rtv;
 				}
 			}
 
@@ -124,19 +114,9 @@ void Framebuffer::Clear()
 	Renderer::Submit(
 		[inst](const RendererPackage& package)
 		{
-			for (auto& view : inst->_nativeRenderTargetViews)
-			{
-				package.Context.ClearRenderTargetView(view, reinterpret_cast<const float*>(&inst->_clearColor));
-			}
-
 			if (inst->_depthStencilAttachmentFormat.Format != ImageFormat::None)
 			{
-				package.Context.ClearDepthStencilView(
-					&inst->_depthStencilAttachment->RenderViewAs<ID3D11DepthStencilView>(),
-					D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-					inst->_depthClearValue,
-					inst->_stencilClearValue
-				);
+				
 			}
 		}
 	);

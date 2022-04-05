@@ -14,7 +14,8 @@ struct CameraData
 struct ProjectionSpec
 {
 	float Fov;
-	float AspectRatio;
+	float Width;
+	float Height;
 	float Near;
 	float Far;
 };

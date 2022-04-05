@@ -9,13 +9,7 @@ namespace Se
 Keyboard::Keyboard() :
 	Singleton(this)
 {
-	for (int i = 0; i < _keyStates.size(); i++)
-	{
-		_keyStates[i] = false;
-		_prevKeyStates[i] = false;
-	}
-	
-	auto& win = App::Instance().Window();
+	const auto& win = App::Instance().Window();
 
 	win.KeyPressed += SE_EV_ACTION(Keyboard::OnKeyPress);
 	win.KeyReleased += SE_EV_ACTION(Keyboard::OnKeyRelease);
@@ -33,26 +27,33 @@ auto Keyboard::IsKeyDown(const KeyCode& key) -> bool
 {
 	auto& inst = Instance();
 
-	return inst._keyStates[static_cast<int>(key)];
+	return inst._keyStates[key];
 }
 
 auto Keyboard::IsKeyPressed(const KeyCode& key) -> bool
 {
 	auto& inst = Instance();
 
-	return inst._keyStates[static_cast<int>(key)] && !inst._prevKeyStates[static_cast<int>(key)];
+	return inst._keyStates[key] && !inst._prevKeyStates[key];
 }
 
 auto Keyboard::IsKeyReleased(const KeyCode& key) -> bool
 {
 	auto& inst = Instance();
-	return !inst._keyStates[static_cast<int>(key)] && inst._prevKeyStates[static_cast<int>(key)];
+	return !inst._keyStates[key] && inst._prevKeyStates[key];
 }
 
 auto Keyboard::IsAnyKeyDown() -> bool
 {
 	auto& inst = Instance();
-	return std::ranges::any_of(inst._keyStates, [](bool element) { return element; });
+	for (const auto state : inst._keyStates | std::views::values)
+	{
+		if (state)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 auto Keyboard::TextInput() -> std::u32string
@@ -66,14 +67,14 @@ void Keyboard::OnKeyPress(const KeyEvent& event)
 {
 	auto& inst = Instance();
 
-	inst._keyStates[static_cast<int>(event.Code)] = true;
+	inst._keyStates[event.Code] = true;
 }
 
 void Keyboard::OnKeyRelease(const KeyEvent& event)
 {
 	auto& inst = Instance();
 
-	inst._keyStates[static_cast<int>(event.Code)] = false;
+	inst._keyStates[event.Code] = false;
 }
 
 void Keyboard::OnTextInput(const TextEvent& event)

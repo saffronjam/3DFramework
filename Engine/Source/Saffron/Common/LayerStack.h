@@ -8,8 +8,8 @@ namespace Se
 class LayerStack
 {
 public:
-	void Attach(std::shared_ptr<Layer> layer);
-	void Detach(std::shared_ptr<Layer> layer);
+	void Attach(const std::shared_ptr<Layer>& layer);
+	void Detach(const std::shared_ptr<Layer>& layer);
 	void Clear();
 
 	auto begin() const -> std::vector<std::shared_ptr<Layer>>::const_iterator;

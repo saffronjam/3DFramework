@@ -1,7 +1,5 @@
 #include "SaffronPCH.h"
 
-#include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
 
 #include "Saffron/Common/App.h"
 #include "Saffron/Ui/UiManager.h"
@@ -11,17 +9,6 @@ namespace Se
 {
 static auto shaderCallback = [](const ImDrawList* list, const ImDrawCmd* cmd)
 {
-	const auto& userShader = *static_cast<std::shared_ptr<const Shader>*>(cmd->UserCallbackData);
-
-	auto& ctx = ImGui_ImplDX11_GetBackendData()->pd3dDeviceContext;
-
-	auto* drawData = ImGui::GetMainViewport()->DrawData;
-	ImGui_ImplDX11_SetupRenderState(
-		nullptr,
-		ctx,
-		&const_cast<ID3D11VertexShader&>(userShader->NativeVsHandle()),
-		&const_cast<ID3D11PixelShader&>(userShader->NativePsHandle())
-	);
 };
 
 UiManager::UiManager() :
@@ -37,8 +24,6 @@ UiManager::UiManager() :
 
 	const auto& app = App::Instance();
 	const auto hwnd = static_cast<HWND>(app.Window().NativeHandle());
-	ImGui_ImplWin32_Init(hwnd);
-	ImGui_ImplDX11_Init(&Renderer::Device(), &Renderer::Context());
 
 	auto& style = ImGui::GetStyle();
 	auto& colors = ImGui::GetStyle().Colors;
@@ -143,8 +128,6 @@ UiManager::UiManager() :
 
 UiManager::~UiManager()
 {
-	ImGui_ImplDX11_Shutdown();
-	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
 
@@ -153,8 +136,6 @@ void UiManager::BeginFrame()
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
 			ImGui::NewFrame();
 			ImGuizmo::BeginFrame();
 		}
@@ -163,7 +144,6 @@ void UiManager::BeginFrame()
 
 void UiManager::EndFrame()
 {
-	Renderer::BackBuffer().Bind();
 	Renderer::Submit(
 		[this](const RendererPackage& package)
 		{
@@ -175,19 +155,10 @@ void UiManager::EndFrame()
 			);
 
 			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 			ImGui::UpdatePlatformWindows();
 			ImGui::RenderPlatformWindowsDefault();
-			Renderer::Instance().CleanDebugInfo();
-			Instance()._pendingShaders.clear();
 		}
 	);
-}
-
-void UiManager::SetImageShader(const std::shared_ptr<Shader>& shader)
-{
-	_pendingShaders.emplace_back(shader);
-	ImGui::GetWindowDrawList()->AddCallback(shaderCallback, const_cast<void*>(reinterpret_cast<const void*>(this)));
 }
 
 void UiManager::ResetImageShader()

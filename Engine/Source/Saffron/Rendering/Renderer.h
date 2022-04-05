@@ -1,6 +1,5 @@
 #pragma once
 
-#include <d3d11_4.h>
 #include <source_location>
 #include <vector>
 #include <unordered_map>
@@ -10,11 +9,8 @@
 #include "Saffron/Common/Window.h"
 #include "Saffron/Graphics/ModelRegistry.h"
 #include "Saffron/Rendering/BindableStore.h"
-#include "Saffron/Rendering/ShaderStore.h"
 #include "Saffron/Rendering/RenderGraph.h"
 #include "Saffron/Rendering/RenderState.h"
-#include "Saffron/Rendering/Bindables/BackBuffer.h"
-#include "Saffron/Rendering/ErrorHandling/DxgiInfoManager.h"
 
 namespace Se
 {
@@ -22,9 +18,6 @@ using HRESULT = long;
 
 struct RendererPackage
 {
-	ID3D11Device& Device;
-	IDXGISwapChain1& SwapChain;
-	ID3D11DeviceContext& Context;
 };
 
 enum class RenderStrategy
@@ -92,12 +85,6 @@ public:
 	static void Log(const std::string& string, const Args& ... args);
 	static void Log(const std::string& string);
 
-	static auto Device() -> ID3D11Device&;
-	static auto Context() -> ID3D11DeviceContext&;
-	static auto SwapChain() -> IDXGISwapChain&;
-	static auto BackBuffer() -> BackBuffer&;
-	static auto BackBufferPtr() -> const std::shared_ptr<class BackBuffer>&;
-
 	static void SetRenderState(RenderState state);
 	static void ResetRenderState();
 	static void SetViewportSize(uint width, uint height, float depth = 1.0f);
@@ -105,42 +92,24 @@ public:
 
 	static auto WhiteTexture() -> const std::shared_ptr<Texture>&;
 
-	void CleanDebugInfo();
-
 private:
 	void ExecuteSubmition(const Submition& submition);
 
 private:
-	void CreateDeviceAndContext();
-	void CreateFactory();
-	void CreateSwapChain(const Window& window);
 	void CreateRenderState(uint state);
 
 private:
 	RendererConfig _config;
 
-	ComPtr<ID3D11Device> _device{};
-	ComPtr<IDXGISwapChain1> _swapChain{};
-	ComPtr<ID3D11DeviceContext> _context{};
-	ComPtr<IDXGIFactory2> _factory{};
-
 	// Render state
 	RenderState _submittedState = 0;
-	ComPtr<ID3D11DepthStencilState> _nativeDepthStencilState;
-	ComPtr<ID3D11RasterizerState> _nativeRasterizerState;
-	ComPtr<ID3D11SamplerState> _nativeSamplerState;
-	D3D11_PRIMITIVE_TOPOLOGY _topology;
 
 	// Renderer data
-	std::shared_ptr<class BackBuffer> _backbuffer;
 	std::unique_ptr<BindableStore> _bindableStore;
-	std::unique_ptr<ShaderStore> _shaderStore;
 	std::unique_ptr<ModelRegistry> _meshStore;
 	std::shared_ptr<RenderGraph> _currentRenderGraph;
 
 	// Prepared submitions
-	std::shared_ptr<VertexBuffer> _quadVertexBuffer;
-	std::shared_ptr<IndexBuffer> _quadIndexBuffer;
 
 	// Submitions
 	std::map<std::string, RenderQueue> _submitionContainers;
@@ -153,9 +122,6 @@ private:
 
 	// Prepare textures
 	std::shared_ptr<Texture> _whiteTexture;
-
-	// Only initialized in debug
-	std::unique_ptr<DxgiInfoManager> _dxgiInfoQueue{};
 };
 
 template <typename ... Args>
@@ -164,10 +130,4 @@ void Renderer::Log(const std::string& string, const Args&... args)
 	Log(std::format(string, args...));
 }
 
-namespace Utils
-{
-D3D11_COMPARISON_FUNC ToD3D11CompFunc(ulong state);
-D3D11_DEPTH_WRITE_MASK ToD3D11WriteMask(ulong state);
-D3D11_PRIMITIVE_TOPOLOGY ToD3D11PrimiteTopology(ulong state);
-}
 }

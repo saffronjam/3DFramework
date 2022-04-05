@@ -5,7 +5,6 @@
 #include "Saffron/Graphics/Model.h"
 #include "Saffron/Rendering/SceneRenderer.h"
 #include "Saffron/Rendering/PointLight.h"
-#include "Saffron/Rendering/Bindables/ConstantBuffer.h"
 #include "Saffron/Rendering/SceneEnvironment.h"
 #include "Saffron/Scene/EntityRegistry.h"
 #include "Saffron/Scene/EntityComponents.h"

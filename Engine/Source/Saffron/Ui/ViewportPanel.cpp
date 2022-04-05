@@ -56,7 +56,6 @@ void ViewportPanel::OnUi()
 	}
 	_viewportSize = viewportSize;
 
-	Ui::Image(*toUse, _viewportSize);
 
 	Renderered.Invoke(SizeEvent(viewportSize.x, viewportSize.y));
 

@@ -8,6 +8,7 @@ namespace Se
 Window::Window(const WindowSpec& spec) :
 	_spec(spec)
 {
+	Log::Info("Creating Window \"{0}\" ({1:d}x{2:d})", _spec.Title, _spec.Width, _spec.Height);
 }
 
 void Window::OnUpdate()

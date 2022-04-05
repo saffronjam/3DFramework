@@ -13,17 +13,14 @@
 namespace Se
 {
 SceneRenderer::SceneRenderer(Scene& scene) :
-	_scene(scene),
-	_transformCBuffer(TransformCBuffer::Create())
+	_scene(scene)
 {
 	// Construct empty containers for the duration of the object's lifetime
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Geometry, std::vector<DrawCommand>{});
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Shadow, std::vector<DrawCommand>{});
 	_sceneCommon.DrawCommands.emplace(RenderChannel_Outline, std::vector<DrawCommand>{});
 
-	_sceneCommon._sceneCommonCBuffer = ConstantBuffer<ShaderStructs::SceneCommonCBuffer>::Create(1);
 
-	_renderGraph.RegisterOutput("BackBuffer", Renderer::BackBufferPtr());
 	_renderGraph.RegisterInput("FinalOutput", _finalTarget);
 
 	_renderGraph.Setup(_sceneCommon);
@@ -183,29 +180,7 @@ void SceneRenderer::SubmitLines(
 
 void SceneRenderer::SubmitCameraFrustum(const Camera& camera, const Matrix& view)
 {
-	DirectX::BoundingFrustum frustum;
-	std::array<Vector3, 8> output2;
-	frustum.GetCorners(output2.data());
-
-	DirectX::BoundingFrustum::CreateFromMatrix(frustum, camera.Projection(), true);
-	frustum.GetCorners(output2.data());
-	frustum.Transform(frustum, view.Invert());
-
-	std::array<Vector3, 8> positions;
-	frustum.GetCorners(positions.data());
-
-	const std::array<uint, 24> indices{
-		// Far
-		0, 1, 1, 2, 2, 3, 3, 0,
-
-		// Near
-		4, 5, 5, 6, 6, 7, 7, 4,
-
-		// Between
-		0, 4, 1, 5, 2, 6, 3, 7
-	};
-
-	SubmitLines(positions.data(), positions.size(), indices.data(), indices.size(), Colors::White);
+	
 }
 
 void SceneRenderer::SetViewportSize(uint width, uint height)

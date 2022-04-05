@@ -27,8 +27,8 @@ private:
 	static void OnTextInput(const TextEvent& event);
 
 private:
-	std::array<bool, static_cast<int>(KeyCode::Count)> _keyStates;
-	std::array<bool, static_cast<int>(KeyCode::Count)> _prevKeyStates;
+	std::unordered_map<KeyCode, bool> _keyStates{};
+	std::unordered_map<KeyCode, bool> _prevKeyStates{};
 	std::u32string _textInputBuffer;
 };
 }

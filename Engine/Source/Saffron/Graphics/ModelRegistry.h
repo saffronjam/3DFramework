@@ -3,7 +3,6 @@
 #include "Saffron/Base.h"
 #include "Saffron/Common/Enums.h"
 #include "Saffron/Rendering/Bindable.h"
-#include "Saffron/Rendering/Bindables/Shader.h"
 
 namespace Assimp
 {
@@ -42,7 +41,6 @@ private:
 private:
 	Assimp::Importer* _importer;
 	std::unordered_map<std::string, std::shared_ptr<Bindable>> _meshes;
-	std::shared_ptr<Shader> _modelShader;
 
 	static const uint DefaultImportFlags;
 	static const std::filesystem::path BasePath;

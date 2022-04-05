@@ -43,7 +43,6 @@ struct alignas(16) SceneCommonCBuffer
 struct SceneCommon
 {
 	CameraData CameraData;
-	std::shared_ptr<ConstantBuffer<ShaderStructs::SceneCommonCBuffer>> _sceneCommonCBuffer;
 
 	std::map<RenderChannels, std::vector<DrawCommand>> DrawCommands{};
 

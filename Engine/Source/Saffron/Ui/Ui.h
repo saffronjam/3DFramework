@@ -7,8 +7,6 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Graphics/Shapes.h"
-#include "Saffron/Rendering/Bindables/Texture.h"
-#include "Saffron/Rendering/Bindables/Shader.h"
 
 namespace Se
 {
@@ -185,34 +183,6 @@ auto Vec3Control(
 ) -> bool;
 
 #pragma region ButtonImage
-void ButtonImage(
-	const Texture& imageNormal,
-	const Texture& imageHovered,
-	const Texture& imagePressed,
-	uint tintNormal,
-	uint tintHovered,
-	uint tintPressed,
-	const Vector2& rectMin,
-	const Vector2& rectMax
-);
-void ButtonImage(
-	const Texture& image,
-	uint tintNormal,
-	uint tintHovered,
-	uint tintPressed,
-	const Vector2& rectMin,
-	const Vector2& rectMax
-);
-void ButtonImage(const Texture& image, uint tintNormal, uint tintHovered, uint tintPressed, FloatRect rect);
-void ButtonImage(
-	const Texture& imageNormal,
-	const Texture& imageHovered,
-	const Texture& imagePressed,
-	uint tintNormal,
-	uint tintHovered,
-	uint tintPressed
-);
-void ButtonImage(const Texture& image, uint tintNormal, uint tintHovered, uint tintPressed);
 #pragma endregion
 
 auto PropertyGridHeader(const std::string& name, bool openByDefault = true) -> bool
@@ -220,13 +190,6 @@ auto PropertyGridHeader(const std::string& name, bool openByDefault = true) -> b
 }
 
 void BeginGizmo(uint viewportWidth, uint viewportHeight);
-
-void Image(const Texture& texture, const Vector2& size = {0.0f, 0.0f});
-void Image(const Texture& texture, const Shader& shader, const Vector2& size = {0.0f, 0.0f});
-void Image(const TextureCube& texture, const Vector2& size = {0.0f, 0.0f});
-void Image(const TextureCube& texture, const Shader& shader, const Vector2& size = {0.0f, 0.0f});
-void Image(const class Image& image, const Vector2& size = {0.0f, 0.0f});
-void Image(const class Image& image, const std::shared_ptr<Shader>& shader, const Vector2& size = {0.0f, 0.0f});
 
 void Gizmo(Matrix& result, const Matrix& view, Matrix proj, GizmoControl control);
 

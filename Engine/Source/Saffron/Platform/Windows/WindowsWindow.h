@@ -1,8 +1,10 @@
 #pragma once
 
-#include <Windows.h>
-
 #include "Saffron/Common/Window.h"
+#include "Saffron/Event/Event.h"
+
+struct GLFWwindow;
+struct GLFWcursor;
 
 namespace Se
 {
@@ -10,26 +12,21 @@ class WindowsWindow : public Window
 {
 public:
 	explicit WindowsWindow(const WindowSpec& spec);
-	~WindowsWindow() noexcept override;
+	~WindowsWindow() override;
 
 	void OnUpdate() override;
 
-	auto NativeHandle() const -> void* override;
+	void* NativeHandle() const override;
 
 private:
-	static auto WndSetup(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
-	static auto WndProc(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
-	auto HandleWin32Message(HWND hWnd, uint msg, WPARAM wParam, LPARAM lParam) -> LRESULT;
+	void SetupGLFWCallbacks();
+
+	void Restore();
 
 private:
-	HINSTANCE _hInstance = nullptr;
-	HWND _hWnd = nullptr;
+	GLFWwindow* m_NativeWindow;
+	GLFWcursor* m_ImGuiMouseCursors[9] = {nullptr};
+
+	bool m_VSync, m_Minimized, m_Maximized;
 };
-
-namespace Utils
-{
-KeyCode VKToKeyCode(unsigned char vkKey);
-Vector2 LParamToPointPosition(LPARAM lParam);
-int WParamToMouseWheelDelta(WPARAM wParam);
-}
 }

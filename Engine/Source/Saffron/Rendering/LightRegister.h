@@ -2,7 +2,6 @@
 
 #include "Saffron/Base.h"
 #include "Saffron/Rendering/PointLight.h"
-#include "Saffron/Rendering/Bindables/Framebuffer.h"
 
 namespace Se
 {
@@ -12,8 +11,6 @@ public:
 	LightRegister();
 
 	void RegisterPoint(const Vector3& position, float radius, Color color = Colors::White);
-
-	auto Atlas() const -> const std::shared_ptr<Framebuffer>&;
 
 	auto operator[](size_t index) -> PointLight;
 	auto operator[](size_t index) const -> const PointLight&;
@@ -30,7 +27,6 @@ public:
 
 private:
 	std::vector<PointLight> _pointLights{};
-	std::shared_ptr<Framebuffer> _atlas;
 
 	uint currentX = 0;
 	uint currentY = 0;

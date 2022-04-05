@@ -43,14 +43,10 @@ void EditorLayer::OnAttach()
 		Ui::BeginGizmo(event.Width, event.Height);
 		Ui::Gizmo(transform, camera.View(), camera.Projection(), _gizmoControl);
 
-		Vector3 translation, scale;
-		Quaternion rotation;
-		if (transform.Decompose(scale, rotation, translation))
-		{
-			transformComponent.Scale = scale;
-			transformComponent.Translation = translation;
-			transformComponent.Rotation = Math::ToEulerAngles(rotation);
-		}
+		auto [scale, orientation, translation] = transform.Decompose();
+		transformComponent.Scale = scale;
+		transformComponent.Translation = translation;
+		transformComponent.Rotation = Math::ToEulerAngles(orientation);
 		return false;
 	};
 
@@ -62,10 +58,6 @@ void EditorLayer::OnAttach()
 
 	App::Instance().Window().GainedFocus += []
 	{
-		for (auto& shader : ShaderStore::GetAll())
-		{
-			shader->Reload();
-		}
 		return false;
 	};
 }
@@ -80,15 +72,15 @@ void EditorLayer::OnUpdate(TimeSpan ts)
 	_scene->OnUpdate(ts);
 	_scene->OnRender();
 
-	if (Keyboard::IsKeyPressed(KeyCode::Num1))
+	if (Keyboard::IsKeyPressed(KeyCode::D1))
 	{
 		_gizmoControl = GizmoControl::Translate;
 	}
-	if (Keyboard::IsKeyPressed(KeyCode::Num2))
+	if (Keyboard::IsKeyPressed(KeyCode::D2))
 	{
 		_gizmoControl = GizmoControl::Rotate;
 	}
-	if (Keyboard::IsKeyPressed(KeyCode::Num3))
+	if (Keyboard::IsKeyPressed(KeyCode::D3))
 	{
 		_gizmoControl = GizmoControl::Scale;
 	}
@@ -103,21 +95,7 @@ void EditorLayer::OnUi()
 	_entityPanel.OnUi();
 	_entityRegistryPanel.OnUi();
 	_scene->OnUi();
-
-	auto shaders = ShaderStore::GetAll();
-
-	ImGui::Begin("Shaders");
-	for (auto& shader : shaders)
-	{
-		ImGui::Text(shader->Name().c_str());
-		ImGui::SameLine();
-		if (ImGui::Button("Reload"))
-		{
-			shader->Reload();
-		}
-	}
-	ImGui::End();
-
+	
 	ImGui::Begin("Editor");
 	if (ImGui::RadioButton("Translate", _gizmoControl == GizmoControl::Translate))
 	{

@@ -4,8 +4,7 @@
 
 namespace Se
 {
-LightRegister::LightRegister() :
-	_atlas(Framebuffer::Create({SmFullWidth, SmFullHeight, {ImageFormat::RGBA, ImageFormat::Depth}}))
+LightRegister::LightRegister()
 {
 }
 
@@ -26,11 +25,6 @@ void LightRegister::RegisterPoint(const Vector3& position, float radius, Color c
 		currentX++;
 		currentY++;
 	}
-}
-
-auto LightRegister::Atlas() const -> const std::shared_ptr<Framebuffer>&
-{
-	return _atlas;
 }
 
 auto LightRegister::operator[](size_t index) -> PointLight

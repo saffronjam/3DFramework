@@ -27,8 +27,6 @@ private:
 
 private:
 	Entity _entity;
-
-	std::shared_ptr<Texture> _settingsIcon;
 };
 
 template <typename ComponentType>
@@ -64,13 +62,13 @@ void EntityPanel::RenderComponent(bool canBeRemoved)
 		{
 			ImGui::OpenPopup("ComponentSettings");
 		}
-		ButtonImage(
+		/*ButtonImage(
 			*_settingsIcon,
 			IM_COL32(160, 160, 160, 200),
 			IM_COL32(160, 160, 160, 255),
 			IM_COL32(160, 160, 160, 150),
 			ToSaffronRect(RectExpanded(GetItemRect(), -6.0f, -6.0f))
-		);
+		);*/
 
 		if (BeginPopup("ComponentSettings"))
 		{

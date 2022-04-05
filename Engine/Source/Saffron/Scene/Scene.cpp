@@ -57,15 +57,15 @@ void Scene::OnRender()
 	// TEMPORARY
 	_sceneRenderer.SubmitModel(
 		_cameraMesh,
-		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera1.Data().Position)
+		Matrix::CreateScale(0.4f) * Matrix::CreateTranslation(_camera1.Data().Position)
 	);
 	_sceneRenderer.SubmitModel(
 		_cameraMesh,
-		Matrix::CreateScale(0.4) * Matrix::CreateTranslation(_camera2.Data().Position)
+		Matrix::CreateScale(0.4f) * Matrix::CreateTranslation(_camera2.Data().Position)
 	);
 	_sceneRenderer.SubmitModel(
 		_lightModel,
-		Matrix::CreateScale(1.5) * Matrix::CreateTranslation(_sceneRenderer.SceneCommon().PointLight.Position)
+		Matrix::CreateScale(1.5f) * Matrix::CreateTranslation(_sceneRenderer.SceneCommon().PointLight.Position)
 	);
 	////
 

@@ -94,7 +94,6 @@ struct MouseButtonEvent
 ////////////////////////////////////////////////////////////
 struct MouseWheelScrollEvent
 {
-	MouseWheelCode Wheel; //!< Which Wheel (for mice with multiple ones)
 	float Delta;
 	//!< Wheel offset (positive is up/left, negative is down/right). High-precision mice may use non-integral offsets.
 	int x; //!< X position of the mouse pointer, relative to the left of the owner window

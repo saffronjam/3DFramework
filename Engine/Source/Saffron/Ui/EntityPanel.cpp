@@ -4,9 +4,7 @@
 
 namespace Se
 {
-EntityPanel::EntityPanel() :
-	_settingsIcon(Texture::Create("Assets/Textures/Editor/Icons/gear.png"))
-{
+EntityPanel::EntityPanel(){
 }
 
 void EntityPanel::OnUi()

@@ -22,9 +22,9 @@ local EngineAstFol = GetBasePath() .. AstFol
 
 local function RequireAll()
     local deps = {}
-    deps["DirectX"] = require("ThirdParty.DirectX.premake5")
-    deps["DirectXTK"] = require("ThirdParty.DirectXTK.premake5")
-    deps["DirectXTex"] = require("ThirdParty.DirectXTex.premake5")
+    deps["Glm"] = require("ThirdParty.glm.premake5")
+    deps["Glfw"] = require("ThirdParty.glfw.premake5")
+    deps["Vulkan"] = require("ThirdParty.Vulkan.premake5")
     deps["ImGui"] = require("ThirdParty.imgui.premake5")
     deps["Assimp"] = require("ThirdParty.assimp.premake5")
     deps["Entt"] = require("ThirdParty.entt.premake5")
@@ -78,7 +78,7 @@ end
 
 local module = {}
 
-module.Project = "SaffronEngine2D"
+module.Project = "SaffronEngine"
 
 module.Include = function ()
     includedirs {
@@ -130,6 +130,7 @@ module.AddDefines = function()
         }
     filter "system:windows"
         defines {
+			"_GLFW_WIN32",
             "_CRT_SECURE_NO_WARNINGS",
             "SE_PLATFORM_WINDOWS",
         }

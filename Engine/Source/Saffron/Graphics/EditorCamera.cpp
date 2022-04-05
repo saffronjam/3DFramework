@@ -11,7 +11,7 @@ namespace Se
 const Vector3 EditorCamera::_worldUp(0.0f, 1.0f, 0.0f);
 
 EditorCamera::EditorCamera() :
-	Camera(Matrix::CreatePerspectiveFieldOfView(Math::Pi / 4.0f, 16.0f / 9.0f, 0.1f, 100.0f))
+	Camera(Matrix::CreatePerspectiveFieldOfView(Math::Pi / 4.0f, 16.0f, 9.0f, 0.1f, 100.0f))
 {
 	CreateView();
 }
@@ -127,10 +127,10 @@ void EditorCamera::CreateView()
 	front.y = std::sin(_pitch);
 	front.z = std::sin(_yaw) * std::cos(_pitch);
 
-	front.Normalize(_forward);
+	_forward = front.Normalized();
 
-	_forward.Cross(_worldUp).Normalize(_right);
-	_right.Cross(_forward).Normalize(_up);
+	_right = _forward.Cross(_worldUp).Normalized();
+	_up = _right.Cross(_forward).Normalized();
 
 	_view = Matrix::CreateLookAt(_position, _position + _forward, _up);
 }

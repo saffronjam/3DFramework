@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <d3d11_4.h>
-
 #include "Saffron/Base.h"
 #include "Saffron/Event/Event.h"
 #include "Saffron/Rendering/Bindable.h"
@@ -79,8 +77,6 @@ protected:
 
 	std::vector<std::shared_ptr<Image>> _colorAttachments;
 	std::shared_ptr<Image> _depthStencilAttachment;
-
-	std::vector<ID3D11RenderTargetView*> _nativeRenderTargetViews;
 
 	float _depthClearValue = 1.0f;
 	uchar _stencilClearValue = 0;

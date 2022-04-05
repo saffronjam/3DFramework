@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include <d3d11.h>
-
 #include "Saffron/Base.h"
 #include "Saffron/ErrorHandling/ExceptionHelpers.h"
 
@@ -23,7 +21,7 @@ public:
 	auto Type() const -> ElementType;
 
 	auto Name() const -> const std::string&;
-	auto Format() const -> DXGI_FORMAT;
+	auto Format() const -> int;
 	auto ByteSize() const -> uint;
 	auto Code() const -> const char*;
 
@@ -65,7 +63,7 @@ struct InputLayoutElementMap
 template <>
 struct InputLayoutElementMap<ElementType::Float2>
 {
-	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32_FLOAT;
+	static constexpr int Format = 1;
 	static constexpr size_t ByteSize = 8ull;
 	static constexpr const char* Code = "F2";
 };
@@ -73,7 +71,7 @@ struct InputLayoutElementMap<ElementType::Float2>
 template <>
 struct InputLayoutElementMap<ElementType::Float3>
 {
-	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	static constexpr int Format = 2;
 	static constexpr size_t ByteSize = 12ull;
 	static constexpr const char* Code = "F3";
 };
@@ -81,7 +79,7 @@ struct InputLayoutElementMap<ElementType::Float3>
 template <>
 struct InputLayoutElementMap<ElementType::Float4>
 {
-	static constexpr DXGI_FORMAT Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	static constexpr int Format = 3;
 	static constexpr size_t ByteSize = 16ull;
 	static constexpr const char* Code = "F4";
 };
@@ -89,7 +87,7 @@ struct InputLayoutElementMap<ElementType::Float4>
 template <>
 struct InputLayoutElementMap<ElementType::Count>
 {
-	static constexpr DXGI_FORMAT Format = static_cast<DXGI_FORMAT>(0);
+	static constexpr int Format = 0;
 	static constexpr size_t ByteSize = 0ull;
 	static constexpr const char* Code = "??";
 };
@@ -132,12 +130,12 @@ public:
 	VertexLayout(const VertexLayout& other);
 	auto operator =(const VertexLayout& other) -> VertexLayout&;
 
-	auto Descs() const -> const std::vector<D3D11_INPUT_ELEMENT_DESC>&;
+	auto Descs() const -> const std::vector<int>&;
 	auto Code() const -> const std::string&;
 	auto ByteSize() const -> size_t;
 
 private:
-	std::vector<D3D11_INPUT_ELEMENT_DESC> _descs{};
+	std::vector<int> _descs{};
 	std::vector<VertexElement> _elements;
 
 	std::string _code;

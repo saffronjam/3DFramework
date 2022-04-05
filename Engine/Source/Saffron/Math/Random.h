@@ -77,11 +77,6 @@ public:
 	{
 		return {Real(lowX, highX), Real(lowY, highY), Real(lowZ, highZ), Real(lowW, highW)};
 	}
-
-	static auto Color(bool randomizeAlpha = false) -> Color
-	{
-		return Vec4(0, 0, 0, randomizeAlpha ? 0 : 255, 255, 255, 255, 255);
-	}
 };
 
 template <typename T>
