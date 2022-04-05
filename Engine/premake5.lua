@@ -20,25 +20,6 @@ end
 
 local EngineAstFol = GetBasePath() .. AstFol
 
-local function RequireAll()
-    local deps = {}
-    deps["Glm"] = require("ThirdParty.glm.premake5")
-    deps["Glfw"] = require("ThirdParty.glfw.premake5")
-    deps["Vulkan"] = require("ThirdParty.Vulkan.premake5")
-    deps["ImGui"] = require("ThirdParty.imgui.premake5")
-    deps["Assimp"] = require("ThirdParty.assimp.premake5")
-    deps["Entt"] = require("ThirdParty.entt.premake5")
-    deps["Json"] = require("ThirdParty.json.premake5")
-
-    for k, v in pairs(deps) do
-        print("Installed: " .. k)
-    end
-
-    print()
-
-    return deps
-end
-
 local ThirdParties
 
 local function LinkAll()
@@ -73,6 +54,13 @@ local function PostBuildAll(Configuration, BinaryOutputDir, ProjectDir)
     end
 end
 
+local function AfterInstall()
+    for k, v in pairs(ThirdParties) do
+        print("Installed: " .. k)
+    end
+
+    print()
+end
 
 -- Start module
 
@@ -117,9 +105,9 @@ module.SetStartUpProject = function (projectName)
         startproject (projectName)
 end
 
-
 group "Engine/ThirdParty"
-ThirdParties = RequireAll()
+ThirdParties = require("deps")
+AfterInstall()
 group "Engine"
 
 module.AddDefines = function()
